@@ -189,6 +189,7 @@ a{color:var(--amber);text-decoration:none}
 .craft-bar:nth-child(7){height:28px;animation-delay:0.6s}
 .craft-bar:nth-child(8){height:14px;animation-delay:0.7s}
 @keyframes craftwave{0%,100%{transform:scaleY(0.4);opacity:0.4}50%{transform:scaleY(1);opacity:1}}
+@keyframes cwave{0%,100%{transform:scaleY(0.4);opacity:0.4}50%{transform:scaleY(1);opacity:1}}
 .craft-label{font-size:13px;color:var(--tx3);font-weight:500}
 .craft-sublabel{font-size:11px;color:var(--tx4)}
 
@@ -528,6 +529,189 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .kb-err{font-size:12px;color:var(--red);margin-top:8px;min-height:16px}
 .kb-links{font-size:11px;color:var(--tx3);margin-top:8px}
 .kb-links a{color:var(--amber)}
+/* ── SONG LENGTH ── */
+.length-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:18px}
+.lpill{font-size:11px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--b2);background:var(--s2);color:var(--tx3);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:5px}
+.lpill:hover{border-color:var(--b3);color:var(--tx2)}
+.lpill.on{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
+.lpill-desc{font-size:10px;color:var(--tx4);margin-left:2px}
+/* ── SAVE BAR ── */
+.save-bar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px 18px;margin-bottom:14px;display:none;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.save-bar.visible{display:flex}
+.save-bar-title{font-size:13px;font-weight:600;color:var(--tx1)}
+.save-bar-acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn-save-lib{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-save-lib:hover{background:#ffc820}
+.btn-dl{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r4);border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
+.btn-dl:hover{background:var(--cyan);color:#050505}
+.save-bar-saved{font-size:11px;color:var(--green);font-weight:600;display:none;align-items:center;gap:4px}
+/* ── CAMPAIGN MODE ── */
+.camp-hero{padding:28px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px}
+.camp-hero-label{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.camp-hero-title{font-size:22px;font-weight:700;color:var(--tx1);margin-bottom:6px;line-height:1.2}
+.camp-hero-sub{font-size:13px;color:var(--tx3);line-height:1.6;max-width:600px}
+.camp-form{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:22px;margin-bottom:16px}
+.camp-field{margin-bottom:16px}
+.camp-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:7px}
+.camp-input{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:11px 14px;outline:none;transition:border-color .15s;font-family:var(--font)}
+.camp-input:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
+.camp-textarea{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:11px 14px;outline:none;transition:border-color .15s;font-family:var(--font);min-height:80px;resize:vertical}
+.camp-textarea:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
+.camp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:540px){.camp-grid{grid-template-columns:1fr}}
+.camp-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:11px 14px;outline:none;cursor:pointer;font-family:var(--font)}
+.camp-gen-btn{width:100%;padding:14px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:10px}
+.camp-gen-btn:hover:not(:disabled){background:#ffc820;transform:translateY(-1px)}
+.camp-gen-btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.concepts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:20px}
+.concept-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;transition:border-color .15s}
+.concept-card:hover{border-color:var(--amberline)}
+.concept-card-hdr{padding:16px 18px 12px;border-bottom:1px solid var(--b1)}
+.concept-num{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
+.concept-title{font-size:16px;font-weight:700;color:var(--tx1);margin-bottom:3px;line-height:1.3}
+.concept-angle{font-size:12px;color:var(--tx3);font-style:italic;line-height:1.5}
+.concept-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.concept-tag{font-size:10px;font-weight:700;padding:3px 8px;border-radius:99px}
+.concept-tag-genre{background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline)}
+.concept-tag-mood{background:var(--violetbg);color:var(--violet);border:1px solid var(--violetline)}
+.concept-tag-len{background:var(--s4);color:var(--tx3);border:1px solid var(--b2)}
+.concept-body{padding:14px 18px}
+.concept-section-title{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;margin-top:12px}
+.concept-section-title:first-child{margin-top:0}
+.concept-lyrics{font-family:var(--mono);font-size:11px;line-height:1.9;color:var(--tx2);white-space:pre-wrap;word-break:break-word}
+.concept-lyrics .tag{color:var(--amber);font-weight:700}
+.concept-prompt{background:var(--s1);border:1px solid var(--cyanline);border-radius:var(--r2);padding:10px 12px;font-family:var(--mono);font-size:11px;color:var(--cyan);line-height:1.6;word-break:break-word}
+.concept-hook{font-size:13px;color:var(--tx2);line-height:1.7;font-style:italic;padding:10px 14px;background:var(--amberbg);border-left:3px solid var(--amber);border-radius:0 var(--r2) var(--r2) 0}
+.concept-brief{font-size:12px;color:var(--tx2);line-height:1.8;white-space:pre-wrap}
+.concept-actions{padding:12px 18px;border-top:1px solid var(--b1);display:flex;gap:7px;flex-wrap:wrap}
+.concept-error{padding:16px 18px;color:var(--red);font-size:12px}
+.camp-progress{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.camp-prog-item{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx3);padding:6px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:99px;transition:all .2s}
+.camp-prog-item.active{color:var(--amber);border-color:var(--amberline);background:var(--amberbg)}
+.camp-prog-item.done{color:var(--green);border-color:var(--greenline);background:var(--greenbg)}
+.camp-prog-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+.camp-prog-item.active .camp-prog-dot{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+/* ── VARIATIONS ── */
+.var-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r2);border:1px solid var(--b2);background:var(--s2);color:var(--tx2);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;margin-left:8px}
+.var-btn:hover:not(:disabled){background:var(--s3);border-color:var(--b3)}
+.var-btn:disabled{opacity:.35;cursor:not-allowed}
+.var-results{margin-top:14px;display:none}
+.var-results.show{display:block}
+.var-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.var-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;cursor:pointer;transition:all .15s}
+.var-card:hover{border-color:var(--amberline);background:var(--s3)}
+.var-card.selected{border-color:var(--amberline);background:var(--amberbg)}
+.var-num{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.var-title{font-size:14px;font-weight:700;color:var(--tx1);margin-bottom:4px}
+.var-verdict{font-size:12px;color:var(--tx3);line-height:1.5;margin-bottom:8px;font-style:italic}
+.var-preview{font-size:11px;color:var(--tx3);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.var-load-btn{font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;border:1px solid var(--amberline);background:var(--amberbg);color:var(--amber);cursor:pointer;margin-top:8px}
+/* ── SECTION REWRITE ── */
+.lyric-section-wrap{margin-bottom:8px}
+.lyric-section-hdr{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.lyric-section-tag{color:var(--amber);font-weight:700;font-family:var(--mono);font-size:12px}
+.rewrite-btn{font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;opacity:0;transition:all .12s}
+.lyric-section-hdr:hover .rewrite-btn{opacity:1}
+.rewrite-btn:hover{border-color:var(--amberline);color:var(--amber);background:var(--amberbg)}
+.rewrite-panel{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:10px;margin-top:4px;display:none}
+.rewrite-panel.open{display:block}
+.rewrite-direction{width:100%;background:var(--s4);border:1px solid var(--b2);border-radius:var(--r1);color:var(--tx1);font-size:12px;padding:7px 10px;outline:none;font-family:var(--font);margin-bottom:7px}
+.rewrite-direction:focus{border-color:var(--amberline)}
+.rewrite-actions{display:flex;gap:6px;align-items:center}
+.rewrite-go-btn{padding:5px 14px;border-radius:99px;border:none;background:var(--amber);color:#08080a;font-size:11px;font-weight:700;cursor:pointer}
+.rewrite-go-btn:hover{background:#ffc820}
+.rewrite-cancel{font-size:11px;color:var(--tx3);cursor:pointer;padding:4px 8px}
+.rewrite-cancel:hover{color:var(--tx1)}
+.rewrite-result{margin-top:8px;font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;border-top:1px solid var(--b1);padding-top:8px;display:none}
+.rewrite-use-btn{font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;border:1px solid var(--greenline);background:var(--greenbg);color:var(--green);cursor:pointer;margin-top:6px;display:none}
+/* ── SCORE DASHBOARD ── */
+.score-dashboard{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:18px;margin-bottom:14px;display:none}
+.score-dashboard.visible{display:block}
+.score-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.score-title{font-size:13px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em}
+.score-overall{display:flex;align-items:center;gap:8px}
+.score-overall-num{font-size:28px;font-weight:700;color:var(--amber);font-family:var(--mono);line-height:1}
+.score-overall-lbl{font-size:11px;color:var(--tx3);line-height:1.3}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}
+.score-item{background:var(--s3);border-radius:var(--r2);padding:10px 12px}
+.score-item-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.score-bar-wrap{height:5px;background:var(--s5);border-radius:99px;margin-bottom:5px;overflow:hidden}
+.score-bar{height:100%;border-radius:99px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.score-item-val{font-size:12px;font-weight:700;font-family:var(--mono)}
+.score-item-note{font-size:11px;color:var(--tx3);line-height:1.4;margin-top:3px}
+.score-loading{color:var(--tx3);font-size:12px;display:flex;align-items:center;gap:8px;padding:8px 0}
+/* ── SONIC MOOD BOARD ── */
+.moodboard{padding:16px 18px}
+.moodboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
+.moodcard{border-radius:var(--r2);padding:14px;border:1px solid var(--b2);background:var(--s2)}
+.moodcard-era{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px}
+.moodcard-title{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:6px;line-height:1.3}
+.moodcard-desc{font-size:12px;color:var(--tx3);line-height:1.6}
+.moodcard-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.moodcard-tag{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--s4);color:var(--tx3);border:1px solid var(--b1)}
+.moodboard-tempo{display:flex;gap:12px;flex-wrap:wrap;padding:12px 14px;background:var(--s3);border-radius:var(--r2);margin-bottom:10px}
+.moodboard-tempo-item{text-align:center}
+.moodboard-tempo-val{font-size:20px;font-weight:700;color:var(--cyan);font-family:var(--mono);line-height:1}
+.moodboard-tempo-lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+/* ── PDF EXPORT ── */
+.export-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--r2);border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.export-btn:hover{background:var(--violet);color:#fff}
+@media print{
+  body{background:#fff!important;color:#111!important;font-family:Georgia,serif}
+  .nav,.hdr-tags,.result-acts,.save-bar,.otabs,.loaded-banner,.gen-action,.studio,.key-banner,#pg-lucky,#pg-library,#pg-editor,#pg-builder,#pg-more,#pg-campaign,.score-dashboard,.var-results{display:none!important}
+  #pg-write{display:block!important}
+  #gen-out{display:block!important;border:none!important;box-shadow:none!important}
+  .result-card{border:none!important}
+  .opane{display:block!important;padding:0!important}
+  .otabs{display:none!important}
+  #res-opane-lyrics{display:block!important}
+  .lyrics-box{background:#fff!important;border:none!important;color:#111!important;font-size:13px!important;line-height:2!important}
+  .tag{color:#c99300!important;font-weight:bold}
+  .result-song-title,.result-header{font-size:24px!important;color:#111!important}
+  .hdr{border-bottom:2px solid #c99300!important;padding-bottom:10px!important}
+  .hdr-title,.hdr-icon{display:block!important}
+  #print-meta{display:block!important}
+}
+#print-meta{display:none;font-size:12px;color:#666;margin:8px 0 16px;line-height:1.6}
+/* ── SESSION HISTORY ── */
+.hist-bar{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:8px 14px;margin-bottom:10px;display:none;align-items:center;gap:10px;flex-wrap:wrap}
+.hist-bar.show{display:flex}
+.hist-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.hist-items{display:flex;gap:6px;overflow-x:auto;flex:1}
+.hist-items::-webkit-scrollbar{display:none}
+.hist-chip{font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .12s}
+.hist-chip:hover{border-color:var(--amberline);color:var(--amber);background:var(--amberbg)}
+.hist-chip.current{border-color:var(--cyanline);color:var(--cyan);background:var(--cyanbg)}
+/* ── TITLE CREATOR ── */
+.title-creator{}
+.tc-intro{font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:14px}
+.tc-generate-row{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.tc-grid{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
+.tc-card{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px;display:flex;align-items:flex-start;gap:11px;transition:all .15s;cursor:pointer}
+.tc-card:hover{border-color:var(--amberline);background:var(--s4)}
+.tc-card.selected{border-color:var(--amber);background:var(--amberbg)}
+.tc-num{width:22px;height:22px;border-radius:50%;background:var(--s5);border:1px solid var(--b2);font-size:10px;font-weight:700;color:var(--tx3);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;font-family:var(--mono)}
+.tc-card.selected .tc-num{background:var(--amber);border-color:var(--amber);color:#08080a}
+.tc-body{flex:1;min-width:0}
+.tc-title-text{font-size:15px;font-weight:700;color:var(--tx1);letter-spacing:-.3px;margin-bottom:4px;line-height:1.2}
+.tc-card.selected .tc-title-text{color:var(--amber)}
+.tc-why{font-size:11px;color:var(--tx3);line-height:1.5}
+.tc-type{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;display:inline-block;margin-bottom:4px;letter-spacing:.05em;text-transform:uppercase}
+.tc-type-hook{background:var(--amberbg);color:var(--amber);border:1px solid var(--amberline)}
+.tc-type-image{background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline)}
+.tc-type-emotion{background:var(--redbg);color:var(--red);border:1px solid var(--redline)}
+.tc-type-mystery{background:var(--violetbg);color:var(--violet);border:1px solid var(--violetline)}
+.tc-type-statement{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
+.tc-use-btn{flex-shrink:0;background:transparent;border:1px solid var(--b2);border-radius:var(--r1);padding:5px 11px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap;align-self:center}
+.tc-use-btn:hover{background:var(--amber);border-color:var(--amber);color:#08080a}
+.tc-card.selected .tc-use-btn{background:var(--amber);border-color:var(--amber);color:#08080a}
+.tc-custom{border-top:1px solid var(--b1);padding-top:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tc-custom-input{flex:1;min-width:180px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;font-weight:600;padding:9px 12px;outline:none;transition:all .15s;font-family:var(--font);letter-spacing:-.2px}
+.tc-custom-input:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
+.tc-custom-input::placeholder{color:var(--tx4);font-weight:400}
+.tc-applied{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--greenbg);border:1px solid var(--greenline);border-radius:var(--r2);font-size:12px;color:var(--green);font-weight:600;margin-top:10px}
+.loaded-banner{display:none;align-items:center;gap:8px;padding:8px 20px;background:var(--cyanbg);border-bottom:1px solid var(--cyanline);font-size:11px;color:var(--cyan);font-weight:600}
 
 </style>
 
@@ -575,6 +759,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('editor',this)"><span class="ni">✏️</span>Editor</button>
   <button class="nb" onclick="goPg('builder',this)"><span class="ni">🎛️</span>Builder</button>
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
+  <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
 </nav>
 
 <!-- ══════════════════════════════════
@@ -713,6 +898,15 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
       </div>
 
+      <!-- SONG LENGTH -->
+      <label class="topic-label">Song Length</label>
+      <div class="length-row" id="length-pills">
+        <span class="lpill on" onclick="setLen(this,'short')" data-val="short">Short <span class="lpill-desc">~2min</span></span>
+        <span class="lpill" onclick="setLen(this,'medium')" data-val="medium">Medium <span class="lpill-desc">~3min</span></span>
+        <span class="lpill" onclick="setLen(this,'long')" data-val="long">Long <span class="lpill-desc">~4min</span></span>
+        <span class="lpill" onclick="setLen(this,'extended')" data-val="extended">Extended <span class="lpill-desc">~5min+</span></span>
+      </div>
+
       <!-- GENERATE -->
       <div class="gen-action">
         <button class="gen-btn" id="gen-btn" onclick="generateSong()">
@@ -725,9 +919,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
+  <!-- SESSION HISTORY BAR -->
+  <div class="hist-bar" id="hist-bar">
+    <span class="hist-label">History</span>
+    <div class="hist-items" id="hist-items"></div>
+  </div>
+
   <!-- RESULT OUTPUT -->
   <div class="result-card" id="gen-out">
     <div class="loaded-banner" id="loaded-banner">✦ Loaded from library — changes won't overwrite the saved version</div>
+    <div id="print-meta"></div>
     <div class="result-header">
       <div>
         <div class="result-song-title" id="res-title">—</div>
@@ -738,7 +939,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
+        <button class="btn btn-sm export-btn" onclick="exportPDF()">📄 Export</button>
+        <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled>✨ Variations</button>
       </div>
+    </div>
+
+    <!-- SAVE BAR -->
+    <div class="save-bar" id="res-save-bar">
+      <span class="save-bar-title">💾 Save this song to your library</span>
+      <div class="save-bar-acts">
+        <button class="btn-save-lib" onclick="saveLib()">Save to Library</button>
+        <button class="btn-dl" onclick="downloadSong('res')">⬇ Download .txt</button>
+        <span class="save-bar-saved" id="res-save-bar-saved">✓ Saved!</span>
+      </div>
+    </div>
+
+    <!-- SCORE DASHBOARD -->
+    <div class="score-dashboard" id="res-score-dashboard">
+      <div class="score-header">
+        <span class="score-title">🎯 Song Score</span>
+        <div class="score-overall"><span class="score-overall-num" id="res-score-num">—</span><span class="score-overall-lbl">overall<br>score</span></div>
+      </div>
+      <div class="score-grid" id="res-score-grid"></div>
     </div>
 
     <div class="otabs">
@@ -748,11 +970,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="otab" onclick="goOtab('res','dopamine',this)">⚡ Dopamine</div>
       <div class="otab" onclick="goOtab('res','notes',this)">💡 Director Notes</div>
       <div class="otab" onclick="goOtab('res','titles',this);loadTitles('res')">🏷 Titles</div>
+      <div class="otab" onclick="goOtab('res','moodboard',this);loadMoodBoard('res')">🎨 Moodboard</div>
     </div>
 
     <div id="res-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="res-lyrics-text" class="lyrics-box"></div>
+      <!-- VARIATIONS -->
+      <div class="var-results" id="res-var-results">
+        <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">✨ Song Variations</div>
+        <div class="var-grid" id="res-var-grid"></div>
+      </div>
     </div>
     <div id="res-opane-brief" class="opane">
       <div id="res-brief-content" class="brief-output"></div>
@@ -761,6 +989,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-dopamine" class="opane"><div id="res-dopamine-text" class="prose-box"></div></div>
     <div id="res-opane-notes" class="opane"><div id="res-notes-text" class="prose-box"></div></div>
     <div id="res-opane-titles" class="opane"><div id="res-titles-content"></div></div>
+    <div id="res-opane-moodboard" class="opane"><div id="res-moodboard-content" class="moodboard"></div></div>
   </div>
 
 </div>
@@ -1083,6 +1312,71 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════
+     CAMPAIGN PAGE
+══════════════════════════════════ -->
+<div id="pg-campaign" class="pg">
+  <div class="camp-hero">
+    <div class="camp-hero-label">🚀 Campaign Mode</div>
+    <div class="camp-hero-title">Generate a Full Song Campaign</div>
+    <div class="camp-hero-sub">Create multiple song concepts at once — each with unique lyrics, a hook, production brief, and Suno/Udio prompt. Perfect for artists, producers, and content creators building a release campaign.</div>
+  </div>
+
+  <div class="camp-form">
+    <div class="camp-field">
+      <label class="camp-label">Campaign Theme / Artist Brief</label>
+      <textarea id="camp-brief" class="camp-textarea" placeholder="e.g. A breakup album about moving on and finding yourself again. Artist is a 25-year-old pop singer with a vulnerable, honest tone."></textarea>
+    </div>
+    <div class="camp-grid">
+      <div class="camp-field">
+        <label class="camp-label">Primary Genre</label>
+        <select id="camp-genre" class="camp-select">
+          <option value="pop">Pop</option><option value="hiphop">Rap / Hip-Hop</option>
+          <option value="rnb">R&B / Soul</option><option value="rock">Rock</option>
+          <option value="country">Country</option><option value="edm">EDM / Electronic</option>
+          <option value="latin">Latin</option><option value="folk">Folk</option>
+          <option value="ss">Singer-Songwriter</option><option value="altrock">Alt-Rock</option>
+          <option value="reggae">Reggae</option><option value="jazz">Jazz</option>
+        </select>
+      </div>
+      <div class="camp-field">
+        <label class="camp-label">Number of Concepts</label>
+        <select id="camp-count" class="camp-select">
+          <option value="2">2 concepts</option>
+          <option value="3" selected>3 concepts</option>
+          <option value="4">4 concepts</option>
+        </select>
+      </div>
+      <div class="camp-field">
+        <label class="camp-label">Mood Range</label>
+        <select id="camp-mood" class="camp-select">
+          <option value="mixed">Mixed (variety)</option>
+          <option value="upbeat">All upbeat / hopeful</option>
+          <option value="dark">All dark / emotional</option>
+          <option value="romantic">All romantic</option>
+          <option value="energetic">All energetic</option>
+        </select>
+      </div>
+      <div class="camp-field">
+        <label class="camp-label">Target Platform</label>
+        <select id="camp-platform" class="camp-select">
+          <option value="suno">Suno AI</option>
+          <option value="udio">Udio</option>
+          <option value="both">Both (dual prompts)</option>
+          <option value="general">General / No platform</option>
+        </select>
+      </div>
+    </div>
+    <button class="camp-gen-btn" id="camp-btn" onclick="generateCampaign()">
+      <span>🚀</span> Generate Campaign
+    </button>
+  </div>
+
+  <div class="camp-progress" id="camp-progress" style="display:none"></div>
+  <div class="concepts-grid" id="concepts-grid"></div>
+</div>
+
 </div><!-- /wrap -->
 
 <script>
@@ -1242,10 +1536,10 @@ const FUSION_DATA={
 // STATE
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
-  quality:'viral',substyle:'',
+  quality:'viral',substyle:'',selectedLength:'short',
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]'),
-  luckyHistory:[],
+  luckyHistory:[],sessionHistory:[],
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
@@ -1282,6 +1576,9 @@ async function callClaude(prompt, systemPrompt='') {
   }
 
   // Local — call API directly
+  const apiKey = window._soniqKey;
+  const isOpenRouter = apiKey && apiKey.startsWith('sk-or-');
+  if (!apiKey || apiKey === 'server-side') { showKeyScreen('API key required'); throw new Error('enter-key'); }
   if (isOpenRouter) {
     // OpenRouter — OpenAI-compatible format
     const msgs = systemPrompt
@@ -1471,7 +1768,7 @@ function toggleBlend(){
   S.blend.open=!S.blend.open;
   body.style.display=S.blend.open?'block':'none';
   chevron.classList.toggle('open',S.blend.open);
-  row.classList.toggle('blend-open',S.blend.open);
+  row.classList.toggle('open',S.blend.open);
   updBlendDesc();
 }
 function updBlend(inp){
@@ -1685,9 +1982,10 @@ function loadLuckyHistItem(i){
   toast('✓ Loaded: '+(song.title||'Lucky Song'));
 }
 
+const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
+
 async function generateSong(){
   const genre=S.selectedGenre||'pop';
-  const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
   const genreLabel=GENRE_LABELS[genre]||genre;
   const topic=document.getElementById('g-topic').value.trim();
   const mood=document.getElementById('g-mood').value;
@@ -1731,7 +2029,8 @@ Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
 Structure: ${structStr}
-Quality target: ${S.quality}${substyleNote}${bibleNote}${blendNote}
+Quality target: ${S.quality}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -1839,6 +2138,7 @@ function parseSection(raw, key, nextKey){
   }
   return raw.slice(start,end).trim();
 }
+function sec(r,k,n){return parseSection(r,k,n);}
 
 function parseSongResult(raw,genre,topic){
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
@@ -1861,6 +2161,11 @@ function parseSongResult(raw,genre,topic){
   renderBrief('res', songPrompt, briefRaw);
 
   S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,genre,topic,ts:Date.now()};
+  addToHistory(S.currentSong);
+  showSaveBar('res');
+  const varBtn = document.getElementById('res-var-btn');
+  if (varBtn) varBtn.disabled = false;
+  generateScoreDashboard('res', lyrics, genre);
   toast('✓ Song generated: "'+title+'"');
 }
 
@@ -2427,7 +2732,7 @@ async function generateFusion(){
             <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('fd-sty').textContent).then(()=>toast('✓ Copied'))">Copy Style</button>
           </div>
         </div>
-        <pre id="fd-lyr" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--bg1);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:10px">${lyrics}</pre>
+        <pre id="fd-lyr" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:10px">${lyrics}</pre>
         <div class="styleout" id="fd-sty" style="margin-bottom:10px">${style}</div>
         <div style="font-size:13px;color:var(--tx2);line-height:1.7;font-style:italic">${expl}</div>
       </div>`;
@@ -2756,6 +3061,412 @@ function initGenreGrid(){
       <div class="gp-icon">${g.icon}</div>
       <div class="gp-name">${g.label}</div>
     </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG LENGTH
+// ═══════════════════════════════════════════════════════
+function setLen(el, val) {
+  document.querySelectorAll('.lpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.selectedLength = val;
+}
+
+// ═══════════════════════════════════════════════════════
+// SESSION HISTORY
+// ═══════════════════════════════════════════════════════
+function addToHistory(song) {
+  if (!song || !song.title) return;
+  // Avoid duplicates by title
+  S.sessionHistory = S.sessionHistory.filter(h => h.title !== song.title);
+  S.sessionHistory.unshift({title: song.title, song});
+  if (S.sessionHistory.length > 10) S.sessionHistory = S.sessionHistory.slice(0, 10);
+  renderHistory();
+}
+
+function renderHistory() {
+  const bar = document.getElementById('hist-bar');
+  const items = document.getElementById('hist-items');
+  if (!bar || !items) return;
+  if (S.sessionHistory.length < 2) { bar.classList.remove('show'); return; }
+  bar.classList.add('show');
+  items.innerHTML = S.sessionHistory.map((h, i) =>
+    `<span class="hist-chip${i===0?' current':''}" onclick="loadFromHistory(${i})" title="${h.title}">${h.title}</span>`
+  ).join('');
+}
+
+function loadFromHistory(idx) {
+  const h = S.sessionHistory[idx];
+  if (!h) return;
+  loadSongToWrite(h.song);
+  toast('↩ Loaded: ' + h.title);
+}
+
+// ═══════════════════════════════════════════════════════
+// DOWNLOAD
+// ═══════════════════════════════════════════════════════
+function downloadSong(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song) { toast('No song to download'); return; }
+  const lines = [];
+  lines.push('SONIQ — Song Export');
+  lines.push('===================');
+  lines.push('Title: ' + (song.title || 'Untitled'));
+  if (song.genre) lines.push('Genre: ' + song.genre);
+  lines.push('');
+  lines.push('LYRICS');
+  lines.push('------');
+  lines.push(song.lyrics || '');
+  if (song.prompt) { lines.push(''); lines.push('PRODUCTION PROMPT'); lines.push('-----------------'); lines.push(song.prompt); }
+  const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (song.title || 'song').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.txt';
+  a.click();
+}
+
+function downloadConcept(idx) {
+  const card = document.querySelectorAll('.concept-card')[idx];
+  if (!card) return;
+  const title = card.querySelector('.concept-title')?.textContent || 'concept';
+  const lyrics = card.querySelector('.concept-lyrics')?.textContent || '';
+  const prompt = card.querySelector('.concept-prompt')?.textContent || '';
+  const lines = ['SONIQ Campaign Concept — ' + title, '='.repeat(40), '', 'LYRICS', '------', lyrics, '', 'SUNO/UDIO PROMPT', '----------------', prompt];
+  const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = title.replace(/[^a-z0-9]/gi, '_').toLowerCase() + '_concept.txt';
+  a.click();
+}
+
+// ═══════════════════════════════════════════════════════
+// EXPORT PDF (print)
+// ═══════════════════════════════════════════════════════
+function exportPDF() {
+  const song = S.currentSong;
+  if (!song) { toast('Generate a song first'); return; }
+  const meta = document.getElementById('print-meta');
+  if (meta) {
+    meta.innerHTML = `<strong>${song.title||'Untitled'}</strong> · Genre: ${song.genre||''} · Generated by SONIQ · ${new Date().toLocaleDateString()}`;
+  }
+  window.print();
+}
+
+// ═══════════════════════════════════════════════════════
+// SCORE DASHBOARD
+// ═══════════════════════════════════════════════════════
+async function generateScoreDashboard(prefix, lyricsText, genre) {
+  const dash = document.getElementById(prefix + '-score-dashboard');
+  if (!dash) return;
+  dash.classList.add('visible');
+  const grid = document.getElementById(prefix + '-score-grid');
+  const numEl = document.getElementById(prefix + '-score-num');
+  grid.innerHTML = '<div class="score-loading"><span>⏳</span> Scoring your song…</div>';
+
+  const prompt = `You are a professional A&R evaluator. Score this ${genre||'pop'} song on these criteria. Return ONLY valid JSON in this exact format:
+{"overall":82,"hook":{"score":88,"note":"Strong melodic hook"},"originality":{"score":75,"note":"Fresh angle on theme"},"commercial":{"score":80,"note":"Radio-friendly structure"},"lyrics":{"score":85,"note":"Vivid, specific imagery"},"flow":{"score":78,"note":"Good rhythmic variation"},"emotion":{"score":90,"note":"Hits hard on the bridge"}}
+
+Song lyrics:
+${lyricsText.slice(0, 2000)}`;
+
+  try {
+    const raw = await callClaude(prompt, 'Return only valid JSON, no markdown, no explanation.');
+    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
+    if (!jsonStr) throw new Error('no json');
+    const data = JSON.parse(jsonStr);
+    if (numEl) numEl.textContent = data.overall || '—';
+    const criteria = ['hook','originality','commercial','lyrics','flow','emotion'];
+    const colors = {hook:'var(--amber)',originality:'var(--cyan)',commercial:'var(--green)',lyrics:'var(--violet)',flow:'var(--amber)',emotion:'var(--red)'};
+    grid.innerHTML = criteria.map(k => {
+      if (!data[k]) return '';
+      const s = data[k].score || 0;
+      const col = colors[k] || 'var(--amber)';
+      return `<div class="score-item">
+        <div class="score-item-label">${k.charAt(0).toUpperCase()+k.slice(1)}</div>
+        <div class="score-bar-wrap"><div class="score-bar" style="width:${s}%;background:${col}"></div></div>
+        <div class="score-item-val" style="color:${col}">${s}/100</div>
+        <div class="score-item-note">${data[k].note||''}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = '<div style="font-size:12px;color:var(--tx3)">Score unavailable</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// VARIATIONS
+// ═══════════════════════════════════════════════════════
+async function generateVariations(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song) { toast('Generate a song first'); return; }
+  const btn = document.getElementById(prefix + '-var-btn');
+  const results = document.getElementById(prefix + '-var-results');
+  const grid = document.getElementById(prefix + '-var-grid');
+  if (!btn || !results || !grid) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Generating…';
+  results.classList.add('show');
+  grid.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:8px 0">Generating 3 variations…</div>';
+
+  const prompt = `You are a hit songwriter. Based on this song concept, generate 3 distinct variations. Each should have a different angle, mood shift, or structural approach.
+
+Original title: ${song.title}
+Original genre: ${song.genre || 'pop'}
+Original topic: ${song.topic || ''}
+
+Return ONLY valid JSON array:
+[
+  {"title":"Variation Title 1","verdict":"One sentence describing the angle","previewLine":"First line of the hook or verse","lyricsSnippet":"[Verse 1]\\n4 lines of lyrics here"},
+  {"title":"Variation Title 2","verdict":"One sentence describing the angle","previewLine":"First line of the hook or verse","lyricsSnippet":"[Verse 1]\\n4 lines of lyrics here"},
+  {"title":"Variation Title 3","verdict":"One sentence describing the angle","previewLine":"First line of the hook or verse","lyricsSnippet":"[Verse 1]\\n4 lines of lyrics here"}
+]`;
+
+  try {
+    const raw = await callClaude(prompt, 'Return only valid JSON array, no markdown.');
+    const jsonStr = raw.match(/\[[\s\S]*\]/)?.[0];
+    if (!jsonStr) throw new Error('no json');
+    const vars = JSON.parse(jsonStr);
+    grid.innerHTML = vars.map((v, i) => `
+      <div class="var-card" onclick="selectVariation(this, '${prefix}', ${i})">
+        <div class="var-num">Variation ${i+1}</div>
+        <div class="var-title">${v.title||''}</div>
+        <div class="var-verdict">${v.verdict||''}</div>
+        <div class="var-preview">${v.previewLine||''}</div>
+        <button class="var-load-btn" onclick="event.stopPropagation();loadVariation('${prefix}',${i})">Load this variation →</button>
+      </div>`).join('');
+    btn.textContent = '✨ Variations';
+    btn.disabled = false;
+    // Store variations on state
+    if (prefix === 'res') S._resVariations = vars;
+    else S._luckyVariations = vars;
+  } catch(e) {
+    grid.innerHTML = '<div style="font-size:12px;color:var(--red)">Could not generate variations. Try again.</div>';
+    btn.textContent = '✨ Variations';
+    btn.disabled = false;
+  }
+}
+
+function selectVariation(el, prefix, idx) {
+  el.closest('.var-grid').querySelectorAll('.var-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function loadVariation(prefix, idx) {
+  const vars = prefix === 'res' ? S._resVariations : S._luckyVariations;
+  if (!vars || !vars[idx]) return;
+  const v = vars[idx];
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  const newSong = Object.assign({}, song, {title: v.title, _variationSnippet: v.lyricsSnippet});
+  toast('✓ Variation loaded — regenerate for full lyrics');
+  if (prefix === 'res') {
+    document.getElementById('res-title').textContent = v.title;
+    document.getElementById('g-topic').value = v.verdict || document.getElementById('g-topic').value;
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// MOODBOARD
+// ═══════════════════════════════════════════════════════
+async function loadMoodBoard(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  const container = document.getElementById(prefix + '-moodboard-content');
+  if (!container) return;
+  if (container.dataset.loaded === '1') return;
+  if (!song) { container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:16px">Generate a song first.</div>'; return; }
+
+  container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:16px">⏳ Building sonic moodboard…</div>';
+
+  const prompt = `Create a sonic moodboard for this ${song.genre||'pop'} song titled "${song.title}". Return ONLY valid JSON:
+{
+  "tempo":{"bpm":120,"feel":"Mid-tempo groove","swing":"straight"},
+  "key":{"key":"A minor","mode":"aeolian","energy":"melancholic"},
+  "references":[
+    {"era":"2020s","title":"Artist — Song Title","desc":"Short reason why this reference fits","tags":["vibe1","prod style"]},
+    {"era":"2010s","title":"Artist — Song Title","desc":"Short reason","tags":["vibe","emotion"]},
+    {"era":"2000s","title":"Artist — Song Title","desc":"Short reason","tags":["production","era"]}
+  ],
+  "colors":["#hex1","#hex2","#hex3"],
+  "textures":["texture description 1","texture description 2","texture description 3"]
+}`;
+
+  try {
+    const raw = await callClaude(prompt, 'Return only valid JSON, no markdown.');
+    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
+    if (!jsonStr) throw new Error('no json');
+    const mb = JSON.parse(jsonStr);
+    let html = '';
+    if (mb.tempo || mb.key) {
+      html += '<div class="moodboard-tempo">';
+      if (mb.tempo?.bpm) html += `<div class="moodboard-tempo-item"><div class="moodboard-tempo-val">${mb.tempo.bpm}</div><div class="moodboard-tempo-lbl">BPM</div></div>`;
+      if (mb.tempo?.feel) html += `<div class="moodboard-tempo-item"><div class="moodboard-tempo-val" style="font-size:14px">${mb.tempo.feel}</div><div class="moodboard-tempo-lbl">Feel</div></div>`;
+      if (mb.key?.key) html += `<div class="moodboard-tempo-item"><div class="moodboard-tempo-val" style="font-size:14px">${mb.key.key}</div><div class="moodboard-tempo-lbl">Key</div></div>`;
+      html += '</div>';
+    }
+    if (mb.references?.length) {
+      html += '<div class="moodboard-grid">';
+      mb.references.forEach(r => {
+        html += `<div class="moodcard">
+          <div class="moodcard-era">${r.era||''}</div>
+          <div class="moodcard-title">${r.title||''}</div>
+          <div class="moodcard-desc">${r.desc||''}</div>
+          <div class="moodcard-tags">${(r.tags||[]).map(t=>`<span class="moodcard-tag">${t}</span>`).join('')}</div>
+        </div>`;
+      });
+      html += '</div>';
+    }
+    if (mb.textures?.length) {
+      html += '<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Sonic Textures</div>';
+      html += '<div style="display:flex;flex-wrap:wrap;gap:6px">' + mb.textures.map(t => `<span style="font-size:12px;padding:4px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx2)">${t}</span>`).join('') + '</div>';
+    }
+    container.innerHTML = html;
+    container.dataset.loaded = '1';
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:16px">Moodboard unavailable.</div>';
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// CAMPAIGN MODE
+// ═══════════════════════════════════════════════════════
+async function generateCampaign() {
+  const brief = document.getElementById('camp-brief').value.trim();
+  const genre = document.getElementById('camp-genre').value;
+  const count = parseInt(document.getElementById('camp-count').value) || 3;
+  const mood = document.getElementById('camp-mood').value;
+  const platform = document.getElementById('camp-platform').value;
+
+  if (!brief) { toast('Enter a campaign brief first'); document.getElementById('camp-brief').style.animation='shake .4s'; setTimeout(()=>document.getElementById('camp-brief').style.animation='',500); return; }
+
+  const btn = document.getElementById('camp-btn');
+  const progress = document.getElementById('camp-progress');
+  const grid = document.getElementById('concepts-grid');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="gen-spinner"></span> Generating Campaign…';
+  progress.style.display = 'flex';
+  grid.innerHTML = '';
+
+  const progItems = Array.from({length: count}, (_, i) => {
+    const d = document.createElement('div');
+    d.className = 'camp-prog-item';
+    d.id = 'camp-prog-' + i;
+    d.innerHTML = `<span class="camp-prog-dot"></span> Concept ${i+1}`;
+    progress.appendChild(d);
+    return d;
+  });
+
+  const genreLabel = GENRE_LABELS[genre] || genre;
+  const moodMap = {mixed:'varied moods', upbeat:'upbeat and hopeful', dark:'dark and emotional', romantic:'romantic and intimate', energetic:'high-energy and energetic'};
+  const moodDesc = moodMap[mood] || 'mixed moods';
+  const platformDesc = platform === 'suno' ? 'Suno AI' : platform === 'udio' ? 'Udio' : platform === 'both' ? 'Suno AI and Udio' : 'AI music platforms';
+
+  const prompt = `You are a top-tier A&R consultant and hit songwriter. Create ${count} distinct song concepts for this campaign.
+
+Campaign Brief: ${brief}
+Primary Genre: ${genreLabel}
+Mood Range: ${moodDesc}
+Target Platform: ${platformDesc}
+
+For each concept, provide:
+1. A compelling title
+2. The unique angle/hook concept (2-3 sentences)
+3. Complete lyrics with labeled sections [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge] etc.
+4. A production prompt optimized for ${platformDesc}
+5. A one-line artist hook (memorable phrase or lyric)
+6. Brief production notes
+
+Format each concept clearly with these exact headers:
+CONCEPT [N]:
+TITLE:
+ANGLE:
+HOOK LINE:
+LYRICS:
+[full lyrics here]
+PRODUCTION PROMPT:
+PRODUCTION NOTES:
+---`;
+
+  try {
+    const raw = await callClaude(prompt, `You are a professional hit songwriter and A&R consultant. Generate ${count} fully developed song concepts with complete lyrics.`);
+
+    // Parse concepts
+    const conceptTexts = raw.split(/CONCEPT\s*\[\d+\]:/i).filter(s => s.trim().length > 50);
+
+    for (let i = 0; i < Math.min(count, conceptTexts.length); i++) {
+      if (progItems[i]) { progItems[i].classList.add('active'); }
+
+      const ct = conceptTexts[i];
+      const titleMatch = ct.match(/TITLE:\s*(.+)/i);
+      const angleMatch = ct.match(/ANGLE:\s*([\s\S]+?)(?=HOOK LINE:|LYRICS:|$)/i);
+      const hookMatch = ct.match(/HOOK LINE:\s*(.+)/i);
+      const lyricsMatch = ct.match(/LYRICS:\s*([\s\S]+?)(?=PRODUCTION PROMPT:|PRODUCTION NOTES:|---$|$)/i);
+      const promptMatch = ct.match(/PRODUCTION PROMPT:\s*([\s\S]+?)(?=PRODUCTION NOTES:|---$|$)/i);
+      const notesMatch = ct.match(/PRODUCTION NOTES:\s*([\s\S]+?)(?=---|$)/i);
+
+      const title = titleMatch?.[1]?.trim() || `Concept ${i+1}`;
+      const angle = angleMatch?.[1]?.trim() || '';
+      const hookLine = hookMatch?.[1]?.trim() || '';
+      const lyrics = lyricsMatch?.[1]?.trim() || '';
+      const productionPrompt = promptMatch?.[1]?.trim() || '';
+      const notes = notesMatch?.[1]?.trim() || '';
+
+      const card = document.createElement('div');
+      card.className = 'concept-card';
+      card.innerHTML = `
+        <div class="concept-card-hdr">
+          <div class="concept-num">Concept ${i+1} of ${count}</div>
+          <div class="concept-title">${title}</div>
+          <div class="concept-angle">${angle}</div>
+          <div class="concept-meta">
+            <span class="concept-tag concept-tag-genre">${genreLabel}</span>
+            <span class="concept-tag concept-tag-mood">${moodDesc}</span>
+          </div>
+        </div>
+        <div class="concept-body">
+          ${hookLine ? `<div class="concept-section-title">Hook Line</div><div class="concept-hook">"${hookLine}"</div>` : ''}
+          ${lyrics ? `<div class="concept-section-title">Lyrics Preview</div><div class="concept-lyrics">${lyrics.slice(0,400).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>')}${lyrics.length>400?'…':''}</div>` : ''}
+          ${productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${productionPrompt}</div>` : ''}
+          ${notes ? `<div class="concept-section-title">Production Notes</div><div class="concept-brief">${notes}</div>` : ''}
+        </div>
+        <div class="concept-actions">
+          <button class="btn btn-sm btn-gold" onclick="loadConceptToWrite(${i})">✍️ Write Full Song</button>
+          <button class="btn btn-sm" onclick="downloadConcept(${i})">⬇ Download</button>
+          <button class="btn btn-sm" onclick="cpText(this.closest('.concept-card').querySelector('.concept-prompt').textContent)">Copy Prompt</button>
+        </div>`;
+
+      grid.appendChild(card);
+
+      if (progItems[i]) { progItems[i].classList.remove('active'); progItems[i].classList.add('done'); progItems[i].innerHTML = `<span class="camp-prog-dot"></span> Concept ${i+1} ✓`; }
+    }
+  } catch(e) {
+    grid.innerHTML = `<div class="concept-error">Error generating campaign: ${e.message}. Please try again.</div>`;
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '<span>🚀</span> Generate Campaign';
+}
+
+function loadConceptToWrite(idx) {
+  const card = document.querySelectorAll('.concept-card')[idx];
+  if (!card) return;
+  const title = card.querySelector('.concept-title')?.textContent || '';
+  const angle = card.querySelector('.concept-angle')?.textContent || '';
+  goPg('write', document.querySelector('.nb'));
+  document.getElementById('g-topic').value = angle || title;
+  toast('✓ Concept loaded — hit Generate to write the full song');
+}
+
+function cpText(text) {
+  navigator.clipboard.writeText(text||'').then(() => toast('✓ Copied'));
+}
+
+// ═══════════════════════════════════════════════════════
+// SAVE BAR (show after generation)
+// ═══════════════════════════════════════════════════════
+function showSaveBar(prefix) {
+  const bar = document.getElementById(prefix + '-save-bar');
+  if (bar) bar.classList.add('visible');
 }
 
 // ═══════════════════════════════════════════════════════
