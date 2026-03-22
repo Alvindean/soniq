@@ -29,9 +29,8 @@ async function callAnthropic(apiKey, messages, system, max_tokens) {
   return d.content?.map(c=>c.text||'').join('') || '';
 }
 
-async function callOpenRouter(apiKey, messages, system, max_tokens) {
-  const orMsgs = system ? [{role:'system',content:system}, ...messages] : messages;
-  const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+async function orRequest(apiKey, orMsgs, max_tokens) {
+  return fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -41,6 +40,24 @@ async function callOpenRouter(apiKey, messages, system, max_tokens) {
     },
     body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens, messages:orMsgs})
   });
+}
+
+async function callOpenRouter(apiKey, messages, system, max_tokens) {
+  const orMsgs = system ? [{role:'system',content:system}, ...messages] : messages;
+  let r = await orRequest(apiKey, orMsgs, max_tokens);
+
+  // On 402, extract the affordable token count and retry once
+  if (r.status === 402) {
+    const t = await r.text();
+    const match = t.match(/can only afford (\d+)/);
+    const affordable = match ? parseInt(match[1]) - 50 : 0;
+    if (affordable >= 300) {
+      r = await orRequest(apiKey, orMsgs, affordable);
+    } else {
+      throw new Error('CREDITS_LOW');
+    }
+  }
+
   if (!r.ok) {
     const t = await r.text();
     throw new Error('OpenRouter error ' + r.status + ': ' + t.slice(0,200));
@@ -93,6 +110,9 @@ module.exports = async function handler(req, res) {
       const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
+      if (err.message === 'CREDITS_LOW') {
+        return res.status(402).json({error: 'Your OpenRouter credit balance is too low. Add credits at openrouter.ai/settings/credits to continue.'});
+      }
       console.error('OpenRouter failed:', err.message);
       errors.push('OpenRouter: ' + err.message);
     }
