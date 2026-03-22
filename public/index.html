@@ -789,6 +789,54 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── PDF EXPORT ── */
 .export-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--r2);border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
 .export-btn:hover{background:var(--violet);color:#fff}
+/* ── STREAMING RAW DISPLAY ── */
+.stream-raw{font-family:var(--mono);font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow-y:auto;padding:4px 0;background:transparent;border:none;margin:0}
+.stream-raw::-webkit-scrollbar{width:3px}.stream-raw::-webkit-scrollbar-thumb{background:var(--s5)}
+
+/* ── CHORD PROGRESSION ── */
+.chords-output{padding:4px 0}
+.chord-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.chord-meta-pill{display:flex;flex-direction:column;align-items:center;padding:10px 18px;background:var(--s3);border:1px solid var(--amberline);border-radius:var(--r2);min-width:72px}
+.chord-meta-label{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.chord-meta-val{font-size:18px;font-weight:700;color:var(--tx1);font-family:var(--mono);letter-spacing:-.02em}
+.chord-sections{display:flex;flex-direction:column;gap:8px}
+.chord-row{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 16px;display:flex;gap:14px;align-items:flex-start;transition:border-color .15s}
+.chord-row:hover{border-color:var(--b3)}
+.chord-row-name{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;min-width:70px;flex-shrink:0;padding-top:2px}
+.chord-row-body{flex:1;min-width:0}
+.chord-numerals{font-size:15px;font-weight:700;color:var(--tx1);font-family:var(--mono);margin-bottom:4px;line-height:1.3;word-break:break-all}
+.chord-feel{font-size:11px;color:var(--tx3);line-height:1.5}
+
+/* ── MOBILE FIRST ── */
+@media(max-width:600px){
+  .result-acts{flex-wrap:wrap;gap:5px}
+  .result-acts .btn{font-size:10px;padding:5px 10px}
+  .result-acts .var-btn{font-size:10px;padding:5px 10px}
+  .otabs{gap:1px}
+  .otab{font-size:10px;padding:8px 6px;white-space:nowrap}
+  .chord-meta-pill{padding:8px 12px;min-width:60px}
+  .chord-meta-val{font-size:15px}
+  .chord-row{flex-direction:column;gap:6px}
+  .chord-row-name{min-width:unset}
+  .hdr-tags{gap:4px}
+  .gen-action{flex-direction:column;align-items:stretch}
+  .gen-action .btn{text-align:center}
+  .save-bar-acts{flex-wrap:wrap;gap:6px}
+  .brief-hero{padding:14px}
+  .score-header{flex-direction:column;align-items:flex-start;gap:10px}
+}
+@media(max-width:440px){
+  .nb .ni{font-size:15px}
+  .nb{font-size:9px;min-width:48px;padding:8px 2px;gap:3px}
+  .hdr{flex-direction:column;align-items:flex-start;gap:8px}
+  .enhance-row{flex-wrap:wrap}
+  .enhance-row .topic-input{min-width:0}
+  .topic-input{font-size:15px;padding:13px 14px}
+  .wrap{padding:0 12px 100px}
+  .studio-body{padding:16px 14px}
+  .otab{font-size:9px;padding:7px 5px}
+}
+
 @media print{
   body{background:#fff!important;color:#111!important;font-family:Georgia,serif}
   .nav,.hdr-tags,.result-acts,.save-bar,.otabs,.loaded-banner,.gen-action,.studio,.key-banner,#pg-lucky,#pg-library,#pg-editor,#pg-builder,#pg-more,#pg-campaign,.score-dashboard,.var-results{display:none!important}
@@ -1134,12 +1182,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <div class="otabs">
       <div class="otab on" onclick="goOtab('res','lyrics',this)">📝 Lyrics</div>
-      <div class="otab" onclick="goOtab('res','brief',this)">🎛 Production Brief</div>
+      <div class="otab" onclick="goOtab('res','chords',this)">🎸 Chords</div>
+      <div class="otab" onclick="goOtab('res','brief',this)">🎛 Brief</div>
       <div class="otab" onclick="goOtab('res','structure',this)">🗺 Structure</div>
       <div class="otab" onclick="goOtab('res','dopamine',this)">⚡ Dopamine</div>
-      <div class="otab" onclick="goOtab('res','notes',this)">💡 Director Notes</div>
+      <div class="otab" onclick="goOtab('res','notes',this)">💡 Notes</div>
       <div class="otab" onclick="goOtab('res','titles',this);loadTitles('res')">🏷 Titles</div>
-      <div class="otab" onclick="goOtab('res','moodboard',this);loadMoodBoard('res')">🎨 Moodboard</div>
+      <div class="otab" onclick="goOtab('res','moodboard',this);loadMoodBoard('res')">🎨 Mood</div>
       <div class="otab" onclick="goOtab('res','visual',this);loadVisualPrompts('res')">🎬 Visual</div>
     </div>
 
@@ -1152,6 +1201,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="var-grid" id="res-var-grid"></div>
       </div>
     </div>
+    <div id="res-opane-chords" class="opane"><div id="res-chords-text" class="chords-output"></div></div>
     <div id="res-opane-brief" class="opane">
       <div id="res-brief-content" class="brief-output"></div>
     </div>
@@ -1859,6 +1909,52 @@ const S={selectedGenre:'pop',
 // ANTHROPIC API CALL
 // ═══════════════════════════════════════════════════════
 
+// ── STREAMING ────────────────────────────────────────
+async function callClaudeStream(prompt, systemPrompt, onChunk) {
+  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+
+  if (isVercel) {
+    const res = await fetch('/api/stream', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        messages: [{role: 'user', content: prompt}],
+        system: systemPrompt || undefined,
+        max_tokens: 2048
+      })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.error || 'Stream failed ' + res.status);
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let fullText = '';
+    while (true) {
+      const {done, value} = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, {stream: true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const data = JSON.parse(line.slice(6));
+          if (data.error) throw new Error(data.error);
+          if (data.text) { fullText += data.text; onChunk(data.text, fullText); }
+        } catch (e) { if (e.message && !e.message.includes('JSON')) throw e; }
+      }
+    }
+    return fullText;
+  }
+
+  // Local fallback — non-streaming
+  const text = await callClaude(prompt, systemPrompt);
+  onChunk(text, text);
+  return text;
+}
+
 async function callClaude(prompt, systemPrompt='') {
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
 
@@ -2393,6 +2489,12 @@ DOPAMINE MAP:
 2. [Second peak]
 3. [Third peak]
 
+CHORD PROGRESSION:
+BPM: [exact BPM]
+Key: [e.g. A minor — reason in 5 words]
+Time Signature: [e.g. 4/4]
+[Each section on its own line: Section name → Roman numerals (letter names) · rhythm feel — e.g. "Verse 1 → i–VII–III–VII (Am–G–C–G) · 2 beats each · brooding pull" / "Chorus → I–V–vi–IV (C–G–Am–F) · full bar each · anthemic lift"]
+
 DIRECTOR NOTES:
 1. [Production decision specific to THIS song]
 2. [tip 2]
@@ -2406,14 +2508,24 @@ DIRECTOR NOTES:
   document.getElementById('loaded-banner').style.display='none';
   document.getElementById('res-title').textContent='Crafting your song…';
   document.getElementById('res-verdict').textContent='';
-  document.getElementById('res-lyrics-text').innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Writing your song…</div><div class="craft-sublabel">Lyrics · Production Brief · Structure · Dopamine map</div></div>';
+  document.getElementById('res-lyrics-text').innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Writing your song…</div><div class="craft-sublabel">Lyrics · Chords · Production Brief · Structure · Dopamine</div></div>';
   const briefEl=document.getElementById('res-brief-content');if(briefEl)briefEl.innerHTML='';
   document.getElementById('res-structure-text').textContent='';
   document.getElementById('res-dopamine-text').textContent='';
   document.getElementById('res-notes-text').textContent='';
+  document.getElementById('res-chords-text').textContent='';
 
   try{
-    const raw=await callClaude(prompt,system);
+    let firstChunk=true;
+    const lyricsEl=document.getElementById('res-lyrics-text');
+    const raw=await callClaudeStream(prompt,system,(chunk,full)=>{
+      if(firstChunk){
+        firstChunk=false;
+        lyricsEl.innerHTML='<pre class="stream-raw" id="stream-display"></pre>';
+      }
+      const el=document.getElementById('stream-display');
+      if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
+    });
     parseSongResult(raw,genreLabel,topic);
   }catch(e){
     if(e.message==='enter-key'){btnDone('gen-btn');return;}
@@ -2458,7 +2570,8 @@ function parseSongResult(raw,genre,topic){
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
-  const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
+  const dopamine=parseSection(raw,'DOPAMINE MAP','CHORD PROGRESSION');
+  const chords=parseSection(raw,'CHORD PROGRESSION','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES',null);
 
   document.getElementById('res-title').textContent=title;
@@ -2467,11 +2580,12 @@ function parseSongResult(raw,genre,topic){
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
+  renderChords('res', chords);
 
   // Render Production Brief
   renderBrief('res', songPrompt, briefRaw);
 
-  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,genre,topic,ts:Date.now()};
+  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,notes,genre,topic,ts:Date.now()};
   addToHistory(S.currentSong);
   showSaveBar('res');
   const varBtn = document.getElementById('res-var-btn');
@@ -2552,6 +2666,44 @@ function renderBrief(prefix, songPrompt, briefRaw) {
     const len = corePrompt.length;
     cc.style.color = len > 200 ? 'var(--red)' : len > 160 ? 'var(--amber)' : 'var(--green)';
   }
+}
+
+function renderChords(prefix, chordsRaw) {
+  const el = document.getElementById(prefix + '-chords-text');
+  if (!el) return;
+  if (!chordsRaw) { el.innerHTML = '<div style="padding:20px;color:var(--tx3);font-size:13px">No chord data available.</div>'; return; }
+
+  const lines = chordsRaw.split('\n').map(l => l.trim()).filter(Boolean);
+  let bpm = '', key = '', timeSig = '';
+  const sections = [];
+
+  for (const line of lines) {
+    if (line.startsWith('BPM:')) bpm = line.slice(4).trim();
+    else if (line.startsWith('Key:')) key = line.slice(4).trim();
+    else if (line.startsWith('Time Signature:')) timeSig = line.slice(15).trim();
+    else if (line.includes('→')) sections.push(line);
+  }
+
+  const metaHtml = (bpm || key || timeSig) ? `
+    <div class="chord-meta">
+      ${bpm ? `<div class="chord-meta-pill"><span class="chord-meta-label">BPM</span><span class="chord-meta-val">${bpm}</span></div>` : ''}
+      ${key ? `<div class="chord-meta-pill"><span class="chord-meta-label">Key</span><span class="chord-meta-val">${key}</span></div>` : ''}
+      ${timeSig ? `<div class="chord-meta-pill"><span class="chord-meta-label">Time</span><span class="chord-meta-val">${timeSig}</span></div>` : ''}
+    </div>` : '';
+
+  const sectionHtml = sections.map(s => {
+    const [name, rest] = s.split('→').map(x => x.trim());
+    const parts = rest ? rest.split('·').map(x => x.trim()) : [rest || ''];
+    return `<div class="chord-row">
+      <div class="chord-row-name">${name}</div>
+      <div class="chord-row-body">
+        <div class="chord-numerals">${parts[0] || ''}</div>
+        ${parts.slice(1).map(p => `<div class="chord-feel">${p}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+
+  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+chordsRaw+'</div>'}</div>`;
 }
 
 function saveLib(){
@@ -3479,21 +3631,29 @@ function loadFromHistory(idx) {
 function downloadSong(prefix) {
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   if (!song) { toast('No song to download'); return; }
-  const lines = [];
-  lines.push('SONIQ — Song Export');
-  lines.push('===================');
-  lines.push('Title: ' + (song.title || 'Untitled'));
-  if (song.genre) lines.push('Genre: ' + song.genre);
-  lines.push('');
-  lines.push('LYRICS');
-  lines.push('------');
-  lines.push(song.lyrics || '');
-  if (song.prompt) { lines.push(''); lines.push('PRODUCTION PROMPT'); lines.push('-----------------'); lines.push(song.prompt); }
+  const sep = (label) => '\n' + label + '\n' + '-'.repeat(label.length);
+  const lines = [
+    'SONIQ — Song Export',
+    '===================',
+    'Title:  ' + (song.title || 'Untitled'),
+    'Genre:  ' + (song.genre || '—'),
+    'Topic:  ' + (song.topic || '—'),
+    'Date:   ' + new Date().toLocaleDateString(),
+    '',
+  ];
+  if (song.lyrics)    { lines.push(sep('LYRICS'));            lines.push(''); lines.push(song.lyrics); }
+  if (song.chords)    { lines.push(''); lines.push(sep('CHORD PROGRESSION')); lines.push(''); lines.push(song.chords); }
+  if (song.style)     { lines.push(''); lines.push(sep('SONG PROMPT (paste into Suno/Udio)')); lines.push(''); lines.push(song.style); }
+  if (song.brief)     { lines.push(''); lines.push(sep('PRODUCTION BRIEF')); lines.push(''); lines.push(song.brief); }
+  if (song.structure) { lines.push(''); lines.push(sep('STRUCTURE MAP')); lines.push(''); lines.push(song.structure); }
+  if (song.dopamine)  { lines.push(''); lines.push(sep('DOPAMINE MAP')); lines.push(''); lines.push(song.dopamine); }
+  if (song.notes)     { lines.push(''); lines.push(sep('DIRECTOR NOTES')); lines.push(''); lines.push(song.notes); }
   const blob = new Blob([lines.join('\n')], {type: 'text/plain'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = (song.title || 'song').replace(/[^a-z0-9]/gi, '_').toLowerCase() + '.txt';
   a.click();
+  toast('✓ Downloaded: ' + (song.title || 'song') + '.txt');
 }
 
 function downloadConcept(idx) {
