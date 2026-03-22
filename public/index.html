@@ -2321,15 +2321,29 @@ DIRECTOR NOTES:
 4. [tip 4]
 5. [tip 5]`;
 
-  callClaude(prompt,system).then(raw=>{
+  const luckyOut=document.getElementById('lucky-out');
+  luckyOut.style.display='block';
+  luckyOut.classList.add('visible');
+  document.getElementById('lres-title').textContent='Writing song…';
+  document.getElementById('lres-verdict').textContent='';
+  document.getElementById('lres-lyrics-text').innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Writing your lucky song…</div></div>';
+
+  let firstChunk=true;
+  const lyricsEl=document.getElementById('lres-lyrics-text');
+  callClaudeStream(prompt,system,(chunk,full)=>{
+    if(firstChunk){firstChunk=false;lyricsEl.innerHTML='<pre class="stream-raw" id="lstream-display"></pre>';}
+    const el=document.getElementById('lstream-display');
+    if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
+  }).then(raw=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
   }).catch(e=>{
     if(e.message==='enter-key'){btnDone('lucky-btn');return;}
-    toast('⚠️ '+e.message, 4000);
+    lyricsEl.innerHTML=`<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${e.message}<br><br><strong>Check:</strong><br>1. Vercel → Settings → Environment Variables → ANTHROPIC_API_KEY or OPENROUTER_API_KEY is set<br>2. Redeploy after adding the key</div>`;
+    document.getElementById('lres-title').textContent='Error';
     btnDone('lucky-btn');
-    document.getElementById('lucky-hint').textContent='Error — try again.';
+    document.getElementById('lucky-hint').textContent='Error — check API key in Vercel settings.';
   });
 }
 
@@ -2539,7 +2553,7 @@ DIRECTOR NOTES:
   }catch(e){
     if(e.message==='enter-key'){btnDone('gen-btn');return;}
     document.getElementById('res-title').textContent='Error';
-    document.getElementById('res-lyrics-text').innerHTML='<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ '+e.message+'</div>';
+    document.getElementById('res-lyrics-text').innerHTML=`<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${e.message}<br><br><strong>Check:</strong><br>1. Vercel → Settings → Environment Variables → ANTHROPIC_API_KEY or OPENROUTER_API_KEY is set<br>2. Redeploy after adding the key</div>`;
     toast('⚠️ '+e.message, 4000);
   }
   btnDone('gen-btn');
