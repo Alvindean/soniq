@@ -1966,7 +1966,7 @@ async function callClaudeStream(prompt, systemPrompt, onChunk) {
   return text;
 }
 
-async function callClaude(prompt, systemPrompt='') {
+async function callClaude(prompt, systemPrompt='', maxTok=2048) {
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
 
   // On Vercel — use secure server-side proxy
@@ -1977,7 +1977,7 @@ async function callClaude(prompt, systemPrompt='') {
       body: JSON.stringify({
         messages: [{role:'user', content:prompt}],
         system: systemPrompt || undefined,
-        max_tokens: 2048
+        max_tokens: maxTok
       })
     });
     const ct = res.headers.get('content-type') || '';
@@ -2006,7 +2006,7 @@ async function callClaude(prompt, systemPrompt='') {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey},
-      body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens:2048, messages:msgs})
+      body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens:maxTok, messages:msgs})
     });
     if (res.status===401) {
       localStorage.removeItem('soniq_api_key'); window._soniqKey=null;
@@ -2019,7 +2019,7 @@ async function callClaude(prompt, systemPrompt='') {
     return data.choices?.[0]?.message?.content || '';
   } else {
     // Anthropic direct
-    const body = {model:'claude-sonnet-4-20250514', max_tokens:2048, messages:[{role:'user',content:prompt}]};
+    const body = {model:'claude-sonnet-4-20250514', max_tokens:maxTok, messages:[{role:'user',content:prompt}]};
     if (systemPrompt) body.system = systemPrompt;
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -2628,6 +2628,7 @@ function parseSongResult(raw,genre,topic){
   const varBtn = document.getElementById('res-var-btn');
   if (varBtn) varBtn.disabled = false;
   generateScoreDashboard('res', lyrics, genre);
+  document.getElementById('instant-edit-card').classList.add('visible');
   toast('✓ Song generated: "'+title+'"');
 }
 
@@ -3445,7 +3446,7 @@ Respond with a JSON array only. No markdown, no explanation outside the array:
 ]`;
 
   try {
-    const raw = await callClaude(prompt, 'You are a hit song title specialist. Output only valid JSON arrays. No markdown fences, no extra text.');
+    const raw = await callClaude(prompt, 'You are a hit song title specialist. Output only valid JSON arrays. No markdown fences, no extra text.', 512);
 
     // Strip markdown fences if present
     const cleaned = raw.replace(/```json\n?|\n?```/g, '').trim();
@@ -4088,6 +4089,295 @@ function updateMoodHint(){
   if(!hint)return;
   const descs=S.selectedMoods.map(id=>MOODS_DEF.find(m=>m.id===id)?.hint||'').filter(Boolean);
   hint.textContent=descs.join(' · ')||'Select a mood to see how it shapes your song';
+}
+
+// ═══════════════════════════════════════════════════════
+// VISUAL PROMPTS
+// ═══════════════════════════════════════════════════════
+async function loadVisualPrompts(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  const el = document.getElementById(prefix + '-visual-content');
+  if (!el) return;
+  if (!song?.lyrics) {
+    el.innerHTML = '<div style="padding:20px;color:var(--tx3);font-size:13px">Generate a song first to see visual prompts.</div>';
+    return;
+  }
+  el.innerHTML = '<div style="padding:20px;color:var(--tx3);font-size:13px;display:flex;align-items:center;gap:10px"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span> Generating visual prompts…</div>';
+  const prompt = `For this ${song.genre||'pop'} song titled "${song.title||'Untitled'}" about "${song.topic||'love'}" with this sound: ${(song.style||'').slice(0,100)}
+
+Generate EXACTLY:
+ALBUM ART: [vivid Midjourney/DALL-E prompt for album cover — no faces, no text, no artist names, under 120 chars]
+SCENE 1: [Opening shot for music video — 10 words]
+SCENE 2: [Core visual metaphor scene — 10 words]
+SCENE 3: [Emotional peak scene — 10 words]
+COLORS: #HEX Label, #HEX Label, #HEX Label`;
+  try {
+    const raw = await callClaude(prompt, 'You are a visual art director for music. Be specific and evocative. Respond only in the exact format requested.', 300);
+    const getLine = key => { const m = raw.match(new RegExp(key+':\\s*(.+)')); return m ? m[1].trim() : ''; };
+    const albumArt = getLine('ALBUM ART');
+    const s1 = getLine('SCENE 1'), s2 = getLine('SCENE 2'), s3 = getLine('SCENE 3');
+    const colors = (getLine('COLORS')||'').split(',').map(c => { const m = c.trim().match(/(#[0-9A-Fa-f]{6})\s+(.+)/); return m ? {hex:m[1],label:m[2].trim()} : null; }).filter(Boolean);
+    el.innerHTML = `
+      <div class="vp-section">
+        <div class="vp-label">🖼 Album Art Prompt</div>
+        <div class="vp-prompt-box" id="${prefix}-vp-art">${albumArt||'—'}
+          <button class="vp-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('${prefix}-vp-art').textContent.replace('Copy','').trim());toast('Copied!')">Copy</button>
+        </div>
+        <div style="font-size:11px;color:var(--tx3)">Paste into Midjourney, DALL-E 3, or Adobe Firefly</div>
+      </div>
+      <div class="vp-section">
+        <div class="vp-label">🎬 Music Video Scenes</div>
+        <div class="vp-scene-grid">
+          ${[{n:'Opening Shot',d:s1},{n:'Core Visual',d:s2},{n:'Emotional Peak',d:s3}].map((s,i)=>`<div class="vp-scene"><div class="vp-scene-num">Scene ${i+1} — ${s.n}</div><div class="vp-scene-body">${s.d||'—'}</div></div>`).join('')}
+        </div>
+      </div>
+      ${colors.length ? `<div class="vp-section"><div class="vp-label">🎨 Colour Palette</div><div style="display:flex;gap:12px;flex-wrap:wrap;padding:4px 0">${colors.map(c=>`<div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:44px;height:44px;border-radius:8px;background:${c.hex};border:1px solid var(--b2)"></div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)">${c.hex}</div><div style="font-size:10px;color:var(--tx2)">${c.label}</div></div>`).join('')}</div></div>` : ''}
+      <div class="vp-section"><button class="vp-gen-btn" onclick="loadVisualPrompts('${prefix}')">↺ Regenerate</button></div>`;
+  } catch(e) {
+    el.innerHTML = apiErrHtml(e.message);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// ALBUM ENGINE
+// ═══════════════════════════════════════════════════════
+function goAlbTab(id, el) {
+  document.querySelectorAll('.album-pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.album-tab').forEach(b => b.classList.remove('on'));
+  const pane = document.getElementById('alb-pane-' + id);
+  if (pane) pane.classList.add('on');
+  if (el) el.classList.add('on');
+}
+
+function setLane(el, lane) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) {
+    if (!S.albumLanes.includes(lane)) S.albumLanes.push(lane);
+  } else {
+    S.albumLanes = S.albumLanes.filter(l => l !== lane);
+    if (!S.albumLanes.length) { S.albumLanes.push(lane); el.classList.add('on'); }
+  }
+}
+
+async function generateAlbumTheme() {
+  const brief = document.getElementById('alb-brief')?.value?.trim() || '';
+  const genre = document.getElementById('alb-genre')?.value || 'pop';
+  const type  = document.getElementById('alb-type')?.value || 'full';
+  const lanes = S.albumLanes?.join(', ') || 'mainstream streaming';
+  const btn   = document.getElementById('alb-btn');
+  btnLoad('alb-btn', 'Generating…');
+  const out = document.getElementById('album-out');
+  if (out) { out.style.display = 'block'; out.classList.add('visible'); }
+  document.getElementById('alb-name').textContent = 'Generating album concept…';
+  document.getElementById('alb-tags').innerHTML = '';
+
+  const prompt = `Create a complete ${genre} ${type} album concept targeting: ${lanes}.${brief ? '\nArtist brief: ' + brief : ''}
+
+Respond with EXACTLY this format:
+ALBUM NAME: [name]
+TAGS: [3-4 comma-separated concept tags]
+SUMMARY:
+[2-3 sentence album summary]
+
+ARC:
+[2-3 sentence emotional and narrative arc]
+
+MOTIFS:
+- [motif 1]
+- [motif 2]
+- [motif 3]
+
+TRACK TYPES:
+OPENER | [description] | [emotional role]
+LEAD SINGLE | [description] | [emotional role]
+BALLAD | [description] | [emotional role]
+MID-TEMPO | [description] | [emotional role]
+STATEMENT TRACK | [description] | [emotional role]
+CLOSER | [description] | [emotional role]
+
+SONIC PALETTE:
+[color name] | [sound description]
+[color name] | [sound description]
+[color name] | [sound description]
+
+PRODUCTION STYLE:
+[2 sentences on production direction]
+
+VISUAL DIRECTION:
+[2 sentences on visual/art direction]
+
+POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
+
+  try {
+    let raw = '';
+    await callClaudeStream(prompt, 'You are a creative director for a major record label. Be specific and commercially minded.', (chunk, full) => { raw = full; });
+
+    const sec = (key, next) => { const re = new RegExp(key+':\\s*([\\s\\S]*?)(?=\\n[A-Z][A-Z &\\/]+:|$)'); const m = raw.match(re); return m ? m[1].trim() : ''; };
+    const name = raw.match(/ALBUM NAME:\s*(.+)/)?.[1]?.trim() || 'Untitled Album';
+    const tagsRaw = raw.match(/TAGS:\s*(.+)/)?.[1]?.trim() || '';
+    const summary = sec('SUMMARY','ARC'), arc = sec('ARC','MOTIFS');
+    const motifsRaw = sec('MOTIFS','TRACK TYPES'), trackTypesRaw = sec('TRACK TYPES','SONIC PALETTE');
+    const paletteRaw = sec('SONIC PALETTE','PRODUCTION STYLE'), prodStyle = sec('PRODUCTION STYLE','VISUAL DIRECTION');
+    const visual = sec('VISUAL DIRECTION','POSSIBLE TITLES');
+    const titlesRaw = raw.match(/POSSIBLE TITLES:\s*(.+)/)?.[1]?.trim() || '';
+
+    document.getElementById('alb-name').textContent = name;
+    document.getElementById('alb-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${t.trim()}</span>`).join('');
+    document.getElementById('alb-summary').textContent = summary;
+    document.getElementById('alb-arc').textContent = arc;
+    document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${l.replace(/^-\s*/,'')}</li>`).join('');
+
+    document.getElementById('alb-track-types').innerHTML = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
+      const [type,desc,role] = l.split('|').map(s=>s.trim());
+      return `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${type||''}</div><div class="gap-role-desc">${desc||''} — ${role||''}</div></div></div>`;
+    }).join('');
+
+    const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
+    document.getElementById('alb-palette').innerHTML = paletteRaw.split('\n').filter(l=>l.includes('|')).map((l,i)=>{
+      const [label,desc] = l.split('|').map(s=>s.trim());
+      const col = PALETTE_COLORS[i % PALETTE_COLORS.length];
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${col};flex-shrink:0"></div><div><div style="font-size:12px;font-weight:700;color:var(--tx1)">${label||''}</div><div style="font-size:11px;color:var(--tx3)">${desc||''}</div></div></div>`;
+    }).join('');
+    document.getElementById('alb-prod-refs').textContent = prodStyle;
+    document.getElementById('alb-visual').textContent = visual;
+    document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent='${t.trim().replace(/'/g,"\\'")}';toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${t.trim()}</div></div></div>`).join('');
+
+    S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, palette:paletteRaw, visual, titles:titlesRaw, genre, lanes};
+    toast('🎼 Album concept generated!');
+    out.scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    document.getElementById('alb-name').textContent = 'Error';
+    document.getElementById('alb-summary').innerHTML = apiErrHtml(e.message);
+  }
+  btnDone('alb-btn');
+}
+
+function loadGapMap() {
+  const grid = document.getElementById('alb-gap-grid');
+  if (!grid) return;
+  if (!S.albumData) {
+    grid.innerHTML = '<div style="font-size:13px;color:var(--tx3);padding:16px 0">Generate an album concept first, then come back to the Gap Map.</div>';
+    return;
+  }
+  const ROLES = [
+    {role:'OPENER', icon:'🚀', why:'Sets the sonic world and tone'},
+    {role:'LEAD SINGLE', icon:'⭐', why:'Most radio-ready and commercial hook'},
+    {role:'BALLAD', icon:'💙', why:'Emotional depth and vulnerability'},
+    {role:'STATEMENT TRACK', icon:'🎯', why:"The album's artistic mission statement"},
+    {role:'CLUB / DANCE', icon:'💃', why:'Energy release and replayability'},
+    {role:'COLLABORATION', icon:'🤝', why:'Audience crossover and discovery'},
+    {role:'DEEPER CUT', icon:'🔍', why:'Rewards repeated listening'},
+    {role:'CLOSER', icon:'🌅', why:'Final emotional resolution'},
+  ];
+  const tt = (S.albumData.trackTypes || '').toUpperCase();
+  grid.innerHTML = ROLES.map(r => {
+    const covered = tt.includes(r.role.split('/')[0].trim());
+    return `<div class="gap-role">
+      <div class="gap-role-icon">${r.icon}</div>
+      <div class="gap-role-body">
+        <div class="gap-role-name">${r.role}</div>
+        <div class="gap-role-desc">${covered ? '✓ Covered in your track map' : '⚠️ Missing — ' + r.why}</div>
+      </div>
+      <div class="gap-role-actions"><span class="gap-status ${covered ? 'gap-status-present' : 'gap-status-missing'}">${covered ? 'Present' : 'Missing'}</span></div>
+    </div>`;
+  }).join('');
+}
+
+async function albumInstantEdit() {
+  const inp = document.getElementById('alb-ie-input');
+  const instruction = inp?.value?.trim();
+  if (!instruction) { toast('Describe your edit first'); return; }
+  if (!S.albumData) { toast('Generate an album concept first'); return; }
+  btnLoad('alb-ie-btn', '⚡ Applying…');
+  try {
+    const raw = await callClaude(
+      `Album: "${S.albumData.name}" (${S.albumData.genre})\nSummary: ${S.albumData.summary}\n\nApply this change: "${instruction}"\n\nReturn revised SUMMARY and ARC only:\nSUMMARY:\n[revised]\n\nARC:\n[revised]`,
+      'You are a record label creative director. Apply edits precisely.', 300);
+    const newSummary = raw.match(/SUMMARY:\s*([\s\S]*?)(?=ARC:|$)/i)?.[1]?.trim() || '';
+    const newArc = raw.match(/ARC:\s*([\s\S]*?)$/i)?.[1]?.trim() || '';
+    if (newSummary) { document.getElementById('alb-summary').textContent = newSummary; S.albumData.summary = newSummary; }
+    if (newArc) { document.getElementById('alb-arc').textContent = newArc; S.albumData.arc = newArc; }
+    toast('⚡ Album updated!');
+    inp.value = '';
+  } catch(e) { toast('⚠️ ' + e.message); }
+  btnDone('alb-ie-btn');
+}
+
+// ═══════════════════════════════════════════════════════
+// WRITE PAGE — MISSING FUNCTIONS
+// ═══════════════════════════════════════════════════════
+function setBracket(el, mode) {
+  S.bracketMode = mode;
+  document.querySelectorAll('.bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+async function enhanceConcept() {
+  const inp = document.getElementById('g-topic');
+  const raw = inp?.value?.trim();
+  if (!raw || raw.length < 5) { toast('Type a concept first'); return; }
+  btnLoad('enhance-btn', '✦ Enhancing…');
+  try {
+    const enhanced = await callClaude(
+      `Rewrite this song concept into a sharper, more emotionally precise and specific version. Keep the core idea but make it more vivid and hook-worthy. Return ONLY the rewritten concept (1-2 sentences, no quotes, no intro):\n\n"${raw}"`,
+      'You are a professional songwriting coach. Be emotionally precise and specific.', 120);
+    inp.value = enhanced.replace(/^["']|["']$/g, '').trim();
+    toast('✦ Concept enhanced!');
+  } catch(e) { toast('⚠️ ' + e.message); }
+  btnDone('enhance-btn');
+}
+
+async function generateSynopsis() {
+  const topic = document.getElementById('g-topic')?.value?.trim();
+  if (!topic) { toast('Enter a song concept first'); return; }
+  const genre = S.selectedGenre, moods = (S.selectedMoods||['Emotional']).join(' + ');
+  const vocal = document.getElementById('g-vocal')?.value || 'Male vocals';
+  const structure = document.getElementById('g-structure')?.value || 'standard';
+  btnLoad('synopsis-btn', '📋 Generating…');
+  try {
+    const synopsis = await callClaude(
+      `Write a song creative brief for:\nGenre: ${genre}\nConcept: ${topic}\nMood: ${moods}\nVocal: ${vocal}\nStructure: ${structure}\n\nRespond with exactly:\nTITLE IDEA: [working title]\nSYNOPSIS: [what the song is about]\nHOOK CONCEPT: [the emotional hook]\nPRODUCTION DIRECTION: [key production feel]`,
+      'You are a music producer writing a creative brief.', 200);
+    document.getElementById('synopsis-body').innerHTML = synopsis.split('\n').filter(Boolean).map(line => {
+      const colon = line.indexOf(':');
+      if (colon < 0) return `<div style="font-size:13px;color:var(--tx2);margin-bottom:6px">${line}</div>`;
+      const k = line.slice(0, colon).trim(), v = line.slice(colon+1).trim();
+      return `<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${k}</div><div style="font-size:13px;color:var(--tx2)">${v}</div></div>`;
+    }).join('');
+    document.getElementById('synopsis-card').classList.add('visible');
+  } catch(e) { toast('⚠️ ' + e.message); }
+  btnDone('synopsis-btn');
+}
+
+function ieChip(el, text) {
+  const inp = document.getElementById('ie-input');
+  if (inp) { inp.value = text; inp.focus(); }
+  document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
+  el.style.borderColor = 'var(--amber)';
+}
+
+async function instantEdit() {
+  const inp = document.getElementById('ie-input');
+  const instruction = inp?.value?.trim();
+  if (!instruction) { toast('Describe your edit first'); return; }
+  if (!S.currentSong?.lyrics) { toast('Generate a song first'); return; }
+  btnLoad('ie-btn', '⚡ Editing…');
+  const lyricsEl = document.getElementById('res-lyrics-text');
+  lyricsEl.innerHTML = '<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Applying edit…</div></div>';
+  try {
+    let full = '';
+    await callClaudeStream(
+      `You are editing a ${S.currentSong.genre||'pop'} song. Apply this specific change: "${instruction}"\n\nCURRENT LYRICS:\n${S.currentSong.lyrics}\n\nRules:\n- Only change what the instruction asks for\n- Preserve all other sections exactly\n- Return the complete revised lyrics with [Section] tags\n- No commentary — only the lyrics`,
+      'You are a professional lyric editor. Apply only the requested change precisely.',
+      (chunk, text) => { full = text; });
+    const newLyrics = full.trim();
+    S.currentSong.lyrics = newLyrics;
+    lyricsEl.innerHTML = newLyrics.replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+    toast('⚡ Edit applied!');
+    inp.value = '';
+    document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
+  } catch(e) { lyricsEl.innerHTML = apiErrHtml(e.message); }
+  btnDone('ie-btn');
 }
 
 // ═══════════════════════════════════════════════════════
