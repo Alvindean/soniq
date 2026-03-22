@@ -2232,6 +2232,15 @@ const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy male','Soulf
 
 function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
+function apiErrHtml(msg) {
+  const isCredits = msg.toLowerCase().includes('credit');
+  const isKey = msg.toLowerCase().includes('api key') || msg.toLowerCase().includes('configured');
+  let hint = '';
+  if (isCredits) hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--accent)">openrouter.ai/settings/credits</a>';
+  else if (isKey) hint = '<br><br><strong>Fix:</strong><br>1. Vercel → Settings → Environment Variables → set ANTHROPIC_API_KEY or OPENROUTER_API_KEY<br>2. Redeploy';
+  return `<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${msg}${hint}</div>`;
+}
+
 function feelLucky(){
   // Pick random fusion pair from FUSION_DATA keys
   const keys=Object.keys(FUSION_DATA);
@@ -2345,7 +2354,7 @@ DIRECTOR NOTES:
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
   }).catch(e=>{
     if(e.message==='enter-key'){btnDone('lucky-btn');return;}
-    lyricsEl.innerHTML=`<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${e.message}<br><br><strong>Check:</strong><br>1. Vercel → Settings → Environment Variables → ANTHROPIC_API_KEY or OPENROUTER_API_KEY is set<br>2. Redeploy after adding the key</div>`;
+    lyricsEl.innerHTML=apiErrHtml(e.message);
     document.getElementById('lres-title').textContent='Error';
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Error — check API key in Vercel settings.';
@@ -2558,7 +2567,7 @@ DIRECTOR NOTES:
   }catch(e){
     if(e.message==='enter-key'){btnDone('gen-btn');return;}
     document.getElementById('res-title').textContent='Error';
-    document.getElementById('res-lyrics-text').innerHTML=`<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${e.message}<br><br><strong>Check:</strong><br>1. Vercel → Settings → Environment Variables → ANTHROPIC_API_KEY or OPENROUTER_API_KEY is set<br>2. Redeploy after adding the key</div>`;
+    document.getElementById('res-lyrics-text').innerHTML=apiErrHtml(e.message);
     toast('⚠️ '+e.message, 4000);
   }
   btnDone('gen-btn');
