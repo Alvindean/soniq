@@ -1,6 +1,6 @@
 /**
- * SONIQ — Universal API Proxy
- * Supports both Anthropic and OpenRouter API keys
+ * SONIQ — Universal API Proxy with automatic fallback
+ * Primary: ANTHROPIC_API_KEY → fallback: OPENROUTER_API_KEY (and vice versa)
  * POST /api/generate
  */
 
@@ -13,6 +13,42 @@ function checkLimit(ip) {
   e.count++; return true;
 }
 
+async function callAnthropic(apiKey, messages, system, max_tokens) {
+  const payload = {model:'claude-sonnet-4-20250514', max_tokens, messages};
+  if (system) payload.system = system;
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01'},
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error('Anthropic error ' + r.status + ': ' + t.slice(0,200));
+  }
+  const d = await r.json();
+  return d.content?.map(c=>c.text||'').join('') || '';
+}
+
+async function callOpenRouter(apiKey, messages, system, max_tokens) {
+  const orMsgs = system ? [{role:'system',content:system}, ...messages] : messages;
+  const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + apiKey,
+      'HTTP-Referer': 'https://soniq.vercel.app',
+      'X-Title': 'SONIQ'
+    },
+    body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens, messages:orMsgs})
+  });
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error('OpenRouter error ' + r.status + ': ' + t.slice(0,200));
+  }
+  const d = await r.json();
+  return d.choices?.[0]?.message?.content || '';
+}
+
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -20,12 +56,10 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
 
-  // Support both key types
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const openrouterKey = process.env.OPENROUTER_API_KEY;
-  const apiKey = anthropicKey || openrouterKey;
 
-  if (!apiKey) {
+  if (!anthropicKey && !openrouterKey) {
     return res.status(500).json({
       error: 'No API key configured. Add ANTHROPIC_API_KEY or OPENROUTER_API_KEY in Vercel → Settings → Environment Variables, then Redeploy.'
     });
@@ -41,48 +75,28 @@ module.exports = async function handler(req, res) {
   const { messages, system, max_tokens = 4096 } = body || {};
   if (!messages?.length) return res.status(400).json({error:'messages required'});
 
-  try {
-    let responseText;
+  const errors = [];
 
-    if (openrouterKey && !anthropicKey) {
-      // OpenRouter path
-      const orMsgs = system
-        ? [{role:'system',content:system}, ...messages]
-        : messages;
-
-      const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + openrouterKey,
-          'HTTP-Referer': 'https://soniq.vercel.app',
-          'X-Title': 'SONIQ'
-        },
-        body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens, messages:orMsgs})
-      });
-      if (!r.ok) { const t=await r.text(); return res.status(r.status).json({error:'OpenRouter error '+r.status, detail:t}); }
-      const d = await r.json();
-      responseText = d.choices?.[0]?.message?.content || '';
-    } else {
-      // Anthropic path
-      const payload = {model:'claude-sonnet-4-20250514', max_tokens, messages};
-      if (system) payload.system = system;
-
-      const r = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-version':'2023-06-01'},
-        body: JSON.stringify(payload)
-      });
-      if (!r.ok) { const t=await r.text(); return res.status(r.status).json({error:'Anthropic error '+r.status, detail:t}); }
-      const d = await r.json();
-      responseText = d.content?.map(c=>c.text||'').join('') || '';
+  // Try Anthropic first, then OpenRouter as fallback
+  if (anthropicKey) {
+    try {
+      const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
+      return res.status(200).json({content:[{type:'text', text}]});
+    } catch(err) {
+      console.error('Anthropic failed, trying fallback:', err.message);
+      errors.push('Anthropic: ' + err.message);
     }
-
-    // Always return Anthropic-compatible format
-    return res.status(200).json({content:[{type:'text', text:responseText}]});
-
-  } catch(err) {
-    console.error('Proxy error:', err);
-    return res.status(500).json({error: err.message});
   }
+
+  if (openrouterKey) {
+    try {
+      const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
+      return res.status(200).json({content:[{type:'text', text}]});
+    } catch(err) {
+      console.error('OpenRouter failed:', err.message);
+      errors.push('OpenRouter: ' + err.message);
+    }
+  }
+
+  return res.status(502).json({error: 'All API providers failed. ' + errors.join(' | ')});
 };

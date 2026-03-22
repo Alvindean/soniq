@@ -451,6 +451,130 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .params{grid-template-columns:1fr 1fr}
 }
 
+/* ── CONCEPT ENHANCE ── */
+.enhance-row{display:flex;gap:8px;align-items:stretch;margin-bottom:20px}
+.enhance-row .topic-input{margin-bottom:0;flex:1}
+.enhance-btn{flex-shrink:0;padding:0 16px;border-radius:var(--r2);border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:.02em}
+.enhance-btn:hover:not(:disabled){background:var(--violet);color:#fff;transform:translateY(-1px)}
+.enhance-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── SYNOPSIS PREVIEW ── */
+.synopsis-card{background:var(--s2);border:1px solid var(--violetline);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
+.synopsis-card.visible{display:block;animation:pgIn .25s ease}
+.synopsis-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--violetbg)}
+.synopsis-hdr-title{font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.08em}
+.synopsis-body{padding:14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:580px){.synopsis-body{grid-template-columns:1fr}}
+.synopsis-field{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:9px 12px}
+.synopsis-field-label{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.synopsis-field-body{font-size:12px;color:var(--tx1);line-height:1.55}
+.synopsis-actions{padding:10px 16px 14px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--b1)}
+
+/* ── BRACKET SELECTOR ── */
+.bracket-row{margin-bottom:16px}
+.bracket-label{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;display:block}
+.bracket-pills{display:flex;gap:5px;flex-wrap:wrap}
+.bpill{font-size:11px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s}
+.bpill:hover{color:var(--tx2);border-color:var(--b3)}
+.bpill.on{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
+
+/* ── INSTANT EDIT ── */
+.instant-edit-card{background:var(--s2);border:1px solid var(--amberline);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
+.instant-edit-card.visible{display:block;animation:pgIn .25s ease}
+.ie-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--amberbg)}
+.ie-hdr-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
+.ie-body{padding:14px 16px}
+.ie-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.ie-chip{font-size:10px;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;user-select:none}
+.ie-chip:hover{background:var(--s4);color:var(--tx2);border-color:var(--b3)}
+.ie-textarea{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:56px;line-height:1.6;transition:border-color .15s;font-family:var(--font)}
+.ie-textarea:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
+.ie-textarea::placeholder{color:var(--tx4)}
+.ie-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+
+/* ── ALBUM PAGE ── */
+.album-hero{text-align:center;padding:28px 20px 20px}
+.album-hero-label{font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.14em;margin-bottom:8px}
+.album-hero-title{font-size:26px;font-weight:700;letter-spacing:-.5px;margin-bottom:6px;color:var(--tx1)}
+.album-hero-sub{font-size:13px;color:var(--tx3);max-width:500px;margin:0 auto;line-height:1.6}
+.album-form{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:20px;margin-bottom:16px}
+.album-field{margin-bottom:14px}
+.album-label{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block}
+.album-textarea{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:11px 14px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:all .15s;font-family:var(--font)}
+.album-textarea:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
+.album-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+.album-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+@media(max-width:580px){.album-grid{grid-template-columns:1fr}}
+.album-lanes{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
+.lane-pill{font-size:11px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;user-select:none}
+.lane-pill:hover{color:var(--tx2);border-color:var(--b3)}
+.lane-pill.on{background:var(--violetbg);border-color:var(--violetline);color:var(--violet)}
+.album-gen-btn{display:inline-flex;align-items:center;gap:9px;padding:13px 28px;border-radius:var(--r4);border:none;background:linear-gradient(135deg,var(--violet),#7b67e5);color:#fff;font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:.02em;cursor:pointer;transition:all .2s;box-shadow:0 2px 16px rgba(155,135,245,.25)}
+.album-gen-btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 4px 24px rgba(155,135,245,.38)}
+.album-gen-btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.album-out{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
+.album-out.visible{display:block;animation:pgIn .25s ease}
+.album-out-hdr{padding:16px 20px;border-bottom:1px solid var(--b1)}
+.album-name{font-size:22px;font-weight:700;letter-spacing:-.5px;color:var(--tx1);margin-bottom:6px}
+.album-concept-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.album-concept-tag{font-size:10px;font-weight:600;padding:2px 9px;border-radius:99px;background:var(--violetbg);border:1px solid var(--violetline);color:var(--violet)}
+.album-tabs{display:flex;gap:0;overflow-x:auto;border-bottom:1px solid var(--b1);padding:0 20px}
+.album-tabs::-webkit-scrollbar{display:none}
+.album-tab{padding:11px 14px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;letter-spacing:.02em;flex-shrink:0}
+.album-tab:hover{color:var(--tx2)}
+.album-tab.on{color:var(--violet);border-bottom-color:var(--violet)}
+.album-pane{display:none;padding:16px 20px}
+.album-pane.on{display:block}
+.album-section-title{font-size:10px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.album-prose{font-size:13px;color:var(--tx2);line-height:1.8;white-space:pre-wrap;background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px}
+.album-list{list-style:none;padding:0;display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.album-list li{font-size:13px;color:var(--tx1);padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);line-height:1.5}
+.album-list li strong{color:var(--violet)}
+.album-palette{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.palette-tag{font-size:12px;font-weight:600;padding:5px 13px;border-radius:99px;background:var(--s3);border:1px solid var(--b2);color:var(--tx2)}
+.gap-map-grid{display:flex;flex-direction:column;gap:7px}
+.gap-role{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);transition:all .15s}
+.gap-role:hover{border-color:var(--amberline)}
+.gap-role-icon{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:13px;background:var(--s4);border:1px solid var(--b2);margin-top:1px}
+.gap-role-body{flex:1}
+.gap-role-name{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px}
+.gap-role-desc{font-size:11px;color:var(--tx3);line-height:1.5}
+.gap-role-actions{display:flex;flex-direction:column;gap:5px;align-self:center;flex-shrink:0}
+.gap-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.gap-status-missing{background:var(--redbg);color:var(--red);border:1px solid var(--redline)}
+.gap-status-present{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
+.gap-write-btn{background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r1);padding:4px 10px;font-size:10px;font-weight:700;color:var(--amber);cursor:pointer;transition:all .15s;white-space:nowrap}
+.gap-write-btn:hover{background:var(--amber);color:#050505}
+.album-ie-box{padding:14px 16px;border-top:1px solid var(--b1);background:var(--amberbg)}
+.album-ie-label{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.album-ie-textarea{width:100%;background:var(--s3);border:1px solid var(--amberline);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:48px;line-height:1.6;font-family:var(--font)}
+.album-ie-textarea:focus{box-shadow:0 0 0 3px var(--amberbg)}
+
+/* ── MOOD GRID ── */
+.mood-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:5px;margin-bottom:20px}
+.mood-pill{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:7px 8px;text-align:center;cursor:pointer;transition:all .15s;user-select:none}
+.mood-pill:hover{border-color:var(--b3);background:var(--s4)}
+.mood-pill.on{border-color:var(--amberline);background:var(--amberbg)}
+.mood-pill-icon{font-size:16px;line-height:1;margin-bottom:3px}
+.mood-pill-name{font-size:10px;font-weight:700;color:var(--tx2);letter-spacing:.02em}
+.mood-pill.on .mood-pill-name{color:var(--amber)}
+.mood-hint{font-size:10px;color:var(--tx3);font-style:italic;margin-bottom:14px;line-height:1.5;min-height:16px}
+@media(max-width:440px){.mood-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}}
+
+/* ── VISUAL PROMPT TAB ── */
+.vp-section{margin-bottom:16px}
+.vp-label{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.vp-prompt-box{background:var(--s1);border:1px solid var(--cyanline);border-radius:var(--r2);padding:14px 16px;font-family:var(--mono);font-size:12px;color:var(--cyan);line-height:1.7;word-break:break-word;position:relative;margin-bottom:8px}
+.vp-copy-btn{position:absolute;top:8px;right:8px;font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--cyanline);background:var(--s2);color:var(--cyan);cursor:pointer;transition:all .15s}
+.vp-copy-btn:hover{background:var(--cyan);color:#050505}
+.vp-scene-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.vp-scene{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 14px}
+.vp-scene-num{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.vp-scene-body{font-size:12px;color:var(--tx2);line-height:1.6}
+.vp-gen-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:var(--r3);border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;margin-bottom:14px}
+.vp-gen-btn:hover:not(:disabled){background:var(--cyan);color:#050505}
+.vp-gen-btn:disabled{opacity:.4;cursor:not-allowed}
+
 /* ═══════════════════════════════════════════
    PRODUCTION BRIEF
 ═══════════════════════════════════════════ */
@@ -760,6 +884,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('builder',this)"><span class="ni">🎛️</span>Builder</button>
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
   <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
+  <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
 </nav>
 
 <!-- ══════════════════════════════════
@@ -777,24 +902,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
       <!-- BIG TOPIC INPUT -->
       <label class="topic-label" for="g-topic">What is your song about?</label>
-      <input type="text" id="g-topic" class="topic-input"
-        placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
-        onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}" />
+      <div class="enhance-row">
+        <input type="text" id="g-topic" class="topic-input"
+          placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
+          onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}" />
+        <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept into a sharper, more emotionally precise version">✦ Enhance</button>
+      </div>
 
       <!-- GENRE GRID -->
       <label class="topic-label">Genre</label>
       <div class="genre-grid" id="genre-grid"></div>
 
-      <!-- PARAMS ROW -->
-      <div class="params">
-        <div class="param">
-          <div class="param-label">Mood</div>
-          <select id="g-mood">
-            <option>Euphoric</option><option>Melancholic</option><option>Angry</option>
-            <option>Hopeful</option><option>Dark</option><option>Romantic</option>
-            <option>Rebellious</option><option>Peaceful</option><option>Nostalgic</option><option>Defiant</option>
-          </select>
-        </div>
+      <!-- MOOD GRID -->
+      <label class="topic-label">Mood <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— select up to 2</span></label>
+      <div class="mood-grid" id="mood-grid"></div>
+      <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
+
+      <!-- PARAMS ROW (Vocal + Structure only) -->
+      <div class="params" style="grid-template-columns:1fr 1fr">
         <div class="param">
           <div class="param-label">Vocal Style</div>
           <select id="g-vocal">
@@ -813,7 +938,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <option value="epic">Epic (8 sections)</option>
             <option value="verseonly">Verse-Only (folk/SS)</option>
             <option value="riddim">Riddim Loop (reggae)</option>
-          <option value="kpop">K-Pop (pre-chorus + key change)</option>
+            <option value="kpop">K-Pop (pre-chorus + key change)</option>
           </select>
         </div>
       </div>
@@ -907,15 +1032,50 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="lpill" onclick="setLen(this,'extended')" data-val="extended">Extended <span class="lpill-desc">~5min+</span></span>
       </div>
 
+      <!-- ERA SELECTOR -->
+      <label class="topic-label">Era <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— shapes vocabulary, production, and cultural references</span></label>
+      <div class="quality-row" id="era-pills">
+        <span class="qpill" onclick="setEra(this,'classic')" data-era="classic">🎙 Classic <span style="font-size:9px;opacity:.7">pre-1980</span></span>
+        <span class="qpill" onclick="setEra(this,'vintage')" data-era="vintage">📼 Vintage <span style="font-size:9px;opacity:.7">1980–1999</span></span>
+        <span class="qpill on" onclick="setEra(this,'modern')" data-era="modern">💿 Modern <span style="font-size:9px;opacity:.7">2000–2015</span></span>
+        <span class="qpill" onclick="setEra(this,'contemporary')" data-era="contemporary">📱 Contemporary <span style="font-size:9px;opacity:.7">2016–2022</span></span>
+        <span class="qpill" onclick="setEra(this,'current')" data-era="current">🔥 Current <span style="font-size:9px;opacity:.7">2023–Now</span></span>
+      </div>
+      <div id="era-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:16px;min-height:16px"></div>
+
+      <!-- BRACKET INTENSITY SELECTOR -->
+      <label class="bracket-label">Suno Bracket Formatting</label>
+      <div class="bracket-pills" id="bracket-pills">
+        <span class="bpill" onclick="setBracket(this,'none')">No Brackets</span>
+        <span class="bpill on" onclick="setBracket(this,'basic')">Basic Suno Brackets</span>
+        <span class="bpill" onclick="setBracket(this,'enhanced')">Enhanced Movement</span>
+        <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
+      </div>
+
       <!-- GENERATE -->
       <div class="gen-action">
         <button class="gen-btn" id="gen-btn" onclick="generateSong()">
           <span class="gen-btn-icon">🎵</span>
           Generate Complete Song
         </button>
-        <span class="gen-hint">Lyrics · song prompt · Structure map · Dopamine analysis · Title creator</span>
+        <button class="btn btn-sm" id="synopsis-btn" onclick="generateSynopsis()" style="border-color:var(--violetline);color:var(--violet);background:var(--violetbg)">📋 Preview Synopsis</button>
+        <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
 
+    </div>
+  </div>
+
+  <!-- SYNOPSIS PREVIEW CARD -->
+  <div class="synopsis-card" id="synopsis-card">
+    <div class="synopsis-hdr">
+      <span class="synopsis-hdr-title">📋 Song Synopsis Preview</span>
+      <button class="btn btn-xs" onclick="document.getElementById('synopsis-card').classList.remove('visible')" style="border-color:var(--violetline);color:var(--violet)">✕ Dismiss</button>
+    </div>
+    <div class="synopsis-body" id="synopsis-body"></div>
+    <div class="synopsis-actions">
+      <button class="btn btn-sm" style="background:var(--violet);border-color:var(--violet);color:#fff;font-weight:700" onclick="document.getElementById('synopsis-card').classList.remove('visible');generateSong()">✓ Approve &amp; Generate Song</button>
+      <button class="btn btn-sm" style="border-color:var(--violetline);color:var(--violet)" onclick="generateSynopsis()">↺ Regenerate Synopsis</button>
+      <button class="btn btn-sm btn-red" onclick="document.getElementById('synopsis-card').classList.remove('visible')">Edit Concept</button>
     </div>
   </div>
 
@@ -971,6 +1131,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="otab" onclick="goOtab('res','notes',this)">💡 Director Notes</div>
       <div class="otab" onclick="goOtab('res','titles',this);loadTitles('res')">🏷 Titles</div>
       <div class="otab" onclick="goOtab('res','moodboard',this);loadMoodBoard('res')">🎨 Moodboard</div>
+      <div class="otab" onclick="goOtab('res','visual',this);loadVisualPrompts('res')">🎬 Visual</div>
     </div>
 
     <div id="res-opane-lyrics" class="opane on">
@@ -990,6 +1151,31 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-notes" class="opane"><div id="res-notes-text" class="prose-box"></div></div>
     <div id="res-opane-titles" class="opane"><div id="res-titles-content"></div></div>
     <div id="res-opane-moodboard" class="opane"><div id="res-moodboard-content" class="moodboard"></div></div>
+    <div id="res-opane-visual" class="opane"><div id="res-visual-content"></div></div>
+  </div>
+
+  <!-- INSTANT EDIT CARD -->
+  <div class="instant-edit-card" id="instant-edit-card">
+    <div class="ie-hdr">
+      <span class="ie-hdr-title">⚡ Instant Edit — quick changes, no full rebuild</span>
+    </div>
+    <div class="ie-body">
+      <div class="ie-chips">
+        <span class="ie-chip" onclick="ieChip(this,'Make the chorus more anthemic and uplifting')">More anthemic chorus</span>
+        <span class="ie-chip" onclick="ieChip(this,'Shift perspective from third person to first person')">First person POV</span>
+        <span class="ie-chip" onclick="ieChip(this,'Darken the mood and emotional tone')">Darker mood</span>
+        <span class="ie-chip" onclick="ieChip(this,'Add a stronger hook in the first line')">Stronger hook</span>
+        <span class="ie-chip" onclick="ieChip(this,'Make the bridge more vulnerable and stripped down')">Vulnerable bridge</span>
+        <span class="ie-chip" onclick="ieChip(this,'Increase the energy and tempo feel throughout')">Higher energy</span>
+        <span class="ie-chip" onclick="ieChip(this,'Tighten the lyrics — remove filler, increase specificity')">Tighten lyrics</span>
+        <span class="ie-chip" onclick="ieChip(this,'Blend in more genre-specific vocabulary and phrasing')">Genre-authentic phrasing</span>
+      </div>
+      <textarea class="ie-textarea" id="ie-input" placeholder="Describe your quick edit… e.g. 'Make the pre-chorus build more tension' or 'Change the title direction to something more mysterious'"></textarea>
+      <div class="ie-actions">
+        <button class="btn btn-amber" id="ie-btn" onclick="instantEdit()">⚡ Apply Edit</button>
+        <span style="font-size:11px;color:var(--tx3)">Preserves unchanged strengths — only refines what you ask for</span>
+      </div>
+    </div>
   </div>
 
 </div>
@@ -1377,6 +1563,116 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div class="concepts-grid" id="concepts-grid"></div>
 </div>
 
+<!-- ══════════════════════════════════
+     ALBUM PAGE
+══════════════════════════════════ -->
+<div id="pg-album" class="pg">
+
+  <div class="album-hero">
+    <div class="album-hero-label">🎼 Album Engine</div>
+    <div class="album-hero-title">Album-Level Creative Planning</div>
+    <div class="album-hero-sub">Generate a complete album concept — emotional arc, track map, sonic palette, commercial strategy, and gap analysis. Turn an idea into a release plan.</div>
+  </div>
+
+  <div class="album-form">
+    <div class="album-field">
+      <label class="album-label">Album Concept / Artist Brief</label>
+      <textarea id="alb-brief" class="album-textarea" placeholder="e.g. A debut album about leaving your hometown and finding identity in a new city. Soulful pop with R&B influences. Female artist, 22, honest and cinematic lyric style."></textarea>
+    </div>
+    <div class="album-grid">
+      <div>
+        <label class="album-label">Primary Genre</label>
+        <select id="alb-genre" class="album-select">
+          <option value="pop">Pop</option><option value="hiphop">Rap / Hip-Hop</option>
+          <option value="rnb">R&B / Soul</option><option value="rock">Rock</option>
+          <option value="country">Country</option><option value="edm">EDM / Electronic</option>
+          <option value="folk">Folk</option><option value="latin">Latin</option>
+          <option value="ss">Singer-Songwriter</option><option value="altrock">Alt-Rock</option>
+          <option value="reggae">Reggae</option><option value="jazz">Jazz</option>
+          <option value="metal">Metal</option><option value="afrobeats">Afrobeats</option>
+          <option value="blues">Blues</option><option value="kpop">K-Pop</option>
+        </select>
+      </div>
+      <div>
+        <label class="album-label">Album Type</label>
+        <select id="alb-type" class="album-select">
+          <option value="full">Full LP (10-14 tracks)</option>
+          <option value="ep">EP (5-7 tracks)</option>
+          <option value="mini">Mini Album (7-9 tracks)</option>
+          <option value="debut">Debut Album</option>
+          <option value="concept">Concept Album (unified narrative)</option>
+        </select>
+      </div>
+    </div>
+    <label class="album-label">Commercial Lane — select all that apply</label>
+    <div class="album-lanes" id="album-lanes">
+      <span class="lane-pill on" onclick="setLane(this,'streaming')">📱 Mainstream Streaming</span>
+      <span class="lane-pill" onclick="setLane(this,'radio')">📻 Crossover Radio</span>
+      <span class="lane-pill" onclick="setLane(this,'critical')">🏆 Critical Acclaim</span>
+      <span class="lane-pill" onclick="setLane(this,'sync')">🎬 Sync Licensing</span>
+      <span class="lane-pill" onclick="setLane(this,'viral')">🔥 Virality</span>
+      <span class="lane-pill" onclick="setLane(this,'brand')">🌟 Artist Brand Building</span>
+    </div>
+    <button class="album-gen-btn" id="alb-btn" onclick="generateAlbumTheme()">
+      <span>🎼</span> Generate Album Concept
+    </button>
+  </div>
+
+  <!-- ALBUM OUTPUT -->
+  <div class="album-out" id="album-out">
+    <div class="album-out-hdr">
+      <div class="album-name" id="alb-name">—</div>
+      <div class="album-concept-tags" id="alb-tags"></div>
+    </div>
+    <div class="album-tabs">
+      <div class="album-tab on" onclick="goAlbTab('concept',this)">📖 Concept</div>
+      <div class="album-tab" onclick="goAlbTab('tracks',this)">🎵 Track Map</div>
+      <div class="album-tab" onclick="goAlbTab('sonic',this)">🔊 Sonic Palette</div>
+      <div class="album-tab" onclick="goAlbTab('visual',this)">🎨 Visual &amp; Brand</div>
+      <div class="album-tab" onclick="goAlbTab('gap',this);loadGapMap()">🗺 Gap Map</div>
+    </div>
+    <div id="alb-pane-concept" class="album-pane on">
+      <div class="album-section-title">Album Summary</div>
+      <div id="alb-summary" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title">Emotional &amp; Narrative Arc</div>
+      <div id="alb-arc" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title">Recurring Motifs</div>
+      <ul id="alb-motifs" class="album-list"></ul>
+    </div>
+    <div id="alb-pane-tracks" class="album-pane">
+      <div class="album-section-title">Required Track Types</div>
+      <div class="gap-map-grid" id="alb-track-types"></div>
+    </div>
+    <div id="alb-pane-sonic" class="album-pane">
+      <div class="album-section-title">Sonic Palette</div>
+      <div id="alb-palette" class="album-palette" style="margin-bottom:16px"></div>
+      <div class="album-section-title">Production References</div>
+      <div id="alb-prod-refs" class="album-prose"></div>
+    </div>
+    <div id="alb-pane-visual" class="album-pane">
+      <div class="album-section-title">Visual Branding Direction</div>
+      <div id="alb-visual" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title">Possible Album Titles</div>
+      <div id="alb-titles" class="gap-map-grid"></div>
+    </div>
+    <div id="alb-pane-gap" class="album-pane">
+      <div class="album-section-title">Album Gap Map — Missing Track Roles</div>
+      <div id="alb-gap-grid" class="gap-map-grid">
+        <div style="font-size:13px;color:var(--tx3);padding:16px 0">Click the Gap Map tab to analyse track roles.</div>
+      </div>
+    </div>
+    <!-- INSTANT EDIT for Album -->
+    <div class="album-ie-box">
+      <div class="album-ie-label">⚡ Quick Album Edit — describe one or two changes</div>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+        <textarea class="album-ie-textarea" id="alb-ie-input" placeholder="e.g. 'Make the arc darker and more introspective' or 'Shift commercial focus toward sync licensing'"></textarea>
+        <button class="btn btn-amber" id="alb-ie-btn" onclick="albumInstantEdit()" style="align-self:flex-end;flex-shrink:0">⚡ Apply</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
 </div><!-- /wrap -->
 
 <script>
@@ -1543,6 +1839,11 @@ const S={selectedGenre:'pop',
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
+  selectedMoods:['Emotional'],
+  bracketMode:'basic',
+  selectedEra:'modern',
+  albumLanes:['streaming'],
+  albumData:null,
 };
 
 // ═══════════════════════════════════════════════════════
@@ -2030,6 +2331,7 @@ Mood: ${mood}
 Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
+Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
 Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}
 
 SONGWRITING RULES:
@@ -3061,6 +3363,24 @@ function initGenreGrid(){
       <div class="gp-icon">${g.icon}</div>
       <div class="gp-name">${g.label}</div>
     </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// ERA SELECTOR
+// ═══════════════════════════════════════════════════════
+const ERA_DESCS = {
+  classic:      'Pre-1980 vocabulary: analog warmth, live band dynamics, raw emotional delivery.',
+  vintage:      '1980–1999 production: drum machines, synth pads, MTV-era hooks and gated reverb.',
+  modern:       '2000–2015 sound: polished production, digital sheen, chart-ready anthems.',
+  contemporary: '2016–2022 aesthetic: lo-fi textures, trap hi-hats, streaming-optimised dynamics.',
+  current:      '2023–Now: hyperpop edges, AI-era production, ultra-compressed modern sound.',
+};
+function setEra(el, val) {
+  document.querySelectorAll('#era-pills .qpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.selectedEra = val;
+  const desc = document.getElementById('era-desc');
+  if (desc) desc.textContent = ERA_DESCS[val] || '';
 }
 
 // ═══════════════════════════════════════════════════════

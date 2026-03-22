@@ -1,4 +1,9 @@
 {
   "version": 2,
-  "name": "soniq"
+  "name": "soniq",
+  "outputDirectory": "public",
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
