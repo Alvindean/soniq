@@ -2298,7 +2298,7 @@ async function generateSong(){
   const genre=S.selectedGenre||'pop';
   const genreLabel=GENRE_LABELS[genre]||genre;
   const topic=document.getElementById('g-topic').value.trim();
-  const mood=document.getElementById('g-mood').value;
+  const mood=(S.selectedMoods&&S.selectedMoods.length)?S.selectedMoods.join(' + '):'Emotional';
   const vocal=document.getElementById('g-vocal').value;
   const structure=document.getElementById('g-structure').value;
 
@@ -3841,10 +3841,64 @@ function showSaveBar(prefix) {
 }
 
 // ═══════════════════════════════════════════════════════
+// MOOD GRID
+// ═══════════════════════════════════════════════════════
+const MOODS_DEF=[
+  {id:'Emotional',    icon:'💔', hint:'Raw vulnerability — intimate verses, devastating chorus payoff'},
+  {id:'Euphoric',     icon:'🌟', hint:'Pure joy — high BPM, bright production, singalong chorus'},
+  {id:'Melancholic',  icon:'🌧️', hint:'Bittersweet — minor key, slow build, reflective imagery'},
+  {id:'Hopeful',      icon:'🌅', hint:'Rising arc — tension in verse, resolution in chorus'},
+  {id:'Defiant',      icon:'✊', hint:'Anthem energy — punchy rhythm, rallying chorus, declarative lyrics'},
+  {id:'Nostalgic',    icon:'📼', hint:'Past longing — detailed imagery, warm production, slower tempo'},
+  {id:'Dark',         icon:'🌑', hint:'Brooding tension — minor chords, heavy bass, sparse arrangement'},
+  {id:'Rebellious',   icon:'🔥', hint:'Punk/rap energy — fast pace, aggressive delivery, anti-authority theme'},
+  {id:'Romantic',     icon:'💫', hint:'Intimate warmth — close-mic vocal, lush chords, sensory detail'},
+  {id:'Peaceful',     icon:'🍃', hint:'Gentle resolution — fingerpicked guitar, soft dynamics, breath in the mix'},
+  {id:'Angry',        icon:'⚡', hint:'Explosive tension — distortion, heavy drums, cathartic release'},
+  {id:'Playful',      icon:'🎉', hint:'Light energy — bouncy groove, quick wordplay, major key warmth'},
+];
+
+function initMoodGrid(){
+  const grid=document.getElementById('mood-grid');
+  const hint=document.getElementById('mood-hint');
+  if(!grid)return;
+  grid.innerHTML=MOODS_DEF.map(m=>`
+    <div class="mood-pill${S.selectedMoods.includes(m.id)?' on':''}" data-mid="${m.id}" onclick="toggleMood('${m.id}',this)">
+      <div class="mood-pill-icon">${m.icon}</div>
+      <div class="mood-pill-name">${m.id}</div>
+    </div>`).join('');
+  updateMoodHint();
+}
+function toggleMood(id,el){
+  const idx=S.selectedMoods.indexOf(id);
+  if(idx>-1){
+    if(S.selectedMoods.length===1)return; // keep at least one
+    S.selectedMoods.splice(idx,1);
+    el.classList.remove('on');
+  }else{
+    if(S.selectedMoods.length>=2){
+      // deselect oldest
+      const old=S.selectedMoods.shift();
+      document.querySelector(`.mood-pill[data-mid="${old}"]`)?.classList.remove('on');
+    }
+    S.selectedMoods.push(id);
+    el.classList.add('on');
+  }
+  updateMoodHint();
+}
+function updateMoodHint(){
+  const hint=document.getElementById('mood-hint');
+  if(!hint)return;
+  const descs=S.selectedMoods.map(id=>MOODS_DEF.find(m=>m.id===id)?.hint||'').filter(Boolean);
+  hint.textContent=descs.join(' · ')||'Select a mood to see how it shapes your song';
+}
+
+// ═══════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════
 initGenreGrid();
 onGenreChange(S.selectedGenre);
+initMoodGrid();
 renderLib();
 updateLibBadge();
 </script>
