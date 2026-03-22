@@ -1922,12 +1922,14 @@ async function callClaudeStream(prompt, systemPrompt, onChunk) {
         body: JSON.stringify({
           messages: [{role: 'user', content: prompt}],
           system: systemPrompt || undefined,
-          max_tokens: 4096
+          max_tokens: 2048
         })
       });
       if (!res.ok) {
         const e = await res.json().catch(() => ({}));
-        throw new Error(e.error || 'Stream failed ' + res.status);
+        const msg = e.error || 'Stream failed ' + res.status;
+        if (msg.includes('402')) throw new Error('Insufficient OpenRouter credits. Visit openrouter.ai/settings/credits to add credits, then try again.');
+        throw new Error(msg);
       }
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -1975,7 +1977,7 @@ async function callClaude(prompt, systemPrompt='') {
       body: JSON.stringify({
         messages: [{role:'user', content:prompt}],
         system: systemPrompt || undefined,
-        max_tokens: 4096
+        max_tokens: 2048
       })
     });
     const ct = res.headers.get('content-type') || '';
@@ -1984,7 +1986,9 @@ async function callClaude(prompt, systemPrompt='') {
     }
     if (!res.ok) {
       const e = await res.json().catch(()=>({}));
-      throw new Error(e.error || 'Request failed ' + res.status);
+      const msg = e.error || 'Request failed ' + res.status;
+      if (msg.includes('402')) throw new Error('Insufficient OpenRouter credits. Visit openrouter.ai/settings/credits to add credits, then try again.');
+      throw new Error(msg);
     }
     const data = await res.json();
     return data.content?.map(c=>c.text||'').join('') || data.choices?.[0]?.message?.content || '';
@@ -2002,19 +2006,20 @@ async function callClaude(prompt, systemPrompt='') {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey},
-      body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens:4096, messages:msgs})
+      body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens:2048, messages:msgs})
     });
     if (res.status===401) {
       localStorage.removeItem('soniq_api_key'); window._soniqKey=null;
       showKeyScreen('API key rejected — check it at openrouter.ai/keys');
       throw new Error('enter-key');
     }
+    if (res.status===402) { throw new Error('Insufficient OpenRouter credits. Visit openrouter.ai/settings/credits to add credits, then try again.'); }
     if (!res.ok) { const e=await res.text(); throw new Error('OpenRouter error '+res.status+': '+e.slice(0,120)); }
     const data = await res.json();
     return data.choices?.[0]?.message?.content || '';
   } else {
     // Anthropic direct
-    const body = {model:'claude-sonnet-4-20250514', max_tokens:4096, messages:[{role:'user',content:prompt}]};
+    const body = {model:'claude-sonnet-4-20250514', max_tokens:2048, messages:[{role:'user',content:prompt}]};
     if (systemPrompt) body.system = systemPrompt;
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
