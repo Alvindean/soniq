@@ -1922,7 +1922,7 @@ async function callClaudeStream(prompt, systemPrompt, onChunk) {
         body: JSON.stringify({
           messages: [{role: 'user', content: prompt}],
           system: systemPrompt || undefined,
-          max_tokens: 2048
+          max_tokens: 4096
         })
       });
       if (!res.ok) {

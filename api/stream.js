@@ -112,7 +112,7 @@ module.exports = async function handler(req, res) {
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).end(); }
 
-  const {messages, system, max_tokens = 2048} = body || {};
+  const {messages, system, max_tokens = 4096} = body || {};
   if (!messages?.length) return res.status(400).end();
 
   // SSE headers
