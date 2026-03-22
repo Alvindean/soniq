@@ -3405,23 +3405,27 @@ function toggleMic() {
 
   const rec = new SpeechRecognition();
   rec.lang = 'en-US';
+  rec.continuous = true;
   rec.interimResults = true;
   rec.maxAlternatives = 1;
 
   const existing = input.value.trim();
-  let interim = '';
+  let finalTranscript = existing ? existing + ' ' : '';
 
-  rec.onstart = () => { _micRec = rec; btn.classList.add('recording'); btn.textContent = '⏹'; };
+  rec.onstart = () => { _micRec = rec; btn.classList.add('recording'); btn.textContent = '⏹'; toast('Listening… click ⏹ to stop', 3000); };
   rec.onresult = (e) => {
-    interim = '';
-    let final = existing ? existing + ' ' : '';
+    let interim = '';
     for (let i = e.resultIndex; i < e.results.length; i++) {
-      if (e.results[i].isFinal) final += e.results[i][0].transcript;
-      else interim = e.results[i][0].transcript;
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + ' ';
+      else interim += e.results[i][0].transcript;
     }
-    input.value = (final + interim).trim();
+    input.value = (finalTranscript + interim).trim();
   };
-  rec.onerror = (e) => { toast('Mic error: ' + e.error); };
+  rec.onerror = (e) => {
+    if (e.error === 'not-allowed') toast('Mic access denied — allow microphone in your browser settings.');
+    else if (e.error === 'no-speech') toast('No speech detected. Try speaking closer to your mic.');
+    else toast('Mic error: ' + e.error);
+  };
   rec.onend = () => { _micRec = null; btn.classList.remove('recording'); btn.textContent = '🎤'; };
   rec.start();
 }
