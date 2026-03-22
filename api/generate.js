@@ -72,7 +72,7 @@ module.exports = async function handler(req, res) {
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).json({error:'Invalid JSON'}); }
 
-  const { messages, system, max_tokens = 4096 } = body || {};
+  const { messages, system, max_tokens = 2048 } = body || {};
   if (!messages?.length) return res.status(400).json({error:'messages required'});
 
   const errors = [];
