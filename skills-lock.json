@@ -1,10 +1,2115 @@
 {
   "version": 1,
   "skills": {
+    "3d-model-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "efa647c18a05475ff54e3320ff208ac2754d97e59d890b0c68572947d5a2807d"
+    },
+    "404-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "24507969881b9d289cea3963d57887c75c7dcf18c13582e1225afae49d753885"
+    },
+    "AI Influencer Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "bcdbc89dc887d1bb2aad5dff955827ff25bbe72eb0361c9e388896a4741a0977"
+    },
+    "Book Cover Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "4ba2f90a3c57de526078264828e3722da9e304de42426c703b12bf35bc01bf5b"
+    },
+    "Food Photography Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "20d30add58e01b677cc71baf97c6da7289752a01fef0bebfd85a75eaf8f33ab8"
+    },
+    "NSFW Image Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "f1a560a4df98d628e05b8a06362ead2c6949c674b65568697dd976498e921363"
+    },
+    "NSFW Video Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "2c3132e833831801657001124cf259643ae31a079c2c272c9b641b918fbcfec8"
+    },
+    "Product Photo Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "0f914be693ee4a28901cf22b5f070f0e401ac95e8e662430d92850104957a67a"
+    },
+    "Real Estate Photo Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "892c64466c35a03b768ea0fc3cb34cb7f24b1ed78a6bc5775ed6054060445a7a"
+    },
+    "TikTok Ad Creative Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "bf1bb0e0f01b463c044b84044fcbeb77f4f6051a586cc4d57542ab571774433e"
+    },
+    "UGC Video Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "542a8d3e6434f32ac2de0964b0b9f023a8f923f8c9eb0612da240a0149d62458"
+    },
+    "Virtual Try-On": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "b576c830eb99c1fabfdfa296bcb50b7c0d6cad7baab3184caae003dcd8bb037d"
+    },
+    "YouTube Thumbnail Generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "affb957690849ec7926e833c90c769ab7cceec7fa71601e27fd121c6d85cb219"
+    },
+    "ab-test-setup": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "9c96cb82a1d348a3ceee6fb8d61e876bc02a452fce14d3b746f1419accbf3ad8"
+    },
+    "about-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "d9a3901af244e8eaf64f1696338eeda7f0e0b3e4f3ea37ae8e9a41929eeadc29"
+    },
+    "ad-creative": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "5d8f869c7e683e4d4fc7aa7a2b0d370b0ad54a81d9cffb48736ffc47759b3f4d"
+    },
+    "affiliate-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "d8a16257df4c92ad11199c1368d3f9e747cc062e5afe2e2db61991a59373eb3a"
+    },
+    "affiliate-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "20ef9c7075a7a7116f7a4eb419c41bcd24489ac07194b1501bd4d6b998255b3a"
+    },
+    "age-transformation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "922d49720e6a852213cfa9123a5ee9343b7c626c4e2b7d5a1e91b60b465a0d71"
+    },
+    "agents": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "computedHash": "7af9f3fdf19a040394e928bcc894313b0b46e1140af0c1027fe912843aa96028"
+    },
+    "ai-avatar-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "6f60fe2d3dd6649e514f58753451ab416a91b9e4a7aa7e5b16276704a956464c"
+    },
+    "ai-headshot-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "a683306b8acb26107b2c2d452717ece0718403c6242a21e008c44c61d77c7c0d"
+    },
+    "ai-seo": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "5f7ce5ccdb2b0dce5e1ea7f3ed8bf17070b790865e91725ca8908e6ec829e164"
+    },
+    "ai-traffic-tracking": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "fae52a50c6ab15586896d628b8eb356cd6286c99a5f7cf8f8ce9ee9df737087d"
+    },
+    "ai-video-gen": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "800382614ffda9818bf753bb8ba6b92fdaaa7a0a35e6bd43571166890462a4be"
+    },
+    "album-cover-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e8cd78cc6eeb296eb5a32ad2eb9a6ac992481f3b0a74952dc1257b5691b828f9"
+    },
+    "alternatives-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "c519bf5c67b2478c87eeb97074e64ab167f3608076fead596e5bd5d1099c1bbc"
+    },
+    "analytics-tracking": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6fa2b27cacd16547c311feb1a4215397df33009a4571a678abd63c69d6cdb82d"
+    },
+    "anime-avatar-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "033e4a117f06a22f746482e8e7470bc25f27ba801d486c3f1706552c967c5e7b"
+    },
+    "app-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "fea19ebbf39fa990e425717197130f485cab093a8cf439ac55d9eba4558237c3"
+    },
+    "app-store-screenshot-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "9922141db483de175a71d6015b6b82742cd89dd0d1bf9cbe3afda50a03bd6ec5"
+    },
+    "ar-filter-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "2298991d1fa8bb960487e81277118276218087526960d51594efd42a128ce45f"
+    },
+    "architecture-rendering": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "0b170ad81f98d2c2be77633cafaf9f1431155675f72bf0beef34baa5bb45994a"
+    },
+    "article-content": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "735e1c1fc526bbfb5aab30849db58e3b49f71de3a1740056d072c6539f402875"
+    },
+    "article-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ff602bae1ba33e5c1160395ae1f94a6267a38d16dfdccbe9158ae50074217adf"
+    },
+    "artifacts-builder": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "8d69507435408416d8d8081517dddcf0a1e0e2bc8e0484863984b19ff8c6cd58"
+    },
+    "audio-visualization": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "7ec88b50dfc8985d8a31710aba21b4aabc77457146174635d31ad07dbc0343f3"
+    },
+    "avatar-video": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "66a49290a0412d7bad634aac7e9cc24c5722ea6f508d6427e19ac2241bce8740"
+    },
+    "background-removal": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "6049893f27a2f66339fc5ea5b843b583831b12a40f8fd15b8dea4ad8d7a7cc8a"
+    },
+    "backlink-analysis": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ad3380990e817e713df423f86a1a971f97d6c79138d2a59f05dac122a880b805"
+    },
+    "blog-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "76117ca5ef5a6eaad4320b56d6ec00f641eb06aa3f040a6c0fb7df1994d7a572"
+    },
+    "blue-ocean-strategy": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "21cc6ba13e7a900ac18ca274080f8e22ad3fce96f3a10c24eb0834cfe8d10003"
+    },
+    "board": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "7098b6016c96276754ef1fc66d6cd398e437d71e313bdd7e7e5913997e22fde6"
+    },
+    "board-prep": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "0abed2ca274ab85ae169d5fe0018a91de3bc5d1d12cc693262d42b75fb5fc384"
+    },
+    "brand-guidelines": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "4aa754f4f7fc54ac3e7f6e2fb55c0e2fb14b7d70da077b41a86bd1889ff9094c"
+    },
+    "brand-monitoring": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f8cc9d3ee28034b4b53fcbfbaebee14b8283015a375113cf20b22d85d0582094"
+    },
+    "brand-protection": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a42d0f4c98a77e82ef7dcd4fe15ff022c6d1598a346aa1d671ff84608171668b"
+    },
+    "brand-visual-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5b83cd86de57e8da5224072b4d0c836c06b1ee52d6baf5dba60049ad3ef20866"
+    },
+    "branding": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "43757fb284528af806305e532ac9f441acfe58a60d410e91db51a2e187f807b5"
+    },
+    "breadcrumb-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "586a50f6006f66644e13475791a7c0eee4b194ce0a6969b1da8bf33662215184"
+    },
+    "brochure-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3644f07f8354a2aca57616f76665825a1d16d42d49faeb2e655a431b0d754d9f"
+    },
+    "browserstack": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "1ab4638bb9903ad6d95761ba5b744f2e36c7f27e2de8677f546ccc8973719038"
+    },
+    "business-card-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "529423c7767a2eec4690853c137e70cde783e2f7e60e577259d9f4f660144396"
+    },
+    "business-growth-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "79378703fcff4525acdd5d852efb9f119f9111dec734633a4ce1d1f80a4cfe8d"
+    },
+    "c-level-advisor": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "11a39057a2179009da4ca92a653ee458e9b3ba5970e5a5e34c8ceb657e0cd4f2"
+    },
+    "canonical-tag": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "75006de49663dc97ff959b042b1d06989a64d99ea953aeb34bd63fe5f416352b"
+    },
+    "canvas-design": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "a2fe47d24b3fd8e52faef731fff099c557e698083cd644b2e5695cc4dd8c7715"
+    },
+    "card": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5b2bb3089acfc6f7ec513c70eadeb34af3b2bc4725a0f8fe3555dcbe31296b5a"
+    },
+    "careers-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "13542f2a11a177742d507aa30e598075ce5f5f7ad83450762de27e018df6bccf"
+    },
+    "carousel": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "84e9a03b20269b88876fdbffc3c3b3c6f7c3f3af79ab086ea3d6ded1b7a73a7d"
+    },
+    "category-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "cdc4265a1bcb668d1fbe4192b6adcfae553bf15a5c3d880c8ec2dc0977ee7f4d"
+    },
+    "certificate-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "41b5c4d821ef3e9acd895642299373ec57b3a1aa54b7a716e7481ecdb2622049"
+    },
+    "challenge": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "4e9e7b8429308918b2464fd4309140bc504e698e7dd7d829886f3424ad5a7733"
+    },
+    "changelog-generator": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "0facdb5c491a654e3b0f6d300fb8fa14472d811cb715c632dc2862919b277dae"
+    },
+    "changelog-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "90eb04b6c8fdc6048f5544be9b068f5b9bc7c5d555176a1a006b0122b1e26b33"
+    },
+    "churn-prevention": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "ce389baf7e32cc942143503ecba7068784ca2c790460824c1e5a306d83d1283f"
+    },
+    "clean-architecture": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "c5b5d297c11b1bbf38195f8fb3c55fce4cffaa32b6ed06ec944b38cae6b3ae5c"
+    },
+    "clean-code": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "c2b1dc6c2490860ff92005b2369057c77c36fa90e866116b8da5c09e9b997da1"
+    },
+    "cold-email": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "6b2c73ca8ee9f2104958476078f50f92ac61ab1b63880762b52816c968a6fea6"
+    },
+    "cold-start-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "061a14b3f3760dd08120bfae8b74455213f0b2d3a00cb96b5f8fc62ca3c43f19"
+    },
+    "comic-panel-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "a37219fdc669183fa8a55f0080dc3834d466bf20376c91b31fa3fabdddfcfc40"
+    },
+    "community-forum": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "4456241e7035f482b453637edaa389cc8d0c430d7405c10bd4607446dd1432cb"
+    },
+    "competitive-ads-extractor": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "8367364ae0aefcf0554468308066e39dc81aeaccfcf9922f85de1b7f56ad61a8"
+    },
+    "competitor-alternatives": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "bbaf0d378114c7f1581ec63218c9061da983afc1e30887af69ba6ce7ce9cd4c1"
+    },
+    "competitor-research": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "519866ad06ffd889eefd84e6801652aff6b9fd2e4651e40dd0788788627e3852"
+    },
+    "connect": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "85aee775c70ddfba6873dc8dd79b0f957bcadc9c4454c9b5caedb8b6456a733c"
+    },
+    "connect-apps": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "46ff9090ad2709d097f07d621873fb96e8b77ef515d81d48bf532adebfd01d8d"
+    },
+    "contact-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "e700892f6db554f90537cc0b6f398c368cf482ea1ea3aed29fa4201b8fffc662"
+    },
+    "contagious": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "a08f6ca882db91f5ef322e0536aa116302719467c27d57ff2e4b6be6ccfb1189"
+    },
+    "content-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6c29b396cdc504080e5f305bec5d55ab26a32a31d9aac45b935e5a9a9d0ecf0b"
+    },
+    "content-optimization": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0829595e342c500866a255403505bf3947da42a0b2308165d506a2303399588e"
+    },
+    "content-research-writer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "de7e9085e875a651f209c826d1a5e7dd5f2436fb38fe565ef76b54492c1a0c22"
+    },
+    "content-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5b322bd8890b20f7d3f7bdf299d8274eb07a653064ff3d62325a8c5bed9a0f60"
+    },
+    "contest-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "3946e16082c343fc3fe4e143b11919d3f710af1599cca60bd19db931001c99c1"
+    },
+    "continuous-discovery": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "cd79dcce313a10fef91176086c11acab87f49e2c684259b18c7583fab3d60837"
+    },
+    "conversion-optimization": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "bffdaec43a4006f7ceeff28e89971807951ddb2a05ce4ad4414b60739288f5e2"
+    },
+    "cookie-policy-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6eb51322e1f8ea4914e6d48e9c4206735a309b93d1466bbd052f00f2dcc7b41a"
+    },
+    "copy-editing": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "3c6241215420e69b36814270a47413b2de9593b5516f5942b7481092f6c63382"
+    },
+    "copywriting": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9e31d03094309f4ec199cbc1e06a1d0f0469bd53c512631dc95a9480f5eea3d1"
+    },
+    "core-web-vitals": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f917be273941a21f791defa20419cafa322b17e9e8a284676842f905bb82d127"
+    },
+    "coverage": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "766adfa256cc2e34ef65702b619fad0a228cab4f414cc3ae03a8df511fa16d6d"
+    },
+    "create-video": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "cc85de7d334304112e35863409f0ea0c0bb66b80223f21583fd3c5158930db8d"
+    },
+    "creator-program": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "95542e8d30501f3307791d722eb3797c9a2de231b36da12d82e34ff29cf006af"
+    },
+    "cro-methodology": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "6fdef9eaa7296256b08c7b58950a923694c34ff4a28b75d305b8c03bd4cc2b6f"
+    },
+    "crossing-the-chasm": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "e25ad8dba4cac07fa968e965096bcbfcef977173b1b276dddfd9b383fd9ef7f2"
+    },
+    "cta-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0e3fe8267b2582d74d71b153e2a19e53ca54070e612a01a7a3c44afca5ffbd6c"
+    },
+    "ctv-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ae1b60f614e9be923673c9bbf1986cc03f142cf0afc2ac50a319e675dd94fc7d"
+    },
+    "customer-stories-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "3a24a928daa3e62d19c2c0187dc89dc9af90c3dcb716246081c719a74e9f8d1b"
+    },
+    "ddia-systems": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "3a58eed99591c9ac2f1be600fb6ce1307a3190fa4c978e217da1abf61f9f893d"
+    },
+    "depth-map-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "fe37c11941438b6d932c61c995fc2f93debaeeee491433288db24a698a46d9d1"
+    },
+    "design-everyday-things": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "b2ec256b91ce6dda39439366a79b5442451ce75bb93f95626c8b5529ac5171ee"
+    },
+    "design-sprint": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "1d3b94e51393694cae2452c735dfebd67249ffa58ecb179c39dfd0a88ac22a13"
+    },
+    "developer-growth-analysis": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "e3dcbe091bacd9f1afdac53319dea01aace1e50a9d8e64c21c859ab0a89765f5"
+    },
+    "digital-twin-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "0549a07cc00bfd1e42c5440f9def390e15f245b6cea9857b522c49b15256583c"
+    },
+    "directory-listing-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "491c2102ea0a53a4aa16d9b1cdf0ef31ecfc1215ea18527f10712b31ec035370"
+    },
+    "directory-submission": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "97ae0b085fe9123a7743a8123d27dafeb785e7db52692417dd51c29e7d562eec"
+    },
+    "disclosure-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "69ded6be2029ee98a9a96c18659659708920e7d24e93858c45e60bce2420bee3"
+    },
+    "discord-graphics-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "0965a6d2032fec81cc908577dde2138482d67d170598ee9848b41d2630867436"
+    },
+    "discount-marketing-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5553bca3999002b32e9b9f6e715a9bab20f3a1a3d31046b967ade4bdbc6dedee"
+    },
+    "display-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "8c149e6dc2d0d38a20338bbd08bff131477ff28b8942e075f776c7c92ea5fa40"
+    },
+    "distribution-channels": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "cfe9ab529ebafa7ce838109421f5dbe86ed975ccb7a348dc8297ca8efbdeb937"
+    },
+    "docs-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6adfd40238759d0e3db778bdcc55dfd51a0ab4d82d763f542ccf47da8f7242b3"
+    },
+    "domain-architecture": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5de4aa82e930d46d69f6980a2eafd38d8e60b36dd08e734ebd076c3d72dbb0d0"
+    },
+    "domain-driven-design": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "01ae2a9d33c87237a174a36e2b9d2f34f796398a2b6ff6ea9d08076417c83545"
+    },
+    "domain-name-brainstormer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "911dba9c4e55a47bebbf3d44482579518797a94d5bfc02088a9ed85360df6d2b"
+    },
+    "domain-selection": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a5df97fd7756b92fbb150fa34c4981c925aa47bda001b55a82852e7b34065a78"
+    },
+    "download-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "3bf4cbc7e2823ff8f11f239f68ea34f666ac027a7ac24abfe823f86238dd6f6e"
+    },
+    "drive-motivation": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "33d87d1f12d214506ad284c36c3c7bf315c6c7315268d603803d06bbb515c2b1"
+    },
+    "each-sense": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "a3024a187b12c0e6b91c955ae23312eabfa05651c2f60ba312f86c56f01f514f"
+    },
+    "eachlabs-face-swap": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "55b8adc3ca0ba4d641ae6cc7a0ca5649f67342de921caeca3016140707c7bf16"
+    },
+    "eachlabs-fashion-ai": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "fb4ffdfe4d332c86eec3be95b4530324202ac5a78cf0b77a3fc5fe4f07e1a055"
+    },
+    "eachlabs-image-edit": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "699e37d5cd72e9fcf49abb3b4954280659044abd1968ed75d71d3d22b28a55cb"
+    },
+    "eachlabs-image-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3195b86a8dff94d8c5f249a51a2dcd935c9fe24e2c8f1322ec063f997ca9b3ef"
+    },
+    "eachlabs-music": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "040bde5aeb703193f7ff490f351f459b558cd501e3aa1cdaa74c137aec088fd8"
+    },
+    "eachlabs-product-visuals": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "10e961a44bf4205a1e8e135350d90e7951524c2a7d9c7995bd3bec183837dc15"
+    },
+    "eachlabs-video-edit": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "461837be5768e22d5ab1400b505aa1c349e8d38dc764dbce9fa865e72447af20"
+    },
+    "eachlabs-video-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "843648d6b75c6e67cf5e51a6d7ef2214015ad820e7f0c8533de2855625733236"
+    },
+    "eachlabs-voice-audio": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e616947e5086c91400f0b491403895cae2b2edd24fcb9dce47f4c56412bbf683"
+    },
+    "eachlabs-workflows": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "d5625f861a23b602d2bc8c64213d7386fc80349850a14fcce304c262796c4d98"
+    },
+    "education-program": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "788215981b41ecd98421fd5ac9285c6f4196d5070789295f6cf4ab0237d9f4eb"
+    },
+    "eeat-signals": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "83ee553a86db7876094b9c1c589b204680f9f4bcf59d193d70f9d355fac98da0"
+    },
+    "email-banner-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "73dc232be967929b26b6ab06af5fc00ec7b8d16216edbbe35de1533104730b05"
+    },
+    "email-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "2e8af7bd65b01d880e406ba6c50e5fab2091f5c13ed597e60f4bee847bd18f70"
+    },
+    "email-sequence": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "2b313030c852960ea6dbc2d39484fbe32bc9ab231ddfd458baafacf19c5f9c25"
+    },
+    "emoji-sticker-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "bbe0cb37dbed12c1de96c753b25ac1e66bb8a0366332a11b4a1c1c0f239f9d83"
+    },
+    "employee-generated-content": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "fd570e1dd9261818310474b0d3c2cd60535724fbfa984a20c699f58571bd32a8"
+    },
+    "engineering-advanced-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "452c6e371300c1f3aa0e6a0b54261a929db2d56860546d91a22a5d96090f5a5a"
+    },
+    "engineering-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "5b9e8f4df19f6721c842ba35224d886f9fcf87175fcdbb32f190349e2b192544"
+    },
+    "entity-seo": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a34e6511193b3f8382e07cef705a57e5b2220b9feebbd0495439ce33697e5732"
+    },
+    "eval": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "1fdd3154cc20fd6a685ae63c3a1ca641a43562da58679a286f38f8029bfc2f08"
+    },
+    "extract": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "5935e35eac3a69ba3959f9283238f3c7784d3f2470597b8f8c5830f21ca7ab85"
+    },
+    "eye-color-changer": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "f4940f24f02882bc2f29e177cbfc718af9623982d54b17927fee9edb49ba56c1"
+    },
+    "face-morphing": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "aa655628b8414115f1751fccde38483377d1021f73589b121d498df79d07635f"
+    },
+    "faceswap": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "caefcda181d6dddc2c30841238ebabdd7583c0a2fec2e17b521454d015168f28"
+    },
+    "faq-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ccc4619130d8f407e3778f86cb1a68689f47ec039008deff6a7caaf7531ed176"
+    },
+    "favicon-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "58aea86476b9c6f3fae19c4e7fee3307ce3a44234e3d9d274cb03dc62df2d352"
+    },
+    "featured-snippet": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6ca0897f9e29fba6e3a60204983aaaa732b9d4e2cd23a7b08a572114781e756c"
+    },
+    "features-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "c35547601465861455144a80a3a4fcdecc0dc173168877de5f6df82b2a89766e"
+    },
+    "feedback-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "cb8de8a16f257a2dfb7b1dc2f5a87c2d53f4477fead7cffa34591efe4377a6ad"
+    },
+    "file-organizer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "1b03d0f0879230671fba161b92d732c9ae7e947bfe061cbf008d39fa9df1ed8b"
+    },
+    "finance-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "b9f0821b36140977fb082705f8f25fb9b7faa5927babe804d152db3ce52f1104"
+    },
+    "fix": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "1871540ba9bfe00390e6708788282de0c4d6673a6717554c24bfeadfabe569b1"
+    },
+    "floor-plan-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "6bc0e632ae32410863a6ca90e024ed9b14e2f35a6065cef5c5828f582a1bcf6e"
+    },
+    "flyer-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "7664331e5aecc90b5f3cb94b86315b735bbe5c0b82a1cd2c4b802df7afd98893"
+    },
+    "footer-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "1099964217b39f238af3b5177522b10b9b21fbcd72ee58e79675c7ec370b7c8c"
+    },
+    "form-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "d6d5dcc076f4042b333a34bb707b3bde22bf1a67f9acfb598cb4d4bf1199f3d5"
+    },
+    "free-tool-strategy": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "de49a0fd426d4710fc05b2759244588c6f5b5014d9cd9331a0d54dc655f023bc"
+    },
+    "game-asset-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "f3998da688fd61956b40560597f4a14bb77a61f44aed3887ab66192f57ad314b"
+    },
+    "generate": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "859457f0e45df10d24dec1b72d5e91073446aff935ca563268e97763e746aeda"
+    },
+    "generative-engine-optimization": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "1faad941f6b0281b9156b57c8b6e6f9cda5a22cbb9b71e880f762cb9b6afe0cb"
+    },
+    "github": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "1c21f12f5de0fdacf62af934bbb7e7860e2e9bf5ed85153f123f8f915292e2cc"
+    },
+    "glossary-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "357e3d2b755d6063cc1237bdb154d8cbbece4c6e58151a87ad59323ccf78a899"
+    },
+    "google-ad-creative-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "6d78646ea9dafec4143eb943e07f340c0de502cb3030a70b794be2daf3598e23"
+    },
+    "google-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ccd122a2b63bfe0092e957c069c0976ce20d130ce8f828098f2d805e1416d81d"
+    },
+    "google-search-console": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "00070f9d64948fbcb65a118b756ad3f1b2f2feb90e0746ba7926a4a2a3ba8d0c"
+    },
+    "grid": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "3b1dc273cc6bea2ea0a1aa9daf51f89e678f588a2a960b528afc136af0478847"
+    },
+    "grokipedia-recommendations": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "08a6b155a2f2ffa5020b60fadab299bdfd988e9f77d3243628f0044ea52bd9f7"
+    },
+    "growth-funnel": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0d536527216bdec3a2f0c573004fbf8c69a9d51fe856cb66d7b34fc34465951c"
+    },
+    "gtm-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9d61be55341be2623d6083eef3655a97e9ddbed16849817023b06af11a0d0e93"
+    },
+    "hair-color-changer": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "f4a281a72260ae6dfe248ff83a3e1cc805d26bf4412163cd5b915686e1692434"
+    },
+    "hard-call": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "eae683058dc93ea6c16d172800f74fdfb23e36b81cbd146c5af98bcb7a876475"
+    },
+    "heading-structure": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "3ea14cd0b64533c4f1ae9fd9d4a5d3a31e3473e945d4baf7bc1071a49f889101"
+    },
+    "hero-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "33ff695d19ddd1d73160360d34c5de758fcc8506bf265991253578d66188b8ca"
+    },
+    "heygen": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "e2c5db9c36904294497fcd18ee4f003cdf0f79746d46a57f1cc352d83957018f"
+    },
+    "high-perf-browser": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "ea35a0d7b2e4908a73b0fca5cfa877a75c49f554fc73e59154d88d6178880915"
+    },
+    "hologram-content-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "0889e8c6d1280c5141140c1f4239384a9049196b959bd395e4d91d16bda512b9"
+    },
+    "homepage-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "4525147c5621f407031ffd2031b844ae31614b72a3c2653b5ebcae71d73b66c5"
+    },
+    "hooked-ux": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "21071166f94d9ec8ff063eccde279124767662a029161629f4b1250de0a7a499"
+    },
+    "hundred-million-offers": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "8dde2922934ba5161806518d5669fcd7776a8a13687287371fee7a2833b49ad7"
+    },
+    "image-enhancer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "2fbd9f8dadf7de2e93844d0626a46f1096925ee78f41174f4c261604b39828ca"
+    },
+    "image-optimization": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "7d579827c728c3cd6af1ba1082c5d4cdf6fcb3a959c3dde32a6e04ee1e26a90e"
+    },
+    "image-outpainting": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "a0c80410f3f99af89945ce6594e730b8952f623da9f78b66b0b0fef35666fd20"
+    },
+    "image-relighting": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3c227072c6dfcc030f0ecb89da3cfd33016f69318c3a79d82889010ba499ffcb"
+    },
+    "image-to-video": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "b6f09a9da76832cabcc66104bbd91995dc2a4ed86ed6b032d3f4572f90621ed6"
+    },
+    "image-upscaling": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3e9dcfda3e0aafb88627b32c82440ebcca8f20c931bf798560f2402a59992bbb"
+    },
+    "improve-retention": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "2e10f0bb2d08515e2216c6aa07050c158f5bdb1019aa1faaf75c39476be623ac"
+    },
+    "indexing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "069d430ea56fffec9e5d25b728480d558f76679e610ebb4749c4c8ab6c1ec633"
+    },
+    "indexnow": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "701a353e05ecc30417d73c9036658850a614ef6f14e37e309b1273e60605c348"
+    },
+    "indie-hacker-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "b34227752f2b7fb1522cf862c6a21b3f95146a65706fd86044c161c39a80284f"
+    },
+    "influence-psychology": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "8c15c2a50c45ba3ee25edb303117ba64dd0fd27303167d2adbc5e956316d0418"
+    },
+    "influencer-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "36a66a625027b8cd7eeb901ee61a86be5a6ba744f7a5836a936d49b3e4dc59d7"
+    },
+    "infographic-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "1684badbc64a9e889e76c9d7679e676fa27a62bf1de90c97c069a624099df060"
+    },
+    "init": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "7017e287cf72a17418774faad2ffac8c9f354fdbc83d4833485722415916e532"
+    },
+    "inspired-product": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "701518ea7b21fa8f3e59af1155ffcaf530e080691a3fac79553b8c9cc8671223"
+    },
+    "instagram-content-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "2b73b15a9514a98dc1a39f4c8d50101aadfc77edd079f73d679910e6cf25a08e"
+    },
+    "integrated-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "4ad4878006a26ca2c9390de762bb3c11f77058c404414f1331e02eafaa902281"
+    },
+    "integrations-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "680702b510a7d7b45fac5055f23dd026d39f2fbc329259104219826c596636c6"
+    },
+    "interior-design-visualization": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "49a2d7b1c4d3f9cb2e54209a12d44f8434e628a9f9cf26e3480c6e19e0bb0eaf"
+    },
+    "internal-comms": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "b36b333bee983462008af46d74689ae5832c2f79ae5f2c18680ee82f6e6bef56"
+    },
+    "internal-links": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "899a57492947798dc7bf7d95ebb4021a6d03c32f3eae34660a92027fa59fc113"
+    },
+    "invoice-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "d9fc93f8f91d087086e21616909662199d43257bf48a80d95bf292e3a2314c68"
+    },
+    "invoice-organizer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "3981cc7b74330cb508ffd53e03664e94eb3413b9fbf9fd14a123774de15a8499"
+    },
+    "ios-hig-design": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "ffeeb9e22a092d1c0e22b8b2d51c8cdeb03f3d8ac3cb3cdbf0cf8066d9240a67"
+    },
+    "jobs-to-be-done": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "234dbc3fd40a93c3365db5e801af7a55993ed1b8428ea09c9c543eb19a7b52e5"
+    },
+    "keyword-research": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "35fd5cae840f7202305ebb82bd0e50292b9a4faf7e1aed1bf83c4aba2cafba79"
+    },
+    "landing-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "52f20b32b57a985a5a59741934b4df14a94bf0fcc8936d657849d77565bd73ed"
+    },
+    "langsmith-fetch": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "7953660eee3f80ce985956e4ad2ed1f551efca6aad596b7f3479d5a829602180"
+    },
+    "launch-strategy": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "5d74a25820c4f36d58dd90bafa2f3bfe0350806b699d6a16d2afad53ec7a02fe"
+    },
+    "lead-magnets": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "b71ffc7be2d96e4887ccedf457d02c395f78e68723dab59bd8d6a2a9959ec6c4"
+    },
+    "lead-research-assistant": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "08cf5477dfdcbefa0758fad431c226efb9f09e108c8c6477b4a14db2d6810889"
+    },
+    "lean-startup": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "1564146a8058a241c08b55c4ba0d43268563a6334e095c6c6a89458dfabe2e52"
+    },
+    "lean-ux": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "72bfd885bae4d490d36bfe9a1117ea618a3d7a9386eb603177aeff3d1c52d490"
+    },
+    "legal-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "b6b2100c1cf9516ba42676e8e9186a657b9c22442a8145c436a78957acfcedcb"
+    },
+    "link-building": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "920350c194ebd2be3f9ba77daa6bafe5ffa23e3b6462c585cc5172cb2e9db9be"
+    },
+    "linkedin-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "d6a131f80589f2c6987c9d6db64a6ad4168f4b243c43b23766e03ca7be0fab2d"
+    },
+    "linkedin-content-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3b16a5ac802d1200e80d5775d406e2ab2465034d4a901bf85c0bce0215e694a1"
+    },
+    "linkedin-posts": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "d4181ab02876eb91d8c60ff9ca15edb0686c04dea91e0c7984155357e962734e"
+    },
+    "list": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "bcaec459216bee426f4e14cb712455fd0a191aab6cd437523467d7f20a7918be"
+    },
+    "local-seo": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "383bc40bf7ea1918fc8af725bad7cd7f180293a9d762a6ad6f77c4acc07cbe67"
+    },
+    "localization-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9851bbc19c8b51bb77e8a7b7a5c4c983e03d8ab76621f2e9b5c1cec35fe07fb9"
+    },
+    "logo-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "769108c80ef627290efab1188e2ff9b9d3266b3cb034a932e5e7b45e96aa52d2"
+    },
+    "logo-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "4742c2df83ce4cca83ecbecdc1ea88341ef4a38f5a6dc8a9706f7168e0f70a24"
+    },
+    "loop": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "93abb1c2e585f0a1ff24af74690464afa697db50ba8f949134b355cef93a260c"
+    },
+    "made-to-stick": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "6b717a78dae66c2a1c607a23e1d80f0fdc49f0a77fbf74c4e045646239f79487"
+    },
+    "marketing-ideas": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "6463f11419704994d58248c398b99c6b097eac24f72f4c86bea1565e435e222e"
+    },
+    "marketing-psychology": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "ddec844d01d102687f89749e1d3a9f7a9019010dce1039a7d442189f39726ad4"
+    },
+    "marketing-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "73445ac9a349baba58ec52dbe6c76e065d7609d7197bf347add2dfda62f00d1e"
+    },
+    "masonry": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "3b3ab50d0cba9e2a393dffeed4fdd5ae87f83948a44ab1e55a1d8e71a491c1f9"
+    },
+    "mcp-builder": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "796e369a513fe27a0eb5461611dec6bf943da7992194ddec1291f4fa34fb28cb"
+    },
+    "media-kit-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "63804516b3d5c5fd32c4c55498e62c824c17d9439c4c95f31a71910dd2765f0e"
+    },
+    "medium-posts": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "89748e4ea39cc11cced9ccd8ad2596cf99024ccdc13853201823e6590f726c26"
+    },
+    "meeting-insights-analyzer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "73d94649632b9b146bb9a745a31efcbc315a8916f14619a327f009b54d1be656"
+    },
+    "meme-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e579a383aa9a744e243aacd13404a115d9fa072cfd22daed6bacceab2c3fc5c3"
+    },
+    "menu-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "05e6ffda7be5bbd883bcbb6380bd39051844ef20756eb5ee08219616ec3c6b0f"
+    },
+    "merge": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "f0e773ac2441a10acd3dbfecbbf9fa9d8affe2715405c235898a27830b18915e"
+    },
+    "meta-ad-creative-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3e84a75ab24e295808de0b16792f028b067fcb49ec281cfbb7dadb631eef1457"
+    },
+    "meta-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "097c38e2229cf1cddd04c9239e3689f1ce42bde0ef8ff3db1d8a5a615e1699d8"
+    },
+    "meta-description": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5709fc738ae28a08e616854c6007d25d4d2ef8ea2a2f687154062a01b2af1429"
+    },
+    "microinteractions": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "efd849fc74c68b851120ae9e89fe76da3bf89311a564f48ea296e09d62ad64c1"
+    },
+    "migrate": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "5606894fecef56ee44478236fd4c3c8c94062ae997cd676c37a6e6bf70a0858d"
+    },
+    "migration-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "263e1fa583e36961fe5fc8384aa535cd7fba6abc9228249076d3ccbd5d11710d"
+    },
+    "mobile-friendly": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "45a02273eaa910f2c02cde3cb2c675ba25e5ae34d9f0d1357dfae9dd061c4fc4"
+    },
+    "mom-test": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "07d4fc7fe1043d2acd47073f7db24628b67adebdadfd64096d668e0b61103eed"
+    },
+    "multi-domain-brand-seo": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "89845a0c41562d5da1e8846036f22fa5a7a5687cc098767a3a493b11d34d549b"
+    },
+    "music": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "computedHash": "8de187c5fe68aba221193d827406c832fa5ed0cc1d7a82fc3b91d8a5fafeaefc"
+    },
+    "music-video-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "83e176331ea060ccf7e6ca60c4eaddac16ef68c6d11c100fb6e11d01004af5d1"
+    },
+    "native-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a23ca13edfb5f6c1f7a3725798133615b3823b4d9a893c3e797a6d18c178201c"
+    },
+    "navigation-menu-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "afc53ef1816334626b1d81844c62f177a0a75b0338c757074c621e0622919756"
+    },
+    "negotiation": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "ba53cab2d25ac6f05ca0cf9f52838bbc8cb9357776e1a42a27d531b1f97f857a"
+    },
+    "newsletter-signup-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "2ecd5f422cc705ab089d7f6bb5cf51dd1642a47dec68e02c2017a340be999ba2"
+    },
+    "nft-art-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "680624b89bfa7381fc4cedcb4edc06ba3ec62eb9721356be6ea8a8c6fea2ad87"
+    },
+    "nsfw-content-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "ffd7f60501548f24baddc37ac3914a5e0198cdc705fec2998bac4e4380860347"
+    },
+    "object-removal": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "6472a76d9378e83879e6638d312b365340316653f3bd349ca36fe92e4870c866"
+    },
+    "obviously-awesome": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "ecb1d9449f56d734d02e0ee22e6d505d1608d6e05d4515800d07271744024b26"
+    },
+    "onboarding-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "9d935c024e0768c8b805852fbf9419c2e8c56be2b9e62e89d43a390008bd1229"
+    },
+    "one-page-marketing": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "ed78a23d5fa521f3ec1760f8be816db053fd5b5945a16669e9806fe23241056b"
+    },
+    "open-graph": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "afecfb6acd7c2fa139cde1ad2f7797198033fae7b0dff449be8ae4ce5955abd2"
+    },
+    "open-source-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "b294c58addc5ed64640c883770417902d5a448990d74108a85478926f9b43b23"
+    },
+    "packaging-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e1496bedea7f92de4f35a6ab3cb6ef5811593fd71ba2fc54641e63d8e64f5762"
+    },
+    "page-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "9505748dba2319487b285f8ab8c1e5417fce38a512d596e1c9e2e87b34b196e1"
+    },
+    "page-metadata": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a12b401aa1c76aa9263613a433773eb510fd08156237f5fb5ed0eb306d8edaeb"
+    },
+    "paid-ads": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "74be53d9e279bafaf1f53e2612cbba0d9e4750df4116496732d877782f0c3a48"
+    },
+    "paid-ads-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ce55922f956e0bb8c73c4a18aabcf30de82ef3007d3fdcfa0e7f0ed3fe69da99"
+    },
+    "parasite-seo": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "e56d10580bad3bd9cb663836de1b0cb2b0e23637fc849cb8c79ed1ce6a7fe7c8"
+    },
+    "paywall-upgrade-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "f3955bea72dc22cf5b8e2387ee310a519302ab02518498e045055b1b9bd62a0f"
+    },
+    "pet-portrait-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "77fad32b3047ccc314787ee48148b7dd25887b12c8b61bacf5ae6eefc9c1ff3c"
+    },
+    "photo-colorization": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "b848843efd79db224096aad5a292623a5782c2f249db5ab87d29799a8ae351fd"
+    },
+    "photo-restoration": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "549e2e46aba38a24888d7774e76ec6e926b2a91bc432ea5da9d1471d5097051d"
+    },
+    "pinterest-pin-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "3cb67cd709ad7809be2e303871070ec2b20c7da3ca642beba89ffc49acf1f983"
+    },
+    "pinterest-posts": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a5e3bda03c8b6f2faaa37634bf79ff523219e2c9205607229867c10f5de4b3b0"
+    },
+    "pm-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "9cf83ef0561d70599194014a7198f51a9905fc1acddfebb6c3c500bd28607e07"
+    },
+    "pmf-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f52496442a206c74c669b29c6df2d9a8628c20746b83c1e9487cdaa4ff074984"
+    },
+    "podcast-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "d215b8f8fff2347ff286d4025acd1feeab07797a6fd4cd431f6fe52d09c6e416"
+    },
+    "popup-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "5b97d79f11192e1fff0b6797629ccdd7515c82f57d1502b761e58679df2b56e5"
+    },
+    "popup-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "cb109b16d4687356771d17c3e18179d232ef855ba030c4e1aefe8c20183f1bdb"
+    },
+    "portrait-enhancement": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "9c7183431f86ec31cee57f81304d3d127f2eeb7c0787e77d68210ca58ba4e874"
+    },
+    "poster-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "7b9311f9174f2e7e28f6cbdaa1b0bae38355507d8097d7d6d872a3bb333b63e5"
+    },
+    "postmortem": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "eddaf278525720a8839dbaca65755be2ab7674c518f06f7e0a397f146510622c"
+    },
+    "pragmatic-programmer": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "1076a3ba9b1ae50d6c87d58959777bcf1342d09dc192b54a56e55ce8d6f77565"
+    },
+    "predictable-revenue": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "e183bc3210c24b2212c1b03c75c09da01b778936450343d6eeef59090a4eed09"
+    },
+    "presentation-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "39f9a0baa415e4ad31f371956879e1c860d35a4d97bc7971102d08633a608e0b"
+    },
+    "press-coverage-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "e5fac6411469702b0e2ce198a3c8e7bbfbcbf10bcb3e92937d7a49f7c65899d6"
+    },
+    "pricing-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "c1fb9be148f4ba4917263ec56971940a6a456466902fde1f3518e300a49eae3f"
+    },
+    "pricing-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9644ce5f59b399d01d93588317100f20608a863ccfc158042a2bd6ea5f48b2ee"
+    },
+    "privacy-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "68ad8252a19a1696c12a0975104afe5edda9a511afec5e99ca2ec5f384c2b28f"
+    },
+    "product-hunt-launch": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "941bc6106d2915d9dcd5df80c46866033c8f05a39e49640300ff083a812fe571"
+    },
+    "product-launch": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "ebf8bb2acc2d6b295b7db652cf92db85a894aecbf913876d17db039f9414911d"
+    },
+    "product-marketing-context": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "21dd05f970ba54406d7405f92240853f809d0fed09ef6ca2a9204abcdd21548a"
+    },
+    "product-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "7081e8f8c4bffca94737755b7497d0c585ed3d3f64cf2f6698ed867f9c497734"
+    },
+    "products-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "8636e61c088fa42c4e6e80c92160d8bbf1bf156deca04d425197774d9f023e62"
+    },
+    "programmatic-seo": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "fe90606eec20a28ab2e73b6459d544dd04ff9138f8f8ef2347c1c31458f2e5fd"
+    },
+    "promote": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "8e9c02b9d081a6f7debf561ad568c58580c7500354715428e95948e056582e6e"
+    },
+    "public-relations": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "58f6e216ee67c348a3eedeece1f3b4a8fdc398fce9c1a11f9c4c78b5a1990e40"
+    },
+    "qr-code-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "76c4cb08dfb9aa195199be796467e5f28fa50e3383b125b32485047c2cdd4d9f"
+    },
+    "ra-qm-skills": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "4cae356cb24b034cc0a532723b4b1f8faea14498e0181a2f7fbc5ca7ab75f8ee"
+    },
+    "raffle-winner-picker": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "cd97da2fa280d9545b6f60dfc07335663af4932acb58d83d6801a1bb3b8a8aae"
+    },
+    "rebranding-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0a444fc333e6c1671215708761f8d9614b40b0dcc0b6c527eab7d8ad4849569e"
+    },
+    "reddit-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "63a44938e6417f7f4bd517e8d27ec5828c143cdae0ce4675aee9437cf997160c"
+    },
+    "reddit-posts": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "e6a187305f2b1e0acc0dfa6594f435b3a4f2bbe6f400fe6902a67940736cf229"
+    },
+    "refactoring-patterns": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "db96f6f1953645be6d318aeef537e239ee496e80b5f96cc5884fec9b93c47f7a"
+    },
+    "refactoring-ui": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "cdf42009a0eec7fa9b0174a8f5de234bd1d6fe25ec81cb6cdcf7866ad74f9909"
+    },
+    "referral-program": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f7108cafd963f62b5ea84c4cc85a81ff67ed3c979e2d4854c2677f7c834130a7"
+    },
+    "refund-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6a35d0c7c6abedce7033e747082a300fffd13547d69d7dad2d530881fdaa6ab0"
+    },
+    "release-it": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "4da6dbcdce380eba00ceed8868abe316d6c1a986642f9b0ba12f690eb8403318"
+    },
+    "remember": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "d21dd41bc9014d280003b0303dd5300e324193a182701f149270eded14ab2bd4"
+    },
     "remotion-best-practices": {
       "source": "remotion-dev/skills",
       "sourceType": "github",
       "computedHash": "2f673b7710813ac07c71c0a54657f740078aec6585f15edf351494499e1f9ac3"
+    },
+    "rendering-strategies": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "1025f2c1c3406a82da597bd590cb544df7231ecdc28ae19afb072d17c6dd9d64"
+    },
+    "report": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "27962537f7b7caa785fe16239924d681dede27482be114cd04820df5d65249f3"
+    },
+    "research-sources": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "03d3299a262de84ae01e7fd256451bddb9db36c014386a5cd5205ced03a0d091"
+    },
+    "resources-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "b8d6d1936e23cc80dbaf96641ed90671a767d1c9f627fb2b514932ba22f701e6"
+    },
+    "resume": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "236ffe6896d2f4d820357e747f07ab918c59a8077e85b54373bf69bea7eabdb2"
+    },
+    "resume-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e6e37b7496acbf94fe0084b24b8f5324f2d5ec6db590ec866c2a7e3b634c6a52"
+    },
+    "retention-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "c0e0956df0f255d6f88000fafbee075e66733c34891ece84fcaea12a24a40af6"
+    },
+    "review": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "293152a5037aa448113fd484a6c398d99e451bb984b3a685ab7b687c96592f15"
+    },
+    "revops": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "d6efa402972662f23d8b052c8f4c79d1e9b9c0a4d9bebf11468462c6d682f0db"
+    },
+    "robots-txt": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a3d0259ca04242e2480e4fa6cca4a04380fee31a790c1808e0d537d6c0ee6909"
+    },
+    "run": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "074fa13e8e2cd2a8fb4d48360b19c953088eba5519a5675623a9d5e8818e0026"
+    },
+    "sales-enablement": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "aaba13bea7b98c41225a1893d90778ef53044642c3099e42876434f8f3712622"
+    },
+    "schema-markup": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "1d0ce706c2ec9c119593cf8f1750b68af7a903996adc5a859cf5d5653282235f"
+    },
+    "scorecard-marketing": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "bb49aa1339b1ebdadcaa55ce5498f14856641021727aa7d04391930308ef7883"
+    },
+    "seamless-pattern-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "806aa2d06cd4bb9b55ea025eb93f2c73a4e40c950562a7d1eda2e8a650113858"
+    },
+    "seo-audit": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a1bffc9a2cd4778aa6ca3de4ee94e28c6149936bb6fc31ffd8376100cb91cd1d"
+    },
+    "seo-monitoring": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "88ec1c290d84e608cbffd3a49b6252ff9cff59d2246e31f828c9a218e44f67da"
+    },
+    "seo-strategy": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "326c01a179a4aaf7b85b4142f3fcf0f540bbb1f10ef03154b11f4f8190aae978"
+    },
+    "serp-features": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9fa7240a75a86bf8afeb85f6c85f5a05e7892175526681a7346e5b384e751566"
+    },
+    "services-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "27450879bfa390423a73363ac6d118309fe603041fab478f761c99e25a43491b"
+    },
+    "setup": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "6a4a1bb9ab10e1768aca228b022ba827a66b5bf1e9114445b02df1788beb9c18"
+    },
+    "setup-api-key": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "computedHash": "45e680b4a199bb031472fc28e752abc29bc2a38334cf5c80e1428c3f9fa33083"
+    },
+    "shipping-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "5b3a2d9c51046723a0b83e1db5feb216af2829df2a18ade5d8aa55ef7e0d40a9"
+    },
+    "showcase-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "801f475280c33aab78a8fdaaf134eebc2e0906f12650f26806ee1853daa22b21"
+    },
+    "sidebar-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "04c6db7722a501d422d1bf061266b88a5842e2d3f3bae9ca05ce2cb790489420"
+    },
+    "signup-flow-cro": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "8c4b9ce342ccb721eed9a4c1eb0d1ea647e5f1a77db8609509181c62636acf61"
+    },
+    "signup-login-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9eccb5fc30dee66983ca9a5f14595be0eec6d3e43fd1dc490e502c8950819ef4"
+    },
+    "site-architecture": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "4cdfd1ba49925184462a7524586a5ec0b127668498e7bf2972ef0d4c112e9585"
+    },
+    "site-crawlability": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "9355cb479d27fd7e098c06af6e5a0a84284772929a9cd973446c815724765547"
+    },
+    "skill-creator": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "6233fd26885f4e61c30c8282c885dc73a9feb2d2611ccb736d0cefc8899b678d"
+    },
+    "skill-share": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "09f71aa830cb200d355ff6103958d85ecd33121c4454e3b8c2d60b70c88e05cc"
+    },
+    "slack-gif-creator": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "6139cf556d1dd78b69c1dd84af43c132db391b6f31e67de38d1edb4551ba93e0"
+    },
+    "social-carousel-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "8dd3016cf612b5cca2df81f34b57a48ba51f2f25e59a9ab0a812b48a03f14c53"
+    },
+    "social-content": {
+      "source": "coreyhaines31/marketingskills",
+      "sourceType": "github",
+      "computedHash": "85ffbc05cf88939ba3ff643a315928185af16181470349dfbaad2880047c9900"
+    },
+    "social-share-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f47b14aee5129083945932b2f8db0b04db93fbe48c2fbefaf99b700fcb6003ae"
+    },
+    "software-design-philosophy": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "3c1501694f474624974d53247ec3a72ded98c32050ddd56b1406c9470bbf9eb7"
+    },
+    "solutions-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "204ec7ec38237d24a7960e070f6999919b65aa4c8b936220c56d7b27129ebb53"
+    },
+    "sound-effects": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "computedHash": "54ec05122413cbc956b28fbd81c676e44eb0fdbbf6459ee3b367b2c7a1350b02"
+    },
+    "spawn": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "f730314174866d9552ab534285511710f56103a2204aa9899f57e51fd4e0cf6f"
+    },
+    "speech-to-text": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "computedHash": "bcb005567f41385e5dcba25d84de8d8ae10b65930a154146750c7004d103762b"
+    },
+    "startups-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "e880f8950396358f8831811f054467a2fdee0bc5c190e651fbcf4b358e44eb9e"
+    },
+    "status": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "3d85cb3372364c5b7897b8f3874afc76fa489f5ad9b58ba8177ae1f9a2e8b899"
+    },
+    "status-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f6e93e5f87d518e47aa68207536d74d8723476357313688a386b59a0d3b4ec93"
+    },
+    "sticker-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "44ff536a642970469ea76a8e977d97dd2f3fd795d2fb0793b3fc3f3853eefec1"
+    },
+    "storybrand-messaging": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "97e1fe5e886c49a5fd7ca5776071b0fca82878976a440945abcc8d8cd4f3b276"
+    },
+    "stress-test": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "ff15de25f63ec9993940d16e6c4fbe927f47378b17cbfbecd233df9877c0b89e"
+    },
+    "style-transfer": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "1dbb7c9353d45ec0bc330ddfccec9f8a76e9f99029046d514adc14b434e165bb"
+    },
+    "subtitle-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "2c35e4348b7296907495ca37475ca7ad38a7df0591544fa1473f3c4b0945d176"
+    },
+    "system-design": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "b6e52c195351d8bb1f7ed7773140f0a518515619245ce80d7fc52cbd663af46b"
+    },
+    "tab-accordion": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "18d8b0c7f31c8c966ccf12394e5207289637a24ed1a7e1f4f8e9bdc69deead24"
+    },
+    "tailored-resume-generator": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "37ad72564c908b09bcccc8a34087bef06b12b4c38dc68d76cddba5afc588bd92"
+    },
+    "talking-head-video": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "6e34886ff8cf61e839440650ca1f2c19e5c4346dd54b17ca674739399565a780"
+    },
+    "tattoo-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "8361ee0f06e9795efb5f99c5ea9a6b263149252c54e89522132d5c0ac14b803b"
+    },
+    "tavily-best-practices": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "f674b49e68bb5dc55250e4905fae451a7a9a5571cfea8af762da689ccf16bb0a"
+    },
+    "tavily-cli": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "3e62960686a24b313bf2c03c30168436de5694fad515a349789c38fa72d4f672"
+    },
+    "tavily-crawl": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "4da558ada7a957333cbabafb6fa92b553eb553c12944b65d7cb43b56c550ec8b"
+    },
+    "tavily-extract": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "8d52d231d67d398637d06234e09e9207fb7caa692ff1c33c0df43493b7d4ca7e"
+    },
+    "tavily-map": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "9a4996c7249ff1a1e0757e16c89d1e197ec6ef3b0ced9fe7fc103d4707d8ba27"
+    },
+    "tavily-research": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "58a32caadb010598a2faad7544dedade288c1e81e72aa550b13d83b003264062"
+    },
+    "tavily-search": {
+      "source": "tavily-ai/skills",
+      "sourceType": "github",
+      "computedHash": "bda6e90a41addbe0f8750a38aebdf59c5bdc8514d23aaf2015ffe45de6958b74"
+    },
+    "template-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "26b4541df12339344d98f312362eca4e285a473d726f0fabb4fd4f8ec9b03222"
+    },
+    "template-skill": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "38c88f722b574a922311d334a70c2008a2a5b896f06eaa75516d716e5725b26f"
+    },
+    "terms-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0ebd520374bfde0a505fcba487ba52fc0253cb0d70a0f66f69d1cf6318ef71fd"
+    },
+    "testimonials-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "c77e9a6cc98838f03d809788d463e0d584cf99041b9e5a6a6b55a9e55b4ded45"
+    },
+    "testrail": {
+      "source": "alirezarezvani/claude-skills",
+      "sourceType": "github",
+      "computedHash": "a8405733ea688a9344027b89b3e9b2e99c60bd1921178c4c78e71a0bf1752c17"
+    },
+    "text-to-speech": {
+      "source": "elevenlabs/skills",
+      "sourceType": "github",
+      "computedHash": "dccf9155f284345ade4a5af5d3c3db5d5da77856011ff92fff725160b0df8370"
+    },
+    "theme-factory": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "93e78aa44f8fa00bb2c0608f400de1e1dcd6494611dd8ea27c867654240c7bcd"
+    },
+    "tiktok-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "58a753e4fa07c3af015b82974812de15c91f075c48ae43c7a513ee7ab5c75739"
+    },
+    "tiktok-captions": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "206bcd1f033c39c3398ad059d49726e55477563ad9278584278280de5fc57e00"
+    },
+    "title-tag": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "7ff78a2d5a140b0cf2ccdb1c62cf339885c32239d6b2d1dc9b1bad60869f7b47"
+    },
+    "toc-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "7f79357daa3575dc7693ee4852a4a542c63a96ad9d98f8b6e4de11d32c5e1a8d"
+    },
+    "tools-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "82d750c50f9a7e145b70c9c45f61c2728709fb9413cd46d7a48ed1646d632476"
+    },
+    "top-banner-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "7c576f11148414007f810737dc6c8d8abb9b889b68733930fd03a12f248b5d33"
+    },
+    "top-design": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "cca887bdf89eb2cefe38e5bd6b9ef11d8e16d85b677676bb9b679d1aaa4c8038"
+    },
+    "traction-eos": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "2ff50046df68f51963ae8cdf0c4eaab45f0712a3025301392206c69ad52bed7b"
+    },
+    "traffic-analysis": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "59367b1ff4db56085dc26544360cb6bcfe4794a7f197fec0555cabdfdb3e4f85"
+    },
+    "translation": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "d3b45338971cf0a423a2646a5ac300a2ce6f0d3f63c7c63185be30380726511a"
+    },
+    "trust-badges-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "83f2c2e046a70daa9b3b3255dc31f4f755bcfe553991c6a36db54c0a4d0c5a8c"
+    },
+    "tshirt-design-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "ff383d373b0b26b2576ca05120f568a922c1f457c7274da292c3e6f92547e014"
+    },
+    "twitch-overlay-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "71c75de9329f47e9c7b352cbe90150383d1eb8310d316f324f95f8fd8b0d3fae"
+    },
+    "twitter-algorithm-optimizer": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "4dacb151d9267f390a2a1aa5ff06ea984c2270f6a188315dcb8a65cd0d4bcf34"
+    },
+    "twitter-cards": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "01d6f6f4014ec23f278883b385b548f05f42db7ca3849759f066bfd05ababde1"
+    },
+    "twitter-x-posts": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0e2d2397a907204665d926f5d9f590ac3fb246dbb88879ea49cdccc70c06369f"
+    },
+    "url-slug-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "c03d2cc58f463cfb7978ef9dd110678b18e694c23aca4a39feca6f6a943ab437"
+    },
+    "url-structure": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0853759250591849a80a1130705ae9273113103dae9c27468db5a5511a9250d6"
+    },
+    "use-cases-page-generator": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "8809c4ea86cb78b6d87ebd3dfe250e70d44e36168f7ff744cc951468f467d78e"
+    },
+    "ux-heuristics": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "247932fa41630006ddce6f50a8795633c816e4acc3635be2939a1459c9e3a975"
+    },
+    "video-background-removal": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "cd5ed219e7b7965e20962950c3f32d83878923268bb936b97c52c5b43c8ea378"
+    },
+    "video-color-grading": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "32191835cea1007df8be7476c05df4ec7e7178f3f3e139ac1bdcde974f93f5ae"
+    },
+    "video-download": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "07ec3543f6bfeb4a0dce4086c018fbee3ab747ac68b8ba475c87050d3212d31b"
+    },
+    "video-edit": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "c392bc176158a9d0deed541752fc0fe5bcccd910aa3568beca5741ec2b2827e0"
+    },
+    "video-format-conversion": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "ca036bbf01edb23d5eccee462f42f4ee6d669efa12953d081b14893988ee723b"
+    },
+    "video-highlight-extraction": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "dc93b2d7872c85f4ed73ea341683401af6d517d94e491de89b8fc0a5f3ab7fd7"
+    },
+    "video-localization": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "ade4009103b6d3a57fb5ceb92b83c824f9783e07fb4663a266484696ec689746"
+    },
+    "video-marketing": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "8c2f35fd1ec0f450fa5b08bd984e5a8ad49302599ff1d6f5ae09ad5643fe1b66"
+    },
+    "video-noise-reduction": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "8c01287561a8ccd3498dfa1d8fe2188a3d7e89274fd364577239999044a8bb96"
+    },
+    "video-optimization": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "2250c8857fb45e57a0ad832afbf7b5881b1228b8ac96bea015a3a0654d670715"
+    },
+    "video-speed-adjustment": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "abe737852ed61545c4db84115cfb668ea925fac91dc1fc2de02a65f8f8ae45bf"
+    },
+    "video-stabilization": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "01a83fb770ac89301734ec2076912c3bc36f7605864063d8318bac973f05522b"
+    },
+    "video-translate": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "97b045355d672aec6a2831bd0fb56dbfec67101d238ec5cd3b4ccb9e505a2d09"
+    },
+    "video-trimming": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e20d6e0c16aaa95546056e95316ed0b2705dee1499aa716ac7611f81b3862a1b"
+    },
+    "video-understand": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "098f2e869473b0e03c75fbf85009b0f46e75a2870ab52885faaae16578a211b8"
+    },
+    "video-watermark": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "e03ff8a703b76b89fbbc5fd017e7b56f5bdada465819c260bf202f581fa73292"
+    },
+    "virtual-staging": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "38d6fef9bf4cbbd48ba8e226f27110b8e69b68c447d987a48e88da01d1b26e89"
+    },
+    "visual-content": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "0bb7913c8029cc6b1f7bc0b28480336d8687668e65689607cbfd66f0b8ebe7d2"
+    },
+    "visual-style": {
+      "source": "heygen-com/skills",
+      "sourceType": "github",
+      "computedHash": "9b6545b4467ad420a311582abb4070850e24643b15e5856d907190ff5247ae7e"
+    },
+    "vtuber-avatar-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "d23fe06358131ca20c79f4f1503eccb5f575b7b08e3de293bc1881f4e180a03c"
+    },
+    "web-typography": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "computedHash": "154c59a8ef89a5f47127eec776cf46a7d00e6ae331bc2ac407b395b819589017"
+    },
+    "webapp-testing": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "cf8e5916d474886bd67b09691247f43f331523008b7d366064bc607ab42d6302"
+    },
+    "website-structure": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "6a34cc1dbfcbb928fcb5a220e6f0bbfd4e954aaed5373d25973e2c00141ead56"
+    },
+    "wedding-invitation-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "d09d8da4b25b8572a75852bf71edc09f8bfb911a1e975ecef8189d1cca915673"
+    },
+    "xml-sitemap": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "a31f865edc5a9286256dc3f62696381b1c3d0f8dfe59310c5799d9256afdf6d0"
+    },
+    "youtube-ads": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "f9b2dd6d4c42abc93f0e0e6b7cb866958a5988a9aa3e4a43309a967ecd7357f4"
+    },
+    "youtube-downloader": {
+      "source": "ComposioHQ/awesome-claude-skills",
+      "sourceType": "github",
+      "computedHash": "3e4e2304770b72777cabb2b03fb94503adecc9917e9c02ba295dbce31b75d791"
+    },
+    "youtube-seo": {
+      "source": "kostja94/marketing-skills",
+      "sourceType": "github",
+      "computedHash": "4478054c52b552eeda451be978c52dd7143f2a98f33a69a1a463d9a0eb7ae0f6"
+    },
+    "youtube-video-generation": {
+      "source": "eachlabs/skills",
+      "sourceType": "github",
+      "computedHash": "d83933d40c9185fd9f6f14c17ed8ffcfb3cf920381f3960b3ea64895c1854005"
     }
   }
 }
