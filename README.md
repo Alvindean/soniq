@@ -7,8 +7,9 @@ Full-stack deployment: Vercel (serverless) + Supabase (auth + database).
 ```
 soniq-vercel/
 ├── api/
-│   ├── generate.js        ← Anthropic proxy with auth + usage metering
-│   ├── auth.js            ← Signup / login / session endpoints  
+│   ├── generate.js        ← AI proxy: Anthropic primary, OpenRouter fallback
+│   ├── stream.js          ← Streaming SSE proxy (same provider fallback logic)
+│   ├── auth.js            ← Signup / login / session endpoints
 │   └── songs.js           ← Cloud library CRUD
 ├── public/
 │   └── index.html         ← Full SONIQ app
@@ -49,11 +50,19 @@ git push -u origin main
 
 ### Step 4 — Environment variables
 
-Vercel → your project → Settings → Environment Variables — add all 5:
+Vercel → your project → Settings → Environment Variables.
+
+**AI provider** — add at least one (Anthropic is tried first; OpenRouter is the fallback):
+
+| Variable              | Where to find it |
+|-----------------------|-----------------|
+| ANTHROPIC_API_KEY     | console.anthropic.com → API Keys (`sk-ant-...`) |
+| OPENROUTER_API_KEY    | openrouter.ai/keys (`sk-or-...`) — optional fallback |
+
+**Supabase + app** — add all four:
 
 | Variable                   | Where to find it |
 |----------------------------|-----------------|
-| ANTHROPIC_API_KEY          | console.anthropic.com → API Keys |
 | SUPABASE_URL               | Supabase → Settings → API → Project URL |
 | SUPABASE_ANON_KEY          | Supabase → Settings → API → anon public |
 | SUPABASE_SERVICE_ROLE_KEY  | Supabase → Settings → API → service_role |
@@ -71,7 +80,10 @@ npm install
 
 Create .env.local (never commit):
 ```
+# AI provider — add at least one; Anthropic is tried first, OpenRouter is the fallback
 ANTHROPIC_API_KEY=sk-ant-...
+OPENROUTER_API_KEY=sk-or-...
+
 SUPABASE_URL=https://xxxx.supabase.co
 SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
@@ -106,11 +118,21 @@ UPDATE user_profiles SET plan = 'pro' WHERE email = 'user@example.com';
 Browser → POST /api/generate (Authorization: Bearer <jwt>)
         → Vercel Function verifies JWT with Supabase
         → Checks + increments usage counter
-        → Calls Anthropic with your API key (server-side only)
+        → Tries Anthropic first (ANTHROPIC_API_KEY)
+        → Falls back to OpenRouter (OPENROUTER_API_KEY) if Anthropic fails
         → Returns result
 ```
 
-Your Anthropic API key never touches the browser. Ever.
+Your API keys never touch the browser. Ever.
+
+## AI Provider Fallback
+
+SONIQ uses a two-provider fallback chain:
+
+1. **Anthropic** (`ANTHROPIC_API_KEY`) — primary, uses `claude-sonnet-4-20250514`
+2. **OpenRouter** (`OPENROUTER_API_KEY`) — automatic fallback if Anthropic is unavailable
+
+You can set one or both. If only OpenRouter is configured, it is used directly without fallback.
 
 ---
 
