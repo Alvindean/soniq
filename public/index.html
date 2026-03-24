@@ -904,12 +904,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <div id="key-banner">
   <div class="kb-title">🔑 Enter your API key to start creating</div>
   <div class="kb-desc">
-    Works with <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> (free credits, <code style="font-size:11px">sk-or-...</code>)
-    or <a href="https://console.anthropic.com" target="_blank">Anthropic</a> direct (<code style="font-size:11px">sk-ant-...</code>).<br>
+    Works with <a href="https://console.anthropic.com" target="_blank">Anthropic</a> direct (<code style="font-size:11px">sk-ant-...</code>)
+    or <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> (free credits, <code style="font-size:11px">sk-or-...</code>).<br>
     Stored in your browser only — never sent anywhere except the AI provider.
   </div>
   <div class="kb-row">
-    <input id="kb-input" class="kb-input" type="password" placeholder="sk-or-v1-... or sk-ant-api03-..."
+    <input id="kb-input" class="kb-input" type="password" placeholder="sk-ant-api03-... or sk-or-v1-..."
       onkeydown="if(event.key==='Enter')saveKey()"/>
     <button class="kb-save" onclick="saveKey()">Save &amp; Start →</button>
   </div>
