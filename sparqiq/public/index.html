@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SparqIQ — AI Business Idea Engine</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--accent:#7c3aed;
+    --accent2:#06b6d4;--text:#e2e8f0;--muted:#64748b;--success:#10b981;
+    --danger:#ef4444;--grad:linear-gradient(135deg,#7c3aed,#06b6d4);
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh}
+
+  /* HEADER */
+  header{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;gap:1rem;position:sticky;top:0;z-index:100}
+  .logo{display:flex;align-items:center;gap:.6rem}
+  .logo-icon{width:38px;height:38px;background:var(--grad);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem}
+  .logo-text{font-size:1.4rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+  .logo-sub{font-size:.7rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase}
+  header .spacer{flex:1}
+  .limit-badge{font-size:.75rem;color:var(--muted);background:var(--border);padding:.3rem .7rem;border-radius:20px}
+
+  /* NAV TABS */
+  nav{display:flex;gap:.25rem;padding:1.25rem 2rem .5rem;overflow-x:auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  .tab{background:none;border:1px solid var(--border);color:var(--muted);padding:.55rem 1.1rem;border-radius:8px;cursor:pointer;font-size:.85rem;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:.4rem}
+  .tab:hover{border-color:var(--accent);color:var(--text)}
+  .tab.active{background:var(--grad);border-color:transparent;color:#fff;font-weight:600}
+
+  /* MAIN */
+  main{padding:1.25rem 2rem 4rem;max-width:900px;margin:0 auto}
+  .panel{display:none}
+  .panel.active{display:block}
+  h2{font-size:1.3rem;font-weight:700;margin-bottom:.35rem}
+  .desc{color:var(--muted);font-size:.88rem;margin-bottom:1.25rem}
+
+  /* FORM */
+  .form-group{margin-bottom:1rem}
+  label{display:block;font-size:.82rem;font-weight:600;color:var(--muted);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.04em}
+  input,textarea,select{width:100%;background:var(--card);border:1px solid var(--border);color:var(--text);padding:.7rem 1rem;border-radius:8px;font-size:.93rem;font-family:inherit;transition:border .2s;resize:vertical}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--accent)}
+  textarea{min-height:90px}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  @media(max-width:600px){.row{grid-template-columns:1fr}}
+
+  /* BUTTON */
+  .btn{display:inline-flex;align-items:center;gap:.5rem;background:var(--grad);color:#fff;border:none;padding:.7rem 1.5rem;border-radius:8px;font-size:.93rem;font-weight:600;cursor:pointer;transition:opacity .2s}
+  .btn:hover{opacity:.85}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn-sm{padding:.4rem .9rem;font-size:.8rem}
+  .btn-outline{background:none;border:1px solid var(--border);color:var(--text)}
+  .btn-outline:hover{border-color:var(--accent);opacity:1}
+
+  /* OUTPUT */
+  .output-wrap{margin-top:1.5rem}
+  .output-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem}
+  .output-header h3{font-size:.9rem;font-weight:600;color:var(--muted)}
+  .copy-btn{background:none;border:1px solid var(--border);color:var(--muted);padding:.3rem .8rem;border-radius:6px;font-size:.78rem;cursor:pointer;transition:all .2s}
+  .copy-btn:hover{border-color:var(--accent2);color:var(--accent2)}
+  .output-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.25rem 1.4rem;font-size:.92rem;line-height:1.75;min-height:120px;white-space:pre-wrap;word-break:break-word}
+  .output-box.streaming::after{content:'▋';animation:blink .7s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+  .placeholder{color:var(--muted);font-style:italic}
+  .error-msg{color:var(--danger);font-size:.85rem;margin-top:.5rem;display:none}
+
+  /* HISTORY CHIPS */
+  .history-row{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1rem}
+  .chip{background:var(--card);border:1px solid var(--border);color:var(--muted);padding:.3rem .75rem;border-radius:20px;font-size:.78rem;cursor:pointer;transition:all .2s}
+  .chip:hover{border-color:var(--accent);color:var(--text)}
+
+  /* CARDS GRID */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;margin-top:1rem}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1.1rem}
+  .card h4{font-size:.95rem;font-weight:700;margin-bottom:.4rem}
+  .card p{font-size:.83rem;color:var(--muted);line-height:1.55}
+  .card-badge{display:inline-block;font-size:.7rem;padding:.2rem .55rem;border-radius:20px;margin-bottom:.6rem;font-weight:600}
+  .badge-purple{background:#7c3aed22;color:#a78bfa}
+  .badge-cyan{background:#06b6d422;color:#22d3ee}
+  .badge-green{background:#10b98122;color:#34d399}
+  .badge-orange{background:#f9731622;color:#fb923c}
+
+  /* HOME HERO */
+  .hero{text-align:center;padding:3rem 1rem 2rem}
+  .hero-icon{font-size:3.5rem;margin-bottom:1rem}
+  .hero h1{font-size:2.2rem;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:.6rem}
+  .hero p{color:var(--muted);font-size:1rem;max-width:520px;margin:0 auto 2rem}
+  .tool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:1rem;text-align:left}
+  .tool-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.1rem;cursor:pointer;transition:all .2s}
+  .tool-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .tool-card .tc-icon{font-size:1.6rem;margin-bottom:.6rem}
+  .tool-card h3{font-size:.92rem;font-weight:700;margin-bottom:.25rem}
+  .tool-card p{font-size:.78rem;color:var(--muted)}
+
+  /* LOADING SPINNER */
+  .spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+  .btn.loading .spinner{display:inline-block}
+  .btn.loading .btn-label{display:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">⚡</div>
+    <div>
+      <div class="logo-text">SparqIQ</div>
+      <div class="logo-sub">AI Business Idea Engine</div>
+    </div>
+  </div>
+  <div class="spacer"></div>
+  <div class="limit-badge" id="limitBadge">20 requests / hr</div>
+</header>
+
+<nav>
+  <button class="tab active" data-panel="home">🏠 Home</button>
+  <button class="tab" data-panel="spark">⚡ Idea Spark</button>
+  <button class="tab" data-panel="concept">🧠 Concept Builder</button>
+  <button class="tab" data-panel="market">📊 Market Intel</button>
+  <button class="tab" data-panel="competitor">🔍 Competitor Scan</button>
+  <button class="tab" data-panel="blueprint">🚀 Launch Blueprint</button>
+</nav>
+
+<main>
+
+  <!-- HOME -->
+  <div class="panel active" id="panel-home">
+    <div class="hero">
+      <div class="hero-icon">⚡</div>
+      <h1>Ignite Your Next Big Idea</h1>
+      <p>Cross-niche trend intelligence that turns market gaps into business opportunities. Pick a tool to get started.</p>
+    </div>
+    <div class="tool-grid">
+      <div class="tool-card" onclick="switchTab('spark')">
+        <div class="tc-icon">⚡</div>
+        <h3>Idea Spark</h3>
+        <p>Generate fresh cross-niche business ideas from your interests</p>
+      </div>
+      <div class="tool-card" onclick="switchTab('concept')">
+        <div class="tc-icon">🧠</div>
+        <h3>Concept Builder</h3>
+        <p>Turn a rough idea into a full business concept with positioning</p>
+      </div>
+      <div class="tool-card" onclick="switchTab('market')">
+        <div class="tc-icon">📊</div>
+        <h3>Market Intel</h3>
+        <p>Uncover target audience, trends, and market size for any niche</p>
+      </div>
+      <div class="tool-card" onclick="switchTab('competitor')">
+        <div class="tc-icon">🔍</div>
+        <h3>Competitor Scan</h3>
+        <p>Identify key competitors and find gaps you can exploit</p>
+      </div>
+      <div class="tool-card" onclick="switchTab('blueprint')">
+        <div class="tc-icon">🚀</div>
+        <h3>Launch Blueprint</h3>
+        <p>Get a 90-day action plan to take your idea from zero to launch</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- IDEA SPARK -->
+  <div class="panel" id="panel-spark">
+    <h2>⚡ Idea Spark</h2>
+    <p class="desc">Enter your interests or niches and we'll generate high-potential cross-niche business ideas.</p>
+    <div class="form-group">
+      <label>Your Interests / Niches</label>
+      <input type="text" id="spark-niches" placeholder="e.g. fitness, AI, remote work, Gen Z, sustainability" />
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Business Model Preference</label>
+        <select id="spark-model">
+          <option value="any">Any</option>
+          <option value="SaaS">SaaS</option>
+          <option value="marketplace">Marketplace</option>
+          <option value="productized service">Productized Service</option>
+          <option value="physical product">Physical Product</option>
+          <option value="community / membership">Community / Membership</option>
+          <option value="info product / course">Info Product / Course</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Number of Ideas</label>
+        <select id="spark-count">
+          <option value="5">5 ideas</option>
+          <option value="10" selected>10 ideas</option>
+          <option value="15">15 ideas</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="spark-btn" onclick="runSpark()">
+      <span class="spinner"></span>
+      <span class="btn-label">⚡ Generate Ideas</span>
+    </button>
+    <div class="error-msg" id="spark-error"></div>
+    <div class="output-wrap" id="spark-output-wrap" style="display:none">
+      <div class="output-header">
+        <h3>Generated Ideas</h3>
+        <button class="copy-btn" onclick="copyOutput('spark-output')">Copy</button>
+      </div>
+      <div class="output-box" id="spark-output"><span class="placeholder">Results will appear here…</span></div>
+    </div>
+  </div>
+
+  <!-- CONCEPT BUILDER -->
+  <div class="panel" id="panel-concept">
+    <h2>🧠 Concept Builder</h2>
+    <p class="desc">Take a rough idea and get a fully fleshed out business concept with value proposition, audience, and positioning.</p>
+    <div class="form-group">
+      <label>Your Raw Idea</label>
+      <textarea id="concept-idea" placeholder="e.g. An app that helps remote workers find co-working spaces with good wifi and vibes"></textarea>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Target Customer</label>
+        <input type="text" id="concept-customer" placeholder="e.g. freelancers, startups, Gen Z" />
+      </div>
+      <div class="form-group">
+        <label>Budget Stage</label>
+        <select id="concept-budget">
+          <option value="bootstrapped (under $5k)">Bootstrapped (&lt;$5k)</option>
+          <option value="small budget ($5k–$50k)" selected>Small ($5k–$50k)</option>
+          <option value="funded ($50k+)">Funded ($50k+)</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="concept-btn" onclick="runConcept()">
+      <span class="spinner"></span>
+      <span class="btn-label">🧠 Build Concept</span>
+    </button>
+    <div class="error-msg" id="concept-error"></div>
+    <div class="output-wrap" id="concept-output-wrap" style="display:none">
+      <div class="output-header">
+        <h3>Business Concept</h3>
+        <button class="copy-btn" onclick="copyOutput('concept-output')">Copy</button>
+      </div>
+      <div class="output-box" id="concept-output"><span class="placeholder">Results will appear here…</span></div>
+    </div>
+  </div>
+
+  <!-- MARKET INTEL -->
+  <div class="panel" id="panel-market">
+    <h2>📊 Market Intel</h2>
+    <p class="desc">Deep market intelligence — target audience, trends, pain points, willingness to pay, and market size.</p>
+    <div class="form-group">
+      <label>Business / Niche to Analyze</label>
+      <input type="text" id="market-niche" placeholder="e.g. AI scheduling tools for small businesses" />
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Geography</label>
+        <select id="market-geo">
+          <option value="global">Global</option>
+          <option value="USA" selected>USA</option>
+          <option value="Europe">Europe</option>
+          <option value="Asia">Asia</option>
+          <option value="Latin America">Latin America</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Analysis Depth</label>
+        <select id="market-depth">
+          <option value="overview">Quick Overview</option>
+          <option value="detailed" selected>Detailed</option>
+          <option value="deep dive">Deep Dive</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="market-btn" onclick="runMarket()">
+      <span class="spinner"></span>
+      <span class="btn-label">📊 Analyze Market</span>
+    </button>
+    <div class="error-msg" id="market-error"></div>
+    <div class="output-wrap" id="market-output-wrap" style="display:none">
+      <div class="output-header">
+        <h3>Market Intelligence Report</h3>
+        <button class="copy-btn" onclick="copyOutput('market-output')">Copy</button>
+      </div>
+      <div class="output-box" id="market-output"><span class="placeholder">Results will appear here…</span></div>
+    </div>
+  </div>
+
+  <!-- COMPETITOR SCAN -->
+  <div class="panel" id="panel-competitor">
+    <h2>🔍 Competitor Scan</h2>
+    <p class="desc">Identify your likely competitors, their strengths and weaknesses, and gaps you can exploit to win.</p>
+    <div class="form-group">
+      <label>Your Business / Idea</label>
+      <textarea id="comp-idea" placeholder="e.g. A Notion-like tool built specifically for solopreneurs managing client projects"></textarea>
+    </div>
+    <div class="form-group">
+      <label>Known Competitors (optional)</label>
+      <input type="text" id="comp-known" placeholder="e.g. Notion, ClickUp, Basecamp" />
+    </div>
+    <button class="btn" id="comp-btn" onclick="runCompetitor()">
+      <span class="spinner"></span>
+      <span class="btn-label">🔍 Scan Competitors</span>
+    </button>
+    <div class="error-msg" id="comp-error"></div>
+    <div class="output-wrap" id="comp-output-wrap" style="display:none">
+      <div class="output-header">
+        <h3>Competitor Analysis</h3>
+        <button class="copy-btn" onclick="copyOutput('comp-output')">Copy</button>
+      </div>
+      <div class="output-box" id="comp-output"><span class="placeholder">Results will appear here…</span></div>
+    </div>
+  </div>
+
+  <!-- LAUNCH BLUEPRINT -->
+  <div class="panel" id="panel-blueprint">
+    <h2>🚀 Launch Blueprint</h2>
+    <p class="desc">Get a concrete 90-day action plan to validate, build, and launch your business from zero.</p>
+    <div class="form-group">
+      <label>Your Business Idea</label>
+      <textarea id="bp-idea" placeholder="e.g. A subscription box for plant parents that includes rare cuttings and care guides"></textarea>
+    </div>
+    <div class="row">
+      <div class="form-group">
+        <label>Founder Skills</label>
+        <input type="text" id="bp-skills" placeholder="e.g. marketing, coding, design" />
+      </div>
+      <div class="form-group">
+        <label>Available Budget</label>
+        <select id="bp-budget">
+          <option value="$0 (pure sweat equity)">$0 — Pure sweat equity</option>
+          <option value="under $1,000" selected>Under $1,000</option>
+          <option value="$1,000–$10,000">$1,000–$10,000</option>
+          <option value="$10,000+">$10,000+</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" id="bp-btn" onclick="runBlueprint()">
+      <span class="spinner"></span>
+      <span class="btn-label">🚀 Create Blueprint</span>
+    </button>
+    <div class="error-msg" id="bp-error"></div>
+    <div class="output-wrap" id="bp-output-wrap" style="display:none">
+      <div class="output-header">
+        <h3>90-Day Launch Blueprint</h3>
+        <button class="copy-btn" onclick="copyOutput('bp-output')">Copy</button>
+      </div>
+      <div class="output-box" id="bp-output"><span class="placeholder">Results will appear here…</span></div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── Tab switching ──────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelector(`[data-panel="${name}"]`).classList.add('active');
+  document.getElementById(`panel-${name}`).classList.add('active');
+}
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.panel));
+});
+
+// ── Request counter ───────────────────────────────────────────
+let reqCount = 0;
+function bumpCount() {
+  reqCount++;
+  document.getElementById('limitBadge').textContent = `${20 - reqCount} requests left`;
+}
+
+// ── Streaming helper ──────────────────────────────────────────
+async function streamTo(payload, outputEl, errorEl, wrapEl, btnEl) {
+  errorEl.style.display = 'none';
+  wrapEl.style.display = 'block';
+  outputEl.textContent = '';
+  outputEl.classList.add('streaming');
+  btnEl.classList.add('loading');
+  btnEl.disabled = true;
+
+  try {
+    const res = await fetch('/api/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const d = await res.json().catch(() => ({}));
+      throw new Error(d.error || `Server error ${res.status}`);
+    }
+
+    const reader = res.body.getReader();
+    const dec = new TextDecoder();
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += dec.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const ev = JSON.parse(line.slice(6));
+          if (ev.error) throw new Error(ev.error);
+          if (ev.text) outputEl.textContent += ev.text;
+          if (ev.done) break;
+        } catch(e) {
+          if (e.message) throw e;
+        }
+      }
+    }
+    bumpCount();
+  } catch (err) {
+    errorEl.textContent = err.message || 'Something went wrong. Please try again.';
+    errorEl.style.display = 'block';
+    if (!outputEl.textContent) wrapEl.style.display = 'none';
+  } finally {
+    outputEl.classList.remove('streaming');
+    btnEl.classList.remove('loading');
+    btnEl.disabled = false;
+  }
+}
+
+// ── Copy helper ───────────────────────────────────────────────
+function copyOutput(id) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied!';
+    setTimeout(() => btn.textContent = 'Copy', 1500);
+  });
+}
+
+// ── Tool: Idea Spark ──────────────────────────────────────────
+function runSpark() {
+  const niches = document.getElementById('spark-niches').value.trim();
+  if (!niches) return alert('Please enter at least one interest or niche.');
+  const model = document.getElementById('spark-model').value;
+  const count = document.getElementById('spark-count').value;
+
+  const system = `You are SparqIQ, an elite business strategist specializing in cross-niche innovation.
+You identify unexpected intersections between different markets to surface high-potential business opportunities.
+Format each idea clearly with: Idea name, one-line description, why the niches cross well, potential revenue model, and a quick validation tip.`;
+
+  const prompt = `Generate ${count} high-potential business ideas that creatively combine these niches/interests: ${niches}.
+${model !== 'any' ? `Preferred business model: ${model}.` : ''}
+For each idea include:
+• 💡 Idea Name
+• 📝 One-liner description
+• 🔀 Why these niches intersect powerfully
+• 💰 Revenue model
+• ✅ Quick validation tip (how to test in 1 week with no money)
+
+Make ideas specific, actionable, and genuinely creative — not generic.`;
+
+  streamTo(
+    { messages: [{ role: 'user', content: prompt }], system, max_tokens: 3000 },
+    document.getElementById('spark-output'),
+    document.getElementById('spark-error'),
+    document.getElementById('spark-output-wrap'),
+    document.getElementById('spark-btn')
+  );
+}
+
+// ── Tool: Concept Builder ─────────────────────────────────────
+function runConcept() {
+  const idea = document.getElementById('concept-idea').value.trim();
+  if (!idea) return alert('Please describe your idea.');
+  const customer = document.getElementById('concept-customer').value.trim();
+  const budget = document.getElementById('concept-budget').value;
+
+  const system = `You are SparqIQ, a world-class business strategist and startup advisor.
+You turn rough ideas into fully fleshed-out business concepts with sharp positioning, clear value propositions, and actionable strategy.`;
+
+  const prompt = `Build out this business idea into a full concept:
+
+Idea: ${idea}
+${customer ? `Target customer: ${customer}` : ''}
+Budget stage: ${budget}
+
+Please provide:
+## 🏷️ Business Name Ideas (3 options)
+## 🎯 Core Value Proposition (1-2 sentences, crystal clear)
+## 👥 Target Customer Profile (psychographic + demographic)
+## 😤 Problem Being Solved (and how painful it is)
+## ✨ Solution & Key Features (top 5)
+## 💰 Business Model & Pricing
+## 🏆 Unfair Advantage / Differentiation
+## ⚠️ Top 3 Risks & Mitigations
+## 📣 Go-To-Market Strategy (first 30 days)`;
+
+  streamTo(
+    { messages: [{ role: 'user', content: prompt }], system, max_tokens: 3000 },
+    document.getElementById('concept-output'),
+    document.getElementById('concept-error'),
+    document.getElementById('concept-output-wrap'),
+    document.getElementById('concept-btn')
+  );
+}
+
+// ── Tool: Market Intel ────────────────────────────────────────
+function runMarket() {
+  const niche = document.getElementById('market-niche').value.trim();
+  if (!niche) return alert('Please enter a business or niche to analyze.');
+  const geo = document.getElementById('market-geo').value;
+  const depth = document.getElementById('market-depth').value;
+
+  const system = `You are SparqIQ, a market research expert with deep knowledge of consumer trends, market sizing, and buyer psychology.
+Provide structured, data-informed market intelligence that entrepreneurs can act on immediately.`;
+
+  const prompt = `Provide a ${depth} market intelligence report for: "${niche}"
+Geography: ${geo}
+
+Include:
+## 📏 Market Size & Growth
+## 👥 Target Audience Breakdown
+   - Primary segment (demographics, psychographics, behaviors)
+   - Secondary segment
+## 😤 Top Pain Points & Frustrations
+## 🔥 Current Trends Driving This Market
+## 💳 Willingness to Pay (pricing benchmarks)
+## 📣 Where This Audience Hangs Out (channels & communities)
+## ⚡ Market Entry Timing (is now a good time? why?)
+## 🚩 Red Flags & Market Risks`;
+
+  streamTo(
+    { messages: [{ role: 'user', content: prompt }], system, max_tokens: 3000 },
+    document.getElementById('market-output'),
+    document.getElementById('market-error'),
+    document.getElementById('market-output-wrap'),
+    document.getElementById('market-btn')
+  );
+}
+
+// ── Tool: Competitor Scan ─────────────────────────────────────
+function runCompetitor() {
+  const idea = document.getElementById('comp-idea').value.trim();
+  if (!idea) return alert('Please describe your business or idea.');
+  const known = document.getElementById('comp-known').value.trim();
+
+  const system = `You are SparqIQ, a competitive intelligence specialist. You identify market competitors, analyze their strengths and weaknesses, and find exploitable gaps that new entrants can leverage to win.`;
+
+  const prompt = `Run a competitor analysis for this business:
+"${idea}"
+${known ? `Known competitors to include: ${known}` : ''}
+
+Provide:
+## 🏢 Key Competitors (6–8 players, direct + indirect)
+   For each: Name | What they do | Strengths | Weaknesses | Pricing (if known)
+
+## 🗺️ Competitive Landscape Map
+   (position players on value vs. price spectrum)
+
+## 🕳️ Market Gaps & Opportunities
+   (what nobody is doing well that you could own)
+
+## 🏆 Recommended Positioning Strategy
+   (how to differentiate and win)
+
+## 💬 Messaging Angles Competitors Are Missing`;
+
+  streamTo(
+    { messages: [{ role: 'user', content: prompt }], system, max_tokens: 3000 },
+    document.getElementById('comp-output'),
+    document.getElementById('comp-error'),
+    document.getElementById('comp-output-wrap'),
+    document.getElementById('comp-btn')
+  );
+}
+
+// ── Tool: Launch Blueprint ────────────────────────────────────
+function runBlueprint() {
+  const idea = document.getElementById('bp-idea').value.trim();
+  if (!idea) return alert('Please describe your business idea.');
+  const skills = document.getElementById('bp-skills').value.trim();
+  const budget = document.getElementById('bp-budget').value;
+
+  const system = `You are SparqIQ, a startup launch strategist who has helped hundreds of founders go from zero to first revenue.
+You create detailed, realistic, week-by-week action plans tailored to the founder's actual resources and skills.`;
+
+  const prompt = `Create a detailed 90-day launch blueprint for:
+"${idea}"
+${skills ? `Founder skills: ${skills}` : ''}
+Budget: ${budget}
+
+Structure it as:
+
+## 🎯 Goal: What "Launched" Looks Like (definition of success)
+
+## Month 1: Validate (Days 1–30)
+### Week 1: Research & Hypothesis
+### Week 2: Customer Discovery (5 interviews minimum)
+### Week 3: Build MVP / Landing Page
+### Week 4: First 10 Users
+
+## Month 2: Build (Days 31–60)
+### Week 5–6: Core Product / Service
+### Week 7–8: Feedback Loop & Iteration
+
+## Month 3: Launch (Days 61–90)
+### Week 9–10: Pre-launch Buzz
+### Week 11: Public Launch
+### Week 12: Scale What Works
+
+## 🛠️ Tools & Resources (free/cheap tools for each phase)
+## 📊 Key Metrics to Track
+## ⚠️ Top 3 Mistakes to Avoid`;
+
+  streamTo(
+    { messages: [{ role: 'user', content: prompt }], system, max_tokens: 3500 },
+    document.getElementById('bp-output'),
+    document.getElementById('bp-error'),
+    document.getElementById('bp-output-wrap'),
+    document.getElementById('bp-btn')
+  );
+}
+</script>
+</body>
+</html>
