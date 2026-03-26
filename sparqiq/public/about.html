@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>About SparqIQ — The AI Business Idea Engine</title>
+<meta name="description" content="SparqIQ was built for the moment before you start. Learn our story, mission, and the team behind the AI business idea engine."/>
+<meta name="keywords" content="SparqIQ about, AI business idea engine, entrepreneur tools, business idea generator"/>
+<link rel="canonical" href="https://sparqiq.com/about.html"/>
+<meta property="og:title" content="About SparqIQ — The AI Business Idea Engine"/>
+<meta property="og:description" content="SparqIQ was built for the moment before you start. Learn our story, mission, and the team behind the AI business idea engine."/>
+<meta property="og:url" content="https://sparqiq.com/about.html"/>
+<meta property="og:type" content="website"/>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "name": "SparqIQ",
+      "url": "https://sparqiq.com",
+      "logo": "https://sparqiq.com/favicon.ico",
+      "description": "SparqIQ is an AI-powered business idea engine built for entrepreneurs, solopreneurs, and agencies at the moment before they start.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer support",
+        "email": "support@sparqiq.com"
+      }
+    },
+    {
+      "@type": "AboutPage",
+      "name": "About SparqIQ",
+      "url": "https://sparqiq.com/about.html",
+      "description": "Learn the story, mission, and values behind SparqIQ — the AI business idea engine.",
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "SparqIQ",
+        "url": "https://sparqiq.com"
+      }
+    }
+  ]
+}
+</script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--accent:#7c3aed;
+    --accent2:#06b6d4;--text:#e2e8f0;--muted:#64748b;
+    --grad:linear-gradient(135deg,#7c3aed,#06b6d4);
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;line-height:1.7}
+
+  /* HEADER */
+  header{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;gap:1.5rem;position:sticky;top:0;z-index:100}
+  .logo-link{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+  .logo-icon{width:38px;height:38px;background:var(--grad);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .logo-text{font-size:1.4rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  header .spacer{flex:1}
+  header nav{display:flex;align-items:center;gap:.25rem}
+  header nav a{color:var(--muted);text-decoration:none;font-size:.88rem;padding:.45rem .85rem;border-radius:7px;transition:all .2s;white-space:nowrap}
+  header nav a:hover{color:var(--text);background:var(--border)}
+  header nav a.active{color:var(--text);background:var(--border)}
+  .cta-btn{background:var(--grad);color:#fff;text-decoration:none;padding:.5rem 1.1rem;border-radius:8px;font-size:.88rem;font-weight:600;transition:opacity .2s;white-space:nowrap}
+  .cta-btn:hover{opacity:.85}
+  @media(max-width:700px){header{padding:.75rem 1rem}header nav{display:none}}
+
+  /* LAYOUT */
+  main{max-width:1000px;margin:0 auto;padding:0 1.5rem 5rem}
+
+  /* HERO */
+  .hero{text-align:center;padding:5rem 1rem 4rem;position:relative}
+  .hero-eyebrow{display:inline-block;font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent2);background:rgba(6,182,212,.1);border:1px solid rgba(6,182,212,.25);padding:.35rem 1rem;border-radius:20px;margin-bottom:1.5rem}
+  .hero h1{font-size:clamp(2.2rem,5.5vw,3.6rem);font-weight:900;line-height:1.1;margin-bottom:1.5rem}
+  .hero h1 span{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .hero-mission{font-size:1.2rem;color:var(--muted);max-width:620px;margin:0 auto;font-style:italic;line-height:1.7;border-left:3px solid var(--accent);padding-left:1.5rem;text-align:left}
+
+  /* SECTION STRUCTURE */
+  section{margin-bottom:5rem}
+  .section-label{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent);margin-bottom:.75rem}
+  .section-heading{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:800;line-height:1.25;margin-bottom:1.5rem}
+  .prose p{color:var(--muted);font-size:.97rem;line-height:1.8;margin-bottom:1.25rem}
+  .prose p:last-child{margin-bottom:0}
+
+  /* TWO COL LAYOUT */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center}
+  @media(max-width:700px){.two-col{grid-template-columns:1fr}}
+
+  /* PROBLEM SECTION */
+  .problem-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
+  @media(max-width:700px){.problem-grid{grid-template-columns:1fr}}
+  .problem-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem}
+  .problem-card .icon{font-size:2rem;margin-bottom:1rem}
+  .problem-card h3{font-size:1rem;font-weight:700;margin-bottom:.6rem}
+  .problem-card p{font-size:.87rem;color:var(--muted);line-height:1.7}
+
+  /* DIFFERENTIATORS */
+  .diff-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
+  @media(max-width:700px){.diff-grid{grid-template-columns:1fr}}
+  .diff-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem;position:relative;overflow:hidden}
+  .diff-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+  .diff-card .diff-num{font-size:2.5rem;font-weight:900;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;margin-bottom:.5rem}
+  .diff-card h3{font-size:1rem;font-weight:700;margin-bottom:.6rem}
+  .diff-card p{font-size:.87rem;color:var(--muted);line-height:1.7}
+
+  /* TOOLS GRID */
+  .tools-intro{color:var(--muted);font-size:.97rem;margin-bottom:2rem;max-width:600px}
+  .tools-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.25rem}
+  .tool-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.5rem;text-decoration:none;color:inherit;transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:.75rem}
+  .tool-card:hover{border-color:var(--accent);transform:translateY(-3px)}
+  .tool-card-head{display:flex;align-items:center;gap:.75rem}
+  .tool-icon{width:44px;height:44px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .tool-card h3{font-size:.97rem;font-weight:700}
+  .tool-card p{font-size:.85rem;color:var(--muted);line-height:1.65;flex:1}
+  .tool-link{font-size:.8rem;color:var(--accent2);font-weight:600;display:flex;align-items:center;gap:.3rem}
+  .tool-link::after{content:"→"}
+
+  /* VALUES */
+  .values-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem;margin-top:2rem}
+  @media(max-width:600px){.values-grid{grid-template-columns:1fr}}
+  .value-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem}
+  .value-card .val-icon{font-size:1.8rem;margin-bottom:1rem}
+  .value-card h3{font-size:1rem;font-weight:800;margin-bottom:.5rem;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  .value-card p{font-size:.88rem;color:var(--muted);line-height:1.7}
+
+  /* CTA */
+  .cta-section{background:var(--card);border:1px solid var(--border);border-radius:20px;text-align:center;padding:4rem 2rem}
+  .cta-section h2{font-size:2rem;font-weight:800;margin-bottom:1rem}
+  .cta-section p{color:var(--muted);max-width:460px;margin:0 auto 2rem;font-size:.97rem}
+  .cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+  .btn-primary{background:var(--grad);color:#fff;text-decoration:none;padding:.85rem 2rem;border-radius:9px;font-weight:700;font-size:1rem;transition:opacity .2s}
+  .btn-primary:hover{opacity:.85}
+  .btn-ghost{color:var(--muted);text-decoration:none;padding:.85rem 1.5rem;font-size:.95rem;transition:color .2s}
+  .btn-ghost:hover{color:var(--text)}
+
+  /* DIVIDER */
+  .section-divider{height:1px;background:var(--border);margin:0 0 5rem}
+
+  /* FOOTER */
+  footer{background:var(--card);border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center}
+  .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-bottom:1.25rem}
+  .footer-links a{color:var(--muted);text-decoration:none;font-size:.85rem;transition:color .2s}
+  .footer-links a:hover{color:var(--text)}
+  .footer-copy{color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="https://sparqiq.com" class="logo-link">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">SparqIQ</span>
+  </a>
+  <div class="spacer"></div>
+  <nav>
+    <a href="https://sparqiq.com/#tools">Tools</a>
+    <a href="/blog/">Blog</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/about.html" class="active">About</a>
+  </nav>
+  <a href="https://sparqiq.com" class="cta-btn">Try Free ⚡</a>
+</header>
+
+<main>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-eyebrow">Our Story</div>
+    <h1>Built for the Moment<br/><span>Before You Start</span></h1>
+    <blockquote class="hero-mission">
+      "We believe every person has the raw ingredients for a great business inside them. SparqIQ connects the dots."
+    </blockquote>
+  </section>
+
+  <!-- THE PROBLEM -->
+  <section>
+    <div class="section-label">The Problem</div>
+    <h2 class="section-heading">Why Starting a Business Is Harder Than It Should Be</h2>
+    <div class="problem-grid">
+      <div class="problem-card">
+        <div class="icon">🌫️</div>
+        <h3>Finding ideas is genuinely hard</h3>
+        <p>Most aspiring entrepreneurs have energy, skills, and ambition — but they get stuck before they ever start. The blank page problem is real. Traditional brainstorming is slow, biased by your own experience, and fails to surface the cross-niche connections that lead to truly differentiated businesses. The moment before you start is the loneliest moment of the entire entrepreneurial journey.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🤖</div>
+        <h3>Generic AI tools weren't built for this</h3>
+        <p>ChatGPT and other general-purpose AI tools are impressive — but they're not designed for business ideation. They require you to already know what to ask, which is exactly the problem you're trying to solve. Without structured prompting frameworks, expert context, and domain-specific outputs, general AI gives you generic ideas dressed up in confident language. The output looks good. The strategy isn't.</p>
+      </div>
+      <div class="problem-card">
+        <div class="icon">🔐</div>
+        <h3>Expensive consultants gatekeep strategy</h3>
+        <p>Business strategy has historically been locked behind expensive consultants, MBA programs, and exclusive networks. The people who could benefit most from strategic business thinking — first-generation entrepreneurs, bootstrappers, career-switchers — are exactly the people priced out of the rooms where those conversations happen. We think that's wrong. Strategy shouldn't cost $5,000 an engagement to access.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- HOW WE'RE DIFFERENT -->
+  <section>
+    <div class="section-label">Why SparqIQ</div>
+    <h2 class="section-heading">Intelligence Built for Business Builders</h2>
+    <p style="color:var(--muted);font-size:.97rem;max-width:640px;margin-bottom:2.5rem;line-height:1.8">SparqIQ isn't a chatbot. It's a purpose-built system that brings together five specialized tools, each designed for a specific phase of the pre-launch journey — from raw idea generation through to a plan you can actually act on.</p>
+    <div class="diff-grid">
+      <div class="diff-card">
+        <div class="diff-num">01</div>
+        <h3>Cross-niche intelligence</h3>
+        <p>SparqIQ synthesizes patterns across hundreds of industries and business models. It can identify where an idea from one space creates a genuine opportunity in another — the kind of lateral thinking that only comes from seeing a lot of business landscapes at once. You get ideas that are specific to your skills and market, not recycled startup clichés.</p>
+      </div>
+      <div class="diff-card">
+        <div class="diff-num">02</div>
+        <h3>Structured, actionable outputs</h3>
+        <p>Every tool in SparqIQ produces structured, export-ready documents — not walls of conversational text you have to interpret and reformat. Market analysis, business models, competitive breakdowns, and launch plans come out organized, labeled, and ready to share with co-founders, investors, or your own future self reviewing the decision months later.</p>
+      </div>
+      <div class="diff-card">
+        <div class="diff-num">03</div>
+        <h3>Zero to launch in one tool</h3>
+        <p>From "I have no idea what to build" to a validated, structured business plan — SparqIQ handles the entire pre-launch thought process in one place. No stitching together five different apps, no losing your thinking between tabs. Your entire ideation journey is saved, searchable, and buildable from a single workspace designed to take you somewhere real.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- TOOLS OVERVIEW -->
+  <section>
+    <div class="section-label">The Tools</div>
+    <h2 class="section-heading">Five Tools. One Engine.</h2>
+    <p class="tools-intro">SparqIQ's five specialized tools cover every critical stage of the pre-launch process — from sparking your first idea to producing a business plan that's ready to execute.</p>
+    <div class="tools-grid">
+
+      <a href="/tools/idea-spark.html" class="tool-card">
+        <div class="tool-card-head">
+          <div class="tool-icon">💡</div>
+          <h3>Idea Spark</h3>
+        </div>
+        <p>Generate tailored business ideas based on your skills, interests, budget, and lifestyle goals. Goes beyond generic suggestions to surface ideas specific to who you actually are.</p>
+        <span class="tool-link">Explore Idea Spark</span>
+      </a>
+
+      <a href="/tools/market-lens.html" class="tool-card">
+        <div class="tool-card-head">
+          <div class="tool-icon">🔭</div>
+          <h3>Market Lens</h3>
+        </div>
+        <p>Analyze target markets, understand customer segments, identify demand signals, and size your opportunity — structured market intelligence without the consultant invoice.</p>
+        <span class="tool-link">Explore Market Lens</span>
+      </a>
+
+      <a href="/tools/rival-radar.html" class="tool-card">
+        <div class="tool-card-head">
+          <div class="tool-icon">📡</div>
+          <h3>Rival Radar</h3>
+        </div>
+        <p>Map the competitive landscape for any business idea. Understand existing players, identify gaps, and find the positioning angles that give you a defensible edge from day one.</p>
+        <span class="tool-link">Explore Rival Radar</span>
+      </a>
+
+      <a href="/tools/model-forge.html" class="tool-card">
+        <div class="tool-card-head">
+          <div class="tool-icon">⚙️</div>
+          <h3>Model Forge</h3>
+        </div>
+        <p>Turn a rough idea into a concrete business model. Revenue streams, pricing logic, cost structure, key partners — built out systematically so you can see if the numbers make sense before you spend a dollar.</p>
+        <span class="tool-link">Explore Model Forge</span>
+      </a>
+
+      <a href="/tools/launch-blueprint.html" class="tool-card">
+        <div class="tool-card-head">
+          <div class="tool-icon">🗺️</div>
+          <h3>Launch Blueprint</h3>
+        </div>
+        <p>Generate a phased launch plan with milestones, go-to-market tactics, and early traction strategies tailored to your specific idea, resources, and target customer — a real roadmap, not a template.</p>
+        <span class="tool-link">Explore Launch Blueprint</span>
+      </a>
+
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- VALUES -->
+  <section>
+    <div class="section-label">What We Stand For</div>
+    <h2 class="section-heading">Our Values</h2>
+    <p style="color:var(--muted);font-size:.97rem;max-width:600px;margin-bottom:0;line-height:1.8">These aren't words on a wall. They're the principles that shaped every product decision we've made.</p>
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="val-icon">⚡</div>
+        <h3>Speed over perfection</h3>
+        <p>The best business ideas don't emerge from months of deliberation — they come from rapid iteration, feedback, and willingness to move before everything is figured out. SparqIQ is designed to get you to your first insight in minutes, not days. Momentum is a product feature.</p>
+      </div>
+      <div class="value-card">
+        <div class="val-icon">🎯</div>
+        <h3>Clarity over complexity</h3>
+        <p>Every output from SparqIQ is designed to be immediately useful — no jargon, no bloat, no 60-page reports nobody reads. If you can't understand it and act on it within five minutes, we haven't done our job. Clarity is respect for the user's time and intelligence.</p>
+      </div>
+      <div class="value-card">
+        <div class="val-icon">🚀</div>
+        <h3>Action over analysis paralysis</h3>
+        <p>Research and planning matter — but they can also become the world's most socially acceptable form of procrastination. SparqIQ is built to push you toward a decision, a next step, a thing to build or test. We optimize for doing, not just knowing.</p>
+      </div>
+      <div class="value-card">
+        <div class="val-icon">🔓</div>
+        <h3>Accessibility over gatekeeping</h3>
+        <p>World-class business strategy should not require a Harvard MBA or a $500/hour advisor. It should be available to the single parent with a skill and a weekend, the immigrant with deep domain expertise, the creative who has never written a business plan. That is who SparqIQ is for.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="cta-section">
+    <h2>Ready to find your idea?</h2>
+    <p>Ten free generations. No credit card. The moment before you start just got a lot less lonely.</p>
+    <div class="cta-buttons">
+      <a href="https://sparqiq.com" class="btn-primary">Start for Free ⚡</a>
+      <a href="/blog/" class="btn-ghost">Read the Blog →</a>
+    </div>
+  </section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="https://sparqiq.com">sparqiq.com</a>
+    <a href="/blog/">Blog</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/about.html">About</a>
+    <a href="/legal/privacy.html">Privacy Policy</a>
+    <a href="/legal/terms.html">Terms of Service</a>
+  </div>
+  <div class="footer-copy">© 2026 SparqIQ. All rights reserved.</div>
+</footer>
+
+</body>
+</html>

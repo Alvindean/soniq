@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Idea Spark — AI Cross-Niche Business Idea Generator | SparqIQ</title>
+  <meta name="description" content="Generate 10 high-potential cross-niche business ideas from your interests in seconds. Powered by AI. Free to try." />
+  <meta name="keywords" content="cross niche business idea generator, AI business ideas, cross-niche opportunities, business idea generator free, AI startup ideas" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://sparqiq.com/tools/idea-spark.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Idea Spark — AI Cross-Niche Business Idea Generator | SparqIQ" />
+  <meta property="og:description" content="Generate 10 high-potential cross-niche business ideas from your interests in seconds. Powered by AI. Free to try." />
+  <meta property="og:url" content="https://sparqiq.com/tools/idea-spark.html" />
+  <meta property="og:image" content="https://sparqiq.com/og/idea-spark.png" />
+  <meta property="og:site_name" content="SparqIQ" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Idea Spark — AI Cross-Niche Business Idea Generator | SparqIQ" />
+  <meta name="twitter:description" content="Generate 10 high-potential cross-niche business ideas from your interests in seconds. Powered by AI. Free to try." />
+  <meta name="twitter:image" content="https://sparqiq.com/og/idea-spark.png" />
+  <meta name="twitter:site" content="@sparqiq" />
+
+  <!-- Schema: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Idea Spark",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "AI-powered cross-niche business idea generator that produces 10 high-potential ideas with revenue models and validation tips in seconds.",
+    "url": "https://sparqiq.com/tools/idea-spark.html",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "SparqIQ",
+      "url": "https://sparqiq.com"
+    }
+  }
+  </script>
+
+  <!-- Schema: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is cross-niche business idea generation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Cross-niche idea generation combines two or more unrelated industries or interests to find unexplored business opportunities. For example, pairing fitness with fintech, or education with gaming. These intersections often yield differentiated ideas with less competition than single-niche spaces."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How many ideas does Idea Spark generate?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Idea Spark generates up to 10 high-potential cross-niche business ideas per session. Each idea includes a short concept summary, a revenue model, and a one-week validation tip so you can test before committing."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I save or export my generated ideas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. After generation, you can copy your ideas to clipboard, download them as a text summary, or pipe them directly into SparqIQ's Concept Builder tool to develop a full business concept from any idea you like."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What AI models does Idea Spark support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Idea Spark supports multiple AI models via the SparqIQ platform. You can choose between standard and advanced modes depending on the depth and creativity of ideas you want. No API key required — everything runs through your SparqIQ account."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Idea Spark free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes, Idea Spark is free to try with no credit card required. Free users receive a limited number of generations per month. Upgrading to a SparqIQ paid plan unlocks unlimited generations and access to all five AI tools in the suite."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How accurate are the AI-generated business ideas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Idea Spark draws on broad knowledge of market trends, business models, and consumer behavior to generate plausible, high-potential concepts. The ideas are starting points designed to spark your thinking — not validated guarantees. We always recommend using Market Intel to research any idea before investing time or money."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f;
+      --card: #12121a;
+      --border: #1e1e2e;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 1.25rem; font-weight: 700;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--muted); font-size: 0.9rem; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-cta {
+      background: var(--gradient); color: #fff; padding: 0.45rem 1.2rem;
+      border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+    }
+    .nav-cta:hover { opacity: 0.9; text-decoration: none; }
+
+    /* HERO */
+    .hero {
+      max-width: 860px; margin: 0 auto;
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+      color: #a78bfa; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 0.35rem 1rem; border-radius: 999px; margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800; line-height: 1.2;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p {
+      font-size: 1.15rem; color: var(--muted); max-width: 620px; margin: 0 auto 2.5rem;
+    }
+    .hero-cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gradient); color: #fff; padding: 0.8rem 2rem;
+      border-radius: 8px; font-weight: 700; font-size: 1rem; display: inline-block;
+    }
+    .btn-primary:hover { opacity: 0.9; text-decoration: none; }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); padding: 0.8rem 2rem;
+      border-radius: 8px; font-weight: 600; font-size: 1rem; display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+
+    /* HERO IMAGE */
+    .hero-img-wrap {
+      max-width: 860px; margin: 0 auto 4rem;
+      padding: 0 2rem;
+    }
+    .hero-img {
+      width: 100%; border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      aspect-ratio: 16/7;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .hero-img::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.15), rgba(6,182,212,0.1));
+    }
+    .hero-img-label {
+      position: relative; color: var(--muted); font-size: 0.9rem;
+    }
+
+    /* SECTIONS */
+    .section { max-width: 1040px; margin: 0 auto; padding: 4rem 2rem; }
+    .section-label {
+      text-align: center;
+      font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent2); margin-bottom: 0.75rem;
+    }
+    .section-title {
+      text-align: center; font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 800; margin-bottom: 1rem;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted); max-width: 580px;
+      margin: 0 auto 3rem; font-size: 1rem;
+    }
+
+    /* HOW IT WORKS */
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+    .step-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 2rem;
+      position: relative; overflow: hidden;
+    }
+    .step-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient);
+    }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #a78bfa; margin-bottom: 1rem;
+    }
+    .step-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .step-card p { color: var(--muted); font-size: 0.93rem; }
+
+    /* FEATURES */
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .feature-icon {
+      width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
+      background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .feature-card h3 { font-size: 0.97rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .feature-card p { color: var(--muted); font-size: 0.88rem; }
+
+    /* FAQ */
+    .faq-list { display: flex; flex-direction: column; gap: 1rem; }
+    .faq-item {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+    }
+    .faq-q {
+      padding: 1.25rem 1.5rem;
+      font-weight: 600; font-size: 0.97rem; cursor: pointer;
+      display: flex; justify-content: space-between; align-items: center;
+      user-select: none;
+    }
+    .faq-q::after { content: '+'; color: var(--accent2); font-size: 1.3rem; font-weight: 300; }
+    .faq-a {
+      padding: 0 1.5rem 1.25rem;
+      color: var(--muted); font-size: 0.93rem;
+    }
+
+    /* TOOLS NAV */
+    .tools-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+    .tool-link {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem;
+      text-align: center; color: var(--text); transition: border-color 0.2s;
+    }
+    .tool-link:hover { border-color: var(--accent); text-decoration: none; color: var(--text); }
+    .tool-link.active { border-color: var(--accent); background: rgba(124,58,237,0.08); }
+    .tool-link-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .tool-link-name { font-size: 0.88rem; font-weight: 600; }
+    .tool-link-desc { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+
+    /* BLOG */
+    .blog-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+    .blog-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .blog-tag { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; color: var(--accent2); }
+    .blog-card h3 { font-size: 1rem; font-weight: 700; }
+    .blog-card p { color: var(--muted); font-size: 0.88rem; flex: 1; }
+    .blog-card a { font-size: 0.88rem; font-weight: 600; color: var(--accent2); }
+
+    /* CTA BANNER */
+    .cta-banner {
+      margin: 4rem 2rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 3.5rem 2rem;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05));
+    }
+    .cta-banner h2 { position: relative; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-banner p { position: relative; color: var(--muted); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-banner .btn-primary { position: relative; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center; color: var(--muted); font-size: 0.85rem;
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 1rem; }
+
+    @media (max-width: 640px) {
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="https://sparqiq.com" class="nav-logo">SparqIQ</a>
+    <ul class="nav-links">
+      <li><a href="https://sparqiq.com">Home</a></li>
+      <li><a href="idea-spark.html">Tools</a></li>
+      <li><a href="https://sparqiq.com/blog">Blog</a></li>
+      <li><a href="https://sparqiq.com/pricing">Pricing</a></li>
+    </ul>
+    <a href="https://sparqiq.com" class="nav-cta">Get Started Free</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">AI Business Tool</div>
+    <h1>Turn Your Interests Into<br /><span>Business Ideas</span></h1>
+    <p>Enter two or more niches and let Idea Spark generate 10 cross-niche business concepts in seconds — each with a revenue model and a one-week validation tip.</p>
+    <div class="hero-cta-group">
+      <a href="https://sparqiq.com" class="btn-primary">Generate Ideas Free</a>
+      <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+    </div>
+  </section>
+
+  <!-- HERO IMAGE -->
+  <div class="hero-img-wrap">
+    <div class="hero-img">
+      <span class="hero-img-label">Screenshot: Idea Spark generating 10 cross-niche business ideas from "fitness + fintech" inputs</span>
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how-it-works">
+    <p class="section-label">Simple 3-Step Process</p>
+    <h2 class="section-title">How Idea Spark Works</h2>
+    <p class="section-sub">Go from a blank page to 10 actionable cross-niche business ideas in under 60 seconds.</p>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Enter Your Niches &amp; Interests</h3>
+        <p>Type in two or more industries, hobbies, or areas you're passionate about — like "health tech" and "remote work," or "gaming" and "education." No formal knowledge required.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Choose Model &amp; Idea Count</h3>
+        <p>Select the AI model depth (standard or advanced) and how many ideas you want — up to 10 per session. Advanced mode digs deeper into niche intersections for more nuanced concepts.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Get 10 AI-Generated Ideas</h3>
+        <p>Receive a list of up to 10 fully described cross-niche business ideas, each paired with a revenue model (SaaS, marketplace, service, etc.) and a one-week validation tip you can act on today.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <p class="section-label">What You Get</p>
+    <h2 class="section-title">Everything You Need to Spark the Right Idea</h2>
+    <p class="section-sub">Idea Spark doesn't just list names — it delivers structured, actionable concepts ready to develop further.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🔀</div>
+        <div>
+          <h3>Cross-Niche Intelligence</h3>
+          <p>The AI analyzes intersections between your chosen niches, surfacing opportunities that single-niche tools miss entirely. These white-space ideas face lower competition by default.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💰</div>
+        <div>
+          <h3>Revenue Model Per Idea</h3>
+          <p>Every idea comes tagged with its most natural revenue model — SaaS, marketplace, productized service, content, or community — so you know how the business makes money before you start building.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✅</div>
+        <div>
+          <h3>1-Week Validation Tips</h3>
+          <p>Each idea includes a concrete action you can complete in seven days to test market interest — whether that's a landing page test, a cold outreach sequence, or a quick Reddit thread.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏗️</div>
+        <div>
+          <h3>5 Business Model Types</h3>
+          <p>Idea Spark covers SaaS, marketplace, service-based, community-led, and content-monetization models — giving you diversity in how you could monetize each cross-niche opportunity.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div>
+          <h3>Instant Results</h3>
+          <p>No waiting. No loading screens. Your 10 ideas are generated and displayed in real time, typically within 10–20 seconds of submitting your inputs.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔗</div>
+        <div>
+          <h3>Direct Pipeline to Concept Builder</h3>
+          <p>Found an idea you love? Send it directly to <a href="concept-builder.html">Concept Builder</a> with one click to generate a full business concept, pricing strategy, and go-to-market plan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BODY CONTENT -->
+  <section class="section" id="about">
+    <div style="max-width:720px; margin:0 auto;">
+      <h2 style="font-size:1.75rem; font-weight:800; margin-bottom:1.25rem;">The Case for Cross-Niche Business Ideas</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Most entrepreneurs start by going deep into a single niche — fitness apps, productivity tools, e-commerce. The problem? Those spaces are crowded. The real opportunity in 2026 lies at the intersections: businesses that blend two distinct industries in ways neither community has served well.</p>
+      <p style="color:var(--muted); margin-bottom:1rem;">Consider how the collision of mental health and workplace productivity gave rise to a wave of employee wellness platforms. Or how the convergence of pet care and subscription commerce created a billion-dollar category. Cross-niche businesses differentiate naturally, attract press because they're novel, and often face less direct competition because potential rivals aren't even watching that intersection.</p>
+      <p style="color:var(--muted); margin-bottom:1rem;">Idea Spark is built specifically to surface these intersections for you. Rather than generating another generic "build a fitness app" idea, it finds the underserved gaps where your specific combination of interests creates a natural moat. The AI evaluates not just what's possible, but what's commercially plausible given current consumer trends, platform ecosystems, and funding climates.</p>
+      <h3 style="font-size:1.2rem; font-weight:700; margin:2rem 0 0.75rem;">Who Idea Spark Is For</h3>
+      <p style="color:var(--muted); margin-bottom:1rem;">Idea Spark works for first-time founders who have interests but no clear business idea yet, experienced entrepreneurs looking to diversify into adjacent markets, freelancers exploring productized service opportunities, and investors scanning for early-stage niche signals. If you've ever thought "there has to be a business in this somehow" when two of your passions collide, Idea Spark is designed to answer that question systematically.</p>
+      <h3 style="font-size:1.2rem; font-weight:700; margin:2rem 0 0.75rem;">From Idea to Execution</h3>
+      <p style="color:var(--muted); margin-bottom:1rem;">Generating an idea is just the beginning. SparqIQ's full suite of AI tools is designed to take you from idea to launch without needing a business degree or a team of consultants. After using Idea Spark, use <a href="concept-builder.html">Concept Builder</a> to flesh out your concept, <a href="market-intel.html">Market Intel</a> to validate the market size, <a href="competitor-scan.html">Competitor Scan</a> to understand the landscape, and <a href="launch-blueprint.html">Launch Blueprint</a> to create your week-by-week 90-day action plan.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub">Everything you need to know about Idea Spark and cross-niche business ideas.</p>
+    <div class="faq-list" style="max-width:720px; margin:0 auto;">
+      <div class="faq-item">
+        <div class="faq-q">What is cross-niche business idea generation?</div>
+        <div class="faq-a">Cross-niche idea generation combines two or more unrelated industries or interests to find unexplored business opportunities. For example, pairing fitness with fintech, or education with gaming. These intersections often yield differentiated ideas with less competition than single-niche spaces.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How many ideas does Idea Spark generate per session?</div>
+        <div class="faq-a">Idea Spark generates up to 10 high-potential cross-niche business ideas per session. Each idea includes a short concept summary, a revenue model, and a one-week validation tip so you can test before committing significant resources.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I save or export my generated ideas?</div>
+        <div class="faq-a">Yes. After generation, you can copy your ideas to clipboard, download them as a formatted summary, or pipe them directly into SparqIQ's Concept Builder tool to develop a full business concept from any idea you like.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What AI models does Idea Spark support?</div>
+        <div class="faq-a">Idea Spark supports multiple AI models via the SparqIQ platform. You can choose between standard and advanced modes depending on the depth and creativity of ideas you want. No API key required — everything runs through your SparqIQ account.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is Idea Spark free to use?</div>
+        <div class="faq-a">Yes, Idea Spark is free to try with no credit card required. Free users receive a limited number of generations per month. Upgrading to a SparqIQ paid plan unlocks unlimited generations and access to all five AI tools in the suite.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How accurate are the AI-generated business ideas?</div>
+        <div class="faq-a">Idea Spark draws on broad knowledge of market trends, business models, and consumer behavior to generate plausible, high-potential concepts. The ideas are starting points designed to spark your thinking — not validated guarantees. We recommend using <a href="market-intel.html">Market Intel</a> to research any idea before investing time or money.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OTHER TOOLS -->
+  <section class="section" id="tools">
+    <p class="section-label">Full Suite</p>
+    <h2 class="section-title">Explore All SparqIQ Tools</h2>
+    <p class="section-sub">From idea to launch — every AI tool you need in one place.</p>
+    <div class="tools-nav">
+      <a href="idea-spark.html" class="tool-link active">
+        <div class="tool-link-icon">💡</div>
+        <div class="tool-link-name">Idea Spark</div>
+        <div class="tool-link-desc">Cross-niche idea generator</div>
+      </a>
+      <a href="concept-builder.html" class="tool-link">
+        <div class="tool-link-icon">🏗️</div>
+        <div class="tool-link-name">Concept Builder</div>
+        <div class="tool-link-desc">Full business concept</div>
+      </a>
+      <a href="market-intel.html" class="tool-link">
+        <div class="tool-link-icon">📊</div>
+        <div class="tool-link-name">Market Intel</div>
+        <div class="tool-link-desc">AI market research</div>
+      </a>
+      <a href="competitor-scan.html" class="tool-link">
+        <div class="tool-link-icon">🔍</div>
+        <div class="tool-link-name">Competitor Scan</div>
+        <div class="tool-link-desc">Competitive landscape</div>
+      </a>
+      <a href="launch-blueprint.html" class="tool-link">
+        <div class="tool-link-icon">🚀</div>
+        <div class="tool-link-name">Launch Blueprint</div>
+        <div class="tool-link-desc">90-day launch plan</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- BLOG -->
+  <section class="section" id="blog">
+    <p class="section-label">Learn More</p>
+    <h2 class="section-title">Related Resources</h2>
+    <div class="blog-grid" style="max-width:720px; margin:0 auto;">
+      <div class="blog-card">
+        <div class="blog-tag">Guide</div>
+        <h3>How to Use an AI Business Idea Generator Effectively</h3>
+        <p>Practical tips for getting the most out of AI tools when exploring business concepts in 2026.</p>
+        <a href="/blog/ai-business-idea-generator.html">Read article &rarr;</a>
+      </div>
+      <div class="blog-card">
+        <div class="blog-tag">Trends</div>
+        <h3>Top Cross-Niche Business Ideas for 2026</h3>
+        <p>A curated look at the most promising niche intersections our AI identified across thousands of sessions.</p>
+        <a href="/blog/cross-niche-business-ideas-2026.html">Read article &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="cta-banner" style="max-width:1040px; margin:0 auto 4rem;">
+    <h2>Ready to Find Your Next Business Idea?</h2>
+    <p>Join thousands of entrepreneurs using SparqIQ's AI tools to discover, validate, and launch cross-niche businesses.</p>
+    <a href="https://sparqiq.com" class="btn-primary">Start Generating Ideas Free</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://sparqiq.com">Home</a>
+      <a href="idea-spark.html">Idea Spark</a>
+      <a href="concept-builder.html">Concept Builder</a>
+      <a href="market-intel.html">Market Intel</a>
+      <a href="competitor-scan.html">Competitor Scan</a>
+      <a href="launch-blueprint.html">Launch Blueprint</a>
+      <a href="https://sparqiq.com/privacy">Privacy</a>
+      <a href="https://sparqiq.com/terms">Terms</a>
+    </div>
+    <p>&copy; 2026 SparqIQ. All rights reserved. &nbsp;|&nbsp; <a href="https://sparqiq.com">sparqiq.com</a></p>
+  </footer>
+
+</body>
+</html>

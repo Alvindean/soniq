@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concept Builder — AI Business Concept Generator | SparqIQ</title>
+  <meta name="description" content="Turn a rough business idea into a full concept with value proposition, target audience, pricing model, and GTM strategy. AI-powered, instant." />
+  <meta name="keywords" content="AI business concept generator, business concept development, value proposition generator, GTM strategy AI, business idea to concept" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://sparqiq.com/tools/concept-builder.html" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Concept Builder — AI Business Concept Generator | SparqIQ" />
+  <meta property="og:description" content="Turn a rough business idea into a full concept with value proposition, target audience, pricing model, and GTM strategy. AI-powered, instant." />
+  <meta property="og:url" content="https://sparqiq.com/tools/concept-builder.html" />
+  <meta property="og:image" content="https://sparqiq.com/og/concept-builder.png" />
+  <meta property="og:site_name" content="SparqIQ" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Concept Builder — AI Business Concept Generator | SparqIQ" />
+  <meta name="twitter:description" content="Turn a rough business idea into a full concept with value proposition, target audience, pricing model, and GTM strategy. AI-powered, instant." />
+  <meta name="twitter:image" content="https://sparqiq.com/og/concept-builder.png" />
+  <meta name="twitter:site" content="@sparqiq" />
+
+  <!-- Schema: SoftwareApplication -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Concept Builder",
+    "applicationCategory": "BusinessApplication",
+    "operatingSystem": "Web",
+    "description": "AI-powered business concept generator that transforms a rough idea into a full concept with value proposition, customer profile, pricing model, risk analysis, and 30-day GTM plan.",
+    "url": "https://sparqiq.com/tools/concept-builder.html",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "provider": {
+      "@type": "Organization",
+      "name": "SparqIQ",
+      "url": "https://sparqiq.com"
+    }
+  }
+  </script>
+
+  <!-- Schema: FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is a business concept?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A business concept is a structured description of a business opportunity that goes beyond a raw idea. It includes the core value proposition (what problem you solve and for whom), the target customer profile, the revenue and pricing model, key risks, and the initial go-to-market approach. It's the bridge between a spark of inspiration and a fundable, buildable business."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How is a business concept different from a business plan?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "A business concept is a concise strategic summary used to quickly evaluate and communicate an opportunity — typically one to two pages. A business plan is a comprehensive operational document covering financials, organizational structure, and multi-year projections. Concept Builder produces a concept-level output, which is more useful at the early validation stage before you've committed to building."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How detailed is the output from Concept Builder?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Concept Builder generates a structured output covering: a one-paragraph value proposition, a target customer profile (demographics, psychographics, jobs-to-be-done), two to three pricing model options with rationale, a top-five risk list, and a 30-day GTM plan with concrete first actions. The depth scales with your input — more detail in means more actionable output."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What budget stages does Concept Builder support?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Concept Builder adjusts its recommendations based on your budget stage: bootstrapped (under $1,000), lean startup ($1,000–$10,000), funded ($10,000–$100,000), or venture-scale ($100,000+). This ensures your GTM plan and tool stack suggestions are realistic for your actual situation."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Can I edit the output after it's generated?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. The generated concept is fully editable in the SparqIQ editor. You can modify any section, regenerate specific parts, or export the final concept as a formatted PDF or markdown document to share with collaborators or investors."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Is Concept Builder free to use?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Concept Builder is free to try with no credit card required. Free users can generate a limited number of concepts per month. SparqIQ paid plans unlock unlimited generations, advanced AI models, and full export capabilities."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0a0a0f;
+      --card: #12121a;
+      --border: #1e1e2e;
+      --accent: #7c3aed;
+      --accent2: #06b6d4;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 1.25rem; font-weight: 700;
+      background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a { color: var(--muted); font-size: 0.9rem; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+    .nav-cta {
+      background: var(--gradient); color: #fff; padding: 0.45rem 1.2rem;
+      border-radius: 6px; font-size: 0.9rem; font-weight: 600;
+    }
+    .nav-cta:hover { opacity: 0.9; text-decoration: none; }
+    .hero {
+      max-width: 860px; margin: 0 auto;
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.3);
+      color: #67e8f9; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.05em;
+      padding: 0.35rem 1rem; border-radius: 999px; margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.25rem);
+      font-weight: 800; line-height: 1.2;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 span { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: 1.15rem; color: var(--muted); max-width: 620px; margin: 0 auto 2.5rem; }
+    .hero-cta-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gradient); color: #fff; padding: 0.8rem 2rem;
+      border-radius: 8px; font-weight: 700; font-size: 1rem; display: inline-block;
+    }
+    .btn-primary:hover { opacity: 0.9; text-decoration: none; }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border); padding: 0.8rem 2rem;
+      border-radius: 8px; font-weight: 600; font-size: 1rem; display: inline-block;
+    }
+    .btn-secondary:hover { border-color: var(--accent); text-decoration: none; }
+    .hero-img-wrap { max-width: 860px; margin: 0 auto 4rem; padding: 0 2rem; }
+    .hero-img {
+      width: 100%; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--card); aspect-ratio: 16/7;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+    .hero-img::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(6,182,212,0.12), rgba(124,58,237,0.08));
+    }
+    .hero-img-label { position: relative; color: var(--muted); font-size: 0.9rem; }
+    .section { max-width: 1040px; margin: 0 auto; padding: 4rem 2rem; }
+    .section-label {
+      text-align: center; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--accent2); margin-bottom: 0.75rem;
+    }
+    .section-title {
+      text-align: center; font-size: clamp(1.5rem, 3vw, 2.25rem);
+      font-weight: 800; margin-bottom: 1rem;
+    }
+    .section-sub {
+      text-align: center; color: var(--muted); max-width: 580px;
+      margin: 0 auto 3rem; font-size: 1rem;
+    }
+    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; }
+    .step-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 2rem; position: relative; overflow: hidden;
+    }
+    .step-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient);
+    }
+    .step-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(6,182,212,0.12); border: 1px solid rgba(6,182,212,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; color: #67e8f9; margin-bottom: 1rem;
+    }
+    .step-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .step-card p { color: var(--muted); font-size: 0.93rem; }
+    .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.5rem; display: flex; gap: 1rem; align-items: flex-start;
+    }
+    .feature-icon {
+      width: 42px; height: 42px; border-radius: 8px; flex-shrink: 0;
+      background: rgba(6,182,212,0.1); border: 1px solid rgba(6,182,212,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.1rem;
+    }
+    .feature-card h3 { font-size: 0.97rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .feature-card p { color: var(--muted); font-size: 0.88rem; }
+    .faq-list { display: flex; flex-direction: column; gap: 1rem; }
+    .faq-item { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .faq-q {
+      padding: 1.25rem 1.5rem; font-weight: 600; font-size: 0.97rem;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-q::after { content: '+'; color: var(--accent2); font-size: 1.3rem; font-weight: 300; }
+    .faq-a { padding: 0 1.5rem 1.25rem; color: var(--muted); font-size: 0.93rem; }
+    .tools-nav { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+    .tool-link {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem; text-align: center; color: var(--text);
+    }
+    .tool-link:hover { border-color: var(--accent); text-decoration: none; color: var(--text); }
+    .tool-link.active { border-color: var(--accent2); background: rgba(6,182,212,0.06); }
+    .tool-link-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .tool-link-name { font-size: 0.88rem; font-weight: 600; }
+    .tool-link-desc { font-size: 0.78rem; color: var(--muted); margin-top: 0.2rem; }
+    .cta-banner {
+      margin: 4rem 2rem; background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 3.5rem 2rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .cta-banner::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(6,182,212,0.07), rgba(124,58,237,0.07));
+    }
+    .cta-banner h2 { position: relative; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 800; margin-bottom: 0.75rem; }
+    .cta-banner p { position: relative; color: var(--muted); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto; }
+    .cta-banner .btn-primary { position: relative; }
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem; text-align: center; color: var(--muted); font-size: 0.85rem;
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+    .footer-links { display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    @media (max-width: 640px) { .nav-links { display: none; } }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a href="https://sparqiq.com" class="nav-logo">SparqIQ</a>
+    <ul class="nav-links">
+      <li><a href="https://sparqiq.com">Home</a></li>
+      <li><a href="idea-spark.html">Tools</a></li>
+      <li><a href="https://sparqiq.com/blog">Blog</a></li>
+      <li><a href="https://sparqiq.com/pricing">Pricing</a></li>
+    </ul>
+    <a href="https://sparqiq.com" class="nav-cta">Get Started Free</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-badge">AI Business Tool</div>
+    <h1>From Rough Idea to<br /><span>Full Business Concept</span></h1>
+    <p>Describe your rough idea, set your target customer and budget, and Concept Builder delivers a complete business concept — value proposition, pricing, risk analysis, and 30-day GTM plan — instantly.</p>
+    <div class="hero-cta-group">
+      <a href="https://sparqiq.com" class="btn-primary">Build Your Concept Free</a>
+      <a href="#how-it-works" class="btn-secondary">See How It Works</a>
+    </div>
+  </section>
+
+  <div class="hero-img-wrap">
+    <div class="hero-img">
+      <span class="hero-img-label">Screenshot: Concept Builder output showing value proposition, customer profile, and GTM plan for a SaaS idea</span>
+    </div>
+  </div>
+
+  <section class="section" id="how-it-works">
+    <p class="section-label">Simple 3-Step Process</p>
+    <h2 class="section-title">How Concept Builder Works</h2>
+    <p class="section-sub">Turn a napkin idea into an investor-ready business concept in three steps.</p>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h3>Describe Your Rough Idea</h3>
+        <p>Write a few sentences about your business idea — even if it's incomplete. The more context you give (the problem, the solution, the industry), the sharper your output will be. One sentence is enough to get started.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h3>Set Target Customer &amp; Budget</h3>
+        <p>Tell Concept Builder who your customer is (consumer, SMB, enterprise) and your available budget stage (bootstrapped to venture-scale). These inputs calibrate the pricing model and GTM strategy to your real constraints.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h3>Get Your Full Business Concept</h3>
+        <p>Receive a structured output: sharp value proposition, detailed customer profile, pricing model options, top risks to mitigate, and a 30-day GTM plan with prioritized action steps you can start this week.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <p class="section-label">What You Get</p>
+    <h2 class="section-title">A Complete Business Concept in Minutes</h2>
+    <p class="section-sub">Concept Builder delivers every strategic layer a new business needs before writing a single line of code or spending the first dollar.</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <div>
+          <h3>Value Proposition Generator</h3>
+          <p>Get a crisp, differentiated value proposition that articulates the specific problem you solve, for whom, and why your approach is better than existing alternatives.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👤</div>
+        <div>
+          <h3>Customer Profile</h3>
+          <p>Receive a detailed target customer profile including demographics, psychographics, key pain points, and the specific jobs-to-be-done your business addresses — the foundation for all marketing and product decisions.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💲</div>
+        <div>
+          <h3>Pricing Model Suggestions</h3>
+          <p>Get two to three viable pricing models tailored to your business type and target customer — including rationale for each and a recommended starting price range based on comparable market solutions.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⚠️</div>
+        <div>
+          <h3>Risk Analysis</h3>
+          <p>Understand the top five risks facing your concept — market, technical, financial, regulatory, and competitive — along with a suggested mitigation approach for each so you're not caught off guard.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <div>
+          <h3>30-Day GTM Plan</h3>
+          <p>Walk away with a concrete 30-day go-to-market plan broken into weekly priorities: who to talk to, what channels to test, what to build first, and what metrics to track to validate your concept is working.</p>
+        </div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📤</div>
+        <div>
+          <h3>Export &amp; Continue Building</h3>
+          <p>Export your concept as PDF or markdown, share it with co-founders or advisors, or feed it directly into <a href="market-intel.html">Market Intel</a> and <a href="launch-blueprint.html">Launch Blueprint</a> for the next phase.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="about">
+    <div style="max-width:720px; margin:0 auto;">
+      <h2 style="font-size:1.75rem; font-weight:800; margin-bottom:1.25rem;">Why a Business Concept Matters Before You Build</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">The most common and costly mistake early-stage founders make is jumping straight from idea to execution without clearly defining what they're building, for whom, and why anyone will pay for it. A well-defined business concept is the cheapest form of validation available — it forces you to confront the hard questions before you've spent months writing code or thousands of dollars on ads.</p>
+      <p style="color:var(--muted); margin-bottom:1rem;">Concept Builder applies the same structured thinking frameworks used by professional strategists and startup advisors — lean canvas, jobs-to-be-done, positioning mapping — and delivers the output in seconds rather than days. You don't need to be an MBA to use it. You just need a rough idea and the willingness to think through the fundamentals.</p>
+      <p style="color:var(--muted); margin-bottom:1rem;">The output is designed to be a working document, not a finished product. Real businesses evolve as you learn from customers and markets. Concept Builder gives you the most intelligent starting point possible so that your evolution is based on real learning, not correcting foundational misunderstandings about who your customer is or how your business makes money.</p>
+      <h3 style="font-size:1.2rem; font-weight:700; margin:2rem 0 0.75rem;">The Complete Business Development Stack</h3>
+      <p style="color:var(--muted); margin-bottom:1rem;">Concept Builder sits in the middle of SparqIQ's end-to-end toolchain. Start with <a href="idea-spark.html">Idea Spark</a> if you need help finding an opportunity, then build your concept here, validate it with <a href="market-intel.html">Market Intel</a>, analyze the competition with <a href="competitor-scan.html">Competitor Scan</a>, and create your execution plan with <a href="launch-blueprint.html">Launch Blueprint</a>. Each tool is designed to feed into the next, giving you a clear path from inspiration to launch.</p>
+      <h3 style="font-size:1.2rem; font-weight:700; margin:2rem 0 0.75rem;">Built for Early-Stage Founders</h3>
+      <p style="color:var(--muted); margin-bottom:1rem;">Concept Builder is calibrated for solo founders, small teams, and early-stage startups — not enterprise strategy consultants. The outputs are practical, opinionated, and actionable rather than exhaustive or generic. If you have a rough idea and want to know whether it's worth pursuing, Concept Builder will help you find out faster than any other tool on the market.</p>
+    </div>
+  </section>
+
+  <section class="section" id="faq">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <p class="section-sub">Everything you need to know about Concept Builder and business concept development.</p>
+    <div class="faq-list" style="max-width:720px; margin:0 auto;">
+      <div class="faq-item">
+        <div class="faq-q">What is a business concept?</div>
+        <div class="faq-a">A business concept is a structured description of a business opportunity that goes beyond a raw idea. It includes the core value proposition, the target customer profile, the revenue and pricing model, key risks, and the initial go-to-market approach. It bridges inspiration and a fundable, buildable business.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How is a business concept different from a business plan?</div>
+        <div class="faq-a">A business concept is a concise strategic summary used to quickly evaluate and communicate an opportunity. A business plan is a comprehensive operational document covering financials, organizational structure, and multi-year projections. Concept Builder produces concept-level output — more useful at the early validation stage before committing to build.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">How detailed is the output from Concept Builder?</div>
+        <div class="faq-a">The output covers: a one-paragraph value proposition, a target customer profile (demographics, psychographics, jobs-to-be-done), two to three pricing model options with rationale, a top-five risk list, and a 30-day GTM plan with concrete first actions. The depth scales with your input quality.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">What budget stages does Concept Builder support?</div>
+        <div class="faq-a">Concept Builder adjusts its recommendations based on your budget stage: bootstrapped (under $1,000), lean startup ($1,000–$10,000), funded ($10,000–$100,000), or venture-scale ($100,000+). This ensures your GTM plan and tool stack suggestions are realistic for your actual situation.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Can I edit the concept after it's generated?</div>
+        <div class="faq-a">Yes. The generated concept is fully editable in the SparqIQ editor. You can modify any section, regenerate specific parts, or export the final concept as a formatted PDF or markdown document to share with collaborators or investors.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">Is Concept Builder free to use?</div>
+        <div class="faq-a">Concept Builder is free to try with no credit card required. Free users can generate a limited number of concepts per month. SparqIQ paid plans unlock unlimited generations, advanced AI models, and full export capabilities.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="tools">
+    <p class="section-label">Full Suite</p>
+    <h2 class="section-title">Explore All SparqIQ Tools</h2>
+    <p class="section-sub">From idea to launch — every AI tool you need in one place.</p>
+    <div class="tools-nav">
+      <a href="idea-spark.html" class="tool-link">
+        <div class="tool-link-icon">💡</div>
+        <div class="tool-link-name">Idea Spark</div>
+        <div class="tool-link-desc">Cross-niche idea generator</div>
+      </a>
+      <a href="concept-builder.html" class="tool-link active">
+        <div class="tool-link-icon">🏗️</div>
+        <div class="tool-link-name">Concept Builder</div>
+        <div class="tool-link-desc">Full business concept</div>
+      </a>
+      <a href="market-intel.html" class="tool-link">
+        <div class="tool-link-icon">📊</div>
+        <div class="tool-link-name">Market Intel</div>
+        <div class="tool-link-desc">AI market research</div>
+      </a>
+      <a href="competitor-scan.html" class="tool-link">
+        <div class="tool-link-icon">🔍</div>
+        <div class="tool-link-name">Competitor Scan</div>
+        <div class="tool-link-desc">Competitive landscape</div>
+      </a>
+      <a href="launch-blueprint.html" class="tool-link">
+        <div class="tool-link-icon">🚀</div>
+        <div class="tool-link-name">Launch Blueprint</div>
+        <div class="tool-link-desc">90-day launch plan</div>
+      </a>
+    </div>
+  </section>
+
+  <div class="cta-banner" style="max-width:1040px; margin:0 auto 4rem;">
+    <h2>Ready to Build Your Business Concept?</h2>
+    <p>Stop thinking in circles. Get a structured, actionable business concept in minutes — free to start.</p>
+    <a href="https://sparqiq.com" class="btn-primary">Build Your Concept Free</a>
+  </div>
+
+  <footer>
+    <div class="footer-links">
+      <a href="https://sparqiq.com">Home</a>
+      <a href="idea-spark.html">Idea Spark</a>
+      <a href="concept-builder.html">Concept Builder</a>
+      <a href="market-intel.html">Market Intel</a>
+      <a href="competitor-scan.html">Competitor Scan</a>
+      <a href="launch-blueprint.html">Launch Blueprint</a>
+      <a href="https://sparqiq.com/privacy">Privacy</a>
+      <a href="https://sparqiq.com/terms">Terms</a>
+    </div>
+    <p>&copy; 2026 SparqIQ. All rights reserved. &nbsp;|&nbsp; <a href="https://sparqiq.com">sparqiq.com</a></p>
+  </footer>
+
+</body>
+</html>

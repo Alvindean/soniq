@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Privacy Policy | SparqIQ</title>
+<meta name="description" content="SparqIQ Privacy Policy — how we collect, use, and protect your data. GDPR and CCPA compliant."/>
+<link rel="canonical" href="https://sparqiq.com/legal/privacy.html"/>
+<meta name="robots" content="noindex,follow"/>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0a0f;--card:#12121a;--border:#1e1e2e;--accent:#7c3aed;
+    --accent2:#06b6d4;--text:#e2e8f0;--muted:#64748b;
+    --grad:linear-gradient(135deg,#7c3aed,#06b6d4);
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;line-height:1.75}
+
+  /* HEADER */
+  header{background:var(--card);border-bottom:1px solid var(--border);padding:1rem 2rem;display:flex;align-items:center;gap:1.5rem;position:sticky;top:0;z-index:100}
+  .logo-link{display:flex;align-items:center;gap:.6rem;text-decoration:none}
+  .logo-icon{width:38px;height:38px;background:var(--grad);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+  .logo-text{font-size:1.4rem;font-weight:800;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+  header .spacer{flex:1}
+  header nav{display:flex;align-items:center;gap:.25rem}
+  header nav a{color:var(--muted);text-decoration:none;font-size:.88rem;padding:.45rem .85rem;border-radius:7px;transition:all .2s;white-space:nowrap}
+  header nav a:hover{color:var(--text);background:var(--border)}
+  .cta-btn{background:var(--grad);color:#fff;text-decoration:none;padding:.5rem 1.1rem;border-radius:8px;font-size:.88rem;font-weight:600;transition:opacity .2s;white-space:nowrap}
+  .cta-btn:hover{opacity:.85}
+  @media(max-width:700px){header{padding:.75rem 1rem}header nav{display:none}}
+
+  /* LEGAL LAYOUT */
+  .legal-wrap{max-width:820px;margin:0 auto;padding:3.5rem 1.5rem 5rem}
+  .legal-header{margin-bottom:3rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
+  .legal-badge{display:inline-block;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);background:var(--border);padding:.3rem .8rem;border-radius:20px;margin-bottom:1rem}
+  .legal-header h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;margin-bottom:.75rem}
+  .legal-meta{font-size:.85rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:.5rem 2rem}
+  .legal-meta span{display:flex;align-items:center;gap:.4rem}
+
+  /* TOC */
+  .toc{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.75rem;margin-bottom:3rem}
+  .toc h2{font-size:.85rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:1rem}
+  .toc ol{padding-left:1.25rem;display:grid;grid-template-columns:1fr 1fr;gap:.35rem .5rem}
+  @media(max-width:500px){.toc ol{grid-template-columns:1fr}}
+  .toc li{font-size:.88rem}
+  .toc a{color:var(--accent2);text-decoration:none;transition:color .2s}
+  .toc a:hover{color:var(--text)}
+
+  /* CONTENT */
+  .legal-section{margin-bottom:3rem;scroll-margin-top:80px}
+  .legal-section h2{font-size:1.2rem;font-weight:700;margin-bottom:1rem;padding-bottom:.6rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem}
+  .legal-section h2 .num{background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;font-size:1rem}
+  .legal-section h3{font-size:1rem;font-weight:600;color:var(--accent2);margin:1.5rem 0 .6rem}
+  .legal-section p{color:var(--muted);font-size:.92rem;line-height:1.8;margin-bottom:1rem}
+  .legal-section p:last-child{margin-bottom:0}
+  .legal-section ul, .legal-section ol{padding-left:1.5rem;margin-bottom:1rem;color:var(--muted);font-size:.92rem}
+  .legal-section li{margin-bottom:.4rem;line-height:1.75}
+  .legal-section a{color:var(--accent2);text-decoration:none}
+  .legal-section a:hover{text-decoration:underline}
+  .highlight-box{background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:10px;padding:1.25rem 1.5rem;margin:1.25rem 0}
+  .highlight-box p{color:var(--text) !important;font-size:.9rem !important}
+
+  /* CONTACT CTA */
+  .contact-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-top:3rem;text-align:center}
+  .contact-box h2{font-size:1.2rem;font-weight:700;margin-bottom:.6rem}
+  .contact-box p{color:var(--muted);font-size:.9rem;margin-bottom:1rem}
+  .contact-box a{color:var(--accent2);font-weight:600;text-decoration:none}
+  .contact-box a:hover{text-decoration:underline}
+
+  /* FOOTER */
+  footer{background:var(--card);border-top:1px solid var(--border);padding:2.5rem 2rem;text-align:center}
+  .footer-links{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.5rem;margin-bottom:1.25rem}
+  .footer-links a{color:var(--muted);text-decoration:none;font-size:.85rem;transition:color .2s}
+  .footer-links a:hover{color:var(--text)}
+  .footer-copy{color:var(--muted);font-size:.8rem}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <a href="https://sparqiq.com" class="logo-link">
+    <div class="logo-icon">⚡</div>
+    <span class="logo-text">SparqIQ</span>
+  </a>
+  <div class="spacer"></div>
+  <nav>
+    <a href="https://sparqiq.com/#tools">Tools</a>
+    <a href="/blog/">Blog</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/about.html">About</a>
+  </nav>
+  <a href="https://sparqiq.com" class="cta-btn">Try Free ⚡</a>
+</header>
+
+<div class="legal-wrap">
+
+  <div class="legal-header">
+    <div class="legal-badge">Legal</div>
+    <h1>Privacy Policy</h1>
+    <div class="legal-meta">
+      <span>Effective: April 1, 2026</span>
+      <span>Last updated: April 1, 2026</span>
+      <span>Contact: <a href="mailto:privacy@sparqiq.com" style="color:var(--accent2)">privacy@sparqiq.com</a></span>
+    </div>
+  </div>
+
+  <div class="highlight-box">
+    <p><strong>Summary:</strong> SparqIQ collects only the data it needs to operate the service. We do not sell your personal information. We do not use your inputs to train AI models. You have full rights to access, correct, and delete your data. If you have questions, email <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a>.</p>
+  </div>
+
+  <!-- TABLE OF CONTENTS -->
+  <div class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#who-we-are">Who We Are</a></li>
+      <li><a href="#data-collected">Data We Collect</a></li>
+      <li><a href="#how-used">How We Use Your Data</a></li>
+      <li><a href="#legal-basis">Legal Basis (GDPR)</a></li>
+      <li><a href="#cookies">Cookies &amp; Tracking</a></li>
+      <li><a href="#third-parties">Third-Party Services</a></li>
+      <li><a href="#data-retention">Data Retention</a></li>
+      <li><a href="#sharing">Data Sharing &amp; Sales</a></li>
+      <li><a href="#security">Security</a></li>
+      <li><a href="#international">International Transfers</a></li>
+      <li><a href="#gdpr-rights">Your Rights (GDPR)</a></li>
+      <li><a href="#ccpa-rights">Your Rights (CCPA)</a></li>
+      <li><a href="#children">Children's Privacy</a></li>
+      <li><a href="#changes">Policy Changes</a></li>
+      <li><a href="#contact">Contact Us</a></li>
+    </ol>
+  </div>
+
+  <!-- SECTIONS -->
+
+  <div class="legal-section" id="who-we-are">
+    <h2><span class="num">1.</span> Who We Are</h2>
+    <p>SparqIQ ("SparqIQ," "we," "our," or "us") operates the website at <a href="https://sparqiq.com">sparqiq.com</a> and provides an AI-powered business idea generation platform (the "Service"). This Privacy Policy explains how SparqIQ collects, uses, discloses, and protects information about you when you use our Service.</p>
+    <p>For the purposes of the General Data Protection Regulation (GDPR) and applicable data protection laws, SparqIQ is the data controller for the personal data we collect through the Service.</p>
+    <p>Questions about this policy or your data may be directed to: <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a></p>
+  </div>
+
+  <div class="legal-section" id="data-collected">
+    <h2><span class="num">2.</span> Data We Collect</h2>
+
+    <h3>2.1 Account Information</h3>
+    <p>When you create an account, we collect:</p>
+    <ul>
+      <li>Email address (required for login and communications)</li>
+      <li>Display name or username (optional)</li>
+      <li>Password (stored as a one-way hash — we never store plain-text passwords)</li>
+      <li>Account creation date and last login date</li>
+    </ul>
+
+    <h3>2.2 Payment Information</h3>
+    <p>For paid subscriptions, billing is handled entirely by our third-party payment processor (Stripe). SparqIQ does not store your credit card number, CVV, or full billing address. We retain only: subscription tier, billing cycle, payment status, and a tokenized customer ID provided by Stripe.</p>
+
+    <h3>2.3 Usage Data</h3>
+    <p>When you use the Service, we automatically collect:</p>
+    <ul>
+      <li>Tool interactions (which tool was used, when, and generation count — not content)</li>
+      <li>Feature usage patterns (e.g., which exports you've run)</li>
+      <li>Session duration and frequency</li>
+      <li>Browser type, operating system, device type</li>
+      <li>IP address (used for fraud prevention and rate limiting; not used for advertising)</li>
+      <li>Referring URL and pages visited within the Service</li>
+    </ul>
+
+    <h3>2.4 Tool Inputs and Outputs</h3>
+    <p>When you use SparqIQ's AI tools, we transmit your inputs to our AI providers (Anthropic and/or OpenRouter) to generate outputs. We store your inputs and the resulting outputs in your account history (where history features are enabled on your plan). This content is treated as private and confidential. <strong>We do not use your inputs or outputs to train AI models, and our AI providers are contractually prohibited from using your data for model training.</strong></p>
+
+    <h3>2.5 Communications</h3>
+    <p>If you contact us via email or a support channel, we retain those communications to provide support and improve the Service.</p>
+
+    <h3>2.6 Information You Do Not Provide</h3>
+    <p>We do not require — and ask you not to submit — sensitive personal data such as health information, government identification numbers, financial account details (beyond payment processing), or data about minors.</p>
+  </div>
+
+  <div class="legal-section" id="how-used">
+    <h2><span class="num">3.</span> How We Use Your Data</h2>
+    <p>We use the information we collect for the following purposes:</p>
+    <ul>
+      <li><strong>Providing the Service:</strong> Authenticating your account, processing generations, storing your history, enabling exports, and delivering paid features.</li>
+      <li><strong>Billing and account management:</strong> Processing payments, managing subscriptions, sending invoices and receipts.</li>
+      <li><strong>Service communications:</strong> Sending transactional emails such as password resets, billing confirmations, and service announcements.</li>
+      <li><strong>Product improvement:</strong> Analyzing aggregated, anonymized usage patterns to improve features, fix bugs, and inform product decisions. This analysis is never tied to identifiable individuals.</li>
+      <li><strong>Security and fraud prevention:</strong> Detecting abuse, enforcing rate limits, preventing unauthorized access, and protecting other users.</li>
+      <li><strong>Legal compliance:</strong> Meeting our obligations under applicable laws and responding to lawful requests from authorities.</li>
+      <li><strong>Marketing (optional):</strong> Sending product updates, new feature announcements, and educational content — only if you have opted in. You can unsubscribe at any time.</li>
+    </ul>
+    <p>We do not use your data for behavioral advertising, sell your data to third parties, or share it for purposes unrelated to operating the Service.</p>
+  </div>
+
+  <div class="legal-section" id="legal-basis">
+    <h2><span class="num">4.</span> Legal Basis for Processing (GDPR)</h2>
+    <p>If you are located in the European Economic Area (EEA) or United Kingdom, our legal bases for processing personal data are:</p>
+    <ul>
+      <li><strong>Contract performance:</strong> Processing necessary to deliver the Service you've subscribed to (account management, generation delivery, billing).</li>
+      <li><strong>Legitimate interests:</strong> Security, fraud prevention, aggregated analytics, and improving the Service — where these interests are not overridden by your rights.</li>
+      <li><strong>Legal obligation:</strong> Compliance with applicable laws.</li>
+      <li><strong>Consent:</strong> Marketing communications. You may withdraw consent at any time without affecting the lawfulness of prior processing.</li>
+    </ul>
+  </div>
+
+  <div class="legal-section" id="cookies">
+    <h2><span class="num">5.</span> Cookies &amp; Tracking Technologies</h2>
+
+    <h3>5.1 Essential Cookies</h3>
+    <p>We use session cookies and authentication tokens that are strictly necessary for the Service to function. These cannot be disabled without breaking core functionality such as staying logged in and maintaining your session state.</p>
+
+    <h3>5.2 Analytics Cookies</h3>
+    <p>We use privacy-focused analytics (such as Plausible or a similar tool) to understand aggregate traffic patterns — pages visited, referral sources, and general device types. These tools do not use fingerprinting and do not track you across other websites. No third-party advertising networks receive data from our analytics.</p>
+
+    <h3>5.3 Managing Cookies</h3>
+    <p>You can configure your browser to refuse cookies or delete existing cookies at any time. Note that disabling all cookies will prevent you from using authenticated features of the Service. Most browsers include built-in cookie management tools under Settings or Preferences.</p>
+
+    <h3>5.4 Do Not Track</h3>
+    <p>We respect Do Not Track (DNT) signals. When a DNT signal is detected, we limit tracking to only what is strictly necessary for the Service to function and do not enable any optional analytics tracking.</p>
+  </div>
+
+  <div class="legal-section" id="third-parties">
+    <h2><span class="num">6.</span> Third-Party Services</h2>
+    <p>SparqIQ integrates with a limited number of carefully selected third-party services necessary to operate the platform:</p>
+
+    <h3>6.1 AI Providers</h3>
+    <p><strong>Anthropic (Claude API)</strong> and <strong>OpenRouter</strong> process your tool inputs to generate AI outputs. Your inputs are transmitted to these services over encrypted connections. Both providers are contractually prohibited from using SparqIQ customer inputs for model training. Please review their privacy policies for additional context:</p>
+    <ul>
+      <li><a href="https://www.anthropic.com/legal/privacy" target="_blank" rel="noopener">Anthropic Privacy Policy</a></li>
+      <li><a href="https://openrouter.ai/privacy" target="_blank" rel="noopener">OpenRouter Privacy Policy</a></li>
+    </ul>
+
+    <h3>6.2 Payment Processing</h3>
+    <p><strong>Stripe</strong> handles all payment processing. SparqIQ transmits only the data necessary to create and manage a billing relationship. Stripe is PCI-DSS compliant. Review <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a> for details on how they handle cardholder data.</p>
+
+    <h3>6.3 Infrastructure</h3>
+    <p>SparqIQ's application is hosted on cloud infrastructure. Hosting providers operate under appropriate data processing agreements and do not access your content for any purpose beyond delivering infrastructure services.</p>
+
+    <h3>6.4 Email Delivery</h3>
+    <p>Transactional and marketing emails are delivered through a third-party email service provider. Your email address is shared with this provider solely for the purpose of delivering messages on our behalf.</p>
+
+    <h3>6.5 No Data Sales</h3>
+    <p>SparqIQ does not sell, rent, or trade your personal data to any third party for any purpose, including advertising or data brokering.</p>
+  </div>
+
+  <div class="legal-section" id="data-retention">
+    <h2><span class="num">7.</span> Data Retention</h2>
+    <p>We retain your data for as long as your account is active or as needed to provide the Service. Specific retention guidelines:</p>
+    <ul>
+      <li><strong>Account data:</strong> Retained for the life of your account. Upon account deletion, account data is purged within 30 days.</li>
+      <li><strong>Generation history:</strong> Retained based on your plan (Free: none; Starter: 30 days; Pro/Agency: until deletion). You may manually delete history at any time from your dashboard.</li>
+      <li><strong>Payment records:</strong> Retained for 7 years as required by financial record-keeping regulations.</li>
+      <li><strong>Server logs:</strong> Retained for up to 90 days for security and debugging purposes, then automatically deleted.</li>
+      <li><strong>Support correspondence:</strong> Retained for 3 years from the date of last contact.</li>
+    </ul>
+    <p>If you request account deletion, we will purge your personal data within 30 days, except where retention is required by law (e.g., payment records).</p>
+  </div>
+
+  <div class="legal-section" id="sharing">
+    <h2><span class="num">8.</span> Data Sharing &amp; Sales</h2>
+    <p>We do not sell your personal information. Full stop. We share personal data only in the following limited circumstances:</p>
+    <ul>
+      <li><strong>Service providers:</strong> With third-party vendors (listed in Section 6) who process data on our behalf under strict data processing agreements.</li>
+      <li><strong>Legal requirements:</strong> When required by law, court order, or governmental authority, we may disclose data. Where legally permitted, we will notify you before complying.</li>
+      <li><strong>Business transfers:</strong> In the event of a merger, acquisition, or sale of substantially all assets, your data may be transferred. We will notify you via email and this page prior to any such transfer becoming effective.</li>
+      <li><strong>Protection of rights:</strong> To protect the rights, property, or safety of SparqIQ, our users, or the public when required.</li>
+      <li><strong>With your consent:</strong> For any other purpose disclosed to you at the time of collection and with your explicit consent.</li>
+    </ul>
+  </div>
+
+  <div class="legal-section" id="security">
+    <h2><span class="num">9.</span> Security</h2>
+    <p>We implement industry-standard technical and organizational measures to protect your data, including:</p>
+    <ul>
+      <li>TLS/HTTPS encryption for all data in transit</li>
+      <li>Encryption of sensitive data at rest</li>
+      <li>One-way hashing of passwords (bcrypt)</li>
+      <li>Access controls limiting employee access to personal data on a need-to-know basis</li>
+      <li>Regular security reviews and dependency updates</li>
+      <li>Vulnerability disclosure program</li>
+    </ul>
+    <p>No method of transmission over the internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your data, we cannot guarantee absolute security. If you discover a security vulnerability, please report it responsibly to <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a>.</p>
+    <p>In the event of a data breach affecting your personal information, we will notify you as required by applicable law.</p>
+  </div>
+
+  <div class="legal-section" id="international">
+    <h2><span class="num">10.</span> International Data Transfers</h2>
+    <p>SparqIQ is operated from the United States. If you access the Service from outside the US, your data may be transferred to, stored, and processed in the US where data protection laws may differ from those in your jurisdiction.</p>
+    <p>For users in the EEA or UK, we rely on the following safeguards for international transfers:</p>
+    <ul>
+      <li>Standard Contractual Clauses (SCCs) approved by the European Commission, incorporated into our agreements with data processors</li>
+      <li>Adequacy decisions where applicable</li>
+    </ul>
+    <p>By using the Service, you acknowledge that your data will be processed in the US and other jurisdictions where SparqIQ and its service providers operate.</p>
+  </div>
+
+  <div class="legal-section" id="gdpr-rights">
+    <h2><span class="num">11.</span> Your Rights Under GDPR</h2>
+    <p>If you are located in the EEA or UK, you have the following rights regarding your personal data. To exercise any right, contact <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a>. We will respond within 30 days.</p>
+    <ul>
+      <li><strong>Right of access:</strong> Request a copy of the personal data we hold about you.</li>
+      <li><strong>Right to rectification:</strong> Request correction of inaccurate or incomplete data.</li>
+      <li><strong>Right to erasure ("right to be forgotten"):</strong> Request deletion of your personal data, subject to legal retention requirements.</li>
+      <li><strong>Right to restriction of processing:</strong> Request that we restrict how we use your data in certain circumstances.</li>
+      <li><strong>Right to data portability:</strong> Receive your data in a structured, machine-readable format and transmit it to another controller.</li>
+      <li><strong>Right to object:</strong> Object to processing based on legitimate interests, including direct marketing.</li>
+      <li><strong>Right to withdraw consent:</strong> Where processing is based on consent, withdraw it at any time without affecting prior processing.</li>
+      <li><strong>Right to lodge a complaint:</strong> You have the right to lodge a complaint with your local data protection authority (e.g., the ICO in the UK, or your national supervisory authority in the EEA).</li>
+    </ul>
+    <p>We will not discriminate against you for exercising any of these rights.</p>
+  </div>
+
+  <div class="legal-section" id="ccpa-rights">
+    <h2><span class="num">12.</span> Your Rights Under CCPA (California Residents)</h2>
+    <p>If you are a California resident, the California Consumer Privacy Act (CCPA) and the California Privacy Rights Act (CPRA) grant you additional rights:</p>
+    <ul>
+      <li><strong>Right to know:</strong> Request disclosure of the categories and specific pieces of personal information we've collected about you, our sources, our purposes for collecting it, and the categories of third parties we share it with.</li>
+      <li><strong>Right to delete:</strong> Request deletion of personal information we've collected from you, subject to certain exceptions.</li>
+      <li><strong>Right to correct:</strong> Request correction of inaccurate personal information.</li>
+      <li><strong>Right to opt out of sale:</strong> We do not sell personal information. You do not need to opt out — but if our practices change, we will provide a "Do Not Sell or Share My Personal Information" link.</li>
+      <li><strong>Right to non-discrimination:</strong> We will not discriminate against you for exercising your CCPA rights.</li>
+    </ul>
+    <p>To submit a CCPA request, email <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a> with the subject line "CCPA Request." We will verify your identity and respond within 45 days. You may designate an authorized agent to submit requests on your behalf.</p>
+  </div>
+
+  <div class="legal-section" id="children">
+    <h2><span class="num">13.</span> Children's Privacy</h2>
+    <p>The Service is not directed to individuals under the age of 16. We do not knowingly collect personal information from children under 16. If you are a parent or guardian and believe your child has provided us with personal information, please contact us at <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a> and we will delete the information promptly.</p>
+    <p>If we become aware that we have inadvertently collected personal data from a child under 16, we will take steps to delete that information as quickly as possible.</p>
+  </div>
+
+  <div class="legal-section" id="changes">
+    <h2><span class="num">14.</span> Changes to This Policy</h2>
+    <p>We may update this Privacy Policy from time to time to reflect changes in our practices, technologies, legal requirements, or for other operational reasons. When we make material changes, we will:</p>
+    <ul>
+      <li>Update the "Last updated" date at the top of this page</li>
+      <li>Send an email notification to registered users at least 14 days before the changes take effect</li>
+      <li>Display a prominent notice within the Service</li>
+    </ul>
+    <p>Your continued use of the Service after the effective date of an updated Privacy Policy constitutes your acceptance of the updated policy. We encourage you to review this page periodically.</p>
+  </div>
+
+  <div class="legal-section" id="contact">
+    <h2><span class="num">15.</span> Contact Us</h2>
+    <p>If you have questions, concerns, or requests related to this Privacy Policy or your personal data, please contact our Privacy team:</p>
+    <ul>
+      <li><strong>Email:</strong> <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a></li>
+      <li><strong>Response time:</strong> We aim to respond to all privacy inquiries within 5 business days.</li>
+      <li><strong>Data rights requests:</strong> We will complete verified rights requests within the timeframes required by applicable law (30 days for GDPR, 45 days for CCPA).</li>
+    </ul>
+    <p>If you are not satisfied with our response to a privacy concern, you have the right to escalate your complaint to your applicable data protection authority.</p>
+  </div>
+
+  <div class="contact-box">
+    <h2>Privacy Questions?</h2>
+    <p>We take privacy seriously and respond to all inquiries within 5 business days.</p>
+    <a href="mailto:privacy@sparqiq.com">privacy@sparqiq.com</a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-links">
+    <a href="https://sparqiq.com">sparqiq.com</a>
+    <a href="/blog/">Blog</a>
+    <a href="/pricing.html">Pricing</a>
+    <a href="/about.html">About</a>
+    <a href="/legal/privacy.html">Privacy Policy</a>
+    <a href="/legal/terms.html">Terms of Service</a>
+  </div>
+  <div class="footer-copy">© 2026 SparqIQ. All rights reserved.</div>
+</footer>
+
+</body>
+</html>
