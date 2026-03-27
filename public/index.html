@@ -965,6 +965,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 ══════════════════════════════════ -->
 <div id="pg-write" class="pg on">
 
+  <!-- ALBUM TRACK CONTEXT BANNER -->
+  <div id="album-track-banner" style="display:none;background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r2);padding:10px 16px;font-size:12px;font-weight:600;color:var(--amber);margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px">
+    <span id="album-track-banner-text"></span>
+    <button onclick="S.albumTrack=null;document.getElementById('album-track-banner').style.display='none'" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:14px;line-height:1">✕</button>
+  </div>
+
   <!-- STUDIO INPUT CARD -->
   <div class="studio">
     <div class="studio-top">
@@ -2464,6 +2470,9 @@ async function generateSong(){
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
   const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
   const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.`:'';
+  const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
+  // Clear album context after use so it doesn't carry over to next song
+  if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
 
   // Build secondary style instructions
   const g2sel=document.getElementById('g-genre2');
@@ -2493,7 +2502,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -4178,6 +4187,42 @@ function setLane(el, lane) {
   }
 }
 
+function writeAlbumTrack(index) {
+  const alb = S.albumData;
+  const tr  = alb?.trackList?.[index];
+  if (!tr) { toast('Generate an album concept first'); return; }
+
+  // Store context so generateSong() can inject it
+  S.albumTrack = { album: alb.name, type: tr.ttype, desc: tr.desc, role: tr.role, arc: alb.arc || '' };
+
+  // Pre-fill the Write page
+  const topicEl = document.getElementById('g-topic');
+  if (topicEl) topicEl.value = `${tr.desc} — ${tr.role}`;
+
+  // Set genre
+  const genreKey = alb.genre || 'pop';
+  S.selectedGenre = genreKey;
+  document.querySelectorAll('#genre-grid .gp').forEach(g => {
+    g.classList.toggle('on', g.dataset.genre === genreKey);
+  });
+
+  // Show banner on the write page
+  const banner = document.getElementById('album-track-banner');
+  const bannerText = document.getElementById('album-track-banner-text');
+  if (banner && bannerText) {
+    bannerText.textContent = `✦ Writing ${tr.ttype} for "${alb.name}" — click Generate when ready`;
+    banner.style.display = 'flex';
+  }
+
+  // Navigate to Write page
+  const nb = Array.from(document.querySelectorAll('.nb')).find(b => /pg-write/.test(b.getAttribute('onclick')));
+  if (nb) goPg('pg-write', nb);
+
+  // Scroll to generate button
+  setTimeout(() => document.getElementById('gen-btn')?.scrollIntoView({behavior:'smooth', block:'center'}), 300);
+  toast(`✦ "${tr.ttype}" loaded — hit Generate!`);
+}
+
 async function generateAlbumTheme() {
   const brief = document.getElementById('alb-brief')?.value?.trim() || '';
   const genre = document.getElementById('alb-genre')?.value || 'pop';
@@ -4246,10 +4291,15 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     document.getElementById('alb-arc').textContent = arc;
     document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${l.replace(/^-\s*/,'')}</li>`).join('');
 
-    document.getElementById('alb-track-types').innerHTML = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
-      const [type,desc,role] = l.split('|').map(s=>s.trim());
-      return `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${type||''}</div><div class="gap-role-desc">${desc||''} — ${role||''}</div></div></div>`;
-    }).join('');
+    const trackList = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
+      const [ttype,desc,role] = l.split('|').map(s=>s.trim());
+      return {ttype:ttype||'', desc:desc||'', role:role||''};
+    });
+    S.albumData = S.albumData || {};
+    S.albumData.trackList = trackList;
+    document.getElementById('alb-track-types').innerHTML = trackList.map((tr,i)=>
+      `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${tr.ttype}</div><div class="gap-role-desc">${tr.desc} — ${tr.role}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">✦ Write This Track</button></div>`
+    ).join('');
 
     const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
     document.getElementById('alb-palette').innerHTML = paletteRaw.split('\n').filter(l=>l.includes('|')).map((l,i)=>{
@@ -4261,7 +4311,7 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     document.getElementById('alb-visual').textContent = visual;
     document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent='${t.trim().replace(/'/g,"\\'")}';toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${t.trim()}</div></div></div>`).join('');
 
-    S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, palette:paletteRaw, visual, titles:titlesRaw, genre, lanes};
+    S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes};
     toast('🎼 Album concept generated!');
     out.scrollIntoView({behavior:'smooth', block:'nearest'});
   } catch(e) {
