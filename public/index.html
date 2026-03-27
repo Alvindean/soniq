@@ -1000,6 +1000,73 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .tc-applied{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--greenbg);border:1px solid var(--greenline);border-radius:var(--r2);font-size:12px;color:var(--green);font-weight:600;margin-top:10px}
 .loaded-banner{display:none;align-items:center;gap:8px;padding:8px 20px;background:var(--cyanbg);border-bottom:1px solid var(--cyanline);font-size:11px;color:var(--cyan);font-weight:600}
 
+/* ── LIKE/DISLIKE ── */
+.like-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.like-btn:hover{border-color:var(--greenline);color:var(--green)}
+.like-btn.liked{border-color:var(--greenline);background:var(--greenbg);color:var(--green)}
+.dislike-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.dislike-btn:hover{border-color:var(--redline);color:var(--red)}
+.dislike-btn.disliked{border-color:var(--redline);background:var(--redbg);color:var(--red)}
+.lc-heart{font-size:10px;margin-left:2px;vertical-align:middle}
+
+/* ── SYNC META CARD ── */
+.sync-meta-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:16px;margin-bottom:12px}
+.sync-row{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--b1)}
+.sync-row:last-child{border-bottom:none}
+.sync-key{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;min-width:120px;flex-shrink:0;padding-top:2px}
+.sync-val{font-size:13px;color:var(--tx1);line-height:1.5;flex:1}
+.sync-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.sync-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline)}
+.sync-copy-all-btn{font-size:11px;font-weight:700;padding:6px 14px;border-radius:99px;border:1px solid var(--amberline);background:var(--amberbg);color:var(--amber);cursor:pointer;transition:all .15s;margin-top:10px}
+.sync-copy-all-btn:hover{background:var(--amber);color:#050505}
+
+/* ── REVISION BAR ── */
+.revision-bar{display:flex;flex-wrap:wrap;gap:6px;padding:12px 24px;border-top:1px solid var(--b1);background:var(--s2);animation:pgIn .3s ease}
+.revision-bar-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;align-self:center;margin-right:4px}
+.rev-pill{font-size:11px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}
+.rev-pill:hover{border-color:var(--amberline);color:var(--amber);background:var(--amberbg)}
+.rev-pill.loading{opacity:.6;cursor:not-allowed;border-color:var(--amberline);color:var(--amber)}
+
+/* ── VERSION BAR ── */
+.version-bar{display:flex;align-items:center;gap:6px;padding:10px 24px;border-bottom:1px solid var(--b1);background:var(--s2);flex-wrap:wrap}
+.version-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+.version-chip{font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;font-family:var(--mono)}
+.version-chip:hover{border-color:var(--cyanline);color:var(--cyan)}
+.version-chip.active{border-color:var(--amberline);background:var(--amberbg);color:var(--amber)}
+
+/* ── BLEND PREVIEW CARD ── */
+.blend-preview{background:linear-gradient(135deg,var(--cyanbg),var(--amberbg));border:1px solid var(--cyanline);border-radius:var(--r2);padding:14px 16px;margin-top:10px;animation:pgIn .25s ease}
+.blend-preview-title{font-size:11px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.blend-preview-desc{font-size:13px;color:var(--tx2);line-height:1.6;font-style:italic;margin-bottom:8px}
+.blend-preview-tags{display:flex;flex-wrap:wrap;gap:5px}
+.blend-preview-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--s4);color:var(--tx2);border:1px solid var(--b2)}
+
+/* ── ARTIST VOICE CARD ── */
+.voice-card{background:var(--s3);border:1px solid var(--violetline);border-radius:var(--r2);padding:14px 16px;margin-top:14px}
+.voice-card-title{font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.voice-field{margin-bottom:10px}
+.voice-field label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px}
+.voice-field input{width:100%;background:var(--s4);border:1px solid var(--b2);border-radius:var(--r1);color:var(--tx1);font-size:13px;padding:8px 10px;outline:none;font-family:var(--font);transition:border-color .15s}
+.voice-field input:focus{border-color:var(--violetline)}
+.voice-field input::placeholder{color:var(--tx4)}
+.voice-save-btn{font-size:11px;font-weight:700;padding:6px 14px;border-radius:99px;border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);cursor:pointer;transition:all .15s;margin-top:4px}
+.voice-save-btn:hover{background:var(--violet);color:#fff}
+
+/* ── BATCH MODAL ── */
+.batch-overlay{position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.batch-modal{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px;width:100%;max-width:860px;max-height:90vh;overflow-y:auto;position:relative}
+.batch-modal-title{font-size:18px;font-weight:700;color:var(--tx1);margin-bottom:18px;display:flex;align-items:center;justify-content:space-between}
+.batch-close{background:none;border:none;color:var(--tx4);font-size:18px;cursor:pointer;padding:4px 8px;border-radius:4px}
+.batch-close:hover{color:var(--tx1)}
+.batch-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.batch-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:16px;display:flex;flex-direction:column;gap:10px}
+.batch-card-title{font-size:15px;font-weight:700;color:var(--tx1);letter-spacing:-.2px}
+.batch-card-var{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
+.batch-preview{font-family:var(--mono);font-size:11px;color:var(--tx2);line-height:1.8;flex:1;white-space:pre-wrap;border-top:1px solid var(--b1);padding-top:8px}
+.batch-use-btn{padding:8px 14px;border-radius:99px;border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;width:100%}
+.batch-use-btn:hover{background:#ffc820}
+.batch-loading{text-align:center;padding:12px 0;color:var(--tx3);font-size:11px}
+
 </style>
 
 </head>
@@ -1423,6 +1490,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled>✨ Variations</button>
+        <button class="like-btn" id="res-like-btn" onclick="setLike('res',true)" title="Like this song">👍</button>
+        <button class="dislike-btn" id="res-dislike-btn" onclick="setLike('res',false)" title="Dislike">👎</button>
+        <button class="btn btn-sm" onclick="printBrief('res')" title="Print song brief">🖨 Print</button>
+        <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
+        <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
       </div>
     </div>
 
