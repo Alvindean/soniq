@@ -825,6 +825,38 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .moodboard-tempo-item{text-align:center}
 .moodboard-tempo-val{font-size:20px;font-weight:700;color:var(--cyan);font-family:var(--mono);line-height:1}
 .moodboard-tempo-lbl{font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+/* ── VISUAL BRIEF ── */
+.visual-brief{padding:18px 20px;display:flex;flex-direction:column;gap:16px}
+.vb-header{display:flex;align-items:center;gap:10px;margin-bottom:2px}
+.vb-title{font-size:13px;font-weight:700;color:var(--tx1);text-transform:uppercase;letter-spacing:.07em}
+.vb-platforms{display:flex;flex-wrap:wrap;gap:5px}
+.vb-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;border:1px solid;letter-spacing:.04em}
+.vb-chip.img{color:#a78bfa;border-color:#6d3fa040;background:#6d3fa018}
+.vb-chip.vid{color:#34d399;border-color:#34d39940;background:#34d39918}
+.vb-chip.art{color:var(--amber);border-color:var(--amberline);background:var(--amberbg)}
+.vb-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);overflow:hidden;transition:border-color .15s}
+.vb-card:hover{border-color:var(--b3)}
+.vb-card-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 8px;border-bottom:1px solid var(--b1)}
+.vb-card-label{display:flex;align-items:center;gap:8px}
+.vb-card-icon{font-size:16px;line-height:1}
+.vb-card-name{font-size:12px;font-weight:700;color:var(--tx1)}
+.vb-card-sub{font-size:10px;color:var(--tx3);margin-top:1px}
+.vb-card-acts{display:flex;gap:6px;align-items:center}
+.vb-copy-btn{font-size:11px;font-weight:600;padding:4px 11px;border-radius:var(--r2);border:1px solid var(--b3);background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--font);transition:all .15s}
+.vb-copy-btn:hover{background:var(--s4);color:var(--tx1);border-color:var(--cyan)}
+.vb-copy-btn.copied{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
+.vb-prompt-box{padding:13px 14px;font-family:var(--mono);font-size:12px;line-height:1.85;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;min-height:60px;cursor:text;user-select:text}
+.vb-prompt-box .vb-hl{color:var(--cyan);font-weight:600}
+.vb-loading{display:flex;flex-direction:column;align-items:center;gap:16px;padding:40px 20px;color:var(--tx3);font-size:12px}
+.vb-wave{display:flex;gap:5px;align-items:flex-end;height:28px}
+.vb-wave .b{width:5px;border-radius:3px;background:var(--violet);animation:vbwv 1s ease-in-out infinite}
+.vb-wave .b:nth-child(1){animation-delay:0s}
+.vb-wave .b:nth-child(2){animation-delay:.12s}
+.vb-wave .b:nth-child(3){animation-delay:.24s}
+.vb-wave .b:nth-child(4){animation-delay:.36s}
+.vb-wave .b:nth-child(5){animation-delay:.48s}
+@keyframes vbwv{0%,100%{height:6px;opacity:.4}50%{height:26px;opacity:1}}
+.vb-regen-row{display:flex;justify-content:flex-end;padding:0 0 4px}
 /* ── PDF EXPORT ── */
 .export-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:var(--r2);border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
 .export-btn:hover{background:var(--violet);color:#fff}
@@ -1451,6 +1483,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="otab-more-menu" id="lres-more-menu">
           <div class="otab-more-item" onclick="goOtabMore('lres','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
           <div class="otab-more-item" onclick="goOtabMore('lres','notes','💡 Director Notes')">💡 Director Notes</div>
+          <div class="otab-more-item" onclick="goOtabMore('lres','visual','🎬 Visual');loadVisualPrompts('lres')">🎬 Visual</div>
         </div>
       </div>
     </div>
@@ -1465,6 +1498,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="lres-opane-dopamine" class="opane"><div id="lres-dopamine-text" class="prose-box"></div></div>
     <div id="lres-opane-notes" class="opane"><div id="lres-notes-text" class="prose-box"></div></div>
     <div id="lres-opane-titles" class="opane"><div id="lres-titles-content"></div></div>
+    <div id="lres-opane-visual" class="opane"><div id="lres-visual-content"></div></div>
   </div>
 
   <div id="lucky-history" class="lucky-hist-section" style="display:none">
@@ -3023,6 +3057,7 @@ function parseLuckyResult(raw,fusionName,meta){
   renderBrief('lres', songPrompt, briefRaw);
 
   S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,genre:fusionName,topic:meta.topic,ts:Date.now(),id:Date.now()};
+  const _lrv=document.getElementById('lres-visual-content');if(_lrv)_lrv.dataset.loaded='';
   S.luckyHistory.unshift({...S.luckyCurrentSong});
   if(S.luckyHistory.length>20)S.luckyHistory=S.luckyHistory.slice(0,20);
   renderLuckyHistory();
@@ -3329,6 +3364,8 @@ function parseSongResult(raw,genre,topic){
   renderBrief('res', songPrompt, briefRaw);
 
   S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,notes,genre,topic,ts:Date.now()};
+  // reset visual cache so new song gets fresh visuals
+  const _rv=document.getElementById('res-visual-content');if(_rv)_rv.dataset.loaded='';
   addToHistory(S.currentSong);
   showSaveBar('res');
   const varBtn = document.getElementById('res-var-btn');
@@ -4654,6 +4691,107 @@ async function loadMoodBoard(prefix) {
 }
 
 // ═══════════════════════════════════════════════════════
+// VISUAL BRIEF
+// ═══════════════════════════════════════════════════════
+async function loadVisualPrompts(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  const container = document.getElementById(prefix + '-visual-content');
+  if (!container) return;
+  if (container.dataset.loaded === '1') return;
+  if (!song) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:20px">Generate a song first.</div>';
+    return;
+  }
+
+  container.innerHTML = `<div class="vb-loading">
+    <div class="vb-wave"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div>
+    <div>Building your visual world…</div>
+  </div>`;
+
+  const lyricsSnippet = (song.lyrics || '').slice(0, 400);
+  const systemPrompt = `You are a creative director specializing in music video concepts and AI-generated visuals. Return ONLY the 3 sections asked for — no preamble, no extra commentary.`;
+  const userPrompt = `Song: "${song.title}"
+Genre: ${song.genre || 'pop'}
+Style prompt: ${song.style || ''}
+Lyrics excerpt:
+${lyricsSnippet}
+
+Generate 3 ready-to-paste visual prompts for this song. Use EXACTLY these headers:
+
+ARTIST_VISUAL:
+[One detailed paragraph. Physical description: gender presentation, age range, skin tone, hair, face features. Outfit: specific clothing, fabrics, accessories, era/aesthetic. Setting: where they are, background. Lighting: type, color, source direction. Camera angle. Mood keywords. End with: --ar 2:3 --style raw --q 2 (Midjourney params). Optimized for Midjourney v6 / Flux / Ideogram.]
+
+MUSIC_VIDEO:
+[One detailed paragraph for a 15–45 second short-form vertical video (9:16). Opening shot. Artist/subject action and movement. Environment and set details. Camera movement (slow push in, tracking, handheld, etc.). Color grade (warm golden, desaturated cinematic, neon-drenched, etc.). Lighting mood. Emotional arc. Wardrobe moment. Closing shot. Optimized for Runway Gen-3, Pika 2.0, Kling, Dream Machine.]
+
+COVER_ART:
+[One detailed paragraph for single/album artwork. Visual metaphor representing the song theme. Color palette (3–4 specific colors). Composition style (centered subject, rule of thirds, abstract, etc.). Art style (photorealistic, painterly, graphic illustration, etc.). Atmosphere and mood. Texture details. NO text in image. Square format 1:1. Optimized for Midjourney v6 / Ideogram v2 / Adobe Firefly.]`;
+
+  try {
+    const raw = await callClaude(userPrompt, systemPrompt);
+
+    function extractSection(text, key) {
+      const regex = new RegExp(key + ':\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$)', 'i');
+      return (text.match(regex)?.[1] || '').trim();
+    }
+    const artistVisual = extractSection(raw, 'ARTIST_VISUAL');
+    const musicVideo   = extractSection(raw, 'MUSIC_VIDEO');
+    const coverArt     = extractSection(raw, 'COVER_ART');
+
+    function makeCard(icon, name, sub, chipClass, chips, promptText, copyKey) {
+      return `<div class="vb-card" id="${prefix}-vb-${copyKey}">
+        <div class="vb-card-head">
+          <div class="vb-card-label">
+            <span class="vb-card-icon">${icon}</span>
+            <div>
+              <div class="vb-card-name">${name}</div>
+              <div class="vb-card-sub">${sub}</div>
+            </div>
+          </div>
+          <div class="vb-card-acts">
+            <div class="vb-platforms">${chips.map(c=>`<span class="vb-chip ${chipClass}">${c}</span>`).join('')}</div>
+            <button class="vb-copy-btn" onclick="vbCopy('${prefix}-vb-${copyKey}',this)">Copy</button>
+          </div>
+        </div>
+        <div class="vb-prompt-box">${escHtml(promptText)}</div>
+      </div>`;
+    }
+
+    const html = `<div class="visual-brief">
+      <div class="vb-regen-row">
+        <button class="vb-copy-btn" onclick="regenVisual('${prefix}')">↻ Regenerate</button>
+      </div>
+      ${makeCard('🎤','Artist Visual','How your artist looks — paste into any image AI','img',['Midjourney','Flux','Ideogram','Firefly'],artistVisual,'artist')}
+      ${makeCard('🎬','Music Video','Short-form vertical video concept — 9:16, 15–45 sec','vid',['Runway Gen-3','Pika 2.0','Kling','Dream Machine'],musicVideo,'video')}
+      ${makeCard('🖼','Cover Art','Single / album artwork — no text in image','art',['Midjourney v6','Ideogram v2','Firefly','Flux'],coverArt,'cover')}
+    </div>`;
+
+    container.innerHTML = html;
+    container.dataset.loaded = '1';
+    // cache on song object
+    if (song) song._visual = { artistVisual, musicVideo, coverArt };
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:20px">Visual brief unavailable. Try again.</div>';
+  }
+}
+
+function vbCopy(cardId, btn) {
+  const box = document.getElementById(cardId)?.querySelector('.vb-prompt-box');
+  if (!box) return;
+  navigator.clipboard.writeText(box.textContent).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+async function regenVisual(prefix) {
+  const container = document.getElementById(prefix + '-visual-content');
+  if (container) container.dataset.loaded = '';
+  await loadVisualPrompts(prefix);
+}
+
+// ═══════════════════════════════════════════════════════
 // CAMPAIGN MODE
 // ═══════════════════════════════════════════════════════
 async function generateCampaign() {
@@ -4853,53 +4991,6 @@ function updateMoodHint(){
   if(!hint)return;
   const descs=S.selectedMoods.map(id=>MOODS_DEF.find(m=>m.id===id)?.hint||'').filter(Boolean);
   hint.textContent=descs.join(' · ')||'Select a mood to see how it shapes your song';
-}
-
-// ═══════════════════════════════════════════════════════
-// VISUAL PROMPTS
-// ═══════════════════════════════════════════════════════
-async function loadVisualPrompts(prefix) {
-  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
-  const el = document.getElementById(prefix + '-visual-content');
-  if (!el) return;
-  if (!song?.lyrics) {
-    el.innerHTML = '<div style="padding:20px;color:var(--tx3);font-size:13px">Generate a song first to see visual prompts.</div>';
-    return;
-  }
-  el.innerHTML = '<div style="padding:20px;color:var(--tx3);font-size:13px;display:flex;align-items:center;gap:10px"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span> Generating visual prompts…</div>';
-  const prompt = `For this ${song.genre||'pop'} song titled "${song.title||'Untitled'}" about "${song.topic||'love'}" with this sound: ${(song.style||'').slice(0,100)}
-
-Generate EXACTLY:
-ALBUM ART: [vivid Midjourney/DALL-E prompt for album cover — no faces, no text, no artist names, under 120 chars]
-SCENE 1: [Opening shot for music video — 10 words]
-SCENE 2: [Core visual metaphor scene — 10 words]
-SCENE 3: [Emotional peak scene — 10 words]
-COLORS: #HEX Label, #HEX Label, #HEX Label`;
-  try {
-    const raw = await callClaude(prompt, 'You are a visual art director for music. Be specific and evocative. Respond only in the exact format requested.', 300);
-    const getLine = key => { const m = raw.match(new RegExp(key+':\\s*(.+)')); return m ? m[1].trim() : ''; };
-    const albumArt = getLine('ALBUM ART');
-    const s1 = getLine('SCENE 1'), s2 = getLine('SCENE 2'), s3 = getLine('SCENE 3');
-    const colors = (getLine('COLORS')||'').split(',').map(c => { const m = c.trim().match(/(#[0-9A-Fa-f]{6})\s+(.+)/); return m ? {hex:m[1],label:m[2].trim()} : null; }).filter(Boolean);
-    el.innerHTML = `
-      <div class="vp-section">
-        <div class="vp-label">🖼 Album Art Prompt</div>
-        <div class="vp-prompt-box" id="${prefix}-vp-art">${albumArt||'—'}
-          <button class="vp-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('${prefix}-vp-art').textContent.replace('Copy','').trim());toast('Copied!')">Copy</button>
-        </div>
-        <div style="font-size:11px;color:var(--tx3)">Paste into Midjourney, DALL-E 3, or Adobe Firefly</div>
-      </div>
-      <div class="vp-section">
-        <div class="vp-label">🎬 Music Video Scenes</div>
-        <div class="vp-scene-grid">
-          ${[{n:'Opening Shot',d:s1},{n:'Core Visual',d:s2},{n:'Emotional Peak',d:s3}].map((s,i)=>`<div class="vp-scene"><div class="vp-scene-num">Scene ${i+1} — ${s.n}</div><div class="vp-scene-body">${s.d||'—'}</div></div>`).join('')}
-        </div>
-      </div>
-      ${colors.length ? `<div class="vp-section"><div class="vp-label">🎨 Colour Palette</div><div style="display:flex;gap:12px;flex-wrap:wrap;padding:4px 0">${colors.map(c=>`<div style="display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:44px;height:44px;border-radius:8px;background:${c.hex};border:1px solid var(--b2)"></div><div style="font-size:10px;color:var(--tx3);font-family:var(--mono)">${c.hex}</div><div style="font-size:10px;color:var(--tx2)">${c.label}</div></div>`).join('')}</div></div>` : ''}
-      <div class="vp-section"><button class="vp-gen-btn" onclick="loadVisualPrompts('${prefix}')">↺ Regenerate</button></div>`;
-  } catch(e) {
-    el.innerHTML = apiErrHtml(e.message);
-  }
 }
 
 // ═══════════════════════════════════════════════════════
