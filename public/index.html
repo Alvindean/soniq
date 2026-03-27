@@ -185,6 +185,12 @@ a{color:var(--amber);text-decoration:none}
 .otab{padding:13px 16px;font-size:12px;font-weight:600;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all 0.15s;white-space:nowrap;letter-spacing:0.02em;flex-shrink:0}
 .otab:hover{color:var(--tx2)}
 .otab.on{color:var(--amber);border-bottom-color:var(--amber)}
+.otab-more{position:relative}
+.otab-more-menu{position:absolute;top:100%;right:0;z-index:200;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:4px 0;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,.4);display:none}
+.otab-more-menu.open{display:block}
+.otab-more-item{padding:9px 16px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;white-space:nowrap;transition:background .1s}
+.otab-more-item:hover{background:var(--s4);color:var(--tx1)}
+.otab-more-item.on{color:var(--amber)}
 .opane{display:none;padding:22px 24px}
 .opane.on{display:block}
 .opane-hint{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:10px}
@@ -1029,13 +1035,47 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="spills" id="substyle-pills"></div>
       </div>
 
-      <!-- QUALITY -->
-      <label class="topic-label">Quality Target</label>
-      <div class="quality-row" id="quality-pills">
-        <span class="qpill" onclick="setQ(this,'radio')">📻 Radio Ready</span>
-        <span class="qpill on" onclick="setQ(this,'viral')">🔥 Viral</span>
-        <span class="qpill" onclick="setQ(this,'artistic')">🎨 Artistic</span>
-        <span class="qpill" onclick="setQ(this,'experimental')">🧪 Experimental</span>
+      <!-- ADVANCED SETTINGS ACCORDION -->
+      <div class="blend-acc" id="adv-acc">
+        <div class="blend-trigger" onclick="toggleAdv()">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="blend-trigger-dot" id="adv-dot"></div>
+            <span class="blend-trigger-label">⚙ Advanced Settings</span>
+          </div>
+          <span class="blend-arrow" id="adv-arrow">▼</span>
+        </div>
+        <div class="blend-body" id="adv-body" style="display:none;padding:0 16px 16px">
+
+          <!-- QUALITY -->
+          <label class="topic-label" style="margin-top:4px">Quality Target</label>
+          <div class="quality-row" id="quality-pills">
+            <span class="qpill" onclick="setQ(this,'radio')">📻 Radio Ready</span>
+            <span class="qpill on" onclick="setQ(this,'viral')">🔥 Viral</span>
+            <span class="qpill" onclick="setQ(this,'artistic')">🎨 Artistic</span>
+            <span class="qpill" onclick="setQ(this,'experimental')">🧪 Experimental</span>
+          </div>
+
+          <!-- ERA SELECTOR -->
+          <label class="topic-label">Era</label>
+          <div class="quality-row" id="era-pills">
+            <span class="qpill" onclick="setEra(this,'classic')" data-era="classic">🎙 Classic <span style="font-size:9px;opacity:.7">pre-1980</span></span>
+            <span class="qpill" onclick="setEra(this,'vintage')" data-era="vintage">📼 Vintage <span style="font-size:9px;opacity:.7">1980–1999</span></span>
+            <span class="qpill on" onclick="setEra(this,'modern')" data-era="modern">💿 Modern <span style="font-size:9px;opacity:.7">2000–2015</span></span>
+            <span class="qpill" onclick="setEra(this,'contemporary')" data-era="contemporary">📱 Contemporary <span style="font-size:9px;opacity:.7">2016–2022</span></span>
+            <span class="qpill" onclick="setEra(this,'current')" data-era="current">🔥 Current <span style="font-size:9px;opacity:.7">2023–Now</span></span>
+          </div>
+          <div id="era-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px"></div>
+
+          <!-- BRACKET FORMATTING -->
+          <label class="bracket-label">Suno Bracket Formatting</label>
+          <div class="bracket-pills" id="bracket-pills">
+            <span class="bpill" onclick="setBracket(this,'none')">No Brackets</span>
+            <span class="bpill on" onclick="setBracket(this,'basic')">Basic Suno Brackets</span>
+            <span class="bpill" onclick="setBracket(this,'enhanced')">Enhanced Movement</span>
+            <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
+          </div>
+
+        </div>
       </div>
 
       <!-- BLEND ACCORDION -->
@@ -1112,25 +1152,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="lpill" onclick="setLen(this,'extended')" data-val="extended">Extended <span class="lpill-desc">~5min+</span></span>
       </div>
 
-      <!-- ERA SELECTOR -->
-      <label class="topic-label">Era <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— shapes vocabulary, production, and cultural references</span></label>
-      <div class="quality-row" id="era-pills">
-        <span class="qpill" onclick="setEra(this,'classic')" data-era="classic">🎙 Classic <span style="font-size:9px;opacity:.7">pre-1980</span></span>
-        <span class="qpill" onclick="setEra(this,'vintage')" data-era="vintage">📼 Vintage <span style="font-size:9px;opacity:.7">1980–1999</span></span>
-        <span class="qpill on" onclick="setEra(this,'modern')" data-era="modern">💿 Modern <span style="font-size:9px;opacity:.7">2000–2015</span></span>
-        <span class="qpill" onclick="setEra(this,'contemporary')" data-era="contemporary">📱 Contemporary <span style="font-size:9px;opacity:.7">2016–2022</span></span>
-        <span class="qpill" onclick="setEra(this,'current')" data-era="current">🔥 Current <span style="font-size:9px;opacity:.7">2023–Now</span></span>
-      </div>
-      <div id="era-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:16px;min-height:16px"></div>
-
-      <!-- BRACKET INTENSITY SELECTOR -->
-      <label class="bracket-label">Suno Bracket Formatting</label>
-      <div class="bracket-pills" id="bracket-pills">
-        <span class="bpill" onclick="setBracket(this,'none')">No Brackets</span>
-        <span class="bpill on" onclick="setBracket(this,'basic')">Basic Suno Brackets</span>
-        <span class="bpill" onclick="setBracket(this,'enhanced')">Enhanced Movement</span>
-        <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
-      </div>
 
       <!-- GENERATE -->
       <div class="gen-action">
@@ -1138,7 +1159,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <span class="gen-btn-icon">🎵</span>
           Generate Complete Song
         </button>
-        <button class="btn btn-sm" id="synopsis-btn" onclick="generateSynopsis()" style="border-color:var(--violetline);color:var(--violet);background:var(--violetbg)">📋 Preview Synopsis</button>
         <button class="btn btn-sm" onclick="showImportModal()" style="border-color:var(--cyanline);color:var(--cyan);background:var(--cyanbg)">↑ Import Lyrics</button>
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
@@ -1180,7 +1200,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
-        <button class="btn btn-sm export-btn" onclick="exportPDF()">📄 Export</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled>✨ Variations</button>
       </div>
     </div>
@@ -1190,7 +1209,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <span class="save-bar-title">💾 Save this song to your library</span>
       <div class="save-bar-acts">
         <button class="btn-save-lib" onclick="saveLib()">Save to Library</button>
-        <button class="btn-dl" onclick="downloadSong('res')">⬇ Download .txt</button>
         <span class="save-bar-saved" id="res-save-bar-saved">✓ Saved!</span>
       </div>
     </div>
@@ -1205,15 +1223,20 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
 
     <div class="otabs">
-      <div class="otab on" onclick="goOtab('res','lyrics',this)">📝 Lyrics</div>
-      <div class="otab" onclick="goOtab('res','chords',this)">🎸 Chords</div>
-      <div class="otab" onclick="goOtab('res','brief',this)">🎛 Brief</div>
-      <div class="otab" onclick="goOtab('res','structure',this)">🗺 Structure</div>
-      <div class="otab" onclick="goOtab('res','dopamine',this)">⚡ Dopamine</div>
-      <div class="otab" onclick="goOtab('res','notes',this)">💡 Notes</div>
-      <div class="otab" onclick="goOtab('res','titles',this);loadTitles('res')">🏷 Titles</div>
-      <div class="otab" onclick="goOtab('res','moodboard',this);loadMoodBoard('res')">🎨 Mood</div>
-      <div class="otab" onclick="goOtab('res','visual',this);loadVisualPrompts('res')">🎬 Visual</div>
+      <div class="otab on" id="res-tab-lyrics" onclick="goOtab('res','lyrics',this)">📝 Lyrics</div>
+      <div class="otab" id="res-tab-brief" onclick="goOtab('res','brief',this)">🎛 Brief</div>
+      <div class="otab" id="res-tab-chords" onclick="goOtab('res','chords',this)">🎸 Chords</div>
+      <div class="otab" id="res-tab-structure" onclick="goOtab('res','structure',this)">🗺 Structure</div>
+      <div class="otab" id="res-tab-titles" onclick="goOtab('res','titles',this);loadTitles('res')">🏷 Titles</div>
+      <div class="otab otab-more" id="res-more-tab">
+        <span onclick="toggleMoreMenu('res')">More ›</span>
+        <div class="otab-more-menu" id="res-more-menu">
+          <div class="otab-more-item" onclick="goOtabMore('res','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
+          <div class="otab-more-item" onclick="goOtabMore('res','notes','💡 Notes')">💡 Notes</div>
+          <div class="otab-more-item" onclick="goOtabMore('res','moodboard','🎨 Mood');loadMoodBoard('res')">🎨 Mood</div>
+          <div class="otab-more-item" onclick="goOtabMore('res','visual','🎬 Visual');loadVisualPrompts('res')">🎬 Visual</div>
+        </div>
+      </div>
     </div>
 
     <div id="res-opane-lyrics" class="opane on">
@@ -1304,11 +1327,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
     <div class="otabs">
       <div class="otab on" onclick="goOtab('lres','lyrics',this)">📝 Lyrics</div>
-      <div class="otab" onclick="goOtab('lres','brief',this)">🎛 Production Brief</div>
+      <div class="otab" onclick="goOtab('lres','brief',this)">🎛 Brief</div>
       <div class="otab" onclick="goOtab('lres','structure',this)">🗺 Structure</div>
-      <div class="otab" onclick="goOtab('lres','dopamine',this)">⚡ Dopamine</div>
-      <div class="otab" onclick="goOtab('lres','notes',this)">💡 Director Notes</div>
       <div class="otab" onclick="goOtab('lres','titles',this);loadTitles('lres')">🏷 Titles</div>
+      <div class="otab otab-more" id="lres-more-tab">
+        <span onclick="toggleMoreMenu('lres')">More ›</span>
+        <div class="otab-more-menu" id="lres-more-menu">
+          <div class="otab-more-item" onclick="goOtabMore('lres','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
+          <div class="otab-more-item" onclick="goOtabMore('lres','notes','💡 Director Notes')">💡 Director Notes</div>
+        </div>
+      </div>
     </div>
     <div id="lres-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
@@ -1365,9 +1393,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="edtoolbar">
       <div class="edstats">Lines: <span id="ed-total">0</span> &nbsp;·&nbsp; Avg syllables: <span id="ed-avg">0</span> &nbsp;·&nbsp; Over limit: <span id="ed-over" style="color:var(--red)">0</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <button class="btn btn-sm" onclick="showPasteModal()">📋 Paste Lyrics</button>
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">Copy Edited</button>
-        <button class="btn btn-sm btn-gold" onclick="saveEdited()">💾 Save Version</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
@@ -2151,9 +2177,40 @@ function goOtab(ns,id,el){
   const pre=ns+'-opane-';
   document.querySelectorAll(`[id^="${pre}"]`).forEach(p=>p.classList.remove('on'));
   el.closest('.otabs').querySelectorAll('.otab').forEach(t=>t.classList.remove('on'));
+  // also clear any active More menu items
+  document.querySelectorAll(`#${ns}-more-menu .otab-more-item`).forEach(i=>i.classList.remove('on'));
   document.getElementById(pre+id)?.classList.add('on');
   el.classList.add('on');
 }
+function toggleMoreMenu(ns){
+  const menu=document.getElementById(ns+'-more-menu');
+  if(!menu)return;
+  const isOpen=menu.classList.contains('open');
+  // close all other menus first
+  document.querySelectorAll('.otab-more-menu.open').forEach(m=>m.classList.remove('open'));
+  if(!isOpen)menu.classList.add('open');
+}
+function goOtabMore(ns,id,label){
+  const pre=ns+'-opane-';
+  document.querySelectorAll(`[id^="${pre}"]`).forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll(`#${ns}-more-tab`).closest?.('.otabs')?.querySelectorAll('.otab').forEach(t=>t.classList.remove('on'));
+  // use a broader selector since closest won't chain on NodeList
+  const tabsEl=document.getElementById(ns+'-more-tab')?.closest('.otabs');
+  if(tabsEl) tabsEl.querySelectorAll('.otab').forEach(t=>t.classList.remove('on'));
+  document.getElementById(pre+id)?.classList.add('on');
+  // mark the More tab as "on" and update its label temporarily
+  const moreTab=document.getElementById(ns+'-more-tab');
+  if(moreTab){ moreTab.classList.add('on'); moreTab.querySelector('span').textContent=label+' ›'; }
+  // mark item active
+  document.querySelectorAll(`#${ns}-more-menu .otab-more-item`).forEach(i=>i.classList.toggle('on',i.textContent.trim().startsWith(label.replace(/[⚡💡🎨🎬]/g,'').trim())));
+  document.getElementById(ns+'-more-menu')?.classList.remove('open');
+}
+// Close More menus when clicking outside
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.otab-more')){
+    document.querySelectorAll('.otab-more-menu.open').forEach(m=>m.classList.remove('open'));
+  }
+});
 
 // ═══════════════════════════════════════════════════════
 // UTILITIES
@@ -2205,6 +2262,15 @@ function onGenreChange(g){
 function setQ(el,v){document.querySelectorAll('#quality-pills .qpill').forEach(p=>p.classList.remove('on'));el.classList.add('on');S.quality=v;}
 
 // ─── BLEND ───
+function toggleAdv(){
+  const body=document.getElementById('adv-body');
+  const arrow=document.getElementById('adv-arrow');
+  const dot=document.getElementById('adv-dot');
+  const open=body.style.display==='none';
+  body.style.display=open?'block':'none';
+  arrow.style.transform=open?'rotate(180deg)':'';
+  dot.style.background=open?'var(--cyan)':'var(--tx4)';
+}
 function toggleBlend(){
   const body=document.getElementById('blend-body');
   const chevron=document.getElementById('blend-chevron');
