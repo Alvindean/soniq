@@ -897,6 +897,22 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .chord-row-body{flex:1;min-width:0}
 .chord-numerals{font-size:15px;font-weight:700;color:var(--tx1);font-family:var(--mono);margin-bottom:4px;line-height:1.3;word-break:break-all}
 .chord-feel{font-size:11px;color:var(--tx3);line-height:1.5}
+.chord-row-outlier{border-color:var(--amberline);background:linear-gradient(90deg,#1f1a0a,var(--s3))}
+.outlier-badge{font-size:9px;font-weight:700;color:var(--amber);background:var(--amberbg);border:1px solid var(--amberline);border-radius:99px;padding:1px 5px;vertical-align:middle;margin-left:4px;text-transform:uppercase;letter-spacing:.05em}
+.key-psych-pill{border-color:var(--cyanline)!important}
+.key-psych-bar{display:flex;align-items:center;gap:10px;padding:8px 14px 14px;background:var(--s2);border-radius:var(--r2);margin-bottom:14px;border:1px solid var(--b1)}
+.key-psych-feel{font-size:11px;color:var(--tx2);flex:1;font-style:italic;line-height:1.5}
+.key-bright-bar{width:80px;height:5px;background:var(--s4);border-radius:99px;flex-shrink:0}
+.key-bright-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--violet),var(--amber));transition:width .4s}
+/* Theory Analysis */
+.theory-analysis{margin-top:16px;background:var(--s2);border:1px solid #3a3060;border-radius:var(--r2);overflow:hidden}
+.theory-header{font-size:11px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;background:#1a1030;border-bottom:1px solid #3a3060}
+.theory-row{display:flex;gap:10px;padding:7px 14px;border-bottom:1px solid var(--b1);align-items:baseline}
+.theory-row:last-child{border-bottom:none}
+.theory-row-body{align-items:flex-start}
+.theory-key{font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em;min-width:100px;flex-shrink:0;padding-top:1px}
+.theory-val{font-size:12px;color:var(--tx2);line-height:1.6;flex:1}
+.theory-outlier-val{color:var(--amber)}
 
 /* ── MOBILE FIRST ── */
 @media(max-width:600px){
@@ -1191,6 +1207,44 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="bpill on" onclick="setBracket(this,'basic')">Basic Suno Brackets</span>
             <span class="bpill" onclick="setBracket(this,'enhanced')">Enhanced Movement</span>
             <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
+          </div>
+
+          <!-- THEORY LEVEL -->
+          <label class="bracket-label" style="margin-top:14px">🎼 Harmony Level <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how adventurous the chord choices are</span></label>
+          <div class="bracket-pills" id="theory-level-pills">
+            <span class="bpill on" onclick="setTheoryLevel(this,'standard')">Standard</span>
+            <span class="bpill" onclick="setTheoryLevel(this,'adventurous')">Adventurous</span>
+            <span class="bpill" onclick="setTheoryLevel(this,'avantgarde')">Avant-garde</span>
+          </div>
+          <div id="theory-level-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px">Diatonic, genre-typical progressions — the proven formulas that work</div>
+
+          <!-- MODE SELECTOR -->
+          <label class="bracket-label" style="margin-top:2px">🎵 Scale / Mode <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— overrides genre default</span></label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px">
+            <select id="g-mode" style="background:#1a1a24;border:1px solid #35354a;border-radius:var(--r2);color:#e0e0f0;font-size:12px;padding:7px 10px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer" onchange="updateModeDesc()">
+              <option value="auto">Auto (genre default)</option>
+              <optgroup label="─ Major modes ─">
+                <option value="ionian">Major / Ionian — bright, triumphant</option>
+                <option value="lydian">Lydian — dreamy, floating, magical</option>
+                <option value="mixolydian">Mixolydian — rock swagger, bluesy pull</option>
+              </optgroup>
+              <optgroup label="─ Minor modes ─">
+                <option value="aeolian">Natural Minor / Aeolian — sad, melancholic</option>
+                <option value="dorian">Dorian — minor but hopeful, bluesy cool</option>
+                <option value="phrygian">Phrygian — dark, Spanish, tense</option>
+                <option value="locrian">Locrian — unstable, dissonant tension</option>
+              </optgroup>
+              <optgroup label="─ Pentatonic ─">
+                <option value="pent_maj">Major Pentatonic — open, pastoral, folk</option>
+                <option value="pent_min">Minor Pentatonic — blues, rock, raw soul</option>
+                <option value="blues_sc">Blues Scale — tension baked in, American soul</option>
+              </optgroup>
+              <optgroup label="─ Exotic ─">
+                <option value="wholetone">Whole Tone — dreamlike, impressionist</option>
+                <option value="chromatic">Chromatic — maximum tension, bebop density</option>
+              </optgroup>
+            </select>
+            <div id="mode-desc" style="font-size:11px;color:var(--tx3);font-style:italic;align-self:center;padding-left:4px">Genre-appropriate scale selected automatically</div>
           </div>
 
           <!-- HOOK STYLE -->
@@ -2216,6 +2270,109 @@ const FORMULA_LAWS=[
   {n:'BPM groove lock',d:'120–130 BPM = walking cadence (pop/dance). 60–70 BPM = resting heartbeat (ballads). Matching tempo to physiology creates embodied engagement.',v:8},
 ];
 
+// ═══════════════════════════════════════════════════════
+// MUSIC THEORY BIBLE
+// ═══════════════════════════════════════════════════════
+const MUSIC_THEORY_BIBLE={
+  modes:{
+    ionian:    {name:'Major (Ionian)',      feel:'Bright, happy, triumphant, resolved — the "default" Western scale',          genres:['pop','country','children','gospel','kpop'],    steps:'W-W-H-W-W-W-H'},
+    dorian:    {name:'Dorian',              feel:'Minor but hopeful — bluesy cool, mysterious funk, bittersweet groove',       genres:['jazz','rnb','neosoul','blues','afrobeats'],    steps:'W-H-W-W-W-H-W'},
+    phrygian:  {name:'Phrygian',            feel:'Dark, Spanish, tense, threatening — the "danger" mode',                      genres:['latin','altrock','edm'],                       steps:'H-W-W-W-H-W-W'},
+    lydian:    {name:'Lydian',              feel:'Dreamy, floating, magical, film-score wonder — the "#4 shimmer"',            genres:['edm','tvmusical','pop'],                       steps:'W-W-W-H-W-W-H'},
+    mixolydian:{name:'Mixolydian',          feel:'Rock swagger, bluesy, unresolved pull — major with a flat-7',               genres:['blues','country','altrock','reggae','afrobeats'],steps:'W-W-H-W-W-H-W'},
+    aeolian:   {name:'Natural Minor (Aeolian)',feel:'Sad, introspective, dark, melancholic — the most emotional minor mode',  genres:['pop','hiphop','altrock','rnb','reggaeton'],    steps:'W-H-W-W-H-W-W'},
+    locrian:   {name:'Locrian',             feel:'Unstable, dissonant — tension with no promise of release',                  genres:['altrock','experimental'],                      steps:'H-W-W-H-W-W-W'},
+    pent_maj:  {name:'Major Pentatonic',    feel:'Open, pastoral, folk — simple joy, bluegrass, sunrise',                    genres:['country','ss','children','gospel','reggae'],   steps:'W-W-W+H-W-W+H'},
+    pent_min:  {name:'Minor Pentatonic',    feel:'Blues, rock, raw emotion — the soulful cry. 5 notes that say everything',  genres:['blues','rnb','altrock','hiphop','neosoul'],    steps:'W+H-W-W-W+H-W'},
+    blues_sc:  {name:'Blues Scale',         feel:'Minor pentatonic + blue note — the soul of American music, tension baked in',genres:['blues','jazz','rnb','neosoul'],               steps:'W+H-W-H-H-W+H-W'},
+    wholetone: {name:'Whole Tone',          feel:'Dreamlike, floating, unresolved — Debussy impressionism, jazz shimmer',    genres:['jazz','edm'],                                  steps:'W-W-W-W-W-W'},
+    chromatic: {name:'Chromatic',           feel:'Maximum tension, bebop density — all 12 tones, no tonal center to rest in',genres:['jazz','experimental'],                         steps:'H×12'},
+  },
+
+  outlierChords:{
+    neapolitan:  {name:'Neapolitan (♭II)',         short:'♭II',  feel:'Profound sadness before resolution — the heartbreak chord. ♭II→V→I. Classical tragedy weaponized.',       howto:'Insert ♭II major chord before the final V→I cadence',                            genres:['pop','tvmusical','gospel','ss'],     tension:9},
+    tritone_sub: {name:'Tritone Substitution',     short:'♭II7', feel:'Maximum chromatic pull — replaces V7 with a chord a tritone away, creating a chromatic bass descent to I.',howto:'Replace V7 with ♭II7 for a sliding bass-line resolution',                         genres:['jazz','neosoul','rnb'],              tension:10},
+    borrowed_bVII:{name:'Borrowed ♭VII',           short:'♭VII', feel:'The "Hollywood chord" — unexpected grandeur and warmth from the parallel minor. Sounds huge every time.',  howto:'Insert ♭VII major chord before the final chorus or key moment',                   genres:['pop','altrock','country','tvmusical'],tension:5},
+    borrowed_bVI: {name:'Borrowed ♭VI',            short:'♭VI',  feel:'Bittersweet, nostalgic — dark beauty in a major key song. The moment everything gets complicated.',        howto:'Use ♭VI as the bridge chord or emotional pivot',                                  genres:['pop','rnb','gospel','country'],       tension:6},
+    borrowed_iv:  {name:'Borrowed iv (minor 4)',   short:'iv',   feel:'The most-used outlier in pop — adds instant melancholy to a major key song without fully darkening it.',  howto:'Use minor iv chord instead of major IV for one progression',                      genres:['pop','rnb','altrock','country','ss'], tension:4},
+    secondary_dom:{name:'Secondary Dominant',      short:'V/V',  feel:'"Double drive" to the chord of resolution — creates far more momentum than a plain V→I.',                howto:'Insert V/V (e.g. A7 in key of C) before the V chord',                            genres:['jazz','gospel','latin','pop'],        tension:7},
+    chromatic_med:{name:'Chromatic Mediant',       short:'±III', feel:'Magical non-functional move — a third up/down with a mode change. Film score wonder/revelation chord.',   howto:'Jump a major third up or down with opposite mode for the bridge key change',      genres:['edm','altrock','tvmusical','pop'],    tension:6},
+    pedal_point:  {name:'Pedal Point',             short:'Pedal',feel:'Bass holds one note while chords move above — dominant pedal = massive tension; tonic pedal = spiritual.',howto:'Hold bass on V or I while chord progression continues above it',                  genres:['gospel','edm','blues','jazz'],        tension:8},
+    deceptive_cad:{name:'Deceptive Cadence',       short:'V→vi', feel:'The false ending — listener expects V→I but gets V→vi. Creates surprise, yearning, prolonged emotion.',  howto:'Replace the final I chord with vi to delay resolution',                           genres:['pop','tvmusical','gospel','country'], tension:7},
+    augmented_6th:{name:'Augmented 6th Chord',    short:'+6',   feel:'Classical maximum tension — chromatic half-step approach to V from both sides. Devastating in context.',  howto:'Use Ger+6 or It+6 before the dominant cadence for dramatic effect',               genres:['tvmusical','jazz','classical'],       tension:10},
+    modal_mixture:{name:'Modal Mixture',           short:'Mix',  feel:'Borrowing across parallel modes for color — the palette of film scores and sophisticated pop.',           howto:'Freely borrow chords from the parallel major or minor key',                       genres:['pop','rnb','country','altrock','jazz'],tension:5},
+    andalusian:   {name:'Andalusian Cadence',      short:'i-♭VII-♭VI-V',feel:'Descending bass line generating harmonic inevitability — Spanish, flamenco, cinematic, visceral.',howto:'Use descending chromatic bass: i → ♭VII → ♭VI → V for verse or bridge',          genres:['latin','altrock','edm','blues'],      tension:8},
+    suspension:   {name:'Suspended Chord (sus2/4)', short:'sus', feel:'Tension without commitment — the sus4 creates yearning, the sus2 creates openness. Resolution = payoff.',howto:'Replace tonic or dominant with sus4 before resolving to create emotional breath',  genres:['pop','ss','gospel','edm'],            tension:6},
+  },
+
+  keyPsychology:{
+    'C major': {feel:'Clean, neutral, transparent — no sharps/flats, no color bias. The blank canvas.',tension:'Low',bright:7},
+    'G major': {feel:'Warm, pastoral, hopeful. Country\'s home. Guitar open strings = natural resonance.',tension:'Low',bright:8},
+    'D major': {feel:'Triumphant, bright, grand. Orchestral victory. Beethoven\'s key of glory.',tension:'Low',bright:9},
+    'A major': {feel:'Confident, joyful, clean. Pop and rock workhorse. Bright without harshness.',tension:'Low',bright:8},
+    'E major': {feel:'Razor-sharp, almost harsh. Electric guitar\'s natural home. Raw energy.',tension:'Medium',bright:9},
+    'B major': {feel:'Tense brightness. Rarely used for a reason — unstable, searching, restless.',tension:'Medium-High',bright:7},
+    'F# major':{feel:'Extremely tense brightness. Enharmonic of G♭ — jazz's far-sharp territory.',tension:'High',bright:6},
+    'F major': {feel:'Pastoral, warm, slightly melancholic. Mozart\'s "key of love". Folk comfort.',tension:'Low',bright:6},
+    'B♭ major':{feel:'Noble, warm, full. Jazz and gospel staple. Natural brass key — resonant.',tension:'Low-Med',bright:7},
+    'E♭ major':{feel:'Heroic, bold, grand. Classical "heroic key". Gospel and jazz ballad natural home.',tension:'Medium',bright:7},
+    'A♭ major':{feel:'Warm and lush. Romantic ballad key. Rich, slightly mysterious.',tension:'Medium',bright:6},
+    'D♭ major':{feel:'Gorgeous and remote. Jazz ballad key of distance and longing.',tension:'Medium',bright:6},
+    'A minor': {feel:'Melancholic, introspective, natural sadness. Most-used minor in pop and rock.',tension:'Medium',bright:3},
+    'E minor': {feel:'Dark, pensive, longing. "Hotel California" key. Guitar\'s most emotional.',tension:'Med-High',bright:3},
+    'D minor': {feel:'"The saddest of all keys." Deep tragedy, classical devastation. Beethoven\'s 9th.',tension:'High',bright:2},
+    'B minor': {feel:'Cold, isolated, reserved sorrow. Bach\'s most heartbreaking works.',tension:'High',bright:2},
+    'F# minor':{feel:'Anguished, desperate, raw grief. Schubert\'s key of torment.',tension:'Very High',bright:1},
+    'G minor': {feel:'Dramatic, earnest, serious. More urgent than D minor. Mozart\'s tragic mode.',tension:'High',bright:3},
+    'C minor': {feel:'Fate, destiny, darkness with power. Beethoven\'s 5th. Determined suffering.',tension:'Very High',bright:2},
+    'F minor': {feel:'Profound, funereal, deep grief. Chopin\'s darkest. Rarely used, always devastating.',tension:'Very High',bright:1},
+  },
+
+  genreScales:{
+    pop:      ['Major (Ionian)','Natural Minor (Aeolian)','Major Pentatonic'],
+    hiphop:   ['Minor Pentatonic','Natural Minor (Aeolian)','Dorian'],
+    rnb:      ['Dorian','Minor Pentatonic','Major (Ionian)','Blues Scale'],
+    neosoul:  ['Dorian','Mixolydian','Minor Pentatonic','Blues Scale'],
+    gospel:   ['Major (Ionian)','Major Pentatonic','Minor Pentatonic','Natural Minor (Aeolian)'],
+    jazz:     ['Dorian','Mixolydian','Lydian','Whole Tone','Chromatic','Blues Scale'],
+    blues:    ['Blues Scale','Minor Pentatonic','Mixolydian'],
+    country:  ['Major Pentatonic','Major (Ionian)','Mixolydian'],
+    ss:       ['Major (Ionian)','Natural Minor (Aeolian)','Major Pentatonic'],
+    edm:      ['Natural Minor (Aeolian)','Phrygian','Lydian','Major (Ionian)'],
+    latin:    ['Phrygian','Dorian','Major (Ionian)','Mixolydian'],
+    reggae:   ['Mixolydian','Major Pentatonic','Dorian'],
+    reggaeton:['Natural Minor (Aeolian)','Minor Pentatonic','Dorian'],
+    altrock:  ['Natural Minor (Aeolian)','Phrygian','Minor Pentatonic','Dorian'],
+    afrobeats:['Dorian','Major Pentatonic','Mixolydian'],
+    punk:     ['Major (Ionian)','Natural Minor (Aeolian)','Major Pentatonic'],
+    kpop:     ['Major (Ionian)','Natural Minor (Aeolian)','Dorian'],
+    neosoul:  ['Dorian','Mixolydian','Minor Pentatonic','Blues Scale'],
+  },
+
+  progressions:{
+    'The Canon':       {prog:'I–V–vi–IV',          feel:'Triumphant, anthemic, universal — the #1 pop progression',         genres:['pop','gospel'],       tension:'Low',  outlier:false},
+    'The Minor Wheel': {prog:'i–VII–VI–VII',        feel:'Dark, driving, cyclical — Russian sadness, hip-hop backbone',      genres:['hiphop','altrock'],   tension:'Med',  outlier:false},
+    'The Blues 12-Bar':{prog:'I7–IV7–I7–V7–IV7–I7',feel:'Raw, American, inevitable — the founding form of popular music',  genres:['blues','jazz'],       tension:'Med',  outlier:false},
+    'The ii–V–I':      {prog:'ii7–V7–Imaj7',        feel:'Jazz resolution — the most sophisticated "going home" in music',  genres:['jazz','neosoul'],     tension:'High→Low',outlier:false},
+    'The Andalusian':  {prog:'i–♭VII–♭VI–V',        feel:'Descending Spanish drama — chromatic bass inevitability',         genres:['latin','altrock'],    tension:'High', outlier:true},
+    'The Axis':        {prog:'I–V–vi–iii–IV',       feel:'Emotional complexity — common in K-pop and cinematic pop',        genres:['pop','kpop'],         tension:'Med',  outlier:false},
+    'Borrowed ♭VII':   {prog:'I–♭VII–IV–I',         feel:'Rock anthem grandeur — unexpected warmth from parallel minor',    genres:['altrock','country'],  tension:'Med',  outlier:true},
+    'The Neapolitan':  {prog:'i–iv–♭II–V–i',        feel:'Classical heartbreak — the most devastating cadence sequence',    genres:['tvmusical','pop'],    tension:'V.High',outlier:true},
+    'Tritone Slide':   {prog:'ii7–♭II7–Imaj7',      feel:'Jazz chromatic pull — bass descends by half-step twice to home', genres:['jazz','neosoul'],     tension:'High', outlier:true},
+    'The Modal Vamp':  {prog:'i–VII (looped)',       feel:'Groove-first hypnosis — neo-soul and Afrobeats foundation',      genres:['neosoul','afrobeats'],tension:'Low',  outlier:false},
+    'The Deceptive':   {prog:'I–IV–V–vi',           feel:'False ending — denied resolution creates yearning',              genres:['pop','gospel'],       tension:'High', outlier:true},
+    'Gospel Shout':    {prog:'I–IV–I–V–IV–I',       feel:'Church jubilation — call-and-response harmonic structure',       genres:['gospel'],             tension:'Low→High',outlier:false},
+    'Chromatic Med':   {prog:'I–♭III–IV',            feel:'Film score wonder — magical non-functional chord jump',          genres:['edm','tvmusical'],    tension:'Med',  outlier:true},
+    'The Lydian Float':{prog:'I–II (in Lydian)',     feel:'The #4 shimmer — dreamy, weightless, film-score levitation',    genres:['edm','tvmusical'],    tension:'Low',  outlier:true},
+  },
+
+  theoryLevels:{
+    standard:    {label:'Standard',     desc:'Diatonic, genre-typical progressions — the proven formulas that work',                  outliers:0},
+    adventurous: {label:'Adventurous',  desc:'One strategic harmonic outlier — a borrowed chord or secondary dominant that surprises', outliers:1},
+    avantgarde:  {label:'Avant-garde',  desc:'Bold harmonic choices — tritone subs, Neapolitan, chromatic mediants, pedal points',    outliers:3},
+  },
+};
+
 // Maps substyle → the bracket vocabulary that mirrors its production style
 const SUBSTYLE_BRACKETS={
   'G-Funk':            { verse:'[16-bar Verse | Laid-Back | West Coast]', hook:'[Hook | Sung | Smooth | Nate Dogg style]', extra:['[Synth Whine Break]','[Outro Vamp]'] },
@@ -3168,6 +3325,25 @@ async function generateSong(){
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
   const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
   const counterNote=GENRE_BIBLE[genre]?.counter?`\nCounter-melody device for this genre: ${GENRE_BIBLE[genre].counter.device} — ${GENRE_BIBLE[genre].counter.does} Include this in the COUNTERMELODY section and embed it in the SONG PROMPT.`:'';
+
+  // ── Music Theory Context ──
+  const theoryLevel = S.theoryLevel || 'standard';
+  const modeId = document.getElementById('g-mode')?.value || 'auto';
+  const modeDef = modeId !== 'auto' ? MUSIC_THEORY_BIBLE.modes[modeId] : null;
+  const genreScales = MUSIC_THEORY_BIBLE.genreScales[genre] || [];
+  // Pick genre-matched outlier chords for adventurous/avantgarde
+  const eligibleOutliers = Object.values(MUSIC_THEORY_BIBLE.outlierChords)
+    .filter(o => o.genres.includes(genre))
+    .sort((a,b) => b.tension - a.tension);
+  const outlierCount = theoryLevel === 'avantgarde' ? 2 : theoryLevel === 'adventurous' ? 1 : 0;
+  const chosenOutliers = eligibleOutliers.slice(0, outlierCount);
+  const theoryNote = `
+MUSIC THEORY CONTEXT (apply to CHORD PROGRESSION and THEORY ANALYSIS sections):
+- Scale palette for ${GENRE_LABELS[genre]||genre}: ${genreScales.join(', ') || 'Major / Minor diatonic'}
+${modeDef ? `- Specified mode override: ${modeDef.name} — ${modeDef.feel}` : '- Mode: Use genre-appropriate default'}
+- Harmony level: ${MUSIC_THEORY_BIBLE.theoryLevels[theoryLevel]?.label} — ${MUSIC_THEORY_BIBLE.theoryLevels[theoryLevel]?.desc}
+${chosenOutliers.length ? `- Include these harmonic outliers:\n${chosenOutliers.map(o => `  • ${o.name} (${o.short}): ${o.feel} — HOW: ${o.howto}`).join('\n')}` : '- Use standard diatonic harmony — no outlier chords required'}
+- THEORY ANALYSIS section is REQUIRED: identify the scale/mode used, flag any outlier chords with explanation, describe the most interesting voice-leading move, and rate overall harmonic tension (1-10).`;
   const substyleDetail = S.substyle && SUBSTYLE_NOTES[S.substyle] ? `\n${SUBSTYLE_NOTES[S.substyle]}` : '';
   const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.${substyleDetail}`:'';
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
@@ -3264,7 +3440,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -3321,6 +3497,14 @@ BPM: [exact BPM]
 Key: [e.g. A minor — reason in 5 words]
 Time Signature: [e.g. 4/4]
 [Each section on its own line: Section name → Roman numerals (letter names) · rhythm feel — e.g. "Verse 1 → i–VII–III–VII (Am–G–C–G) · 2 beats each · brooding pull" / "Chorus → I–V–vi–IV (C–G–Am–F) · full bar each · anthemic lift"]
+
+THEORY ANALYSIS:
+SCALE: [The specific scale or mode used — e.g. "D Dorian" or "A Blues Scale" or "G Mixolydian"]
+KEY FEEL: [2 sentences on why this key/mode serves the song's emotional intention]
+OUTLIER CHORDS: [Any non-diatonic chords and their function — e.g. "The ♭VII chord (borrowed from parallel minor) adds unexpected warmth before the final chorus" — if none: "All diatonic — harmonic tension comes from rhythm and dynamics"]
+VOICE LEADING: [The most interesting voice-leading move in the song — e.g. "The 3rd of the I chord (E) moves chromatically down to ♭7 of IV (E♭), creating smooth inner-voice motion that pulls the ear forward"]
+TENSION RATING: [X/10 — one sentence on where harmonic tension peaks and how it resolves]
+PROGRESSION ARCHETYPE: [Which of these archetypes matches: The Canon / The Minor Wheel / Blues 12-Bar / ii-V-I / The Andalusian / Borrowed ♭VII / The Neapolitan / Modal Vamp / The Deceptive / other — and why]
 
 DIRECTOR NOTES:
 1. [Production decision specific to THIS song]
@@ -3457,7 +3641,8 @@ function parseSongResult(raw,genre,topic){
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','CHORD PROGRESSION');
-  const chords=parseSection(raw,'CHORD PROGRESSION','DIRECTOR NOTES');
+  const chords=parseSection(raw,'CHORD PROGRESSION','THEORY ANALYSIS');
+  const theoryAnalysis=parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
   const countermelody=parseSection(raw,'COUNTERMELODY',null);
 
@@ -3467,13 +3652,13 @@ function parseSongResult(raw,genre,topic){
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
-  renderChords('res', chords);
+  renderChords('res', chords, theoryAnalysis);
 
   // Render Production Brief
   renderBrief('res', songPrompt, briefRaw);
 
   const ts = Date.now();
-  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,notes,countermelody,genre,topic,ts};
+  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};
   // reset visual cache so new song gets fresh visuals
   const _rv=document.getElementById('res-visual-content');if(_rv)_rv.dataset.loaded='';
   addToHistory(S.currentSong);
@@ -3585,7 +3770,7 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
   }
 }
 
-function renderChords(prefix, chordsRaw) {
+function renderChords(prefix, chordsRaw, theoryRaw) {
   const el = document.getElementById(prefix + '-chords-text');
   if (!el) return;
   if (!chordsRaw) { el.innerHTML = '<div style="padding:20px;color:var(--tx3);font-size:13px">No chord data available.</div>'; return; }
@@ -3601,26 +3786,57 @@ function renderChords(prefix, chordsRaw) {
     else if (line.includes('→')) sections.push(line);
   }
 
+  // Key psychology lookup
+  const keyBase = key.split('—')[0].trim().split('·')[0].trim();
+  const keyPsych = MUSIC_THEORY_BIBLE.keyPsychology[keyBase];
+
   const metaHtml = (bpm || key || timeSig) ? `
     <div class="chord-meta">
       ${bpm ? `<div class="chord-meta-pill"><span class="chord-meta-label">BPM</span><span class="chord-meta-val">${bpm}</span></div>` : ''}
       ${key ? `<div class="chord-meta-pill"><span class="chord-meta-label">Key</span><span class="chord-meta-val">${key}</span></div>` : ''}
       ${timeSig ? `<div class="chord-meta-pill"><span class="chord-meta-label">Time</span><span class="chord-meta-val">${timeSig}</span></div>` : ''}
-    </div>` : '';
+      ${keyPsych ? `<div class="chord-meta-pill key-psych-pill" title="${keyPsych.feel}"><span class="chord-meta-label">Tension</span><span class="chord-meta-val">${keyPsych.tension}</span></div>` : ''}
+    </div>
+    ${keyPsych ? `<div class="key-psych-bar"><span class="key-psych-feel">${keyPsych.feel}</span><div class="key-bright-bar"><div class="key-bright-fill" style="width:${keyPsych.bright*10}%"></div></div></div>` : ''}` : '';
 
   const sectionHtml = sections.map(s => {
     const [name, rest] = s.split('→').map(x => x.trim());
     const parts = rest ? rest.split('·').map(x => x.trim()) : [rest || ''];
-    return `<div class="chord-row">
-      <div class="chord-row-name">${name}</div>
+    // Flag outlier chords with amber highlight
+    const numeralsRaw = parts[0] || '';
+    const outlierSymbols = ['♭II','♭VII','♭VI','♭III','#IV','+6','sus'];
+    const hasOutlier = outlierSymbols.some(sym => numeralsRaw.includes(sym));
+    return `<div class="chord-row${hasOutlier?' chord-row-outlier':''}">
+      <div class="chord-row-name">${name}${hasOutlier?' <span class="outlier-badge">outlier</span>':''}</div>
       <div class="chord-row-body">
-        <div class="chord-numerals">${parts[0] || ''}</div>
+        <div class="chord-numerals">${numeralsRaw}</div>
         ${parts.slice(1).map(p => `<div class="chord-feel">${p}</div>`).join('')}
       </div>
     </div>`;
   }).join('');
 
-  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+chordsRaw+'</div>'}</div>`;
+  // Theory Analysis section
+  let theoryHtml = '';
+  if (theoryRaw) {
+    const getTA = key => { const m = theoryRaw.match(new RegExp(key+':\\s*(.+)')); return m ? m[1].trim() : ''; };
+    const scale    = getTA('SCALE');
+    const keyFeel  = getTA('KEY FEEL');
+    const outliers = getTA('OUTLIER CHORDS');
+    const vl       = getTA('VOICE LEADING');
+    const tension  = getTA('TENSION RATING');
+    const archetype= getTA('PROGRESSION ARCHETYPE');
+    theoryHtml = `<div class="theory-analysis">
+      <div class="theory-header">🎼 Theory Analysis</div>
+      ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${scale}</span></div>` : ''}
+      ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${keyFeel}</span></div>` : ''}
+      ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${outliers}</span></div>` : ''}
+      ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${vl}</span></div>` : ''}
+      ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${tension}</span></div>` : ''}
+      ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${archetype}</span></div>` : ''}
+    </div>`;
+  }
+
+  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+chordsRaw+'</div>'}</div>` + theoryHtml;
 }
 
 function saveLib(){
@@ -5466,8 +5682,30 @@ async function importAndAnalyze() {
 
 function setBracket(el, mode) {
   S.bracketMode = mode;
-  document.querySelectorAll('.bpill').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('#bracket-pills .bpill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
+}
+
+function setTheoryLevel(el, level) {
+  S.theoryLevel = level;
+  document.querySelectorAll('#theory-level-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const desc = MUSIC_THEORY_BIBLE.theoryLevels[level]?.desc || '';
+  const el2 = document.getElementById('theory-level-desc');
+  if (el2) el2.textContent = desc;
+}
+
+function updateModeDesc() {
+  const sel = document.getElementById('g-mode');
+  const modeId = sel?.value || 'auto';
+  const el = document.getElementById('mode-desc');
+  if (!el) return;
+  if (modeId === 'auto') {
+    el.textContent = 'Genre-appropriate scale selected automatically';
+  } else {
+    const m = MUSIC_THEORY_BIBLE.modes[modeId];
+    el.textContent = m ? m.feel : '';
+  }
 }
 
 function setHookStyle(el, style) {
