@@ -95,7 +95,9 @@ a{color:var(--amber);text-decoration:none}
 .param:focus-within{border-color:var(--b2)}
 .param-label{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px}
 .param select{width:100%;background:transparent;border:none;color:var(--tx1);font-size:14px;font-weight:500;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center}
-.param select option{background:var(--s4);color:var(--tx1)}
+.param select option{background:#1a1a24;color:#e0e0f0}
+.param select optgroup{background:#1a1a24;color:#6060a0}
+.param select option:checked{background:#2a2a40;color:#fff}
 
 /* ── SUBSTYLE ── */
 .substyle-wrap{margin-bottom:20px;display:none}
@@ -542,7 +544,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .album-label{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px;display:block}
 .album-textarea{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:11px 14px;outline:none;resize:vertical;min-height:80px;line-height:1.6;transition:all .15s;font-family:var(--font)}
 .album-textarea:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
-.album-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+.album-select{width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:var(--r2);color:#e0e0f0;font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color .15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%236060a0'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
+.album-select:focus{border-color:var(--cyanline)}
+.album-select option{background:#1a1a24;color:#e0e0f0}
+.album-select optgroup{background:#1a1a24;color:#6060a0}
+.camp-select option{background:#1a1a24;color:#e0e0f0}
+.camp-select optgroup{background:#1a1a24;color:#6060a0}
 .album-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 @media(max-width:580px){.album-grid{grid-template-columns:1fr}}
 .album-lanes{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
@@ -1528,8 +1535,33 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <div id="pg-builder" class="pg">
   <div class="card">
     <div class="ctitle">🎛️ Song Prompt Builder</div>
-    <p style="font-size:12px;color:var(--tx3);margin-bottom:16px">Build an optimised AI music prompt visually. Works with Suno, Udio, and any AI music platform.</p>
-    <div class="pbsec"><div class="pblabel">Primary genre</div><div class="pbopts" id="pb-genre"></div></div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:16px">Build a precision AI music production prompt visually. Copy to Suno/Udio, or hit <strong style="color:var(--amber)">Generate Song</strong> to write full lyrics with it.</p>
+
+    <div class="pbsec">
+      <div class="pblabel">Primary genre</div>
+      <div class="pbopts" id="pb-genre"></div>
+    </div>
+
+    <div class="pbsec">
+      <div class="pblabel">Mood / emotion</div>
+      <div class="pbopts" id="pb-mood">
+        <div class="pbopt" onclick="pbSingle(this,'mood')">emotional</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">euphoric</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">melancholic</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">hopeful</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">defiant</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">nostalgic</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">dark brooding</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">romantic</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">peaceful</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">angry</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">longing</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">triumphant</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">bittersweet</div>
+        <div class="pbopt" onclick="pbSingle(this,'mood')">transcendent</div>
+      </div>
+    </div>
+
     <div class="pbsec">
       <div class="pblabel">Production era</div>
       <div class="pbopts" id="pb-era">
@@ -1542,31 +1574,35 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="pbopt" onclick="pbSingle(this,'era')">timeless classic</div>
       </div>
     </div>
+
     <div class="pbsec">
       <div class="pblabel">Tempo — <span id="pb-bpm-lbl" style="color:var(--amber);font-family:var(--mono)">100 BPM</span></div>
       <div class="pbslider">
         <span style="font-size:10px;color:var(--tx4)">60</span>
-        <input type="range" min="60" max="200" value="100" id="pb-bpm" oninput="pbBpm(this)">
-        <span style="font-size:10px;color:var(--tx4)">200</span>
+        <input type="range" min="60" max="220" value="100" id="pb-bpm" oninput="pbBpm(this)">
+        <span style="font-size:10px;color:var(--tx4)">220</span>
       </div>
-      <div class="pbslabels"><span>Slow ballad</span><span>Mid-tempo</span><span>Fast / Hyper</span></div>
+      <div class="pbslabels"><span>Slow / Lullaby</span><span>Mid-tempo</span><span>Fast / Hyper</span></div>
     </div>
+
     <div class="pbsec">
-      <div class="pblabel">Key instruments (pick up to 4)</div>
+      <div class="pblabel">Key instruments <span style="font-weight:400;color:var(--tx4)">(pick up to 4)</span></div>
       <div class="pbopts" id="pb-instr"></div>
     </div>
+
     <div class="pbsec">
       <div class="pblabel">Energy level</div>
       <div class="pbopts" id="pb-energy">
-        <div class="pbopt" onclick="pbSingle(this,'energy')">intimate whisper</div>
+        <div class="pbopt" onclick="pbSingle(this,'energy')">ASMR intimate</div>
         <div class="pbopt" onclick="pbSingle(this,'energy')">understated cool</div>
         <div class="pbopt on" onclick="pbSingle(this,'energy')">mid-energy groove</div>
         <div class="pbopt" onclick="pbSingle(this,'energy')">high energy anthemic</div>
         <div class="pbopt" onclick="pbSingle(this,'energy')">explosive maximum</div>
       </div>
     </div>
+
     <div class="pbsec">
-      <div class="pblabel">Production texture (multi-select)</div>
+      <div class="pblabel">Production texture <span style="font-weight:400;color:var(--tx4)">(multi-select)</span></div>
       <div class="pbopts" id="pb-texture">
         <div class="pbopt multi" onclick="pbMulti(this,'texture')">lo-fi raw</div>
         <div class="pbopt multi" onclick="pbMulti(this,'texture')">polished studio</div>
@@ -1576,20 +1612,35 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="pbopt multi" onclick="pbMulti(this,'texture')">dark atmospheric</div>
         <div class="pbopt multi" onclick="pbMulti(this,'texture')">warm organic</div>
         <div class="pbopt multi" onclick="pbMulti(this,'texture')">electronic crisp</div>
+        <div class="pbopt multi" onclick="pbMulti(this,'texture')">vinyl crackle</div>
+        <div class="pbopt multi" onclick="pbMulti(this,'texture')">cinematic swell</div>
+        <div class="pbopt multi" onclick="pbMulti(this,'texture')">layered harmonies</div>
+        <div class="pbopt multi" onclick="pbMulti(this,'texture')">sparse minimal</div>
       </div>
     </div>
+
     <div class="pbsec">
       <div class="pblabel">Voice casting — tested Suno vocal descriptors</div>
       <div class="vcgrid" id="pb-voices"></div>
     </div>
-    <div class="crow" style="margin-top:16px">
-      <span style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Generated Song Prompt</span>
+
+    <!-- PROMPT OUTPUT -->
+    <div class="crow" style="margin-top:18px">
+      <span style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Song Prompt</span>
       <div style="display:flex;align-items:center;gap:8px">
         <span class="ppcount ok" id="pb-cc">0/200</span>
-        <button class="btn btn-sm btn-gold" onclick="copyBuilderPrompt()">Copy Prompt</button>
+        <button class="btn btn-sm" onclick="copyBuilderPrompt()">Copy</button>
+        <button class="btn btn-sm btn-gold" id="pb-gen-btn" onclick="generateFromBuilder()">🎵 Generate Song</button>
       </div>
     </div>
     <div class="pprev" id="pb-preview">Select options above to generate your song production prompt…</div>
+
+    <!-- BUILDER SONG TOPIC -->
+    <div style="margin-top:14px;display:none" id="pb-topic-row">
+      <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Song Topic / Concept</div>
+      <input id="pb-topic" class="topic-input" style="font-size:14px;padding:12px 14px;margin-bottom:0" placeholder="What is this song about? (optional — leave blank for instrumental)" />
+    </div>
+    <div id="pb-song-out" style="margin-top:14px"></div>
   </div>
 </div>
 
@@ -1801,14 +1852,38 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div>
         <label class="album-label">Primary Genre</label>
         <select id="alb-genre" class="album-select">
-          <option value="pop">Pop</option><option value="hiphop">Rap / Hip-Hop</option>
-          <option value="rnb">R&B / Soul</option><option value="rock">Rock</option>
-          <option value="country">Country</option><option value="edm">EDM / Electronic</option>
-          <option value="folk">Folk</option><option value="latin">Latin</option>
-          <option value="ss">Singer-Songwriter</option><option value="altrock">Alt-Rock</option>
-          <option value="reggae">Reggae</option><option value="jazz">Jazz</option>
-          <option value="metal">Metal</option><option value="afrobeats">Afrobeats</option>
-          <option value="blues">Blues</option><option value="kpop">K-Pop</option>
+          <optgroup label="── Core ──">
+            <option value="pop">Pop</option>
+            <option value="hiphop">Rap / Hip-Hop</option>
+            <option value="rnb">R&amp;B / Soul</option>
+            <option value="rock">Rock</option>
+            <option value="country">Country</option>
+            <option value="edm">EDM / Electronic</option>
+            <option value="jazz">Jazz</option>
+            <option value="folk">Folk</option>
+            <option value="metal">Metal</option>
+          </optgroup>
+          <optgroup label="── Soul / Spirit ──">
+            <option value="neosoul">Neo-Soul</option>
+            <option value="gospel">Gospel</option>
+            <option value="blues">Blues</option>
+          </optgroup>
+          <optgroup label="── Global ──">
+            <option value="latin">Latin</option>
+            <option value="reggaeton">Reggaeton</option>
+            <option value="reggae">Reggae</option>
+            <option value="afrobeats">Afrobeats</option>
+            <option value="kpop">K-Pop</option>
+          </optgroup>
+          <optgroup label="── Alternative ──">
+            <option value="altrock">Alt-Rock</option>
+            <option value="punk">Punk</option>
+            <option value="ss">Singer-Songwriter</option>
+          </optgroup>
+          <optgroup label="── Special ──">
+            <option value="tvmusical">TV / Musical</option>
+            <option value="children">Children's</option>
+          </optgroup>
         </select>
       </div>
       <div>
@@ -1858,8 +1933,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <ul id="alb-motifs" class="album-list"></ul>
     </div>
     <div id="alb-pane-tracks" class="album-pane">
-      <div class="album-section-title">Required Track Types</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="album-section-title" style="margin-bottom:0">Track Map</div>
+        <button class="btn btn-sm btn-gold" onclick="writeAllTracks()">✍️ Write All Tracks</button>
+      </div>
       <div class="gap-map-grid" id="alb-track-types"></div>
+      <div id="alb-tracks-written" style="margin-top:14px"></div>
     </div>
     <div id="alb-pane-sonic" class="album-pane">
       <div class="album-section-title">Sonic Palette</div>
@@ -2279,7 +2358,32 @@ const FUSION_DATA={
   'Latin+Reggaeton':{name:'Urban Latino',tip:'This IS modern latin music. 90 BPM, dembow, melodic hook, Spanish lyrics = streaming gold.',q:{overall:94,compat:95,structural:90,commercial:95}},
   'Latin+Pop':{name:'Latin Pop Crossover',tip:'Never apologise for the accent or the language. The otherness IS the appeal.',q:{overall:90,compat:89,structural:86,commercial:92}},
   'Reggaeton+Afrobeats':{name:'Afro-Reggaeton',tip:'Both genres are groove-first. Let the rhythm lead — lyrics are secondary to the feel.',q:{overall:88,compat:85,structural:83,commercial:88}},
-  'Reggaeton+R&B':{name:'Urbano Romántico',tip:'The most commercially successful reggaeton of the 2020s lives here. Smooth, melodic, modern.',q:{overall:92,compat:91,structural:88,commercial:93}}
+  'Reggaeton+R&B':{name:'Urbano Romántico',tip:'The most commercially successful reggaeton of the 2020s lives here. Smooth, melodic, modern.',q:{overall:92,compat:91,structural:88,commercial:93}},
+  // Neo-Soul fusions
+  'Neo-Soul+Pop':{name:'Soul Pop',tip:'The groove must breathe — never quantize the drums fully. Let imperfection create intimacy.',q:{overall:91,compat:89,structural:87,commercial:91},artists:'H.E.R., SZA, Jorja Smith, Frank Ocean',formula:'Neo-soul warmth + pop hooks = the smoothest lane in modern music. Rhodes piano under a singable chorus.'},
+  'Neo-Soul+Hip-Hop':{name:'Hip-Hop Soul',tip:'J Dilla beat + neo-soul vocal = the blueprint. Let the drums swing behind the beat, never on it.',q:{overall:96,compat:95,structural:92,commercial:93},artists:'Lauryn Hill, Common, D\'Angelo, Frank Ocean, Bilal',formula:'Hip-hop production values meet neo-soul vocal vulnerability. Head-nod drums + Rhodes + sung hook.'},
+  'Neo-Soul+R&B':{name:'Contemporary R&B',tip:'This IS what modern R&B is. Space, ad-libs, imperfection. Never fill every bar.',q:{overall:94,compat:95,structural:90,commercial:92},artists:'SZA, Frank Ocean, H.E.R., Daniel Caesar, Jhené Aiko',formula:'The most natural fusion in music. Neo-soul\'s groove-first DNA meets R&B\'s melody and emotion.'},
+  'Neo-Soul+Jazz':{name:'Jazz Soul',tip:'Let the chord extensions breathe — neo-soul harmony is jazz made accessible. Don\'t resolve everything.',q:{overall:88,compat:90,structural:84,commercial:80},artists:'Erykah Badu, Esperanza Spalding, Robert Glasper, Ambrose Akinmusire',formula:'Jazz sophistication — extended chords, improvisation — filtered through neo-soul\'s warmth and groove.'},
+  'Neo-Soul+Gospel':{name:'Gospel Soul',tip:'The testimony verse + neo-soul groove + gospel bridge vamp = the most emotionally devastating structure.',q:{overall:92,compat:93,structural:88,commercial:86},artists:'Tems, Kirk Franklin, India.Arie, Jill Scott, Marvin Gaye',formula:'Gospel\'s emotional architecture (testimony → declaration → vamp) fused with neo-soul\'s groove and intimacy.'},
+  'Neo-Soul+Afrobeats':{name:'Afro-Soul',tip:'Two groove-first genres. Let the rhythm hold everything — melody is secondary to feel.',q:{overall:90,compat:88,structural:86,commercial:89},artists:'Tems, Asa, Simi, Burna Boy, Adekunle Gold',formula:'West African polyrhythm meets neo-soul warmth. The talking drum and Rhodes piano is the formula.'},
+  // Gospel fusions
+  'Gospel+Pop':{name:'Inspirational Pop',tip:'The testimony arc (I was → now I am) works in any key. Keep the production pop, let the message be gospel.',q:{overall:89,compat:87,structural:85,commercial:91},artists:'Lauren Daigle, For King & Country, Tasha Cobbs, Tauren Wells',formula:'Pop production accessibility with gospel emotional architecture. Commercial without compromising the message.'},
+  'Gospel+R&B':{name:'Gospel R&B',tip:'The melismatic run must feel earned — deploy it at the bridge payoff, not throughout.',q:{overall:90,compat:91,structural:87,commercial:88},artists:'Mary J. Blige, BeBe Winans, Beyoncé, Fantasia, Yolanda Adams',formula:'R&B smoothness carrying gospel emotional weight. The bridge vamp is where both genres peak simultaneously.'},
+  'Gospel+Hip-Hop':{name:'Gospel Rap',tip:'The 16-bar testimony verse leads into an 8-bar gospel chorus. Contrast is everything.',q:{overall:88,compat:85,structural:84,commercial:87},artists:'Lecrae, Kanye West, Andy Mineo, Chance the Rapper, KB',formula:'Hip-hop\'s street credibility carries gospel\'s testimony. The beat makes you move, the message makes you feel.'},
+  'Gospel+Country':{name:'Southern Gospel',tip:'The acoustic quartet tradition is ancient and powerful. Four-part harmony over simple guitar is timeless.',q:{overall:84,compat:86,structural:82,commercial:80},artists:'Alan Jackson, Dolly Parton (gospel), Gaither Vocal Band',formula:'Country storytelling + gospel testimony arc = Americana spiritual. Simple, honest, devastating.'},
+  'Gospel+Soul':{name:'Classic Soul Gospel',tip:'This is where soul music was born — Aretha Franklin\'s church training became popular music. Never separate them.',q:{overall:93,compat:96,structural:90,commercial:87},artists:'Aretha Franklin, Sam Cooke, Stevie Wonder, Al Green',formula:'The origin point of all Black American music. Soul IS gospel made secular. The vamp outro is mandatory.'},
+  // Country fusions
+  'Country+Pop':{name:'Country Pop',tip:'Story matters as much as hook. The 2nd verse must deepen emotionally, not repeat the first.',q:{overall:92,compat:90,structural:87,commercial:94},artists:'Taylor Swift, Kacey Musgraves, Carrie Underwood, Sam Hunt'},
+  'Country+Hip-Hop':{name:'Country Trap',tip:'The cultural tension IS the appeal. Lean into the seams — don\'t smooth them out.',q:{overall:82,compat:74,structural:76,commercial:88},artists:'Lil Nas X, Blanco Brown, Colt Ford, Nelly + Tim McGraw'},
+  'Country+R&B':{name:'Country Soul',tip:'The rawness of country storytelling + the emotional depth of R&B = completely underexplored territory.',q:{overall:84,compat:80,structural:82,commercial:82},artists:'Darius Rucker, Mickey Guyton, Brittney Spencer, Beyoncé (Cowboy Carter)'},
+  'Country+Folk':{name:'Americana',tip:'Americana prizes authenticity above all. Let uncomfortable truths stay uncomfortable.',q:{overall:89,compat:92,structural:86,commercial:83},artists:'Sturgill Simpson, Americana · Chris Stapleton, Brandi Carlile, Jason Isbell'},
+  // Jazz fusions
+  'Jazz+Pop':{name:'Jazz Pop',tip:'The jazz harmony is the texture, not the structure. Keep the pop song intact — enrich the chords.',q:{overall:84,compat:80,structural:82,commercial:83},artists:'Diana Krall, Jamie Cullum, Norah Jones, Michael Bublé'},
+  'Jazz+R&B':{name:'Jazz R&B',tip:'Robert Glasper blueprint: jazz musician plays R&B groove = smoothest crossover in modern music.',q:{overall:88,compat:87,structural:85,commercial:82},artists:'Robert Glasper, Thundercat, Kendrick Lamar (To Pimp A Butterfly), Kamasi Washington'},
+  'Jazz+Hip-Hop':{name:'Jazz Rap',tip:'The jazz sample is not decoration — it IS the beat. Build the track around one perfectly chosen moment.',q:{overall:90,compat:86,structural:88,commercial:82},artists:'A Tribe Called Quest, Kendrick Lamar, Robert Glasper, Flying Lotus, Madlib'},
+  'Jazz+Soul':{name:'Soul Jazz',tip:'Jimmy Smith, Ray Charles, Stevie Wonder — the organ is the bridge between jazz and soul.',q:{overall:87,compat:88,structural:84,commercial:78},artists:'Jimmy Smith, Ray Charles, Stevie Wonder, Charles Brown'},
+  'Jazz+Blues':{name:'Blues Jazz',tip:'The 12-bar and the ii-V-I are cousins. The bebop solo over a shuffle groove is the formula.',q:{overall:85,compat:88,structural:83,commercial:72},artists:'Cannonball Adderley, Mose Allison, Ray Charles, B.B. King + jazz'},
+  'Pop+Jazz':{name:'Jazz Pop',tip:'The jazz chord under a pop melody creates instant sophistication. One unexpected substitution per chorus.',q:{overall:84,compat:80,structural:82,commercial:83},artists:'Norah Jones, Diana Krall, Amy Winehouse, Harry Connick Jr.'}
 };
 
 // ═══════════════════════════════════════════════════════
@@ -3590,26 +3694,72 @@ function saveEdited(){
 // ═══════════════════════════════════════════════════════
 function initBuilder(){
   if(document.getElementById('pb-genre').innerHTML)return;
-  const genres=['pop','hip-hop','R&B','rock','country','EDM','folk','latin','metal','jazz','singer-songwriter','alt-rock','reggae','afrobeats','blues','punk'];
+  const genres=['pop','hip-hop','R&B','rock','country','EDM','folk','latin','metal','jazz','K-pop','neo-soul','gospel','reggae','afrobeats','blues','punk','alt-rock','singer-songwriter','reggaeton','children\'s','parody','comedy','TV/musical'];
   document.getElementById('pb-genre').innerHTML=genres.map(g=>`<div class="pbopt" onclick="pbSingle(this,'genre')">${g}</div>`).join('');
-  const instrs=['acoustic guitar','electric guitar','piano','synth','808 bass','upright bass','live drums','brushed snare','violin','cello','trumpet','saxophone','harmonica','banjo','organ','flute','talking drum','congas','hi-hats','ambient pads'];
+  const instrs=[
+    'acoustic guitar','electric guitar','piano / Rhodes','synth / keys',
+    '808 bass','upright bass','live drums','drum machine',
+    'brushed snare','trap hi-hats','violin','cello',
+    'trumpet','saxophone','harmonica','banjo',
+    'Hammond organ','flute','talking drum','congas',
+    'ambient pads','moog synth','choir','glockenspiel',
+    'steel guitar','sitar','kalimba','ukulele'
+  ];
   document.getElementById('pb-instr').innerHTML=instrs.map(i=>`<div class="pbopt multi" onclick="pbMultiLimit(this,'instr',4)">${i}</div>`).join('');
   const voices=[
     {n:'Smoky jazz female',d:'sultry female vocals, jazzy, breathy'},
-    {n:'Soulful gospel female',d:'powerful soulful female vocals, gospel runs'},
-    {n:'Intimate bedroom pop',d:'soft intimate female vocals, close mic'},
-    {n:'Arena rock male',d:'powerful male vocals, gritty, anthemic'},
+    {n:'Gospel belter',d:'powerful gospel belter, runs, soulful'},
+    {n:'Intimate bedroom pop',d:'soft intimate female vocals, close mic, whispered'},
+    {n:'Arena rock male',d:'powerful male vocals, gritty, anthemic, belting'},
     {n:'Raspy blues male',d:'raspy male vocals, blues growl, emotional'},
-    {n:'Trap melodic auto',d:'autotune male vocals, melodic trap delivery'},
-    {n:'Conscious rap male',d:'clear articulate male rap, lyrical flow'},
+    {n:'Trap melodic auto',d:'autotune male vocals, melodic trap, pitch-bent'},
+    {n:'Neo-soul runs',d:'neo-soul female vocals, ad-libs, melismatic, warm'},
+    {n:'Conscious rap',d:'clear articulate male rap, lyrical flow, no auto-tune'},
     {n:'Reggae toaster',d:'reggae toasting, Jamaican patois, relaxed'},
-    {n:'Punk aggression',d:'raw aggressive male punk vocals, no-fi'},
-    {n:'Falsetto indie male',d:'high falsetto male vocals, indie folk'},
-    {n:'Deep folk baritone',d:'deep warm baritone, folk storyteller'},
-    {n:'Afrobeats smooth',d:'smooth Nigerian vocals, melodic pidgin'},
+    {n:'Punk raw',d:'raw aggressive punk vocals, shouted, no-fi'},
+    {n:'Falsetto indie',d:'high falsetto male vocals, indie folk, fragile'},
+    {n:'Deep folk baritone',d:'deep warm baritone, storyteller, acoustic'},
+    {n:'Afrobeats smooth',d:'smooth Nigerian vocals, melodic pidgin, warm'},
+    {n:'K-pop precision',d:'precise polished K-pop vocals, multi-layered harmonies'},
+    {n:'Country twang',d:'country female vocals, twang, authentic, heartfelt'},
+    {n:'Children\'s warm',d:'warm friendly children\'s vocals, bright, singalong'},
   ];
   document.getElementById('pb-voices').innerHTML=voices.map(v=>`<div class="vcard" onclick="pbVoice(this,'${v.d}')"><div class="vc-name">${v.n}</div><div class="vc-desc">${v.d}</div></div>`).join('');
+  // Show topic row
+  document.getElementById('pb-topic-row').style.display='block';
   updBuilderPrompt();
+}
+
+async function generateFromBuilder(){
+  const prompt = document.getElementById('pb-preview')?.textContent||'';
+  if(!prompt||prompt.includes('Select options')){toast('Build a prompt first — select at least a genre');return;}
+  const topic = document.getElementById('pb-topic')?.value?.trim() || 'an evocative instrumental journey';
+  const out = document.getElementById('pb-song-out');
+  const btn = document.getElementById('pb-gen-btn');
+  btn.disabled=true; btn.textContent='Writing…';
+  out.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:16px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Generating song from your prompt…</span></div>';
+  try{
+    const system='You are a world-class songwriter. Write exactly the format requested. No extra commentary.';
+    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 180 chars — use the production prompt above as base, optimise for Suno]`;
+    const raw = await callClaude(fullPrompt, system, 2000);
+    const title = parseSection(raw,'TITLE','LYRICS');
+    const lyrics = parseSection(raw,'LYRICS','SUNO STYLE PROMPT');
+    const style  = parseSection(raw,'SUNO STYLE PROMPT', null);
+    out.innerHTML=`
+      <div style="border-top:1px solid var(--b1);padding-top:16px;margin-top:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:18px;font-weight:800">"${title||'Untitled'}"</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('pb-lyr').textContent).then(()=>toast('✓ Lyrics copied'))">Copy Lyrics</button>
+            <button class="btn btn-sm btn-gold" onclick="navigator.clipboard.writeText(document.getElementById('pb-sty').textContent).then(()=>toast('✓ Style prompt copied'))">Copy Style</button>
+          </div>
+        </div>
+        <pre id="pb-lyr" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">${lyrics}</pre>
+        <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Suno Style Prompt</div>
+        <div id="pb-sty" class="styleout">${style}</div>
+      </div>`;
+  }catch(e){out.innerHTML=`<div style="color:var(--red);font-size:13px;padding:12px 0">Error: ${e.message}</div>`;}
+  btn.disabled=false; btn.textContent='🎵 Generate Song';
 }
 function pbSingle(el,group){el.parentElement.querySelectorAll('.pbopt').forEach(o=>o.classList.remove('on'));el.classList.add('on');S.pb[group]=el.textContent.trim();updBuilderPrompt();}
 function pbMulti(el,group){el.classList.toggle('on');S.pb[group]=Array.from(el.parentElement.querySelectorAll('.on')).map(e=>e.textContent.trim());updBuilderPrompt();}
@@ -3654,7 +3804,7 @@ function copyBuilderPrompt(){
 // ═══════════════════════════════════════════════════════
 // FUSION MATRIX + QUALITY PREDICTOR
 // ═══════════════════════════════════════════════════════
-const FG=['Pop','Hip-Hop','R&B','K-Pop','EDM','Latin','Reggaeton','Singer-Songwriter','Alt-Rock','Reggae','Afrobeats','Blues','Punk'];
+const FG=['Pop','Hip-Hop','R&B','Neo-Soul','Gospel','K-Pop','EDM','Latin','Reggaeton','Country','Singer-Songwriter','Alt-Rock','Jazz','Reggae','Afrobeats','Blues','Punk'];
 
 function scoreColor(s){
   if(!s)return{bg:'#111118',t:'#303040'};
@@ -4715,6 +4865,44 @@ function writeAlbumTrack(index) {
   // Scroll to generate button
   setTimeout(() => document.getElementById('gen-btn')?.scrollIntoView({behavior:'smooth', block:'center'}), 300);
   toast(`✦ "${tr.ttype}" loaded — hit Generate!`);
+}
+
+async function writeAllTracks() {
+  const alb = S.albumData;
+  if (!alb?.trackList?.length) { toast('Generate an album concept first, then come back here'); return; }
+  const out = document.getElementById('alb-tracks-written');
+  out.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Writing all tracks…</span></div>';
+  const results = [];
+  for (let i = 0; i < alb.trackList.length; i++) {
+    const tr = alb.trackList[i];
+    out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
+    try {
+      const prompt = `Write a complete, production-ready song for this album track.\n\nAlbum: "${alb.name}"\nTrack role: ${tr.ttype}\nDescription: ${tr.desc}\nAlbum genre: ${alb.genre || 'pop'}\nAlbum arc context: ${alb.arc || 'part of a cohesive album'}\nTrack position: ${i+1} of ${alb.trackList.length}\n\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds\n- Every line specific — no vague emotions, no clichés\n- Dynamic contrast verse vs chorus\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 180 chars, Suno-optimised]`;
+      const raw = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
+      const title  = parseSection(raw,'TITLE','LYRICS');
+      const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
+      const style  = parseSection(raw,'SONG PROMPT', null);
+      results.push({i, ttype:tr.ttype, title, lyrics, style});
+    } catch(e) {
+      results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
+    }
+  }
+  out.innerHTML = results.map(r => `
+    <div style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em">Track ${r.i+1} · ${r.ttype}</div>
+          <div style="font-size:17px;font-weight:800;margin-top:2px">"${r.title}"</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="navigator.clipboard.writeText(this.closest('div[data-idx]')||document.querySelectorAll('#alb-tracks-written pre')[${r.i}]?.textContent||'').then(()=>toast('✓ Copied'))">Copy Lyrics</button>
+          <button class="btn btn-sm btn-gold" onclick="navigator.clipboard.writeText('${r.style.replace(/'/g,"\\'")}').then(()=>toast('✓ Style copied'))">Copy Style</button>
+        </div>
+      </div>
+      <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${r.lyrics}</pre>
+      <div class="styleout" style="font-size:11px">${r.style}</div>
+    </div>`).join('');
+  toast(`✓ ${results.length} tracks written`);
 }
 
 async function generateAlbumTheme() {
