@@ -1893,6 +1893,48 @@ const GENRE_BIBLE={
     artists:'Daddy Yankee · J Balvin · Bad Bunny · Ozuna · Karol G · Maluma · Nicky Jam · Rauw Alejandro'
   },
   punk:{dna:'3 chords, max 3 minutes, political or personal fury, anti-production aesthetic, speed as ideology, DIY ethic.',structure:'Fast VCVCBC or just VCV. No solos usually. Verse = setup. Chorus = explosion. Speed to end is valid.',suno:'"punk rock, distorted guitar, fast drums, raw production, 180 BPM, aggressive vocals" for classic. "Post-punk, angular guitar, bass-forward, 140 BPM" for post-punk.',keys:['Every second wasted is ideologically wrong — cut everything that does not serve the fury','Chorus should be a slogan — 4-8 words, shoutable','Production should sound slightly wrong — too loud, slightly clipping','Personal fury is timeless; political specificity ages'],artists:'Sex Pistols · The Clash · Ramones · Dead Kennedys · Black Flag · Wire · Bikini Kill · Green Day'},
+  parody:{
+    dna:'Comedy through musical weaponization. A parody rewrites a recognizable song with absurdist/satirical/comedic lyrics while keeping the melody and structure intact. The humor lives in the gap between the serious original form and the ridiculous subject matter. Commitment to the bit is everything — play it completely straight musically. Specificity is the engine of comedy: "a cat who knocks glasses off tables" beats "a mischievous cat" every time.',
+    structure:'Mirror the original song structure exactly — same verse lengths, same chorus, same bridge placement. The comedic contrast between the production seriousness and the lyrical absurdity IS the joke. Use the original song\'s exact section count. Never break the parody frame mid-song.',
+    suno:'Match the original song\'s production style exactly. If parodying a power ballad: "dramatic piano, soaring strings, stadium rock, emotional vocal". If parodying trap: "trap beat, 808 bass, auto-tune". The music should sound serious — the comedy is entirely lyrical.',
+    keys:[
+      'The setup rule: establish the absurd premise clearly in the first 4 lines of verse 1 — never bury the joke',
+      'Callback structure: introduce a specific image in verse 1, callback and escalate it in verse 2, payoff in the bridge',
+      'Chorus is the punchline delivery system — it must be immediately singable AND the funniest part',
+      'Commitment rule: never wink at the camera. Play every line completely straight. The music is always sincere',
+      'Rule of threes in comedy: setup, setup, subvert. Two expected things then one unexpected. Works at line level too',
+      'Specificity is the engine: "I ate seventeen hot pockets" > "I ate a lot of food". Proper nouns, numbers, brand names'
+    ],
+    artists:'Weird Al Yankovic · Flight of the Conchords · Lonely Island · Bo Burnham · "Weird Al" · Garfunkel & Oates · Tim Minchin'
+  },
+  comedy:{
+    dna:'Original comedic songs — not parody rewrites but purpose-built funny songs. Musical comedy weaponizes genre conventions for laughs: the earnest folk song about mundane frustration, the over-produced ballad about pizza, the gangster rap about doing taxes. Structure serves the joke. The genre itself is the straight man. Comedy comes from subverting expectations, from specificity, from escalation.',
+    structure:'Three-act joke structure mapped to verse/chorus/bridge. Verse 1: establish the premise. Verse 2: complications and escalation. Bridge: the twist or darkest point. Final chorus: subverted to reflect the journey. Always end on the biggest laugh.',
+    suno:'Intentional genre mismatch amplifies comedy. Use "epic orchestral, dramatic, soaring" for a song about grocery shopping. Use "soft folk ballad, acoustic, intimate" for absurd dark content. The production sincerity is the straight man to the comedy. Specify genre that contrasts the subject.',
+    keys:[
+      'The comedy premise must be stated or implied in the title and first verse — do not bury the setup',
+      'Escalation rule: each verse should raise the stakes of the absurdity. Verse 1 is silly, Verse 2 is committed, Bridge is unhinged',
+      'Musical genre should be played completely straight — the comedy is lyrical, not musical',
+      'End on the biggest laugh — the final line of the song is the punchline, always',
+      'Puns and wordplay: use sparingly — one great pun per song, not wall-to-wall. Subverted clichés hit harder than straight puns',
+      'The bridge is the darkest/most absurd escalation — then the final chorus lands with the full weight of the joke'
+    ],
+    artists:'Bo Burnham · Flight of the Conchords · Lonely Island · "Weird Al" Yankovic · Tim Minchin · Garfunkel & Oates · Stephen Lynch · Tenacious D'
+  },
+  tvmusical:{
+    dna:'Music written for narrative context: TV themes, film scores, Broadway/musical theater, video game OSTs, jingles. Every song has a DRAMATIC FUNCTION — it advances plot, reveals character, creates atmosphere, or sells a product. The lyric is always in service of something beyond itself. Musical theater in particular: characters sing what they cannot say in dialogue — the song is the emotional eruption.',
+    structure:'Musical theater: AABA, VCVCBC, or through-composed based on dramatic need. TV theme: 30-90 seconds, premise statement in verse, identity hook in chorus. Jingle: 15-60 seconds, product name in hook 3+ times, problem/solution structure. Film score: follows visual rhythm, no fixed structure.',
+    suno:'TV theme: "catchy, memorable, [genre of show] theme song, 90s sitcom" or "dramatic TV theme, orchestral, HBO prestige". Musical theater: "Broadway musical, theatrical vocals, show tune, orchestral pit band". Jingle: "upbeat jingle, major key, catchy, commercial, [brand feeling]". Always specify the exact use case.',
+    keys:[
+      'TV theme rule: the audience must know what kind of show this is within 5 seconds — genre, tone, era, class',
+      'Musical theater: the song must start where spoken dialogue left off emotionally — it is the overflow of feeling',
+      'Character voice: every musical theater song must sound like IT COULD ONLY be sung by this character in this moment',
+      'Jingle: product name minimum 3 times. Problem in verse, solution/product in chorus. Benefit not feature',
+      'The "I want" song (musical theater): character states their deepest desire in the bridge — this is the emotional core',
+      'Reprise strategy: the same melody with changed lyrics at the end of Act 2 hits harder than any new song'
+    ],
+    artists:'Stephen Sondheim · Lin-Manuel Miranda · Andrew Lloyd Webber · Jerry Herman · Joss Whedon · Mark Shaiman · Alan Menken · John Williams · Ennio Morricone'
+  },
 };
 
 const FORMULA_LAWS=[
@@ -1924,6 +1966,24 @@ const SUBSTYLE_BRACKETS={
   'Cloud Rap':         { verse:'[16-bar Verse | Hazy | Slow Flow]',       hook:'[Hook | Ethereal | Whispered | Melodic]',    extra:['[Ambient Break]','[Outro | Fade-Out]'] },
   'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Chanted | Anthemic | Conscious]',    extra:['[Spoken Word Bridge]','[Outro]'] },
   'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Rapped | Classic]',                  extra:['[Scratch Break]','[Outro]'] },
+  // Parody
+  'Genre Parody':      { verse:'[Verse | Mirror Original Genre]',          hook:'[Chorus | Comedic Payoff | Sincere Delivery]', extra:['[Bridge | Escalation]','[Outro | Callback]'] },
+  'Pop Parody':        { verse:'[Verse | Upbeat | Absurd Subject]',         hook:'[Chorus | Catchy | Ridiculous]',              extra:['[Pre-Chorus | Tension Build]','[Bridge | Subvert]'] },
+  'Rap Parody':        { verse:'[16-bar Verse | Rap Flow | Deflating Topic]', hook:'[Hook | Rapped | Anti-Climactic]',          extra:['[Rap Break | Commitment Bit]','[Outro | Punchline]'] },
+  'Ballad Parody':     { verse:'[Verse | Restrained | Setup Trivial Topic]', hook:'[Chorus | Epic | Overdramatic | Trivial]',  extra:['[Pre-Chorus | Tension]','[Bridge | Darkest Version | Climax]'] },
+  // Comedy
+  'Absurdist':         { verse:'[Verse | Straight-Faced | Absurd Logic]',   hook:'[Chorus | Committed | Ridiculous Premise]',  extra:['[Bridge | Escalation | Unhinged]','[Outro | Dream Logic]'] },
+  'Dark Comedy':       { verse:'[Verse | Upbeat | Dark Subject]',           hook:'[Chorus | Cheerful | Uncomfortable Truth]',  extra:['[Bridge | Darkest Point]','[Outro | Casual Resolution]'] },
+  'Satirical':         { verse:'[Verse | Exaggerated | Target Established]', hook:'[Chorus | Satirical | Repeated Accusation]',extra:['[Bridge | Killing Blow]','[Outro | Ironic]'] },
+  'Observational':     { verse:'[Verse | Conversational | Relatable]',      hook:'[Chorus | Universal Frustration | Catchy]',  extra:['[Bridge | Specific Detail]','[Outro | Acceptance]'] },
+  'Musical Roast':     { verse:'[Verse | Setup Target]',                    hook:'[Chorus | Roast | Repeated Charge]',         extra:['[Bridge | Killing Blow]','[Outro | Final Joke]'] },
+  // TV / Musical
+  'TV Theme':          { verse:'[Intro | Premise Setup]',                   hook:'[Theme Hook | Show Title | Catchy]',         extra:['[Instrumental Tag]','[Outro Sting]'] },
+  'Broadway / Show Tune': { verse:'[Verse | Character Voice | Dramatic]',  hook:'[Chorus | Belted | Emotional Peak]',         extra:['[Pre-Chorus | Tension Build]','[Bridge | Darkest Moment | Turning Point]'] },
+  'Disney-Style':      { verse:'[Verse | Wonder | I Want Song]',            hook:'[Chorus | Magical | Soaring | Big Dream]',   extra:['[Pre-Chorus | World Responds]','[Bridge | Dark Moment | Hope]'] },
+  'Jingle / Ad':       { verse:'[Verse | Problem | Pain Point]',            hook:'[Chorus | Product Name | Benefit | Catchy]', extra:['[Instrumental Tag]','[Outro | Call to Action]'] },
+  'Sitcom Theme':      { verse:'[Intro | Premise | Warm]',                  hook:'[Theme Hook | Show World | Inviting]',       extra:['[Instrumental Break]','[Tag | Laugh Track Ready]'] },
+  'Prestige Drama Theme': { verse:'[Intro | Atmosphere | Stakes]',          hook:'[Theme | Melancholic | Foreboding]',         extra:['[Instrumental Swell]','[Outro | Fade]'] },
 };
 
 // Maps hook style → full DNA instruction injected into the prompt
@@ -1954,6 +2014,24 @@ const SUBSTYLE_NOTES={
   'East Coast':  'East Coast DNA: New York lyricism tradition. Complex internal rhyme schemes, dense wordplay, cultural references. Jazz/soul samples (Pete Rock, Large Professor, RZA). Boom bap drums, minimal production. 85-95 BPM. Verses carry the song — hooks are functional not melodic. Suno style: "east coast hip-hop, boom bap, jazz sample, vinyl, 90 BPM, new york". Artists: Nas, Jay-Z, Biggie, Rakim, Big L, Mobb Deep, Wu-Tang.',
   'Midwest':     'Midwest DNA: Chicago soul samples (Kanye era), Twista hyperspeed flow, Detroit grit (Big Sean, Royce da 5\'9"), St. Louis bounce. Emotional vulnerability alongside street realism. Chipmunk soul samples. Suno style: "midwest rap, soul sample, chicago, 95 BPM, emotional, chipmunk soul". Artists: Kanye West, Twista, Common, Lupe Fiasco, Chance the Rapper, Big Sean.',
   'Cloud Rap':   'Cloud Rap DNA: Ethereal, atmospheric, lo-fi production. Hazy drum machines, woozy synth pads, reverb-drenched vocals. Existential/introspective themes, often melancholic. Very slow BPM 70-90. Mumbled delivery. Suno style: "cloud rap, ethereal, lo-fi, reverb, atmospheric synths, 80 BPM, dreamy". Artists: Lil B, Bladee, Yung Lean, Carti (early), Bones.',
+  // Parody substyles
+  'Genre Parody':   'Genre Parody DNA: Rewrite a specific song in a specific genre with absurdist/comedic new lyrics. The production must sound 100% authentic to the source genre — the comedy is purely in the lyrical content. Suno style: mirror the original genre exactly. Key rule: commit fully to the genre performance while the lyrics are completely ridiculous.',
+  'Pop Parody':     'Pop Parody DNA: Rewrite a mainstream pop song with mundane or absurdist subject matter. Use the original song\'s structure, melody cues, and production style. Subject could be: grocery shopping, Wi-Fi passwords, IKEA assembly. Suno style: "upbeat pop, polished production, major key, 120 BPM" — same as a real pop song.',
+  'Rap Parody':     'Rap Parody DNA: Rap verse structure with comedic/absurdist bars. Can parody a specific rap song or rap in general about a non-rap subject. Use real rap flow patterns (16-bar verse, 8-bar hook) with completely deflating subject matter. Suno style: match specific rap era/substyle being parodied.',
+  'Ballad Parody':  'Ballad Parody DNA: Soaring dramatic ballad delivery applied to something trivial. The bigger the emotional production, the funnier the trivial subject. Verse builds with restraint, pre-chorus adds tension, chorus erupts in full dramatic glory — all about something like losing your phone charger. Suno style: "epic power ballad, piano, strings, dramatic, emotional, stadium".',
+  // Comedy substyles
+  'Absurdist':      'Absurdist Comedy DNA: Internal dream-logic. The premise is established early and followed to its extreme conclusion without apology. The world of the song has rules, and those rules are insane. Suno style: match the emotional sincerity of the genre — the music never acknowledges the absurdity.',
+  'Dark Comedy':    'Dark Comedy DNA: Finding humor in genuinely dark or uncomfortable situations. The delivery is always casual and upbeat — the contrast between tone and content IS the comedy. Tim Minchin territory. Suno style: "upbeat, cheerful, major key" applied to dark subject matter for maximum tonal contrast.',
+  'Satirical':      'Satirical Comedy DNA: Exaggerated social/political commentary through music. The target (institution, behavior, attitude) must be crystal clear. Satire punches at power, not down. Uses genre conventions of the target demographic to increase impact. Suno style: mirror the genre of the demographic being satirized.',
+  'Observational':  'Observational Comedy DNA: The universal shared experience of mundane modern life — the frustration of tech support, the anxiety of small talk, the tragedy of dying phone batteries. Relatable specificity is everything. Suno style: "singer-songwriter, acoustic, intimate, conversational" — feels like a friend venting.',
+  'Musical Roast':  'Musical Roast DNA: A song specifically aimed at a target (person, brand, idea) written to roast them. Format: verse 1 establishes the target\'s positive self-image, verse 2 demolishes it, bridge is the killing blow, chorus is the repeated accusation. Never cruel — always funny.',
+  // TV/Musical substyles
+  'TV Theme':       'TV Theme DNA: 30-90 seconds to establish the show\'s entire world — genre, tone, era, class level, emotional register. The hook IS the show title or a defining phrase. Suno style: "catchy TV theme, [show genre tone], memorable, [era]". The audience knows what they\'re watching within 5 seconds.',
+  'Broadway / Show Tune': 'Broadway DNA: Character sings what cannot be said in dialogue — the emotional eruption. Clear dramatic objective ("I want" / "I need" / "I feel"). Musical theater diction: precise consonants, open vowels, projected. Suno style: "Broadway musical, show tune, theatrical, orchestral pit band, belting vocals".',
+  'Disney-Style':   'Disney DNA: The "I want" song. Character expresses their deepest wish in verse, the world responds in chorus. Magical orchestration. Pure emotional sincerity — no irony. Suno style: "Disney animated film song, orchestral, magical, warm, major key, soaring melody, 120 BPM".',
+  'Jingle / Ad':    'Jingle DNA: Product name minimum 3× in 30-60 seconds. Problem in verse (pain point), product = solution in chorus. Benefit not feature. Melody sticky enough to remember after one listen. Suno style: "upbeat commercial jingle, major key, catchy, corporate, polished, radio-ready".',
+  'Sitcom Theme':   'Sitcom Theme DNA: 30-60 seconds. Warm, inviting, tells you this is a safe fun place. Often summarizes the show\'s premise. Major key, upbeat tempo, memorable chorus. Era-appropriate production. Suno style: "sitcom theme, warm, upbeat, [era: 90s/2000s/modern], feel-good, catchy melody".',
+  'Prestige Drama Theme': 'Prestige Drama Theme DNA: Atmospheric, sparse, foreboding or melancholic. Establishes stakes and tone. Minor key or modal. Often instrumental or near-instrumental. Suno style: "prestige TV theme, cinematic, atmospheric, [mood: dark/cold/intense], strings, piano, sparse, HBO-style".',
 };
 
 const SUBSTYLES={
@@ -1966,6 +2044,9 @@ const SUBSTYLES={
   blues:['Chicago Blues','Delta Blues','Texas Blues','Jump Blues','Soul Blues'],
   reggae:['Roots Reggae','Dancehall','Ska','Rocksteady','Dub','Lovers Rock'],
   afrobeats:['Afrobeats','Afropop','Amapiano','Highlife','Afro-Soul'],
+  parody:['Genre Parody','Pop Parody','Rap Parody','Country Parody','Rock Parody','Ballad Parody','EDM Parody','Folk Parody'],
+  comedy:['Absurdist','Dark Comedy','Satirical','Observational','Nerd Comedy','Romantic Comedy','Storytelling Comedy','Musical Roast'],
+  tvmusical:['TV Theme','Broadway / Show Tune','Film Score Ballad','Disney-Style','Jingle / Ad','Video Game OST','Sitcom Theme','Prestige Drama Theme'],
 };
 
 const STRUCTURES={
@@ -2666,6 +2747,33 @@ async function generateSong(){
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle]
     ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}`
     : '';
+  // Comedy / Parody special rules
+  const comedyNote = genre === 'parody' ? `\n\nPARODY RULES (non-negotiable):
+- The music production style must be 100% sincere and authentic to the genre. Never wink at the camera musically.
+- The comedy lives ENTIRELY in the lyrics. Every line should make logical sense within the absurd premise.
+- Establish the absurd premise in the FIRST 4 LINES of verse 1 — never bury the setup.
+- Use the rule of threes: setup, setup, subvert. Two expected things then one unexpected twist.
+- Callbacks: introduce a specific image in verse 1, reference it in verse 2, payoff in bridge or outro.
+- Specificity is the engine of comedy: "seventeen Diet Cokes" beats "lots of soda". Use proper nouns, numbers, brand names.
+- The chorus must be the funniest part AND the most singable. It must work both as a joke and as a hook.
+- Commitment is everything: the more seriously the song takes itself, the funnier the parody.`
+  : genre === 'comedy' ? `\n\nCOMEDY SONGWRITING RULES (non-negotiable):
+- Three-act joke arc: Verse 1 = premise established, Verse 2 = escalation and complications, Bridge = darkest/most unhinged point, Final Chorus = full payoff.
+- The FINAL LINE of the entire song is the punchline. Build everything toward it.
+- Escalation rule: each verse must be funnier and higher-stakes than the last. Never plateau.
+- Specificity rule: concrete images, numbers, brand names, proper nouns beat vague descriptions every time.
+- Genre sincerity: the music plays completely straight. Comedy is lyrical. The genre is the straight man.
+- Subverted clichés hit harder than straight puns. Take a familiar phrase and twist its meaning.
+- End on the biggest laugh. Never resolve the tension with something heartfelt — commit to comedy through the outro.`
+  : genre === 'tvmusical' ? `\n\nTV/MUSICAL THEATER RULES (non-negotiable):
+- Every song has a DRAMATIC FUNCTION: advance plot, reveal character, create atmosphere, or sell a product. Name the function before writing.
+- Musical theater: characters sing BECAUSE spoken dialogue is insufficient — this is the emotional eruption/overflow.
+- Character voice: the song must only make sense coming from this specific character in this specific moment.
+- "I want" structure: establish what the character desperately wants in verse 1 (or Chorus 1), complicate it in verse 2, transform it in the bridge.
+- TV theme: establish genre, tone, era, and emotional register within the first 5 seconds. The show's world is clear immediately.
+- Jingle: product name minimum 3 times. Problem in verse, product = solution in chorus. Benefit over feature, always.
+- Reprise principle: the same melody with changed lyrics after character transformation hits harder than any new song.`
+  : '';
   // Clear album context after use so it doesn't carry over to next song
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
 
@@ -2697,7 +2805,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}${hookNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -3537,7 +3645,7 @@ async function buildBlueprint(){
 // ═══════════════════════════════════════════════════════
 function renderBiblePills(){
   const el=document.getElementById('bible-pills');if(!el||el.innerHTML)return;
-  const allG=[{id:'pop',label:'Pop',new:false},{id:'hiphop',label:'Hip-Hop',new:false},{id:'rnb',label:'R&B',new:false},{id:'rock',label:'Rock',new:false},{id:'country',label:'Country',new:false},{id:'edm',label:'EDM',new:false},{id:'folk',label:'Folk',new:false},{id:'latin',label:'Latin',new:false},{id:'metal',label:'Metal',new:false},{id:'jazz',label:'Jazz',new:false},{id:'ss',label:'Singer-Songwriter',new:true},{id:'altrock',label:'Alt-Rock',new:true},{id:'reggae',label:'Reggae',new:true},{id:'afrobeats',label:'Afrobeats',new:true},{id:'blues',label:'Blues',new:true},{id:'punk',label:'Punk',new:true},{id:'latin',label:'Latin',new:false},{id:'reggaeton',label:'Reggaeton',new:true},{id:'kpop',label:'K-Pop',new:true}];
+  const allG=[{id:'pop',label:'Pop',new:false},{id:'hiphop',label:'Hip-Hop',new:false},{id:'rnb',label:'R&B',new:false},{id:'rock',label:'Rock',new:false},{id:'country',label:'Country',new:false},{id:'edm',label:'EDM',new:false},{id:'folk',label:'Folk',new:false},{id:'latin',label:'Latin',new:false},{id:'metal',label:'Metal',new:false},{id:'jazz',label:'Jazz',new:false},{id:'ss',label:'Singer-Songwriter',new:true},{id:'altrock',label:'Alt-Rock',new:true},{id:'reggae',label:'Reggae',new:true},{id:'afrobeats',label:'Afrobeats',new:true},{id:'blues',label:'Blues',new:true},{id:'punk',label:'Punk',new:true},{id:'reggaeton',label:'Reggaeton',new:true},{id:'kpop',label:'K-Pop',new:true},{id:'parody',label:'Parody',new:true},{id:'comedy',label:'Comedy',new:true},{id:'tvmusical',label:'TV / Musical',new:true}];
   allG.forEach(g=>{
     const p=document.createElement('span');
     p.className='pill'+(g.new?' new':'')+(g.id==='ss'?' on':'');
@@ -3773,6 +3881,9 @@ const GENRES_DEF = [
   {id:'blues',label:'Blues',icon:'🎺',new:true},
   {id:'kpop',label:'K-Pop',icon:'✨',new:true},
   {id:'punk',label:'Punk',icon:'⚡',new:true},
+  {id:'parody',label:'Parody',icon:'🎭',new:true},
+  {id:'comedy',label:'Comedy',icon:'😂',new:true},
+  {id:'tvmusical',label:'TV / Musical',icon:'🎬',new:true},
 ];
 
 function initGenreGrid(){
@@ -4672,12 +4783,64 @@ function setHookStyle(el, style) {
 
 function bracketInstruction() {
   const mode     = S.bracketMode || 'basic';
-  const isRap    = (S.selectedGenre === 'hiphop');
+  const genre    = S.selectedGenre || 'pop';
+  const isRap    = (genre === 'hiphop');
+  const isParody = (genre === 'parody');
+  const isComedy = (genre === 'comedy');
+  const isTV     = (genre === 'tvmusical');
   const substyle = S.substyle || '';
   const sb       = SUBSTYLE_BRACKETS[substyle]; // substyle-specific vocab
 
   if (mode === 'none')
     return 'SECTION TAGS: Write the lyrics with absolutely NO section labels, headers, or brackets of any kind. Pure lyric lines only.';
+
+  // Parody — mirror the source genre brackets, add comedy-specific tags
+  if (isParody) {
+    if (sb) {
+      if (mode === 'basic')
+        return `SECTION TAGS: Mirror the source genre's structure with brackets. Verse: ${sb.verse}. Hook/Chorus: ${sb.hook}. Every section must sound musically authentic — the comedy is in the LYRICS only, never in the tags.`;
+      if (mode === 'enhanced')
+        return `SECTION TAGS: Use source-genre brackets with comedic escalation markers. Verse: ${sb.verse}. Hook: ${sb.hook}. Add: [Bridge | Absurd Escalation], [Outro | Callback Punchline]. Extra: ${sb.extra.join(', ')}. Keep production tags straight-faced.`;
+    }
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use standard song structure brackets that match the genre being parodied: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Music sounds completely sincere — comedy is lyrics only.';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Standard brackets matching parodied genre, plus comedy escalation markers: [Verse 1], [Pre-Chorus], [Chorus], [Bridge | Darkest Escalation], [Final Chorus | Payoff], [Outro | Callback]. Play it completely straight musically.';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Full meta-brackets for comedic structure: [Verse 1 | Premise Established], [Pre-Chorus | Tension], [Chorus | Punchline Delivery], [Verse 2 | Complications], [Bridge | Darkest / Most Absurd Point], [Final Chorus | Full Payoff], [Outro | Callback to Verse 1 Image]. Music always sincere.';
+  }
+
+  // Comedy — structure serves the joke arc
+  if (isComedy) {
+    if (sb) {
+      if (mode === 'basic')
+        return `SECTION TAGS: Structure brackets that serve the comedy arc. Verse: ${sb.verse}. Hook: ${sb.hook}. The genre sounds serious — the words are funny.`;
+      if (mode === 'enhanced')
+        return `SECTION TAGS: Comedy structure with escalation. Verse: ${sb.verse}. Hook: ${sb.hook}. Add: [Bridge | Maximum Escalation | Unhinged]. Extra: ${sb.extra.join(', ')}. End on the biggest laugh.`;
+    }
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use [Verse 1] (premise), [Chorus] (punchline hook), [Verse 2] (escalation), [Bridge] (darkest/most absurd point), [Final Chorus] (full payoff), [Outro]. The final line of the song IS the punchline.';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Comedy arc brackets: [Verse 1 | Premise], [Chorus | Punchline Hook], [Verse 2 | Escalation], [Pre-Bridge | Stakes Rising], [Bridge | Most Unhinged Moment], [Final Chorus | Full Payoff], [Outro | Callback]. Genre music plays completely straight.';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Full comedy structure meta-brackets: [Verse 1 | Setup — establish the ridiculous premise clearly], [Chorus | Punchline Hook — most memorable funny line], [Verse 2 | Complications and escalation], [Bridge | Darkest or most absurd point — cross the line then laugh], [Final Chorus | Full comedic payoff], [Outro | Callback to the original image from verse 1].';
+  }
+
+  // TV / Musical
+  if (isTV) {
+    if (sb) {
+      if (mode === 'basic')
+        return `SECTION TAGS: Narrative/functional brackets for ${substyle || 'TV/Musical'} format. Opening: ${sb.verse}. Theme hook: ${sb.hook}. Every bracket serves the dramatic or commercial function.`;
+      if (mode === 'enhanced')
+        return `SECTION TAGS: Full theatrical brackets. Opening: ${sb.verse}. Theme: ${sb.hook}. Add: ${sb.extra.join(', ')}. Brackets reflect the dramatic function of each section.`;
+    }
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use dramatic function brackets: [Intro], [Verse 1 | Character Establishes], [Chorus | Emotional Peak | I Want], [Verse 2 | Complication], [Bridge | Turning Point], [Final Chorus | Resolution], [Outro]. Every section has a narrative job.';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Full theatrical structure: [Intro | World Established], [Verse 1 | Character Voice], [Pre-Chorus | Tension], [Chorus | Emotional Eruption], [Verse 2 | Complication Deepens], [Bridge | Darkest Moment | Turning Point], [Final Chorus | Transformed Meaning], [Outro | Resolution or Cliffhanger].';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Theatrical meta-brackets with dramatic direction: [Intro | Establish world and stakes], [Verse 1 | Character sings what cannot be spoken], [Pre-Chorus | Stakes rise], [Chorus | Full emotional eruption — the "I want/need/feel" moment], [Verse 2 | Complication or obstacle], [Bridge | Darkest point / character transformation], [Final Chorus | Same melody, transformed meaning], [Outro | Resolution or new question].';
+  }
 
   if (isRap) {
     const verseTag = sb ? sb.verse : '[16-bar Verse | Rap Verse]';
