@@ -146,6 +146,23 @@ a{color:var(--amber);text-decoration:none}
 
 /* ── GENERATE BUTTON ── */
 .gen-action{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.import-overlay{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.import-modal{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:28px 28px 24px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative}
+.import-modal h2{font-size:17px;font-weight:700;color:var(--tx1);margin:0 0 4px;letter-spacing:-.3px}
+.import-modal p{font-size:12px;color:var(--tx3);margin:0 0 20px}
+.import-row{display:flex;gap:12px;margin-bottom:14px}
+.import-field{display:flex;flex-direction:column;gap:5px;flex:1}
+.import-field label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em}
+.import-field input,.import-field select,.import-field textarea{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;font-family:var(--font);transition:border-color .15s}
+.import-field input:focus,.import-field select:focus,.import-field textarea:focus{border-color:var(--cyan)}
+.import-field select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+.import-field textarea{min-height:180px;resize:vertical;line-height:1.6;font-family:var(--mono,monospace);font-size:12px}
+.import-actions{display:flex;gap:10px;margin-top:6px}
+.import-submit-btn{flex:1;padding:12px;border-radius:var(--r3);border:none;background:var(--cyan);color:#06060a;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
+.import-submit-btn:hover{opacity:.9}
+.import-cancel-btn{padding:12px 20px;border-radius:var(--r3);border:1px solid var(--b2);background:transparent;color:var(--tx2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.import-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--tx4);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px}
+.import-close:hover{color:var(--tx1)}
 .gen-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 34px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 16px rgba(245,184,0,0.22)}
 .gen-btn:hover:not(:disabled){background:#ffc820;transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,184,0,0.35)}
 .gen-btn:active:not(:disabled){transform:translateY(0)}
@@ -1116,6 +1133,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           Generate Complete Song
         </button>
         <button class="btn btn-sm" id="synopsis-btn" onclick="generateSynopsis()" style="border-color:var(--violetline);color:var(--violet);background:var(--violetbg)">📋 Preview Synopsis</button>
+        <button class="btn btn-sm" onclick="showImportModal()" style="border-color:var(--cyanline);color:var(--cyan);background:var(--cyanbg)">↑ Import Lyrics</button>
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
 
@@ -2296,7 +2314,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect]
 
 LYRICS:
-[Complete lyrics. Tag every section: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.]
+[${bracketInstruction()}]
 
 SONG PROMPT:
 [Under 180 chars. Core genre, instruments (3-4), tempo feel, vocal descriptor. NO artist names.]
@@ -2493,8 +2511,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect with listeners]
 
 LYRICS:
-[Complete lyrics. Tag every section: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro] etc.
-4 lines per verse. 2-4 lines per chorus. Every word must earn its place.]
+[${bracketInstruction()} Every word must earn its place.]
 
 SONG PROMPT:
 [The AI music platform style prompt. Under 180 characters. Include: core genre, sub-genre feel, key instruments (3-4 max), tempo feel, vocal descriptor, production texture. NO artist names.]
@@ -4306,10 +4323,111 @@ async function albumInstantEdit() {
 // ═══════════════════════════════════════════════════════
 // WRITE PAGE — MISSING FUNCTIONS
 // ═══════════════════════════════════════════════════════
+// ══ IMPORT LYRICS ══════════════════════════════════════════════
+function showImportModal() {
+  const sel = document.getElementById('imp-genre');
+  if (sel && !sel.options.length) {
+    Object.entries(GENRE_LABELS).forEach(([k,v]) => {
+      const o = document.createElement('option'); o.value = k; o.textContent = v; sel.appendChild(o);
+    });
+  }
+  document.getElementById('import-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('imp-lyrics').focus(), 100);
+}
+function closeImportModal() {
+  document.getElementById('import-overlay').style.display = 'none';
+}
+async function importAndAnalyze() {
+  const title   = document.getElementById('imp-title').value.trim() || 'Imported Song';
+  const genre   = document.getElementById('imp-genre').value || 'pop';
+  const topic   = document.getElementById('imp-topic').value.trim();
+  const lyrics  = document.getElementById('imp-lyrics').value.trim();
+  if (!lyrics || lyrics.length < 20) { toast('Paste some lyrics first'); return; }
+
+  const btn = document.getElementById('imp-btn');
+  const origLabel = btn.textContent;
+  btn.disabled = true; btn.textContent = '⏳ Analysing…';
+
+  try {
+    const genreLabel = GENRE_LABELS[genre] || genre;
+    const topicLine  = topic ? `Topic/Concept: ${topic}` : '';
+    const raw = await callClaude(
+      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 180 chars. Core genre, 3-4 instruments, tempo feel, vocal descriptor. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
+      'You are a world-class songwriter, music producer, and AI music specialist. Analyse the provided lyrics and return only the requested format with no extra commentary.',
+      900
+    );
+
+    // Parse the response the same way generateSong does
+    function extract(key, text) {
+      const idx = text.indexOf(key + ':');
+      if (idx === -1) return '';
+      const start = idx + key.length + 1;
+      const nextMatch = text.slice(start).search(/\n[A-Z][A-Z &]+:/);
+      const end = nextMatch === -1 ? text.length : start + nextMatch;
+      return text.slice(start, end).trim();
+    }
+    const verdict    = extract('VERDICT', raw);
+    const songPrompt = extract('SONG PROMPT', raw);
+    const briefRaw   = raw.slice(raw.indexOf('PRODUCTION BRIEF:'));
+    const structure  = extract('STRUCTURE MAP', raw);
+    const dopamine   = extract('DOPAMINE MAP', raw);
+    const chords     = extract('CHORD SUGGESTIONS', raw);
+    const notes      = extract('DIRECTOR NOTES', raw);
+
+    // Populate output card (same as generateSong)
+    document.getElementById('res-title').textContent   = title;
+    document.getElementById('res-verdict').textContent = verdict;
+    document.getElementById('res-lyrics-text').innerHTML = lyrics.replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    document.getElementById('res-structure-text').textContent = structure;
+    document.getElementById('res-dopamine-text').textContent  = dopamine;
+    document.getElementById('res-notes-text').textContent     = notes;
+    renderChords('res', chords);
+    renderBrief('res', songPrompt, briefRaw);
+
+    S.currentSong = { title, verdict, lyrics, style: songPrompt, brief: briefRaw, structure, dopamine, chords, notes, genre, topic, ts: Date.now() };
+    addToHistory(S.currentSong);
+    showSaveBar('res');
+    const varBtn = document.getElementById('res-var-btn');
+    if (varBtn) varBtn.disabled = false;
+    generateScoreDashboard('res', lyrics, genre);
+    document.getElementById('instant-edit-card')?.classList.add('visible');
+    document.getElementById('gen-out').style.display = '';
+
+    closeImportModal();
+    // Navigate to write page so the result is visible
+    const nb = Array.from(document.querySelectorAll('.nb')).find(b => /pg-write/.test(b.getAttribute('onclick')));
+    if (nb) goPg('pg-write', nb);
+    // Reset tabs to lyrics
+    const firstTab = document.querySelector('#gen-out .otabs .otab');
+    if (firstTab) { document.querySelectorAll('#gen-out .otabs .otab').forEach(t=>t.classList.remove('on')); firstTab.classList.add('on'); }
+    document.querySelectorAll('#gen-out .opane').forEach(p => p.classList.remove('on'));
+    document.getElementById('res-opane-lyrics')?.classList.add('on');
+
+    toast('✦ Lyrics imported & analysed: "' + title + '"');
+  } catch(e) {
+    toast('⚠️ ' + e.message, 5000);
+  }
+  btn.disabled = false; btn.textContent = origLabel;
+}
+// ═══════════════════════════════════════════════════════════════
+
 function setBracket(el, mode) {
   S.bracketMode = mode;
   document.querySelectorAll('.bpill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
+}
+
+function bracketInstruction() {
+  const mode = S.bracketMode || 'basic';
+  if (mode === 'none')
+    return 'Write lyrics with NO section labels or brackets. Pure lyric text only — no [Verse], [Chorus] or any other tags.';
+  if (mode === 'basic')
+    return 'Tag every section with standard Suno brackets: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse. 2-4 lines per chorus.';
+  if (mode === 'enhanced')
+    return 'Tag every section with standard brackets ([Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]) AND add inter-song movement tags between sections where energy shifts occur — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. These guide the energy arc. 4 lines per verse. 2-4 lines per chorus.';
+  if (mode === 'experimental')
+    return 'Tag every section with detailed meta-brackets that include emotional context — e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also add production direction tags like [Quiet], [Intense], [Spoken], [Whispered] where they serve the song. 4 lines per verse. 2-4 lines per chorus.';
+  return 'Tag every section with standard Suno brackets: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse. 2-4 lines per chorus.';
 }
 
 async function enhanceConcept() {
@@ -4403,5 +4521,35 @@ initMoodGrid();
 renderLib();
 updateLibBadge();
 </script>
+<!-- ══ IMPORT LYRICS OVERLAY ══ -->
+<div id="import-overlay" class="import-overlay" style="display:none" onclick="if(event.target===this)closeImportModal()">
+  <div class="import-modal">
+    <button class="import-close" onclick="closeImportModal()">✕</button>
+    <h2>↑ Import External Lyrics</h2>
+    <p>Paste lyrics from any source — Soniq will analyse them and unlock all production tools.</p>
+    <div class="import-row">
+      <div class="import-field" style="flex:2">
+        <label>Song Title</label>
+        <input type="text" id="imp-title" placeholder="e.g. Midnight Drive" />
+      </div>
+      <div class="import-field" style="flex:1">
+        <label>Genre</label>
+        <select id="imp-genre"></select>
+      </div>
+    </div>
+    <div class="import-field" style="margin-bottom:14px">
+      <label>Topic / Concept <span style="font-weight:400;color:var(--tx4);text-transform:none;letter-spacing:0">(optional — helps the analysis)</span></label>
+      <input type="text" id="imp-topic" placeholder="e.g. letting go after a long relationship" />
+    </div>
+    <div class="import-field">
+      <label>Lyrics</label>
+      <textarea id="imp-lyrics" placeholder="[Verse 1]&#10;Paste your lyrics here…&#10;&#10;[Chorus]&#10;Your chorus lines…"></textarea>
+    </div>
+    <div class="import-actions">
+      <button class="import-submit-btn" id="imp-btn" onclick="importAndAnalyze()">✦ Import &amp; Analyze</button>
+      <button class="import-cancel-btn" onclick="closeImportModal()">Cancel</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
