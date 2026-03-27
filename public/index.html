@@ -2306,6 +2306,7 @@ SONGWRITING RULES:
 - Specific imagery only — no clichés · Zeigarnik effect in chorus
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
+- ${bracketInstruction()}
 
 Respond with EXACTLY this format:
 
@@ -2314,7 +2315,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect]
 
 LYRICS:
-[${bracketInstruction()}]
+[Complete lyrics — 4 lines per verse, 2-4 per chorus. Every word must earn its place.]
 
 SONG PROMPT:
 [Under 180 chars. Core genre, instruments (3-4), tempo feel, vocal descriptor. NO artist names.]
@@ -2503,6 +2504,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - Bridge must offer a new emotional or narrative perspective — not a repeat
 - The last chorus must feel bigger than the first
+- ${bracketInstruction()}
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
 
@@ -2511,7 +2513,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect with listeners]
 
 LYRICS:
-[${bracketInstruction()} Every word must earn its place.]
+[Complete lyrics — every word must earn its place.]
 
 SONG PROMPT:
 [The AI music platform style prompt. Under 180 characters. Include: core genre, sub-genre feel, key instruments (3-4 max), tempo feel, vocal descriptor, production texture. NO artist names.]
@@ -4420,14 +4422,14 @@ function setBracket(el, mode) {
 function bracketInstruction() {
   const mode = S.bracketMode || 'basic';
   if (mode === 'none')
-    return 'Write lyrics with NO section labels or brackets. Pure lyric text only — no [Verse], [Chorus] or any other tags.';
+    return 'SECTION TAGS: Write the lyrics with absolutely NO section labels, headers, or brackets of any kind. Pure lyric lines only.';
   if (mode === 'basic')
-    return 'Tag every section with standard Suno brackets: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse. 2-4 lines per chorus.';
+    return 'SECTION TAGS: Label every section with standard Suno-style brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.';
   if (mode === 'enhanced')
-    return 'Tag every section with standard brackets ([Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]) AND add inter-song movement tags between sections where energy shifts occur — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. These guide the energy arc. 4 lines per verse. 2-4 lines per chorus.';
+    return 'SECTION TAGS: Label every section with standard brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Additionally insert inter-song movement tags on their own line between sections wherever the energy shifts — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. These direct the energy arc of the song. 4 lines per verse, 2-4 per chorus.';
   if (mode === 'experimental')
-    return 'Tag every section with detailed meta-brackets that include emotional context — e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also add production direction tags like [Quiet], [Intense], [Spoken], [Whispered] where they serve the song. 4 lines per verse. 2-4 lines per chorus.';
-  return 'Tag every section with standard Suno brackets: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse. 2-4 lines per chorus.';
+    return 'SECTION TAGS: Label every section with detailed meta-brackets on their own line that include emotional context, e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also insert production direction tags on their own line where fitting: [Quiet], [Intense], [Spoken], [Whispered]. 4 lines per verse, 2-4 per chorus.';
+  return 'SECTION TAGS: Label every section with standard Suno-style brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.';
 }
 
 async function enhanceConcept() {
