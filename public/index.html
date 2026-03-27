@@ -857,6 +857,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .vb-wave .b:nth-child(5){animation-delay:.48s}
 @keyframes vbwv{0%,100%{height:6px;opacity:.4}50%{height:26px;opacity:1}}
 .vb-regen-row{display:flex;justify-content:flex-end;padding:0 0 4px}
+/* ── COUNTERMELODY BLOCK ── */
+.cm-section{border-left:2px solid #34d39960;background:linear-gradient(90deg,#0a1f1580,transparent)}
+.cm-device{font-size:13px;font-weight:700;color:#34d399;margin-top:4px}
+.cm-map{font-size:11px;color:var(--tx3);margin-top:6px;font-style:italic}
+.cm-prompt-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:10px;padding:8px 10px;background:var(--s3);border-radius:var(--r2);border:1px solid #34d39930}
+.cm-prompt-label{font-size:10px;font-weight:700;color:#34d399;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.cm-prompt-chip{font-family:var(--mono);font-size:12px;color:#c8c8e8;flex:1;user-select:all}
 /* ── COPYRIGHT STRIP ── */
 .copyright-strip{border-top:1px solid var(--b1);border-bottom:1px solid var(--b1);background:linear-gradient(90deg,#1a1408 0%,var(--s2) 100%);padding:10px 18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .cp-seal{width:26px;height:26px;border-radius:50%;border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;color:var(--amber)}
@@ -1679,7 +1686,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="crow" style="margin-top:18px">
       <span style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Song Prompt</span>
       <div style="display:flex;align-items:center;gap:8px">
-        <span class="ppcount ok" id="pb-cc">0/200</span>
+        <span class="ppcount ok" id="pb-cc">0/440</span>
         <button class="btn btn-sm" onclick="copyBuilderPrompt()">Copy</button>
         <button class="btn btn-sm btn-gold" id="pb-gen-btn" onclick="generateFromBuilder()">🎵 Generate Song</button>
       </div>
@@ -2066,35 +2073,39 @@ const GENRE_BIBLE={
       'Verse structure within 16 bars: bars 1-4 establish scene/topic, bars 5-8 develop, bars 9-12 complicate or contrast, bar 16 is always the punchline or emotional peak',
       'Internal rhymes every 2-3 syllables add density beyond end rhymes. Chain rhymes across 4-bar units create momentum'
     ],
-    artists:'Kendrick Lamar · Drake · Travis Scott · J. Cole · Eminem · Future · Lil Baby · Tyler the Creator · 21 Savage · Gunna · Nas · Jay-Z'
+    artists:'Kendrick Lamar · Drake · Travis Scott · J. Cole · Eminem · Future · Lil Baby · Tyler the Creator · 21 Savage · Gunna · Nas · Jay-Z',
+    counter:{device:'Sample loop / producer melody vs. rap flow',does:'The melodic sample or producer-generated hook plays continuously underneath the rap verses — it becomes the emotional anchor that the bars respond to. Ad-lib voices ("yeah","uh") create a rhythmic counter-voice.',howto:'melodic sample hook, producer melody loop, ad-lib counter-voice',map:'Verse: sample loops under bars / Hook: producer melody IS the hook / Outro: ad-lib voices build over the loop'}
   },
-  ss:{dna:'Voice, acoustic guitar, emotional truth, first-person narrative, autobiographical imagery. The song is the diary entry.',structure:'Most flexible genre. Verse-only (no chorus), VCVCBC, or through-composed. The STORY determines structure — not a template.',suno:'"fingerpicked acoustic guitar, intimate close-mic vocals, warm room reverb, no drums" for stripped. Add "brushed snare, upright bass" for fuller feel.',keys:['Every line must earn its place — no filler','Specificity creates universality — house numbers, dog names, street names','Second verse must deepen emotionally, not repeat the first','Guitar tuning is a character — mention DADGAD or open G in style'],artists:'Tracy Chapman · Joni Mitchell · Elliott Smith · Bon Iver · Phoebe Bridgers · Paul Simon · Brandi Carlile'},
-  altrock:{dna:'Indie ethos + rock power + outsider perspective. Distortion as emotional language. Quiet-loud dynamic is the core structural move.',structure:'VPCVC with massive dynamic variance. Quiet verse (clean guitar, restrained vocal) → explosive chorus (distortion, full drums, pushed vocal).',suno:'Sub-genre specific: "shoegaze, wall of sound" vs "post-punk, angular guitars, Joy Division atmosphere" vs "indie rock, jangly clean guitars".',keys:['Chorus must be earned — verse tension must build to a real release','Distortion is an emotion — use it purposefully','Alt-rock lyrics embrace ambiguity — specific images, opaque meaning','Bridge should recontextualize the chorus, not just repeat it'],artists:'Radiohead · Pixies · Pavement · Modest Mouse · The National · Interpol · Arctic Monkeys · Mitski'},
-  reggae:{dna:'Offbeat skank (guitar chop on beats 2&4), one-drop drum (kick on beat 3), bass as melody, spiritual/political consciousness, community and resistance.',structure:'Long meditative verses. Chorus is comforting mantra, not explosive hook. Outro vamps are essential — let the groove breathe and fade slowly.',suno:'"reggae, one-drop rhythm, offbeat skank guitar, melodic bass, roots reggae" for classic. "Dancehall, digital riddim, 90 BPM" for modern.',keys:['Bass is the lead instrument — it carries melody','Chorus is resolution, not climax — reggae builds peace not tension','Outro vamp is non-negotiable','Add [dub break] in Suno for echo/reverb instrumental section'],artists:'Bob Marley · Peter Tosh · Burning Spear · Jimmy Cliff · Toots · Damian Marley · Chronixx'},
-  afrobeats:{dna:'Polyrhythmic percussion, talking drum, high-life guitar, pidgin English/Yoruba, call-response, joy as spiritual practice.',structure:'Hook-driven but loose. Hook repeats 4-6 times. Verses are conversational and ad-libbed in feel.',suno:'"afrobeats, talking drum, shekere, highlife guitar, Lagos pop" for Nigerian. "Amapiano, log drum, piano, South African" for SA. BPM 95-105.',keys:['Hook must be melodically simple but rhythmically interesting','Call-response between lead and backing vocal is structural','The groove should make you move before you process the words'],artists:'Wizkid · Burna Boy · Davido · Tems · CKay · Rema · Ayra Starr · Femi Kuti'},
-  blues:{dna:'12-bar AAB lyric form, call-response between voice and guitar, 3 chords (I-IV-V), emotional honesty above all production.',structure:'12-bar progression is the container. AAB: line stated, repeated, then resolved/twisted. Guitar solos ARE verses.',suno:'"Chicago blues, electric guitar, shuffle rhythm, walking bass, harmonica" vs "Delta blues, acoustic slide guitar" vs "Texas blues, electric shuffle".',keys:['AAB form forces economy — every line must be justified','Guitar answers the vocal — it is a conversation','Blues is about transformation not just suffering — resolution matters','Specify shuffle rhythm feel in song production'],artists:'Robert Johnson · Muddy Waters · B.B. King · Howlin Wolf · SRV · John Lee Hooker · Etta James'},
+  ss:{dna:'Voice, acoustic guitar, emotional truth, first-person narrative, autobiographical imagery. The song is the diary entry.',structure:'Most flexible genre. Verse-only (no chorus), VCVCBC, or through-composed. The STORY determines structure — not a template.',suno:'"fingerpicked acoustic guitar, intimate close-mic vocals, warm room reverb, no drums" for stripped. Add "brushed snare, upright bass" for fuller feel.',keys:['Every line must earn its place — no filler','Specificity creates universality — house numbers, dog names, street names','Second verse must deepen emotionally, not repeat the first','Guitar tuning is a character — mention DADGAD or open G in style'],artists:'Tracy Chapman · Joni Mitchell · Elliott Smith · Bon Iver · Phoebe Bridgers · Paul Simon · Brandi Carlile',counter:{device:'Guitar fingerpicking pattern / second acoustic voice',does:'The fingerpicked guitar part weaves a melodic answer around the vocal — in the gaps between sung phrases, the guitar fills with its own melody, creating a dialogue between voice and instrument. On bigger arrangements, a cello or second acoustic plays a counter-line underneath.',howto:'fingerpicked counter-melody, guitar fills between vocal phrases, cello counter-line',map:'Verse: guitar fills the phrase gaps / Chorus: both voices lock together / Bridge: guitar takes melodic lead while vocal strips back'}},
+  altrock:{dna:'Indie ethos + rock power + outsider perspective. Distortion as emotional language. Quiet-loud dynamic is the core structural move.',structure:'VPCVC with massive dynamic variance. Quiet verse (clean guitar, restrained vocal) → explosive chorus (distortion, full drums, pushed vocal).',suno:'Sub-genre specific: "shoegaze, wall of sound" vs "post-punk, angular guitars, Joy Division atmosphere" vs "indie rock, jangly clean guitars".',keys:['Chorus must be earned — verse tension must build to a real release','Distortion is an emotion — use it purposefully','Alt-rock lyrics embrace ambiguity — specific images, opaque meaning','Bridge should recontextualize the chorus, not just repeat it'],artists:'Radiohead · Pixies · Pavement · Modest Mouse · The National · Interpol · Arctic Monkeys · Mitski',counter:{device:'Second guitar counter-riff / bass counter-melody',does:'A second guitar plays a melodic counter-riff against the lead guitar — often a clean line against distortion, or a high-register phrase against a low rhythm part. The bass frequently breaks from the root and plays a counter-melodic line in post-chorus sections, carrying the emotional weight while the guitars settle.',howto:'second guitar counter-riff, bass counter-melody, lead guitar answer phrase',map:'Verse: bass counter-melody under clean guitar / Pre-chorus: second guitar tension / Chorus: bass breaks from root / Bridge: guitar leads melodically'}},
+  reggae:{dna:'Offbeat skank (guitar chop on beats 2&4), one-drop drum (kick on beat 3), bass as melody, spiritual/political consciousness, community and resistance.',structure:'Long meditative verses. Chorus is comforting mantra, not explosive hook. Outro vamps are essential — let the groove breathe and fade slowly.',suno:'"reggae, one-drop rhythm, offbeat skank guitar, melodic bass, roots reggae" for classic. "Dancehall, digital riddim, 90 BPM" for modern.',keys:['Bass is the lead instrument — it carries melody','Chorus is resolution, not climax — reggae builds peace not tension','Outro vamp is non-negotiable','Add [dub break] in Suno for echo/reverb instrumental section'],artists:'Bob Marley · Peter Tosh · Burning Spear · Jimmy Cliff · Toots · Damian Marley · Chronixx',counter:{device:'Rhythm guitar offbeat skank / melodica / horn fills',does:'The rhythm guitar chop on beats 2 and 4 creates a persistent rhythmic counter-melody against the bass — together they form a locked two-voice counterpoint that IS reggae\'s groove. Melodica or horns fill the spaces between vocal phrases with melodic responses.',howto:'offbeat rhythm guitar skank, melodica fills, horn response phrases',map:'Throughout: guitar skank creates rhythmic counter / Verse gaps: melodica or horn fills / Dub break: bass and guitar in pure counterpoint'}},
+  afrobeats:{dna:'Polyrhythmic percussion, talking drum, high-life guitar, pidgin English/Yoruba, call-response, joy as spiritual practice.',structure:'Hook-driven but loose. Hook repeats 4-6 times. Verses are conversational and ad-libbed in feel.',suno:'"afrobeats, talking drum, shekere, highlife guitar, Lagos pop" for Nigerian. "Amapiano, log drum, piano, South African" for SA. BPM 95-105.',keys:['Hook must be melodically simple but rhythmically interesting','Call-response between lead and backing vocal is structural','The groove should make you move before you process the words'],artists:'Wizkid · Burna Boy · Davido · Tems · CKay · Rema · Ayra Starr · Femi Kuti',counter:{device:'Guitar ostinato / highlife guitar counter-line',does:'The highlife-style guitar plays a repeating melodic ostinato — a short looping phrase — that weaves around the vocal hook. This is the defining counter-melody of Afrobeats: the guitar "sings" its own melodic thread simultaneously with the vocal, creating the characteristic layered groove.',howto:'highlife guitar ostinato, melodic guitar counter-line, guitar riff loop',map:'Throughout all sections: guitar ostinato never stops / Hook: guitar counter-line peaks / Verse: guitar is subtle beneath vocal / Outro: guitar leads the fade'}},
+  blues:{dna:'12-bar AAB lyric form, call-response between voice and guitar, 3 chords (I-IV-V), emotional honesty above all production.',structure:'12-bar progression is the container. AAB: line stated, repeated, then resolved/twisted. Guitar solos ARE verses.',suno:'"Chicago blues, electric guitar, shuffle rhythm, walking bass, harmonica" vs "Delta blues, acoustic slide guitar" vs "Texas blues, electric shuffle".',keys:['AAB form forces economy — every line must be justified','Guitar answers the vocal — it is a conversation','Blues is about transformation not just suffering — resolution matters','Specify shuffle rhythm feel in song production'],artists:'Robert Johnson · Muddy Waters · B.B. King · Howlin Wolf · SRV · John Lee Hooker · Etta James',counter:{device:'Guitar talks back to the vocal (call-and-response)',does:'After every sung phrase, the guitar "answers" with its own melodic response — this call-and-response IS the cornerstone of blues. The guitar is not accompaniment; it is the second voice in a conversation. In slow blues this response is a bending note or lick. In uptempo blues it is a quick turnaround phrase.',howto:'guitar call and response, guitar answers vocal, blues guitar lick fills',map:'Every verse: vocal line then guitar response / Turnaround: guitar leads into next section / Solo sections: guitar takes full melodic lead'}},
   kpop:{
     dna:'Precise vocal production, multi-member group dynamics, mandatory pre-chorus tension builder, rap break in most songs, choreography-driven structure (8-count phrasing), key change before final chorus, visual concept driving lyric themes. The most engineered pop format in existence.',
     structure:'Intro → Verse 1 → Pre-Chorus (essential) → Chorus → Verse 2 → Pre-Chorus → Chorus → Rap Break / Bridge → Key Change → Final Chorus (bigger) → Outro. Every section has a job and a predetermined energy level.',
     suno:'"K-pop, synth pop, 808 bass, punchy drums, bright synths, polished production, 120-130 BPM" for standard. "K-pop ballad, piano, strings, emotional, 80 BPM" for ballad. "K-pop dance pop, electronic, hi-hats, energetic" for club-ready.',
     keys:['Pre-chorus is non-negotiable — it is what makes K-pop K-pop. Build tension before every chorus','Rap break must contrast completely with the vocal sections — different flow, different energy','Final chorus MUST be a key change (usually +1 or +2 semitones) — the listener expects it','8-bar phrasing throughout — K-pop is built for choreography, count your bars','Verse lyrics can be abstract/visual — the feeling matters more than literal meaning','Specify "K-pop" first in your style prompt — it is the strongest genre signal for AI platforms'],
-    artists:'BTS · BLACKPINK · aespa · NewJeans · TWICE · EXO · IU · Stray Kids · SEVENTEEN · LE SSERAFIM'
+    artists:'BTS · BLACKPINK · aespa · NewJeans · TWICE · EXO · IU · Stray Kids · SEVENTEEN · LE SSERAFIM',
+    counter:{device:'Rap break rhythmic counter / synth post-chorus line',does:'The rap break section creates a complete rhythmic counterpoint to the melodic hook — different flow, different register, different texture. After the final chorus, a synth or string line plays a counter-melody during the outro that re-harmonizes the hook, giving it new emotional meaning.',howto:'rap break rhythmic contrast, post-chorus synth counter-melody, string answer phrase',map:'Verse: synth arpeggiation counter / Pre-chorus: tension builds, no counter / Rap break: rhythm IS the counter / Post-chorus: synth or string counter-line peaks'}
   },
   latin:{
     dna:'Rhythmic diversity (salsa, cumbia, bachata, bossa), emotional romanticism, bilingual/Spanish lyrics, family and community themes, dance-floor energy. Many sub-genres under one umbrella.',
     structure:'Varies by sub-genre. Salsa: verse-chorus with horn breaks. Bachata: romantic verse-chorus. Reggaeton/Latin pop: hook-heavy, dembow or Latin rhythm underpins everything.',
     suno:'"Latin pop, acoustic guitar, percussion, romantic, 100 BPM" for pop crossover. "salsa, brass section, piano, congas, 180 BPM" for salsa. "bachata, guitar, romantic vocals, 130 BPM" for bachata.',
     keys:['Rhythm IS the genre — specify the exact dance rhythm in your prompt','Bilingual lyrics (Spanish + English) dramatically increase global reach','Percussion instruments are not optional — they ARE the genre','Romantic/family themes are universal — lean in not away'],
-    artists:'Shakira · Marc Anthony · Romeo Santos · Celia Cruz · Juan Luis Guerra · Selena · J Balvin · Bad Bunny'
+    artists:'Shakira · Marc Anthony · Romeo Santos · Celia Cruz · Juan Luis Guerra · Selena · J Balvin · Bad Bunny',
+    counter:{device:'Piano montuno / horn section stabs',does:'The piano montuno — a repeating right-hand rhythmic-melodic figure locked to the clave — creates the defining counter-melody in salsa and Latin jazz. Against the vocal melody, the montuno never stops, providing both harmonic and melodic contrast. Horn section stabs punctuate between vocal phrases as sharp counter-accents.',howto:'piano montuno pattern, horn stab counter-accents, clave rhythmic counter',map:'Throughout: montuno runs under everything / Verse: subtle montuno / Chorus: horns stab between phrases / Brass break: full counter-melody takes over'}
   },
   reggaeton:{
     dna:'Dembow rhythm (syncopated kick-snare pattern), 808 bass, bilingual/Spanish lyrics, perreo culture, street credibility, romance and party energy. Production-first genre — the beat IS the identity.',
     structure:'Hook-first or hook-heavy. Short verses (8-12 bars), enormous hook repeated 4-6 times. Outro vamp is essential. Bridges rare — energy never drops for long.',
     suno:'"reggaeton, dembow rhythm, 808 bass, electronic production, 90-95 BPM, trap hi-hats, Spanish lyrics" for classic. "reggaeton romántico, melodic vocals, smooth 808s" for romantic. "trap latino, dark 808s, aggressive flow" for urban.',
     keys:['Dembow pattern is non-negotiable — it IS reggaeton','Spanish lyrics (or Spanglish) dramatically increase authenticity','Hook must be the catchiest thing in the song by a wide margin','Production energy stays high throughout — no quiet moments','Specify "dembow, 90 BPM" in your style prompt for correct rhythm'],
-    artists:'Daddy Yankee · J Balvin · Bad Bunny · Ozuna · Karol G · Maluma · Nicky Jam · Rauw Alejandro'
+    artists:'Daddy Yankee · J Balvin · Bad Bunny · Ozuna · Karol G · Maluma · Nicky Jam · Rauw Alejandro',
+    counter:{device:'Dembow rhythmic counter / producer synth melody',does:'The dembow kick-snare pattern creates a persistent rhythmic counterpoint against the melodic hook — the syncopated "and" hit is the counter-accent that defines reggaeton\'s groove. A producer synth melody or vocal chop often plays a secondary melodic line under the main hook in the perreo section.',howto:'dembow rhythmic counter, synth melody loop, vocal chop counter-line',map:'Throughout: dembow creates rhythmic counter / Hook: producer melody layers under vocal / Perreo section: synth counter-melody emerges / Outro: counter-melody leads fade'}
   },
-  punk:{dna:'3 chords, max 3 minutes, political or personal fury, anti-production aesthetic, speed as ideology, DIY ethic.',structure:'Fast VCVCBC or just VCV. No solos usually. Verse = setup. Chorus = explosion. Speed to end is valid.',suno:'"punk rock, distorted guitar, fast drums, raw production, 180 BPM, aggressive vocals" for classic. "Post-punk, angular guitar, bass-forward, 140 BPM" for post-punk.',keys:['Every second wasted is ideologically wrong — cut everything that does not serve the fury','Chorus should be a slogan — 4-8 words, shoutable','Production should sound slightly wrong — too loud, slightly clipping','Personal fury is timeless; political specificity ages'],artists:'Sex Pistols · The Clash · Ramones · Dead Kennedys · Black Flag · Wire · Bikini Kill · Green Day'},
+  punk:{dna:'3 chords, max 3 minutes, political or personal fury, anti-production aesthetic, speed as ideology, DIY ethic.',structure:'Fast VCVCBC or just VCV. No solos usually. Verse = setup. Chorus = explosion. Speed to end is valid.',suno:'"punk rock, distorted guitar, fast drums, raw production, 180 BPM, aggressive vocals" for classic. "Post-punk, angular guitar, bass-forward, 140 BPM" for post-punk.',keys:['Every second wasted is ideologically wrong — cut everything that does not serve the fury','Chorus should be a slogan — 4-8 words, shoutable','Production should sound slightly wrong — too loud, slightly clipping','Personal fury is timeless; political specificity ages'],artists:'Sex Pistols · The Clash · Ramones · Dead Kennedys · Black Flag · Wire · Bikini Kill · Green Day',counter:{device:'Bass counter-melody (only when intentional)',does:'No counter-melody IS the aesthetic statement — punk\'s refusal of ornamentation is ideological. However, the bass can and should diverge from the guitar root occasionally — especially in post-punk (Wire, The Clash) where the bass plays a melodic counter-line that gives the song its intelligence.',howto:'bass counter-melody, post-punk bass independence, melodic bass line',map:'Chorus: bass locks with guitar (no counter — pure power) / Verse: bass may diverge melodically / Bridge: bass can take counter-melodic lead briefly'}},
   parody:{
     dna:'Comedy through musical weaponization. A parody rewrites a recognizable song with absurdist/satirical/comedic lyrics while keeping the melody and structure intact. The humor lives in the gap between the serious original form and the ridiculous subject matter. Commitment to the bit is everything — play it completely straight musically. Specificity is the engine of comedy: "a cat who knocks glasses off tables" beats "a mischievous cat" every time.',
     structure:'Mirror the original song structure exactly — same verse lengths, same chorus, same bridge placement. The comedic contrast between the production seriousness and the lyrical absurdity IS the joke. Use the original song\'s exact section count. Never break the parody frame mid-song.',
@@ -2107,7 +2118,8 @@ const GENRE_BIBLE={
       'Rule of threes in comedy: setup, setup, subvert. Two expected things then one unexpected. Works at line level too',
       'Specificity is the engine: "I ate seventeen hot pockets" > "I ate a lot of food". Proper nouns, numbers, brand names'
     ],
-    artists:'Weird Al Yankovic · Flight of the Conchords · Lonely Island · Bo Burnham · "Weird Al" · Garfunkel & Oates · Tim Minchin'
+    artists:'Weird Al Yankovic · Flight of the Conchords · Lonely Island · Bo Burnham · "Weird Al" · Garfunkel & Oates · Tim Minchin',
+    counter:{device:'Mock-serious orchestral counter / ironic instrument response',does:'The counter-melody in parody is deployed for comedic effect: a soaring string line under a lyric about laundry; a triumphant brass response after a trivial punchline. The instrument\'s emotional seriousness vs. the lyric\'s absurdity IS the joke. The counter-melody should be more emotionally committed than the song deserves.',howto:'ironic orchestral counter-melody, serious instrumental response, mock-epic strings',map:'Chorus: most elaborate counter to heighten the absurdity / Bridge: counter-melody at its most earnest under the most ridiculous lyric / Verse: subtle counter as setup'}
   },
   comedy:{
     dna:'Original comedic songs — not parody rewrites but purpose-built funny songs. Musical comedy weaponizes genre conventions for laughs: the earnest folk song about mundane frustration, the over-produced ballad about pizza, the gangster rap about doing taxes. Structure serves the joke. The genre itself is the straight man. Comedy comes from subverting expectations, from specificity, from escalation.',
@@ -2121,7 +2133,8 @@ const GENRE_BIBLE={
       'Puns and wordplay: use sparingly — one great pun per song, not wall-to-wall. Subverted clichés hit harder than straight puns',
       'The bridge is the darkest/most absurd escalation — then the final chorus lands with the full weight of the joke'
     ],
-    artists:'Bo Burnham · Flight of the Conchords · Lonely Island · "Weird Al" Yankovic · Tim Minchin · Garfunkel & Oates · Stephen Lynch · Tenacious D'
+    artists:'Bo Burnham · Flight of the Conchords · Lonely Island · "Weird Al" Yankovic · Tim Minchin · Garfunkel & Oates · Stephen Lynch · Tenacious D',
+    counter:{device:'Genre-contrast instrument / comedy response voice',does:'The counter-melody carries the punchline in comedy music. The instrument chosen to respond to the vocal creates the comedic contrast — a tuba playing a pompous counter-line after a self-deprecating lyric, or a music-box response after a dark admission. The counter-melody is the straight man.',howto:'comedic instrument counter-response, genre-contrast counter-melody, comic timing instrument fill',map:'End of each verse: instrument responds to the lyric comedically / Chorus: counter-melody amplifies the absurdity / Bridge: counter-melody has its most unhinged moment'}
   },
   tvmusical:{
     dna:'Music written for narrative context: TV themes, film scores, Broadway/musical theater, video game OSTs, jingles. Every song has a DRAMATIC FUNCTION — it advances plot, reveals character, creates atmosphere, or sells a product. The lyric is always in service of something beyond itself. Musical theater in particular: characters sing what they cannot say in dialogue — the song is the emotional eruption.',
@@ -2135,7 +2148,8 @@ const GENRE_BIBLE={
       'The "I want" song (musical theater): character states their deepest desire in the bridge — this is the emotional core',
       'Reprise strategy: the same melody with changed lyrics at the end of Act 2 hits harder than any new song'
     ],
-    artists:'Stephen Sondheim · Lin-Manuel Miranda · Andrew Lloyd Webber · Jerry Herman · Joss Whedon · Mark Shaiman · Alan Menken · John Williams · Ennio Morricone'
+    artists:'Stephen Sondheim · Lin-Manuel Miranda · Andrew Lloyd Webber · Jerry Herman · Joss Whedon · Mark Shaiman · Alan Menken · John Williams · Ennio Morricone',
+    counter:{device:'Orchestra underscore / leitmotif counter-line',does:'Musical theater\'s counter-melody is the orchestral underscore — the pit orchestra plays a thematic counter-line beneath the vocal that either supports or dramatically contradicts the lyric (ironic underscore). Leitmotifs return as counter-melodies: a character\'s theme plays under another character\'s song, creating dramatic subtext.',howto:'orchestral underscore counter-melody, leitmotif counter-line, dramatic ironic underscore',map:'Verse: orchestra plays supportive counter-melody / Chorus: full pit counter-melody peaks / Key scenes: ironic underscore contradicts lyric for dramatic effect / Reprise: original melody returns as counter under new lyric'}
   },
   neosoul:{
     dna:'D\'Angelo, Erykah Badu, Lauryn Hill, Bilal, Maxwell — the collision of classic soul (raw emotion, live instrumentation, vulnerability) and hip-hop production aesthetics (head-nodding groove, layered samples, lo-fi warmth). Neo-soul is anti-formula: it breathes, it drags beats deliberately, it leaves space. Vocals are instruments — improvised runs, ad-libs that ARE the lyric. Production feels human and imperfect on purpose.',
@@ -2149,7 +2163,8 @@ const GENRE_BIBLE={
       'The outro vamp escalates emotionally — it should be the most cathartic part of the song, not a fade-out afterthought',
       'Lyrics avoid cliché with surgical specificity: sensory detail, time-stamped moments, names of places and things'
     ],
-    artists:'D\'Angelo · Erykah Badu · Lauryn Hill · Maxwell · Bilal · India.Arie · Musiq Soulchild · Common · Jill Scott · Frank Ocean · H.E.R. · SZA'
+    artists:'D\'Angelo · Erykah Badu · Lauryn Hill · Maxwell · Bilal · India.Arie · Musiq Soulchild · Common · Jill Scott · Frank Ocean · H.E.R. · SZA',
+    counter:{device:'Rhodes/keyboard ostinato vs. lead vocal',does:'The keyboard or Rhodes piano plays a continuous repeating melodic-rhythmic figure — an ostinato — that is the counter-melody Neo-Soul is built on. D\'Angelo\'s Voodoo is the reference: the Rhodes "talks" alongside the vocal rather than underneath it. The bass walks against both. Three voices in constant melodic conversation: lead vocal, keyboard ostinato, melodic bass.',howto:'Rhodes piano ostinato, keyboard counter-melody, melodic bass walks against vocal',map:'Throughout: Rhodes ostinato never stops / Intro: keyboard establishes counter before vocal enters / Verse: three-voice counterpoint / Outro vamp: keyboard and vocal improvise against each other freely'}
   },
   gospel:{
     dna:'Music as spiritual encounter — not performance but worship, testimony, and collective catharsis. Call-and-response at its DNA core: leader calls, congregation answers. The song builds to a moment of release (the "shout") where emotion overflows technique. Three traditions: Traditional Gospel (Thomas Dorsey, Mahalia Jackson — piano, choir, testimony), Contemporary Gospel (Kirk Franklin — pop production, hip-hop rhythms, mass choir), Worship/CCM (Chris Tomlin, Hillsong — arena rock, CCLI, corporate worship). Each has distinct rules.',
@@ -2163,7 +2178,8 @@ const GENRE_BIBLE={
       'The vamp outro MUST be written — this is where 80% of the emotional impact lives. Write 4-8 lines to cycle through',
       'Contemporary gospel: the beat must make you move before the lyric lands. Rhythm serves spirit, spirit serves rhythm'
     ],
-    artists:'Mahalia Jackson · Thomas Dorsey · Andraé Crouch · Kirk Franklin · Yolanda Adams · Donnie McClurkin · BeBe & CeCe Winans · Fred Hammond · Tye Tribbett · Maverick City Music · Hillsong · Chris Tomlin'
+    artists:'Mahalia Jackson · Thomas Dorsey · Andraé Crouch · Kirk Franklin · Yolanda Adams · Donnie McClurkin · BeBe & CeCe Winans · Fred Hammond · Tye Tribbett · Maverick City Music · Hillsong · Chris Tomlin',
+    counter:{device:'Choir response to lead vocal (call-and-response IS the counter-melody)',does:'Gospel\'s counter-melody IS its structure: the choir\'s response to the lead vocal creates a constant back-and-forth that builds to the bridge vamp. The organ plays fills between every phrase. In the bridge, the choir vamp becomes the primary melody while the lead improvises a counter over them — a complete melodic inversion.',howto:'choir call and response, organ fill counter-melody, choir vamp counter',map:'Verse: organ fills between phrases / Chorus: choir responds to every lead line / Bridge: choir vamp IS the main melody, lead sings counter over / Outro vamp: full call-and-response builds'}
   },
   children:{
     dna:'Music for ages 2-10 — but great children\'s music (Raffi, They Might Be Giants, "Mister Rogers") works for adults too because it operates on multiple levels simultaneously. Core rules: simple melodies (5-note range ideal), repetition is a feature not a flaw, every listen rewards a child (singability, motion), vocabulary stays accessible without being condescending. Themes: wonder, kindness, the natural world, belonging, imagination, small everyday adventures. The best children\'s songs teach without ever saying "lesson".',
@@ -2177,8 +2193,14 @@ const GENRE_BIBLE={
       'Never condescend — wonder and curiosity are adult emotions too. Write UP to children\'s imagination, not DOWN to their vocabulary',
       'Bedtime songs: descending melody, slowing tempo in each verse, safety and love in every image — the child must feel held'
     ],
-    artists:'Raffi · They Might Be Giants · Mister Rogers · Elizabeth Mitchell · Laurie Berkner · Disney songwriters (Sherman Brothers, Alan Menken) · Sesame Street · Jack Johnson (Curious George) · Carly Rae Jepsen'
+    artists:'Raffi · They Might Be Giants · Mister Rogers · Elizabeth Mitchell · Laurie Berkner · Disney songwriters (Sherman Brothers, Alan Menken) · Sesame Street · Jack Johnson (Curious George) · Carly Rae Jepsen',
+    counter:{device:'Call-and-response echo / simple instrument answer',does:'Children\'s music\'s counter-melody is the echo and response — the simplest and most instinctive musical dialogue. A phrase sung by the lead is echoed or answered by a simple instrument (xylophone, ukulele, hand claps). The child naturally wants to be the "response" voice, making the counter-melody participatory.',howto:'echo response counter-melody, instrument answers vocal, call and response pattern',map:'Throughout: instrument echoes or answers every vocal phrase / Chorus: hand clap or stomp rhythm creates counter / Bridge: call-and-response between "teacher" voice and "students" / Outro: children complete the melodic phrase'}
   },
+  pop:{dna:'Hook-driven, verse-chorus structure, universal emotional themes, radio-ready production, broad demographic appeal.',structure:'Intro → Verse → Pre-Chorus → Chorus → Verse 2 → Pre-Chorus → Chorus → Bridge → Final Chorus → Outro. Pre-chorus is the tension builder. Chorus is the payoff.',suno:'"pop, synth, piano, driving beat, polished production, 120 BPM" for mainstream. "dark pop, atmospheric synth, moody, 105 BPM" for alternative pop.',keys:['Hook within 30 seconds is non-negotiable','Chorus must be singable after one listen — max 10 syllables per line','Pre-chorus tension makes the chorus land harder','Bridge must recontextualize the chorus emotionally'],artists:'Taylor Swift · Billie Eilish · Olivia Rodrigo · Harry Styles · Doja Cat · The Weeknd · Ariana Grande · Justin Bieber',counter:{device:'Strings / synth pad counter-line / backing vocal response',does:'Pop\'s counter-melody typically lives in the strings or synth pad that plays a melodic answer to the chorus hook. Backing vocals sing a counter-phrase against the lead in the post-chorus. The guitar arpeggiation in the verse creates a melodic counter beneath the vocal.',howto:'string counter-melody, synth pad answer phrase, backing vocal counter-harmony',map:'Verse: synth arpeggiation under vocal / Chorus: strings play counter-line in gaps / Post-chorus: backing vocals counter the hook / Bridge: counter-melody takes over as lead strips back'}},
+  rnb:{dna:'Rhythm and blues: groove, vocal runs, romance and desire, emotional vulnerability, live instrumentation or sampled soul.',structure:'Verse → Hook → Verse → Hook → Bridge → Final Hook. Hook-centric. Verse sets emotional scene. Hook is the declaration. Bridge is the turn or breakdown.',suno:'"R&B, smooth production, vocal runs, electric piano, 90 BPM" for classic. "Contemporary R&B, 808 bass, trap hi-hats, 75 BPM" for modern.',keys:['Ad-libs and runs are a second vocal melody — write them','Groove must feel inevitable — bass and drums locked','Bridge is the emotional vulnerability peak','Specificity in lyrics: name the street, the hour, the feeling precisely'],artists:'Beyoncé · Usher · Alicia Keys · Frank Ocean · SZA · The Weeknd · Daniel Caesar · Giveon · Jhené Aiko',counter:{device:'Keyboard riff / ad-lib vocal counter-voice',does:'R&B\'s counter-melody lives in two places: the keyboard fills that respond between vocal phrases (a riff answering the lead), and the ad-lib vocal layer that creates an organic second melody running alongside the primary line. Together they create the layered warmth that defines R&B production.',howto:'keyboard fill counter-melody, ad-lib vocal counter-voice, electric piano response phrase',map:'Verse: keyboard fills between phrases / Hook: ad-lib vocal creates counter / Bridge: keyboard counter-line peaks / Outro: ad-lib voice overtakes as lead improvises'}},
+  edm:{dna:'Drop-driven structure, electronic production, 4-on-the-floor kick, tension/release arc, euphoric peak moments, anonymous subject.',structure:'Intro (build) → Drop → Break → Drop 2 (bigger) → Outro. The build IS the tension. The drop IS the payoff. Everything serves the drop.',suno:'"EDM, synth lead, 4-on-the-floor kick, 128 BPM, festival drop" for festival. "Deep house, bass-driven, warm, 120 BPM" for underground.',keys:['The drop must be worth the build — if the buildup is epic the drop must be devastating','Vocals are usually hooks — minimal lyrics, maximum repetition','Breakdown creates anticipation — strip everything except a single element','Specify BPM — it is the genre\'s most fundamental parameter'],artists:'Calvin Harris · Martin Garrix · Avicii · Deadmau5 · Daft Punk · Skrillex · Disclosure · Flume',counter:{device:'Drop counter-melody synth / bass synth vs. lead',does:'The drop counter-melody is a secondary synth line that plays simultaneously with the main lead synth during the drop — two melodic voices creating counterpoint at peak energy. Below them, the bass synth plays a third counter-melodic line. The arpeggiated lead in the breakdown provides pre-drop counter-melody, building tension.',howto:'drop counter-melody synth, bass synth counter-line, arpeggio build counter',map:'Build: arpeggiated synth creates anticipatory counter-melody / Drop: two synths in counterpoint / Breakdown: stripped to single counter-melody line / Drop 2: both counter-melodies return louder'}},
+  country:{dna:'Storytelling over everything, authentic emotion, rural/small-town imagery, guitar as emotional anchor, hook grounded in relatable universal truth.',structure:'Verse (story) → Chorus (universal truth) → Verse 2 (story deepens) → Chorus → Bridge (turn/reveal) → Final Chorus. Second verse MUST deepen the story emotionally.',suno:'"country, acoustic guitar, pedal steel, fiddle, 100 BPM, warm" for classic. "country pop, electric guitar, modern production, 120 BPM" for Nashville pop.',keys:['Second verse must be the emotional payoff — not a repeat of verse 1','Chorus is universal truth extracted from specific verse story','Pedal steel and fiddle are genre signals — specify them','Bridge is the revelation — what the narrator finally understands'],artists:'Dolly Parton · Garth Brooks · Johnny Cash · Kacey Musgraves · Chris Stapleton · Zach Bryan · Luke Combs · Carrie Underwood',counter:{device:'Pedal steel answer-line / fiddle counter-melody',does:'Country\'s definitive counter-melody is the pedal steel guitar — it plays an answering melodic phrase between vocal lines that aches with emotional resonance. In bluegrass, the fiddle plays a counter-melody against the vocal simultaneously. Both voices — vocal and pedal steel — are in constant melodic conversation.',howto:'pedal steel guitar answer fills, fiddle counter-melody, steel guitar response line',map:'Verse: pedal steel answers after each vocal phrase / Chorus: steel or fiddle counter-line under the hook / Bridge: pedal steel takes melodic lead while vocal drops / Outro: steel guitar leads the fade'}},
+  jazz:{dna:'Improvisation over harmony, chord substitution, rhythmic sophistication, the conversation between instruments, space as music.',structure:'Head (melody) → Solos → Head out. Blues form (12-bar) or AABA (32-bar standard). The arrangement is a vehicle for improvisation.',suno:'"jazz, piano trio, upright bass, brushed drums, 120 BPM swing" for classic. "jazz fusion, electric piano, 100 BPM" for fusion.',keys:['The melody (head) is the launching pad — state it cleanly, then destroy it in the solo','Walking bass is always a counter-melody','Chord substitution creates harmonic surprise — ii-V-I can be approached from anywhere','Silence is the most important note in jazz'],artists:'Miles Davis · John Coltrane · Bill Evans · Thelonious Monk · Charlie Parker · Herbie Hancock · Esperanza Spalding · Kamasi Washington',counter:{device:'Walking bass (primary counter) / piano comping / horn counterpoint',does:'Jazz has the richest counter-melody tradition: the walking bass is ALWAYS a counter-melody — it creates an independent melodic line of its own against the soloist. Piano comping creates harmonic counter-commentary. In ensemble sections, horns play genuine counterpoint — multiple independent melodic lines simultaneously, each complete on its own.',howto:'walking bass counter-melody, piano comp counter-voice, horn counterpoint lines',map:'Throughout: walking bass provides constant counter / Head: piano comps creates harmonic counter / Solos: bass and comping in three-voice counterpoint / Ensemble: full horn counterpoint'}}
 };
 
 const FORMULA_LAWS=[
@@ -2990,7 +3012,7 @@ LYRICS:
 [Write the complete song lyrics below. EVERY SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. 4 lines per verse, 2-4 per chorus. Every word must earn its place.]
 
 SONG PROMPT:
-[Under 180 chars. Core genre, instruments (3-4), tempo feel, vocal descriptor. NO artist names.]
+[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3020,11 +3042,17 @@ DOPAMINE MAP:
 3. [Third peak]
 
 DIRECTOR NOTES:
-1. [Production decision specific to this song]
+1. [Production decision specific to THIS song]
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]`;
+5. [tip 5]
+
+COUNTERMELODY:
+DEVICE: [Name the specific counter-melodic instrument/voice for this genre — e.g. "Pedal steel guitar" or "Piano montuno" or "Choir response" or "Guitar talks back to vocal"]
+WHAT IT DOES: [One sentence: where in the song it plays, what it plays against, and the emotional effect it creates]
+HOW TO PROMPT: [Exact language to add to the Suno/Udio style prompt to trigger this counter-melody — e.g. "add pedal steel answer fills" or "piano montuno backing pattern" or "choir call and response" — under 60 chars]
+SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: subtle / Chorus: prominent / Bridge: leads"]`;
 
   const luckyOut=document.getElementById('lucky-out');
   luckyOut.style.display='block';
@@ -3060,7 +3088,8 @@ function parseLuckyResult(raw,fusionName,meta){
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
-  const notes=parseSection(raw,'DIRECTOR NOTES',null);
+  const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
+  const countermelody=parseSection(raw,'COUNTERMELODY',null);
 
   const out=document.getElementById('lucky-out');
   out.style.display='block';
@@ -3074,7 +3103,7 @@ function parseLuckyResult(raw,fusionName,meta){
   renderBrief('lres', songPrompt, briefRaw);
 
   const lts = Date.now();
-  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
+  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
   const _lrv=document.getElementById('lres-visual-content');if(_lrv)_lrv.dataset.loaded='';
   showCopyrightStrip('lres', title, lts);
   S.luckyHistory.unshift({...S.luckyCurrentSong});
@@ -3138,6 +3167,7 @@ async function generateSong(){
 
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
   const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
+  const counterNote=GENRE_BIBLE[genre]?.counter?`\nCounter-melody device for this genre: ${GENRE_BIBLE[genre].counter.device} — ${GENRE_BIBLE[genre].counter.does} Include this in the COUNTERMELODY section and embed it in the SONG PROMPT.`:'';
   const substyleDetail = S.substyle && SUBSTYLE_NOTES[S.substyle] ? `\n${SUBSTYLE_NOTES[S.substyle]}` : '';
   const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.${substyleDetail}`:'';
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
@@ -3234,7 +3264,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -3257,7 +3287,7 @@ LYRICS:
 [Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
 
 SONG PROMPT:
-[The AI music platform style prompt. Under 180 characters. Include: core genre, sub-genre feel, key instruments (3-4 max), tempo feel, vocal descriptor, production texture. NO artist names.]
+[The AI music platform style prompt. Under 440 characters. Include: core genre, sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device (the secondary melodic layer specific to this genre — e.g. "pedal steel answer-line", "piano montuno", "choir call-response", "guitar talks back to vocal"). NO artist names.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3428,7 +3458,8 @@ function parseSongResult(raw,genre,topic){
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','CHORD PROGRESSION');
   const chords=parseSection(raw,'CHORD PROGRESSION','DIRECTOR NOTES');
-  const notes=parseSection(raw,'DIRECTOR NOTES',null);
+  const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
+  const countermelody=parseSection(raw,'COUNTERMELODY',null);
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;
@@ -3442,7 +3473,7 @@ function parseSongResult(raw,genre,topic){
   renderBrief('res', songPrompt, briefRaw);
 
   const ts = Date.now();
-  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,notes,genre,topic,ts};
+  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,notes,countermelody,genre,topic,ts};
   // reset visual cache so new song gets fresh visuals
   const _rv=document.getElementById('res-visual-content');if(_rv)_rv.dataset.loaded='';
   addToHistory(S.currentSong);
@@ -3465,17 +3496,22 @@ function parseBriefSection(text, key) {
   return text.slice(start, end).trim();
 }
 
-function renderBrief(prefix, songPrompt, briefRaw) {
+function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
   const el = document.getElementById(prefix + '-brief-content');
   if (!el) return;
+  // countermelody from song object if not passed directly
+  if (!countermelodyRaw) {
+    const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+    countermelodyRaw = song?.countermelody || '';
+  }
 
   const raw = briefRaw || '';
-  const corePrompt = parseBriefSection(raw, 'CORE PROMPT') || songPrompt || '';
-  const tempoKey   = parseBriefSection(raw, 'TEMPO & KEY');
-  const arrange    = parseBriefSection(raw, 'ARRANGEMENT BLUEPRINT');
-  const vocal      = parseBriefSection(raw, 'VOCAL DIRECTION');
-  const sonic      = parseBriefSection(raw, 'SONIC REFERENCES');
-  const platTips   = parseBriefSection(raw, 'PLATFORM TIPS');
+  const corePrompt    = parseBriefSection(raw, 'CORE PROMPT') || songPrompt || '';
+  const tempoKey      = parseBriefSection(raw, 'TEMPO & KEY');
+  const arrange       = parseBriefSection(raw, 'ARRANGEMENT BLUEPRINT');
+  const vocal         = parseBriefSection(raw, 'VOCAL DIRECTION');
+  const sonic         = parseBriefSection(raw, 'SONIC REFERENCES');
+  const platTips      = parseBriefSection(raw, 'PLATFORM TIPS');
 
   const cpBtn = (id, label='Copy') =>
     `<button class="brief-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('${id}').textContent).then(()=>toast('✓ Copied'))">${label}</button>`;
@@ -3489,7 +3525,7 @@ function renderBrief(prefix, songPrompt, briefRaw) {
         ${cpBtn('brief-core-prompt', 'Copy Prompt')}
       </div>
       <div class="brief-prompt-box" id="brief-core-prompt">${corePrompt}</div>
-      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/200 characters</div>
+      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/440 characters</div>
     </div>
 
     <div class="brief-grid">
@@ -3518,6 +3554,26 @@ function renderBrief(prefix, songPrompt, briefRaw) {
       <div class="brief-section-body">${platTips.split(/\n|\d\.\s/).filter(t=>t.trim()).map(t=>`<div class="brief-tip">→ ${t.trim()}</div>`).join('')}</div>
     </div>` : ''}
 
+    ${countermelodyRaw ? (() => {
+      const cmLines = {};
+      countermelodyRaw.split('\n').forEach(line => {
+        const m = line.match(/^(DEVICE|WHAT IT DOES|HOW TO PROMPT|SECTION MAP):\s*(.+)/);
+        if (m) cmLines[m[1]] = m[2].trim();
+      });
+      const howTo = cmLines['HOW TO PROMPT'] || '';
+      return `<div class="brief-section cm-section">
+        <div class="brief-section-label">🎵 Countermelody</div>
+        <div class="cm-device">${cmLines['DEVICE'] || ''}</div>
+        ${cmLines['WHAT IT DOES'] ? `<div class="brief-section-body" style="margin-top:6px">${cmLines['WHAT IT DOES']}</div>` : ''}
+        ${cmLines['SECTION MAP'] ? `<div class="cm-map">Sections: ${cmLines['SECTION MAP']}</div>` : ''}
+        ${howTo ? `<div class="cm-prompt-row">
+          <span class="cm-prompt-label">Add to prompt:</span>
+          <span class="cm-prompt-chip" id="${prefix}-cm-prompt">${howTo}</span>
+          <button class="brief-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('${prefix}-cm-prompt').textContent).then(()=>toast('✓ Counter-melody added to clipboard'))">Copy</button>
+        </div>` : ''}
+      </div>`;
+    })() : ''}
+
     ${!corePrompt&&!raw ? `<div style="padding:40px;text-align:center;color:var(--tx3);font-size:13px">Generate a song to see the Production Brief</div>` : ''}
   `;
 
@@ -3525,7 +3581,7 @@ function renderBrief(prefix, songPrompt, briefRaw) {
   const cc = el.querySelector('#brief-charcount');
   if (cc) {
     const len = corePrompt.length;
-    cc.style.color = len > 200 ? 'var(--red)' : len > 160 ? 'var(--amber)' : 'var(--green)';
+    cc.style.color = len > 440 ? 'var(--red)' : len > 380 ? 'var(--amber)' : 'var(--green)';
   }
 }
 
@@ -3949,7 +4005,7 @@ async function generateFromBuilder(){
   out.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:16px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Generating song from your prompt…</span></div>';
   try{
     const system='You are a world-class songwriter. Write exactly the format requested. No extra commentary.';
-    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 180 chars — use the production prompt above as base, optimise for Suno]`;
+    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 440 chars — use the production prompt above as base, include genre, instruments (4-5), BPM, tempo feel, vocal style, counter-melody device. Optimise for Suno/Udio.]`;
     const raw = await callClaude(fullPrompt, system, 2000);
     const title = parseSection(raw,'TITLE','LYRICS');
     const lyrics = parseSection(raw,'LYRICS','SUNO STYLE PROMPT');
@@ -3999,8 +4055,8 @@ function updBuilderPrompt(){
   if(previewEl) previewEl.textContent=prompt||'Select options above to generate your song production prompt…';
   const len=prompt.length;
   if(ccEl){
-    ccEl.textContent=len+'/200';
-    ccEl.className='ppcount '+(len>200?'over':len>160?'warn':'ok');
+    ccEl.textContent=len+'/440';
+    ccEl.className='ppcount '+(len>440?'over':len>380?'warn':'ok');
   }
 }
 function copyBuilderPrompt(){
@@ -4082,7 +4138,7 @@ function showFusion(g1,g2){
 async function generateFusion(){
   const {g1,g2,fd}=S.currentFusion||{};
   if(!g1)return;
-  const prompt=`Write a complete ${g1} × ${g2} genre fusion song.\n\n${fd?`Fusion style: ${fd.name}\nFormula: ${fd.formula}`:`Experimental fusion of ${g1} and ${g2}. Define what makes it work and write accordingly.`}\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics with all section tags]\n\nSONG PROMPT:\n[under 180 chars, specific instruments, no artist names]\n\nFUSION EXPLANATION:\n[2-3 sentences on how the two genres combine and what makes it work]`;
+  const prompt=`Write a complete ${g1} × ${g2} genre fusion song.\n\n${fd?`Fusion style: ${fd.name}\nFormula: ${fd.formula}`:`Experimental fusion of ${g1} and ${g2}. Define what makes it work and write accordingly.`}\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics with all section tags]\n\nSONG PROMPT:\n[under 440 chars, core genre, instruments (4-5), BPM, tempo, vocal descriptor, counter-melody device, no artist names]\n\nFUSION EXPLANATION:\n[2-3 sentences on how the two genres combine and what makes it work]`;
 
   btnLoad('fd-gen-btn','Writing…');
   document.getElementById('fd-out').innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Generating fusion song…</span></div>';
@@ -4168,7 +4224,7 @@ async function buildBlueprint(){
   const genre=document.getElementById('f-genre').options[document.getElementById('f-genre').selectedIndex].text;
   const topic=document.getElementById('f-topic').value||'finding peace after struggle';
   const emotion=document.getElementById('f-emotion').value;
-  const prompt=`Build a complete song blueprint.\nGenre: ${genre}\nTopic: ${topic}\nTarget emotion: ${emotion}\n\nDeliver with these exact headers:\n\nSONG TITLE: [title]\n\nSTRUCTURE MAP:\n[sections with bar counts]\n\nSECTION BLUEPRINT:\n[each section: emotional job, energy 1-10, 2 example opening lines]\n\nHOOK FORMULA:\n[chorus phrase + psychological reason it works]\n\nSONG PROMPT:\n[under 180 chars, no artist names]\n\nDOPAMINE MAP:\n[3 peak moments and what creates each]\n\nSUCCESS PREDICTION:\nViral Potential: X/10\nEmotional Depth: X/10\nCommercial Appeal: X/10`;
+  const prompt=`Build a complete song blueprint.\nGenre: ${genre}\nTopic: ${topic}\nTarget emotion: ${emotion}\n\nDeliver with these exact headers:\n\nSONG TITLE: [title]\n\nSTRUCTURE MAP:\n[sections with bar counts]\n\nSECTION BLUEPRINT:\n[each section: emotional job, energy 1-10, 2 example opening lines]\n\nHOOK FORMULA:\n[chorus phrase + psychological reason it works]\n\nSONG PROMPT:\n[under 440 chars, no artist names, include instruments (4-5), BPM, vocal style, counter-melody device]\n\nDOPAMINE MAP:\n[3 peak moments and what creates each]\n\nSUCCESS PREDICTION:\nViral Potential: X/10\nEmotional Depth: X/10\nCommercial Appeal: X/10`;
   btnLoad('f-btn','Building…');
   document.getElementById('f-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Building blueprint…</span></div></div>';
   try{
@@ -5140,7 +5196,7 @@ async function writeAllTracks() {
     const tr = alb.trackList[i];
     out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
     try {
-      const prompt = `Write a complete, production-ready song for this album track.\n\nAlbum: "${alb.name}"\nTrack role: ${tr.ttype}\nDescription: ${tr.desc}\nAlbum genre: ${alb.genre || 'pop'}\nAlbum arc context: ${alb.arc || 'part of a cohesive album'}\nTrack position: ${i+1} of ${alb.trackList.length}\n\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds\n- Every line specific — no vague emotions, no clichés\n- Dynamic contrast verse vs chorus\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 180 chars, Suno-optimised]`;
+      const prompt = `Write a complete, production-ready song for this album track.\n\nAlbum: "${alb.name}"\nTrack role: ${tr.ttype}\nDescription: ${tr.desc}\nAlbum genre: ${alb.genre || 'pop'}\nAlbum arc context: ${alb.arc || 'part of a cohesive album'}\nTrack position: ${i+1} of ${alb.trackList.length}\n\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds\n- Every line specific — no vague emotions, no clichés\n- Dynamic contrast verse vs chorus\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style + counter-melody device]`;
       const raw = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
       const title  = parseSection(raw,'TITLE','LYRICS');
       const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
@@ -5349,7 +5405,7 @@ async function importAndAnalyze() {
     const genreLabel = GENRE_LABELS[genre] || genre;
     const topicLine  = topic ? `Topic/Concept: ${topic}` : '';
     const raw = await callClaude(
-      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 180 chars. Core genre, 3-4 instruments, tempo feel, vocal descriptor. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
+      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 440 chars. Core genre, sub-genre feel, instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
       'You are a world-class songwriter, music producer, and AI music specialist. Analyse the provided lyrics and return only the requested format with no extra commentary.',
       900
     );
