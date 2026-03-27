@@ -2296,7 +2296,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect]
 
 LYRICS:
-[Complete lyrics. Tag every section: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.]
+[${bracketInstruction()}]
 
 SONG PROMPT:
 [Under 180 chars. Core genre, instruments (3-4), tempo feel, vocal descriptor. NO artist names.]
@@ -2493,8 +2493,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect with listeners]
 
 LYRICS:
-[Complete lyrics. Tag every section: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro] etc.
-4 lines per verse. 2-4 lines per chorus. Every word must earn its place.]
+[${bracketInstruction()} Every word must earn its place.]
 
 SONG PROMPT:
 [The AI music platform style prompt. Under 180 characters. Include: core genre, sub-genre feel, key instruments (3-4 max), tempo feel, vocal descriptor, production texture. NO artist names.]
@@ -4310,6 +4309,19 @@ function setBracket(el, mode) {
   S.bracketMode = mode;
   document.querySelectorAll('.bpill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
+}
+
+function bracketInstruction() {
+  const mode = S.bracketMode || 'basic';
+  if (mode === 'none')
+    return 'Write lyrics with NO section labels or brackets. Pure lyric text only — no [Verse], [Chorus] or any other tags.';
+  if (mode === 'basic')
+    return 'Tag every section with standard Suno brackets: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse. 2-4 lines per chorus.';
+  if (mode === 'enhanced')
+    return 'Tag every section with standard brackets ([Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]) AND add inter-song movement tags between sections where energy shifts occur — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. These guide the energy arc. 4 lines per verse. 2-4 lines per chorus.';
+  if (mode === 'experimental')
+    return 'Tag every section with detailed meta-brackets that include emotional context — e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also add production direction tags like [Quiet], [Intense], [Spoken], [Whispered] where they serve the song. 4 lines per verse. 2-4 lines per chorus.';
+  return 'Tag every section with standard Suno brackets: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse. 2-4 lines per chorus.';
 }
 
 async function enhanceConcept() {
