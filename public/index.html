@@ -3472,6 +3472,7 @@ function parseLuckyResult(raw,fusionName,meta){
   S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
   pushVersion('lres');
   renderVersionBar('lres');
+  updateShareHash(S.luckyCurrentSong);
   const _lrv=document.getElementById('lres-visual-content');if(_lrv)_lrv.dataset.loaded='';
   showCopyrightStrip('lres', title, lts);
   // Show revision bar
@@ -3891,6 +3892,7 @@ function parseSongResult(raw,genre,topic){
   // Push the new song as a version too
   pushVersion('res');
   renderVersionBar('res');
+  updateShareHash(S.currentSong);
   // reset visual cache so new song gets fresh visuals
   const _rv=document.getElementById('res-visual-content');if(_rv)_rv.dataset.loaded='';
   addToHistory(S.currentSong);
@@ -6520,6 +6522,14 @@ function loadVersion(prefix, idx) {
 // ═══════════════════════════════════════════════════════
 // FEATURE 9: SHAREABLE BRIEF LINK
 // ═══════════════════════════════════════════════════════
+function updateShareHash(song) {
+  if (!song) return;
+  try {
+    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(song))));
+    history.replaceState(null, '', '#share=' + encoded);
+  } catch(e) { /* silent fail */ }
+}
+
 function shareLink(prefix) {
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   if (!song) { toast('Generate a song first'); return; }
