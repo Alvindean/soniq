@@ -4,13 +4,21 @@
  * POST /api/generate
  */
 
-const anonUsage = new Map();
-function checkLimit(ip) {
+const rateLimitMap = new Map();
+const RATE_LIMIT = 10;
+const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+
+function checkRateLimit(ip) {
   const now = Date.now();
-  const e = anonUsage.get(ip);
-  if (!e || now - e.reset > 3600000) { anonUsage.set(ip,{count:1,reset:now}); return true; }
-  if (e.count >= 10) return false;
-  e.count++; return true;
+  const entry = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_WINDOW };
+  if (now > entry.resetAt) {
+    entry.count = 0;
+    entry.resetAt = now + RATE_WINDOW;
+  }
+  entry.count++;
+  rateLimitMap.set(ip, entry);
+  const remaining = Math.ceil((entry.resetAt - now) / 60000);
+  return { allowed: entry.count <= RATE_LIMIT, minutesLeft: remaining, count: entry.count };
 }
 
 async function callAnthropic(apiKey, messages, system, max_tokens) {
@@ -73,6 +81,26 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
 
+  let body;
+  try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
+  catch { return res.status(400).json({error:'Invalid JSON'}); }
+
+  if (body?.userKey) {
+    // User-supplied key: skip rate limit, use their key directly
+    const { messages, system, max_tokens = 2048 } = body;
+    if (!messages?.length) return res.status(400).json({error:'messages required'});
+    try {
+      const text = await callAnthropic(body.userKey, messages, system, max_tokens);
+      return res.status(200).json({content:[{type:'text', text}]});
+    } catch(err) {
+      return res.status(502).json({error: 'Anthropic error: ' + err.message});
+    }
+  }
+
+  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  const rl = checkRateLimit(ip);
+  if (!rl.allowed) return res.status(429).json({error: `Rate limit exceeded. Try again in ${rl.minutesLeft} minutes.`});
+
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const openrouterKey = process.env.OPENROUTER_API_KEY;
 
@@ -81,13 +109,6 @@ module.exports = async function handler(req, res) {
       error: 'No API key configured. Add ANTHROPIC_API_KEY or OPENROUTER_API_KEY in Vercel → Settings → Environment Variables, then Redeploy.'
     });
   }
-
-  const ip = (req.headers['x-forwarded-for']||'').split(',')[0].trim()||'unknown';
-  if (!checkLimit(ip)) return res.status(429).json({error:'Hourly limit reached. Try again soon.'});
-
-  let body;
-  try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
-  catch { return res.status(400).json({error:'Invalid JSON'}); }
 
   const { messages, system, max_tokens = 2048 } = body || {};
   if (!messages?.length) return res.status(400).json({error:'messages required'});
