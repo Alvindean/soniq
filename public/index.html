@@ -1094,6 +1094,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
           </div>
 
+          <!-- HOOK STYLE -->
+          <label class="bracket-label" style="margin-top:14px">Hook Style <span style="font-weight:400;color:var(--tx4);font-size:10px;text-transform:none;letter-spacing:0">— auto-detected from genre by default</span></label>
+          <div class="bracket-pills" id="hook-style-pills">
+            <span class="bpill on"  onclick="setHookStyle(this,'auto')">Auto (from genre)</span>
+            <span class="bpill" onclick="setHookStyle(this,'Smooth Sung')">Smooth Sung</span>
+            <span class="bpill" onclick="setHookStyle(this,'Melodic Auto-Tune')">Melodic / Auto-Tune</span>
+            <span class="bpill" onclick="setHookStyle(this,'Chanted')">Chanted</span>
+            <span class="bpill" onclick="setHookStyle(this,'Call & Response')">Call &amp; Response</span>
+            <span class="bpill" onclick="setHookStyle(this,'Screamed / Crunk')">Screamed / Crunk</span>
+            <span class="bpill" onclick="setHookStyle(this,'Southern Drawl')">Southern Drawl</span>
+            <span class="bpill" onclick="setHookStyle(this,'Rapped Hook')">Rapped Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Minimal / Groove')">Minimal / Groove</span>
+            <span class="bpill" onclick="setHookStyle(this,'Mantra')">Mantra</span>
+            <span class="bpill" onclick="setHookStyle(this,'Double Hook A+B')">Double Hook A+B</span>
+            <span class="bpill" onclick="setHookStyle(this,'Gospel Vamp')">Gospel Vamp</span>
+            <span class="bpill" onclick="setHookStyle(this,'Post-Hook Drop')">Post-Hook Drop</span>
+          </div>
+
         </div>
       </div>
 
@@ -1890,6 +1908,42 @@ const FORMULA_LAWS=[
   {n:'BPM groove lock',d:'120–130 BPM = walking cadence (pop/dance). 60–70 BPM = resting heartbeat (ballads). Matching tempo to physiology creates embodied engagement.',v:8},
 ];
 
+// Maps substyle → the bracket vocabulary that mirrors its production style
+const SUBSTYLE_BRACKETS={
+  'G-Funk':            { verse:'[16-bar Verse | Laid-Back | West Coast]', hook:'[Hook | Sung | Smooth | Nate Dogg style]', extra:['[Synth Whine Break]','[Outro Vamp]'] },
+  'Bay Area':          { verse:'[16-bar Verse | Hyphy | High Energy]',   hook:'[Hook | Hyphy | Call and Response | Crowd]', extra:['[Ghost Ride Break]','[Outro | Ad-libs]'] },
+  'Down South':        { verse:'[16-bar Verse | Southern Drawl]',         hook:'[Hook | Southern | Chant | Slow]',           extra:['[Trunk Music Break]','[Outro Vamp]'] },
+  'Crunk':             { verse:'[8-bar Verse | Rapid | Punchy]',          hook:'[Hook | Screamed | Call and Response | Crunk]', extra:['[Crunk Break]','[Crowd Chant]'] },
+  'Chopped & Screwed': { verse:'[16-bar Verse | Chopped | Slowed]',       hook:'[Hook | Chopped | Syrupy | Slow]',            extra:['[Screwed Break]','[Chopped Ad-libs]'] },
+  'Trap':              { verse:'[12-bar Verse | Trap | Rap Verse]',        hook:'[Hook | Melodic | Auto-Tune]',               extra:['[Trap Break]','[Outro | Fade-Out]'] },
+  'Boom Bap':          { verse:'[16-bar Verse | Boom Bap | Dense]',       hook:'[Hook | Rapped | Chanted]',                  extra:['[Boom Bap Break]','[Outro]'] },
+  'Melodic Rap':       { verse:'[16-bar Verse | Rap Verse | Melodic]',    hook:'[Hook | Sung | Melodic | Auto-Tune]',        extra:['[Bridge | Sung]','[Outro | Fade-Out]'] },
+  'Drill':             { verse:'[16-bar Verse | Drill | Dark]',            hook:'[Hook | Melodic | Dark | Drill]',            extra:['[Drill Break]','[Outro]'] },
+  'East Coast':        { verse:'[16-bar Verse | Boom Bap | Lyrical]',     hook:'[Hook | Chanted | Anthemic]',                extra:['[Boom Bap Break]','[Outro]'] },
+  'Midwest':           { verse:'[16-bar Verse | Soulful | Rap Verse]',    hook:'[Hook | Sung | Soul | Chipmunk]',            extra:['[Soul Break]','[Outro Vamp]'] },
+  'Cloud Rap':         { verse:'[16-bar Verse | Hazy | Slow Flow]',       hook:'[Hook | Ethereal | Whispered | Melodic]',    extra:['[Ambient Break]','[Outro | Fade-Out]'] },
+  'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Chanted | Anthemic | Conscious]',    extra:['[Spoken Word Bridge]','[Outro]'] },
+  'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Rapped | Classic]',                  extra:['[Scratch Break]','[Outro]'] },
+};
+
+// Maps hook style → full DNA instruction injected into the prompt
+const HOOK_STYLE_NOTES={
+  'auto':          '',  // auto = derived from substyle/genre
+  'Smooth Sung':   'HOOK STYLE: Smooth sung hook — Nate Dogg / R&B crooner delivery. 8 bars, 4 unique melodic lines. The hook carries the emotional memory of the entire song. Long vowels, easy to sing along to, settles into the groove.',
+  'Melodic Auto-Tune': 'HOOK STYLE: Melodic auto-tune hook — Drake/Future/Lil Baby style. 8 bars, simple pitch-bent phrases, few words maximum impact. Auto-tune is a melody instrument not correction. Hook repeats 4-6× total.',
+  'Chanted':       'HOOK STYLE: Chanted / anthemic hook — Kendrick / boom bap style. Short punchy phrase, crowd-participation ready. Rhythm of the chant IS the hook. Hard consonants on the beat. 4-8 bars.',
+  'Call & Response': 'HOOK STYLE: Call and response hook — lead line, crowd responds. Two distinct parts: call (lead vocal, 1-2 bars) + response (answer phrase or chant, 1-2 bars). Repeat 4 times. OutKast, Bay Area, gospel tradition.',
+  'Screamed / Crunk': 'HOOK STYLE: Crunk screamed hook — maximum energy, 2-4 words per phrase, shouted not sung. Call and response between two voices. Ultra-repetitive, designed for the club floor. Under 4 bars, loops 6+ times.',
+  'Southern Drawl': 'HOOK STYLE: Southern drawl hook — slow, elongated vowels, laid-back against the 808 bass. Hook hits AFTER the beat (behind the bar). Southern pride theme. 8 bars, slow deliberate delivery.',
+  'Chopped':       'HOOK STYLE: Chopped & screwed hook — the hook phrase is repeated and "chopped" (cut and restarted mid-word). Syrupy pitch, 65-75 BPM feel. Every other syllable slightly elongated. Slurred delivery.',
+  'Rapped Hook':   'HOOK STYLE: Rapped hook — bars delivered at verse speed but the phrase is hook-catchy. Dense rhyme, melodic cadence in the flow itself. Eminem / Jay-Z / Big Pun tradition. 4-8 bars.',
+  'Minimal / Groove': 'HOOK STYLE: Minimal groove hook — Future / 21 Savage style. 2-4 words, maximum repetition. The GROOVE carries the hook, not the lyric. Long spaces between phrases. Hypnotic through simplicity.',
+  'Mantra':        'HOOK STYLE: Mantra hook — one devastating line, looped. The entire hook IS one sentence, repeated 4-8 times with slight variation. "Never broke again." "HUMBLE." Power through repetition not complexity.',
+  'Double Hook A+B': 'HOOK STYLE: Double hook — two distinct hook sections back to back. Hook A (4 bars, melodic/sung) → Hook B (4 bars, different cadence/energy, rapped or chanted). Travis Scott / Kanye style. Creates two earworms in one.',
+  'Gospel Vamp':   'HOOK STYLE: Gospel vamp hook — the hook repeats and ad-libs ESCALATE over it. Start simple, each repeat adds a new ad-lib or harmony layer. Outro vamp version goes 2-3 minutes, building to emotional peak. Sam Smith, Beyoncé, Kirk Franklin tradition.',
+  'Post-Hook Drop':'HOOK STYLE: Hook + post-hook drop. Main hook (4 bars sung/melodic) → Post-hook (2-bar punchy instrumental or vocal phrase that lands like a punch). The post-hook is where the bass drops or the sample flips.',
+};
+
 const SUBSTYLE_NOTES={
   // Hip-Hop regional/era deep notes injected alongside substyleNote
   'G-Funk':      'G-Funk DNA: 90-100 BPM, slow rolling groove. Synthesizer whine (Moog/Roland), P-Funk bass samples (Parliament-Funkadelic). Laid-back West Coast flow — lines stretch over the beat, never rushed. Imagery: Lowriders, sunshine, Crenshaw, Pacific Coast. Nate Dogg-style melodic sung hooks. Suno style: "g-funk, moog synth whine, west coast hip-hop, slow rolling 808, 95 BPM, smooth melodic hook". Artists: Dr. Dre, Snoop Dogg, Warren G, Nate Dogg, Tha Dogg Pound.',
@@ -2001,7 +2055,7 @@ const FUSION_DATA={
 // STATE
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
-  quality:'viral',substyle:'',selectedLength:'short',
+  quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]'),
   luckyHistory:[],sessionHistory:[],
@@ -2605,8 +2659,13 @@ async function generateSong(){
 - [Triplet Flow] section: use rapid 3-syllable rolling groups (da-da-DUM cadence, twice the syllable density).
 - [Double Time] section: twice as many syllables per bar — dense, rapid-fire delivery.
 - [Beat Switch]: the section after must feel like a completely different song (different energy, flow, topic angle).
-- Hook must be melodic and singable — 8 bars, simple phrase that earns its repetition.
 - Internal rhymes every 2-3 syllables add density on top of end rhymes.`:'';
+  // Hook style note — explicit override or auto-derived from substyle
+  const resolvedHookStyle = (S.hookStyle && S.hookStyle !== 'auto') ? S.hookStyle
+    : ({Trap:'Melodic Auto-Tune','G-Funk':'Smooth Sung','Bay Area':'Call & Response','Down South':'Southern Drawl','Crunk':'Screamed / Crunk','Chopped & Screwed':'Chopped','Boom Bap':'Chanted','East Coast':'Rapped Hook','Cloud Rap':'Minimal / Groove','Gospel':'Gospel Vamp'}[S.substyle] || null);
+  const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle]
+    ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}`
+    : '';
   // Clear album context after use so it doesn't carry over to next song
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
 
@@ -2638,7 +2697,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}${hookNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -4605,21 +4664,32 @@ function setBracket(el, mode) {
   el.classList.add('on');
 }
 
+function setHookStyle(el, style) {
+  S.hookStyle = style;
+  document.querySelectorAll('#hook-style-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+}
+
 function bracketInstruction() {
-  const mode   = S.bracketMode || 'basic';
-  const isRap  = (S.selectedGenre === 'hiphop');
+  const mode     = S.bracketMode || 'basic';
+  const isRap    = (S.selectedGenre === 'hiphop');
+  const substyle = S.substyle || '';
+  const sb       = SUBSTYLE_BRACKETS[substyle]; // substyle-specific vocab
 
   if (mode === 'none')
     return 'SECTION TAGS: Write the lyrics with absolutely NO section labels, headers, or brackets of any kind. Pure lyric lines only.';
 
   if (isRap) {
-    // Hip-hop gets its own tag vocabulary regardless of mode
+    const verseTag = sb ? sb.verse : '[16-bar Verse | Rap Verse]';
+    const hookTag  = sb ? sb.hook  : '[8-bar Hook]';
+    const extras   = sb ? sb.extra.join(', ') : '[Beat Switch], [Outro | Fade-Out]';
+
     if (mode === 'basic')
-      return 'SECTION TAGS: Use hip-hop Suno brackets on their own line. Structure tags: [Intro | Beat Only], [Rap Verse], [Hook], [Bridge], [Outro]. Include bar counts matching the structure (e.g. [16-bar Rap Verse], [8-bar Hook]). Write ad-libs in parentheses inline: "grind never stops (yeah) came up (uh)".';
+      return `SECTION TAGS: Use hip-hop Suno brackets on their own line with bar counts. Verse tag: ${verseTag}. Hook tag: ${hookTag}. Also use: [4-bar Intro | Beat Only], [Bridge], [Outro]. Ad-libs in parentheses inline: "came from nothing (yeah) built this (uh)".`;
     if (mode === 'enhanced')
-      return 'SECTION TAGS: Use hip-hop brackets with flow direction on their own line: [16-bar Rap Verse], [8-bar Hook], [Triplet Flow], [Double Time], [Beat Switch], [Ad-libs], [Outro | Fade-Out]. Insert flow-change tags between sections where the delivery shifts. Ad-libs in parentheses inline: (yeah) (uh) (let\'s go).';
+      return `SECTION TAGS: Use hip-hop brackets with flow direction. Verse: ${verseTag}. Hook: ${hookTag}. Add movement tags between sections: [Triplet Flow], [Double Time], [Beat Switch], [Ad-libs]. Extra style tags: ${extras}. Ad-libs in parentheses inline: (yeah) (uh) (let's go).`;
     if (mode === 'experimental')
-      return 'SECTION TAGS: Use full hip-hop meta-brackets on their own line with emotional + flow context: [16-bar Verse 1 | establishing the hustle], [8-bar Hook | sung | melodic], [16-bar Verse 2 | Double Time | escalating], [Beat Switch], [16-bar Verse 3 | Triplet Flow | resolution]. Add production tags: [Hard 808s], [Minimalist Beat], [Chopped Vocal Ad-libs]. Inline ad-libs in parentheses.';
+      return `SECTION TAGS: Full hip-hop meta-brackets with emotional + flow context. Verse: ${verseTag.replace(']', ' | establishing scene]')}. Hook: ${hookTag.replace(']', ' | emotional peak]')}. Scale intensity each verse: Verse 1 normal → Verse 2 Double Time → Verse 3 Triplet Flow. Extra tags: ${extras}. Production tags: [Hard 808s], [Minimalist Beat], [Chopped Vocal Ad-libs]. Inline ad-libs in parentheses.`;
   }
 
   if (mode === 'basic')
