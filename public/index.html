@@ -1017,14 +1017,33 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="param">
           <div class="param-label">Structure</div>
           <select id="g-structure">
-            <option value="standard">Standard V-PC-C-V-PC-C-B-C</option>
-            <option value="hookfirst">Hook-First (modern)</option>
-            <option value="storytelling">Storytelling Arc</option>
-            <option value="minimal">Minimal / Loop</option>
-            <option value="epic">Epic (8 sections)</option>
-            <option value="verseonly">Verse-Only (folk/SS)</option>
-            <option value="riddim">Riddim Loop (reggae)</option>
-            <option value="kpop">K-Pop (pre-chorus + key change)</option>
+            <optgroup label="— General —">
+              <option value="standard">Standard V-PC-C-V-PC-C-B-C</option>
+              <option value="hookfirst">Hook-First (modern streaming)</option>
+              <option value="chorusfirst">Chorus-First (radio pop)</option>
+              <option value="doublechorus">Double Chorus (arena pop)</option>
+              <option value="storytelling">Storytelling Arc (3 verses)</option>
+              <option value="minimal">Minimal / Loop</option>
+              <option value="epic">Epic (8 sections)</option>
+              <option value="verseonly">Verse-Only (folk/SS)</option>
+              <option value="aaba">AABA 32-bar (jazz/classic)</option>
+              <option value="ballad">Ballad / Cinematic (key change)</option>
+              <option value="edm">EDM Build-Drop</option>
+              <option value="viral">TikTok / Viral (hook at 0:00)</option>
+            </optgroup>
+            <optgroup label="— Hip-Hop / Rap —">
+              <option value="hiphop_classic">Classic Hip-Hop (3×16-bar verses)</option>
+              <option value="hiphop_trap">Trap (hook-first, 12-bar verses)</option>
+              <option value="hiphop_beatswitch">Beat Switch (SICKO MODE style)</option>
+              <option value="hiphop_storytelling">Storytelling Rap (3×24-bar, no hook)</option>
+              <option value="hiphop_melodic">Melodic Rap / R&amp;B Crossover</option>
+            </optgroup>
+            <optgroup label="— Genre-Specific —">
+              <option value="riddim">Riddim Loop (reggae)</option>
+              <option value="afrobeats">Afrobeats Vamp</option>
+              <option value="gospel">Gospel / R&amp;B Vamp</option>
+              <option value="kpop">K-Pop (pre-chorus + key change)</option>
+            </optgroup>
           </select>
         </div>
       </div>
@@ -1075,6 +1094,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
           </div>
 
+          <!-- HOOK STYLE -->
+          <label class="bracket-label" style="margin-top:14px">Hook Style <span style="font-weight:400;color:var(--tx4);font-size:10px;text-transform:none;letter-spacing:0">— auto-detected from genre by default</span></label>
+          <div class="bracket-pills" id="hook-style-pills">
+            <span class="bpill on"  onclick="setHookStyle(this,'auto')">Auto (from genre)</span>
+            <span class="bpill" onclick="setHookStyle(this,'Smooth Sung')">Smooth Sung</span>
+            <span class="bpill" onclick="setHookStyle(this,'Melodic Auto-Tune')">Melodic / Auto-Tune</span>
+            <span class="bpill" onclick="setHookStyle(this,'Chanted')">Chanted</span>
+            <span class="bpill" onclick="setHookStyle(this,'Call & Response')">Call &amp; Response</span>
+            <span class="bpill" onclick="setHookStyle(this,'Screamed / Crunk')">Screamed / Crunk</span>
+            <span class="bpill" onclick="setHookStyle(this,'Southern Drawl')">Southern Drawl</span>
+            <span class="bpill" onclick="setHookStyle(this,'Rapped Hook')">Rapped Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Minimal / Groove')">Minimal / Groove</span>
+            <span class="bpill" onclick="setHookStyle(this,'Mantra')">Mantra</span>
+            <span class="bpill" onclick="setHookStyle(this,'Double Hook A+B')">Double Hook A+B</span>
+            <span class="bpill" onclick="setHookStyle(this,'Gospel Vamp')">Gospel Vamp</span>
+            <span class="bpill" onclick="setHookStyle(this,'Post-Hook Drop')">Post-Hook Drop</span>
+          </div>
+
         </div>
       </div>
 
@@ -1101,18 +1138,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
                 <option value="rnb">R&B / Soul</option><option value="rock">Rock</option>
                 <option value="country">Country</option><option value="edm">EDM / Electronic</option>
                 <option value="latin">Latin</option><option value="reggaeton">Reggaeton</option>
-                <option value="folk">Folk</option><option value="latin">Latin</option>
-                <option value="metal">Metal</option><option value="jazz">Jazz</option>
-                <option value="ss">Singer-Songwriter</option><option value="altrock">Alt-Rock</option>
-                <option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option>
-                <option value="blues">Blues</option><option value="punk">Punk</option>
-                <option value="kpop">K-Pop</option>
+                <option value="folk">Folk</option><option value="metal">Metal</option>
+                <option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option>
+                <option value="altrock">Alt-Rock</option><option value="reggae">Reggae</option>
+                <option value="afrobeats">Afrobeats</option><option value="blues">Blues</option>
+                <option value="punk">Punk</option><option value="kpop">K-Pop</option>
+                <option value="neosoul">Neo-Soul</option><option value="gospel">Gospel</option>
+                <option value="children">Children's</option><option value="parody">Parody</option>
+                <option value="comedy">Comedy</option><option value="tvmusical">TV / Musical</option>
               </select>
             </div>
             <div class="blend-field">
               <label>Writing Style Influence</label>
               <select id="g-style2">
                 <option value="">— None —</option>
+                <option value="soul">Soul (classic soul warmth, raw emotion)</option>
+                <option value="funk">Funk (groove-first, syncopated, James Brown DNA)</option>
+                <option value="lofi">Lo-Fi (vinyl crackle, dusty, bedroom warmth)</option>
+                <option value="folkworld">Folk World (Celtic, West African, Appalachian, global roots)</option>
                 <option value="gospel">Gospel / Spiritual</option>
                 <option value="spoken_word">Spoken Word / Slam Poetry</option>
                 <option value="cinematic">Cinematic / Narrative</option>
@@ -1815,6 +1858,20 @@ const SONGS={
 };
 
 const GENRE_BIBLE={
+  hiphop:{
+    dna:'Bars are currency — 1 bar = 1 line. 16-bar verse = 16 lines. Hook = 8 bars = 8 lines (or 4 unique lines repeated). Ad-libs in parentheses: (yeah) (uh) (let\'s go). Internal rhymes every 2-3 syllables create density. Flow variation (normal → double time → triplet) is the surprise weapon.',
+    structure:'Classic: [16-bar Verse] × 3 with [8-bar Hook]. Trap: [8-bar Hook] → [12-bar Verse] repeated with hook 4-6×. Beat Switch: two complete song sections at different BPMs joined by [Beat Switch]. Bar 16 of every verse = the punchline. 4-bar groups: bars 1-4 setup, 5-8 develop, 9-12 deepen, 13-16 payoff.',
+    suno:'"trap, 808 bass, hard snare, rolling hi-hats, 140 BPM" for trap. "boom bap, vinyl crackle, jazz sample, hard kick, 90 BPM" for classic. "melodic rap, atmospheric, auto-tune, 120 BPM" for melodic. Always specify BPM. Use [Rap Verse] to prevent Suno singing the verse.',
+    keys:[
+      '1 bar = 1 line — write exactly the bar count specified in the structure. 16-bar verse = 16 lines, no more, no less',
+      'Ad-libs belong in parentheses on the same line: "I got it (yeah) from nothing (uh)" — Suno renders these as background interjections',
+      '[Triplet Flow] = rolling 3-syllable subdivisions (da-da-DUM). [Double Time] = twice the syllables per bar. Use [Beat Switch] for full BPM/key change',
+      'Hook must be melodically singable even in a rap song — it carries the emotional memory. Trap hooks repeat 4-6× total across the song',
+      'Verse structure within 16 bars: bars 1-4 establish scene/topic, bars 5-8 develop, bars 9-12 complicate or contrast, bar 16 is always the punchline or emotional peak',
+      'Internal rhymes every 2-3 syllables add density beyond end rhymes. Chain rhymes across 4-bar units create momentum'
+    ],
+    artists:'Kendrick Lamar · Drake · Travis Scott · J. Cole · Eminem · Future · Lil Baby · Tyler the Creator · 21 Savage · Gunna · Nas · Jay-Z'
+  },
   ss:{dna:'Voice, acoustic guitar, emotional truth, first-person narrative, autobiographical imagery. The song is the diary entry.',structure:'Most flexible genre. Verse-only (no chorus), VCVCBC, or through-composed. The STORY determines structure — not a template.',suno:'"fingerpicked acoustic guitar, intimate close-mic vocals, warm room reverb, no drums" for stripped. Add "brushed snare, upright bass" for fuller feel.',keys:['Every line must earn its place — no filler','Specificity creates universality — house numbers, dog names, street names','Second verse must deepen emotionally, not repeat the first','Guitar tuning is a character — mention DADGAD or open G in style'],artists:'Tracy Chapman · Joni Mitchell · Elliott Smith · Bon Iver · Phoebe Bridgers · Paul Simon · Brandi Carlile'},
   altrock:{dna:'Indie ethos + rock power + outsider perspective. Distortion as emotional language. Quiet-loud dynamic is the core structural move.',structure:'VPCVC with massive dynamic variance. Quiet verse (clean guitar, restrained vocal) → explosive chorus (distortion, full drums, pushed vocal).',suno:'Sub-genre specific: "shoegaze, wall of sound" vs "post-punk, angular guitars, Joy Division atmosphere" vs "indie rock, jangly clean guitars".',keys:['Chorus must be earned — verse tension must build to a real release','Distortion is an emotion — use it purposefully','Alt-rock lyrics embrace ambiguity — specific images, opaque meaning','Bridge should recontextualize the chorus, not just repeat it'],artists:'Radiohead · Pixies · Pavement · Modest Mouse · The National · Interpol · Arctic Monkeys · Mitski'},
   reggae:{dna:'Offbeat skank (guitar chop on beats 2&4), one-drop drum (kick on beat 3), bass as melody, spiritual/political consciousness, community and resistance.',structure:'Long meditative verses. Chorus is comforting mantra, not explosive hook. Outro vamps are essential — let the groove breathe and fade slowly.',suno:'"reggae, one-drop rhythm, offbeat skank guitar, melodic bass, roots reggae" for classic. "Dancehall, digital riddim, 90 BPM" for modern.',keys:['Bass is the lead instrument — it carries melody','Chorus is resolution, not climax — reggae builds peace not tension','Outro vamp is non-negotiable','Add [dub break] in Suno for echo/reverb instrumental section'],artists:'Bob Marley · Peter Tosh · Burning Spear · Jimmy Cliff · Toots · Damian Marley · Chronixx'},
@@ -1842,6 +1899,90 @@ const GENRE_BIBLE={
     artists:'Daddy Yankee · J Balvin · Bad Bunny · Ozuna · Karol G · Maluma · Nicky Jam · Rauw Alejandro'
   },
   punk:{dna:'3 chords, max 3 minutes, political or personal fury, anti-production aesthetic, speed as ideology, DIY ethic.',structure:'Fast VCVCBC or just VCV. No solos usually. Verse = setup. Chorus = explosion. Speed to end is valid.',suno:'"punk rock, distorted guitar, fast drums, raw production, 180 BPM, aggressive vocals" for classic. "Post-punk, angular guitar, bass-forward, 140 BPM" for post-punk.',keys:['Every second wasted is ideologically wrong — cut everything that does not serve the fury','Chorus should be a slogan — 4-8 words, shoutable','Production should sound slightly wrong — too loud, slightly clipping','Personal fury is timeless; political specificity ages'],artists:'Sex Pistols · The Clash · Ramones · Dead Kennedys · Black Flag · Wire · Bikini Kill · Green Day'},
+  parody:{
+    dna:'Comedy through musical weaponization. A parody rewrites a recognizable song with absurdist/satirical/comedic lyrics while keeping the melody and structure intact. The humor lives in the gap between the serious original form and the ridiculous subject matter. Commitment to the bit is everything — play it completely straight musically. Specificity is the engine of comedy: "a cat who knocks glasses off tables" beats "a mischievous cat" every time.',
+    structure:'Mirror the original song structure exactly — same verse lengths, same chorus, same bridge placement. The comedic contrast between the production seriousness and the lyrical absurdity IS the joke. Use the original song\'s exact section count. Never break the parody frame mid-song.',
+    suno:'Match the original song\'s production style exactly. If parodying a power ballad: "dramatic piano, soaring strings, stadium rock, emotional vocal". If parodying trap: "trap beat, 808 bass, auto-tune". The music should sound serious — the comedy is entirely lyrical.',
+    keys:[
+      'The setup rule: establish the absurd premise clearly in the first 4 lines of verse 1 — never bury the joke',
+      'Callback structure: introduce a specific image in verse 1, callback and escalate it in verse 2, payoff in the bridge',
+      'Chorus is the punchline delivery system — it must be immediately singable AND the funniest part',
+      'Commitment rule: never wink at the camera. Play every line completely straight. The music is always sincere',
+      'Rule of threes in comedy: setup, setup, subvert. Two expected things then one unexpected. Works at line level too',
+      'Specificity is the engine: "I ate seventeen hot pockets" > "I ate a lot of food". Proper nouns, numbers, brand names'
+    ],
+    artists:'Weird Al Yankovic · Flight of the Conchords · Lonely Island · Bo Burnham · "Weird Al" · Garfunkel & Oates · Tim Minchin'
+  },
+  comedy:{
+    dna:'Original comedic songs — not parody rewrites but purpose-built funny songs. Musical comedy weaponizes genre conventions for laughs: the earnest folk song about mundane frustration, the over-produced ballad about pizza, the gangster rap about doing taxes. Structure serves the joke. The genre itself is the straight man. Comedy comes from subverting expectations, from specificity, from escalation.',
+    structure:'Three-act joke structure mapped to verse/chorus/bridge. Verse 1: establish the premise. Verse 2: complications and escalation. Bridge: the twist or darkest point. Final chorus: subverted to reflect the journey. Always end on the biggest laugh.',
+    suno:'Intentional genre mismatch amplifies comedy. Use "epic orchestral, dramatic, soaring" for a song about grocery shopping. Use "soft folk ballad, acoustic, intimate" for absurd dark content. The production sincerity is the straight man to the comedy. Specify genre that contrasts the subject.',
+    keys:[
+      'The comedy premise must be stated or implied in the title and first verse — do not bury the setup',
+      'Escalation rule: each verse should raise the stakes of the absurdity. Verse 1 is silly, Verse 2 is committed, Bridge is unhinged',
+      'Musical genre should be played completely straight — the comedy is lyrical, not musical',
+      'End on the biggest laugh — the final line of the song is the punchline, always',
+      'Puns and wordplay: use sparingly — one great pun per song, not wall-to-wall. Subverted clichés hit harder than straight puns',
+      'The bridge is the darkest/most absurd escalation — then the final chorus lands with the full weight of the joke'
+    ],
+    artists:'Bo Burnham · Flight of the Conchords · Lonely Island · "Weird Al" Yankovic · Tim Minchin · Garfunkel & Oates · Stephen Lynch · Tenacious D'
+  },
+  tvmusical:{
+    dna:'Music written for narrative context: TV themes, film scores, Broadway/musical theater, video game OSTs, jingles. Every song has a DRAMATIC FUNCTION — it advances plot, reveals character, creates atmosphere, or sells a product. The lyric is always in service of something beyond itself. Musical theater in particular: characters sing what they cannot say in dialogue — the song is the emotional eruption.',
+    structure:'Musical theater: AABA, VCVCBC, or through-composed based on dramatic need. TV theme: 30-90 seconds, premise statement in verse, identity hook in chorus. Jingle: 15-60 seconds, product name in hook 3+ times, problem/solution structure. Film score: follows visual rhythm, no fixed structure.',
+    suno:'TV theme: "catchy, memorable, [genre of show] theme song, 90s sitcom" or "dramatic TV theme, orchestral, HBO prestige". Musical theater: "Broadway musical, theatrical vocals, show tune, orchestral pit band". Jingle: "upbeat jingle, major key, catchy, commercial, [brand feeling]". Always specify the exact use case.',
+    keys:[
+      'TV theme rule: the audience must know what kind of show this is within 5 seconds — genre, tone, era, class',
+      'Musical theater: the song must start where spoken dialogue left off emotionally — it is the overflow of feeling',
+      'Character voice: every musical theater song must sound like IT COULD ONLY be sung by this character in this moment',
+      'Jingle: product name minimum 3 times. Problem in verse, solution/product in chorus. Benefit not feature',
+      'The "I want" song (musical theater): character states their deepest desire in the bridge — this is the emotional core',
+      'Reprise strategy: the same melody with changed lyrics at the end of Act 2 hits harder than any new song'
+    ],
+    artists:'Stephen Sondheim · Lin-Manuel Miranda · Andrew Lloyd Webber · Jerry Herman · Joss Whedon · Mark Shaiman · Alan Menken · John Williams · Ennio Morricone'
+  },
+  neosoul:{
+    dna:'D\'Angelo, Erykah Badu, Lauryn Hill, Bilal, Maxwell — the collision of classic soul (raw emotion, live instrumentation, vulnerability) and hip-hop production aesthetics (head-nodding groove, layered samples, lo-fi warmth). Neo-soul is anti-formula: it breathes, it drags beats deliberately, it leaves space. Vocals are instruments — improvised runs, ad-libs that ARE the lyric. Production feels human and imperfect on purpose.',
+    structure:'Loose and groove-led. Hook is not always the loudest moment — sometimes the vocal vamp in the outro IS the song. Intros are often long instrumental grooves before the vocal enters (8-16 bars). Bridges frequently go to a half-time feel. Songs end on extended vamps, not hard stops.',
+    suno:'"neo-soul, Rhodes piano, Fender bass, warm vinyl warmth, head-nod groove, live drums with swing, 85-95 BPM" for classic. "neo-soul, 90s hip-hop drums, soul vocals, Dilla-style off-beat, warm, soulful" for hip-hop adjacent. "neo-soul ballad, piano, strings, intimate, vulnerability" for slow. Always specify "live feel, swing" — not quantized.',
+    keys:[
+      'Groove before hook: the beat must make the listener nod before the vocal arrives. Never rush the entrance',
+      'Imperfection is the aesthetic: slightly late snares (J Dilla feel), crackle, room sound, breath in the mic',
+      'Vocal ad-libs are not decoration — they are parallel lyrics that carry equal emotional weight to the main line',
+      'Leave space: the rests ARE the music. Silence between phrases creates tension more powerful than constant vocal',
+      'The outro vamp escalates emotionally — it should be the most cathartic part of the song, not a fade-out afterthought',
+      'Lyrics avoid cliché with surgical specificity: sensory detail, time-stamped moments, names of places and things'
+    ],
+    artists:'D\'Angelo · Erykah Badu · Lauryn Hill · Maxwell · Bilal · India.Arie · Musiq Soulchild · Common · Jill Scott · Frank Ocean · H.E.R. · SZA'
+  },
+  gospel:{
+    dna:'Music as spiritual encounter — not performance but worship, testimony, and collective catharsis. Call-and-response at its DNA core: leader calls, congregation answers. The song builds to a moment of release (the "shout") where emotion overflows technique. Three traditions: Traditional Gospel (Thomas Dorsey, Mahalia Jackson — piano, choir, testimony), Contemporary Gospel (Kirk Franklin — pop production, hip-hop rhythms, mass choir), Worship/CCM (Chris Tomlin, Hillsong — arena rock, CCLI, corporate worship). Each has distinct rules.',
+    structure:'Gospel resists fixed structure because it serves the Spirit — the song goes where the moment leads. Typically: Verse (testimony/setup) → Pre-Chorus (tension building) → Chorus (declaration) → Bridge (the highest emotional point — often repeated 4-8x as the choir vamps) → Outro Vamp (where the real church happens — this section can last minutes). Never cut the outro vamp short.',
+    suno:'"traditional gospel, Hammond B3 organ, choir, piano, hand claps, call and response, soul" for classic. "contemporary gospel, Kirk Franklin style, hip-hop beat, mass choir, full production, celebratory" for modern. "worship ballad, piano, strings, intimate, congregational, 75 BPM" for CCM/worship. "southern gospel, acoustic, quartet, harmonies" for country gospel.',
+    keys:[
+      'Call-and-response is structural, not decorative — write the congregation\'s response line as carefully as the lead',
+      'The bridge is the climax, not the chorus — in gospel the bridge is repeated and escalated until the room breaks open',
+      'Testimony structure: I WAS lost/broken/struggling → God moved/intervened → NOW I am free/healed/changed. The arc is transformation',
+      'Dynamics are everything: whisper the verse, speak the pre-chorus, DECLARE the chorus, SHOUT the bridge',
+      'The vamp outro MUST be written — this is where 80% of the emotional impact lives. Write 4-8 lines to cycle through',
+      'Contemporary gospel: the beat must make you move before the lyric lands. Rhythm serves spirit, spirit serves rhythm'
+    ],
+    artists:'Mahalia Jackson · Thomas Dorsey · Andraé Crouch · Kirk Franklin · Yolanda Adams · Donnie McClurkin · BeBe & CeCe Winans · Fred Hammond · Tye Tribbett · Maverick City Music · Hillsong · Chris Tomlin'
+  },
+  children:{
+    dna:'Music for ages 2-10 — but great children\'s music (Raffi, They Might Be Giants, "Mister Rogers") works for adults too because it operates on multiple levels simultaneously. Core rules: simple melodies (5-note range ideal), repetition is a feature not a flaw, every listen rewards a child (singability, motion), vocabulary stays accessible without being condescending. Themes: wonder, kindness, the natural world, belonging, imagination, small everyday adventures. The best children\'s songs teach without ever saying "lesson".',
+    structure:'Short (90 seconds - 3 minutes). VCVCBC or VCV. Chorus/hook must be singable after ONE listen — maximum 8 words. Verses teach something new each time. Bridge is an adventure or a question. Outro brings safety/resolution. Physical motion cues embedded in lyrics (clap, stomp, spin, jump) make songs interactive.',
+    suno:'"children\'s song, ukulele, hand claps, playful, major key, bright, warm, singalong" for classic. "educational children\'s song, upbeat, acoustic guitar, glockenspiel, 110 BPM, joyful" for school. "lullaby, soft, gentle, acoustic, 60 BPM, warm, soothing" for bedtime. "children\'s pop, modern production, fun, energetic, 120 BPM" for contemporary. Always specify age target.',
+    keys:[
+      'Singability above everything: if a 5-year-old cannot sing it back after 2 listens, simplify the melody or shorten the line',
+      'Repetition rule: the chorus should repeat at least 3-4 times. Children learn through repetition — this is the feature, not a flaw',
+      'Every verse should answer a child\'s question or describe something they recognize from their world',
+      'Physical movement cues: embed "clap," "stomp," "spin," "shake" as lyric actions — make the song a physical experience',
+      'Never condescend — wonder and curiosity are adult emotions too. Write UP to children\'s imagination, not DOWN to their vocabulary',
+      'Bedtime songs: descending melody, slowing tempo in each verse, safety and love in every image — the child must feel held'
+    ],
+    artists:'Raffi · They Might Be Giants · Mister Rogers · Elizabeth Mitchell · Laurie Berkner · Disney songwriters (Sherman Brothers, Alan Menken) · Sesame Street · Jack Johnson (Curious George) · Carly Rae Jepsen'
+  },
 };
 
 const FORMULA_LAWS=[
@@ -1857,9 +1998,126 @@ const FORMULA_LAWS=[
   {n:'BPM groove lock',d:'120–130 BPM = walking cadence (pop/dance). 60–70 BPM = resting heartbeat (ballads). Matching tempo to physiology creates embodied engagement.',v:8},
 ];
 
+// Maps substyle → the bracket vocabulary that mirrors its production style
+const SUBSTYLE_BRACKETS={
+  'G-Funk':            { verse:'[16-bar Verse | Laid-Back | West Coast]', hook:'[Hook | Sung | Smooth | Nate Dogg style]', extra:['[Synth Whine Break]','[Outro Vamp]'] },
+  'Bay Area':          { verse:'[16-bar Verse | Hyphy | High Energy]',   hook:'[Hook | Hyphy | Call and Response | Crowd]', extra:['[Ghost Ride Break]','[Outro | Ad-libs]'] },
+  'Down South':        { verse:'[16-bar Verse | Southern Drawl]',         hook:'[Hook | Southern | Chant | Slow]',           extra:['[Trunk Music Break]','[Outro Vamp]'] },
+  'Crunk':             { verse:'[8-bar Verse | Rapid | Punchy]',          hook:'[Hook | Screamed | Call and Response | Crunk]', extra:['[Crunk Break]','[Crowd Chant]'] },
+  'Chopped & Screwed': { verse:'[16-bar Verse | Chopped | Slowed]',       hook:'[Hook | Chopped | Syrupy | Slow]',            extra:['[Screwed Break]','[Chopped Ad-libs]'] },
+  'Trap':              { verse:'[12-bar Verse | Trap | Rap Verse]',        hook:'[Hook | Melodic | Auto-Tune]',               extra:['[Trap Break]','[Outro | Fade-Out]'] },
+  'Boom Bap':          { verse:'[16-bar Verse | Boom Bap | Dense]',       hook:'[Hook | Rapped | Chanted]',                  extra:['[Boom Bap Break]','[Outro]'] },
+  'Melodic Rap':       { verse:'[16-bar Verse | Rap Verse | Melodic]',    hook:'[Hook | Sung | Melodic | Auto-Tune]',        extra:['[Bridge | Sung]','[Outro | Fade-Out]'] },
+  'Drill':             { verse:'[16-bar Verse | Drill | Dark]',            hook:'[Hook | Melodic | Dark | Drill]',            extra:['[Drill Break]','[Outro]'] },
+  'East Coast':        { verse:'[16-bar Verse | Boom Bap | Lyrical]',     hook:'[Hook | Chanted | Anthemic]',                extra:['[Boom Bap Break]','[Outro]'] },
+  'Midwest':           { verse:'[16-bar Verse | Soulful | Rap Verse]',    hook:'[Hook | Sung | Soul | Chipmunk]',            extra:['[Soul Break]','[Outro Vamp]'] },
+  'Cloud Rap':         { verse:'[16-bar Verse | Hazy | Slow Flow]',       hook:'[Hook | Ethereal | Whispered | Melodic]',    extra:['[Ambient Break]','[Outro | Fade-Out]'] },
+  'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Chanted | Anthemic | Conscious]',    extra:['[Spoken Word Bridge]','[Outro]'] },
+  'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Rapped | Classic]',                  extra:['[Scratch Break]','[Outro]'] },
+  // Neo-Soul
+  'Classic Neo-Soul':  { verse:'[Verse | Groove-Led | Conversational]',     hook:'[Chorus | Soulful | Declaration]',          extra:['[Outro Vamp | Escalating Ad-libs]','[Bridge | Half-Time Feel]'] },
+  'Hip-Hop Neo-Soul':  { verse:'[Verse | Rap-Soul | Dilla Feel]',            hook:'[Chorus | Sung | Soul]',                    extra:['[Rap Bridge | Bars]','[Outro Vamp]'] },
+  'Neo-Soul Ballad':   { verse:'[Verse | Intimate | Space-Between-Lines]',   hook:'[Chorus | Emotional Peak | Runs]',          extra:['[Bridge | Darkest Point]','[Outro Vamp | Vocal Improvisation]'] },
+  'Psychedelic Soul':  { verse:'[Verse | Cosmic | Layered]',                 hook:'[Chorus | Transcendent | Soulful]',         extra:['[Psychedelic Break | Textures]','[Outro Vamp | Hypnotic]'] },
+  // Gospel
+  'Traditional Gospel':{ verse:'[Verse | Testimony | Lead Vocal]',           hook:'[Chorus | Declaration | Call and Response]',extra:['[Bridge | Shout Moment | Vamp]','[Outro Vamp | Choir]'] },
+  'Contemporary Gospel':{ verse:'[Verse | Testimony | Modern]',              hook:'[Chorus | Celebratory | Mass Choir]',       extra:['[Bridge | Vamp | Repeat and Escalate]','[Outro | Full Choir]'] },
+  'Worship / CCM':     { verse:'[Verse | Intimate | Setup]',                 hook:'[Chorus | Congregational | Singable]',      extra:['[Bridge | Highest Moment | Repeat]','[Outro | Worship Vamp]'] },
+  'Gospel Hip-Hop':    { verse:'[16-bar Verse | Rap | Testimony]',           hook:'[Hook | Gospel | Celebratory]',             extra:['[Bridge | Spiritual Peak]','[Outro | Praise Vamp]'] },
+  // Children
+  'Singalong / Playful':{ verse:'[Verse | Teaching | Playful]',              hook:'[Chorus | Singalong | Motion Cues]',        extra:['[Clap Break]','[Outro | Repeat Chorus Together]'] },
+  'Educational':       { verse:'[Verse | Discovery | Wonder]',               hook:'[Chorus | Remember This | Simple]',         extra:['[Bridge | Ask a Question]','[Outro | Recap]'] },
+  'Lullaby / Bedtime': { verse:'[Verse | Soft | Safe | Descending Melody]',  hook:'[Chorus | Gentle | Soothing | Love]',       extra:['[Bridge | Quieter]','[Outro | Drift | Fade]'] },
+  'Silly / Nonsense':  { verse:'[Verse | Absurd | Committed | Straight-Face]',hook:'[Chorus | Maximum Silly | Repeat]',        extra:['[Bridge | Even Sillier]','[Outro | Nonsense Vamp]'] },
+  // Parody
+  'Genre Parody':      { verse:'[Verse | Mirror Original Genre]',          hook:'[Chorus | Comedic Payoff | Sincere Delivery]', extra:['[Bridge | Escalation]','[Outro | Callback]'] },
+  'Pop Parody':        { verse:'[Verse | Upbeat | Absurd Subject]',         hook:'[Chorus | Catchy | Ridiculous]',              extra:['[Pre-Chorus | Tension Build]','[Bridge | Subvert]'] },
+  'Rap Parody':        { verse:'[16-bar Verse | Rap Flow | Deflating Topic]', hook:'[Hook | Rapped | Anti-Climactic]',          extra:['[Rap Break | Commitment Bit]','[Outro | Punchline]'] },
+  'Ballad Parody':     { verse:'[Verse | Restrained | Setup Trivial Topic]', hook:'[Chorus | Epic | Overdramatic | Trivial]',  extra:['[Pre-Chorus | Tension]','[Bridge | Darkest Version | Climax]'] },
+  // Comedy
+  'Absurdist':         { verse:'[Verse | Straight-Faced | Absurd Logic]',   hook:'[Chorus | Committed | Ridiculous Premise]',  extra:['[Bridge | Escalation | Unhinged]','[Outro | Dream Logic]'] },
+  'Dark Comedy':       { verse:'[Verse | Upbeat | Dark Subject]',           hook:'[Chorus | Cheerful | Uncomfortable Truth]',  extra:['[Bridge | Darkest Point]','[Outro | Casual Resolution]'] },
+  'Satirical':         { verse:'[Verse | Exaggerated | Target Established]', hook:'[Chorus | Satirical | Repeated Accusation]',extra:['[Bridge | Killing Blow]','[Outro | Ironic]'] },
+  'Observational':     { verse:'[Verse | Conversational | Relatable]',      hook:'[Chorus | Universal Frustration | Catchy]',  extra:['[Bridge | Specific Detail]','[Outro | Acceptance]'] },
+  'Musical Roast':     { verse:'[Verse | Setup Target]',                    hook:'[Chorus | Roast | Repeated Charge]',         extra:['[Bridge | Killing Blow]','[Outro | Final Joke]'] },
+  // TV / Musical
+  'TV Theme':          { verse:'[Intro | Premise Setup]',                   hook:'[Theme Hook | Show Title | Catchy]',         extra:['[Instrumental Tag]','[Outro Sting]'] },
+  'Broadway / Show Tune': { verse:'[Verse | Character Voice | Dramatic]',  hook:'[Chorus | Belted | Emotional Peak]',         extra:['[Pre-Chorus | Tension Build]','[Bridge | Darkest Moment | Turning Point]'] },
+  'Disney-Style':      { verse:'[Verse | Wonder | I Want Song]',            hook:'[Chorus | Magical | Soaring | Big Dream]',   extra:['[Pre-Chorus | World Responds]','[Bridge | Dark Moment | Hope]'] },
+  'Jingle / Ad':       { verse:'[Verse | Problem | Pain Point]',            hook:'[Chorus | Product Name | Benefit | Catchy]', extra:['[Instrumental Tag]','[Outro | Call to Action]'] },
+  'Sitcom Theme':      { verse:'[Intro | Premise | Warm]',                  hook:'[Theme Hook | Show World | Inviting]',       extra:['[Instrumental Break]','[Tag | Laugh Track Ready]'] },
+  'Prestige Drama Theme': { verse:'[Intro | Atmosphere | Stakes]',          hook:'[Theme | Melancholic | Foreboding]',         extra:['[Instrumental Swell]','[Outro | Fade]'] },
+};
+
+// Maps hook style → full DNA instruction injected into the prompt
+const HOOK_STYLE_NOTES={
+  'auto':          '',  // auto = derived from substyle/genre
+  'Smooth Sung':   'HOOK STYLE: Smooth sung hook — Nate Dogg / R&B crooner delivery. 8 bars, 4 unique melodic lines. The hook carries the emotional memory of the entire song. Long vowels, easy to sing along to, settles into the groove.',
+  'Melodic Auto-Tune': 'HOOK STYLE: Melodic auto-tune hook — Drake/Future/Lil Baby style. 8 bars, simple pitch-bent phrases, few words maximum impact. Auto-tune is a melody instrument not correction. Hook repeats 4-6× total.',
+  'Chanted':       'HOOK STYLE: Chanted / anthemic hook — Kendrick / boom bap style. Short punchy phrase, crowd-participation ready. Rhythm of the chant IS the hook. Hard consonants on the beat. 4-8 bars.',
+  'Call & Response': 'HOOK STYLE: Call and response hook — lead line, crowd responds. Two distinct parts: call (lead vocal, 1-2 bars) + response (answer phrase or chant, 1-2 bars). Repeat 4 times. OutKast, Bay Area, gospel tradition.',
+  'Screamed / Crunk': 'HOOK STYLE: Crunk screamed hook — maximum energy, 2-4 words per phrase, shouted not sung. Call and response between two voices. Ultra-repetitive, designed for the club floor. Under 4 bars, loops 6+ times.',
+  'Southern Drawl': 'HOOK STYLE: Southern drawl hook — slow, elongated vowels, laid-back against the 808 bass. Hook hits AFTER the beat (behind the bar). Southern pride theme. 8 bars, slow deliberate delivery.',
+  'Chopped':       'HOOK STYLE: Chopped & screwed hook — the hook phrase is repeated and "chopped" (cut and restarted mid-word). Syrupy pitch, 65-75 BPM feel. Every other syllable slightly elongated. Slurred delivery.',
+  'Rapped Hook':   'HOOK STYLE: Rapped hook — bars delivered at verse speed but the phrase is hook-catchy. Dense rhyme, melodic cadence in the flow itself. Eminem / Jay-Z / Big Pun tradition. 4-8 bars.',
+  'Minimal / Groove': 'HOOK STYLE: Minimal groove hook — Future / 21 Savage style. 2-4 words, maximum repetition. The GROOVE carries the hook, not the lyric. Long spaces between phrases. Hypnotic through simplicity.',
+  'Mantra':        'HOOK STYLE: Mantra hook — one devastating line, looped. The entire hook IS one sentence, repeated 4-8 times with slight variation. "Never broke again." "HUMBLE." Power through repetition not complexity.',
+  'Double Hook A+B': 'HOOK STYLE: Double hook — two distinct hook sections back to back. Hook A (4 bars, melodic/sung) → Hook B (4 bars, different cadence/energy, rapped or chanted). Travis Scott / Kanye style. Creates two earworms in one.',
+  'Gospel Vamp':   'HOOK STYLE: Gospel vamp hook — the hook repeats and ad-libs ESCALATE over it. Start simple, each repeat adds a new ad-lib or harmony layer. Outro vamp version goes 2-3 minutes, building to emotional peak. Sam Smith, Beyoncé, Kirk Franklin tradition.',
+  'Post-Hook Drop':'HOOK STYLE: Hook + post-hook drop. Main hook (4 bars sung/melodic) → Post-hook (2-bar punchy instrumental or vocal phrase that lands like a punch). The post-hook is where the bass drops or the sample flips.',
+};
+
+const SUBSTYLE_NOTES={
+  // Hip-Hop regional/era deep notes injected alongside substyleNote
+  'G-Funk':      'G-Funk DNA: 90-100 BPM, slow rolling groove. Synthesizer whine (Moog/Roland), P-Funk bass samples (Parliament-Funkadelic). Laid-back West Coast flow — lines stretch over the beat, never rushed. Imagery: Lowriders, sunshine, Crenshaw, Pacific Coast. Nate Dogg-style melodic sung hooks. Suno style: "g-funk, moog synth whine, west coast hip-hop, slow rolling 808, 95 BPM, smooth melodic hook". Artists: Dr. Dre, Snoop Dogg, Warren G, Nate Dogg, Tha Dogg Pound.',
+  'Bay Area':    'Bay Area DNA: Hyphy movement — E-40, Mac Dre, Too Short, Mistah F.A.B. High-energy, frenetic delivery contrasted with laid-back Oakland drawl. Slang: hella, thizz, yadadamean, stunna, turf, ghost ride. Ghost riding the whip references. Screwed/chopped variants for slower tracks. Trunk-rattling bass. Suno style: "bay area hip-hop, hyphy, trunk music, 808 bass, hi-energy, Oakland rap". Older Bay flavor: Too Short pimp talk, Digital Underground funk-rap.',
+  'Down South':  'Down South / Dirty South DNA: Trunk-rattling slow 808s, Southern drawl, elongated vowels on stressed syllables. Sub-genres: Atlanta (OutKast psychedelic, Goodie Mob soul), Houston (UGK country-rap, Scarface cinematic, DJ Screw chopped), Memphis (Three 6 Mafia dark horror, lo-fi cassette), New Orleans (Cash Money bounce, Master P No Limit tank). Themes: Southern heat, street survival, pride, codeine lean. Suno style varies — "dirty south, 808 bass, southern rap, slow tempo" for Houston; "atlanta rap, psychedelic, live band, funk" for ATL.',
+  'Crunk':       'Crunk DNA: Lil Jon / Three 6 Mafia era. Call-and-response crowd shouts. Extremely high energy, short punchy lines. Repetitive hypnotic hooks meant for clubs. Distorted synth stabs. 140-150 BPM. Screamed adlibs throughout. Suno style: "crunk, distorted synth, 808, 145 BPM, club energy, call and response, eastern Kentucky". Artists: Lil Jon, Ying Yang Twins, Three 6 Mafia.',
+  'Chopped & Screwed': 'Chopped & Screwed DNA: DJ Screw Houston style. Slowed tempo 60-70 BPM. Pitch-lowered vocals (baritone, syrupy). Repeated bars and phrases ("chopped"). Codeine/lean references. Hypnotic repetition creates trance state. Suno style: "chopped and screwed, slowed houston rap, syrupy 65 BPM, baritone, deep 808, houston texas". Artists: DJ Screw, Z-Ro, Slim Thug, Paul Wall.',
+  'East Coast':  'East Coast DNA: New York lyricism tradition. Complex internal rhyme schemes, dense wordplay, cultural references. Jazz/soul samples (Pete Rock, Large Professor, RZA). Boom bap drums, minimal production. 85-95 BPM. Verses carry the song — hooks are functional not melodic. Suno style: "east coast hip-hop, boom bap, jazz sample, vinyl, 90 BPM, new york". Artists: Nas, Jay-Z, Biggie, Rakim, Big L, Mobb Deep, Wu-Tang.',
+  'Midwest':     'Midwest DNA: Chicago soul samples (Kanye era), Twista hyperspeed flow, Detroit grit (Big Sean, Royce da 5\'9"), St. Louis bounce. Emotional vulnerability alongside street realism. Chipmunk soul samples. Suno style: "midwest rap, soul sample, chicago, 95 BPM, emotional, chipmunk soul". Artists: Kanye West, Twista, Common, Lupe Fiasco, Chance the Rapper, Big Sean.',
+  'Cloud Rap':   'Cloud Rap DNA: Ethereal, atmospheric, lo-fi production. Hazy drum machines, woozy synth pads, reverb-drenched vocals. Existential/introspective themes, often melancholic. Very slow BPM 70-90. Mumbled delivery. Suno style: "cloud rap, ethereal, lo-fi, reverb, atmospheric synths, 80 BPM, dreamy". Artists: Lil B, Bladee, Yung Lean, Carti (early), Bones.',
+  // Neo-Soul substyles
+  'Classic Neo-Soul':    'Classic Neo-Soul DNA: D\'Angelo / Erykah Badu era. Warm Rhodes piano, upright or Fender bass, live drums with swing (slightly behind the beat). Head-nod groove mandatory. Vocals are conversational and improvised-feeling. Suno style: "neo-soul, Rhodes piano, live drums, swing, 90 BPM, warm vinyl, head-nod groove". Artists: D\'Angelo, Erykah Badu, Maxwell.',
+  'Hip-Hop Neo-Soul':    'Hip-Hop Neo-Soul DNA: The Lauryn Hill / Common / J Dilla intersection. Boom bap or Dilla-off-beat drum programming under soulful vocal delivery. Rapped bridges or verses inside a sung structure. Sample-flipped soul. Suno style: "neo-soul, hip-hop drums, J Dilla beat, soul vocal, 85 BPM, vinyl warmth". Artists: Lauryn Hill, Common, Bilal, H.E.R.',
+  'Neo-Soul Ballad':     'Neo-Soul Ballad DNA: Slow, intimate, emotionally devastating. Piano-led or sparse Rhodes. Vocal runs that say more than the words. Space between phrases. Minor key tension. Suno style: "neo-soul ballad, piano, 70 BPM, intimate, vulnerable, warm, soul". Artists: Maxwell, Jill Scott, India.Arie.',
+  'Afro-Soul':           'Afro-Soul DNA: West African or Afrobeats rhythm underneath neo-soul warmth. Talking drum or shekere percussive bed with Rhodes or kalimba. Spiritual/ancestral themes. Suno style: "afro-soul, talking drum, Rhodes, warm, 95 BPM, Lagos, spiritual, soulful". Artists: Asa, Simi, Tems (ballad side), Erykah Badu (African-influenced).',
+  'Lo-Fi Soul':          'Lo-Fi Soul DNA: Vinyl crackle, dusty drum loops, muffled warmth. Chopped soul samples. Bedroom production aesthetic. Introspective and intimate. Suno style: "lo-fi soul, vinyl crackle, dusty drums, muffled, warm, 80 BPM, bedroom production, introspective".',
+  'Psychedelic Soul':    'Psychedelic Soul DNA: Sly Stone, early Stevie Wonder, D\'Angelo "Voodoo" — soul meets psychedelia. Layered textures, pitch effects, deep reverb, spiritual/cosmic themes. Exploratory structure. Suno style: "psychedelic soul, funky bass, cosmic, reverb, layers, 95 BPM, voodoo, Sly Stone". Artists: Sly & the Family Stone, early Stevie, D\'Angelo (Voodoo era).',
+  // Gospel substyles
+  'Traditional Gospel':  'Traditional Gospel DNA: Thomas Dorsey / Mahalia Jackson tradition. Hammond B3 organ is the anchor. Call-and-response between lead and choir. Testimony lyrics (I was broken → God moved → I am free). Building to a shout. Suno style: "traditional gospel, Hammond B3, mass choir, hand claps, call and response, soul, powerful".',
+  'Contemporary Gospel': 'Contemporary Gospel DNA: Kirk Franklin, Fred Hammond, Tye Tribbett. Pop and hip-hop production underneath gospel content. 808 bass, modern drums, mass choir stacked harmonies. Celebration energy. Suno style: "contemporary gospel, Kirk Franklin style, 808 bass, mass choir, celebratory, hip-hop gospel, full production".',
+  'Worship / CCM':       'Worship/CCM DNA: Hillsong, Chris Tomlin, Bethel Music. Arena rock meets hymn. Corporate worship — songs designed for congregations to sing together. Simple melody, repetitive chorus designed for crowds. Suno style: "worship music, piano, electric guitar, congregational, 75 BPM, soaring, emotional, Hillsong style".',
+  'Southern Gospel':     'Southern Gospel DNA: Acoustic quartet harmonies, banjo or acoustic guitar, country-gospel intersection. Shaped-note singing tradition. Narrative testimony. Suno style: "southern gospel, acoustic guitar, four-part harmony, country gospel, warm, testimony".',
+  'Gospel Hip-Hop':      'Gospel Hip-Hop DNA: Lecrae, Andy Mineo, KB. Rap flow with gospel message. Trap/boom bap production under spiritual content. Street credibility meets faith testimony. Suno style: "gospel rap, trap beat, 808 bass, conscious lyrics, faith, hip-hop gospel".',
+  // Children substyles
+  'Singalong / Playful': 'Children\'s Singalong DNA: Maximum participation. Simple repeating phrase as chorus hook. Motion cues embedded (clap, stomp, jump). Major key, bright, 100-120 BPM. The melody must be singable by a 4-year-old in 2 listens. Suno style: "children\'s singalong, ukulele, clapping, bright, joyful, 110 BPM, playful".',
+  'Educational':         'Educational Children\'s DNA: The lesson is hidden inside the fun. Count, alphabet, animals, colors, shapes — but approached with wonder not drill. Repetition that teaches. Suno style: "educational children\'s song, acoustic guitar, glockenspiel, clear vocals, 105 BPM, friendly, warm".',
+  'Lullaby / Bedtime':   'Lullaby DNA: Descending melody (literally descending — falling intervals calm the nervous system). Slowing tempo verse to verse. Safety and love in every image. Minimal instrumentation. Suno style: "lullaby, soft acoustic guitar, gentle, 60 BPM, warm, soothing, hushed vocals, night, stars".',
+  'Silly / Nonsense':    'Silly/Nonsense Children\'s DNA: Pure absurdist fun. Made-up words, tongue twisters, impossible scenarios played completely straight. The laugh IS the lesson — joy is educational. Suno style: "silly children\'s song, bouncy, 115 BPM, playful, bright, ukulele, fun".',
+  // Parody substyles
+  'Genre Parody':   'Genre Parody DNA: Rewrite a specific song in a specific genre with absurdist/comedic new lyrics. The production must sound 100% authentic to the source genre — the comedy is purely in the lyrical content. Suno style: mirror the original genre exactly. Key rule: commit fully to the genre performance while the lyrics are completely ridiculous.',
+  'Pop Parody':     'Pop Parody DNA: Rewrite a mainstream pop song with mundane or absurdist subject matter. Use the original song\'s structure, melody cues, and production style. Subject could be: grocery shopping, Wi-Fi passwords, IKEA assembly. Suno style: "upbeat pop, polished production, major key, 120 BPM" — same as a real pop song.',
+  'Rap Parody':     'Rap Parody DNA: Rap verse structure with comedic/absurdist bars. Can parody a specific rap song or rap in general about a non-rap subject. Use real rap flow patterns (16-bar verse, 8-bar hook) with completely deflating subject matter. Suno style: match specific rap era/substyle being parodied.',
+  'Ballad Parody':  'Ballad Parody DNA: Soaring dramatic ballad delivery applied to something trivial. The bigger the emotional production, the funnier the trivial subject. Verse builds with restraint, pre-chorus adds tension, chorus erupts in full dramatic glory — all about something like losing your phone charger. Suno style: "epic power ballad, piano, strings, dramatic, emotional, stadium".',
+  // Comedy substyles
+  'Absurdist':      'Absurdist Comedy DNA: Internal dream-logic. The premise is established early and followed to its extreme conclusion without apology. The world of the song has rules, and those rules are insane. Suno style: match the emotional sincerity of the genre — the music never acknowledges the absurdity.',
+  'Dark Comedy':    'Dark Comedy DNA: Finding humor in genuinely dark or uncomfortable situations. The delivery is always casual and upbeat — the contrast between tone and content IS the comedy. Tim Minchin territory. Suno style: "upbeat, cheerful, major key" applied to dark subject matter for maximum tonal contrast.',
+  'Satirical':      'Satirical Comedy DNA: Exaggerated social/political commentary through music. The target (institution, behavior, attitude) must be crystal clear. Satire punches at power, not down. Uses genre conventions of the target demographic to increase impact. Suno style: mirror the genre of the demographic being satirized.',
+  'Observational':  'Observational Comedy DNA: The universal shared experience of mundane modern life — the frustration of tech support, the anxiety of small talk, the tragedy of dying phone batteries. Relatable specificity is everything. Suno style: "singer-songwriter, acoustic, intimate, conversational" — feels like a friend venting.',
+  'Musical Roast':  'Musical Roast DNA: A song specifically aimed at a target (person, brand, idea) written to roast them. Format: verse 1 establishes the target\'s positive self-image, verse 2 demolishes it, bridge is the killing blow, chorus is the repeated accusation. Never cruel — always funny.',
+  // TV/Musical substyles
+  'TV Theme':       'TV Theme DNA: 30-90 seconds to establish the show\'s entire world — genre, tone, era, class level, emotional register. The hook IS the show title or a defining phrase. Suno style: "catchy TV theme, [show genre tone], memorable, [era]". The audience knows what they\'re watching within 5 seconds.',
+  'Broadway / Show Tune': 'Broadway DNA: Character sings what cannot be said in dialogue — the emotional eruption. Clear dramatic objective ("I want" / "I need" / "I feel"). Musical theater diction: precise consonants, open vowels, projected. Suno style: "Broadway musical, show tune, theatrical, orchestral pit band, belting vocals".',
+  'Disney-Style':   'Disney DNA: The "I want" song. Character expresses their deepest wish in verse, the world responds in chorus. Magical orchestration. Pure emotional sincerity — no irony. Suno style: "Disney animated film song, orchestral, magical, warm, major key, soaring melody, 120 BPM".',
+  'Jingle / Ad':    'Jingle DNA: Product name minimum 3× in 30-60 seconds. Problem in verse (pain point), product = solution in chorus. Benefit not feature. Melody sticky enough to remember after one listen. Suno style: "upbeat commercial jingle, major key, catchy, corporate, polished, radio-ready".',
+  'Sitcom Theme':   'Sitcom Theme DNA: 30-60 seconds. Warm, inviting, tells you this is a safe fun place. Often summarizes the show\'s premise. Major key, upbeat tempo, memorable chorus. Era-appropriate production. Suno style: "sitcom theme, warm, upbeat, [era: 90s/2000s/modern], feel-good, catchy melody".',
+  'Prestige Drama Theme': 'Prestige Drama Theme DNA: Atmospheric, sparse, foreboding or melancholic. Establishes stakes and tone. Minor key or modal. Often instrumental or near-instrumental. Suno style: "prestige TV theme, cinematic, atmospheric, [mood: dark/cold/intense], strings, piano, sparse, HBO-style".',
+};
+
 const SUBSTYLES={
   kpop:['Girl Group','Boy Group','K-Pop Ballad','Dance Pop','Dark Concept','Bubblegum','Hip-Hop K-Pop','R&B K-Pop'],
-  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School'],
+  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap'],
   latin:['Salsa','Bachata','Cumbia','Bossa Nova','Latin Pop','Latin Jazz','Mariachi'],
   reggaeton:['Perreo Clásico','Trap Latino','Reggaeton Romántico','Urbano Latino','Dembow Puro','Reggaeton Pop'],
   altrock:['Shoegaze','Post-Punk','Grunge','Indie Rock','Lo-Fi','Art Rock','Emo','Math Rock'],
@@ -1867,17 +2125,38 @@ const SUBSTYLES={
   blues:['Chicago Blues','Delta Blues','Texas Blues','Jump Blues','Soul Blues'],
   reggae:['Roots Reggae','Dancehall','Ska','Rocksteady','Dub','Lovers Rock'],
   afrobeats:['Afrobeats','Afropop','Amapiano','Highlife','Afro-Soul'],
+  neosoul:['Classic Neo-Soul','Hip-Hop Neo-Soul','Neo-Soul Ballad','Afro-Soul','Jazz-Soul','Lo-Fi Soul','Psychedelic Soul','Gospel Soul'],
+  gospel:['Traditional Gospel','Contemporary Gospel','Worship / CCM','Southern Gospel','Gospel Ballad','Gospel Hip-Hop','Praise & Worship','Mass Choir'],
+  children:['Singalong / Playful','Educational','Lullaby / Bedtime','Adventure Story','Silly / Nonsense','Nature & Animals','Friendship & Kindness','Holiday / Seasonal'],
+  parody:['Genre Parody','Pop Parody','Rap Parody','Country Parody','Rock Parody','Ballad Parody','EDM Parody','Folk Parody'],
+  comedy:['Absurdist','Dark Comedy','Satirical','Observational','Nerd Comedy','Romantic Comedy','Storytelling Comedy','Musical Roast'],
+  tvmusical:['TV Theme','Broadway / Show Tune','Film Score Ballad','Disney-Style','Jingle / Ad','Video Game OST','Sitcom Theme','Prestige Drama Theme'],
 };
 
 const STRUCTURES={
-  standard:'[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
-  hookfirst:'[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
-  storytelling:'[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
-  minimal:'[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
-  epic:'[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
-  verseonly:'[Intro] → [Verse 1] → [Verse 2] → [Verse 3] → [Verse 4] → [Outro]',
-  riddim:'[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Dub Break] → [Verse 3] → [Hook] → [Outro Vamp]',
-  kpop:'[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Rap Break] → [Bridge] → [Key Change +1] → [Final Chorus] → [Outro]',
+  // ── General ──────────────────────────────────────────────────────────────
+  standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
+  hookfirst:    '[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
+  chorusfirst:  '[Chorus] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Final Chorus]',
+  storytelling: '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
+  minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
+  epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
+  doublechorus: '[Verse 1] → [Pre-Chorus] → [Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Chorus] → [Bridge] → [Final Chorus] → [Final Chorus]',
+  verseonly:    '[Intro] → [Verse 1] → [Verse 2] → [Verse 3] → [Verse 4] → [Outro]',
+  aaba:         '[A Section] → [A Section] → [B Bridge] → [A Section]',
+  ballad:       '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Breakdown] → [Key Change] → [Final Chorus]',
+  edm:          '[Intro] → [Build] → [Drop] → [Breakdown] → [Build] → [Drop] → [Outro]',
+  viral:        '[Hook (0:00)] → [Verse] → [Pre-Chorus] → [Hook] → [Bridge] → [Final Hook]',
+  // ── Genre-specific ───────────────────────────────────────────────────────
+  hiphop_classic:      '[4-bar Intro | Beat Only] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook] → [16-bar Verse 2 | Rap Verse] → [8-bar Hook] → [16-bar Verse 3 | Rap Verse] → [8-bar Hook] → [4-bar Outro]',
+  hiphop_trap:         '[4-bar Intro | Beat Only] → [8-bar Hook] → [12-bar Verse 1 | Rap Verse] → [8-bar Hook] → [12-bar Verse 2 | Rap Verse] → [8-bar Hook] → [8-bar Hook] → [4-bar Outro | Ad-libs]',
+  hiphop_beatswitch:   '[4-bar Intro | Beat Only] → [8-bar Hook] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook] → [16-bar Verse 2 | Rap Verse] → [Beat Switch] → [16-bar Verse 3 | Triplet Flow] → [8-bar Final Hook] → [Outro | Fade-Out]',
+  hiphop_storytelling: '[8-bar Intro | Spoken Word] → [24-bar Verse 1 | Rap Verse] → [24-bar Verse 2 | Rap Verse] → [24-bar Verse 3 | Rap Verse] → [8-bar Outro]',
+  hiphop_melodic:      '[4-bar Intro] → [8-bar Hook | Melodic | Sung] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook | Sung] → [16-bar Verse 2 | Rap Verse] → [8-bar Bridge | Sung] → [8-bar Final Hook | Sung | stacked harmonies] → [Outro | Fade-Out]',
+  riddim:       '[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Dub Break] → [Verse 3] → [Hook] → [Outro Vamp]',
+  afrobeats:    '[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Ad-lib Break] → [Hook] → [Outro Vamp]',
+  gospel:       '[Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Bridge] → [Vamp] → [Outro Ad-lib]',
+  kpop:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Rap Break] → [Bridge] → [Key Change +1] → [Final Chorus] → [Outro]',
 };
 
 const FUSION_DATA={
@@ -1941,7 +2220,7 @@ const FUSION_DATA={
 // STATE
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
-  quality:'viral',substyle:'',selectedLength:'short',
+  quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]'),
   luckyHistory:[],sessionHistory:[],
@@ -2316,7 +2595,7 @@ document.getElementById('g-style2').addEventListener('change',updBlendDesc);
 
 // ─── FEEL LUCKY ───
 const LUCKY_TOPICS=['growing up too fast','a city that never loved you back','last message before midnight','the version of yourself you abandoned','driving nowhere at 3am','falling in love with the wrong timeline','what silence sounds like after a storm','rebuilding from zero','the first morning after everything changed','chasing something you lost before you knew its name','finding home in a stranger','the day the music saved you'];
-const LUCKY_MOODS=['Euphoric','Melancholic','Hopeful','Defiant','Nostalgic','Dark','Rebellious','Romantic','Peaceful','Angry'];
+const LUCKY_MOODS=['Euphoric','Melancholic','Hopeful','Defiant','Nostalgic','Dark','Rebellious','Romantic','Peaceful','Angry','Longing','Transcendent','Devastated','Tender','Triumphant','Bittersweet'];
 const LUCKY_STRUCTURES=['standard','hookfirst','storytelling','minimal','epic'];
 const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy male','Soulful female','Whispered/Intimate'];
 
@@ -2535,8 +2814,71 @@ async function generateSong(){
 
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
   const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
-  const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.`:'';
+  const substyleDetail = S.substyle && SUBSTYLE_NOTES[S.substyle] ? `\n${SUBSTYLE_NOTES[S.substyle]}` : '';
+  const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.${substyleDetail}`:'';
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
+  const hiphopNote=genre==='hiphop'?`\n\nHIP-HOP VERSE RULES (non-negotiable):
+- 1 bar = 1 line. Write EXACTLY the bar count in the structure (e.g. [16-bar Verse] = 16 lines, [12-bar Verse] = 12 lines, [8-bar Hook] = 8 lines).
+- 4-bar internal structure per verse: bars 1-4 establish scene, bars 5-8 develop, bars 9-12 complicate, bar 16 = punchline/payoff.
+- Ad-libs in parentheses on the same line: "I came from nothing (yeah) built this from the ground (uh)".
+- [Triplet Flow] section: use rapid 3-syllable rolling groups (da-da-DUM cadence, twice the syllable density).
+- [Double Time] section: twice as many syllables per bar — dense, rapid-fire delivery.
+- [Beat Switch]: the section after must feel like a completely different song (different energy, flow, topic angle).
+- Internal rhymes every 2-3 syllables add density on top of end rhymes.`:'';
+  // Hook style note — explicit override or auto-derived from substyle
+  const resolvedHookStyle = (S.hookStyle && S.hookStyle !== 'auto') ? S.hookStyle
+    : ({Trap:'Melodic Auto-Tune','G-Funk':'Smooth Sung','Bay Area':'Call & Response','Down South':'Southern Drawl','Crunk':'Screamed / Crunk','Chopped & Screwed':'Chopped','Boom Bap':'Chanted','East Coast':'Rapped Hook','Cloud Rap':'Minimal / Groove','Gospel':'Gospel Vamp'}[S.substyle] || null);
+  const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle]
+    ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}`
+    : '';
+  // Comedy / Parody special rules
+  const comedyNote = genre === 'parody' ? `\n\nPARODY RULES (non-negotiable):
+- The music production style must be 100% sincere and authentic to the genre. Never wink at the camera musically.
+- The comedy lives ENTIRELY in the lyrics. Every line should make logical sense within the absurd premise.
+- Establish the absurd premise in the FIRST 4 LINES of verse 1 — never bury the setup.
+- Use the rule of threes: setup, setup, subvert. Two expected things then one unexpected twist.
+- Callbacks: introduce a specific image in verse 1, reference it in verse 2, payoff in bridge or outro.
+- Specificity is the engine of comedy: "seventeen Diet Cokes" beats "lots of soda". Use proper nouns, numbers, brand names.
+- The chorus must be the funniest part AND the most singable. It must work both as a joke and as a hook.
+- Commitment is everything: the more seriously the song takes itself, the funnier the parody.`
+  : genre === 'comedy' ? `\n\nCOMEDY SONGWRITING RULES (non-negotiable):
+- Three-act joke arc: Verse 1 = premise established, Verse 2 = escalation and complications, Bridge = darkest/most unhinged point, Final Chorus = full payoff.
+- The FINAL LINE of the entire song is the punchline. Build everything toward it.
+- Escalation rule: each verse must be funnier and higher-stakes than the last. Never plateau.
+- Specificity rule: concrete images, numbers, brand names, proper nouns beat vague descriptions every time.
+- Genre sincerity: the music plays completely straight. Comedy is lyrical. The genre is the straight man.
+- Subverted clichés hit harder than straight puns. Take a familiar phrase and twist its meaning.
+- End on the biggest laugh. Never resolve the tension with something heartfelt — commit to comedy through the outro.`
+  : genre === 'tvmusical' ? `\n\nTV/MUSICAL THEATER RULES (non-negotiable):
+- Every song has a DRAMATIC FUNCTION: advance plot, reveal character, create atmosphere, or sell a product. Name the function before writing.
+- Musical theater: characters sing BECAUSE spoken dialogue is insufficient — this is the emotional eruption/overflow.
+- Character voice: the song must only make sense coming from this specific character in this specific moment.
+- "I want" structure: establish what the character desperately wants in verse 1 (or Chorus 1), complicate it in verse 2, transform it in the bridge.
+- TV theme: establish genre, tone, era, and emotional register within the first 5 seconds. The show's world is clear immediately.
+- Jingle: product name minimum 3 times. Problem in verse, product = solution in chorus. Benefit over feature, always.
+- Reprise principle: the same melody with changed lyrics after character transformation hits harder than any new song.`
+  : genre === 'neosoul' ? `\n\nNEO-SOUL RULES (non-negotiable):
+- The groove arrives BEFORE the vocal — write an 8-bar instrumental intro feel. Never rush the entrance.
+- Leave space: rests between phrases ARE the music. Silence creates more tension than constant vocal density.
+- Ad-libs carry equal emotional weight to main lyrics — write them as parallel lines, not afterthoughts. Mark with (ad-lib): "I needed you (needed you) to stay (to stay)".
+- Outro vamp MUST be written and must escalate — it is the most cathartic moment of the song. Minimum 4 cycling lines that build in intensity.
+- Imperfect language: conversational phrasing, sentences that trail off, thoughts that don't resolve cleanly — this is authenticity.
+- Every image must be physically specific: brand names, street names, times of day, temperature, smell. Erykah Badu specificity.`
+  : genre === 'gospel' ? `\n\nGOSPEL RULES (non-negotiable):
+- Call-and-response: write both the LEAD line and the CONGREGATION response with equal craft. Format: "Lead: I was broken — Response: (broken)".
+- Testimony arc is mandatory: I WAS [state of struggle] → God/faith/love MOVED → NOW I am [transformed state]. The arc is transformation, not just praise.
+- The bridge is the CLIMAX, not the chorus. Write 4-8 vamp lines for the bridge to cycle through, each escalating in emotional intensity.
+- Dynamics are everything: verse = intimate testimony, pre-chorus = stakes rising, chorus = declaration, bridge/vamp = full emotional release/shout.
+- Contemporary gospel: the production rhythm must make you move before the lyric registers. Groove serves spirit.
+- The outro vamp MUST be written in full — this is where 80% of the emotional impact lives. Never cut it short with "repeat and fade" instructions.`
+  : genre === 'children' ? `\n\nCHILDREN'S SONG RULES (non-negotiable):
+- Singability above all: if a 5-year-old cannot sing the chorus back after 2 listens, simplify. Maximum 8 words in the hook. Melody range under 1 octave.
+- Repetition is the feature, not a flaw — the chorus should appear 3-4 times minimum. Children learn through joyful repetition.
+- Embed physical motion cues naturally in the lyrics: clap, stomp, jump, spin, shake, nod — make the song a full-body experience.
+- Every verse should describe something immediately recognizable from a child's world: animals, weather, food, family, playground, bedtime.
+- Never condescend — wonder and imagination are universal emotions. Write UP to children's curiosity, not DOWN to limited vocabulary.
+- Lullaby rule: descending melody implied through falling imagery (stars coming down, moon settling, eyes getting heavy). Safety in every final line.`
+  : '';
   // Clear album context after use so it doesn't carry over to next song
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
 
@@ -2568,7 +2910,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -3408,7 +3750,7 @@ async function buildBlueprint(){
 // ═══════════════════════════════════════════════════════
 function renderBiblePills(){
   const el=document.getElementById('bible-pills');if(!el||el.innerHTML)return;
-  const allG=[{id:'pop',label:'Pop',new:false},{id:'hiphop',label:'Hip-Hop',new:false},{id:'rnb',label:'R&B',new:false},{id:'rock',label:'Rock',new:false},{id:'country',label:'Country',new:false},{id:'edm',label:'EDM',new:false},{id:'folk',label:'Folk',new:false},{id:'latin',label:'Latin',new:false},{id:'metal',label:'Metal',new:false},{id:'jazz',label:'Jazz',new:false},{id:'ss',label:'Singer-Songwriter',new:true},{id:'altrock',label:'Alt-Rock',new:true},{id:'reggae',label:'Reggae',new:true},{id:'afrobeats',label:'Afrobeats',new:true},{id:'blues',label:'Blues',new:true},{id:'punk',label:'Punk',new:true},{id:'latin',label:'Latin',new:false},{id:'reggaeton',label:'Reggaeton',new:true},{id:'kpop',label:'K-Pop',new:true}];
+  const allG=[{id:'pop',label:'Pop',new:false},{id:'hiphop',label:'Hip-Hop',new:false},{id:'rnb',label:'R&B',new:false},{id:'rock',label:'Rock',new:false},{id:'country',label:'Country',new:false},{id:'edm',label:'EDM',new:false},{id:'folk',label:'Folk',new:false},{id:'latin',label:'Latin',new:false},{id:'metal',label:'Metal',new:false},{id:'jazz',label:'Jazz',new:false},{id:'ss',label:'Singer-Songwriter',new:true},{id:'altrock',label:'Alt-Rock',new:true},{id:'reggae',label:'Reggae',new:true},{id:'afrobeats',label:'Afrobeats',new:true},{id:'blues',label:'Blues',new:true},{id:'kpop',label:'K-Pop',new:true},{id:'punk',label:'Punk',new:true},{id:'reggaeton',label:'Reggaeton',new:true},{id:'neosoul',label:'Neo-Soul',new:true},{id:'gospel',label:'Gospel',new:true},{id:'children',label:"Children's",new:true},{id:'parody',label:'Parody',new:true},{id:'comedy',label:'Comedy',new:true},{id:'tvmusical',label:'TV / Musical',new:true}];
   allG.forEach(g=>{
     const p=document.createElement('span');
     p.className='pill'+(g.new?' new':'')+(g.id==='ss'?' on':'');
@@ -3644,6 +3986,12 @@ const GENRES_DEF = [
   {id:'blues',label:'Blues',icon:'🎺',new:true},
   {id:'kpop',label:'K-Pop',icon:'✨',new:true},
   {id:'punk',label:'Punk',icon:'⚡',new:true},
+  {id:'neosoul',label:'Neo-Soul',icon:'🎹',new:true},
+  {id:'gospel',label:'Gospel',icon:'🙏',new:true},
+  {id:'children',label:"Children's",icon:'🌈',new:true},
+  {id:'parody',label:'Parody',icon:'🎭',new:true},
+  {id:'comedy',label:'Comedy',icon:'😂',new:true},
+  {id:'tvmusical',label:'TV / Musical',icon:'🎬',new:true},
 ];
 
 function initGenreGrid(){
@@ -4148,6 +4496,12 @@ const MOODS_DEF=[
   {id:'Peaceful',     icon:'🍃', hint:'Gentle resolution — fingerpicked guitar, soft dynamics, breath in the mix'},
   {id:'Angry',        icon:'⚡', hint:'Explosive tension — distortion, heavy drums, cathartic release'},
   {id:'Playful',      icon:'🎉', hint:'Light energy — bouncy groove, quick wordplay, major key warmth'},
+  {id:'Longing',      icon:'🌙', hint:'Aching for something just out of reach — held notes, unresolved cadences, imagery of distance and absence'},
+  {id:'Transcendent', icon:'✨', hint:'Beyond the everyday — goosebump production, choir swells, spiritual peak that lifts the listener out of themselves'},
+  {id:'Devastated',   icon:'🖤', hint:'Full grief, not bittersweet — raw loss, shattered structure, silence used as emotional weapon'},
+  {id:'Tender',       icon:'🕯️', hint:'Soft held-breath vulnerability — whispered vocal, sparse arrangement, words almost too honest to say aloud'},
+  {id:'Triumphant',   icon:'🏆', hint:'Earned victory after struggle — rising key change, full production swell, the chorus that makes you raise your fist'},
+  {id:'Bittersweet',  icon:'🍂', hint:'Simultaneous joy and sadness — graduation, last days, farewells — major key melody with minor key ache underneath'},
 ];
 
 function initMoodGrid(){
@@ -4535,16 +4889,133 @@ function setBracket(el, mode) {
   el.classList.add('on');
 }
 
+function setHookStyle(el, style) {
+  S.hookStyle = style;
+  document.querySelectorAll('#hook-style-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+}
+
 function bracketInstruction() {
-  const mode = S.bracketMode || 'basic';
+  const mode      = S.bracketMode || 'basic';
+  const genre     = S.selectedGenre || 'pop';
+  const isRap     = (genre === 'hiphop');
+  const isParody  = (genre === 'parody');
+  const isComedy  = (genre === 'comedy');
+  const isTV      = (genre === 'tvmusical');
+  const isNeoSoul = (genre === 'neosoul');
+  const isGospel  = (genre === 'gospel');
+  const isChild   = (genre === 'children');
+  const substyle  = S.substyle || '';
+  const sb        = SUBSTYLE_BRACKETS[substyle]; // substyle-specific vocab
+
   if (mode === 'none')
     return 'SECTION TAGS: Write the lyrics with absolutely NO section labels, headers, or brackets of any kind. Pure lyric lines only.';
+
+  // Parody — mirror the source genre brackets, add comedy-specific tags
+  if (isParody) {
+    if (sb) {
+      if (mode === 'basic')
+        return `SECTION TAGS: Mirror the source genre's structure with brackets. Verse: ${sb.verse}. Hook/Chorus: ${sb.hook}. Every section must sound musically authentic — the comedy is in the LYRICS only, never in the tags.`;
+      if (mode === 'enhanced')
+        return `SECTION TAGS: Use source-genre brackets with comedic escalation markers. Verse: ${sb.verse}. Hook: ${sb.hook}. Add: [Bridge | Absurd Escalation], [Outro | Callback Punchline]. Extra: ${sb.extra.join(', ')}. Keep production tags straight-faced.`;
+    }
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use standard song structure brackets that match the genre being parodied: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Music sounds completely sincere — comedy is lyrics only.';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Standard brackets matching parodied genre, plus comedy escalation markers: [Verse 1], [Pre-Chorus], [Chorus], [Bridge | Darkest Escalation], [Final Chorus | Payoff], [Outro | Callback]. Play it completely straight musically.';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Full meta-brackets for comedic structure: [Verse 1 | Premise Established], [Pre-Chorus | Tension], [Chorus | Punchline Delivery], [Verse 2 | Complications], [Bridge | Darkest / Most Absurd Point], [Final Chorus | Full Payoff], [Outro | Callback to Verse 1 Image]. Music always sincere.';
+  }
+
+  // Comedy — structure serves the joke arc
+  if (isComedy) {
+    if (sb) {
+      if (mode === 'basic')
+        return `SECTION TAGS: Structure brackets that serve the comedy arc. Verse: ${sb.verse}. Hook: ${sb.hook}. The genre sounds serious — the words are funny.`;
+      if (mode === 'enhanced')
+        return `SECTION TAGS: Comedy structure with escalation. Verse: ${sb.verse}. Hook: ${sb.hook}. Add: [Bridge | Maximum Escalation | Unhinged]. Extra: ${sb.extra.join(', ')}. End on the biggest laugh.`;
+    }
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use [Verse 1] (premise), [Chorus] (punchline hook), [Verse 2] (escalation), [Bridge] (darkest/most absurd point), [Final Chorus] (full payoff), [Outro]. The final line of the song IS the punchline.';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Comedy arc brackets: [Verse 1 | Premise], [Chorus | Punchline Hook], [Verse 2 | Escalation], [Pre-Bridge | Stakes Rising], [Bridge | Most Unhinged Moment], [Final Chorus | Full Payoff], [Outro | Callback]. Genre music plays completely straight.';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Full comedy structure meta-brackets: [Verse 1 | Setup — establish the ridiculous premise clearly], [Chorus | Punchline Hook — most memorable funny line], [Verse 2 | Complications and escalation], [Bridge | Darkest or most absurd point — cross the line then laugh], [Final Chorus | Full comedic payoff], [Outro | Callback to the original image from verse 1].';
+  }
+
+  // TV / Musical
+  if (isTV) {
+    if (sb) {
+      if (mode === 'basic')
+        return `SECTION TAGS: Narrative/functional brackets for ${substyle || 'TV/Musical'} format. Opening: ${sb.verse}. Theme hook: ${sb.hook}. Every bracket serves the dramatic or commercial function.`;
+      if (mode === 'enhanced')
+        return `SECTION TAGS: Full theatrical brackets. Opening: ${sb.verse}. Theme: ${sb.hook}. Add: ${sb.extra.join(', ')}. Brackets reflect the dramatic function of each section.`;
+    }
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use dramatic function brackets: [Intro], [Verse 1 | Character Establishes], [Chorus | Emotional Peak | I Want], [Verse 2 | Complication], [Bridge | Turning Point], [Final Chorus | Resolution], [Outro]. Every section has a narrative job.';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Full theatrical structure: [Intro | World Established], [Verse 1 | Character Voice], [Pre-Chorus | Tension], [Chorus | Emotional Eruption], [Verse 2 | Complication Deepens], [Bridge | Darkest Moment | Turning Point], [Final Chorus | Transformed Meaning], [Outro | Resolution or Cliffhanger].';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Theatrical meta-brackets with dramatic direction: [Intro | Establish world and stakes], [Verse 1 | Character sings what cannot be spoken], [Pre-Chorus | Stakes rise], [Chorus | Full emotional eruption — the "I want/need/feel" moment], [Verse 2 | Complication or obstacle], [Bridge | Darkest point / character transformation], [Final Chorus | Same melody, transformed meaning], [Outro | Resolution or new question].';
+  }
+
+  // Neo-Soul — groove-led, space-conscious, vamp outro
+  if (isNeoSoul) {
+    const verseTag = sb ? sb.verse : '[Verse | Groove-Led | Conversational]';
+    const hookTag  = sb ? sb.hook  : '[Chorus | Soulful | Declaration]';
+    const extras   = sb ? sb.extra.join(', ') : '[Outro Vamp | Escalating Ad-libs], [Bridge | Half-Time Feel]';
+    if (mode === 'basic')
+      return `SECTION TAGS: Use neo-soul structure brackets with groove and space emphasis. Verse: ${verseTag}. Chorus: ${hookTag}. Always include [Outro Vamp | Ad-libs] — write this section out fully, it is the emotional peak.`;
+    if (mode === 'enhanced')
+      return `SECTION TAGS: Full neo-soul structure. Verse: ${verseTag}. Chorus: ${hookTag}. Add [Bridge | Half-Time Feel] and ${extras}. Mark ad-lib lines with (ad-lib) inline. The outro vamp MUST escalate — write 4-6 cycling lines.`;
+    if (mode === 'experimental')
+      return `SECTION TAGS: Meta neo-soul brackets: [Intro | Groove Only — 8 bars before vocal], ${verseTag.replace(']',' | Space-Between-Lines]')}, [Pre-Chorus | Tension], ${hookTag.replace(']',' | Earned]')}, [Bridge | Half-Time | Introspective], [Outro Vamp | Start Sparse → Escalate → Full Catharsis]. Mark ad-libs with (ad-lib) throughout.`;
+  }
+
+  // Gospel — testimony arc, call-and-response, vamp bridge
+  if (isGospel) {
+    const verseTag = sb ? sb.verse : '[Verse | Testimony | Lead Vocal]';
+    const hookTag  = sb ? sb.hook  : '[Chorus | Declaration | Call and Response]';
+    const extras   = sb ? sb.extra.join(', ') : '[Bridge | Shout Moment | Vamp], [Outro Vamp | Choir]';
+    if (mode === 'basic')
+      return `SECTION TAGS: Use gospel structure brackets with call-and-response. Verse: ${verseTag}. Chorus: ${hookTag}. Bridge MUST be written as a vamp with repeating escalating lines. Format call-response as: "Lead line — (Response)".`;
+    if (mode === 'enhanced')
+      return `SECTION TAGS: Full gospel structure. Verse: ${verseTag}. Chorus: ${hookTag}. Add: ${extras}. Mark call-response inline: "I was broken — (broken)". Bridge vamp: write 4-8 escalating cycling lines — this is the climax.`;
+    if (mode === 'experimental')
+      return `SECTION TAGS: Full gospel meta-brackets: [Verse | Testimony Setup — I WAS], [Pre-Chorus | Stakes Rising], [Chorus | Declaration — NOW I AM | Call and Response], [Verse 2 | Testimony Deepens], [Bridge | Shout Moment — Vamp | Repeat and Escalate 4-8×], [Outro Vamp | Choir | Full Catharsis]. Mark call-response throughout.`;
+  }
+
+  // Children's — singable, motion-cued, simple, safe
+  if (isChild) {
+    const verseTag = sb ? sb.verse : '[Verse | Teaching | Playful]';
+    const hookTag  = sb ? sb.hook  : '[Chorus | Singalong | Motion Cues]';
+    if (mode === 'basic')
+      return `SECTION TAGS: Use simple, clear section brackets. Verse: ${verseTag}. Chorus: ${hookTag}. Chorus must repeat 3-4 times. Embed physical motion cues in lyrics (clap, stomp, spin). Keep all section labels child-friendly and clear.`;
+    if (mode === 'enhanced')
+      return `SECTION TAGS: Children's song structure with motion and interaction. Verse: ${verseTag}. Chorus: ${hookTag}. Add [Bridge | Question or Adventure], [Outro | Repeat Together | Fade with Love]. Embed clap/stomp/spin cues naturally in lyric lines.`;
+    if (mode === 'experimental')
+      return `SECTION TAGS: Full interactive children's structure: [Intro | Welcome | Set the World], [Verse 1 | Discover Something], [Chorus | Singalong | Clap Along | Repeat], [Verse 2 | New Discovery | Deeper Into Adventure], [Chorus | Repeat Together], [Bridge | A Question or Silly Turn], [Final Chorus | Everyone Sings | Biggest Energy], [Outro | Safe Resolution | Slow to Love].`;
+  }
+
+  if (isRap) {
+    const verseTag = sb ? sb.verse : '[16-bar Verse | Rap Verse]';
+    const hookTag  = sb ? sb.hook  : '[8-bar Hook]';
+    const extras   = sb ? sb.extra.join(', ') : '[Beat Switch], [Outro | Fade-Out]';
+
+    if (mode === 'basic')
+      return `SECTION TAGS: Use hip-hop Suno brackets on their own line with bar counts. Verse tag: ${verseTag}. Hook tag: ${hookTag}. Also use: [4-bar Intro | Beat Only], [Bridge], [Outro]. Ad-libs in parentheses inline: "came from nothing (yeah) built this (uh)".`;
+    if (mode === 'enhanced')
+      return `SECTION TAGS: Use hip-hop brackets with flow direction. Verse: ${verseTag}. Hook: ${hookTag}. Add movement tags between sections: [Triplet Flow], [Double Time], [Beat Switch], [Ad-libs]. Extra style tags: ${extras}. Ad-libs in parentheses inline: (yeah) (uh) (let's go).`;
+    if (mode === 'experimental')
+      return `SECTION TAGS: Full hip-hop meta-brackets with emotional + flow context. Verse: ${verseTag.replace(']', ' | establishing scene]')}. Hook: ${hookTag.replace(']', ' | emotional peak]')}. Scale intensity each verse: Verse 1 normal → Verse 2 Double Time → Verse 3 Triplet Flow. Extra tags: ${extras}. Production tags: [Hard 808s], [Minimalist Beat], [Chopped Vocal Ad-libs]. Inline ad-libs in parentheses.`;
+  }
+
   if (mode === 'basic')
     return 'SECTION TAGS: Label every section with standard Suno-style brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.';
   if (mode === 'enhanced')
-    return 'SECTION TAGS: Label every section with standard brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Additionally insert inter-song movement tags on their own line between sections wherever the energy shifts — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. These direct the energy arc of the song. 4 lines per verse, 2-4 per chorus.';
+    return 'SECTION TAGS: Label every section with standard brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Additionally insert inter-song movement tags on their own line between sections wherever the energy shifts — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. 4 lines per verse, 2-4 per chorus.';
   if (mode === 'experimental')
-    return 'SECTION TAGS: Label every section with detailed meta-brackets on their own line that include emotional context, e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also insert production direction tags on their own line where fitting: [Quiet], [Intense], [Spoken], [Whispered]. 4 lines per verse, 2-4 per chorus.';
+    return 'SECTION TAGS: Label every section with detailed meta-brackets on their own line including emotional context, e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also insert production direction tags: [Quiet], [Intense], [Spoken], [Whispered]. 4 lines per verse, 2-4 per chorus.';
   return 'SECTION TAGS: Label every section with standard Suno-style brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.';
 }
 
