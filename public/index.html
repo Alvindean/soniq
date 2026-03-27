@@ -1890,9 +1890,21 @@ const FORMULA_LAWS=[
   {n:'BPM groove lock',d:'120–130 BPM = walking cadence (pop/dance). 60–70 BPM = resting heartbeat (ballads). Matching tempo to physiology creates embodied engagement.',v:8},
 ];
 
+const SUBSTYLE_NOTES={
+  // Hip-Hop regional/era deep notes injected alongside substyleNote
+  'G-Funk':      'G-Funk DNA: 90-100 BPM, slow rolling groove. Synthesizer whine (Moog/Roland), P-Funk bass samples (Parliament-Funkadelic). Laid-back West Coast flow — lines stretch over the beat, never rushed. Imagery: Lowriders, sunshine, Crenshaw, Pacific Coast. Nate Dogg-style melodic sung hooks. Suno style: "g-funk, moog synth whine, west coast hip-hop, slow rolling 808, 95 BPM, smooth melodic hook". Artists: Dr. Dre, Snoop Dogg, Warren G, Nate Dogg, Tha Dogg Pound.',
+  'Bay Area':    'Bay Area DNA: Hyphy movement — E-40, Mac Dre, Too Short, Mistah F.A.B. High-energy, frenetic delivery contrasted with laid-back Oakland drawl. Slang: hella, thizz, yadadamean, stunna, turf, ghost ride. Ghost riding the whip references. Screwed/chopped variants for slower tracks. Trunk-rattling bass. Suno style: "bay area hip-hop, hyphy, trunk music, 808 bass, hi-energy, Oakland rap". Older Bay flavor: Too Short pimp talk, Digital Underground funk-rap.',
+  'Down South':  'Down South / Dirty South DNA: Trunk-rattling slow 808s, Southern drawl, elongated vowels on stressed syllables. Sub-genres: Atlanta (OutKast psychedelic, Goodie Mob soul), Houston (UGK country-rap, Scarface cinematic, DJ Screw chopped), Memphis (Three 6 Mafia dark horror, lo-fi cassette), New Orleans (Cash Money bounce, Master P No Limit tank). Themes: Southern heat, street survival, pride, codeine lean. Suno style varies — "dirty south, 808 bass, southern rap, slow tempo" for Houston; "atlanta rap, psychedelic, live band, funk" for ATL.',
+  'Crunk':       'Crunk DNA: Lil Jon / Three 6 Mafia era. Call-and-response crowd shouts. Extremely high energy, short punchy lines. Repetitive hypnotic hooks meant for clubs. Distorted synth stabs. 140-150 BPM. Screamed adlibs throughout. Suno style: "crunk, distorted synth, 808, 145 BPM, club energy, call and response, eastern Kentucky". Artists: Lil Jon, Ying Yang Twins, Three 6 Mafia.',
+  'Chopped & Screwed': 'Chopped & Screwed DNA: DJ Screw Houston style. Slowed tempo 60-70 BPM. Pitch-lowered vocals (baritone, syrupy). Repeated bars and phrases ("chopped"). Codeine/lean references. Hypnotic repetition creates trance state. Suno style: "chopped and screwed, slowed houston rap, syrupy 65 BPM, baritone, deep 808, houston texas". Artists: DJ Screw, Z-Ro, Slim Thug, Paul Wall.',
+  'East Coast':  'East Coast DNA: New York lyricism tradition. Complex internal rhyme schemes, dense wordplay, cultural references. Jazz/soul samples (Pete Rock, Large Professor, RZA). Boom bap drums, minimal production. 85-95 BPM. Verses carry the song — hooks are functional not melodic. Suno style: "east coast hip-hop, boom bap, jazz sample, vinyl, 90 BPM, new york". Artists: Nas, Jay-Z, Biggie, Rakim, Big L, Mobb Deep, Wu-Tang.',
+  'Midwest':     'Midwest DNA: Chicago soul samples (Kanye era), Twista hyperspeed flow, Detroit grit (Big Sean, Royce da 5\'9"), St. Louis bounce. Emotional vulnerability alongside street realism. Chipmunk soul samples. Suno style: "midwest rap, soul sample, chicago, 95 BPM, emotional, chipmunk soul". Artists: Kanye West, Twista, Common, Lupe Fiasco, Chance the Rapper, Big Sean.',
+  'Cloud Rap':   'Cloud Rap DNA: Ethereal, atmospheric, lo-fi production. Hazy drum machines, woozy synth pads, reverb-drenched vocals. Existential/introspective themes, often melancholic. Very slow BPM 70-90. Mumbled delivery. Suno style: "cloud rap, ethereal, lo-fi, reverb, atmospheric synths, 80 BPM, dreamy". Artists: Lil B, Bladee, Yung Lean, Carti (early), Bones.',
+};
+
 const SUBSTYLES={
   kpop:['Girl Group','Boy Group','K-Pop Ballad','Dance Pop','Dark Concept','Bubblegum','Hip-Hop K-Pop','R&B K-Pop'],
-  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School'],
+  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap'],
   latin:['Salsa','Bachata','Cumbia','Bossa Nova','Latin Pop','Latin Jazz','Mariachi'],
   reggaeton:['Perreo Clásico','Trap Latino','Reggaeton Romántico','Urbano Latino','Dembow Puro','Reggaeton Pop'],
   altrock:['Shoegaze','Post-Punk','Grunge','Indie Rock','Lo-Fi','Art Rock','Emo','Math Rock'],
@@ -2583,7 +2595,8 @@ async function generateSong(){
 
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
   const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
-  const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.`:'';
+  const substyleDetail = S.substyle && SUBSTYLE_NOTES[S.substyle] ? `\n${SUBSTYLE_NOTES[S.substyle]}` : '';
+  const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.${substyleDetail}`:'';
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
   const hiphopNote=genre==='hiphop'?`\n\nHIP-HOP VERSE RULES (non-negotiable):
 - 1 bar = 1 line. Write EXACTLY the bar count in the structure (e.g. [16-bar Verse] = 16 lines, [12-bar Verse] = 12 lines, [8-bar Hook] = 8 lines).
