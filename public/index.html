@@ -946,7 +946,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 @media print{
   body{background:#fff!important;color:#111!important;font-family:Georgia,serif}
-  .nav,.hdr-tags,.result-acts,.save-bar,.otabs,.loaded-banner,.gen-action,.studio,.key-banner,#pg-lucky,#pg-library,#pg-editor,#pg-builder,#pg-more,#pg-campaign,.score-dashboard,.var-results{display:none!important}
+  .nav,.hdr-tags,.result-acts,.save-bar,.otabs,.loaded-banner,.gen-action,.studio,.key-banner,#pg-lucky,#pg-library,#pg-editor,#pg-builder,#pg-more,#pg-campaign,.score-dashboard,.var-results,.revision-bar,.version-bar{display:none!important}
   #pg-write{display:block!important}
   #gen-out{display:block!important;border:none!important;box-shadow:none!important}
   .result-card{border:none!important}
@@ -3288,8 +3288,7 @@ function updBlendDesc(){
   const key=s2sel.value||'';
   document.getElementById('blend-desc').textContent=descs[key]||(parts.length?'Secondary influence active — writing will blend both styles proportionally.':'');
 }
-document.getElementById('g-genre2').addEventListener('change',updBlendDesc);
-document.getElementById('g-style2').addEventListener('change',updBlendDesc);
+// Note: updBlendDesc is already called via inline onchange on #g-genre2 and #g-style2
 
 // ─── FEEL LUCKY ───
 const LUCKY_TOPICS=['growing up too fast','a city that never loved you back','last message before midnight','the version of yourself you abandoned','driving nowhere at 3am','falling in love with the wrong timeline','what silence sounds like after a storm','rebuilding from zero','the first morning after everything changed','chasing something you lost before you knew its name','finding home in a stranger','the day the music saved you'];
@@ -6464,6 +6463,9 @@ async function revise(prefix, instruction) {
     if (prefix === 'res') S.currentSong.lyrics = newLyrics;
     else S.luckyCurrentSong.lyrics = newLyrics;
     if (lyricsEl) lyricsEl.innerHTML = newLyrics.replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    pushVersion(prefix);
+    renderVersionBar(prefix);
+    calcHookScore(prefix);
     toast('✓ Revised!');
   } catch(e) {
     toast('⚠️ ' + e.message, 4000);
