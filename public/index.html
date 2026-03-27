@@ -1017,14 +1017,33 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="param">
           <div class="param-label">Structure</div>
           <select id="g-structure">
-            <option value="standard">Standard V-PC-C-V-PC-C-B-C</option>
-            <option value="hookfirst">Hook-First (modern)</option>
-            <option value="storytelling">Storytelling Arc</option>
-            <option value="minimal">Minimal / Loop</option>
-            <option value="epic">Epic (8 sections)</option>
-            <option value="verseonly">Verse-Only (folk/SS)</option>
-            <option value="riddim">Riddim Loop (reggae)</option>
-            <option value="kpop">K-Pop (pre-chorus + key change)</option>
+            <optgroup label="— General —">
+              <option value="standard">Standard V-PC-C-V-PC-C-B-C</option>
+              <option value="hookfirst">Hook-First (modern streaming)</option>
+              <option value="chorusfirst">Chorus-First (radio pop)</option>
+              <option value="doublechorus">Double Chorus (arena pop)</option>
+              <option value="storytelling">Storytelling Arc (3 verses)</option>
+              <option value="minimal">Minimal / Loop</option>
+              <option value="epic">Epic (8 sections)</option>
+              <option value="verseonly">Verse-Only (folk/SS)</option>
+              <option value="aaba">AABA 32-bar (jazz/classic)</option>
+              <option value="ballad">Ballad / Cinematic (key change)</option>
+              <option value="edm">EDM Build-Drop</option>
+              <option value="viral">TikTok / Viral (hook at 0:00)</option>
+            </optgroup>
+            <optgroup label="— Hip-Hop / Rap —">
+              <option value="hiphop_classic">Classic Hip-Hop (3×16-bar verses)</option>
+              <option value="hiphop_trap">Trap (hook-first, 12-bar verses)</option>
+              <option value="hiphop_beatswitch">Beat Switch (SICKO MODE style)</option>
+              <option value="hiphop_storytelling">Storytelling Rap (3×24-bar, no hook)</option>
+              <option value="hiphop_melodic">Melodic Rap / R&amp;B Crossover</option>
+            </optgroup>
+            <optgroup label="— Genre-Specific —">
+              <option value="riddim">Riddim Loop (reggae)</option>
+              <option value="afrobeats">Afrobeats Vamp</option>
+              <option value="gospel">Gospel / R&amp;B Vamp</option>
+              <option value="kpop">K-Pop (pre-chorus + key change)</option>
+            </optgroup>
           </select>
         </div>
       </div>
@@ -1815,6 +1834,20 @@ const SONGS={
 };
 
 const GENRE_BIBLE={
+  hiphop:{
+    dna:'Bars are currency — 1 bar = 1 line. 16-bar verse = 16 lines. Hook = 8 bars = 8 lines (or 4 unique lines repeated). Ad-libs in parentheses: (yeah) (uh) (let\'s go). Internal rhymes every 2-3 syllables create density. Flow variation (normal → double time → triplet) is the surprise weapon.',
+    structure:'Classic: [16-bar Verse] × 3 with [8-bar Hook]. Trap: [8-bar Hook] → [12-bar Verse] repeated with hook 4-6×. Beat Switch: two complete song sections at different BPMs joined by [Beat Switch]. Bar 16 of every verse = the punchline. 4-bar groups: bars 1-4 setup, 5-8 develop, 9-12 deepen, 13-16 payoff.',
+    suno:'"trap, 808 bass, hard snare, rolling hi-hats, 140 BPM" for trap. "boom bap, vinyl crackle, jazz sample, hard kick, 90 BPM" for classic. "melodic rap, atmospheric, auto-tune, 120 BPM" for melodic. Always specify BPM. Use [Rap Verse] to prevent Suno singing the verse.',
+    keys:[
+      '1 bar = 1 line — write exactly the bar count specified in the structure. 16-bar verse = 16 lines, no more, no less',
+      'Ad-libs belong in parentheses on the same line: "I got it (yeah) from nothing (uh)" — Suno renders these as background interjections',
+      '[Triplet Flow] = rolling 3-syllable subdivisions (da-da-DUM). [Double Time] = twice the syllables per bar. Use [Beat Switch] for full BPM/key change',
+      'Hook must be melodically singable even in a rap song — it carries the emotional memory. Trap hooks repeat 4-6× total across the song',
+      'Verse structure within 16 bars: bars 1-4 establish scene/topic, bars 5-8 develop, bars 9-12 complicate or contrast, bar 16 is always the punchline or emotional peak',
+      'Internal rhymes every 2-3 syllables add density beyond end rhymes. Chain rhymes across 4-bar units create momentum'
+    ],
+    artists:'Kendrick Lamar · Drake · Travis Scott · J. Cole · Eminem · Future · Lil Baby · Tyler the Creator · 21 Savage · Gunna · Nas · Jay-Z'
+  },
   ss:{dna:'Voice, acoustic guitar, emotional truth, first-person narrative, autobiographical imagery. The song is the diary entry.',structure:'Most flexible genre. Verse-only (no chorus), VCVCBC, or through-composed. The STORY determines structure — not a template.',suno:'"fingerpicked acoustic guitar, intimate close-mic vocals, warm room reverb, no drums" for stripped. Add "brushed snare, upright bass" for fuller feel.',keys:['Every line must earn its place — no filler','Specificity creates universality — house numbers, dog names, street names','Second verse must deepen emotionally, not repeat the first','Guitar tuning is a character — mention DADGAD or open G in style'],artists:'Tracy Chapman · Joni Mitchell · Elliott Smith · Bon Iver · Phoebe Bridgers · Paul Simon · Brandi Carlile'},
   altrock:{dna:'Indie ethos + rock power + outsider perspective. Distortion as emotional language. Quiet-loud dynamic is the core structural move.',structure:'VPCVC with massive dynamic variance. Quiet verse (clean guitar, restrained vocal) → explosive chorus (distortion, full drums, pushed vocal).',suno:'Sub-genre specific: "shoegaze, wall of sound" vs "post-punk, angular guitars, Joy Division atmosphere" vs "indie rock, jangly clean guitars".',keys:['Chorus must be earned — verse tension must build to a real release','Distortion is an emotion — use it purposefully','Alt-rock lyrics embrace ambiguity — specific images, opaque meaning','Bridge should recontextualize the chorus, not just repeat it'],artists:'Radiohead · Pixies · Pavement · Modest Mouse · The National · Interpol · Arctic Monkeys · Mitski'},
   reggae:{dna:'Offbeat skank (guitar chop on beats 2&4), one-drop drum (kick on beat 3), bass as melody, spiritual/political consciousness, community and resistance.',structure:'Long meditative verses. Chorus is comforting mantra, not explosive hook. Outro vamps are essential — let the groove breathe and fade slowly.',suno:'"reggae, one-drop rhythm, offbeat skank guitar, melodic bass, roots reggae" for classic. "Dancehall, digital riddim, 90 BPM" for modern.',keys:['Bass is the lead instrument — it carries melody','Chorus is resolution, not climax — reggae builds peace not tension','Outro vamp is non-negotiable','Add [dub break] in Suno for echo/reverb instrumental section'],artists:'Bob Marley · Peter Tosh · Burning Spear · Jimmy Cliff · Toots · Damian Marley · Chronixx'},
@@ -1870,14 +1903,29 @@ const SUBSTYLES={
 };
 
 const STRUCTURES={
-  standard:'[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
-  hookfirst:'[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
-  storytelling:'[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
-  minimal:'[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
-  epic:'[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
-  verseonly:'[Intro] → [Verse 1] → [Verse 2] → [Verse 3] → [Verse 4] → [Outro]',
-  riddim:'[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Dub Break] → [Verse 3] → [Hook] → [Outro Vamp]',
-  kpop:'[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Rap Break] → [Bridge] → [Key Change +1] → [Final Chorus] → [Outro]',
+  // ── General ──────────────────────────────────────────────────────────────
+  standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
+  hookfirst:    '[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
+  chorusfirst:  '[Chorus] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Final Chorus]',
+  storytelling: '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
+  minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
+  epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
+  doublechorus: '[Verse 1] → [Pre-Chorus] → [Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Chorus] → [Bridge] → [Final Chorus] → [Final Chorus]',
+  verseonly:    '[Intro] → [Verse 1] → [Verse 2] → [Verse 3] → [Verse 4] → [Outro]',
+  aaba:         '[A Section] → [A Section] → [B Bridge] → [A Section]',
+  ballad:       '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Breakdown] → [Key Change] → [Final Chorus]',
+  edm:          '[Intro] → [Build] → [Drop] → [Breakdown] → [Build] → [Drop] → [Outro]',
+  viral:        '[Hook (0:00)] → [Verse] → [Pre-Chorus] → [Hook] → [Bridge] → [Final Hook]',
+  // ── Genre-specific ───────────────────────────────────────────────────────
+  hiphop_classic:      '[4-bar Intro | Beat Only] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook] → [16-bar Verse 2 | Rap Verse] → [8-bar Hook] → [16-bar Verse 3 | Rap Verse] → [8-bar Hook] → [4-bar Outro]',
+  hiphop_trap:         '[4-bar Intro | Beat Only] → [8-bar Hook] → [12-bar Verse 1 | Rap Verse] → [8-bar Hook] → [12-bar Verse 2 | Rap Verse] → [8-bar Hook] → [8-bar Hook] → [4-bar Outro | Ad-libs]',
+  hiphop_beatswitch:   '[4-bar Intro | Beat Only] → [8-bar Hook] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook] → [16-bar Verse 2 | Rap Verse] → [Beat Switch] → [16-bar Verse 3 | Triplet Flow] → [8-bar Final Hook] → [Outro | Fade-Out]',
+  hiphop_storytelling: '[8-bar Intro | Spoken Word] → [24-bar Verse 1 | Rap Verse] → [24-bar Verse 2 | Rap Verse] → [24-bar Verse 3 | Rap Verse] → [8-bar Outro]',
+  hiphop_melodic:      '[4-bar Intro] → [8-bar Hook | Melodic | Sung] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook | Sung] → [16-bar Verse 2 | Rap Verse] → [8-bar Bridge | Sung] → [8-bar Final Hook | Sung | stacked harmonies] → [Outro | Fade-Out]',
+  riddim:       '[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Dub Break] → [Verse 3] → [Hook] → [Outro Vamp]',
+  afrobeats:    '[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Ad-lib Break] → [Hook] → [Outro Vamp]',
+  gospel:       '[Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Bridge] → [Vamp] → [Outro Ad-lib]',
+  kpop:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Rap Break] → [Bridge] → [Key Change +1] → [Final Chorus] → [Outro]',
 };
 
 const FUSION_DATA={
@@ -2537,6 +2585,15 @@ async function generateSong(){
   const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
   const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.`:'';
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
+  const hiphopNote=genre==='hiphop'?`\n\nHIP-HOP VERSE RULES (non-negotiable):
+- 1 bar = 1 line. Write EXACTLY the bar count in the structure (e.g. [16-bar Verse] = 16 lines, [12-bar Verse] = 12 lines, [8-bar Hook] = 8 lines).
+- 4-bar internal structure per verse: bars 1-4 establish scene, bars 5-8 develop, bars 9-12 complicate, bar 16 = punchline/payoff.
+- Ad-libs in parentheses on the same line: "I came from nothing (yeah) built this from the ground (uh)".
+- [Triplet Flow] section: use rapid 3-syllable rolling groups (da-da-DUM cadence, twice the syllable density).
+- [Double Time] section: twice as many syllables per bar — dense, rapid-fire delivery.
+- [Beat Switch]: the section after must feel like a completely different song (different energy, flow, topic angle).
+- Hook must be melodic and singable — 8 bars, simple phrase that earns its repetition.
+- Internal rhymes every 2-3 syllables add density on top of end rhymes.`:'';
   // Clear album context after use so it doesn't carry over to next song
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
 
@@ -2568,7 +2625,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${blendNote}${albumNote}${hiphopNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -4536,15 +4593,28 @@ function setBracket(el, mode) {
 }
 
 function bracketInstruction() {
-  const mode = S.bracketMode || 'basic';
+  const mode   = S.bracketMode || 'basic';
+  const isRap  = (S.selectedGenre === 'hiphop');
+
   if (mode === 'none')
     return 'SECTION TAGS: Write the lyrics with absolutely NO section labels, headers, or brackets of any kind. Pure lyric lines only.';
+
+  if (isRap) {
+    // Hip-hop gets its own tag vocabulary regardless of mode
+    if (mode === 'basic')
+      return 'SECTION TAGS: Use hip-hop Suno brackets on their own line. Structure tags: [Intro | Beat Only], [Rap Verse], [Hook], [Bridge], [Outro]. Include bar counts matching the structure (e.g. [16-bar Rap Verse], [8-bar Hook]). Write ad-libs in parentheses inline: "grind never stops (yeah) came up (uh)".';
+    if (mode === 'enhanced')
+      return 'SECTION TAGS: Use hip-hop brackets with flow direction on their own line: [16-bar Rap Verse], [8-bar Hook], [Triplet Flow], [Double Time], [Beat Switch], [Ad-libs], [Outro | Fade-Out]. Insert flow-change tags between sections where the delivery shifts. Ad-libs in parentheses inline: (yeah) (uh) (let\'s go).';
+    if (mode === 'experimental')
+      return 'SECTION TAGS: Use full hip-hop meta-brackets on their own line with emotional + flow context: [16-bar Verse 1 | establishing the hustle], [8-bar Hook | sung | melodic], [16-bar Verse 2 | Double Time | escalating], [Beat Switch], [16-bar Verse 3 | Triplet Flow | resolution]. Add production tags: [Hard 808s], [Minimalist Beat], [Chopped Vocal Ad-libs]. Inline ad-libs in parentheses.';
+  }
+
   if (mode === 'basic')
     return 'SECTION TAGS: Label every section with standard Suno-style brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.';
   if (mode === 'enhanced')
-    return 'SECTION TAGS: Label every section with standard brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Additionally insert inter-song movement tags on their own line between sections wherever the energy shifts — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. These direct the energy arc of the song. 4 lines per verse, 2-4 per chorus.';
+    return 'SECTION TAGS: Label every section with standard brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Additionally insert inter-song movement tags on their own line between sections wherever the energy shifts — e.g. [Build], [Drop], [Breakdown], [Crescendo], [Transition], [Hook], [Quiet], [Intense]. 4 lines per verse, 2-4 per chorus.';
   if (mode === 'experimental')
-    return 'SECTION TAGS: Label every section with detailed meta-brackets on their own line that include emotional context, e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also insert production direction tags on their own line where fitting: [Quiet], [Intense], [Spoken], [Whispered]. 4 lines per verse, 2-4 per chorus.';
+    return 'SECTION TAGS: Label every section with detailed meta-brackets on their own line including emotional context, e.g. [Verse 1: establishing the scene], [Pre-Chorus: tension rising], [Chorus: emotional release], [Bridge: perspective shift], [Outro: resolution]. Also insert production direction tags: [Quiet], [Intense], [Spoken], [Whispered]. 4 lines per verse, 2-4 per chorus.';
   return 'SECTION TAGS: Label every section with standard Suno-style brackets on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. 4 lines per verse, 2-4 per chorus.';
 }
 
