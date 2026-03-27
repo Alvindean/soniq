@@ -132,8 +132,17 @@ a{color:var(--amber);text-decoration:none}
 .blend-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:500px){.blend-2col{grid-template-columns:1fr}}
 .blend-field label{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;display:block}
-.blend-field select{width:100%;background:var(--s4);border:1px solid var(--b2);border-radius:var(--r1);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color 0.15s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
-.blend-field select:focus{border-color:var(--cyanline)}
+.blend-field select{width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:var(--r1);color:#e0e0f0;font-size:13px;padding:9px 32px 9px 12px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%236060a0'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.blend-field select:hover{border-color:#5050a0;background-color:#20202e}
+.blend-field select:focus{border-color:var(--cyanline);box-shadow:0 0 0 2px rgba(0,220,200,0.1);background-color:#1e1e2a}
+.blend-field select option{background:#1a1a24;color:#e0e0f0}
+.blend-field select option:checked{background:#2a2a40;color:#fff}
+.blend-field-label{font-size:10px;font-weight:700;color:#6868a0;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.blend-field-label::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#5050a0}
+.blend-active-tag{font-size:10px;font-weight:700;color:var(--cyan);background:rgba(0,220,200,0.1);border:1px solid var(--cyanline);border-radius:99px;padding:2px 8px;margin-left:auto;display:none}
+.blend-field.has-val .blend-active-tag{display:inline-block}
+.blend-field.has-val select{border-color:#5050c8;background-color:#1e1e30}
+.blend-field.has-val .blend-field-label::before{background:var(--cyan)}
 .blend-ratio-track{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .blend-ratio-lbl{font-size:10px;font-weight:700;min-width:52px}
 .blend-slider{flex:1;height:3px;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,var(--amber),var(--cyan));border-radius:2px;outline:none;cursor:pointer}
@@ -1009,9 +1018,40 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="param">
           <div class="param-label">Vocal Style</div>
           <select id="g-vocal">
-            <option>Male vocals</option><option>Female vocals</option><option>Duet M/F</option>
-            <option>Raspy male</option><option>Soulful female</option><option>Whispered/Intimate</option>
-            <option>Reggae toasting</option><option>Punk raw</option><option>Blues growl</option>
+            <optgroup label="── Core ──">
+              <option>Male vocals</option>
+              <option>Female vocals</option>
+              <option>Duet M/F</option>
+              <option>Group / Choir</option>
+            </optgroup>
+            <optgroup label="── Texture ──">
+              <option>Raspy / Gritty male</option>
+              <option>Soulful female</option>
+              <option>Whispered / Intimate</option>
+              <option>Falsetto male</option>
+              <option>Deep baritone</option>
+              <option>Breathy / Airy female</option>
+              <option>Husky / Smoky female</option>
+            </optgroup>
+            <optgroup label="── Style ──">
+              <option>Gospel belter</option>
+              <option>Auto-Tune / Melodic trap</option>
+              <option>Spoken word / Talk-sing</option>
+              <option>Operatic / Classical</option>
+              <option>Country twang</option>
+              <option>Blues growl</option>
+              <option>Jazz crooner</option>
+              <option>Neo-soul runs</option>
+            </optgroup>
+            <optgroup label="── Genre-Specific ──">
+              <option>Punk raw / Shouted</option>
+              <option>Metal scream / Growl</option>
+              <option>Reggae toasting</option>
+              <option>K-Pop precision</option>
+              <option>Children's voice</option>
+              <option>Character / Comedy voice</option>
+              <option>ASMR / Barely-there</option>
+            </optgroup>
           </select>
         </div>
         <div class="param">
@@ -1130,47 +1170,73 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
         <div class="blend-inner" id="blend-body">
           <div class="blend-2col">
-            <div class="blend-field">
-              <label>Secondary Genre</label>
-              <select id="g-genre2">
-                <option value="">— None —</option>
-                <option value="pop">Pop</option><option value="hiphop">Rap / Hip-Hop</option>
-                <option value="rnb">R&B / Soul</option><option value="rock">Rock</option>
-                <option value="country">Country</option><option value="edm">EDM / Electronic</option>
-                <option value="latin">Latin</option><option value="reggaeton">Reggaeton</option>
-                <option value="folk">Folk</option><option value="metal">Metal</option>
-                <option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option>
-                <option value="altrock">Alt-Rock</option><option value="reggae">Reggae</option>
-                <option value="afrobeats">Afrobeats</option><option value="blues">Blues</option>
-                <option value="punk">Punk</option><option value="kpop">K-Pop</option>
-                <option value="neosoul">Neo-Soul</option><option value="gospel">Gospel</option>
-                <option value="children">Children's</option><option value="parody">Parody</option>
-                <option value="comedy">Comedy</option><option value="tvmusical">TV / Musical</option>
+            <div class="blend-field" id="blend-field-genre">
+              <div class="blend-field-label">Secondary Genre <span class="blend-active-tag" id="blend-genre-tag">Active</span></div>
+              <select id="g-genre2" onchange="updBlendDesc();updBlendField(this,'blend-field-genre','blend-genre-tag')">
+                <option value="">— None (pure primary) —</option>
+                <optgroup label="── Core ──">
+                  <option value="pop">🎵 Pop</option>
+                  <option value="hiphop">🎤 Rap / Hip-Hop</option>
+                  <option value="rnb">🎶 R&amp;B / Soul</option>
+                  <option value="rock">🎸 Rock</option>
+                  <option value="country">🤠 Country</option>
+                  <option value="edm">🎛️ EDM / Electronic</option>
+                  <option value="jazz">🎷 Jazz</option>
+                  <option value="folk">🪕 Folk</option>
+                  <option value="metal">🤘 Metal</option>
+                </optgroup>
+                <optgroup label="── Soul / Spirit ──">
+                  <option value="neosoul">🎹 Neo-Soul</option>
+                  <option value="gospel">🙏 Gospel</option>
+                  <option value="blues">🎺 Blues</option>
+                </optgroup>
+                <optgroup label="── Global ──">
+                  <option value="latin">💃 Latin</option>
+                  <option value="reggaeton">🔥 Reggaeton</option>
+                  <option value="reggae">🌿 Reggae</option>
+                  <option value="afrobeats">🥁 Afrobeats</option>
+                  <option value="kpop">✨ K-Pop</option>
+                </optgroup>
+                <optgroup label="── Alternative ──">
+                  <option value="altrock">🔊 Alt-Rock</option>
+                  <option value="punk">⚡ Punk</option>
+                  <option value="ss">🎙️ Singer-Songwriter</option>
+                </optgroup>
+                <optgroup label="── Special ──">
+                  <option value="parody">🎭 Parody</option>
+                  <option value="comedy">😂 Comedy</option>
+                  <option value="tvmusical">🎬 TV / Musical</option>
+                  <option value="children">🌈 Children's</option>
+                </optgroup>
               </select>
             </div>
-            <div class="blend-field">
-              <label>Writing Style Influence</label>
-              <select id="g-style2">
+            <div class="blend-field" id="blend-field-style">
+              <div class="blend-field-label">Writing Style Influence <span class="blend-active-tag" id="blend-style-tag">Active</span></div>
+              <select id="g-style2" onchange="updBlendDesc();updBlendField(this,'blend-field-style','blend-style-tag')">
                 <option value="">— None —</option>
-                <option value="soul">Soul (classic soul warmth, raw emotion)</option>
-                <option value="funk">Funk (groove-first, syncopated, James Brown DNA)</option>
-                <option value="lofi">Lo-Fi (vinyl crackle, dusty, bedroom warmth)</option>
-                <option value="folkworld">Folk World (Celtic, West African, Appalachian, global roots)</option>
-                <option value="gospel">Gospel / Spiritual</option>
-                <option value="spoken_word">Spoken Word / Slam Poetry</option>
-                <option value="cinematic">Cinematic / Narrative</option>
-                <option value="minimalist">Minimalist</option>
-                <option value="surreal">Surreal / Abstract</option>
-                <option value="confessional">Confessional</option>
-                <option value="political">Political / Protest</option>
-                <option value="romantic_classic">Classic Romance</option>
-                <option value="street">Street Narrative</option>
-                <option value="psychedelic">Psychedelic</option>
+                <optgroup label="── Sonic Palette ──">
+                  <option value="soul">Soul — classic warmth, raw emotion, Motown DNA</option>
+                  <option value="funk">Funk — groove-first, syncopated, James Brown DNA</option>
+                  <option value="lofi">Lo-Fi — vinyl crackle, dusty, bedroom warmth</option>
+                  <option value="folkworld">Folk World — Celtic, West African, Appalachian roots</option>
+                  <option value="psychedelic">Psychedelic — cosmic layers, woozy, exploratory</option>
+                </optgroup>
+                <optgroup label="── Lyric Approach ──">
+                  <option value="gospel">Gospel / Spiritual — testimony, transcendence, call-response</option>
+                  <option value="spoken_word">Spoken Word / Slam Poetry — rhythm over melody</option>
+                  <option value="cinematic">Cinematic / Narrative — scene-setting, story arc</option>
+                  <option value="confessional">Confessional — first-person, diary-honest, exposed</option>
+                  <option value="political">Political / Protest — social commentary, rallying</option>
+                  <option value="street">Street Narrative — vivid realism, community voice</option>
+                  <option value="surreal">Surreal / Abstract — dream logic, image over meaning</option>
+                  <option value="romantic_classic">Classic Romance — timeless love, poetic, elegant</option>
+                  <option value="minimalist">Minimalist — fewer words, more space, restraint</option>
+                </optgroup>
               </select>
             </div>
           </div>
-          <div>
-            <div style="font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Blend Ratio</div>
+          <div style="margin-top:4px">
+            <div style="font-size:10px;font-weight:700;color:#6060a0;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#5050a0"></span>Blend Ratio</div>
             <div class="blend-ratio-track">
               <span class="blend-ratio-lbl" style="color:var(--amber)" id="blend-lbl1">Primary</span>
               <input type="range" min="10" max="90" value="70" step="5" id="g-blend" class="blend-slider" oninput="updBlend(this)"/>
@@ -2560,6 +2626,14 @@ function toggleBlend(){
   row.classList.toggle('open',S.blend.open);
   updBlendDesc();
 }
+function updBlendField(sel, fieldId, tagId) {
+  const field = document.getElementById(fieldId);
+  const tag   = document.getElementById(tagId);
+  if (!field) return;
+  const hasVal = sel.value !== '';
+  field.classList.toggle('has-val', hasVal);
+  if (tag) tag.style.display = hasVal ? 'inline-block' : 'none';
+}
 function updBlend(inp){
   S.blend.ratio=parseInt(inp.value);
   document.getElementById('blend-pct1').textContent=S.blend.ratio+'%';
@@ -2597,7 +2671,7 @@ document.getElementById('g-style2').addEventListener('change',updBlendDesc);
 const LUCKY_TOPICS=['growing up too fast','a city that never loved you back','last message before midnight','the version of yourself you abandoned','driving nowhere at 3am','falling in love with the wrong timeline','what silence sounds like after a storm','rebuilding from zero','the first morning after everything changed','chasing something you lost before you knew its name','finding home in a stranger','the day the music saved you'];
 const LUCKY_MOODS=['Euphoric','Melancholic','Hopeful','Defiant','Nostalgic','Dark','Rebellious','Romantic','Peaceful','Angry','Longing','Transcendent','Devastated','Tender','Triumphant','Bittersweet'];
 const LUCKY_STRUCTURES=['standard','hookfirst','storytelling','minimal','epic'];
-const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy male','Soulful female','Whispered/Intimate'];
+const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy / Gritty male','Soulful female','Whispered / Intimate','Falsetto male','Deep baritone','Gospel belter','Auto-Tune / Melodic trap','Neo-soul runs','Breathy / Airy female','Blues growl','Jazz crooner'];
 
 function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
