@@ -2986,6 +2986,46 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal) {
   return text;
 }
 
+async function callServerStream(action, params, onChunk, signal) {
+  const res = await fetch('/api/stream', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ action, params, userKey: window._soniqKey || undefined }),
+    signal
+  });
+  if (!res.ok) {
+    const e = await res.json().catch(() => ({}));
+    throw new Error(e.error || 'API error ' + res.status);
+  }
+  // Read Lucky meta from header if present
+  const metaHeader = res.headers.get('X-Soniq-Meta');
+  let luckyMeta = null;
+  if (metaHeader) try { luckyMeta = JSON.parse(atob(metaHeader)); } catch(e) {}
+  // Read SSE stream
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '', full = '';
+  while (true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, {stream: true});
+    const lines = buf.split('\n');
+    buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      try {
+        const d = JSON.parse(line.slice(6));
+        if (d.error) throw new Error(d.error);
+        if (d.done) { const result = {text: full}; if (luckyMeta) result.meta = luckyMeta; return result; }
+        if (d.text) { full += d.text; if (onChunk) onChunk(d.text, full); }
+      } catch(e) { if (e.message && !e.message.includes('JSON')) throw e; }
+    }
+  }
+  const result = {text: full};
+  if (luckyMeta) result.meta = luckyMeta;
+  return result;
+}
+
 async function callClaude(prompt, systemPrompt='', maxTok=2048) {
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
 
@@ -3424,11 +3464,16 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
 
   let firstChunk=true;
   const lyricsEl=document.getElementById('lres-lyrics-text');
-  callClaudeStream(prompt,system,(chunk,full)=>{
+  const luckyStreamCb = (chunk,full) => {
     if(firstChunk){firstChunk=false;lyricsEl.innerHTML='<pre class="stream-raw" id="lstream-display"></pre>';}
     const el=document.getElementById('lstream-display');
     if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
-  }).then(raw=>{
+  };
+  const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  const luckyPromise = isVercelLucky
+    ? callServerStream('lucky', {g1, g2}, luckyStreamCb).then(r => r.text)
+    : callClaudeStream(prompt, system, luckyStreamCb);
+  luckyPromise.then(raw=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
@@ -3541,31 +3586,31 @@ async function generateSong(){
     return;
   }
 
-  const structStr=STRUCTURES[structure]||STRUCTURES.standard;
-  const bibleNote=GENRE_BIBLE[genre]?`\nGenre DNA: ${GENRE_BIBLE[genre].dna}`:'';
-  const counterNote=GENRE_BIBLE[genre]?.counter?`\nCounter-melody device for this genre: ${GENRE_BIBLE[genre].counter.device} — ${GENRE_BIBLE[genre].counter.does} Include this in the COUNTERMELODY section and embed it in the SONG PROMPT.`:'';
-  const genreOutliers=GENRE_BIBLE[genre]?.outliers;
-  const outlierSongsNote=genreOutliers?.length?`\n\nRULE-BREAKING PERMISSION — Famous ${GENRE_LABELS[genre]||genre} songs that broke the rules and still hit:\n${genreOutliers.map(o=>`• ${o.song}: broke "${o.rule}" → ${o.result}`).join('\n')}\nThese prove: genre rules are starting points, not ceilings. If the emotional truth demands it, break a rule.`:'';
-  const theoryLevel = S.theoryLevel || 'standard';
-  const modeId = document.getElementById('g-mode')?.value || 'auto';
-  const modeDef = modeId !== 'auto' ? MUSIC_THEORY_BIBLE.modes[modeId] : null;
-  const genreScales = MUSIC_THEORY_BIBLE.genreScales[genre] || [];
-  // Pick genre-matched outlier chords for adventurous/avantgarde
-  const eligibleOutliers = Object.values(MUSIC_THEORY_BIBLE.outlierChords)
-    .filter(o => o.genres.includes(genre))
-    .sort((a,b) => b.tension - a.tension);
-  const outlierCount = theoryLevel === 'avantgarde' ? 2 : theoryLevel === 'adventurous' ? 1 : 0;
-  const chosenOutliers = eligibleOutliers.slice(0, outlierCount);
-  const theoryNote = `
-MUSIC THEORY CONTEXT (apply to CHORD PROGRESSION and THEORY ANALYSIS sections):
-- Scale palette for ${GENRE_LABELS[genre]||genre}: ${genreScales.join(', ') || 'Major / Minor diatonic'}
-${modeDef ? `- Specified mode override: ${modeDef.name} — ${modeDef.feel}` : '- Mode: Use genre-appropriate default'}
-- Harmony level: ${MUSIC_THEORY_BIBLE.theoryLevels[theoryLevel]?.label} — ${MUSIC_THEORY_BIBLE.theoryLevels[theoryLevel]?.desc}
-${chosenOutliers.length ? `- Include these harmonic outliers:\n${chosenOutliers.map(o => `  • ${o.name} (${o.short}): ${o.feel} — HOW: ${o.howto}`).join('\n')}` : '- Use standard diatonic harmony — no outlier chords required'}
-- THEORY ANALYSIS section is REQUIRED: identify the scale/mode used, flag any outlier chords with explanation, describe the most interesting voice-leading move, and rate overall harmonic tension (1-10).`;
-  const substyleDetail = S.substyle && SUBSTYLE_NOTES[S.substyle] ? `\n${SUBSTYLE_NOTES[S.substyle]}` : '';
-  const substyleNote=S.substyle?`\nSub-style: ${S.substyle} — write flow, density, and aesthetic accordingly.${substyleDetail}`:'';
-  const voiceNote = getVoiceNote();
+  // Build params for server-side prompt construction
+  const songParams = {
+    genre, topic, mood, vocal, structure,
+    era: S.selectedEra || 'modern',
+    length: S.selectedLength || 'medium',
+    quality: S.quality || 'high',
+    theoryLevel: S.theoryLevel || 'standard',
+    mode: document.getElementById('g-mode')?.value || 'auto',
+    substyle: S.substyle || '',
+    hookStyle: S.hookStyle || 'auto',
+    bracketMode: S.bracketMode || 'basic',
+    voice: {
+      name: localStorage.getItem('soniq_voice_name') || '',
+      influences: localStorage.getItem('soniq_voice_influences') || '',
+      forbidden: localStorage.getItem('soniq_voice_forbidden') || ''
+    },
+    albumTrack: S.albumTrack || null,
+    blend: {
+      genre2: document.getElementById('g-genre2')?.value || '',
+      style2: document.getElementById('g-style2')?.value || '',
+      ratio: parseInt(document.getElementById('g-blend')?.value || 70)
+    }
+  };
+  // Clear album context after use
+  if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
   const hiphopNote=genre==='hiphop'?`\n\nHIP-HOP VERSE RULES (non-negotiable):
 - 1 bar = 1 line. Write EXACTLY the bar count in the structure (e.g. [16-bar Verse] = 16 lines, [12-bar Verse] = 12 lines, [8-bar Hook] = 8 lines).
@@ -3749,14 +3794,24 @@ DIRECTOR NOTES:
   try{
     let firstChunk=true;
     const lyricsEl=document.getElementById('res-lyrics-text');
-    const raw=await callClaudeStream(prompt,system,(chunk,full)=>{
+    const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+    const streamCb = (chunk,full) => {
       if(firstChunk){
         firstChunk=false;
         lyricsEl.innerHTML='<pre class="stream-raw" id="stream-display"></pre>';
       }
       const el=document.getElementById('stream-display');
       if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
-    });
+    };
+    let raw;
+    if (isVercel) {
+      // Server-side prompt building — IP stays hidden
+      const result = await callServerStream('generate', songParams, streamCb);
+      raw = result.text;
+    } else {
+      // Local dev fallback — client builds prompt
+      raw = await callClaudeStream(prompt, system, streamCb);
+    }
     parseSongResult(raw,genreLabel,topic);
   }catch(e){
     if(e.message==='enter-key'){btnDone('gen-btn');return;}
