@@ -109,6 +109,30 @@ module.exports = async function handler(req, res) {
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).end(); }
 
+  // ── Server-side prompt building (protects IP) ──
+  let messages, system, max_tokens;
+  if (body.action === 'generate' || body.action === 'lucky') {
+    const brain = require('./brain');
+    let built;
+    if (body.action === 'generate') {
+      built = brain.buildSongPrompt(body.params || {});
+    } else {
+      built = brain.buildLuckyPrompt(body.params || {});
+    }
+    messages = [{role: 'user', content: built.prompt}];
+    system = built.system;
+    max_tokens = 4096;
+    // Attach meta for lucky songs (client needs g1, g2, topic, mood etc.)
+    if (built.meta) {
+      res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(built.meta)).toString('base64'));
+    }
+  } else {
+    // Legacy: client sends raw messages (for visual prompts, titles, etc.)
+    messages = body.messages;
+    system = body.system;
+    max_tokens = body.max_tokens || 2048;
+  }
+
   if (!body?.userKey) {
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
     const rl = checkRateLimit(ip);
@@ -124,7 +148,6 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const {messages, system, max_tokens = 2048} = body || {};
   if (!messages?.length) return res.status(400).end();
 
   // SSE headers
