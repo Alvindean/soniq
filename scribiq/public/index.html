@@ -188,9 +188,10 @@ button,input,select,textarea{font-family:var(--font)}a{color:var(--ind);text-dec
     <div class="out-hdr">
       <div class="out-title">Output <span class="out-badge" id="out-badge">Ready</span></div>
       <div class="out-acts">
-        <button class="iBtn" onclick="copyOutput()">Copy</button>
-        <button class="iBtn" onclick="saveToLib()">Save</button>
-        <button class="iBtn" onclick="clearOutput()">Clear</button>
+        <button class="iBtn iBtn-copy" onclick="copyOutput(this)" title="Copy to clipboard (Ctrl+Shift+C)">📋 Copy</button>
+        <button class="iBtn" onclick="toggleEdit(this)" title="Edit output inline">✏️ Edit</button>
+        <button class="iBtn" onclick="saveToLib()">💾 Save</button>
+        <button class="iBtn" onclick="clearOutput()">✕ Clear</button>
       </div>
     </div>
     <div class="out-body" id="out-body"><div class="empty-out"><div class="ei">✨</div>Your output will appear here</div></div>
@@ -217,6 +218,40 @@ button,input,select,textarea{font-family:var(--font)}a{color:var(--ind);text-dec
       <button class="lib-close" onclick="closeView()">✕</button>
     </div>
     <div class="view-body" id="view-body"></div>
+  </div>
+</div>
+
+<!-- Settings Modal -->
+<div class="lib-overlay" id="set-overlay" onclick="closeSettings(event)">
+  <div class="lib-modal" style="max-width:560px">
+    <div class="lib-top">
+      <h2>⚙️ Setup & Style Bible</h2>
+      <button class="lib-close" onclick="closeSettings()">✕</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:16px;overflow-y:auto">
+      <div style="background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:14px;font-size:12px;color:var(--tx2);line-height:1.6">
+        <strong style="color:var(--tx1)">🔑 API Key Setup</strong><br>
+        Add <code style="color:var(--vi)">ANTHROPIC_API_KEY</code> in Vercel → Settings → Environment Variables, then Redeploy.
+      </div>
+      <div>
+        <label class="flbl" style="margin-bottom:8px;display:block">📊 Reading / Grade Level</label>
+        <select class="fsel" id="set-grade">
+          <option value="">Default (no adjustment)</option>
+          <option value="5th grade (elementary)">5th Grade — Elementary</option>
+          <option value="8th grade (middle school)">8th Grade — Middle School</option>
+          <option value="10th grade (high school)">10th Grade — High School</option>
+          <option value="college undergraduate">College — Undergraduate</option>
+          <option value="graduate / expert">Graduate / Expert Level</option>
+        </select>
+        <div style="font-size:11px;color:var(--tx3);margin-top:6px">Applied to every generation. Adjusts vocabulary, sentence complexity, and depth.</div>
+      </div>
+      <div>
+        <label class="flbl" style="margin-bottom:8px;display:block">📖 Style Bible / Writing Voice Guide</label>
+        <textarea class="ftxt" id="set-style" rows="6" placeholder="Describe your writing style, brand voice, or preferences. E.g.: 'Write in an authoritative but conversational tone. Avoid passive voice. Use short punchy sentences. Never use jargon. Target busy professionals aged 30-50.'"></textarea>
+        <div style="font-size:11px;color:var(--tx3);margin-top:6px">Injected into every AI system prompt as a writing guide. Acts as your personal writing brain.</div>
+      </div>
+      <button class="btn-gen" onclick="saveSettings()">Save Settings</button>
+    </div>
   </div>
 </div>
 
@@ -477,198 +512,6 @@ script:[
    system:'You are an explainer video scriptwriter. Make complex things simple. Write scripts that explain clearly, use analogies, and drive viewers to take action.',
    prompt:v=>`Write a ${v.duration||'90 second'} explainer video script for: "${v.subject}"\nAudience: ${v.audience}\nTone: ${v.tone||'Simple & clear'}\n\nStructure: Problem hook, introduce solution, how it works (simple), benefits, CTA. Include [ANIMATION NOTES].`}
 ],
-screen:[
-  {id:'logline',icon:'🎯',label:'Movie Logline',desc:'One sentence that sells the film',format:'plain',
-   inputs:[
-    {id:'genre',label:'Genre',type:'select',options:['Drama','Thriller','Comedy','Horror','Sci-Fi','Action','Romance','Animation']},
-    {id:'protagonist',label:'Protagonist',type:'text',placeholder:'e.g. A washed-up detective'},
-    {id:'goal',label:'Goal',type:'text',placeholder:'e.g. must solve one last murder case'},
-    {id:'obstacle',label:'Obstacle',type:'text',placeholder:'e.g. before the real killer frames him'},
-    {id:'stakes',label:'Stakes',type:'text',placeholder:'e.g. or his daughter dies'}
-   ],
-   system:'You are a Hollywood development executive. Write loglines that are irresistible to producers: one sentence, present tense, protagonist + goal + obstacle + stakes. Write 5 variations.',
-   prompt:v=>`Write 5 logline variations.\nGenre: ${v.genre}\nProtagonist: ${v.protagonist}\nGoal: ${v.goal}\nObstacle: ${v.obstacle}\nStakes: ${v.stakes}\n\nEach logline: 1 sentence, present tense, punchy. Label each 1-5.`},
-  {id:'scene',icon:'🎬',label:'Write a Scene',desc:'Proper screenplay-formatted scene',format:'screen',
-   inputs:[
-    {id:'location',label:'Location',type:'text',placeholder:'e.g. INT. COFFEE SHOP - Downtown Chicago'},
-    {id:'time',label:'Time',type:'select',options:['DAY','NIGHT','DAWN','DUSK','CONTINUOUS','LATER']},
-    {id:'characters',label:'Characters',type:'text',placeholder:'e.g. MARCUS, 40s; SARAH, 30s'},
-    {id:'action',label:'What Happens',type:'text',placeholder:'e.g. A tense confrontation about money owed',span:true},
-    {id:'genre',label:'Genre/Tone',type:'select',options:['Drama','Thriller','Comedy','Horror','Sci-Fi','Romance','Action']}
-   ],
-   system:'You are a professional screenwriter. Write in STRICT screenplay format: INT./EXT. LOCATION - TIME, action in present tense, CHARACTER NAME in ALL CAPS before dialogue, (parentheticals) in lowercase. Be visual and cinematic.',
-   prompt:v=>`Write a screenplay scene:\nLocation: ${v.location}\nTime: ${v.time||'DAY'}\nCharacters: ${v.characters}\nAction/beat: ${v.action}\nTone: ${v.genre||'Drama'}\n\nUse proper screenplay format throughout.`},
-  {id:'dialogue',icon:'💬',label:'Dialogue Scene',desc:'Character dialogue loaded with subtext',format:'screen',
-   inputs:[
-    {id:'char1',label:'Character 1',type:'text',placeholder:'e.g. ANNA, 30s, ambitious journalist'},
-    {id:'char2',label:'Character 2',type:'text',placeholder:'e.g. VICTOR, 60s, corrupt politician'},
-    {id:'relationship',label:'Relationship',type:'text',placeholder:'e.g. estranged father and daughter'},
-    {id:'subtext',label:'What They Really Mean',type:'text',placeholder:'e.g. she knows he is lying; he knows she knows',span:true},
-    {id:'setting',label:'Setting',type:'text',placeholder:'e.g. fancy restaurant, public, tense'}
-   ],
-   system:'You are a master dialogue writer. Write scenes where characters never say what they mean directly. Every line has subtext. Silences and actions matter. Use proper screenplay format.',
-   prompt:v=>`Write a screenplay dialogue scene.\nChar 1: ${v.char1}\nChar 2: ${v.char2}\nRelationship: ${v.relationship}\nSubtext: ${v.subtext}\nSetting: ${v.setting}\n\nProper screenplay format. Subtext in every exchange.`},
-  {id:'treatment',icon:'📄',label:'Treatment',desc:'One-page story treatment for pitching',format:'md',
-   inputs:[
-    {id:'title',label:'Title',type:'text',placeholder:'e.g. THE LAST SIGNAL'},
-    {id:'genre',label:'Genre',type:'select',options:['Drama','Thriller','Comedy','Horror','Sci-Fi','Action','Romance','Animation']},
-    {id:'logline',label:'Logline',type:'text',placeholder:'One sentence summary',span:true},
-    {id:'act1',label:'Act 1 Setup',type:'text',placeholder:'e.g. Detective takes case, discovers conspiracy'},
-    {id:'act2',label:'Act 2 Conflict',type:'text',placeholder:'e.g. Uncovers truth, faces personal demons'},
-    {id:'act3',label:'Act 3 Resolution',type:'text',placeholder:'e.g. Confronts killer, sacrifices himself'}
-   ],
-   system:'You are a professional screenwriter and script consultant. Write compelling one-page treatments that sell the story to producers and development executives.',
-   prompt:v=>`Write a one-page treatment.\nTitle: ${v.title}\nGenre: ${v.genre}\nLogline: ${v.logline}\nAct 1: ${v.act1}\nAct 2: ${v.act2}\nAct 3: ${v.act3}\n\nFormat: Title, logline, synopsis by act, tone/themes, why this story now.`},
-  {id:'tv_pilot',icon:'📺',label:'TV Pilot Outline',desc:'Pilot episode outline for a TV series',format:'md',
-   inputs:[
-    {id:'title',label:'Series Title',type:'text',placeholder:'e.g. THE HOLLOW'},
-    {id:'genre',label:'Genre',type:'select',options:['Drama','Comedy','Thriller','Sci-Fi','Fantasy','Crime','Limited Series','Procedural']},
-    {id:'premise',label:'Series Premise',type:'text',placeholder:'e.g. A town wakes up — everyone has lost their memory',span:true},
-    {id:'characters',label:'Main Characters',type:'text',placeholder:'e.g. Sheriff Dana, newcomer Jake, the mayor'}
-   ],
-   system:'You are a TV writer with major network credits. Write compelling pilot outlines with a strong teaser, A/B story lines, character introductions, and a killer end hook that sets up the series.',
-   prompt:v=>`Write a TV pilot outline.\nTitle: ${v.title}\nGenre: ${v.genre}\nPremise: ${v.premise}\nCharacters: ${v.characters}\n\nInclude: cold open/teaser, act-by-act breakdown, character introductions, series-launching end hook.`},
-  {id:'query_film',icon:'✉️',label:'Query Letter',desc:'Query letter to agents and producers',format:'plain',
-   inputs:[
-    {id:'title',label:'Script Title',type:'text',placeholder:'e.g. THE LAST SIGNAL'},
-    {id:'genre',label:'Genre',type:'select',options:['Drama','Thriller','Comedy','Horror','Sci-Fi','Action','Romance','Animation']},
-    {id:'logline',label:'Logline',type:'text',placeholder:'One sentence',span:true},
-    {id:'synopsis',label:'Brief Synopsis (2-3 sentences)',type:'textarea',rows:3,span:true},
-    {id:'bio',label:'Writer Bio',type:'text',placeholder:'e.g. Short film at Sundance, TV writing fellowship'}
-   ],
-   system:'You are a script consultant who has helped writers land representation. Write query letters that are professional, concise, and get scripts requested.',
-   prompt:v=>`Write a script query letter.\nTitle: ${v.title}\nGenre: ${v.genre}\nLogline: ${v.logline}\nSynopsis: ${v.synopsis}\nBio: ${v.bio}\n\nProfessional format. Under 300 words. Compelling opener, logline, brief synopsis, bio, ask.`},
-  {id:'short_film',icon:'🎞️',label:'Short Film Script',desc:'Complete short film script',format:'screen',
-   inputs:[
-    {id:'premise',label:'Premise',type:'text',placeholder:'e.g. Two strangers share an umbrella; only one is real',span:true},
-    {id:'genre',label:'Genre',type:'select',options:['Drama','Comedy','Thriller','Horror','Romance','Sci-Fi','Surreal']},
-    {id:'tone',label:'Tone',type:'select',options:['Dramatic','Comedic','Heartwarming','Dark','Mysterious']},
-    {id:'length',label:'Target Length',type:'select',options:['5 minutes','8 minutes','10 minutes','15 minutes']}
-   ],
-   system:'You are an award-winning short film writer. Write complete short film scripts with a tight three-act structure. Every scene earns its place. Proper screenplay format throughout.',
-   prompt:v=>`Write a complete short film script.\nPremise: ${v.premise}\nGenre: ${v.genre}\nTone: ${v.tone||'Dramatic'}\nTarget length: ${v.length||'8 minutes'} (~1 page per minute\n\nFull screenplay format. Strong hook, compressed story, resonant ending.`}
-],
-book:[
-  {id:'chapter_outline',icon:'📋',label:'Chapter Outline',desc:'Complete chapter-by-chapter outline',format:'md',
-   inputs:[
-    {id:'genre',label:'Genre',type:'select',options:['Literary Fiction','Thriller','Romance','Fantasy','Sci-Fi','Mystery','Horror','Non-Fiction','Self-Help','Memoir']},
-    {id:'premise',label:'Story Premise',type:'text',placeholder:'e.g. A woman discovers her late mother was a Soviet spy',span:true},
-    {id:'protagonist',label:'Protagonist',type:'text',placeholder:'e.g. Maya, 35, librarian'},
-    {id:'chapters',label:'Number of Chapters',type:'select',options:['10 chapters','15 chapters','20 chapters','25 chapters','30 chapters']}
-   ],
-   system:'You are a developmental editor and published author. Create detailed chapter outlines with chapter titles, key events, character development beats, and pacing notes.',
-   prompt:v=>`Create a ${v.chapters||'20 chapter'} outline.\nGenre: ${v.genre}\nPremise: ${v.premise}\nProtagonist: ${v.protagonist}\n\nFor each chapter: number, title, key events, character development, chapter-ending hook.`},
-  {id:'chapter_draft',icon:'✍️',label:'Chapter Draft',desc:'Full chapter of your book',format:'md',
-   inputs:[
-    {id:'genre',label:'Genre',type:'select',options:['Literary Fiction','Thriller','Romance','Fantasy','Sci-Fi','Mystery','Horror','Non-Fiction','Memoir']},
-    {id:'pov',label:'Point of View',type:'select',options:['First person','Third person limited','Third person omniscient']},
-    {id:'setting',label:'Setting',type:'text',placeholder:'e.g. 1940s Paris, a small apartment'},
-    {id:'scene_goal',label:'Scene Goal',type:'text',placeholder:'e.g. Elena discovers the first clue',span:true},
-    {id:'words',label:'Word Count',type:'select',options:['800 words','1200 words','1500 words','2000 words','2500 words']}
-   ],
-   system:'You are a published novelist. Write vivid, compelling chapters with strong scene-setting, deep POV, show-dont-tell, and authentic character voice.',
-   prompt:v=>`Write a ${v.words||'1500 word'} chapter.\nGenre: ${v.genre}\nPOV: ${v.pov||'Third person limited'}\nSetting: ${v.setting}\nScene goal: ${v.scene_goal}\n\nStrong opening, immersive prose, meaningful conflict, chapter-ending hook.`},
-  {id:'book_blurb',icon:'📖',label:'Book Blurb',desc:'Back-cover copy that sells the book',format:'plain',
-   inputs:[
-    {id:'title',label:'Title',type:'text',placeholder:'e.g. The Glass Daughter'},
-    {id:'genre',label:'Genre',type:'select',options:['Literary Fiction','Thriller','Romance','Fantasy','Sci-Fi','Mystery','Horror','Non-Fiction','Memoir']},
-    {id:'protagonist',label:'Protagonist & Setup',type:'text',placeholder:'e.g. Maya, a disgraced surgeon, arrives in a new town'},
-    {id:'stakes',label:'Stakes / Conflict',type:'text',placeholder:'e.g. discovers her new home holds deadly secrets',span:true},
-    {id:'tone',label:'Tone',type:'select',options:['Dark & suspenseful','Heartwarming','Action-packed','Literary','Witty & fun']}
-   ],
-   system:'You are a book marketing expert. Write back-cover blurbs that make readers buy immediately. Hook, intrigue, stakes — no spoilers. Write one short (100 words) and one long (200 words) version.',
-   prompt:v=>`Write back-cover blurbs for: "${v.title}"\nGenre: ${v.genre}\nProtagonist: ${v.protagonist}\nStakes: ${v.stakes}\nTone: ${v.tone}\n\nVersion 1: ~100 words (for online)\nVersion 2: ~200 words (for back cover)\nNo spoilers. End on a question or cliffhanger.`},
-  {id:'query_novel',icon:'✉️',label:'Query Letter',desc:'Literary agent query letter',format:'plain',
-   inputs:[
-    {id:'title',label:'Title',type:'text',placeholder:'e.g. The Glass Daughter'},
-    {id:'genre',label:'Genre',type:'select',options:['Literary Fiction','Thriller','Romance','Fantasy','Sci-Fi','Mystery','Horror','Non-Fiction','Memoir']},
-    {id:'word_count',label:'Word Count',type:'text',placeholder:'e.g. 85,000 words'},
-    {id:'comps',label:'Comp Titles',type:'text',placeholder:'e.g. GONE GIRL meets THE SILENT PATIENT'},
-    {id:'conflict',label:'Core Conflict (2 sentences)',type:'textarea',rows:3,span:true}
-   ],
-   system:'You are a literary agent who has read thousands of queries. Write letters that get manuscript requests: compelling hook, tight synopsis, professional bio. Standard query format.',
-   prompt:v=>`Write a literary agent query letter.\nTitle: ${v.title} (${v.genre}, ${v.word_count||'80,000 words'})\nComp titles: ${v.comps}\nConflict: ${v.conflict}\n\nFormat: Hook opening, protagonist + conflict synopsis, brief bio, closing. Under 350 words.`},
-  {id:'synopsis',icon:'📄',label:'Synopsis',desc:'One-page synopsis including the ending',format:'plain',
-   inputs:[
-    {id:'title',label:'Title',type:'text',placeholder:'Working title'},
-    {id:'genre',label:'Genre',type:'select',options:['Literary Fiction','Thriller','Romance','Fantasy','Sci-Fi','Mystery','Horror','Non-Fiction','Memoir']},
-    {id:'protagonist',label:'Protagonist',type:'text',placeholder:'e.g. Maya, 35, disgraced surgeon'},
-    {id:'act1',label:'Act 1 — Setup & Inciting Incident',type:'text',placeholder:'What happens in first quarter',span:true},
-    {id:'act2',label:'Act 2 — Conflict & Midpoint',type:'text',placeholder:'Rising conflict, twists, darkest moment',span:true},
-    {id:'act3',label:'Act 3 — Climax & Resolution',type:'text',placeholder:'How it ends — INCLUDE THE ENDING',span:true}
-   ],
-   system:'You are a book editor. Write one-page synopses that tell the full story clearly. Include the ending. Present tense, third person.',
-   prompt:v=>`Write a one-page synopsis for: "${v.title}"\nGenre: ${v.genre}\nProtagonist: ${v.protagonist}\nAct 1: ${v.act1}\nAct 2: ${v.act2}\nAct 3: ${v.act3}\n\nPresent tense, third person, ~400-500 words, include resolution.`},
-  {id:'worldbuilding',icon:'🌍',label:'World Building',desc:'Rich world building notes',format:'md',
-   inputs:[
-    {id:'genre',label:'Genre',type:'select',options:['Fantasy','Sci-Fi','Historical Fiction','Alternate History','Dystopian','Steampunk']},
-    {id:'world_name',label:'World / Setting Name',type:'text',placeholder:'e.g. The Shattered Kingdoms, Neo-Tokyo 2087'},
-    {id:'aspect',label:'Focus Area',type:'select',options:['Magic system','Technology & science','Political structure','Culture & religion','Geography & map','History & mythology','Economy & class']},
-    {id:'detail',label:'Detail Level',type:'select',options:['Overview','Detailed','Exhaustive']}
-   ],
-   system:'You are a world-building expert and bestselling speculative fiction author. Create internally consistent, richly detailed world-building that serves the story.',
-   prompt:v=>`Create ${v.detail||'Detailed'} world-building for: "${v.world_name}"\nGenre: ${v.genre}\nFocus: ${v.aspect||'Magic system'}\n\nBe specific, internally consistent, and story-relevant. Include implications for characters and plot.`}
-],
-story:[
-  {id:'short_story',icon:'📖',label:'Short Story',desc:'Complete short story',format:'md',
-   inputs:[
-    {id:'premise',label:'Premise',type:'text',placeholder:'e.g. A lighthouse keeper receives a message from a ship that sank 100 years ago',span:true},
-    {id:'genre',label:'Genre',type:'select',options:['Literary','Horror','Sci-Fi','Fantasy','Romance','Thriller','Mystery','Magical Realism']},
-    {id:'pov',label:'Point of View',type:'select',options:['First person','Third person limited','Second person']},
-    {id:'tone',label:'Tone',type:'select',options:['Dark','Hopeful','Melancholic','Tense','Whimsical','Haunting']},
-    {id:'words',label:'Length',type:'select',options:['500 words','800 words','1200 words','1500 words']}
-   ],
-   system:'You are a master short story writer. Write with immediate hooks, vivid sensory detail, layered characters, meaningful conflict, and resonant endings. Show dont tell. Every word earns its place.',
-   prompt:v=>`Write a ${v.words||'800 word'} short story.\nPremise: ${v.premise}\nGenre: ${v.genre}\nPOV: ${v.pov||'Third person limited'}\nTone: ${v.tone||'Dark'}\n\nIrresistible opening, vivid detail, earned ending.`},
-  {id:'flash',icon:'⚡',label:'Flash Fiction',desc:'Complete story under 500 words',format:'md',
-   inputs:[
-    {id:'premise',label:'Premise',type:'text',placeholder:'e.g. The last human teaches an AI what love feels like',span:true},
-    {id:'genre',label:'Genre',type:'select',options:['Literary','Horror','Sci-Fi','Fantasy','Romance','Thriller','Magical Realism']},
-    {id:'twist',label:'Twist or Revelation (optional)',type:'text',placeholder:'e.g. the narrator is already dead'},
-    {id:'words',label:'Word Count',type:'select',options:['100 words','200 words','300 words','500 words']}
-   ],
-   system:'You are a flash fiction master. Stories that are complete universes in miniature. Every sentence does double duty. Subvert expectations. Land the ending hard.',
-   prompt:v=>`Write ${v.words||'300 word'} flash fiction.\nPremise: ${v.premise}\nGenre: ${v.genre}${v.twist?'\nTwist: '+v.twist:''}\n\nComplete arc, specific details, resonant ending.`},
-  {id:'story_hook',icon:'🪝',label:'Story Opening',desc:'Three irresistible story openings',format:'md',
-   inputs:[
-    {id:'genre',label:'Genre',type:'select',options:['Literary','Horror','Sci-Fi','Fantasy','Romance','Thriller','Mystery','Magical Realism']},
-    {id:'protagonist',label:'Protagonist',type:'text',placeholder:'e.g. Marcus, 50s, war photographer'},
-    {id:'setting',label:'Setting',type:'text',placeholder:'e.g. war-torn city, golden hour'},
-    {id:'tone',label:'Tone',type:'select',options:['Dark','Atmospheric','Tense','Mysterious','Heartwarming','Urgent']},
-    {id:'pov',label:'Point of View',type:'select',options:['First person','Third person limited','Second person']}
-   ],
-   system:'You are a master fiction writer. Write openings that make it impossible to stop reading. Establish voice, world, and tension in the first sentence. Write 3 different options.',
-   prompt:v=>`Write 3 story opening options.\nGenre: ${v.genre}\nProtagonist: ${v.protagonist}\nSetting: ${v.setting}\nTone: ${v.tone||'Dark'}\nPOV: ${v.pov||'Third person limited'}\n\nLabel Option 1/2/3. Each ~150 words. Different approaches: in-action, atmospheric, in-dialogue.`},
-  {id:'setting_desc',icon:'🏔️',label:'Setting Description',desc:'Vivid, immersive place writing',format:'md',
-   inputs:[
-    {id:'location',label:'Location',type:'text',placeholder:'e.g. Abandoned Victorian mansion on a coastal cliff',span:true},
-    {id:'time_period',label:'Time & Season',type:'text',placeholder:'e.g. Present day, stormy November night'},
-    {id:'atmosphere',label:'Atmosphere',type:'select',options:['Eerie & foreboding','Romantic & sensual','Tense & charged','Peaceful & serene','Chaotic & overwhelming','Dreamlike']},
-    {id:'pov',label:'Point of View',type:'select',options:['First person','Third person limited','Omniscient']}
-   ],
-   system:'You are a literary fiction writer known for immersive settings. Write descriptions that establish mood, reveal character, and transport readers. Specific and sensory, never generic.',
-   prompt:v=>`Write an immersive setting description.\nLocation: ${v.location}\nTime/season: ${v.time_period}\nAtmosphere: ${v.atmosphere||'Eerie & foreboding'}\nPOV: ${v.pov||'Third person limited'}\n\nEngage all senses. Ground in specific detail. Let setting reveal character and mood.`},
-  {id:'plot_twist',icon:'🌀',label:'Plot Twist',desc:'Unexpected but earned plot twists',format:'md',
-   inputs:[
-    {id:'genre',label:'Genre',type:'select',options:['Thriller','Horror','Mystery','Sci-Fi','Fantasy','Drama','Romance']},
-    {id:'story_summary',label:'Story So Far',type:'textarea',rows:4,placeholder:'Brief summary of your story setup and characters',span:true},
-    {id:'twist_type',label:'Twist Type',type:'select',options:['Identity reveal','Betrayal by ally','Time/reality shift','The MacGuffin is wrong','Perspective flip','Hidden villain']},
-    {id:'count',label:'Options',type:'select',options:['3 twists','5 twists','7 twists']}
-   ],
-   system:'You are a thriller writer known for jaw-dropping twists. Generate twists that recontextualize everything, feel earned in hindsight, and serve the story thematically.',
-   prompt:v=>`Generate ${v.count||'5 twists'} for my ${v.genre} story.\nStory so far: ${v.story_summary}\nTwist type preference: ${v.twist_type}\n\nFor each: describe the twist, how it recontextualizes what came before, and how to plant seeds.`},
-  {id:'character_sketch',icon:'🖼️',label:'Character Sketch',desc:'Vivid character introduction',format:'md',
-   inputs:[
-    {id:'name',label:'Character Name',type:'text',placeholder:'e.g. ANNA'},
-    {id:'archetype',label:'Archetype',type:'select',options:['The Rebel','The Mentor','The Innocent','The Hero','The Shadow','The Trickster','The Lover','The Sage','The Outcast']},
-    {id:'occupation',label:'Occupation / Role',type:'text',placeholder:'e.g. disgraced surgeon turned bartender'},
-    {id:'flaw',label:'Core Flaw or Wound',type:'text',placeholder:'e.g. cannot forgive herself for her son\'s death'},
-    {id:'voice',label:'Voice / Manner of Speaking',type:'text',placeholder:'e.g. short sentences, old-fashioned slang, never looks anyone in the eye'}
-   ],
-   system:'You are a fiction writer who creates unforgettable characters. Write character sketches through specific, telling details. Show who they are through what they do, say, and notice — never through adjectives alone.',
-   prompt:v=>`Write a character sketch for ${v.name}.\nArchetype: ${v.archetype}\nOccupation: ${v.occupation}\nCore flaw/wound: ${v.flaw}\nVoice: ${v.voice}\n\nShow through action and detail. Include a signature mannerism, a telling habit, a glimpse of their wound.`}
-],
-
 screen:[
   {id:'logline',icon:'🎯',label:'Movie Logline',desc:'One sentence that sells the film',format:'plain',
    inputs:[
@@ -1127,13 +970,11 @@ function renderTab(tabId) {
   const tools = TOOLS[tabId];
   if (!tools || !tools.length) return;
 
-  // Only rebuild if not already rendered
-  if (!pg.querySelector('.tools-row')) {
-    const pillsHtml = `<div class="tools-row">${tools.map(t =>
-      `<button class="tp" data-tool="${t.id}" onclick="selectTool('${tabId}','${t.id}',this)">${t.icon} ${t.label}</button>`
-    ).join('')}</div><div id="form-container-${tabId}"></div>`;
-    pg.innerHTML = pillsHtml;
-  }
+  // Always rebuild to ensure fresh state and correct tool IDs
+  const pillsHtml = `<div class="tools-row">${tools.map(t =>
+    `<button class="tp" data-tool="${t.id}" onclick="selectTool('${tabId}','${t.id}',this)">${t.icon} ${t.label}</button>`
+  ).join('')}</div><div id="form-container-${tabId}"></div>`;
+  pg.innerHTML = pillsHtml;
 
   // Auto-select first tool
   selectTool(tabId, tools[0].id);
@@ -1159,8 +1000,9 @@ function selectTool(tabId, toolId, btnEl) {
   state.tool = tool;
   state.format = tool.format || 'md';
 
+  state.tab = tabId;
   const fc = document.getElementById('form-container-' + tabId);
-  if (fc) fc.innerHTML = renderForm(tool);
+  if (fc) fc.innerHTML = renderForm(tool, tabId);
 
   // Reset the global output card
   clearOutput();
@@ -1169,16 +1011,19 @@ function selectTool(tabId, toolId, btnEl) {
 }
 
 // ─── RENDER FORM ──────────────────────────────────────────────────────────────
-function renderForm(tool) {
+function renderForm(tool, tabId) {
+  // Prefix input IDs with tabId to prevent collisions across tabs
+  const pfx = tabId ? tabId + '-' : '';
   const fieldsHtml = tool.inputs.map(inp => {
     let inputHtml = '';
+    const iid = 'inp-' + pfx + inp.id;
     if (inp.type === 'text') {
-      inputHtml = `<input type="text" class="finp" id="inp-${inp.id}" placeholder="${escHtml(inp.placeholder || '')}">`;
+      inputHtml = `<input type="text" class="finp" id="${iid}" placeholder="${escHtml(inp.placeholder || '')}">`;
     } else if (inp.type === 'select') {
       const opts = (inp.options || []).map(o => `<option value="${escHtml(o)}">${escHtml(o)}</option>`).join('');
-      inputHtml = `<select class="fsel" id="inp-${inp.id}">${opts}</select>`;
+      inputHtml = `<select class="fsel" id="${iid}">${opts}</select>`;
     } else if (inp.type === 'textarea') {
-      inputHtml = `<textarea class="ftxt" id="inp-${inp.id}" rows="${inp.rows || 5}" placeholder="${escHtml(inp.placeholder || '')}"></textarea>`;
+      inputHtml = `<textarea class="ftxt" id="${iid}" rows="${inp.rows || 5}" placeholder="${escHtml(inp.placeholder || '')}"></textarea>`;
     }
     const spanClass = inp.span === true ? ' span2' : '';
     return `<div class="field${spanClass}"><label class="flbl">${escHtml(inp.label)}</label>${inputHtml}</div>`;
@@ -1197,7 +1042,7 @@ function renderForm(tool) {
     <div class="form-grid">
       ${fieldsHtml}
     </div>
-    <button class="btn-gen" id="btn-gen" onclick="generate()">
+    <button class="btn-gen" onclick="generate()">
       Generate <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </button>
   </div>
@@ -1205,10 +1050,11 @@ function renderForm(tool) {
 }
 
 // ─── GET FORM VALUES ──────────────────────────────────────────────────────────
-function getFormValues(tool) {
+function getFormValues(tool, tabId) {
   const values = {};
+  const pfx = tabId ? tabId + '-' : '';
   for (const inp of tool.inputs) {
-    values[inp.id] = document.getElementById('inp-' + inp.id)?.value || '';
+    values[inp.id] = document.getElementById('inp-' + pfx + inp.id)?.value || '';
   }
   return values;
 }
@@ -1216,14 +1062,21 @@ function getFormValues(tool) {
 // ─── GENERATE ─────────────────────────────────────────────────────────────────
 async function generate() {
   if (!state.tool || state.generating) return;
-  const values = getFormValues(state.tool);
+  const values = getFormValues(state.tool, state.tab);
   const firstInput = state.tool.inputs[0];
   if (!values[firstInput.id]?.trim()) {
     alert('Please fill in the ' + firstInput.label + ' field.');
     return;
   }
-  const userPrompt = state.tool.prompt(values);
-  const system = state.tool.system;
+
+  // Build prompt, optionally injecting style bible & grade level
+  let userPrompt = state.tool.prompt(values);
+  let system = state.tool.system;
+  const styleBible = localStorage.getItem('scribiq_style') || '';
+  const gradeLevel = localStorage.getItem('scribiq_grade') || '';
+  if (styleBible) system = system + '\n\nSTYLE GUIDE: ' + styleBible;
+  if (gradeLevel) userPrompt = userPrompt + '\n\nWrite at a ' + gradeLevel + ' reading level.';
+
   const max_tokens = state.tool.max_tokens || 4096;
 
   state.generating = true;
@@ -1232,9 +1085,9 @@ async function generate() {
   document.getElementById('out-wrap').style.display = 'block';
   document.getElementById('out-body').innerHTML = '<span class="cursor-blink"></span>';
   document.getElementById('out-badge').textContent = 'Generating...';
-  const btn = document.getElementById('btn-gen');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spin"></span> Generating...';
+  // Use scoped query to avoid cross-tab btn-gen collisions
+  const btn = document.querySelector('#pg-' + state.tab + ' .btn-gen');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Generating...'; }
 
   try {
     await streamRequest(
@@ -1247,13 +1100,12 @@ async function generate() {
       }
     );
   } catch(err) {
-    document.getElementById('out-body').innerHTML = `<div class="err-msg">⚠️ ${err.message}</div>`;
+    document.getElementById('out-body').innerHTML = `<div class="err-msg">⚠️ ${escHtml(err.message)}</div>`;
   }
 
   state.generating = false;
   document.getElementById('out-badge').textContent = 'Done';
-  btn.disabled = false;
-  btn.innerHTML = 'Regenerate <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  if (btn) { btn.disabled = false; btn.innerHTML = 'Regenerate <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
   updateWordCount(state.output);
 }
 
@@ -1403,16 +1255,40 @@ function updateWordCount(text) {
 }
 
 // ─── COPY OUTPUT ──────────────────────────────────────────────────────────────
-function copyOutput() {
-  if (!state.output) return;
-  navigator.clipboard.writeText(state.output).then(() => {
-    const btn = document.querySelector('.out-acts .iBtn:nth-child(1)');
-    if (btn) {
-      const orig = btn.textContent;
-      btn.textContent = 'Copied!';
-      setTimeout(() => btn.textContent = orig, 1500);
+function copyOutput(btn) {
+  // Get current text from editable body or state
+  const body = document.getElementById('out-body');
+  const text = body.contentEditable === 'true' ? body.innerText : state.output;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const el = btn || document.querySelector('.iBtn-copy');
+    if (el) {
+      const orig = el.innerHTML;
+      el.innerHTML = '✅ Copied!';
+      setTimeout(() => el.innerHTML = orig, 1500);
     }
   });
+}
+
+// ─── TOGGLE EDIT ──────────────────────────────────────────────────────────────
+function toggleEdit(btn) {
+  const body = document.getElementById('out-body');
+  if (!state.output) return;
+  if (body.contentEditable === 'true') {
+    // Save edits back to state
+    state.output = body.innerText;
+    body.contentEditable = 'false';
+    body.style.outline = '';
+    btn.innerHTML = '✏️ Edit';
+    updateWordCount(state.output);
+  } else {
+    // Make editable — show plain text for easy editing
+    body.textContent = state.output;
+    body.contentEditable = 'true';
+    body.style.outline = '1px solid var(--indln)';
+    body.focus();
+    btn.innerHTML = '✅ Done';
+  }
 }
 
 // ─── CLEAR OUTPUT ─────────────────────────────────────────────────────────────
@@ -1431,19 +1307,21 @@ function clearOutput() {
 
 // ─── SAVE TO LIBRARY ──────────────────────────────────────────────────────────
 function saveToLib() {
-  if (!state.output) return;
+  const body = document.getElementById('out-body');
+  const text = body.contentEditable === 'true' ? body.innerText : state.output;
+  if (!text) return;
   const lib = JSON.parse(localStorage.getItem('scribiq_library') || '[]');
   lib.unshift({
     id: Date.now(),
-    tool: state.tool.label,
-    content: state.output,
-    preview: state.output.slice(0, 200),
+    tool: state.tool ? state.tool.label : 'Unknown',
+    content: text,
+    preview: text.slice(0, 200),
     date: new Date().toLocaleDateString()
   });
   if (lib.length > 100) lib.pop();
   localStorage.setItem('scribiq_library', JSON.stringify(lib));
-  const btn = document.querySelector('.iBtn:nth-child(2)');
-  if (btn) { const orig = btn.textContent; btn.textContent = 'Saved!'; setTimeout(() => btn.textContent = orig, 1500); }
+  const btn = document.querySelector('.out-acts .iBtn:nth-child(3)');
+  if (btn) { const orig = btn.innerHTML; btn.innerHTML = '✅ Saved!'; setTimeout(() => btn.innerHTML = orig, 1500); }
 }
 
 // ─── LIBRARY MODAL ────────────────────────────────────────────────────────────
@@ -1500,7 +1378,21 @@ function closeView(e) {
 
 // ─── SETTINGS MODAL ───────────────────────────────────────────────────────────
 function openSettings() {
-  alert('Setup:\n\n1. Deploy to Vercel\n2. Add ANTHROPIC_API_KEY or OPENROUTER_API_KEY\n   in Vercel → Settings → Environment Variables\n3. Redeploy\n\nFor local dev: create .env.local with your key\nand run: npx vercel dev');
+  const grade = localStorage.getItem('scribiq_grade') || '';
+  const style = localStorage.getItem('scribiq_style') || '';
+  document.getElementById('set-grade').value = grade;
+  document.getElementById('set-style').value = style;
+  document.getElementById('set-overlay').classList.add('on');
+}
+function closeSettings(e) {
+  if (!e || e.target === document.getElementById('set-overlay')) {
+    document.getElementById('set-overlay').classList.remove('on');
+  }
+}
+function saveSettings() {
+  localStorage.setItem('scribiq_grade', document.getElementById('set-grade').value);
+  localStorage.setItem('scribiq_style', document.getElementById('set-style').value);
+  closeSettings();
 }
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
@@ -1509,6 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 document.addEventListener('keydown', e => {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') generate();
+  if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'C') { e.preventDefault(); copyOutput(); }
 });
 </script>
 </body>
