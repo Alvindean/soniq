@@ -93,7 +93,9 @@ module.exports = async function handler(req, res) {
       const text = await callAnthropic(body.userKey, messages, system, max_tokens);
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
-      return res.status(502).json({error: 'Anthropic error: ' + err.message});
+      console.error('User-key Anthropic error:', err.message);
+      const isProduction = process.env.NODE_ENV === 'production';
+      return res.status(502).json({error: isProduction ? 'API request failed. Check your API key and try again.' : 'Anthropic error: ' + err.message});
     }
   }
 
@@ -139,5 +141,6 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  return res.status(502).json({error: 'All API providers failed. ' + errors.join(' | ')});
+  const isProduction = process.env.NODE_ENV === 'production';
+  return res.status(502).json({error: isProduction ? 'Song generation failed. Please try again later.' : 'All API providers failed. ' + errors.join(' | ')});
 };
