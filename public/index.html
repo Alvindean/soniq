@@ -2929,7 +2929,7 @@ const S={selectedGenre:'pop',
 // ═══════════════════════════════════════════════════════
 
 // ── STREAMING ────────────────────────────────────────
-async function callClaudeStream(prompt, systemPrompt, onChunk) {
+async function callClaudeStream(prompt, systemPrompt, onChunk, signal) {
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
 
   if (isVercel) {
@@ -2942,7 +2942,8 @@ async function callClaudeStream(prompt, systemPrompt, onChunk) {
           messages: [{role: 'user', content: prompt}],
           system: systemPrompt || undefined,
           max_tokens: 2048
-        })
+        }),
+        signal
       });
       if (!res.ok) {
         const e = await res.json().catch(() => ({}));

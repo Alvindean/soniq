@@ -135,6 +135,8 @@ module.exports = async function handler(req, res) {
 
   const errors = [];
 
+  const isProduction = process.env.NODE_ENV === 'production';
+
   if (anthropicKey) {
     try {
       await streamAnthropic(anthropicKey, messages, system, max_tokens, res);
@@ -161,6 +163,7 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  res.write(`data: ${JSON.stringify({error: 'All providers failed. ' + errors.join(' | ')})}\n\n`);
+  const clientError = isProduction ? 'Song generation failed. Please try again later.' : 'All providers failed. ' + errors.join(' | ');
+  res.write(`data: ${JSON.stringify({error: clientError})}\n\n`);
   res.end();
 };
