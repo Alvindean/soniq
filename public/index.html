@@ -328,6 +328,32 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .lr-params{display:flex;flex-wrap:wrap;gap:5px}
 .lr-param{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px}
 .lucky-hist-section{width:100%;max-width:640px;margin-top:28px}
+/* ── LUCKY GENRE ZONE ── */
+.gz-toggle{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx3);font-family:var(--font);font-size:11px;font-weight:600;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s;margin-bottom:12px;letter-spacing:0.02em}
+.gz-toggle:hover{border-color:var(--amberline);color:var(--tx1)}
+.gz-toggle.active{border-color:var(--amber);color:var(--amber);background:rgba(245,184,0,0.08)}
+.gz-badge{background:var(--amber);color:#000;border-radius:99px;font-size:9px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center}
+.gz-arrow{font-size:9px;color:var(--tx4);transition:transform 0.2s;line-height:1}
+.gz-arrow.open{transform:rotate(180deg)}
+.genre-zone-panel{width:100%;max-width:500px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;animation:pgIn 0.2s ease}
+.gz-hint{font-size:10px;color:var(--tx4);margin-bottom:10px;text-align:center}
+.gz-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px}
+.gz-pill{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx3);font-size:11px;font-weight:600;padding:5px 13px;cursor:pointer;transition:all 0.15s;user-select:none}
+.gz-pill:hover{border-color:var(--amberline);color:var(--tx1)}
+.gz-pill.on{background:rgba(245,184,0,0.12);border-color:var(--amber);color:var(--amber)}
+.gz-footer{display:flex;justify-content:center;gap:10px}
+.gz-clear{background:transparent;border:none;color:var(--tx4);font-size:10px;cursor:pointer;padding:2px 8px;font-family:var(--font);transition:color 0.15s;border-radius:var(--r1)}
+.gz-clear:hover{color:var(--red);background:var(--redbg)}
+.gz-all{background:transparent;border:1px solid var(--b2);color:var(--tx3);font-size:10px;cursor:pointer;padding:2px 8px;font-family:var(--font);transition:all 0.15s;border-radius:var(--r1)}
+.gz-all:hover{border-color:var(--amberline);color:var(--tx1)}
+/* ── LUCKY SLOTS ── */
+.lucky-slots{display:none;flex-direction:row;align-items:center;gap:10px;margin-bottom:22px;animation:pgIn 0.25s ease}
+.slot-col{width:130px;height:48px;position:relative;overflow:hidden;border-radius:var(--r2);background:var(--s3);border:1px solid var(--b1)}
+.slot-col.landed{border-color:var(--amber);box-shadow:0 0 14px rgba(245,184,0,0.25)}
+.slot-reel{display:flex;flex-direction:column}
+.slot-item{height:48px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--tx2);white-space:nowrap;padding:0 8px;text-align:center;line-height:1.2}
+.slot-x{font-size:18px;font-weight:700;color:var(--tx4);flex-shrink:0;line-height:1}
+.slot-fusion-label{font-size:10px;color:var(--tx4);text-align:center;width:100%;position:absolute;bottom:-18px;white-space:nowrap}
 
 /* ── LIBRARY ── */
 .libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
@@ -1643,7 +1669,37 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="hl-2">Lucky</div>
     </div>
     <div class="lucky-sub">Picks a random fusion from the matrix, randomises topic, mood &amp; structure, and generates a complete song. No setup. One press.</div>
+
+    <!-- Genre Zone toggle -->
+    <button class="gz-toggle" id="gz-toggle-btn" onclick="toggleGenreZone()">
+      🎯 Genre Zone
+      <span class="gz-badge" id="gz-badge" style="display:none">0</span>
+      <span class="gz-arrow" id="gz-arrow">▾</span>
+    </button>
+
+    <!-- Genre Zone panel -->
+    <div id="genre-zone-panel" class="genre-zone-panel" style="display:none">
+      <div class="gz-hint">Pin genres to limit the fusion pool — leave empty for full random</div>
+      <div class="gz-pills" id="gz-pills-container"></div>
+      <div class="gz-footer">
+        <button class="gz-all" onclick="selectAllGenres()">All</button>
+        <button class="gz-clear" onclick="clearGenreZone()">Clear</button>
+      </div>
+    </div>
+
     <div class="lucky-orb" id="lucky-orb">🎲</div>
+
+    <!-- Spin wheel (slot machine) -->
+    <div id="lucky-slots" class="lucky-slots">
+      <div class="slot-col" id="slot-col-1">
+        <div class="slot-reel" id="slot-reel-1"><div class="slot-item">—</div></div>
+      </div>
+      <div class="slot-x">×</div>
+      <div class="slot-col" id="slot-col-2">
+        <div class="slot-reel" id="slot-reel-2"><div class="slot-item">—</div></div>
+      </div>
+    </div>
+
     <button class="lucky-cta" id="lucky-btn" onclick="feelLucky()">
       <span>🎲</span>
       <span id="lucky-btn-text">Surprise Me</span>
@@ -2922,6 +2978,7 @@ const S={selectedGenre:'pop',
   albumData:null,
   currentVersions:[],
   luckyVersions:[],
+  luckyLockedGenres:[],
 };
 
 // ═══════════════════════════════════════════════════════
@@ -2990,7 +3047,7 @@ async function callServerStream(action, params, onChunk, signal) {
   const res = await fetch('/api/stream', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ action, params, userKey: window._soniqKey || undefined }),
+    body: JSON.stringify({ action, params, userKey: (window._soniqKey && window._soniqKey !== 'server-side') ? window._soniqKey : undefined }),
     signal
   });
   if (!res.ok) {
@@ -3340,17 +3397,112 @@ const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy / Gritty mal
 function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
 function apiErrHtml(msg) {
-  const isCredits = msg.toLowerCase().includes('credit');
-  const isKey = msg.toLowerCase().includes('api key') || msg.toLowerCase().includes('configured');
+  const m = msg.toLowerCase();
+  const isCredits = m.includes('credit');
+  const isKey = m.includes('api key') || m.includes('configured') || m.includes('rejected') || m.includes('authentication');
+  const isRate = m.includes('rate limit') || m.includes('429');
+  const isOverload = m.includes('overloaded') || m.includes('529');
   let hint = '';
-  if (isCredits) hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--accent)">openrouter.ai/settings/credits</a>';
-  else if (isKey) hint = '<br><br><strong>Fix:</strong><br>1. Vercel → Settings → Environment Variables → set ANTHROPIC_API_KEY or OPENROUTER_API_KEY<br>2. Redeploy';
-  return `<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${msg}${hint}</div>`;
+  if (isCredits) {
+    hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
+  } else if (isKey) {
+    hint = '<br><br><strong>Fix:</strong> Vercel → your project → Settings → Environment Variables → add <code style="background:var(--s3);padding:1px 5px;border-radius:3px">ANTHROPIC_API_KEY</code> → Redeploy';
+  } else if (isRate) {
+    hint = '<br><br><strong>Fix:</strong> Wait a minute and try again. Add your own API key in Settings to bypass limits.';
+  } else if (isOverload) {
+    hint = '<br><br>Anthropic servers are busy — wait 30 seconds and try again.';
+  }
+  return `<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8;font-family:var(--font)">⚠️ ${msg}${hint}</div>`;
+}
+
+// ── Genre Zone helpers ──
+function renderGenreZonePills(){
+  const container=document.getElementById('gz-pills-container');
+  if(!container)return;
+  container.innerHTML=Object.entries(GENRE_LABELS).map(([k,v])=>`<span class="gz-pill${S.luckyLockedGenres.includes(k)?' on':''}" onclick="toggleLuckyGenre('${k}')">${v}</span>`).join('');
+}
+function toggleGenreZone(){
+  const panel=document.getElementById('genre-zone-panel');
+  const btn=document.getElementById('gz-toggle-btn');
+  const arrow=document.getElementById('gz-arrow');
+  const isOpen=panel.style.display!=='none';
+  panel.style.display=isOpen?'none':'block';
+  arrow.classList.toggle('open',!isOpen);
+  btn.classList.toggle('active',!isOpen);
+  if(!isOpen)renderGenreZonePills();
+}
+function toggleLuckyGenre(k){
+  const idx=S.luckyLockedGenres.indexOf(k);
+  if(idx===-1)S.luckyLockedGenres.push(k);
+  else S.luckyLockedGenres.splice(idx,1);
+  renderGenreZonePills();
+  updateGenreZoneBadge();
+}
+function clearGenreZone(){
+  S.luckyLockedGenres=[];
+  renderGenreZonePills();
+  updateGenreZoneBadge();
+}
+function selectAllGenres(){
+  S.luckyLockedGenres=Object.keys(GENRE_LABELS);
+  renderGenreZonePills();
+  updateGenreZoneBadge();
+}
+function updateGenreZoneBadge(){
+  const badge=document.getElementById('gz-badge');
+  const btn=document.getElementById('gz-toggle-btn');
+  const n=S.luckyLockedGenres.length;
+  if(badge){badge.style.display=n?'inline':'none';badge.textContent=n;}
+  if(btn)btn.classList.toggle('active',n>0);
+}
+
+// ── Slot machine spin ──
+function spinSlot(reelId, colId, targetText, delay, onDone){
+  setTimeout(()=>{
+    const reel=document.getElementById(reelId);
+    const col=document.getElementById(colId);
+    if(!reel||!col){onDone&&onDone();return;}
+    col.classList.remove('landed');
+    const labels=Object.values(GENRE_LABELS);
+    const others=labels.filter(l=>l!==targetText);
+    const duration=900;
+    let elapsed=0;
+    let interval=60;
+    function tick(){
+      const remaining=duration-elapsed;
+      if(remaining<=0){
+        reel.innerHTML=`<div class="slot-item">${targetText}</div>`;
+        col.classList.add('landed');
+        onDone&&onDone();
+        return;
+      }
+      const pick=others[Math.floor(Math.random()*others.length)];
+      reel.innerHTML=`<div class="slot-item">${pick}</div>`;
+      elapsed+=interval;
+      interval=60+240*Math.pow(elapsed/duration,2.5);
+      setTimeout(tick,Math.min(interval,remaining+interval));
+    }
+    tick();
+  },delay);
+}
+function spinLuckyWheel(g1Label, g2Label, onComplete){
+  const slots=document.getElementById('lucky-slots');
+  slots.style.display='flex';
+  let done1=false,done2=false;
+  function check(){if(done1&&done2)onComplete();}
+  spinSlot('slot-reel-1','slot-col-1',g1Label,0,()=>{done1=true;check();});
+  spinSlot('slot-reel-2','slot-col-2',g2Label,180,()=>{done2=true;check();});
 }
 
 function feelLucky(){
+  // Filter fusion keys by locked genres
+  const locked=S.luckyLockedGenres||[];
+  const allKeys=Object.keys(FUSION_DATA);
+  const filtered=locked.length
+    ?allKeys.filter(k=>{const[a,b]=k.split('+');return locked.includes(a)||locked.includes(b);})
+    :allKeys;
+  const keys=filtered.length?filtered:allKeys;
   // Pick random fusion pair from FUSION_DATA keys
-  const keys=Object.keys(FUSION_DATA);
   const key=pickRandom(keys);
   const [g1,g2]=key.split('+');
   const fd=FUSION_DATA[key];
@@ -3376,8 +3528,15 @@ function feelLucky(){
   orb.classList.add('spinning');
   setTimeout(()=>orb.classList.remove('spinning'),1200);
 
-  // Update button
-  btnLoad('lucky-btn','Generating…');
+  // Spin wheel, then generate
+  btnLoad('lucky-btn','Spinning…');
+  document.getElementById('lucky-hint').textContent=`Selecting: ${fd?.name||g1+' × '+g2}…`;
+  const g1Label=GENRE_LABELS[g1]||g1;
+  const g2Label=GENRE_LABELS[g2]||g2;
+  spinLuckyWheel(g1Label,g2Label,()=>{
+  // Update label only — don't call btnLoad again (would corrupt _orig restore)
+  const btnTextEl=document.getElementById('lucky-btn-text');
+  if(btnTextEl)btnTextEl.textContent='Generating…';
   document.getElementById('lucky-hint').textContent=`Writing: ${fd?.name||g1+' × '+g2} · "${topic}" · ${mood}`;
 
   const system='You are an expert songwriter, neuroscientist of music, and AI music production specialist. Write complete, emotionally authentic, production-ready songs. Respond with the exact format requested. No extra commentary.';
@@ -3484,6 +3643,7 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Error — check API key in Vercel settings.';
   });
+  }); // end spinLuckyWheel
 }
 
 function parseLuckyResult(raw,fusionName,meta){
