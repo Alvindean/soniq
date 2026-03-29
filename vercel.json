@@ -2,6 +2,10 @@
   "version": 2,
   "name": "soniq",
   "outputDirectory": "public",
+  "functions": {
+    "api/stream.js":   { "maxDuration": 60 },
+    "api/generate.js": { "maxDuration": 60 }
+  },
   "headers": [
     {
       "source": "/(.*)",

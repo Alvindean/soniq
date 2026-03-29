@@ -3534,7 +3534,9 @@ function feelLucky(){
   const g1Label=GENRE_LABELS[g1]||g1;
   const g2Label=GENRE_LABELS[g2]||g2;
   spinLuckyWheel(g1Label,g2Label,()=>{
-  btnLoad('lucky-btn','Generating…');
+  // Update label only — don't call btnLoad again (would corrupt _orig restore)
+  const btnTextEl=document.getElementById('lucky-btn-text');
+  if(btnTextEl)btnTextEl.textContent='Generating…';
   document.getElementById('lucky-hint').textContent=`Writing: ${fd?.name||g1+' × '+g2} · "${topic}" · ${mood}`;
 
   const system='You are an expert songwriter, neuroscientist of music, and AI music production specialist. Write complete, emotionally authentic, production-ready songs. Respond with the exact format requested. No extra commentary.';

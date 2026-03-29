@@ -141,6 +141,14 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const isProduction = process.env.NODE_ENV === 'production';
-  return res.status(502).json({error: isProduction ? 'Song generation failed. Please try again later.' : 'All API providers failed. ' + errors.join(' | ')});
+  const firstError = errors[0] || '';
+  let errMsg;
+  if (firstError.includes('401') || firstError.includes('invalid') || firstError.includes('authentication')) {
+    errMsg = 'API key rejected. Go to Vercel → Settings → Environment Variables, check ANTHROPIC_API_KEY, then Redeploy.';
+  } else if (firstError.includes('429') || firstError.includes('rate')) {
+    errMsg = 'Rate limit hit. Wait a moment and try again.';
+  } else {
+    errMsg = 'Song generation failed. ' + (errors.length ? errors.join(' | ') : 'Check Vercel function logs.');
+  }
+  return res.status(502).json({error: errMsg});
 };
