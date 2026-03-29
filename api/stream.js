@@ -116,7 +116,12 @@ module.exports = async function handler(req, res) {
       const brain = require('./brain');
       let built;
       if (body.action === 'generate') {
-        built = brain.buildSongPrompt(body.params || {});
+        const p = body.params || {};
+        if (p.genre === 'hiphop' && p.rapLabActive) {
+          built = brain.buildRapLabPrompt(p);
+        } else {
+          built = brain.buildSongPrompt(p);
+        }
       } else {
         built = brain.buildLuckyPrompt(body.params || {});
       }

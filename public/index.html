@@ -1106,6 +1106,36 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .batch-use-btn:hover{background:#ffc820}
 .batch-loading{text-align:center;padding:12px 0;color:var(--tx3);font-size:11px}
 
+/* ── RAP LAB ── */
+.rap-lab-panel{width:100%;margin-top:12px;animation:pgIn 0.2s ease}
+.rl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+.rl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--amber)}
+.rl-category-tabs{display:flex;gap:5px}
+.rl-tab{font-size:10px;font-weight:600;padding:4px 10px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.12s}
+.rl-tab:hover{color:var(--tx2)}
+.rl-tab.on{background:var(--amberbg);border-color:var(--amberline);color:var(--amber)}
+.rl-style-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:16px}
+.rl-style-card{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px;cursor:pointer;transition:all 0.15s;position:relative}
+.rl-style-card:hover{border-color:var(--b3);background:var(--s4)}
+.rl-style-card.on{border-color:var(--amberline);background:var(--amberbg);box-shadow:var(--glow-amber)}
+.rl-style-card.forward{border-left:2px solid var(--cyan)}
+.rl-style-card.revisionist{border-left:2px solid var(--violet)}
+.rl-style-name{font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:2px}
+.rl-style-era{font-size:10px;color:var(--tx4)}
+.rl-style-teaser{font-size:10px;color:var(--tx3);margin-top:4px;line-height:1.4;display:none}
+.rl-style-card.on .rl-style-teaser{display:block}
+.rl-trending-badge{position:absolute;top:6px;right:6px;font-size:8px;font-weight:700;padding:2px 5px;border-radius:99px;background:var(--amberbg);color:var(--amber);border:1px solid var(--amberline)}
+.rl-new-badge{position:absolute;top:6px;right:6px;font-size:8px;font-weight:700;padding:2px 5px;border-radius:99px;background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline)}
+.rl-dimensions{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px;animation:pgIn 0.2s ease}
+.rl-dim-header{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);margin-bottom:10px}
+.rl-dim-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.rl-dim-label{font-size:10px;font-weight:700;color:var(--tx3);min-width:80px;padding-top:5px;text-transform:uppercase;letter-spacing:0.06em}
+.rl-dim-pills{display:flex;gap:4px;flex-wrap:wrap}
+.rl-dpill{font-size:10px;font-weight:600;padding:4px 10px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.12s}
+.rl-dpill:hover{color:var(--tx2);border-color:var(--b3)}
+.rl-dpill.on{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
+.rl-agent-badge{font-size:10px;color:var(--tx4);padding:6px 0;font-style:italic}
+
 </style>
 
 </head>
@@ -1273,6 +1303,75 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="substyle-wrap" id="substyle-row">
         <span class="substyle-label-txt" id="substyle-label">Rap Style</span>
         <div class="spills" id="substyle-pills"></div>
+      </div>
+
+      <!-- RAP LAB PANEL -->
+      <div id="rap-lab-panel" class="rap-lab-panel" style="display:none">
+        <div class="rl-header">
+          <span class="rl-title">🎤 Rap Lab</span>
+          <div class="rl-category-tabs">
+            <span class="rl-tab on" onclick="setRapLabTab(this,'all')">All</span>
+            <span class="rl-tab" onclick="setRapLabTab(this,'established')">Classic</span>
+            <span class="rl-tab" onclick="setRapLabTab(this,'forward')">Forward</span>
+            <span class="rl-tab" onclick="setRapLabTab(this,'revisionist')">Revisionist</span>
+          </div>
+        </div>
+        <div class="rl-style-grid" id="rl-style-grid"></div>
+        <div class="rl-dimensions" id="rl-dimensions" style="display:none">
+          <div class="rl-dim-header">Fine-tune dimensions</div>
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Flow</span>
+            <div class="rl-dim-pills" id="rld-flow">
+              <span class="rl-dpill on" onclick="setRapDim(this,'flow','syncopated')">Syncopated</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'flow','on-beat')">On-Beat</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'flow','triplet')">Triplet</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'flow','double-time')">Double-Time</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'flow','conversational')">Conversational</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'flow','behind-beat')">Behind-Beat</span>
+            </div>
+          </div>
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Rhyme</span>
+            <div class="rl-dim-pills" id="rld-rhyme">
+              <span class="rl-dpill on" onclick="setRapDim(this,'rhymeArch','end-only')">End Only</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','internal')">Internal</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','multi-syllabic')">Multi-Syl</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','chain')">Chain</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','mosaic')">Mosaic</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','slant')">Slant</span>
+            </div>
+          </div>
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Density</span>
+            <div class="rl-dim-pills" id="rld-density">
+              <span class="rl-dpill" onclick="setRapDim(this,'density','sparse')">Sparse 1–4/bar</span>
+              <span class="rl-dpill on" onclick="setRapDim(this,'density','medium')">Medium 5–8/bar</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'density','dense')">Dense 9–12/bar</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'density','ultra-dense')">Ultra-Dense 13+</span>
+            </div>
+          </div>
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Vocab</span>
+            <div class="rl-dim-pills" id="rld-vocab">
+              <span class="rl-dpill on" onclick="setRapDim(this,'vocabRegister','street-coded')">Street-Coded</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','conscious-literary')">Conscious</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','abstract-surreal')">Abstract</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','minimal-phonetic')">Minimal</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','academic')">Academic</span>
+            </div>
+          </div>
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Persona</span>
+            <div class="rl-dim-pills" id="rld-persona">
+              <span class="rl-dpill on" onclick="setRapDim(this,'persona','first-person-raw')">First Person</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'persona','character')">Character</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'persona','omniscient')">Omniscient</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'persona','second-person')">Second Person</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'persona','collective-we')">Collective We</span>
+            </div>
+          </div>
+          <div class="rl-agent-badge" id="rl-agent-badge"></div>
+        </div>
       </div>
 
       <!-- ADVANCED SETTINGS ACCORDION -->
@@ -2985,6 +3084,9 @@ const FUSION_DATA={
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
+  rapStyle: 'trap',
+  rapDimensions: { flow:'syncopated', rhymeArch:'end-only', density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
+  rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]'),
   luckyHistory:[],sessionHistory:[],
@@ -3334,8 +3436,8 @@ function onGenreChange(g){
   const lbl=document.getElementById('substyle-label');
   const pills=document.getElementById('substyle-pills');
   if(!row||!pills)return;
+  const rapLabPanel = document.getElementById('rap-lab-panel');
   if(styles){
-    row.style.display='block';
     lbl.textContent=g==='hiphop'?'Rap Style':g==='reggaeton'?'Reggaeton Style':g==='latin'?'Latin Style':'Sub-Genre Style';
     pills.innerHTML='';
     S.substyle=styles[0];
@@ -3346,9 +3448,155 @@ function onGenreChange(g){
       el.onclick=()=>{pills.querySelectorAll('.spill').forEach(p=>p.classList.remove('on'));el.classList.add('on');S.substyle=s;};
       pills.appendChild(el);
     });
-  }else{row.style.display='none';S.substyle='';}
+    if(g==='hiphop'){
+      row.style.display='none';
+      if(rapLabPanel){
+        rapLabPanel.style.display='block';
+        if(!S._rapLabInit){S._rapLabInit=true;initRapLab();}
+        S.rapLabActive=true;
+      }
+    }else{
+      row.style.display='block';
+      if(rapLabPanel) rapLabPanel.style.display='none';
+      S.rapLabActive=false;
+    }
+  }else{
+    row.style.display='none';
+    S.substyle='';
+    if(rapLabPanel) rapLabPanel.style.display='none';
+    S.rapLabActive=false;
+  }
 }
 function setQ(el,v){document.querySelectorAll('#quality-pills .qpill').forEach(p=>p.classList.remove('on'));el.classList.add('on');S.quality=v;}
+
+// ── RAP LAB DATA ──────────────────────────────────────
+const RAP_STYLES_CLIENT = {
+  trap:            { label:'Trap', category:'established', era:'2010–present', teaser:'808s define the architecture. The beat is the statement.' },
+  boom_bap:        { label:'Boom Bap', category:'established', era:'1988–present', teaser:'Craft is resistance. Every bar must earn its place.' },
+  lyrical_conscious:{ label:'Lyrical / Conscious', category:'established', era:'1990s–present', teaser:'Hip-hop as literature. Meaning over metrics.' },
+  drill:           { label:'Drill', category:'established', era:'2012–present', teaser:'Menace as melody. Darkness weaponised rhythmically.' },
+  melodic_rap:     { label:'Melodic Rap', category:'established', era:'2016–present', teaser:'Auto-Tune as instrument. Emotion over precision.' },
+  old_school:      { label:'Old School', category:'established', era:'1979–1995', teaser:'The origin point. DJ culture, block parties, truth.' },
+  g_funk:          { label:'G-Funk', category:'established', era:'1992–2000', teaser:'Laid-back West Coast. Synth whine, slow groove, smooth.' },
+  east_coast:      { label:'East Coast', category:'established', era:'1990s–present', teaser:'Lyricism as identity. Dense, competitive, literate.' },
+  midwest:         { label:'Midwest', category:'established', era:'2000–present', teaser:'Soul samples and emotional honesty. Chipmunk soul.' },
+  cloud_rap:       { label:'Cloud Rap', category:'established', era:'2010–present', teaser:'Hazy, slow, ethereal. Mood over message.' },
+  drill_uk:        { label:'UK Drill', category:'established', era:'2016–present', teaser:'Sliding triplets, cold precision, London coded.' },
+  afro_rap:        { label:'Afro-Rap', category:'established', era:'2015–present', teaser:'West African rhythm patterns fused with hip-hop structure.' },
+  post_algorithm:  { label:'Post-Algorithm', category:'forward', era:'2025→', teaser:'If the algorithm can predict it, it has already failed.' },
+  neo_phonetic:    { label:'Neo-Phonetic', category:'forward', era:'2024→', teaser:'Sound texture over semantic meaning. Words as instruments.' },
+  climate_rap:     { label:'Climate Rap', category:'forward', era:'2025→', teaser:'Apocalyptic imagery grounded in data, not mythology.' },
+  ai_native:       { label:'AI-Native', category:'forward', era:'2025→', teaser:'Written for AI-generated beats. New rhythmic grammar.' },
+  mosaic_flow:     { label:'Mosaic Flow', category:'forward', era:'2024→', teaser:'No consistent meter. Flow shifts every 4 bars.' },
+  golden_era_2:    { label:'Golden Era 2.0', category:'revisionist', era:'1993 × Now', teaser:'Boom bap density with contemporary production values.' },
+  analog_melodic:  { label:'Analog Melodic', category:'revisionist', era:'2000s × Now', teaser:'Melodic rap on warm analog production. No digital sheen.' },
+  conscious_trap:  { label:'Conscious Trap', category:'revisionist', era:'Trap × Kendrick', teaser:'808s underneath philosophy. The contradiction IS the art.' },
+  afro_boom_bap:   { label:'Afro-Boom Bap', category:'revisionist', era:'Africa × 1993', teaser:'West African tonal patterns applied to boom bap structure.' },
+  jazz_rap_revival:{ label:'Jazz Rap Revival', category:'revisionist', era:'1993 × Now', teaser:'Tribe-era craft with modern mixing and current subjects.' },
+};
+
+const RAP_DIM_DEFAULTS = {
+  trap:             { flow:'syncopated',    rhymeArch:'end-only',        density:'medium',       vocabRegister:'street-coded',        persona:'first-person-raw' },
+  boom_bap:         { flow:'on-beat',       rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  lyrical_conscious:{ flow:'conversational',rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  drill:            { flow:'syncopated',    rhymeArch:'end-only',        density:'medium',       vocabRegister:'street-coded',        persona:'first-person-raw' },
+  melodic_rap:      { flow:'conversational',rhymeArch:'slant',           density:'sparse',       vocabRegister:'minimal-phonetic',    persona:'first-person-raw' },
+  old_school:       { flow:'on-beat',       rhymeArch:'end-only',        density:'medium',       vocabRegister:'street-coded',        persona:'collective-we' },
+  g_funk:           { flow:'behind-beat',   rhymeArch:'slant',           density:'medium',       vocabRegister:'street-coded',        persona:'first-person-raw' },
+  east_coast:       { flow:'on-beat',       rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  midwest:          { flow:'conversational',rhymeArch:'internal',        density:'medium',       vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  cloud_rap:        { flow:'behind-beat',   rhymeArch:'slant',           density:'sparse',       vocabRegister:'abstract-surreal',    persona:'first-person-raw' },
+  drill_uk:         { flow:'syncopated',    rhymeArch:'end-only',        density:'medium',       vocabRegister:'street-coded',        persona:'first-person-raw' },
+  afro_rap:         { flow:'on-beat',       rhymeArch:'chain',           density:'medium',       vocabRegister:'street-coded',        persona:'collective-we' },
+  post_algorithm:   { flow:'mosaic',        rhymeArch:'mosaic',          density:'dense',        vocabRegister:'abstract-surreal',    persona:'omniscient' },
+  neo_phonetic:     { flow:'triplet',       rhymeArch:'mosaic',          density:'ultra-dense',  vocabRegister:'minimal-phonetic',    persona:'character' },
+  climate_rap:      { flow:'conversational',rhymeArch:'internal',        density:'dense',        vocabRegister:'conscious-literary',  persona:'collective-we' },
+  ai_native:        { flow:'syncopated',    rhymeArch:'slant',           density:'medium',       vocabRegister:'abstract-surreal',    persona:'second-person' },
+  mosaic_flow:      { flow:'conversational',rhymeArch:'mosaic',          density:'dense',        vocabRegister:'abstract-surreal',    persona:'omniscient' },
+  golden_era_2:     { flow:'on-beat',       rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  analog_melodic:   { flow:'behind-beat',   rhymeArch:'slant',           density:'sparse',       vocabRegister:'minimal-phonetic',    persona:'first-person-raw' },
+  conscious_trap:   { flow:'syncopated',    rhymeArch:'internal',        density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  afro_boom_bap:    { flow:'on-beat',       rhymeArch:'chain',           density:'dense',        vocabRegister:'conscious-literary',  persona:'collective-we' },
+  jazz_rap_revival: { flow:'behind-beat',   rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'omniscient' },
+};
+
+function initRapLab() {
+  const grid = document.getElementById('rl-style-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.entries(RAP_STYLES_CLIENT).map(([id, s]) => `
+    <div class="rl-style-card ${s.category}" data-style="${id}" data-cat="${s.category}"
+         onclick="onRapStyleSelect('${id}')">
+      <div class="rl-style-name">${s.label}</div>
+      <div class="rl-style-era">${s.era}</div>
+      <div class="rl-style-teaser">${s.teaser}</div>
+      ${s.category==='forward'?'<span class="rl-new-badge">NEW</span>':s.category==='revisionist'?'<span class="rl-new-badge" style="background:var(--violetbg);color:var(--violet);border-color:var(--violetline)">REV</span>':''}
+    </div>`).join('');
+  loadRapStats();
+}
+
+function onRapStyleSelect(styleId) {
+  S.rapStyle = styleId;
+  S.rapLabActive = true;
+  const defaults = RAP_DIM_DEFAULTS[styleId] || {};
+  S.rapDimensions = { ...S.rapDimensions, ...defaults };
+  // Update card selection
+  document.querySelectorAll('.rl-style-card').forEach(c => c.classList.toggle('on', c.dataset.style === styleId));
+  // Show dimensions panel
+  document.getElementById('rl-dimensions').style.display = 'block';
+  // Update dimension pills
+  syncRapDimPills();
+  // Update agent badge
+  const style = RAP_STYLES_CLIENT[styleId];
+  const badge = document.getElementById('rl-agent-badge');
+  if (badge && style) badge.textContent = `${style.label} Agent active — ${style.teaser}`;
+}
+
+function syncRapDimPills() {
+  const dims = S.rapDimensions;
+  const dimMap = { flow:'rld-flow', rhymeArch:'rld-rhyme', density:'rld-density', vocabRegister:'rld-vocab', persona:'rld-persona' };
+  Object.entries(dimMap).forEach(([key, elId]) => {
+    const container = document.getElementById(elId);
+    if (!container) return;
+    container.querySelectorAll('.rl-dpill').forEach(p => {
+      p.classList.toggle('on', p.getAttribute('onclick').includes(`'${dims[key]}'`));
+    });
+  });
+}
+
+function setRapDim(el, dim, value) {
+  S.rapDimensions[dim] = value;
+  document.querySelectorAll(`#rld-${dim==='rhymeArch'?'rhyme':dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+}
+
+function setRapLabTab(el, cat) {
+  document.querySelectorAll('.rl-tab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.rl-style-card').forEach(c => {
+    c.style.display = (cat === 'all' || c.dataset.cat === cat) ? '' : 'none';
+  });
+}
+
+async function loadRapStats() {
+  try {
+    const r = await fetch('/api/rapstats');
+    if (!r.ok) return;
+    const d = await r.json();
+    if (d.trending?.length) {
+      d.trending.forEach(styleId => {
+        const card = document.querySelector(`.rl-style-card[data-style="${styleId}"]`);
+        if (card && !card.querySelector('.rl-trending-badge')) {
+          const badge = document.createElement('span');
+          badge.className = 'rl-trending-badge';
+          badge.textContent = 'TRENDING';
+          // Remove NEW/REV badge if present
+          card.querySelector('.rl-new-badge')?.remove();
+          card.appendChild(badge);
+        }
+      });
+    }
+  } catch(e) {}
+}
 
 // ─── BLEND ───
 function toggleAdv(){
@@ -3787,6 +4035,9 @@ async function generateSong(){
     theoryLevel: S.theoryLevel || 'standard',
     mode: document.getElementById('g-mode')?.value || 'auto',
     substyle: S.substyle || '',
+    rapStyle: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined,
+    rapDimensions: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapDimensions : undefined,
+    rapLabActive: (S.selectedGenre === 'hiphop' && S.rapLabActive) || false,
     hookStyle: S.hookStyle || 'auto',
     bracketMode: S.bracketMode || 'suno',
     voice: {
@@ -4162,7 +4413,7 @@ function parseSongResult(raw,genre,topic){
   const likeB = document.getElementById('res-like-btn'); if(likeB) likeB.classList.remove('liked');
   const dislikeB = document.getElementById('res-dislike-btn'); if(dislikeB) dislikeB.classList.remove('disliked');
   toast('✓ Song generated: "'+title+'"');
-  trackEvent('song_generated', { genre, topic });
+  trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
 }
 

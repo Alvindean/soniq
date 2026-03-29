@@ -187,7 +187,7 @@ function esc(s) {
 }
 
 function render(data) {
-  const { total_songs, top_genres, top_fusions, top_topics, daily_events, recent } = data;
+  const { total_songs, top_genres, top_fusions, top_topics, top_rapstyles, trending_rapstyles, daily_events, recent } = data;
 
   // Stat cards
   const todayRow = daily_events[daily_events.length - 1] || {};
@@ -219,9 +219,10 @@ function render(data) {
     return `<tr><td>${badge}</td><td>${esc(meta)}</td><td style="color:#555">${esc(time)}</td><td style="color:#555;font-size:0.7rem">${dev}</td></tr>`;
   }).join('');
 
-  const maxGenre  = top_genres[0]?.count  || 1;
-  const maxFusion = top_fusions[0]?.count || 1;
-  const maxTopic  = top_topics[0]?.count  || 1;
+  const maxGenre    = top_genres[0]?.count    || 1;
+  const maxFusion   = top_fusions[0]?.count   || 1;
+  const maxTopic    = top_topics[0]?.count    || 1;
+  const maxRapStyle = (top_rapstyles || [])[0]?.count || 1;
 
   document.getElementById('content').innerHTML = `
     <div class="stat-grid">
@@ -259,6 +260,17 @@ function render(data) {
       <div class="top-list">
         <div class="section-title">Event Breakdown Today</div>
         ${buildEventBreakdown(todayRow)}
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="top-list">
+        <div class="section-title">Top Rap Styles</div>
+        ${topListHtml((top_rapstyles || []).slice(0,10), maxRapStyle)}
+      </div>
+      <div class="top-list">
+        <div class="section-title">Trending Rap Styles This Week</div>
+        ${topListHtml((trending_rapstyles || []).slice(0,10), (trending_rapstyles || [])[0]?.count || 1)}
       </div>
     </div>
 
