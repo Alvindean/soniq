@@ -1310,9 +1310,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <label class="bracket-label">Suno Bracket Formatting</label>
           <div class="bracket-pills" id="bracket-pills">
             <span class="bpill" onclick="setBracket(this,'none')">No Brackets</span>
-            <span class="bpill on" onclick="setBracket(this,'basic')">Basic Suno Brackets</span>
-            <span class="bpill" onclick="setBracket(this,'enhanced')">Enhanced Movement</span>
-            <span class="bpill" onclick="setBracket(this,'experimental')">Experimental Meta Tags</span>
+            <span class="bpill" onclick="setBracket(this,'basic')">Basic</span>
+            <span class="bpill" onclick="setBracket(this,'enhanced')">Enhanced</span>
+            <span class="bpill on" onclick="setBracket(this,'suno')">Suno Optimized ✦</span>
+            <span class="bpill" onclick="setBracket(this,'experimental')">Experimental</span>
           </div>
 
           <!-- THEORY LEVEL -->
@@ -2991,7 +2992,7 @@ const S={selectedGenre:'pop',
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
   selectedMoods:['Emotional'],
-  bracketMode:'basic',
+  bracketMode:'suno',
   selectedEra:'modern',
   albumLanes:['streaming'],
   albumData:null,
@@ -3787,7 +3788,7 @@ async function generateSong(){
     mode: document.getElementById('g-mode')?.value || 'auto',
     substyle: S.substyle || '',
     hookStyle: S.hookStyle || 'auto',
-    bracketMode: S.bracketMode || 'basic',
+    bracketMode: S.bracketMode || 'suno',
     voice: {
       name: localStorage.getItem('soniq_voice_name') || '',
       influences: localStorage.getItem('soniq_voice_influences') || '',
