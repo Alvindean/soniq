@@ -2322,11 +2322,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div>
         <label class="album-label">Album Type</label>
         <select id="alb-type" class="album-select">
-          <option value="full">Full LP (10-14 tracks)</option>
-          <option value="ep">EP (5-7 tracks)</option>
-          <option value="mini">Mini Album (7-9 tracks)</option>
-          <option value="debut">Debut Album</option>
-          <option value="concept">Concept Album (unified narrative)</option>
+          <option value="full">Full LP (12 tracks)</option>
+          <option value="ep">EP (6 tracks)</option>
+          <option value="mini">Mini Album (8 tracks)</option>
+          <option value="debut">Debut Album (11 tracks)</option>
+          <option value="concept">Concept Album (10 tracks)</option>
         </select>
       </div>
     </div>
@@ -6195,6 +6195,29 @@ async function writeAllTracks() {
   toast(`✓ ${results.length} tracks written`);
 }
 
+const ALBUM_TYPE_TRACKS = {
+  full: {
+    label: 'Full LP', count: 12,
+    types: ['OPENER','LEAD SINGLE','FEEL-GOOD ANTHEM','BALLAD','MID-TEMPO BANGER','STATEMENT TRACK','INTERLUDE','DEEP CUT','ENERGY TRACK','CLUB / DANCE','COLLABORATION','CLOSER']
+  },
+  ep: {
+    label: 'EP', count: 6,
+    types: ['OPENER','LEAD SINGLE','BALLAD','MID-TEMPO BANGER','DEEP CUT','CLOSER']
+  },
+  mini: {
+    label: 'Mini Album', count: 8,
+    types: ['OPENER','LEAD SINGLE','BALLAD','MID-TEMPO BANGER','STATEMENT TRACK','DEEP CUT','ENERGY TRACK','CLOSER']
+  },
+  debut: {
+    label: 'Debut Album', count: 11,
+    types: ['OPENER','LEAD SINGLE','FEEL-GOOD ANTHEM','BALLAD','MID-TEMPO BANGER','STATEMENT TRACK','INTERLUDE','DEEP CUT','ENERGY TRACK','FAN FAVORITE','CLOSER']
+  },
+  concept: {
+    label: 'Concept Album', count: 10,
+    types: ['INTRO','CHAPTER OPENER','RISING ACTION','BALLAD','TURNING POINT','INTERLUDE','CLIMAX TRACK','RESOLUTION','REPRISE','CLOSER']
+  }
+};
+
 async function generateAlbumTheme() {
   const brief = document.getElementById('alb-brief')?.value?.trim() || '';
   const genre = document.getElementById('alb-genre')?.value || 'pop';
@@ -6207,7 +6230,10 @@ async function generateAlbumTheme() {
   document.getElementById('alb-name').textContent = 'Generating album concept…';
   document.getElementById('alb-tags').innerHTML = '';
 
-  const prompt = `Create a complete ${genre} ${type} album concept targeting: ${lanes}.${brief ? '\nArtist brief: ' + brief : ''}
+  const albumDef = ALBUM_TYPE_TRACKS[type] || ALBUM_TYPE_TRACKS.full;
+  const trackTypesTemplate = albumDef.types.map(t => `${t} | [description] | [emotional role]`).join('\n');
+
+  const prompt = `Create a complete ${genre} ${albumDef.label} (${albumDef.count} tracks) album concept targeting: ${lanes}.${brief ? '\nArtist brief: ' + brief : ''}
 
 Respond with EXACTLY this format:
 ALBUM NAME: [name]
@@ -6224,12 +6250,7 @@ MOTIFS:
 - [motif 3]
 
 TRACK TYPES:
-OPENER | [description] | [emotional role]
-LEAD SINGLE | [description] | [emotional role]
-BALLAD | [description] | [emotional role]
-MID-TEMPO | [description] | [emotional role]
-STATEMENT TRACK | [description] | [emotional role]
-CLOSER | [description] | [emotional role]
+${trackTypesTemplate}
 
 SONIC PALETTE:
 [color name] | [sound description]
@@ -6283,7 +6304,7 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     document.getElementById('alb-visual').textContent = visual;
     document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent='${t.trim().replace(/'/g,"\\'")}';toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${t.trim()}</div></div></div>`).join('');
 
-    S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes};
+    S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes, type};
     toast('🎼 Album concept generated!');
     out.scrollIntoView({behavior:'smooth', block:'nearest'});
   } catch(e) {
@@ -6293,33 +6314,73 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
   btnDone('alb-btn');
 }
 
+// Role icon + tooltip for known track types
+const ROLE_META = {
+  'OPENER':          {icon:'🚀', why:'Sets the sonic world and tone for the entire album'},
+  'INTRO':           {icon:'🌅', why:'Establishes the conceptual world before the first full song'},
+  'LEAD SINGLE':     {icon:'⭐', why:'Most radio-ready and commercial — drives streams and discovery'},
+  'FEEL-GOOD ANTHEM':{icon:'🎉', why:'Energy lift — keeps listeners engaged mid-album'},
+  'BALLAD':          {icon:'💙', why:'Emotional depth and vulnerability — the heart of the album'},
+  'MID-TEMPO BANGER':{icon:'🔥', why:'Groove-focused energy — bridges ballads and bangers'},
+  'STATEMENT TRACK': {icon:'🎯', why:"The album's artistic mission statement — defines the artist's identity"},
+  'INTERLUDE':       {icon:'🌊', why:'Palette cleanser — creates breathing room and tension'},
+  'DEEP CUT':        {icon:'🔍', why:'Rewards devoted listeners — the fan favorite discovered over time'},
+  'ENERGY TRACK':    {icon:'⚡', why:'High-energy release — live show moment and playlist fuel'},
+  'CLUB / DANCE':    {icon:'💃', why:'Dancefloor-ready — expands audience and replayability'},
+  'COLLABORATION':   {icon:'🤝', why:'Cross-audience discovery — expands fanbase'},
+  'FAN FAVORITE':    {icon:'❤️', why:'Emotional connective tissue — the song fans quote in bios'},
+  'CHAPTER OPENER':  {icon:'📖', why:'Opens a new narrative chapter in the concept'},
+  'RISING ACTION':   {icon:'📈', why:'Builds narrative tension toward the climax'},
+  'TURNING POINT':   {icon:'🔄', why:'The moment everything changes — emotional pivot'},
+  'CLIMAX TRACK':    {icon:'💥', why:'Maximum emotional and sonic intensity'},
+  'RESOLUTION':      {icon:'🕊️', why:'Releases tension — emotional payoff'},
+  'REPRISE':         {icon:'🔁', why:'Callback to earlier themes — creates full-circle arc'},
+  'CLOSER':          {icon:'🌙', why:'Final emotional resolution — the last feeling listeners carry out'},
+};
+const DEFAULT_ROLE_META = {icon:'🎵', why:'Supports the album arc'};
+
 function loadGapMap() {
   const grid = document.getElementById('alb-gap-grid');
   if (!grid) return;
-  if (!S.albumData) {
+  if (!S.albumData?.trackList?.length) {
     grid.innerHTML = '<div style="font-size:13px;color:var(--tx3);padding:16px 0">Generate an album concept first, then come back to the Gap Map.</div>';
     return;
   }
-  const ROLES = [
-    {role:'OPENER', icon:'🚀', why:'Sets the sonic world and tone'},
-    {role:'LEAD SINGLE', icon:'⭐', why:'Most radio-ready and commercial hook'},
-    {role:'BALLAD', icon:'💙', why:'Emotional depth and vulnerability'},
-    {role:'STATEMENT TRACK', icon:'🎯', why:"The album's artistic mission statement"},
-    {role:'CLUB / DANCE', icon:'💃', why:'Energy release and replayability'},
-    {role:'COLLABORATION', icon:'🤝', why:'Audience crossover and discovery'},
-    {role:'DEEPER CUT', icon:'🔍', why:'Rewards repeated listening'},
-    {role:'CLOSER', icon:'🌅', why:'Final emotional resolution'},
-  ];
+
+  // Build gap map directly from the generated track list
   const tt = (S.albumData.trackTypes || '').toUpperCase();
-  grid.innerHTML = ROLES.map(r => {
-    const covered = tt.includes(r.role.split('/')[0].trim());
+  const trackList = S.albumData.trackList || [];
+
+  // All strategic roles to check — superset across all album types
+  const ALL_ROLES = [
+    'OPENER','LEAD SINGLE','BALLAD','STATEMENT TRACK',
+    'CLUB / DANCE','COLLABORATION','DEEP CUT','CLOSER',
+    'ENERGY TRACK','FEEL-GOOD ANTHEM','INTERLUDE','MID-TEMPO BANGER',
+    'FAN FAVORITE','INTRO','CLIMAX TRACK','REPRISE'
+  ];
+
+  // Check which of our roles appear in the generated track list
+  const presentRoles = new Set(trackList.map(t => t.ttype.toUpperCase()));
+  // Only show roles that are either present OR are "expected" for this album type
+  const albumDef = ALBUM_TYPE_TRACKS[S.albumData.type || 'full'] || ALBUM_TYPE_TRACKS.full;
+  const expectedRoles = new Set(albumDef.types.map(t => t.toUpperCase()));
+  const rolesToShow = ALL_ROLES.filter(r => expectedRoles.has(r) || presentRoles.has(r));
+
+  grid.innerHTML = rolesToShow.map(r => {
+    const covered = presentRoles.has(r);
+    const meta = ROLE_META[r] || DEFAULT_ROLE_META;
+    const matchIdx = trackList.findIndex(t => t.ttype.toUpperCase() === r);
+    const trackNum = matchIdx >= 0 ? `Track ${matchIdx + 1}` : '';
     return `<div class="gap-role">
-      <div class="gap-role-icon">${r.icon}</div>
+      <div class="gap-role-icon">${meta.icon}</div>
       <div class="gap-role-body">
-        <div class="gap-role-name">${r.role}</div>
-        <div class="gap-role-desc">${covered ? '✓ Covered in your track map' : '⚠️ Missing — ' + r.why}</div>
+        <div class="gap-role-name">${r}</div>
+        <div class="gap-role-desc">${covered ? `✓ ${trackNum} — ${meta.why}` : '⚠️ Missing — ' + meta.why}</div>
       </div>
-      <div class="gap-role-actions"><span class="gap-status ${covered ? 'gap-status-present' : 'gap-status-missing'}">${covered ? 'Present' : 'Missing'}</span></div>
+      <div class="gap-role-actions">${covered
+        ? `<span class="gap-status gap-status-present">Present</span>`
+        : `<span class="gap-status gap-status-missing">Missing</span>`
+      }</div>
     </div>`;
   }).join('');
 }
