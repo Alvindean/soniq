@@ -3887,6 +3887,9 @@ The blend should feel intentional and unique — not jarring. The verses can lea
   }
   const system=`You are a world-class songwriter, music producer, and AI music specialist. You write complete, emotionally devastating, commercially viable songs with deep production intelligence. Your output is used directly by music creators to generate tracks on AI music platforms. Always respond with the exact format requested. No extra commentary before or after.`;
 
+  // These notes are built server-side via songParams — define as empty for the local fallback path
+  const substyleNote='', bibleNote='', counterNote='', outlierSongsNote='', theoryNote='', voiceNote='';
+
   const prompt=`Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
