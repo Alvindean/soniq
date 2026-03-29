@@ -137,14 +137,17 @@ module.exports = async function handler(req, res) {
     max_tokens = body.max_tokens || 2048;
   }
 
-  if (!body?.userKey) {
+  // Treat 'server-side' sentinel (set by client on Vercel) as no user key
+  const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
+
+  if (!userKey) {
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
     const rl = checkRateLimit(ip);
     if (!rl.allowed) return res.status(429).json({error: `Rate limit reached — ${rl.minutesLeft} min left. Add your own API key in Settings to bypass.`});
   }
 
-  const anthropicKey = body?.userKey || process.env.ANTHROPIC_API_KEY;
-  const openrouterKey = body?.userKey ? null : process.env.OPENROUTER_API_KEY;
+  const anthropicKey = userKey || process.env.ANTHROPIC_API_KEY;
+  const openrouterKey = userKey ? null : process.env.OPENROUTER_API_KEY;
 
   if (!anthropicKey && !openrouterKey) {
     return res.status(500).json({

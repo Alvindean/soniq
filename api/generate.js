@@ -85,17 +85,19 @@ module.exports = async function handler(req, res) {
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).json({error:'Invalid JSON'}); }
 
-  if (body?.userKey) {
+  // Treat 'server-side' sentinel as no user key
+  const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
+
+  if (userKey) {
     // User-supplied key: skip rate limit, use their key directly
     const { messages, system, max_tokens = 2048 } = body;
     if (!messages?.length) return res.status(400).json({error:'messages required'});
     try {
-      const text = await callAnthropic(body.userKey, messages, system, max_tokens);
+      const text = await callAnthropic(userKey, messages, system, max_tokens);
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
       console.error('User-key Anthropic error:', err.message);
-      const isProduction = process.env.NODE_ENV === 'production';
-      return res.status(502).json({error: isProduction ? 'API request failed. Check your API key and try again.' : 'Anthropic error: ' + err.message});
+      return res.status(502).json({error: 'API key rejected — check it is valid at console.anthropic.com'});
     }
   }
 

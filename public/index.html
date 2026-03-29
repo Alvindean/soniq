@@ -3047,7 +3047,7 @@ async function callServerStream(action, params, onChunk, signal) {
   const res = await fetch('/api/stream', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ action, params, userKey: window._soniqKey || undefined }),
+    body: JSON.stringify({ action, params, userKey: (window._soniqKey && window._soniqKey !== 'server-side') ? window._soniqKey : undefined }),
     signal
   });
   if (!res.ok) {
