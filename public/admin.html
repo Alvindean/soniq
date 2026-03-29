@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>SONIQ Admin</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', system-ui, sans-serif; background: #0a0a0f; color: #e0e0f0; min-height: 100vh; }
+
+  /* Login */
+  #login-screen {
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; flex-direction: column; gap: 16px;
+  }
+  #login-screen h1 { font-size: 1.6rem; letter-spacing: 0.1em; color: #a78bfa; }
+  #login-screen input {
+    background: #1a1a2e; border: 1px solid #333; color: #fff;
+    padding: 10px 16px; border-radius: 8px; font-size: 1rem; width: 280px;
+    outline: none;
+  }
+  #login-screen input:focus { border-color: #7c3aed; }
+  #login-screen button {
+    background: #7c3aed; color: #fff; border: none; padding: 10px 28px;
+    border-radius: 8px; font-size: 1rem; cursor: pointer; width: 280px;
+  }
+  #login-screen button:hover { background: #6d28d9; }
+  #login-err { color: #f87171; font-size: 0.85rem; min-height: 20px; }
+
+  /* Dashboard */
+  #dashboard { display: none; }
+  header {
+    background: #12121f; border-bottom: 1px solid #1e1e35;
+    padding: 14px 24px; display: flex; justify-content: space-between; align-items: center;
+  }
+  header h1 { font-size: 1.2rem; color: #a78bfa; letter-spacing: 0.12em; }
+  header span { font-size: 0.8rem; color: #666; }
+  #refresh-btn {
+    background: #1e1e35; border: 1px solid #333; color: #a78bfa;
+    padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+  }
+  #refresh-btn:hover { background: #2a2a4a; }
+
+  main { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+
+  /* Stat cards */
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+  .stat-card {
+    background: #12121f; border: 1px solid #1e1e35; border-radius: 12px;
+    padding: 20px; text-align: center;
+  }
+  .stat-card .value { font-size: 2.2rem; font-weight: 700; color: #a78bfa; }
+  .stat-card .label { font-size: 0.75rem; color: #888; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.08em; }
+
+  /* Section headers */
+  .section-title {
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: #666; margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid #1e1e35;
+  }
+
+  /* Two-column layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* Top lists */
+  .top-list { background: #12121f; border: 1px solid #1e1e35; border-radius: 12px; padding: 20px; }
+  .top-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 0; border-bottom: 1px solid #1a1a2e;
+  }
+  .top-item:last-child { border-bottom: none; }
+  .top-item .rank { font-size: 0.7rem; color: #555; min-width: 20px; }
+  .top-item .name { flex: 1; font-size: 0.9rem; color: #c4b5fd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .top-item .bar-wrap { width: 100px; background: #1a1a2e; border-radius: 4px; height: 6px; overflow: hidden; }
+  .top-item .bar { height: 100%; background: #7c3aed; border-radius: 4px; transition: width 0.4s; }
+  .top-item .count { font-size: 0.75rem; color: #888; min-width: 28px; text-align: right; }
+
+  /* Daily chart */
+  .daily-section { margin-bottom: 32px; }
+  .chart-wrap { background: #12121f; border: 1px solid #1e1e35; border-radius: 12px; padding: 20px; overflow-x: auto; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+  .bar-chart .day-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; min-width: 40px; }
+  .bar-chart .day-bar { width: 100%; background: #7c3aed; border-radius: 4px 4px 0 0; transition: height 0.4s; min-height: 2px; }
+  .bar-chart .day-label { font-size: 0.6rem; color: #666; }
+  .bar-chart .day-count { font-size: 0.65rem; color: #a78bfa; }
+
+  /* Recent events */
+  .recent-section { margin-bottom: 32px; }
+  .recent-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  .recent-table th { text-align: left; padding: 8px 10px; color: #666; font-weight: 500; border-bottom: 1px solid #1e1e35; }
+  .recent-table td { padding: 7px 10px; border-bottom: 1px solid #131325; vertical-align: top; }
+  .recent-table tr:last-child td { border-bottom: none; }
+  .event-badge {
+    display: inline-block; padding: 2px 7px; border-radius: 10px;
+    font-size: 0.7rem; font-weight: 600; letter-spacing: 0.04em;
+  }
+  .ev-song_generated { background: #1e3a5f; color: #60a5fa; }
+  .ev-song_liked     { background: #3b1f4a; color: #c084fc; }
+  .ev-song_disliked  { background: #2a1a1a; color: #f87171; }
+  .ev-song_saved     { background: #1a3a2a; color: #6ee7b7; }
+  .ev-feel_lucky_used{ background: #3a2a1a; color: #fbbf24; }
+  .ev-genre_selected { background: #1e2a3a; color: #7dd3fc; }
+
+  .loading { text-align: center; color: #555; padding: 40px; }
+  .error-msg { color: #f87171; text-align: center; padding: 20px; }
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="login-screen">
+  <h1>SONIQ / Admin</h1>
+  <input type="password" id="pw-input" placeholder="Admin password" autocomplete="current-password"/>
+  <button onclick="doLogin()">Sign In</button>
+  <div id="login-err"></div>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <header>
+    <h1>SONIQ Analytics</h1>
+    <div style="display:flex;gap:12px;align-items:center">
+      <span id="last-updated"></span>
+      <button id="refresh-btn" onclick="loadData()">Refresh</button>
+    </div>
+  </header>
+  <main>
+    <div id="content"><div class="loading">Loading…</div></div>
+  </main>
+</div>
+
+<script>
+let _adminKey = '';
+
+function doLogin() {
+  const pw = document.getElementById('pw-input').value.trim();
+  if (!pw) return;
+  _adminKey = pw;
+  document.getElementById('login-err').textContent = '';
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  loadData();
+}
+
+document.getElementById('pw-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+async function loadData() {
+  document.getElementById('content').innerHTML = '<div class="loading">Loading analytics…</div>';
+  try {
+    const r = await fetch(`/api/admin?key=${encodeURIComponent(_adminKey)}`);
+    if (r.status === 401) {
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('login-err').textContent = 'Wrong password.';
+      return;
+    }
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      document.getElementById('content').innerHTML = `<div class="error-msg">${d.error || 'Failed to load analytics.'}</div>`;
+      return;
+    }
+    const data = await r.json();
+    render(data);
+    document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch (e) {
+    document.getElementById('content').innerHTML = `<div class="error-msg">Network error: ${e.message}</div>`;
+  }
+}
+
+function fmt(n) { return n >= 1000 ? (n/1000).toFixed(1) + 'k' : String(n); }
+
+function topListHtml(items, maxCount) {
+  if (!items.length) return '<div style="color:#555;font-size:0.85rem;padding:8px 0">No data yet</div>';
+  return items.map((it, i) => `
+    <div class="top-item">
+      <span class="rank">${i+1}</span>
+      <span class="name" title="${esc(it.name)}">${esc(it.name)}</span>
+      <div class="bar-wrap"><div class="bar" style="width:${Math.round(it.count/maxCount*100)}%"></div></div>
+      <span class="count">${fmt(it.count)}</span>
+    </div>`).join('');
+}
+
+function esc(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function render(data) {
+  const { total_songs, top_genres, top_fusions, top_topics, daily_events, recent } = data;
+
+  // Stat cards
+  const todayRow = daily_events[daily_events.length - 1] || {};
+  const todayTotal = todayRow.total || 0;
+  const weekTotal  = daily_events.reduce((s, d) => s + (d.total || 0), 0);
+  const todayLikes = todayRow.song_liked || 0;
+  const totalLikes = recent.filter(e => e.event === 'song_liked').length; // approx from recent
+
+  // Daily bar chart
+  const maxDay = Math.max(...daily_events.map(d => d.song_generated || 0), 1);
+  const chartBars = daily_events.map(d => {
+    const count = d.song_generated || 0;
+    const pct = Math.round(count / maxDay * 100);
+    const label = d.date ? d.date.slice(5) : ''; // MM-DD
+    return `
+      <div class="day-col">
+        <span class="day-count">${count || ''}</span>
+        <div class="day-bar" style="height:${pct}%"></div>
+        <span class="day-label">${esc(label)}</span>
+      </div>`;
+  }).join('');
+
+  // Recent events table
+  const recentRows = recent.map(ev => {
+    const time = ev.ts ? new Date(ev.ts).toLocaleString() : '—';
+    const badge = `<span class="event-badge ev-${esc(ev.event)}">${esc(ev.event.replace(/_/g,' '))}</span>`;
+    const meta = [ev.genre, ev.genre2, ev.topic, ev.fusion_key].filter(Boolean).map(esc).join(', ') || '—';
+    const dev = ev.device_id ? esc(ev.device_id) : '—';
+    return `<tr><td>${badge}</td><td>${esc(meta)}</td><td style="color:#555">${esc(time)}</td><td style="color:#555;font-size:0.7rem">${dev}</td></tr>`;
+  }).join('');
+
+  const maxGenre  = top_genres[0]?.count  || 1;
+  const maxFusion = top_fusions[0]?.count || 1;
+  const maxTopic  = top_topics[0]?.count  || 1;
+
+  document.getElementById('content').innerHTML = `
+    <div class="stat-grid">
+      <div class="stat-card"><div class="value">${fmt(total_songs)}</div><div class="label">Total Songs</div></div>
+      <div class="stat-card"><div class="value">${fmt(todayTotal)}</div><div class="label">Events Today</div></div>
+      <div class="stat-card"><div class="value">${fmt(weekTotal)}</div><div class="label">Events (7d)</div></div>
+      <div class="stat-card"><div class="value">${fmt(todayRow.song_generated||0)}</div><div class="label">Generated Today</div></div>
+      <div class="stat-card"><div class="value">${fmt(todayLikes)}</div><div class="label">Liked Today</div></div>
+      <div class="stat-card"><div class="value">${fmt(todayRow.feel_lucky_used||0)}</div><div class="label">Lucky Today</div></div>
+    </div>
+
+    <div class="daily-section">
+      <div class="section-title">Songs Generated — Last 7 Days</div>
+      <div class="chart-wrap">
+        <div class="bar-chart">${chartBars}</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="top-list">
+        <div class="section-title">Top Genres</div>
+        ${topListHtml(top_genres.slice(0,10), maxGenre)}
+      </div>
+      <div class="top-list">
+        <div class="section-title">Top Topics</div>
+        ${topListHtml(top_topics.slice(0,10), maxTopic)}
+      </div>
+    </div>
+
+    <div class="two-col">
+      <div class="top-list">
+        <div class="section-title">Top Fusions</div>
+        ${topListHtml(top_fusions.slice(0,10), maxFusion)}
+      </div>
+      <div class="top-list">
+        <div class="section-title">Event Breakdown Today</div>
+        ${buildEventBreakdown(todayRow)}
+      </div>
+    </div>
+
+    <div class="recent-section">
+      <div class="section-title">Recent Events</div>
+      <div class="chart-wrap" style="padding:0">
+        <table class="recent-table">
+          <thead><tr><th>Event</th><th>Metadata</th><th>Time</th><th>Device</th></tr></thead>
+          <tbody>${recentRows || '<tr><td colspan="4" style="color:#555;padding:20px">No recent events</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function buildEventBreakdown(row) {
+  const events = ['song_generated','song_liked','song_disliked','song_saved','feel_lucky_used','genre_selected'];
+  const maxVal = Math.max(...events.map(e => row[e] || 0), 1);
+  return events.map(e => {
+    const count = row[e] || 0;
+    const pct = Math.round(count / maxVal * 100);
+    return `
+      <div class="top-item">
+        <span class="rank"></span>
+        <span class="name">${e.replace(/_/g,' ')}</span>
+        <div class="bar-wrap"><div class="bar" style="width:${pct}%"></div></div>
+        <span class="count">${count}</span>
+      </div>`;
+  }).join('');
+}
+
+// Auto-refresh every 60 seconds
+setInterval(() => { if (_adminKey) loadData(); }, 60000);
+</script>
+</body>
+</html>
