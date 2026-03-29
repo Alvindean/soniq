@@ -2979,6 +2979,8 @@ const S={selectedGenre:'pop',
   currentVersions:[],
   luckyVersions:[],
   luckyLockedGenres:[],
+  genController: null,   // AbortController for main generate
+  luckyController: null, // AbortController for lucky generate
 };
 
 // ═══════════════════════════════════════════════════════
@@ -3495,6 +3497,10 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 }
 
 function feelLucky(){
+  // Cancel any in-flight lucky generation
+  if (S.luckyController) { S.luckyController.abort(); S.luckyController = null; }
+  S.luckyController = new AbortController();
+  const luckySignal = S.luckyController.signal;
   // Filter fusion keys by locked genres
   const locked=S.luckyLockedGenres||[];
   const allKeys=Object.keys(FUSION_DATA);
@@ -3630,19 +3636,20 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
   };
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2}, luckyStreamCb).then(r => r.text)
-    : callClaudeStream(prompt, system, luckyStreamCb);
+    ? callServerStream('lucky', {g1, g2}, luckyStreamCb, luckySignal).then(r => r.text)
+    : callClaudeStream(prompt, system, luckyStreamCb, luckySignal);
   luckyPromise.then(raw=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
   }).catch(e=>{
-    if(e.message==='enter-key'){btnDone('lucky-btn');return;}
+    if(e.name==='AbortError'||e.message==='enter-key'){btnDone('lucky-btn');return;}
     lyricsEl.innerHTML=apiErrHtml(e.message);
     document.getElementById('lres-title').textContent='Error';
     btnDone('lucky-btn');
-    document.getElementById('lucky-hint').textContent='Error — check API key in Vercel settings.';
+    document.getElementById('lucky-hint').textContent='Check API key in Vercel → Settings → Environment Variables.';
   });
+  S.luckyController = null;
   }); // end spinLuckyWheel
 }
 
@@ -3951,6 +3958,11 @@ DIRECTOR NOTES:
   document.getElementById('res-notes-text').textContent='';
   document.getElementById('res-chords-text').textContent='';
 
+  // Cancel any in-flight generation before starting a new one
+  if (S.genController) { S.genController.abort(); S.genController = null; }
+  S.genController = new AbortController();
+  const genSignal = S.genController.signal;
+
   try{
     let firstChunk=true;
     const lyricsEl=document.getElementById('res-lyrics-text');
@@ -3966,15 +3978,16 @@ DIRECTOR NOTES:
     let raw;
     if (isVercel) {
       // Server-side prompt building — IP stays hidden
-      const result = await callServerStream('generate', songParams, streamCb);
+      const result = await callServerStream('generate', songParams, streamCb, genSignal);
       raw = result.text;
     } else {
       // Local dev fallback — client builds prompt
-      raw = await callClaudeStream(prompt, system, streamCb);
+      raw = await callClaudeStream(prompt, system, streamCb, genSignal);
     }
+    S.genController = null;
     parseSongResult(raw,genreLabel,topic);
   }catch(e){
-    if(e.message==='enter-key'){btnDone('gen-btn');return;}
+    if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
     document.getElementById('res-title').textContent='Error';
     document.getElementById('res-lyrics-text').innerHTML=apiErrHtml(e.message);
     toast('⚠️ '+e.message, 4000);
@@ -4093,14 +4106,9 @@ function parseSongResult(raw,genre,topic){
   renderBrief('res', songPrompt, briefRaw);
 
   const ts = Date.now();
-  // Version history — push old song before replacing
+  // Version history — push old song before replacing, never wipe on genre/topic change
   if (S.currentSong && S.currentSong.lyrics) {
     if (!S.currentVersions) S.currentVersions = [];
-    const prev = S.currentSong;
-    // Reset versions if genre/topic changed significantly
-    if (prev.genre !== genre || prev.topic !== topic) {
-      S.currentVersions = [];
-    }
     pushVersion('res');
   }
   S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};

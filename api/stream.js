@@ -134,14 +134,20 @@ module.exports = async function handler(req, res) {
     // Legacy: client sends raw messages (for visual prompts, titles, etc.)
     messages = body.messages;
     system = body.system;
-    max_tokens = body.max_tokens || 2048;
+    // Cap max_tokens — never let a client request blow through credit limits
+    max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
   }
 
   // Treat 'server-side' sentinel (set by client on Vercel) as no user key
   const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
 
   if (!userKey) {
-    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+    // Use x-real-ip (set by Vercel, can't be spoofed) then fall back to last
+    // entry of x-forwarded-for (the trusted proxy's addition), never the first
+    // entry which a client can freely set.
+    const ip = req.headers['x-real-ip'] ||
+      (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+      req.socket?.remoteAddress || 'unknown';
     const rl = checkRateLimit(ip);
     if (!rl.allowed) return res.status(429).json({error: `Rate limit reached — ${rl.minutesLeft} min left. Add your own API key in Settings to bypass.`});
   }
