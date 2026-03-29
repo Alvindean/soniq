@@ -112,19 +112,23 @@ module.exports = async function handler(req, res) {
   // ── Server-side prompt building (protects IP) ──
   let messages, system, max_tokens;
   if (body.action === 'generate' || body.action === 'lucky') {
-    const brain = require('./brain');
-    let built;
-    if (body.action === 'generate') {
-      built = brain.buildSongPrompt(body.params || {});
-    } else {
-      built = brain.buildLuckyPrompt(body.params || {});
-    }
-    messages = [{role: 'user', content: built.prompt}];
-    system = built.system;
-    max_tokens = 4096;
-    // Attach meta for lucky songs (client needs g1, g2, topic, mood etc.)
-    if (built.meta) {
-      res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(built.meta)).toString('base64'));
+    try {
+      const brain = require('./brain');
+      let built;
+      if (body.action === 'generate') {
+        built = brain.buildSongPrompt(body.params || {});
+      } else {
+        built = brain.buildLuckyPrompt(body.params || {});
+      }
+      messages = [{role: 'user', content: built.prompt}];
+      system = built.system;
+      max_tokens = 4096;
+      if (built.meta) {
+        res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(built.meta)).toString('base64'));
+      }
+    } catch (err) {
+      console.error('Brain prompt build failed:', err.message);
+      return res.status(500).json({ error: 'Prompt build error: ' + err.message });
     }
   } else {
     // Legacy: client sends raw messages (for visual prompts, titles, etc.)
@@ -136,7 +140,7 @@ module.exports = async function handler(req, res) {
   if (!body?.userKey) {
     const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
     const rl = checkRateLimit(ip);
-    if (!rl.allowed) return res.status(429).json({error: `Rate limit exceeded. Try again in ${rl.minutesLeft} minutes.`});
+    if (!rl.allowed) return res.status(429).json({error: `Rate limit reached — ${rl.minutesLeft} min left. Add your own API key in Settings to bypass.`});
   }
 
   const anthropicKey = body?.userKey || process.env.ANTHROPIC_API_KEY;
@@ -158,15 +162,19 @@ module.exports = async function handler(req, res) {
 
   const errors = [];
 
-  const isProduction = process.env.NODE_ENV === 'production';
-
   if (anthropicKey) {
     try {
       await streamAnthropic(anthropicKey, messages, system, max_tokens, res);
       res.write(`data: ${JSON.stringify({done: true})}\n\n`);
       return res.end();
     } catch (err) {
-      console.error('Anthropic stream failed, trying OpenRouter:', err.message);
+      console.error('Anthropic stream failed:', err.message);
+      // Surface auth errors immediately — no point trying OpenRouter if key is wrong
+      if (err.message.includes('401') || err.message.includes('invalid') || err.message.includes('authentication')) {
+        const keyHint = body?.userKey ? 'Your API key' : 'ANTHROPIC_API_KEY in Vercel env vars';
+        res.write(`data: ${JSON.stringify({error: `API key rejected — check ${keyHint} is correct and active.`})}\n\n`);
+        return res.end();
+      }
       errors.push('Anthropic: ' + err.message);
     }
   }
@@ -178,7 +186,7 @@ module.exports = async function handler(req, res) {
       return res.end();
     } catch (err) {
       if (err.message === 'CREDITS_LOW') {
-        res.write(`data: ${JSON.stringify({error: 'Your OpenRouter credit balance is too low. Add credits at openrouter.ai/settings/credits to continue.'})}\n\n`);
+        res.write(`data: ${JSON.stringify({error: 'OpenRouter credit balance too low — add credits at openrouter.ai/settings/credits.'})}\n\n`);
         return res.end();
       }
       console.error('OpenRouter stream failed:', err.message);
@@ -186,7 +194,18 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const clientError = isProduction ? 'Song generation failed. Please try again later.' : 'All providers failed. ' + errors.join(' | ');
+  // Both failed — surface actionable error
+  const firstError = errors[0] || '';
+  let clientError;
+  if (firstError.includes('401') || firstError.includes('invalid') || firstError.includes('authentication')) {
+    clientError = 'API key rejected. Go to Vercel → Settings → Environment Variables and check ANTHROPIC_API_KEY, then Redeploy.';
+  } else if (firstError.includes('429') || firstError.includes('rate')) {
+    clientError = 'Anthropic rate limit hit. Wait a moment and try again, or add your own API key in Settings.';
+  } else if (firstError.includes('529') || firstError.includes('overloaded')) {
+    clientError = 'Anthropic is overloaded right now. Try again in 30 seconds.';
+  } else {
+    clientError = 'Song generation failed. ' + (errors.length ? errors.join(' | ') : 'Check Vercel function logs for details.');
+  }
   res.write(`data: ${JSON.stringify({error: clientError})}\n\n`);
   res.end();
 };

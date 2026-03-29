@@ -3397,12 +3397,22 @@ const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy / Gritty mal
 function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
 function apiErrHtml(msg) {
-  const isCredits = msg.toLowerCase().includes('credit');
-  const isKey = msg.toLowerCase().includes('api key') || msg.toLowerCase().includes('configured');
+  const m = msg.toLowerCase();
+  const isCredits = m.includes('credit');
+  const isKey = m.includes('api key') || m.includes('configured') || m.includes('rejected') || m.includes('authentication');
+  const isRate = m.includes('rate limit') || m.includes('429');
+  const isOverload = m.includes('overloaded') || m.includes('529');
   let hint = '';
-  if (isCredits) hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--accent)">openrouter.ai/settings/credits</a>';
-  else if (isKey) hint = '<br><br><strong>Fix:</strong><br>1. Vercel → Settings → Environment Variables → set ANTHROPIC_API_KEY or OPENROUTER_API_KEY<br>2. Redeploy';
-  return `<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8">⚠️ ${msg}${hint}</div>`;
+  if (isCredits) {
+    hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
+  } else if (isKey) {
+    hint = '<br><br><strong>Fix:</strong> Vercel → your project → Settings → Environment Variables → add <code style="background:var(--s3);padding:1px 5px;border-radius:3px">ANTHROPIC_API_KEY</code> → Redeploy';
+  } else if (isRate) {
+    hint = '<br><br><strong>Fix:</strong> Wait a minute and try again. Add your own API key in Settings to bypass limits.';
+  } else if (isOverload) {
+    hint = '<br><br>Anthropic servers are busy — wait 30 seconds and try again.';
+  }
+  return `<div style="padding:20px;color:var(--red);font-size:13px;line-height:1.8;font-family:var(--font)">⚠️ ${msg}${hint}</div>`;
 }
 
 // ── Genre Zone helpers ──
