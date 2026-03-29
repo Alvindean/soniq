@@ -3768,6 +3768,7 @@ async function generateSong(){
   const mood=(S.selectedMoods&&S.selectedMoods.length)?S.selectedMoods.join(' + '):'Emotional';
   const vocal=document.getElementById('g-vocal').value;
   const structure=document.getElementById('g-structure').value;
+  const structStr=STRUCTURES[structure]||STRUCTURES.standard;
 
   if(!topic){
     const inp=document.getElementById('g-topic');
