@@ -322,6 +322,19 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .lucky-cta:active:not(:disabled){transform:scale(0.99)}
 .lucky-cta:disabled{opacity:0.5;cursor:not-allowed;transform:none;box-shadow:none}
 .lucky-hint{font-size:11px;color:var(--tx4);margin-top:14px;text-align:center;max-width:380px;line-height:1.5}
+/* ── GLOBAL COUNTER ── */
+.lucky-counter{display:flex;align-items:center;gap:7px;margin-top:10px;font-size:12px;color:var(--tx3);animation:pgIn 0.4s ease}
+.lc-icon{font-size:14px}
+.lc-num{font-weight:700;color:var(--amber);font-variant-numeric:tabular-nums;font-family:var(--mono)}
+.lc-label{color:var(--tx4)}
+/* ── ACHIEVEMENT TOAST ── */
+.ach-toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(135deg,#1a1a2e,#2a1a40);border:1px solid var(--amberline);border-radius:var(--r3);padding:14px 22px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 32px rgba(0,0,0,0.6);z-index:9999;opacity:0;pointer-events:none;transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1);max-width:320px}
+.ach-toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.ach-icon{font-size:28px;line-height:1;flex-shrink:0}
+.ach-body{display:flex;flex-direction:column;gap:2px}
+.ach-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--amber)}
+.ach-name{font-size:14px;font-weight:700;color:var(--tx1)}
+.ach-desc{font-size:11px;color:var(--tx3)}
 .lucky-reveal{width:100%;max-width:640px;background:var(--s2);border:1px solid var(--amberline);border-radius:var(--r3);padding:16px 20px;margin-top:24px;animation:pgIn 0.3s ease}
 .lr-fusion{font-size:18px;font-weight:700;color:var(--tx1);letter-spacing:-0.3px;margin-bottom:4px}
 .lr-meta{font-size:11px;color:var(--tx3);margin-bottom:10px}
@@ -1705,6 +1718,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <span id="lucky-btn-text">Surprise Me</span>
     </button>
     <div class="lucky-hint" id="lucky-hint">Each press generates a completely different song from a different genre combination</div>
+    <!-- Global counter -->
+    <div class="lucky-counter" id="lucky-counter" style="display:none">
+      <span class="lc-icon">🎵</span>
+      <span class="lc-num" id="lc-num">—</span>
+      <span class="lc-label">songs created worldwide</span>
+    </div>
   </div>
 
   <div id="lucky-reveal" class="lucky-reveal" style="display:none">
@@ -2979,6 +2998,8 @@ const S={selectedGenre:'pop',
   currentVersions:[],
   luckyVersions:[],
   luckyLockedGenres:[],
+  genController: null,   // AbortController for main generate
+  luckyController: null, // AbortController for lucky generate
 };
 
 // ═══════════════════════════════════════════════════════
@@ -3495,6 +3516,10 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 }
 
 function feelLucky(){
+  // Cancel any in-flight lucky generation
+  if (S.luckyController) { S.luckyController.abort(); S.luckyController = null; }
+  S.luckyController = new AbortController();
+  const luckySignal = S.luckyController.signal;
   // Filter fusion keys by locked genres
   const locked=S.luckyLockedGenres||[];
   const allKeys=Object.keys(FUSION_DATA);
@@ -3630,19 +3655,24 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
   };
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2}, luckyStreamCb).then(r => r.text)
-    : callClaudeStream(prompt, system, luckyStreamCb);
+    ? callServerStream('lucky', {g1, g2}, luckyStreamCb, luckySignal).then(r => r.text)
+    : callClaudeStream(prompt, system, luckyStreamCb, luckySignal);
   luckyPromise.then(raw=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
+    trackEvent('feel_lucky_used', { genre: g1, genre2: g2, fusion_key: key, topic });
+    checkAchievements('feel_lucky');
+    // Refresh global counter after a successful generation
+    setTimeout(loadGlobalCounter, 1500);
   }).catch(e=>{
-    if(e.message==='enter-key'){btnDone('lucky-btn');return;}
+    if(e.name==='AbortError'||e.message==='enter-key'){btnDone('lucky-btn');return;}
     lyricsEl.innerHTML=apiErrHtml(e.message);
     document.getElementById('lres-title').textContent='Error';
     btnDone('lucky-btn');
-    document.getElementById('lucky-hint').textContent='Error — check API key in Vercel settings.';
+    document.getElementById('lucky-hint').textContent='Check API key in Vercel → Settings → Environment Variables.';
   });
+  S.luckyController = null;
   }); // end spinLuckyWheel
 }
 
@@ -3738,6 +3768,7 @@ async function generateSong(){
   const mood=(S.selectedMoods&&S.selectedMoods.length)?S.selectedMoods.join(' + '):'Emotional';
   const vocal=document.getElementById('g-vocal').value;
   const structure=document.getElementById('g-structure').value;
+  const structStr=STRUCTURES[structure]||STRUCTURES.standard;
 
   if(!topic){
     const inp=document.getElementById('g-topic');
@@ -3951,6 +3982,11 @@ DIRECTOR NOTES:
   document.getElementById('res-notes-text').textContent='';
   document.getElementById('res-chords-text').textContent='';
 
+  // Cancel any in-flight generation before starting a new one
+  if (S.genController) { S.genController.abort(); S.genController = null; }
+  S.genController = new AbortController();
+  const genSignal = S.genController.signal;
+
   try{
     let firstChunk=true;
     const lyricsEl=document.getElementById('res-lyrics-text');
@@ -3966,15 +4002,16 @@ DIRECTOR NOTES:
     let raw;
     if (isVercel) {
       // Server-side prompt building — IP stays hidden
-      const result = await callServerStream('generate', songParams, streamCb);
+      const result = await callServerStream('generate', songParams, streamCb, genSignal);
       raw = result.text;
     } else {
       // Local dev fallback — client builds prompt
-      raw = await callClaudeStream(prompt, system, streamCb);
+      raw = await callClaudeStream(prompt, system, streamCb, genSignal);
     }
+    S.genController = null;
     parseSongResult(raw,genreLabel,topic);
   }catch(e){
-    if(e.message==='enter-key'){btnDone('gen-btn');return;}
+    if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
     document.getElementById('res-title').textContent='Error';
     document.getElementById('res-lyrics-text').innerHTML=apiErrHtml(e.message);
     toast('⚠️ '+e.message, 4000);
@@ -4093,14 +4130,9 @@ function parseSongResult(raw,genre,topic){
   renderBrief('res', songPrompt, briefRaw);
 
   const ts = Date.now();
-  // Version history — push old song before replacing
+  // Version history — push old song before replacing, never wipe on genre/topic change
   if (S.currentSong && S.currentSong.lyrics) {
     if (!S.currentVersions) S.currentVersions = [];
-    const prev = S.currentSong;
-    // Reset versions if genre/topic changed significantly
-    if (prev.genre !== genre || prev.topic !== topic) {
-      S.currentVersions = [];
-    }
     pushVersion('res');
   }
   S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};
@@ -4126,6 +4158,8 @@ function parseSongResult(raw,genre,topic){
   const likeB = document.getElementById('res-like-btn'); if(likeB) likeB.classList.remove('liked');
   const dislikeB = document.getElementById('res-dislike-btn'); if(dislikeB) dislikeB.classList.remove('disliked');
   toast('✓ Song generated: "'+title+'"');
+  trackEvent('song_generated', { genre, topic });
+  checkAchievements('song_generated', { genre });
 }
 
 // ─── BRIEF RENDERER ───────────────────────────────────────────
@@ -4316,6 +4350,7 @@ function saveLib(){
   } else {
     S.library.unshift(song);
     toast('✓ Saved to library');
+    trackEvent('song_saved', { genre: S.currentSong?.genre, topic: S.currentSong?.topic });
   }
 
   if(S.library.length > 200) S.library = S.library.slice(0, 200);
@@ -4342,6 +4377,7 @@ function saveLuckyToLib(){
   } else {
     S.library.unshift(song);
     toast('✓ Lucky song saved to library');
+    trackEvent('song_saved', { genre: S.luckyCurrentSong?.genre, topic: S.luckyCurrentSong?.topic });
   }
 
   if(S.library.length > 200) S.library = S.library.slice(0, 200);
@@ -6404,6 +6440,9 @@ function setLike(prefix, isLike) {
     renderLib();
   }
   toast(isLike ? '👍 Liked!' : '👎 Disliked');
+  const evName = isLike ? 'song_liked' : 'song_disliked';
+  trackEvent(evName, { genre: song?.genre, topic: song?.topic });
+  if (isLike) checkAchievements('song_liked');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6885,6 +6924,146 @@ updateLibBadge();
 loadVoiceProfile();
 checkShareLink();
 </script>
+<!-- ══ ANALYTICS + GAMIFICATION ══ -->
+<script>
+// ── Device ID (anonymous, persistent) ─────────────────
+function getDeviceId() {
+  let id = localStorage.getItem('soniq_device_id');
+  if (!id) {
+    id = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    localStorage.setItem('soniq_device_id', id);
+  }
+  return id;
+}
+
+// ── Event tracker (fire-and-forget) ───────────────────
+function trackEvent(event, meta) {
+  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  if (!isVercel) return; // skip in local dev
+  try {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ event, device_id: getDeviceId(), ...meta }),
+      keepalive: true
+    });
+  } catch(e) {}
+}
+
+// ── Global counter ─────────────────────────────────────
+async function loadGlobalCounter() {
+  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  if (!isVercel) return;
+  try {
+    const r = await fetch('/api/track?counter=1');
+    if (!r.ok) return;
+    const d = await r.json();
+    const n = d.total || 0;
+    if (n < 1) return; // don't show 0
+    const el = document.getElementById('lc-num');
+    const wrap = document.getElementById('lucky-counter');
+    if (el && wrap) {
+      el.textContent = n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n.toLocaleString();
+      wrap.style.display = 'flex';
+    }
+  } catch(e) {}
+}
+
+// ── Achievements (localStorage-based) ─────────────────
+const ACHIEVEMENTS = {
+  first_song:      { icon: '🎵', name: 'First Song!',     desc: 'You wrote your first song with SONIQ' },
+  genre_explorer:  { icon: '🗺️', name: 'Genre Explorer',  desc: 'Generated songs in 5 different genres' },
+  lucky_7:         { icon: '🎲', name: 'Lucky 7',          desc: 'Used Feel Lucky 7 times' },
+  hit_maker:       { icon: '👑', name: 'Hit Maker',        desc: 'Liked 10 songs — you know quality' }
+};
+
+function getAchState() {
+  try { return JSON.parse(localStorage.getItem('soniq_ach') || '{}'); } catch { return {}; }
+}
+function saveAchState(s) {
+  try { localStorage.setItem('soniq_ach', JSON.stringify(s)); } catch {}
+}
+
+function showAchievementToast(key) {
+  const ach = ACHIEVEMENTS[key];
+  if (!ach) return;
+  let toast = document.getElementById('ach-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'ach-toast';
+    toast.className = 'ach-toast';
+    toast.innerHTML = `<div class="ach-icon" id="ach-t-icon"></div><div class="ach-body"><div class="ach-label">Achievement Unlocked</div><div class="ach-name" id="ach-t-name"></div><div class="ach-desc" id="ach-t-desc"></div></div>`;
+    document.body.appendChild(toast);
+  }
+  document.getElementById('ach-t-icon').textContent = ach.icon;
+  document.getElementById('ach-t-name').textContent = ach.name;
+  document.getElementById('ach-t-desc').textContent = ach.desc;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+function checkAchievements(trigger, extra) {
+  const st = getAchState();
+
+  if (trigger === 'song_generated') {
+    if (!st.first_song) {
+      st.first_song = true;
+      saveAchState(st);
+      setTimeout(() => showAchievementToast('first_song'), 1800);
+    }
+    // genre_explorer: track unique genres
+    const genres = st.genres || [];
+    if (extra?.genre && !genres.includes(extra.genre)) {
+      genres.push(extra.genre);
+      st.genres = genres;
+      if (genres.length >= 5 && !st.genre_explorer) {
+        st.genre_explorer = true;
+        saveAchState(st);
+        setTimeout(() => showAchievementToast('genre_explorer'), 2400);
+      } else {
+        saveAchState(st);
+      }
+    }
+  }
+
+  if (trigger === 'feel_lucky') {
+    st.lucky_count = (st.lucky_count || 0) + 1;
+    if (st.lucky_count >= 7 && !st.lucky_7) {
+      st.lucky_7 = true;
+      saveAchState(st);
+      setTimeout(() => showAchievementToast('lucky_7'), 1800);
+    } else {
+      saveAchState(st);
+    }
+  }
+
+  if (trigger === 'song_liked') {
+    st.like_count = (st.like_count || 0) + 1;
+    if (st.like_count >= 10 && !st.hit_maker) {
+      st.hit_maker = true;
+      saveAchState(st);
+      setTimeout(() => showAchievementToast('hit_maker'), 1200);
+    } else {
+      saveAchState(st);
+    }
+  }
+}
+
+// Load counter when lucky page is viewed
+const _origGoPg = typeof goPg === 'function' ? goPg : null;
+if (_origGoPg) {
+  window.goPg = function(page, btn) {
+    _origGoPg(page, btn);
+    if (page === 'lucky') loadGlobalCounter();
+  };
+}
+// Also load on initial page if lucky is shown
+document.addEventListener('DOMContentLoaded', () => {
+  if (document.getElementById('pg-lucky')?.classList.contains('on')) loadGlobalCounter();
+});
+</script>
+
 <!-- ══ IMPORT LYRICS OVERLAY ══ -->
 <div id="import-overlay" class="import-overlay" style="display:none" onclick="if(event.target===this)closeImportModal()">
   <div class="import-modal">
