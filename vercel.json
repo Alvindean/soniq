@@ -3,10 +3,11 @@
   "name": "soniq",
   "outputDirectory": "public",
   "functions": {
-    "api/stream.js":   { "maxDuration": 60 },
-    "api/generate.js": { "maxDuration": 60 },
-    "api/track.js":    { "maxDuration": 10 },
-    "api/admin.js":    { "maxDuration": 15 }
+    "api/stream.js":    { "maxDuration": 60 },
+    "api/generate.js":  { "maxDuration": 60 },
+    "api/track.js":     { "maxDuration": 10 },
+    "api/admin.js":     { "maxDuration": 15 },
+    "api/rapstats.js":  { "maxDuration": 10 }
   },
   "headers": [
     {

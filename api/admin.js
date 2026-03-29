@@ -76,6 +76,16 @@ module.exports = async function handler(req, res) {
   }
 
   try {
+    function getISOWeek(date) {
+      const d = new Date(date);
+      d.setHours(0,0,0,0);
+      d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+      const week1 = new Date(d.getFullYear(), 0, 4);
+      const weekNum = 1 + Math.round(((d - week1) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+      return `${d.getFullYear()}-W${String(weekNum).padStart(2,'0')}`;
+    }
+    const currentWeek = getISOWeek(new Date());
+
     // Build daily keys for last 7 days
     const days = [];
     for (let i = 0; i < 7; i++) {
@@ -89,22 +99,38 @@ module.exports = async function handler(req, res) {
       ['ZREVRANGE', 'soniq:fusions:top', '0', '19', 'WITHSCORES'],
       ['ZREVRANGE', 'soniq:topics:top', '0', '19', 'WITHSCORES'],
       ['LRANGE', 'soniq:recent', '0', '19'],
+      ['ZREVRANGE', 'soniq:rapstyles:top', '0', '19', 'WITHSCORES'],
+      ['ZREVRANGE', `soniq:rapstyles:weekly:${currentWeek}`, '0', '19', 'WITHSCORES'],
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
     const results = await redisPipeline(commands);
 
-    const total_songs  = parseInt(results[0]) || 0;
-    const top_genres   = parseZSet(results[1]);
-    const top_fusions  = parseZSet(results[2]);
-    const top_topics   = parseZSet(results[3]);
-    const recentRaw    = results[4] || [];
-    const dailyResults = results.slice(5);
+    const total_songs     = parseInt(results[0]) || 0;
+    const top_genres      = parseZSet(results[1]);
+    const top_fusions     = parseZSet(results[2]);
+    const top_topics      = parseZSet(results[3]);
+    const recentRaw       = results[4] || [];
+    const top_rapstyles   = parseZSet(results[5]);
+    const weeklyRapstyles = parseZSet(results[6]);
+    const dailyResults    = results.slice(7);
 
     // Parse recent events
     const recent = recentRaw.map(s => {
       try { return JSON.parse(s); } catch { return null; }
     }).filter(Boolean);
+
+    // Compute trending rap styles: weekly share > 1.5x all-time share AND weekly score >= 3
+    const totalAllTime = top_rapstyles.reduce((s, x) => s + x.count, 0) || 1;
+    const totalWeekly  = weeklyRapstyles.reduce((s, x) => s + x.count, 0) || 1;
+    const weeklyMap    = new Map(weeklyRapstyles.map(x => [x.name, x.count]));
+    const trending_rapstyles = top_rapstyles.filter(x => {
+      const weeklyCount = weeklyMap.get(x.name) || 0;
+      if (weeklyCount < 3) return false;
+      const allTimeShare = x.count / totalAllTime;
+      const weeklyShare  = weeklyCount / totalWeekly;
+      return weeklyShare > 1.5 * allTimeShare;
+    }).map(x => ({ name: x.name, count: weeklyMap.get(x.name) || 0 }));
 
     // Build daily_events: [{date, song_generated, song_liked, ...}]
     const daily_events = days.map((date, i) => {
@@ -124,6 +150,8 @@ module.exports = async function handler(req, res) {
       top_genres,
       top_fusions,
       top_topics,
+      top_rapstyles,
+      trending_rapstyles,
       daily_events,
       recent
     });
