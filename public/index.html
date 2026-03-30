@@ -4733,13 +4733,13 @@ function saveLib(){
 function saveLuckyToLib(){
   if(!S.luckyCurrentSong){toast('Generate a lucky song first');return;}
 
-  const existing = S.library.findIndex(s =>
-    s.title === S.luckyCurrentSong.title && s.lyrics === S.luckyCurrentSong.lyrics
-  );
+  const existing = S.luckyCurrentSong.id
+    ? S.library.findIndex(s => s.id === S.luckyCurrentSong.id)
+    : -1; // no ID = always save as new
 
   const song = {
     ...S.luckyCurrentSong,
-    id: existing >= 0 ? S.library[existing].id : Date.now(),
+    id: existing >= 0 ? S.library[existing].id : (S.luckyCurrentSong.id || Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
     ts: Date.now(),
   };
 
