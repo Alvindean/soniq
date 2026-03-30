@@ -10,13 +10,15 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 
 function checkRateLimit(ip) {
   const now = Date.now();
-  const entry = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_WINDOW };
-  if (now > entry.resetAt) {
-    entry.count = 0;
-    entry.resetAt = now + RATE_WINDOW;
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    // Delete stale entry, create fresh one
+    rateLimitMap.delete(ip);
+    const fresh = { count: 1, resetAt: now + RATE_WINDOW };
+    rateLimitMap.set(ip, fresh);
+    return { allowed: true, minutesLeft: Math.ceil(RATE_WINDOW / 60000), count: 1 };
   }
   entry.count++;
-  rateLimitMap.set(ip, entry);
   const remaining = Math.ceil((entry.resetAt - now) / 60000);
   return { allowed: entry.count <= RATE_LIMIT, minutesLeft: remaining, count: entry.count };
 }
@@ -75,7 +77,11 @@ async function callOpenRouter(apiKey, messages, system, max_tokens) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+  const cors = allowed.includes(origin) ? origin : 'https://soniq.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', cors);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
