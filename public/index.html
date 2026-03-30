@@ -4821,34 +4821,34 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
         <span style="font-size:10px;color:var(--tx3);font-weight:400">Copy this into your AI music platform's style/genre field</span>
         ${cpBtn('brief-core-prompt', 'Copy Prompt')}
       </div>
-      <div class="brief-prompt-box" id="brief-core-prompt">${corePrompt}</div>
+      <div class="brief-prompt-box" id="brief-core-prompt">${escHtml(corePrompt)}</div>
       <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/440 characters</div>
     </div>
 
     <div class="brief-grid">
       ${tempoKey ? `<div class="brief-block brief-block-amber">
         <div class="brief-block-label">🎚 Tempo & Key</div>
-        <div class="brief-block-body">${tempoKey}</div>
+        <div class="brief-block-body">${escHtml(tempoKey)}</div>
       </div>` : ''}
       ${sonic ? `<div class="brief-block brief-block-violet">
         <div class="brief-block-label">🔊 Sonic References</div>
-        <div class="brief-block-body">${sonic}</div>
+        <div class="brief-block-body">${escHtml(sonic)}</div>
       </div>` : ''}
     </div>
 
     ${arrange ? `<div class="brief-section">
       <div class="brief-section-label">🎸 Arrangement Blueprint</div>
-      <div class="brief-section-body">${arrange.replace(/\//g,'<br>→ ')}</div>
+      <div class="brief-section-body">${escHtml(arrange).replace(/\//g,'<br>→ ')}</div>
     </div>` : ''}
 
     ${vocal ? `<div class="brief-section">
       <div class="brief-section-label">🎤 Vocal Direction</div>
-      <div class="brief-section-body">${vocal.replace(/\//g,'<br>→ ')}</div>
+      <div class="brief-section-body">${escHtml(vocal).replace(/\//g,'<br>→ ')}</div>
     </div>` : ''}
 
     ${platTips ? `<div class="brief-section brief-tips">
       <div class="brief-section-label">💡 Platform Tips</div>
-      <div class="brief-section-body">${platTips.split(/\n|\d\.\s/).filter(t=>t.trim()).map(t=>`<div class="brief-tip">→ ${t.trim()}</div>`).join('')}</div>
+      <div class="brief-section-body">${platTips.split(/\n|\d\.\s/).filter(t=>t.trim()).map(t=>`<div class="brief-tip">→ ${escHtml(t.trim())}</div>`).join('')}</div>
     </div>` : ''}
 
     ${countermelodyRaw ? (() => {
@@ -4860,12 +4860,12 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
       const howTo = cmLines['HOW TO PROMPT'] || '';
       return `<div class="brief-section cm-section">
         <div class="brief-section-label">🎵 Countermelody</div>
-        <div class="cm-device">${cmLines['DEVICE'] || ''}</div>
-        ${cmLines['WHAT IT DOES'] ? `<div class="brief-section-body" style="margin-top:6px">${cmLines['WHAT IT DOES']}</div>` : ''}
-        ${cmLines['SECTION MAP'] ? `<div class="cm-map">Sections: ${cmLines['SECTION MAP']}</div>` : ''}
+        <div class="cm-device">${escHtml(cmLines['DEVICE'] || '')}</div>
+        ${cmLines['WHAT IT DOES'] ? `<div class="brief-section-body" style="margin-top:6px">${escHtml(cmLines['WHAT IT DOES'])}</div>` : ''}
+        ${cmLines['SECTION MAP'] ? `<div class="cm-map">Sections: ${escHtml(cmLines['SECTION MAP'])}</div>` : ''}
         ${howTo ? `<div class="cm-prompt-row">
           <span class="cm-prompt-label">Add to prompt:</span>
-          <span class="cm-prompt-chip" id="${prefix}-cm-prompt">${howTo}</span>
+          <span class="cm-prompt-chip" id="${prefix}-cm-prompt">${escHtml(howTo)}</span>
           <button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${prefix}-cm-prompt').textContent,'Counter-melody added to clipboard')">Copy</button>
         </div>` : ''}
       </div>`;
@@ -4904,12 +4904,12 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
 
   const metaHtml = (bpm || key || timeSig) ? `
     <div class="chord-meta">
-      ${bpm ? `<div class="chord-meta-pill"><span class="chord-meta-label">BPM</span><span class="chord-meta-val">${bpm}</span></div>` : ''}
-      ${key ? `<div class="chord-meta-pill"><span class="chord-meta-label">Key</span><span class="chord-meta-val">${key}</span></div>` : ''}
-      ${timeSig ? `<div class="chord-meta-pill"><span class="chord-meta-label">Time</span><span class="chord-meta-val">${timeSig}</span></div>` : ''}
-      ${keyPsych ? `<div class="chord-meta-pill key-psych-pill" title="${keyPsych.feel}"><span class="chord-meta-label">Tension</span><span class="chord-meta-val">${keyPsych.tension}</span></div>` : ''}
+      ${bpm ? `<div class="chord-meta-pill"><span class="chord-meta-label">BPM</span><span class="chord-meta-val">${escHtml(bpm)}</span></div>` : ''}
+      ${key ? `<div class="chord-meta-pill"><span class="chord-meta-label">Key</span><span class="chord-meta-val">${escHtml(key)}</span></div>` : ''}
+      ${timeSig ? `<div class="chord-meta-pill"><span class="chord-meta-label">Time</span><span class="chord-meta-val">${escHtml(timeSig)}</span></div>` : ''}
+      ${keyPsych ? `<div class="chord-meta-pill key-psych-pill" title="${escHtml(keyPsych.feel)}"><span class="chord-meta-label">Tension</span><span class="chord-meta-val">${escHtml(keyPsych.tension)}</span></div>` : ''}
     </div>
-    ${keyPsych ? `<div class="key-psych-bar"><span class="key-psych-feel">${keyPsych.feel}</span><div class="key-bright-bar"><div class="key-bright-fill" style="width:${keyPsych.bright*10}%"></div></div></div>` : ''}` : '';
+    ${keyPsych ? `<div class="key-psych-bar"><span class="key-psych-feel">${escHtml(keyPsych.feel)}</span><div class="key-bright-bar"><div class="key-bright-fill" style="width:${keyPsych.bright*10}%"></div></div></div>` : ''}` : '';
 
   const sectionHtml = sections.map(s => {
     const [name, rest] = s.split('→').map(x => x.trim());
@@ -4919,10 +4919,10 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
     const outlierSymbols = ['♭II','♭VII','♭VI','♭III','#IV','+6','sus'];
     const hasOutlier = outlierSymbols.some(sym => numeralsRaw.includes(sym));
     return `<div class="chord-row${hasOutlier?' chord-row-outlier':''}">
-      <div class="chord-row-name">${name}${hasOutlier?' <span class="outlier-badge">outlier</span>':''}</div>
+      <div class="chord-row-name">${escHtml(name)}${hasOutlier?' <span class="outlier-badge">outlier</span>':''}</div>
       <div class="chord-row-body">
-        <div class="chord-numerals">${numeralsRaw}</div>
-        ${parts.slice(1).map(p => `<div class="chord-feel">${p}</div>`).join('')}
+        <div class="chord-numerals">${escHtml(numeralsRaw)}</div>
+        ${parts.slice(1).map(p => `<div class="chord-feel">${escHtml(p)}</div>`).join('')}
       </div>
     </div>`;
   }).join('');
@@ -4939,16 +4939,16 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
     const archetype= getTA('PROGRESSION ARCHETYPE');
     theoryHtml = `<div class="theory-analysis">
       <div class="theory-header">🎼 Theory Analysis</div>
-      ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${scale}</span></div>` : ''}
-      ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${keyFeel}</span></div>` : ''}
-      ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${outliers}</span></div>` : ''}
-      ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${vl}</span></div>` : ''}
-      ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${tension}</span></div>` : ''}
-      ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${archetype}</span></div>` : ''}
+      ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${escHtml(scale)}</span></div>` : ''}
+      ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${escHtml(keyFeel)}</span></div>` : ''}
+      ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${escHtml(outliers)}</span></div>` : ''}
+      ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${escHtml(vl)}</span></div>` : ''}
+      ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${escHtml(tension)}</span></div>` : ''}
+      ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${escHtml(archetype)}</span></div>` : ''}
     </div>`;
   }
 
-  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+chordsRaw+'</div>'}</div>` + theoryHtml;
+  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+escHtml(chordsRaw)+'</div>'}</div>` + theoryHtml;
   showEmptyTabState(prefix + '-chords-text', 'Chord analysis not available for this genre');
 }
 
@@ -5568,7 +5568,7 @@ async function runAnalysis(){
   document.getElementById('a-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Analyzing songs…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a musicologist, neuroscientist, and hit songwriter. Provide detailed, actionable analysis.');
-    document.getElementById('a-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    document.getElementById('a-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   }catch(e){showErr('a-out',e.message);}
   btnDone('a-btn');
 }
@@ -5589,7 +5589,7 @@ async function buildBlueprint(){
   document.getElementById('f-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Building blueprint…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a hit songwriter and music producer. Build practical, detailed song blueprints.');
-    document.getElementById('f-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    document.getElementById('f-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   }catch(e){showErr('f-out',e.message);}
   btnDone('f-btn');
 }
@@ -5627,7 +5627,7 @@ async function rateSong(){
   document.getElementById('r-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Rating song…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a music industry expert, neuroscientist, and hit songwriter. Provide detailed, honest song ratings.');
-    document.getElementById('r-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    document.getElementById('r-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   }catch(e){showErr('r-out',e.message);}
   btnDone('r-btn');
 }
@@ -5764,11 +5764,11 @@ function renderTitleCards(prefix, titles, song) {
     return `<div class="tc-card${isSelected ? ' selected' : ''}" id="${prefix}-tc-${i}" onclick="selectTitle('${prefix}',${i},${JSON.stringify(t.title).replace(/"/g,'&quot;')})">
       <div class="tc-num">${i + 1}</div>
       <div class="tc-body">
-        <div class="tc-type ${cls}">${t.type}</div>
-        <div class="tc-title-text">${t.title}</div>
-        <div class="tc-why">${t.why}</div>
+        <div class="tc-type ${cls}">${escHtml(t.type)}</div>
+        <div class="tc-title-text">${escHtml(t.title)}</div>
+        <div class="tc-why">${escHtml(t.why)}</div>
       </div>
-      <button class="tc-use-btn" onclick="event.stopPropagation();applyTitle('${prefix}','${t.title.replace(/'/g,"\\'")}')">Use this</button>
+      <button class="tc-use-btn" onclick="event.stopPropagation();applyTitle('${prefix}',this.closest('.tc-card').querySelector('.tc-title-text').textContent)">Use this</button>
     </div>`;
   }).join('');
 }
@@ -6863,21 +6863,21 @@ PRODUCTION NOTES:
       card.innerHTML = `
         <div class="concept-card-hdr">
           <div class="concept-num">Concept ${i+1} of ${count}</div>
-          <div class="concept-title">${title}</div>
-          <div class="concept-angle">${angle}</div>
+          <div class="concept-title">${escHtml(title)}</div>
+          <div class="concept-angle">${escHtml(angle)}</div>
           <div class="concept-meta">
             <span class="concept-tag concept-tag-genre">${genreLabel}</span>
             <span class="concept-tag concept-tag-mood">${moodDesc}</span>
           </div>
         </div>
         <div class="concept-body">
-          ${hookLine ? `<div class="concept-section-title">Hook Line</div><div class="concept-hook">"${hookLine}"</div>` : ''}
-          ${lyrics ? `<div class="concept-section-title">Lyrics Preview</div><div class="concept-lyrics">${lyrics.slice(0,400).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>')}${lyrics.length>400?'…':''}</div>` : ''}
+          ${hookLine ? `<div class="concept-section-title">Hook Line</div><div class="concept-hook">"${escHtml(hookLine)}"</div>` : ''}
+          ${lyrics ? `<div class="concept-section-title">Lyrics Preview</div><div class="concept-lyrics">${escHtml(lyrics.slice(0,400)).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>')}${lyrics.length>400?'…':''}</div>` : ''}
           ${platform === 'both'
-            ? (sunoPrompt ? `<div class="concept-section-title">Suno Prompt</div><div class="concept-prompt">${sunoPrompt}</div>` : '')
-              + (udioPrompt ? `<div class="concept-section-title">Udio Prompt</div><div class="concept-prompt">${udioPrompt}</div>` : '')
-            : (productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${productionPrompt}</div>` : '')}
-          ${notes ? `<div class="concept-section-title">Production Notes</div><div class="concept-brief">${notes}</div>` : ''}
+            ? (sunoPrompt ? `<div class="concept-section-title">Suno Prompt</div><div class="concept-prompt">${escHtml(sunoPrompt)}</div>` : '')
+              + (udioPrompt ? `<div class="concept-section-title">Udio Prompt</div><div class="concept-prompt">${escHtml(udioPrompt)}</div>` : '')
+            : (productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${escHtml(productionPrompt)}</div>` : '')}
+          ${notes ? `<div class="concept-section-title">Production Notes</div><div class="concept-brief">${escHtml(notes)}</div>` : ''}
         </div>
         <div class="concept-actions">
           <button class="btn btn-sm btn-gold" onclick="loadConceptToWrite(${i})">✍️ Write Full Song</button>
@@ -7185,10 +7185,10 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     const titlesRaw = raw.match(/POSSIBLE TITLES:\s*(.+)/)?.[1]?.trim() || '';
 
     document.getElementById('alb-name').textContent = name;
-    document.getElementById('alb-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${t.trim()}</span>`).join('');
+    document.getElementById('alb-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${escHtml(t.trim())}</span>`).join('');
     document.getElementById('alb-summary').textContent = summary;
     document.getElementById('alb-arc').textContent = arc;
-    document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${l.replace(/^-\s*/,'')}</li>`).join('');
+    document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
 
     const trackList = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
       const [ttype,desc,role] = l.split('|').map(s=>s.trim());
@@ -7197,18 +7197,18 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     S.albumData = S.albumData || {};
     S.albumData.trackList = trackList;
     document.getElementById('alb-track-types').innerHTML = trackList.map((tr,i)=>
-      `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${tr.ttype}</div><div class="gap-role-desc">${tr.desc} — ${tr.role}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">✦ Write This Track</button></div>`
+      `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${escHtml(tr.ttype)}</div><div class="gap-role-desc">${escHtml(tr.desc)} — ${escHtml(tr.role)}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">✦ Write This Track</button></div>`
     ).join('');
 
     const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
     document.getElementById('alb-palette').innerHTML = paletteRaw.split('\n').filter(l=>l.includes('|')).map((l,i)=>{
       const [label,desc] = l.split('|').map(s=>s.trim());
       const col = PALETTE_COLORS[i % PALETTE_COLORS.length];
-      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${col};flex-shrink:0"></div><div><div style="font-size:12px;font-weight:700;color:var(--tx1)">${label||''}</div><div style="font-size:11px;color:var(--tx3)">${desc||''}</div></div></div>`;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${col};flex-shrink:0"></div><div><div style="font-size:12px;font-weight:700;color:var(--tx1)">${escHtml(label||'')}</div><div style="font-size:11px;color:var(--tx3)">${escHtml(desc||'')}</div></div></div>`;
     }).join('');
     document.getElementById('alb-prod-refs').textContent = prodStyle;
     document.getElementById('alb-visual').textContent = visual;
-    document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent='${t.trim().replace(/'/g,"\\'")}';toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${t.trim()}</div></div></div>`).join('');
+    document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent=this.querySelector('.gap-role-name').textContent;toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${escHtml(t.trim())}</div></div></div>`).join('');
 
     S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes, type};
     toast('🎼 Album concept generated!');
