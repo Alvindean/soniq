@@ -3104,6 +3104,15 @@ const FUSION_DATA={
   'Afrobeats+Punk':{name:'Afro-Punk',tip:'Afropunk is a real movement. The DIY energy of punk + the groove of Afrobeats = a genuinely political, joyful sound.',q:{overall:68,compat:64,structural:66,commercial:66},artists:'TV on the Radio, Bloc Party, Santigold, badXchannels'}
 };
 
+function safeParseLib() {
+  try {
+    return JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]');
+  } catch(e) {
+    console.warn('Library JSON corrupt, resetting:', e);
+    return [];
+  }
+}
+
 let _soniqKey;
 
 // ═══════════════════════════════════════════════════════
@@ -3115,7 +3124,7 @@ const S={selectedGenre:'pop',
   rapDimensions: { flow:'syncopated', rhymeArch:'end-only', density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
-  library: JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]'),
+  library: safeParseLib(),
   luckyHistory:[],sessionHistory:[],
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
