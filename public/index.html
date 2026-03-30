@@ -2250,7 +2250,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <div class="camp-form">
     <div class="camp-field">
-      <label class="camp-label">Campaign Theme / Artist Brief</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label class="camp-label" style="margin:0">Campaign Theme / Artist Brief</label><button class="mic-btn" id="camp-brief-mic-btn" onclick="toggleMicFor('camp-brief-mic-btn','camp-brief','lines')" title="Dictate your campaign brief" style="font-size:15px;padding:3px 8px">🎤</button></div>
       <textarea id="camp-brief" class="camp-textarea" placeholder="e.g. A breakup album about moving on and finding yourself again. Artist is a 25-year-old pop singer with a vulnerable, honest tone."></textarea>
     </div>
     <div class="camp-grid">
@@ -2318,7 +2318,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <div class="album-form">
     <div class="album-field">
-      <label class="album-label">Album Concept / Artist Brief</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label class="album-label" style="margin:0">Album Concept / Artist Brief</label><button class="mic-btn" id="alb-brief-mic-btn" onclick="toggleMicFor('alb-brief-mic-btn','alb-brief','lines')" title="Dictate your album concept" style="font-size:15px;padding:3px 8px">🎤</button></div>
       <textarea id="alb-brief" class="album-textarea" placeholder="e.g. A debut album about leaving your hometown and finding identity in a new city. Soulful pop with R&B influences. Female artist, 22, honest and cinematic lyric style."></textarea>
     </div>
     <div class="album-grid">
@@ -2435,7 +2435,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="album-ie-box">
       <div class="album-ie-label">⚡ Quick Album Edit — describe one or two changes</div>
       <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
-        <textarea class="album-ie-textarea" id="alb-ie-input" placeholder="e.g. 'Make the arc darker and more introspective' or 'Shift commercial focus toward sync licensing'"></textarea>
+        <div style="position:relative;flex:1">
+          <textarea class="album-ie-textarea" id="alb-ie-input" placeholder="e.g. 'Make the arc darker and more introspective' or 'Shift commercial focus toward sync licensing'" style="width:100%;box-sizing:border-box"></textarea>
+          <button class="mic-btn" style="position:absolute;bottom:8px;right:8px;font-size:13px;padding:3px 7px;opacity:.8" onclick="toggleMicFor('alb-ie-mic-btn','alb-ie-input','inline')" id="alb-ie-mic-btn" title="Speak your edit instruction">🎤</button>
+        </div>
         <button class="btn btn-amber" id="alb-ie-btn" onclick="albumInstantEdit()" style="align-self:flex-end;flex-shrink:0">⚡ Apply</button>
       </div>
     </div>
@@ -7670,10 +7673,10 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
     <div class="import-field" style="margin-bottom:14px">
       <label>Topic / Concept <span style="font-weight:400;color:var(--tx4);text-transform:none;letter-spacing:0">(optional — helps the analysis)</span></label>
-      <input type="text" id="imp-topic" placeholder="e.g. letting go after a long relationship" />
+      <div style="display:flex;gap:6px;align-items:center"><input type="text" id="imp-topic" placeholder="e.g. letting go after a long relationship" style="flex:1"/><button class="mic-btn" id="imp-topic-mic-btn" onclick="toggleMicFor('imp-topic-mic-btn','imp-topic','inline')" title="Speak your topic" style="font-size:15px;padding:4px 8px;flex-shrink:0">🎤</button></div>
     </div>
     <div class="import-field">
-      <label>Lyrics</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label style="margin:0">Lyrics</label><button class="mic-btn" id="imp-lyrics-mic-btn" onclick="toggleMicFor('imp-lyrics-mic-btn','imp-lyrics','lines')" title="Dictate lyrics by voice" style="font-size:15px;padding:3px 8px">🎤</button></div>
       <textarea id="imp-lyrics" placeholder="[Verse 1]&#10;Paste your lyrics here…&#10;&#10;[Chorus]&#10;Your chorus lines…"></textarea>
     </div>
     <div class="import-actions">
