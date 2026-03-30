@@ -4512,7 +4512,7 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
   const platTips      = parseBriefSection(raw, 'PLATFORM TIPS');
 
   const cpBtn = (id, label='Copy') =>
-    `<button class="brief-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('${id}').textContent).then(()=>toast('✓ Copied'))">${label}</button>`;
+    `<button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${id}').textContent)">${label}</button>`;
 
   el.innerHTML = `
     <!-- MAIN PROMPT — hero section -->
@@ -4567,7 +4567,7 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
         ${howTo ? `<div class="cm-prompt-row">
           <span class="cm-prompt-label">Add to prompt:</span>
           <span class="cm-prompt-chip" id="${prefix}-cm-prompt">${howTo}</span>
-          <button class="brief-copy-btn" onclick="navigator.clipboard.writeText(document.getElementById('${prefix}-cm-prompt').textContent).then(()=>toast('✓ Counter-melody added to clipboard'))">Copy</button>
+          <button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${prefix}-cm-prompt').textContent,'Counter-melody added to clipboard')">Copy</button>
         </div>` : ''}
       </div>`;
     })() : ''}
@@ -4976,7 +4976,7 @@ async function regenLine(i){
 }
 function showPasteModal(){document.getElementById('paste-modal').style.display='block';}
 function loadPasted(){const raw=document.getElementById('paste-area').value;if(!raw.trim())return;loadLyricsIntoEditor(raw,'Pasted Song');}
-function copyEdited(){const text=S.editorLines.map(l=>l.text).join('\n');navigator.clipboard.writeText(text).then(()=>toast('✓ Edited lyrics copied'));}
+function copyEdited(){const text=S.editorLines.map(l=>l.text).join('\n');safeCopy(text,'Edited lyrics copied');}
 function saveEdited(){
   const lyrics=S.editorLines.map(l=>l.text).join('\n');
   const song={
@@ -5058,8 +5058,8 @@ async function generateFromBuilder(){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px">
           <div style="font-size:18px;font-weight:800">"${title||'Untitled'}"</div>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('pb-lyr').textContent).then(()=>toast('✓ Lyrics copied'))">Copy Lyrics</button>
-            <button class="btn btn-sm btn-gold" onclick="navigator.clipboard.writeText(document.getElementById('pb-sty').textContent).then(()=>toast('✓ Style prompt copied'))">Copy Style</button>
+            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('pb-lyr').textContent,'Lyrics copied')">Copy Lyrics</button>
+            <button class="btn btn-sm btn-gold" onclick="safeCopy(document.getElementById('pb-sty').textContent,'Style prompt copied')">Copy Style</button>
           </div>
         </div>
         <pre id="pb-lyr" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">${lyrics}</pre>
@@ -5106,7 +5106,7 @@ function copyBuilderPrompt(){
   const el=document.getElementById('pb-preview');
   const text=el?.textContent||'';
   if(!text||text.includes('Select options')){toast('Build a prompt first — select at least one option above');return;}
-  navigator.clipboard.writeText(text).then(()=>toast('✓ Style prompt copied'));
+  safeCopy(text, 'Style prompt copied');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5197,8 +5197,8 @@ async function generateFusion(){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
           <div style="font-size:16px;font-weight:700">"${title}"</div>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('fd-lyr').textContent).then(()=>toast('✓ Copied'))">Copy Lyrics</button>
-            <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('fd-sty').textContent).then(()=>toast('✓ Copied'))">Copy Style</button>
+            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('fd-lyr').textContent)">Copy Lyrics</button>
+            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('fd-sty').textContent)">Copy Style</button>
           </div>
         </div>
         <pre id="fd-lyr" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:10px">${lyrics}</pre>
@@ -5957,11 +5957,16 @@ COVER_ART:
 function vbCopy(cardId, btn) {
   const box = document.getElementById(cardId)?.querySelector('.vb-prompt-box');
   if (!box) return;
-  navigator.clipboard.writeText(box.textContent).then(() => {
+  const afterCopy = () => {
     btn.textContent = '✓ Copied!';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
-  });
+  };
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(box.textContent).then(afterCopy).catch(() => { fallbackCopy(box.textContent); afterCopy(); });
+  } else {
+    fallbackCopy(box.textContent); afterCopy();
+  }
 }
 
 async function regenVisual(prefix) {
@@ -6110,7 +6115,7 @@ function loadConceptToWrite(idx) {
 }
 
 function cpText(text) {
-  navigator.clipboard.writeText(text||'').then(() => toast('✓ Copied'));
+  safeCopy(text||'');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6263,8 +6268,8 @@ async function writeAllTracks() {
           <div style="font-size:17px;font-weight:800;margin-top:2px">"${r.title}"</div>
         </div>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-sm" onclick="navigator.clipboard.writeText(this.closest('div[data-idx]')||document.querySelectorAll('#alb-tracks-written pre')[${r.i}]?.textContent||'').then(()=>toast('✓ Copied'))">Copy Lyrics</button>
-          <button class="btn btn-sm btn-gold" onclick="navigator.clipboard.writeText('${r.style.replace(/'/g,"\\'")}').then(()=>toast('✓ Style copied'))">Copy Style</button>
+          <button class="btn btn-sm" onclick="safeCopy(this.closest('div[data-idx]')||document.querySelectorAll('#alb-tracks-written pre')[${r.i}]?.textContent||'')">Copy Lyrics</button>
+          <button class="btn btn-sm btn-gold" onclick="safeCopy('${r.style.replace(/'/g,"\\'")}','Style copied')">Copy Style</button>
         </div>
       </div>
       <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${r.lyrics}</pre>
@@ -6915,7 +6920,7 @@ function renderSyncMeta(prefix) {
 
   const copyAll = () => {
     const txt = `SYNC METADATA — "${song.title||'Untitled'}"\nMood Tags: ${moods.join(' · ')}\nBPM Estimate: ${bpm}\nInstrumentation: ${instrStr}\nBest For: ${bestFor}\nLicense: Non-exclusive sync recommended`;
-    navigator.clipboard.writeText(txt).then(()=>toast('✓ Sync metadata copied!'));
+    safeCopy(txt, 'Sync metadata copied!');
   };
 
   el.innerHTML = `<div class="sync-meta-card">
@@ -7188,12 +7193,12 @@ function shareLink(prefix) {
     const json = JSON.stringify(song);
     const encoded = btoa(unescape(encodeURIComponent(json)));
     const url = window.location.origin + window.location.pathname + '#share=' + encoded;
-    navigator.clipboard.writeText(url).then(()=>{
-      toast('🔗 Share link copied!');
-    }).catch(()=>{
-      window.location.hash = '#share=' + encoded;
-      toast('🔗 Share link set in URL — copy from address bar');
-    });
+    const fallbackShare = () => { window.location.hash = '#share=' + encoded; toast('🔗 Share link set in URL — copy from address bar'); };
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(()=>{ toast('🔗 Share link copied!'); }).catch(fallbackShare);
+    } else {
+      fallbackShare();
+    }
   } catch(e) { toast('⚠️ Could not create share link'); }
 }
 
