@@ -10,13 +10,15 @@ const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
 
 function checkRateLimit(ip) {
   const now = Date.now();
-  const entry = rateLimitMap.get(ip) || { count: 0, resetAt: now + RATE_WINDOW };
-  if (now > entry.resetAt) {
-    entry.count = 0;
-    entry.resetAt = now + RATE_WINDOW;
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    // Delete stale entry, create fresh one
+    rateLimitMap.delete(ip);
+    const fresh = { count: 1, resetAt: now + RATE_WINDOW };
+    rateLimitMap.set(ip, fresh);
+    return { allowed: true, minutesLeft: Math.ceil(RATE_WINDOW / 60000), count: 1 };
   }
   entry.count++;
-  rateLimitMap.set(ip, entry);
   const remaining = Math.ceil((entry.resetAt - now) / 60000);
   return { allowed: entry.count <= RATE_LIMIT, minutesLeft: remaining, count: entry.count };
 }
@@ -75,7 +77,12 @@ async function callOpenRouter(apiKey, messages, system, max_tokens) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+  const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
+  const cors = allowed.includes(origin) || isPreview ? origin : 'https://soniq.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', cors);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -90,7 +97,8 @@ module.exports = async function handler(req, res) {
 
   if (userKey) {
     // User-supplied key: skip rate limit, use their key directly
-    const { messages, system, max_tokens = 2048 } = body;
+    const { messages, system } = body;
+    const max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
     if (!messages?.length) return res.status(400).json({error:'messages required'});
     try {
       const text = await callAnthropic(userKey, messages, system, max_tokens);
@@ -101,7 +109,9 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  const ip = req.headers['x-real-ip'] ||
+    (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+    req.socket?.remoteAddress || 'unknown';
   const rl = checkRateLimit(ip);
   if (!rl.allowed) return res.status(429).json({error: `Rate limit exceeded. Try again in ${rl.minutesLeft} minutes.`});
 
@@ -114,7 +124,8 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const { messages, system, max_tokens = 2048 } = body || {};
+  const { messages, system } = body || {};
+  const max_tokens = Math.min(Math.max(parseInt(body?.max_tokens) || 2048, 256), 4096);
   if (!messages?.length) return res.status(400).json({error:'messages required'});
 
   const errors = [];

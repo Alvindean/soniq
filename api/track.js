@@ -50,7 +50,12 @@ const ALLOWED_EVENTS = new Set([
 ]);
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+  const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
+  const cors = allowed.includes(origin) || isPreview ? origin : 'https://soniq.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', cors);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
@@ -74,6 +79,8 @@ module.exports = async function handler(req, res) {
 
   const { event, genre, genre2, topic, fusion_key, device_id, rap_style } = body || {};
 
+  const safeStr = (v, max = 200) => v ? String(v).slice(0, max).trim() : null;
+
   if (!event || !ALLOWED_EVENTS.has(event)) {
     return res.status(400).json({ error: 'unknown event' });
   }
@@ -94,41 +101,49 @@ module.exports = async function handler(req, res) {
   // Always increment daily event counter
   commands.push(['HINCRBY', `soniq:events:daily:${today}`, event, 1]);
 
+  const safeGenre      = safeStr(genre);
+  const safeGenre2     = safeStr(genre2);
+  const safeTopic      = safeStr(topic);
+  const safeFusionKey  = safeStr(fusion_key);
+  const safeRapStyle   = safeStr(rap_style);
+
   if (event === 'song_generated') {
     commands.push(['INCR', 'soniq:total_songs']);
-    if (genre)      commands.push(['ZINCRBY', 'soniq:genres:top', 1, genre]);
-    if (genre2)     commands.push(['ZINCRBY', 'soniq:genres:top', 1, genre2]);
-    if (fusion_key) commands.push(['ZINCRBY', 'soniq:fusions:top', 1, fusion_key]);
-    if (topic)      commands.push(['ZINCRBY', 'soniq:topics:top', 1, topic]);
-    if (rap_style) {
-      commands.push(['ZINCRBY', 'soniq:rapstyles:top', 1, rap_style]);
-      commands.push(['ZINCRBY', `soniq:rapstyles:weekly:${currentWeek}`, 1, rap_style]);
+    if (safeGenre)     commands.push(['ZINCRBY', 'soniq:genres:top', 1, safeGenre]);
+    if (safeGenre2)    commands.push(['ZINCRBY', 'soniq:genres:top', 1, safeGenre2]);
+    if (safeFusionKey) commands.push(['ZINCRBY', 'soniq:fusions:top', 1, safeFusionKey]);
+    if (safeTopic)     commands.push(['ZINCRBY', 'soniq:topics:top', 1, safeTopic]);
+    if (safeRapStyle) {
+      commands.push(['ZINCRBY', 'soniq:rapstyles:top', 1, safeRapStyle]);
+      commands.push(['ZINCRBY', `soniq:rapstyles:weekly:${currentWeek}`, 1, safeRapStyle]);
       commands.push(['EXPIRE', `soniq:rapstyles:weekly:${currentWeek}`, 28 * 24 * 3600]);
     }
   }
 
   if (event === 'feel_lucky_used') {
-    if (genre)      commands.push(['ZINCRBY', 'soniq:genres:top', 1, genre]);
-    if (fusion_key) commands.push(['ZINCRBY', 'soniq:fusions:top', 1, fusion_key]);
+    if (safeGenre)     commands.push(['ZINCRBY', 'soniq:genres:top', 1, safeGenre]);
+    if (safeFusionKey) commands.push(['ZINCRBY', 'soniq:fusions:top', 1, safeFusionKey]);
   }
 
-  if (event === 'genre_selected' && genre) {
-    commands.push(['ZINCRBY', 'soniq:genres:top', 1, genre]);
+  if (event === 'genre_selected' && safeGenre) {
+    commands.push(['ZINCRBY', 'soniq:genres:top', 1, safeGenre]);
   }
 
   if (event === 'song_liked' || event === 'song_saved') {
-    if (genre) commands.push(['ZINCRBY', 'soniq:genres:top', 2, genre]); // weight liked/saved higher
-    if (topic) commands.push(['ZINCRBY', 'soniq:topics:top', 2, topic]);
-    if (rap_style) {
-      commands.push(['ZINCRBY', 'soniq:rapstyles:top', 2, rap_style]);
-      commands.push(['ZINCRBY', `soniq:rapstyles:weekly:${currentWeek}`, 2, rap_style]);
+    if (safeGenre)    commands.push(['ZINCRBY', 'soniq:genres:top', 2, safeGenre]); // weight liked/saved higher
+    if (safeTopic)    commands.push(['ZINCRBY', 'soniq:topics:top', 2, safeTopic]);
+    if (safeRapStyle) {
+      commands.push(['ZINCRBY', 'soniq:rapstyles:top', 2, safeRapStyle]);
+      commands.push(['ZINCRBY', `soniq:rapstyles:weekly:${currentWeek}`, 2, safeRapStyle]);
     }
   }
 
   // Append to recent events list (keep last 200)
   const recentEntry = JSON.stringify({
-    event, genre, genre2, topic, fusion_key, rap_style,
-    device_id: device_id ? device_id.slice(0, 16) : null, // truncate for privacy
+    event,
+    genre: safeGenre, genre2: safeGenre2, topic: safeTopic,
+    fusion_key: safeFusionKey, rap_style: safeRapStyle,
+    device_id: device_id ? String(device_id).slice(0, 16) : null, // truncate for privacy
     ts: Date.now()
   });
   commands.push(['LPUSH', 'soniq:recent', recentEntry]);

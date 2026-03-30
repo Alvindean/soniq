@@ -558,7 +558,7 @@ const FUSION_DATA={
   'Afrobeats+Punk':{name:'Afro-Punk',tip:'Afropunk is a real movement. The DIY energy of punk + the groove of Afrobeats = a genuinely political, joyful sound.',q:{overall:68,compat:64,structural:66,commercial:66},artists:'TV on the Radio, Bloc Party, Santigold, badXchannels'}
 };
 
-const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
+const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop','parody':'Parody','comedy':'Comedy','neosoul':'Neo-Soul','gospel':'Gospel','children':"Children's",'tvmusical':'TV / Musical'};
 
 // ── GENRE EXPERT AGENTS ──────────────────────────────────────────────────────
 // Each genre has a distinct creative worldview — philosophy, current state,
@@ -969,14 +969,23 @@ ENERGY ARC: The verse should feel noticeably lower energy than the chorus. The b
   return 'SECTION TAGS: Every section MUST start with its bracket tag on its own line.';
 }
 
+function sanitizeInput(str, maxLen = 300) {
+  if (typeof str !== 'string') return '';
+  return str.slice(0, maxLen).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
+}
+
 function buildSongPrompt(params) {
   const {
-    genre = 'pop', topic = '', mood = 'Emotional', vocal = 'any',
+    genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
     structure = 'standard', era = 'modern', length = 'medium',
     quality = 'high', theoryLevel = 'standard', mode = 'auto',
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
     blend = {}, bracketMode = 'suno'
   } = params;
+
+  const topic = sanitizeInput(rawTopic);
+  const mood = sanitizeInput(rawMood);
+  const vocal = sanitizeInput(rawVocal);
 
   const genreLabel = GENRE_LABELS[genre] || genre;
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
@@ -1158,7 +1167,9 @@ SECTION MAP: [which sections and how it evolves]`;
 
 function buildLuckyPrompt(params) {
   const keys = Object.keys(FUSION_DATA);
-  const key = (params && params.g1 && params.g2) ? params.g1 + '+' + params.g2 : pickRandom(keys);
+  const rawG1 = params && params.g1 ? sanitizeInput(params.g1, 50) : null;
+  const rawG2 = params && params.g2 ? sanitizeInput(params.g2, 50) : null;
+  const key = (rawG1 && rawG2) ? rawG1 + '+' + rawG2 : pickRandom(keys);
   const [g1, g2] = key.split('+');
   const fd = FUSION_DATA[key];
   const topic = pickRandom(LUCKY_TOPICS);
@@ -1428,9 +1439,9 @@ const PERSONA_NOTES = {
 function buildRapLabPrompt(params) {
   const {
     genre = 'hiphop',
-    topic = 'the streets',
-    mood = 'Defiant',
-    vocal = 'Auto-Tune / Melodic trap',
+    topic: rawTopic = 'the streets',
+    mood: rawMood = 'Defiant',
+    vocal: rawVocal = 'Auto-Tune / Melodic trap',
     structure = 'standard',
     quality = 'radio-ready',
     era = 'current',
@@ -1438,6 +1449,10 @@ function buildRapLabPrompt(params) {
     rapDimensions = {},
     hookStyle = 'auto'
   } = params || {};
+
+  const topic = sanitizeInput(rawTopic);
+  const mood = sanitizeInput(rawMood);
+  const vocal = sanitizeInput(rawVocal);
 
   const style = RAP_STYLES[rapStyle] || RAP_STYLES.trap;
   const dims = {

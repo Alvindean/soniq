@@ -33,7 +33,11 @@ async function redisZRevRange(baseUrl, token, key, start, stop) {
 }
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+  const cors = allowed.includes(origin) ? origin : 'https://soniq.vercel.app';
+  res.setHeader('Access-Control-Allow-Origin', cors);
+  res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
