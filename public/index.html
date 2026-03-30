@@ -3374,7 +3374,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
-  luckyHistory:[],sessionHistory:[],
+  luckyHistory:[],sessionHistory:[],editorSong:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
@@ -5189,7 +5189,7 @@ function loadLyricsIntoEditor(lyrics,title){
   if (S.editorSong && S.editorSong.lyrics) {
     vhAddVersion(S.editorSong.title, S.editorSong.lyrics, S.editorSong.genre, 'Auto-save');
   }
-  S.editorSong = { title: title || '', lyrics, genre: S.currentSong?.genre || '' };
+  S.editorSong = { title: title || '', lyrics, genre: S.currentSong?.genre || '', topic: S.currentSong?.topic || '' };
   S.editorLines=lyrics.split('\n').map(l=>({text:l,isTag:/^\[/.test(l.trim()),isEmpty:!l.trim()}));
   renderEditor();
   document.getElementById('paste-modal').style.display='none';
