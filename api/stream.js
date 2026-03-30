@@ -109,7 +109,8 @@ async function pipeSSE(r, res, extractText) {
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
   const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
-  const cors = allowed.includes(origin) ? origin : 'https://soniq.vercel.app';
+  const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
+  const cors = allowed.includes(origin) || isPreview ? origin : 'https://soniq.vercel.app';
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');

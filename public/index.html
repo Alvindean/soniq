@@ -3109,7 +3109,9 @@ const FUSION_DATA={
 
 function safeParseLib() {
   try {
-    return JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]');
+    const data = JSON.parse(localStorage.getItem('soniq_library') || localStorage.getItem('sce5_lib') || '[]');
+    if (!Array.isArray(data)) { console.warn('Library not an array, resetting'); return []; }
+    return data;
   } catch(e) {
     console.warn('Library JSON corrupt, resetting:', e);
     return [];
@@ -3435,6 +3437,16 @@ function goStab(ns,id,el){
   el.classList.add('on');
   if(id==='fusion')initFusion();
 }
+function showEmptyTabState(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el && !el.textContent.trim()) {
+    el.innerHTML = `<div style="text-align:center;padding:32px 16px;color:var(--tx4)">
+      <div style="font-size:22px;margin-bottom:8px">—</div>
+      <div style="font-size:13px">${msg}</div>
+    </div>`;
+  }
+}
+
 function goOtab(ns,id,el){
   const pre=ns+'-opane-';
   document.querySelectorAll(`[id^="${pre}"]`).forEach(p=>p.classList.remove('on'));
@@ -3718,7 +3730,7 @@ function updBlendField(sel, fieldId, tagId) {
   if (tag) tag.style.display = hasVal ? 'inline-block' : 'none';
 }
 function updBlend(inp){
-  S.blend.ratio=parseInt(inp.value);
+  S.blend.ratio=Math.max(0, Math.min(100, parseInt(inp.value) || 50));
   document.getElementById('blend-pct1').textContent=S.blend.ratio+'%';
   document.getElementById('blend-pct2').textContent=(100-S.blend.ratio)+'%';
   document.getElementById('blend-bar-fill').style.width=S.blend.ratio+'%';
@@ -3803,6 +3815,7 @@ function clearGenreZone(){
   S.luckyLockedGenres=[];
   renderGenreZonePills();
   updateGenreZoneBadge();
+  toast('🎲 Genre filter cleared — all genres active');
 }
 function selectAllGenres(){
   S.luckyLockedGenres=Object.keys(GENRE_LABELS);
@@ -3869,6 +3882,9 @@ function feelLucky(){
   const filtered=locked.length
     ?allKeys.filter(k=>{const[a,b]=k.split('+');return locked.includes(a)||locked.includes(b);})
     :allKeys;
+  if (locked.length > 0 && filtered.length === 0) {
+    toast('⚠️ No matching fusions for selected genres — using all');
+  }
   const keys=filtered.length?filtered:allKeys;
   // Pick random fusion pair from FUSION_DATA keys
   const key=pickRandom(keys);
@@ -4490,7 +4506,7 @@ function parseSongResult(raw,genre,topic){
     if (!S.currentVersions) S.currentVersions = [];
     pushVersion('res');
   }
-  S.currentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};
+  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};
   // Push the new song as a version too
   pushVersion('res');
   renderVersionBar('res');
@@ -4683,19 +4699,20 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
   }
 
   el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+chordsRaw+'</div>'}</div>` + theoryHtml;
+  showEmptyTabState(prefix + '-chords-text', 'Chord analysis not available for this genre');
 }
 
 function saveLib(){
   if(!S.currentSong?.lyrics){toast('Generate a song first');return;}
 
-  // Deduplicate: if this song is already saved (same title + lyrics), update it
-  const existing = S.library.findIndex(s =>
-    s.title === S.currentSong.title && s.lyrics === S.currentSong.lyrics
-  );
+  // Deduplicate: if this song is already saved (by unique ID), update it
+  const existing = S.currentSong.id
+    ? S.library.findIndex(s => s.id === S.currentSong.id)
+    : -1; // no ID = always save as new
 
   const song = {
     ...S.currentSong,
-    id: existing >= 0 ? S.library[existing].id : Date.now(),
+    id: existing >= 0 ? S.library[existing].id : (S.currentSong.id || Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
     ts: Date.now(),
   };
 
@@ -5895,8 +5912,9 @@ async function loadMoodBoard(prefix) {
       html += '<div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Sonic Textures</div>';
       html += '<div style="display:flex;flex-wrap:wrap;gap:6px">' + mb.textures.map(t => `<span style="font-size:12px;padding:4px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx2)">${t}</span>`).join('') + '</div>';
     }
-    container.innerHTML = html;
+    container.innerHTML = html || '';
     container.dataset.loaded = '1';
+    showEmptyTabState(prefix + '-moodboard-content', 'Generate a song first to see mood suggestions');
   } catch(e) {
     container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:16px">Moodboard unavailable.</div>';
   }
@@ -5982,6 +6000,7 @@ COVER_ART:
     container.dataset.loaded = '1';
     // cache on song object
     if (song) song._visual = { artistVisual, musicVideo, coverArt };
+    showEmptyTabState(prefix + '-visual-content', 'Visual prompts generated on first click');
   } catch(e) {
     container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:20px">Visual brief unavailable. Try again.</div>';
   }
@@ -6266,7 +6285,7 @@ function writeAlbumTrack(index) {
 
   // Navigate to Write page
   const nb = Array.from(document.querySelectorAll('.nb')).find(b => /pg-write/.test(b.getAttribute('onclick')));
-  if (nb) goPg('pg-write', nb);
+  if (nb) goPg('write', nb);
 
   // Scroll to generate button
   setTimeout(() => document.getElementById('gen-btn')?.scrollIntoView({behavior:'smooth', block:'center'}), 300);
@@ -6595,7 +6614,7 @@ async function importAndAnalyze() {
     renderChords('res', chords);
     renderBrief('res', songPrompt, briefRaw);
 
-    S.currentSong = { title, verdict, lyrics, style: songPrompt, brief: briefRaw, structure, dopamine, chords, notes, genre, topic, ts: Date.now() };
+    S.currentSong = { id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), title, verdict, lyrics, style: songPrompt, brief: briefRaw, structure, dopamine, chords, notes, genre, topic, ts: Date.now() };
     addToHistory(S.currentSong);
     showSaveBar('res');
     const varBtn = document.getElementById('res-var-btn');
@@ -6607,7 +6626,7 @@ async function importAndAnalyze() {
     closeImportModal();
     // Navigate to write page so the result is visible
     const nb = Array.from(document.querySelectorAll('.nb')).find(b => /pg-write/.test(b.getAttribute('onclick')));
-    if (nb) goPg('pg-write', nb);
+    if (nb) goPg('write', nb);
     // Reset tabs to lyrics
     const firstTab = document.querySelector('#gen-out .otabs .otab');
     if (firstTab) { document.querySelectorAll('#gen-out .otabs .otab').forEach(t=>t.classList.remove('on')); firstTab.classList.add('on'); }
@@ -6974,6 +6993,7 @@ function renderSyncMeta(prefix) {
     <div class="sync-row"><div class="sync-key">License</div><div class="sync-val">Non-exclusive sync recommended</div></div>
   </div>
   <button class="sync-copy-all-btn" onclick="(${copyAll.toString()})()">Copy All Metadata</button>`;
+  showEmptyTabState(prefix + '-sync-content', 'Sync metadata generated on first click');
 }
 
 // ═══════════════════════════════════════════════════════
