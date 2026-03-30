@@ -1197,6 +1197,22 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .vh-item-meta { font-size: 11px; color: var(--tx3); }
 .vh-item-restore { font-size: 11px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-left: 10px; }
 
+.pl-card {
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.pl-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pl-card-title { font-size: 14px; font-weight: 700; color: var(--tx1); }
+.pl-card-meta { font-size: 11px; color: var(--tx3); }
+.pl-track { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--b2); font-size: 12px; color: var(--tx2); }
+.pl-track:last-child { border-bottom: none; }
+.pl-track-num { color: var(--tx4); min-width: 18px; font-size: 11px; }
+.pl-picker-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--s3); border: 1px solid var(--b2); border-radius: var(--r2); cursor: pointer; }
+.pl-picker-item.selected { border-color: var(--amber); background: rgba(255,180,0,.08); }
+
 </style>
 
 </head>
@@ -1986,6 +2002,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <span style="flex:1"></span>
       <button class="btn btn-sm btn-red" onclick="clearLib()" style="font-size:10px">Clear All</button>
     </div>
+    <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid var(--b2)">
+      <button class="lib-tab on" id="lib-tab-songs" onclick="libTab('songs')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--amber);color:var(--amber);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">📚 Songs</button>
+      <button class="lib-tab" id="lib-tab-playlists" onclick="libTab('playlists')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx3);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">🎵 Playlists</button>
+    </div>
+    <div id="lib-songs-panel">
     <div style="margin-bottom:14px">
       <input type="text" id="lib-search" placeholder="Search by title, genre or topic…"
         style="width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;font-family:var(--font);transition:border-color .15s"
@@ -1994,6 +2015,29 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         oninput="renderLib()"/>
     </div>
     <div id="lib-grid" class="libgrid"></div>
+    </div>
+    <div id="lib-playlists-panel" style="display:none">
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <input id="pl-name-input" class="topic-input" placeholder="New playlist name…" style="flex:1;font-size:13px;padding:8px 12px" onkeydown="if(event.key==='Enter')createPlaylist()"/>
+    <button class="btn btn-gold" onclick="createPlaylist()">+ Create</button>
+  </div>
+  <div id="pl-list"></div>
+  <div id="pl-empty" style="text-align:center;padding:32px;color:var(--tx4);font-size:13px">No playlists yet.<br>Create one above to start building setlists.</div>
+</div>
+  </div>
+</div>
+
+<!-- PLAYLIST SONG PICKER -->
+<div id="pl-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:902;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closePlPicker()">
+  <div class="card" style="max-width:480px;margin:40px auto;position:relative">
+    <button onclick="closePlPicker()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">Add Songs to <span id="pl-picker-name" style="color:var(--amber)"></span></div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:12px">Select songs from your library to add</div>
+    <div id="pl-picker-list" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto"></div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-gold" onclick="confirmPlPicker()" style="flex:1">Add Selected</button>
+      <button class="btn" onclick="closePlPicker()">Done</button>
+    </div>
   </div>
 </div>
 
@@ -5885,6 +5929,146 @@ async function generateVariant() {
     loadingEl.style.display = 'none';
     goBtn.disabled = false;
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAYLIST BUILDER
+// ═══════════════════════════════════════════════════════
+const PL_KEY = 'soniq_playlists';
+let _plPickerTarget = null;
+let _plPickerSelected = new Set();
+
+function plLoad() {
+  try { return JSON.parse(localStorage.getItem(PL_KEY) || '[]'); } catch(e) { return []; }
+}
+function plSave(data) {
+  try { localStorage.setItem(PL_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function libTab(tab) {
+  document.getElementById('lib-songs-panel').style.display = tab === 'songs' ? '' : 'none';
+  document.getElementById('lib-playlists-panel').style.display = tab === 'playlists' ? '' : 'none';
+  document.getElementById('lib-tab-songs').style.borderBottomColor = tab === 'songs' ? 'var(--amber)' : 'transparent';
+  document.getElementById('lib-tab-songs').style.color = tab === 'songs' ? 'var(--amber)' : 'var(--tx3)';
+  document.getElementById('lib-tab-playlists').style.borderBottomColor = tab === 'playlists' ? 'var(--amber)' : 'transparent';
+  document.getElementById('lib-tab-playlists').style.color = tab === 'playlists' ? 'var(--amber)' : 'var(--tx3)';
+  if (tab === 'playlists') renderPlaylists();
+}
+
+function createPlaylist() {
+  const name = document.getElementById('pl-name-input').value.trim();
+  if (!name) { toast('Enter a playlist name'); return; }
+  const playlists = plLoad();
+  if (playlists.find(p => p.name === name)) { toast('Playlist name already exists'); return; }
+  playlists.push({ name, tracks: [], created: Date.now() });
+  plSave(playlists);
+  document.getElementById('pl-name-input').value = '';
+  renderPlaylists();
+  toast(`Playlist "${name}" created`);
+}
+
+function renderPlaylists() {
+  const playlists = plLoad();
+  const listEl = document.getElementById('pl-list');
+  const emptyEl = document.getElementById('pl-empty');
+  if (!playlists.length) { emptyEl.style.display = 'block'; listEl.innerHTML = ''; return; }
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = playlists.map((pl, i) => `
+    <div class="pl-card">
+      <div class="pl-card-header">
+        <div>
+          <div class="pl-card-title">${escHtml(pl.name)}</div>
+          <div class="pl-card-meta">${pl.tracks.length} track${pl.tracks.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openPlPicker(${i})">+ Add</button>
+          <button class="btn" style="font-size:11px;padding:4px 8px;color:var(--tx3)" onclick="deletePlaylist(${i})" title="Delete playlist">🗑</button>
+        </div>
+      </div>
+      ${pl.tracks.length ? `<div>${pl.tracks.map((t,j) => `
+        <div class="pl-track">
+          <span class="pl-track-num">${j+1}</span>
+          <span style="flex:1">${escHtml(t.title)}</span>
+          <span style="color:var(--tx4);font-size:10px">${escHtml(t.genre || '')}</span>
+          <button onclick="removePlTrack(${i},${j})" style="background:none;border:none;color:var(--tx4);cursor:pointer;font-size:12px;padding:0 2px" title="Remove">✕</button>
+        </div>`).join('')}</div>` : `<div style="font-size:12px;color:var(--tx4);padding:4px 0">No tracks yet — click + Add</div>`}
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn" style="font-size:11px;padding:4px 8px" onclick="copyPlaylist(${i})">📋 Copy Setlist</button>
+      </div>
+    </div>`).join('');
+}
+
+function openPlPicker(plIdx) {
+  _plPickerTarget = plIdx;
+  _plPickerSelected = new Set();
+  const pl = plLoad()[plIdx];
+  document.getElementById('pl-picker-name').textContent = pl.name;
+  const lib = safeParseLib();
+  const listEl = document.getElementById('pl-picker-list');
+  if (!lib.length) { listEl.innerHTML = '<div style="color:var(--tx4);font-size:13px;text-align:center;padding:20px">No songs in library yet</div>'; }
+  else {
+    listEl.innerHTML = lib.map((s,i) => `
+      <div class="pl-picker-item" id="pl-pick-${i}" onclick="togglePlPick(${i})">
+        <span style="font-size:16px">🎵</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">${escHtml(s.title||'Untitled')}</div>
+          <div style="font-size:11px;color:var(--tx3)">${escHtml(s.genre||'')}${s.topic?' · '+escHtml(s.topic.slice(0,40)):''}</div>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('pl-picker-modal').style.display = 'block';
+}
+
+function togglePlPick(idx) {
+  const el = document.getElementById(`pl-pick-${idx}`);
+  if (_plPickerSelected.has(idx)) { _plPickerSelected.delete(idx); el?.classList.remove('selected'); }
+  else { _plPickerSelected.add(idx); el?.classList.add('selected'); }
+}
+
+function confirmPlPicker() {
+  if (!_plPickerSelected.size) { toast('Select at least one song'); return; }
+  const lib = safeParseLib();
+  const playlists = plLoad();
+  const pl = playlists[_plPickerTarget];
+  _plPickerSelected.forEach(idx => {
+    const s = lib[idx];
+    if (s && !pl.tracks.find(t => t.title === s.title)) {
+      pl.tracks.push({ title: s.title, genre: s.genre || '', ts: s.ts || Date.now() });
+    }
+  });
+  plSave(playlists);
+  closePlPicker();
+  renderPlaylists();
+  toast(`Added ${_plPickerSelected.size} track${_plPickerSelected.size !== 1 ? 's' : ''}`);
+}
+
+function closePlPicker() {
+  document.getElementById('pl-picker-modal').style.display = 'none';
+  _plPickerTarget = null;
+  _plPickerSelected = new Set();
+}
+
+function removePlTrack(plIdx, trackIdx) {
+  const playlists = plLoad();
+  playlists[plIdx].tracks.splice(trackIdx, 1);
+  plSave(playlists);
+  renderPlaylists();
+}
+
+function deletePlaylist(plIdx) {
+  const playlists = plLoad();
+  const name = playlists[plIdx].name;
+  playlists.splice(plIdx, 1);
+  plSave(playlists);
+  renderPlaylists();
+  toast(`Deleted "${name}"`);
+}
+
+function copyPlaylist(plIdx) {
+  const pl = plLoad()[plIdx];
+  const text = `${pl.name}\n${'─'.repeat(pl.name.length)}\n${pl.tracks.map((t,i) => `${i+1}. ${t.title}${t.genre ? ' ('+t.genre+')' : ''}`).join('\n')}`;
+  safeCopy(text);
+  toast('Setlist copied to clipboard');
 }
 
 // ═══════════════════════════════════════════════════════
