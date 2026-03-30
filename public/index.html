@@ -5952,7 +5952,7 @@ async function generateVariant() {
     closeVariants();
     const label = VARIANT_LABELS[_selectedVariant] || _selectedVariant;
     loadLyricsIntoEditor(variantText, `${song.title} (${label})`);
-    goPg('editor');
+    navTo('editor');
     toast(`${label} generated — loaded into editor`);
   } catch(e) {
     toast('Variant generation failed: ' + e.message);
@@ -6248,7 +6248,7 @@ function closeVH() {
 function restoreVersion(v, title) {
   closeVH();
   loadLyricsIntoEditor(v.lyrics, title);
-  goPg('editor');
+  navTo('editor');
   toast(`Restored: ${v.label}`);
 }
 
