@@ -1979,7 +1979,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div class="card" id="paste-modal" style="display:none">
     <div class="ctitle">📋 Paste Lyrics</div>
     <div class="fld">
-      <label>Paste lyrics here (with or without section tags)</label>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <label style="margin:0">Paste lyrics here (with or without section tags)</label>
+        <button class="mic-btn" id="editor-mic-btn" onclick="editorMic()" title="Dictate lyrics by voice" style="font-size:16px;padding:4px 8px">🎤</button>
+      </div>
       <textarea id="paste-area" style="min-height:130px" placeholder="[Verse 1]&#10;Your lyrics here&#10;Another line&#10;&#10;[Chorus]&#10;Hook line here"></textarea>
     </div>
     <div class="btn-row">
@@ -5648,6 +5651,48 @@ function toggleMic() {
     else toast('Mic error: ' + e.error);
   };
   rec.onend = () => { _micRec = null; btn.classList.remove('recording'); btn.textContent = '🎤'; };
+  rec.start();
+}
+
+let _editorMicRec = null;
+function editorMic() {
+  const btn = document.getElementById('editor-mic-btn');
+  const area = document.getElementById('paste-area');
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { toast('Speech recognition not supported in this browser. Try Chrome or Edge.'); return; }
+
+  if (_editorMicRec) {
+    _editorMicRec.stop();
+    return;
+  }
+
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  rec.continuous = true;
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+
+  const existing = area.value;
+  // Start after existing content, adding newline separator if needed
+  let finalTranscript = existing ? existing.replace(/\s+$/, '') + '\n' : '';
+  const baseLen = finalTranscript.length;
+
+  rec.onstart = () => { _editorMicRec = rec; btn.classList.add('recording'); btn.textContent = '⏹'; toast('Listening… speak your lyrics, click ⏹ to stop', 4000); };
+  rec.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + '\n';
+      else interim += e.results[i][0].transcript;
+    }
+    area.value = finalTranscript + interim;
+    area.scrollTop = area.scrollHeight;
+  };
+  rec.onerror = (e) => {
+    if (e.error === 'not-allowed') toast('Mic access denied — allow microphone in your browser settings.');
+    else if (e.error === 'no-speech') toast('No speech detected. Try speaking closer to your mic.');
+    else toast('Mic error: ' + e.error);
+  };
+  rec.onend = () => { _editorMicRec = null; btn.classList.remove('recording'); btn.textContent = '🎤'; };
   rec.start();
 }
 
