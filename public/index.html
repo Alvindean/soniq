@@ -1180,6 +1180,39 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .variant-name { font-size: 13px; font-weight: 700; color: var(--tx1); }
 .variant-desc { font-size: 11px; color: var(--tx3); line-height: 1.3; }
 
+.vh-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.vh-item:hover { border-color: var(--amber); }
+.vh-item-info { display: flex; flex-direction: column; gap: 2px; }
+.vh-item-label { font-size: 13px; font-weight: 700; color: var(--tx1); }
+.vh-item-meta { font-size: 11px; color: var(--tx3); }
+.vh-item-restore { font-size: 11px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-left: 10px; }
+
+.pl-card {
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+}
+.pl-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pl-card-title { font-size: 14px; font-weight: 700; color: var(--tx1); }
+.pl-card-meta { font-size: 11px; color: var(--tx3); }
+.pl-track { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid var(--b2); font-size: 12px; color: var(--tx2); }
+.pl-track:last-child { border-bottom: none; }
+.pl-track-num { color: var(--tx4); min-width: 18px; font-size: 11px; }
+.pl-picker-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--s3); border: 1px solid var(--b2); border-radius: var(--r2); cursor: pointer; }
+.pl-picker-item.selected { border-color: var(--amber); background: rgba(255,180,0,.08); }
+
 </style>
 
 </head>
@@ -1705,6 +1738,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
         <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
         <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
+        <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
+        <button class="btn" onclick="openCoach()" id="coach-btn" style="display:none" title="AI Feedback Coach — get expert notes on your lyrics">🎓 Coach</button>
       </div>
     </div>
 
@@ -1968,6 +2003,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <span style="flex:1"></span>
       <button class="btn btn-sm btn-red" onclick="clearLib()" style="font-size:10px">Clear All</button>
     </div>
+    <div style="display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid var(--b2)">
+      <button class="lib-tab on" id="lib-tab-songs" onclick="libTab('songs')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--amber);color:var(--amber);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">📚 Songs</button>
+      <button class="lib-tab" id="lib-tab-playlists" onclick="libTab('playlists')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx3);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">🎵 Playlists</button>
+    </div>
+    <div id="lib-songs-panel">
     <div style="margin-bottom:14px">
       <input type="text" id="lib-search" placeholder="Search by title, genre or topic…"
         style="width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;font-family:var(--font);transition:border-color .15s"
@@ -1976,6 +2016,29 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         oninput="renderLib()"/>
     </div>
     <div id="lib-grid" class="libgrid"></div>
+    </div>
+    <div id="lib-playlists-panel" style="display:none">
+  <div style="display:flex;gap:8px;margin-bottom:14px">
+    <input id="pl-name-input" class="topic-input" placeholder="New playlist name…" style="flex:1;font-size:13px;padding:8px 12px" onkeydown="if(event.key==='Enter')createPlaylist()"/>
+    <button class="btn btn-gold" onclick="createPlaylist()">+ Create</button>
+  </div>
+  <div id="pl-list"></div>
+  <div id="pl-empty" style="text-align:center;padding:32px;color:var(--tx4);font-size:13px">No playlists yet.<br>Create one above to start building setlists.</div>
+</div>
+  </div>
+</div>
+
+<!-- PLAYLIST SONG PICKER -->
+<div id="pl-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:902;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closePlPicker()">
+  <div class="card" style="max-width:480px;margin:40px auto;position:relative">
+    <button onclick="closePlPicker()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">Add Songs to <span id="pl-picker-name" style="color:var(--amber)"></span></div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:12px">Select songs from your library to add</div>
+    <div id="pl-picker-list" style="display:flex;flex-direction:column;gap:6px;max-height:400px;overflow-y:auto"></div>
+    <div style="margin-top:14px;display:flex;gap:8px">
+      <button class="btn btn-gold" onclick="confirmPlPicker()" style="flex:1">Add Selected</button>
+      <button class="btn" onclick="closePlPicker()">Done</button>
+    </div>
   </div>
 </div>
 
@@ -1994,6 +2057,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="edstats">Lines: <span id="ed-total">0</span> &nbsp;·&nbsp; Avg syllables: <span id="ed-avg">0</span> &nbsp;·&nbsp; Over limit: <span id="ed-over" style="color:var(--red)">0</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">Copy Edited</button>
+        <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
+        <button class="btn" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
@@ -2084,6 +2149,44 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="variant-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px">
       <div class="spin" style="margin:0 auto 10px"></div>
       Generating variant…
+    </div>
+  </div>
+</div>
+
+<!-- VERSION HISTORY MODAL -->
+<div id="vh-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:901;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closeVH()">
+  <div class="card" style="max-width:500px;margin:40px auto;position:relative">
+    <button onclick="closeVH()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">🕐 Version History</div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Tap a version to restore it into the editor</div>
+    <div id="vh-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div id="vh-empty" style="text-align:center;padding:24px;color:var(--tx4);font-size:13px;display:none">No versions saved yet.<br>Versions are saved automatically when you edit a song.</div>
+  </div>
+</div>
+
+<!-- AI FEEDBACK COACH MODAL -->
+<div id="coach-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:903;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeCoach()">
+  <div class="card" style="max-width:620px;margin:32px auto;position:relative">
+    <button onclick="closeCoach()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">🎓 AI Feedback Coach</div>
+    <div id="coach-song-info" style="font-size:12px;color:var(--tx3);margin-bottom:14px"></div>
+
+    <div id="coach-idle" style="text-align:center;padding:20px">
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">Get expert feedback on your lyrics across 9 dimensions — hook strength, emotional arc, specificity, rhyme &amp; flow, structure, genre authenticity, opening line, bridge, and Suno readiness.</p>
+      <button class="btn btn-gold" onclick="runCoach()" style="font-size:14px;padding:10px 24px">⚡ Analyze My Lyrics</button>
+    </div>
+
+    <div id="coach-loading" style="display:none;text-align:center;padding:32px">
+      <div class="spin" style="margin:0 auto 12px"></div>
+      <div style="font-size:13px;color:var(--tx3)">Analyzing your lyrics…</div>
+    </div>
+
+    <div id="coach-results" style="display:none">
+      <div id="coach-output" style="font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-wrap"></div>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button class="btn" onclick="copyCoachFeedback()" style="flex:1">📋 Copy Feedback</button>
+        <button class="btn" onclick="resetCoach()">← New Analysis</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3271,7 +3374,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
-  luckyHistory:[],sessionHistory:[],
+  luckyHistory:[],sessionHistory:[],editorSong:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
@@ -4661,6 +4764,10 @@ function parseSongResult(raw,genre,topic){
   if (varBtn) varBtn.disabled = false;
   const variantsBtn = document.getElementById('variants-btn');
   if (variantsBtn) variantsBtn.style.display = '';
+  const vhBtn = document.getElementById('vh-btn');
+  if (vhBtn) vhBtn.style.display = '';
+  const coachBtn = document.getElementById('coach-btn');
+  if (coachBtn) coachBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -5078,6 +5185,11 @@ function clearLib(){
 // LYRIC EDITOR + SYLLABLE COUNTER
 // ═══════════════════════════════════════════════════════
 function loadLyricsIntoEditor(lyrics,title){
+  // Save current editor content as a version before replacing
+  if (S.editorSong && S.editorSong.lyrics) {
+    vhAddVersion(S.editorSong.title, S.editorSong.lyrics, S.editorSong.genre, 'Auto-save');
+  }
+  S.editorSong = { title: title || '', lyrics, genre: S.currentSong?.genre || '', topic: S.currentSong?.topic || '' };
   S.editorLines=lyrics.split('\n').map(l=>({text:l,isTag:/^\[/.test(l.trim()),isEmpty:!l.trim()}));
   renderEditor();
   document.getElementById('paste-modal').style.display='none';
@@ -5840,7 +5952,7 @@ async function generateVariant() {
     closeVariants();
     const label = VARIANT_LABELS[_selectedVariant] || _selectedVariant;
     loadLyricsIntoEditor(variantText, `${song.title} (${label})`);
-    goPg('editor');
+    navTo('editor');
     toast(`${label} generated — loaded into editor`);
   } catch(e) {
     toast('Variant generation failed: ' + e.message);
@@ -5848,6 +5960,296 @@ async function generateVariant() {
     loadingEl.style.display = 'none';
     goBtn.disabled = false;
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAYLIST BUILDER
+// ═══════════════════════════════════════════════════════
+const PL_KEY = 'soniq_playlists';
+let _plPickerTarget = null;
+let _plPickerSelected = new Set();
+
+function plLoad() {
+  try { return JSON.parse(localStorage.getItem(PL_KEY) || '[]'); } catch(e) { return []; }
+}
+function plSave(data) {
+  try { localStorage.setItem(PL_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function libTab(tab) {
+  document.getElementById('lib-songs-panel').style.display = tab === 'songs' ? '' : 'none';
+  document.getElementById('lib-playlists-panel').style.display = tab === 'playlists' ? '' : 'none';
+  document.getElementById('lib-tab-songs').style.borderBottomColor = tab === 'songs' ? 'var(--amber)' : 'transparent';
+  document.getElementById('lib-tab-songs').style.color = tab === 'songs' ? 'var(--amber)' : 'var(--tx3)';
+  document.getElementById('lib-tab-playlists').style.borderBottomColor = tab === 'playlists' ? 'var(--amber)' : 'transparent';
+  document.getElementById('lib-tab-playlists').style.color = tab === 'playlists' ? 'var(--amber)' : 'var(--tx3)';
+  if (tab === 'playlists') renderPlaylists();
+}
+
+function createPlaylist() {
+  const name = document.getElementById('pl-name-input').value.trim();
+  if (!name) { toast('Enter a playlist name'); return; }
+  const playlists = plLoad();
+  if (playlists.find(p => p.name === name)) { toast('Playlist name already exists'); return; }
+  playlists.push({ name, tracks: [], created: Date.now() });
+  plSave(playlists);
+  document.getElementById('pl-name-input').value = '';
+  renderPlaylists();
+  toast(`Playlist "${name}" created`);
+}
+
+function renderPlaylists() {
+  const playlists = plLoad();
+  const listEl = document.getElementById('pl-list');
+  const emptyEl = document.getElementById('pl-empty');
+  if (!playlists.length) { emptyEl.style.display = 'block'; listEl.innerHTML = ''; return; }
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = playlists.map((pl, i) => `
+    <div class="pl-card">
+      <div class="pl-card-header">
+        <div>
+          <div class="pl-card-title">${escHtml(pl.name)}</div>
+          <div class="pl-card-meta">${pl.tracks.length} track${pl.tracks.length !== 1 ? 's' : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn" style="font-size:11px;padding:4px 8px" onclick="openPlPicker(${i})">+ Add</button>
+          <button class="btn" style="font-size:11px;padding:4px 8px;color:var(--tx3)" onclick="deletePlaylist(${i})" title="Delete playlist">🗑</button>
+        </div>
+      </div>
+      ${pl.tracks.length ? `<div>${pl.tracks.map((t,j) => `
+        <div class="pl-track">
+          <span class="pl-track-num">${j+1}</span>
+          <span style="flex:1">${escHtml(t.title)}</span>
+          <span style="color:var(--tx4);font-size:10px">${escHtml(t.genre || '')}</span>
+          <button onclick="removePlTrack(${i},${j})" style="background:none;border:none;color:var(--tx4);cursor:pointer;font-size:12px;padding:0 2px" title="Remove">✕</button>
+        </div>`).join('')}</div>` : `<div style="font-size:12px;color:var(--tx4);padding:4px 0">No tracks yet — click + Add</div>`}
+      <div style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn" style="font-size:11px;padding:4px 8px" onclick="copyPlaylist(${i})">📋 Copy Setlist</button>
+      </div>
+    </div>`).join('');
+}
+
+function openPlPicker(plIdx) {
+  _plPickerTarget = plIdx;
+  _plPickerSelected = new Set();
+  const pl = plLoad()[plIdx];
+  document.getElementById('pl-picker-name').textContent = pl.name;
+  const lib = safeParseLib();
+  const listEl = document.getElementById('pl-picker-list');
+  if (!lib.length) { listEl.innerHTML = '<div style="color:var(--tx4);font-size:13px;text-align:center;padding:20px">No songs in library yet</div>'; }
+  else {
+    listEl.innerHTML = lib.map((s,i) => `
+      <div class="pl-picker-item" id="pl-pick-${i}" onclick="togglePlPick(${i})">
+        <span style="font-size:16px">🎵</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">${escHtml(s.title||'Untitled')}</div>
+          <div style="font-size:11px;color:var(--tx3)">${escHtml(s.genre||'')}${s.topic?' · '+escHtml(s.topic.slice(0,40)):''}</div>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('pl-picker-modal').style.display = 'block';
+}
+
+function togglePlPick(idx) {
+  const el = document.getElementById(`pl-pick-${idx}`);
+  if (_plPickerSelected.has(idx)) { _plPickerSelected.delete(idx); el?.classList.remove('selected'); }
+  else { _plPickerSelected.add(idx); el?.classList.add('selected'); }
+}
+
+function confirmPlPicker() {
+  if (!_plPickerSelected.size) { toast('Select at least one song'); return; }
+  const lib = safeParseLib();
+  const playlists = plLoad();
+  const pl = playlists[_plPickerTarget];
+  _plPickerSelected.forEach(idx => {
+    const s = lib[idx];
+    if (s && !pl.tracks.find(t => t.title === s.title)) {
+      pl.tracks.push({ title: s.title, genre: s.genre || '', ts: s.ts || Date.now() });
+    }
+  });
+  plSave(playlists);
+  closePlPicker();
+  renderPlaylists();
+  toast(`Added ${_plPickerSelected.size} track${_plPickerSelected.size !== 1 ? 's' : ''}`);
+}
+
+function closePlPicker() {
+  document.getElementById('pl-picker-modal').style.display = 'none';
+  _plPickerTarget = null;
+  _plPickerSelected = new Set();
+}
+
+function removePlTrack(plIdx, trackIdx) {
+  const playlists = plLoad();
+  playlists[plIdx].tracks.splice(trackIdx, 1);
+  plSave(playlists);
+  renderPlaylists();
+}
+
+function deletePlaylist(plIdx) {
+  const playlists = plLoad();
+  const name = playlists[plIdx].name;
+  playlists.splice(plIdx, 1);
+  plSave(playlists);
+  renderPlaylists();
+  toast(`Deleted "${name}"`);
+}
+
+function copyPlaylist(plIdx) {
+  const pl = plLoad()[plIdx];
+  const text = `${pl.name}\n${'─'.repeat(pl.name.length)}\n${pl.tracks.map((t,i) => `${i+1}. ${t.title}${t.genre ? ' ('+t.genre+')' : ''}`).join('\n')}`;
+  safeCopy(text);
+  toast('Setlist copied to clipboard');
+}
+
+// ═══════════════════════════════════════════════════════
+// AI FEEDBACK COACH
+// ═══════════════════════════════════════════════════════
+let _coachLyrics = '';
+let _coachGenre = '';
+let _coachTopic = '';
+let _coachFeedback = '';
+
+function openCoach(source) {
+  const song = source === 'editor' ? S.editorSong : (S.currentSong || S.editorSong);
+  if (!song) { toast('No song loaded — generate or load a song first'); return; }
+
+  _coachLyrics = song.lyrics || song.content || '';
+  _coachGenre = song.genre || '';
+  _coachTopic = song.topic || '';
+
+  if (!_coachLyrics.trim()) { toast('No lyrics to analyze'); return; }
+
+  document.getElementById('coach-song-info').textContent = `"${song.title || 'Untitled'}" · ${_coachGenre || 'unknown genre'}`;
+  resetCoach();
+  document.getElementById('coach-modal').style.display = 'block';
+}
+
+function closeCoach() {
+  document.getElementById('coach-modal').style.display = 'none';
+}
+
+function resetCoach() {
+  document.getElementById('coach-idle').style.display = 'block';
+  document.getElementById('coach-loading').style.display = 'none';
+  document.getElementById('coach-results').style.display = 'none';
+  _coachFeedback = '';
+}
+
+async function runCoach() {
+  if (!_coachLyrics) return;
+  document.getElementById('coach-idle').style.display = 'none';
+  document.getElementById('coach-loading').style.display = 'block';
+  document.getElementById('coach-results').style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: `You are Soniq's AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant. Analyze these ${_coachGenre || ''} lyrics${_coachTopic ? ' about "' + _coachTopic + '"' : ''} across these 9 dimensions. For each give: a star rating (⭐-⭐⭐⭐⭐⭐), one sentence on what works, one specific fix if under 4 stars.\n\n**DIMENSIONS:** Hook Strength · Emotional Arc · Specificity · Rhyme & Flow · Structure · Genre Authenticity · Opening Line · Bridge/Turn · Suno Readiness\n\nAfter all 9: give STRONGEST MOMENT, WEAKEST MOMENT, ONE PRIORITY FIX, and GENRE VERDICT.\n\nLYRICS:\n${_coachLyrics}`
+        }],
+        max_tokens: 2048
+      })
+    });
+
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const data = await resp.json();
+    const text = Array.isArray(data.content)
+      ? data.content.map(c => c.text || '').join('')
+      : (data.content || data.text || '');
+
+    if (!text.trim()) throw new Error('Empty response');
+
+    _coachFeedback = text;
+    document.getElementById('coach-output').textContent = text;
+    document.getElementById('coach-loading').style.display = 'none';
+    document.getElementById('coach-results').style.display = 'block';
+  } catch(e) {
+    document.getElementById('coach-loading').style.display = 'none';
+    document.getElementById('coach-idle').style.display = 'block';
+    toast('Coach failed: ' + e.message);
+  }
+}
+
+function copyCoachFeedback() {
+  if (!_coachFeedback) return;
+  safeCopy(_coachFeedback);
+  toast('Feedback copied to clipboard');
+}
+
+// ═══════════════════════════════════════════════════════
+// VERSION HISTORY
+// ═══════════════════════════════════════════════════════
+const VH_KEY = 'soniq_versions';
+const VH_MAX = 10;
+
+function vhLoad() {
+  try { return JSON.parse(localStorage.getItem(VH_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function vhSave(data) {
+  try { localStorage.setItem(VH_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function vhAddVersion(title, lyrics, genre, label) {
+  if (!title || !lyrics) return;
+  const data = vhLoad();
+  if (!data[title]) data[title] = [];
+  // Don't add duplicate if lyrics unchanged
+  if (data[title].length && data[title][0].lyrics === lyrics) return;
+  data[title].unshift({ ts: Date.now(), lyrics, genre: genre || '', label: label || `Edit ${data[title].length + 1}` });
+  if (data[title].length > VH_MAX) data[title] = data[title].slice(0, VH_MAX);
+  vhSave(data);
+}
+
+function openVH(title) {
+  const songTitle = title || S.currentSong?.title || S.editorSong?.title;
+  if (!songTitle) { toast('No song loaded'); return; }
+  const data = vhLoad();
+  const versions = data[songTitle] || [];
+  const listEl = document.getElementById('vh-list');
+  const emptyEl = document.getElementById('vh-empty');
+
+  listEl.innerHTML = '';
+  if (!versions.length) {
+    emptyEl.style.display = 'block';
+    listEl.style.display = 'none';
+  } else {
+    emptyEl.style.display = 'none';
+    listEl.style.display = 'flex';
+    versions.forEach((v, i) => {
+      const d = new Date(v.ts);
+      const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const preview = v.lyrics.replace(/\[.*?\]/g,'').trim().split('\n').find(l=>l.trim()) || '';
+      const item = document.createElement('div');
+      item.className = 'vh-item';
+      item.innerHTML = `
+        <div class="vh-item-info">
+          <div class="vh-item-label">${escHtml(v.label)}</div>
+          <div class="vh-item-meta">${escHtml(dateStr)} · ${escHtml(v.genre || 'unknown genre')}</div>
+          <div class="vh-item-meta" style="color:var(--tx4);margin-top:2px">${escHtml(preview.slice(0,60))}…</div>
+        </div>
+        <div class="vh-item-restore">Restore →</div>`;
+      item.onclick = () => { restoreVersion(v, songTitle); };
+      listEl.appendChild(item);
+    });
+  }
+  document.getElementById('vh-modal').style.display = 'block';
+}
+
+function closeVH() {
+  document.getElementById('vh-modal').style.display = 'none';
+}
+
+function restoreVersion(v, title) {
+  closeVH();
+  loadLyricsIntoEditor(v.lyrics, title);
+  navTo('editor');
+  toast(`Restored: ${v.label}`);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6979,6 +7381,10 @@ async function importAndAnalyze() {
     if (varBtn) varBtn.disabled = false;
     const variantsBtn = document.getElementById('variants-btn');
     if (variantsBtn) variantsBtn.style.display = '';
+    const vhBtn2 = document.getElementById('vh-btn');
+    if (vhBtn2) vhBtn2.style.display = '';
+    const coachBtn2 = document.getElementById('coach-btn');
+    if (coachBtn2) coachBtn2.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';
@@ -7957,6 +8363,8 @@ document.addEventListener('DOMContentLoaded', () => {
 .dbg-k{color:var(--tx3)}.dbg-v{color:var(--cyan);word-break:break-all;text-align:right;margin-left:10px}
 .dbg-action{width:100%;padding:7px 10px;background:var(--b2);border:1px solid var(--b3);color:var(--cyan);border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:600}
 .dbg-err{padding:7px;background:var(--s3);border-left:3px solid var(--red);border-radius:3px;margin-bottom:5px;font-size:11px}
+#coach-output strong { color: var(--amber); }
+#coach-output { font-family: var(--font); }
 </style>
 
 <script>
