@@ -4294,7 +4294,7 @@ function parseLuckyResult(raw,fusionName,meta){
   out.classList.add('visible');
   document.getElementById('lres-title').textContent=title;
   document.getElementById('lres-verdict').textContent=verdict;
-  document.getElementById('lres-lyrics-text').innerHTML=(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -4352,7 +4352,7 @@ function loadLuckyHistItem(i){
   const out=document.getElementById('lucky-out');out.style.display='block';out.classList.add('visible');
   document.getElementById('lres-title').textContent=song.title||'Untitled';
   document.getElementById('lres-verdict').textContent=song.verdict||'';
-  document.getElementById('lres-lyrics-text').innerHTML=(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   renderBrief('lres', song.style||'', song.brief||'');
   document.getElementById('lres-structure-text').textContent=song.structure||'';
   document.getElementById('lres-dopamine-text').textContent=song.dopamine||'';
@@ -4735,7 +4735,7 @@ function parseSongResult(raw,genre,topic){
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;
-  document.getElementById('res-lyrics-text').innerHTML=(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('res-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -5123,7 +5123,8 @@ function escHtml(str){
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 
 function loadFromLibIdx(idx){
@@ -5141,7 +5142,7 @@ function loadSongIntoOutput(song){
   document.getElementById('loaded-banner').style.display = 'flex';
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
-  document.getElementById('res-lyrics-text').innerHTML = (song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('res-lyrics-text').innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   renderBrief('res', song.style||'', song.brief||'');
   document.getElementById('res-structure-text').textContent = song.structure || '';
   document.getElementById('res-dopamine-text').textContent = song.dopamine || '';
@@ -7367,7 +7368,7 @@ async function importAndAnalyze() {
     // Populate output card (same as generateSong)
     document.getElementById('res-title').textContent   = title;
     document.getElementById('res-verdict').textContent = verdict;
-    document.getElementById('res-lyrics-text').innerHTML = lyrics.replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    document.getElementById('res-lyrics-text').innerHTML = escHtml(lyrics).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
     document.getElementById('res-structure-text').textContent = structure;
     document.getElementById('res-dopamine-text').textContent  = dopamine;
     document.getElementById('res-notes-text').textContent     = notes;
@@ -7639,7 +7640,7 @@ async function instantEdit() {
       (chunk, text) => { full = text; });
     const newLyrics = full.trim();
     S.currentSong.lyrics = newLyrics;
-    lyricsEl.innerHTML = newLyrics.replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+    lyricsEl.innerHTML = escHtml(newLyrics).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
     toast('⚡ Edit applied!');
     inp.value = '';
     document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
@@ -7945,7 +7946,7 @@ async function revise(prefix, instruction) {
     const newLyrics = full.trim();
     if (prefix === 'res') S.currentSong.lyrics = newLyrics;
     else S.luckyCurrentSong.lyrics = newLyrics;
-    if (lyricsEl) lyricsEl.innerHTML = newLyrics.replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    if (lyricsEl) lyricsEl.innerHTML = escHtml(newLyrics).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
     pushVersion(prefix);
     renderVersionBar(prefix);
     calcHookScore(prefix);
@@ -7992,7 +7993,7 @@ function loadVersion(prefix, idx) {
   if (prefix === 'res') S.currentSong = {...v};
   else S.luckyCurrentSong = {...v};
   const lyricsEl = document.getElementById(prefix + '-lyrics-text');
-  if (lyricsEl) lyricsEl.innerHTML = (v.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  if (lyricsEl) lyricsEl.innerHTML = escHtml(v.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   const titleEl = document.getElementById(prefix === 'res' ? 'res-title' : 'lres-title');
   if (titleEl) titleEl.textContent = v.title || 'Untitled';
   renderVersionBar(prefix);
@@ -8047,7 +8048,7 @@ function checkShareLink() {
     const verdictEl = document.getElementById('res-verdict');
     if (verdictEl) verdictEl.textContent = song.verdict || '';
     const lyricsEl = document.getElementById('res-lyrics-text');
-    if (lyricsEl) lyricsEl.innerHTML = (song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    if (lyricsEl) lyricsEl.innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
     renderBrief('res', song.style||'', song.brief||'');
     const structEl = document.getElementById('res-structure-text');
     if (structEl) structEl.textContent = song.structure || '';
@@ -8133,7 +8134,7 @@ function useBatchSong(idx) {
   const song = results[idx];
   S.currentSong = song;
   const lyricsEl = document.getElementById('res-lyrics-text');
-  if (lyricsEl) lyricsEl.innerHTML = (song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  if (lyricsEl) lyricsEl.innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   const titleEl = document.getElementById('res-title');
   if (titleEl) titleEl.textContent = song.title || 'Untitled';
   document.getElementById('batch-overlay').style.display = 'none';
