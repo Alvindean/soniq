@@ -106,17 +106,27 @@ module.exports = async function handler(req, res) {
 
     const results = await redisPipeline(commands);
 
-    const total_songs     = parseInt(results[0]) || 0;
-    const top_genres      = parseZSet(results[1]);
-    const top_fusions     = parseZSet(results[2]);
-    const top_topics      = parseZSet(results[3]);
-    const recentRaw       = results[4] || [];
-    const top_rapstyles   = parseZSet(results[5]);
-    const weeklyRapstyles = parseZSet(results[6]);
-    const dailyResults    = results.slice(7);
+    const [
+      totalSongs,
+      topGenres,
+      topFusions,
+      topTopics,
+      recentRaw,
+      topRapStyles,
+      weeklyRapStyles,
+      ...dailyResults
+    ] = results;
+
+    const total_songs     = parseInt(totalSongs) || 0;
+    const top_genres      = parseZSet(topGenres);
+    const top_fusions     = parseZSet(topFusions);
+    const top_topics      = parseZSet(topTopics);
+    const recentRawArr    = recentRaw || [];
+    const top_rapstyles   = parseZSet(topRapStyles);
+    const weeklyRapstyles = parseZSet(weeklyRapStyles);
 
     // Parse recent events
-    const recent = recentRaw.map(s => {
+    const recent = recentRawArr.map(s => {
       try { return JSON.parse(s); } catch { return null; }
     }).filter(Boolean);
 
