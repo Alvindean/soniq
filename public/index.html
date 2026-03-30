@@ -7581,5 +7581,164 @@ document.addEventListener('DOMContentLoaded', () => {
     </div>
   </div>
 </div>
+
+<!-- ══════════════════════════════════════════════════════════
+     DEBUG PANEL — activate with ?debug=1 or Ctrl+Shift+D
+     ══════════════════════════════════════════════════════════ -->
+<div id="debug-panel" style="display:none;position:fixed;bottom:20px;right:20px;width:420px;max-height:480px;background:var(--s1);border:1px solid var(--b3);border-radius:var(--r3);box-shadow:0 20px 60px rgba(0,0,0,0.8);display:none;flex-direction:column;font-family:var(--mono);font-size:12px;color:var(--tx2);z-index:999999">
+  <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--b2);background:var(--s2)">
+    <div style="font-weight:700;color:var(--cyan);letter-spacing:.05em">🔧 SONIQ DEBUG</div>
+    <button onclick="toggleDebugPanel(false)" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:14px;padding:2px 6px;border-radius:4px">✕</button>
+  </div>
+  <div id="dbg-tabs" style="display:flex;gap:2px;padding:8px;background:var(--s2);border-bottom:1px solid var(--b1);overflow-x:auto">
+    <button class="dbg-tab on" onclick="switchDbgTab('api',this)">API</button>
+    <button class="dbg-tab" onclick="switchDbgTab('state',this)">State</button>
+    <button class="dbg-tab" onclick="switchDbgTab('errors',this)">Errors</button>
+    <button class="dbg-tab" onclick="switchDbgTab('health',this)">Health</button>
+    <button class="dbg-tab" onclick="switchDbgTab('stats',this)">Stats</button>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding:12px">
+    <div id="dbg-pane-api" class="dbg-pane on"></div>
+    <div id="dbg-pane-state" class="dbg-pane"></div>
+    <div id="dbg-pane-errors" class="dbg-pane"></div>
+    <div id="dbg-pane-health" class="dbg-pane">
+      <div class="dbg-label">Service Health</div>
+      <div class="dbg-rows" id="dbg-health-rows">Not checked yet</div>
+      <button class="dbg-action" onclick="dbgPingHealth()">⟲ Ping Now</button>
+    </div>
+    <div id="dbg-pane-stats" class="dbg-pane"></div>
+  </div>
+</div>
+
+<style>
+.dbg-tab{padding:5px 10px;border:none;background:transparent;color:var(--tx3);cursor:pointer;font-size:11px;font-weight:600;border-radius:4px;white-space:nowrap;transition:all .15s;font-family:var(--mono)}
+.dbg-tab:hover{background:var(--b1);color:var(--tx1)}
+.dbg-tab.on{background:var(--b2);color:var(--cyan)}
+.dbg-pane{display:none}.dbg-pane.on{display:block}
+.dbg-label{font-weight:700;color:var(--amber);margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
+.dbg-rows{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:8px;margin-bottom:8px}
+.dbg-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:11px}
+.dbg-row:last-child{border:none}
+.dbg-k{color:var(--tx3)}.dbg-v{color:var(--cyan);word-break:break-all;text-align:right;margin-left:10px}
+.dbg-action{width:100%;padding:7px 10px;background:var(--b2);border:1px solid var(--b3);color:var(--cyan);border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:600}
+.dbg-err{padding:7px;background:var(--s3);border-left:3px solid var(--red);border-radius:3px;margin-bottom:5px;font-size:11px}
+</style>
+
+<script>
+const DBG = { on:false, lastCall:null, errors:[], stats:{tokens:0,reqs:0,t0:performance.now()} };
+
+function initDebug() {
+  if (new URLSearchParams(location.search).get('debug')==='1') { DBG.on=true; _showDbg(); }
+  document.addEventListener('keydown', e => { if((e.ctrlKey||e.metaKey)&&e.shiftKey&&e.key==='D'){e.preventDefault();toggleDebugPanel(!DBG.on);} });
+}
+
+function toggleDebugPanel(v) {
+  DBG.on = v===undefined ? !DBG.on : v;
+  const p=document.getElementById('debug-panel');
+  p.style.display = DBG.on ? 'flex' : 'none';
+  if(DBG.on) _showDbg();
+}
+
+function _showDbg() { dbgUpdateAPI(); dbgUpdateState(); dbgUpdateErrors(); dbgUpdateStats(); }
+
+function switchDbgTab(id, el) {
+  document.querySelectorAll('.dbg-pane').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.dbg-tab').forEach(b=>b.classList.remove('on'));
+  document.getElementById('dbg-pane-'+id).classList.add('on');
+  el.classList.add('on');
+  if(id==='state') dbgUpdateState();
+  if(id==='stats') dbgUpdateStats();
+}
+
+function dbgRow(k,v){return`<div class="dbg-row"><span class="dbg-k">${k}</span><span class="dbg-v">${v}</span></div>`;}
+
+function dbgUpdateAPI() {
+  const c=DBG.lastCall;
+  document.getElementById('dbg-pane-api').innerHTML=`<div class="dbg-label">Last API Call</div><div class="dbg-rows">${c?[
+    dbgRow('Endpoint',c.url.replace(location.origin,'')),
+    dbgRow('Method',c.method),
+    dbgRow('Duration',c.ms+'ms'),
+    dbgRow('Status',c.status),
+    dbgRow('Time',c.time)
+  ].join(''):'<div style="color:var(--tx3)">No calls yet</div>'}</div>`;
+}
+
+function dbgUpdateState() {
+  if(typeof S==='undefined') return;
+  document.getElementById('dbg-pane-state').innerHTML=`<div class="dbg-label">App State</div><div class="dbg-rows">${[
+    dbgRow('Genre',S.selectedGenre||'—'),
+    dbgRow('Moods',(S.selectedMoods||[]).join(', ')||'—'),
+    dbgRow('Quality',S.quality||'—'),
+    dbgRow('Rap Lab',S.rapLabActive?'ON ▶ '+S.rapStyle:'off'),
+    dbgRow('Album Track',S.albumTrack?'✓ '+S.albumTrack.type:'—'),
+    dbgRow('Blend',S.blend?.open?'ON ('+S.blend.ratio+'%)':'off'),
+    dbgRow('Library',((S.library||[]).length)+' songs'),
+    dbgRow('_soniqKey',typeof _soniqKey!=='undefined'?(_soniqKey?'set':'none'):'undefined'),
+  ].join('')}</div>`;
+}
+
+function dbgUpdateErrors() {
+  document.getElementById('dbg-pane-errors').innerHTML=`<div class="dbg-label">Error Log</div>${
+    DBG.errors.length?DBG.errors.map(e=>`<div class="dbg-err"><span style="color:var(--tx3)">${e.t}</span> <strong>${e.ctx}:</strong> ${e.msg}</div>`).join('')
+    :'<div style="color:var(--tx3);font-size:12px;padding:8px">No errors</div>'
+  }`;
+}
+
+function dbgUpdateStats() {
+  document.getElementById('dbg-pane-stats').innerHTML=`<div class="dbg-label">Session Stats</div><div class="dbg-rows">${[
+    dbgRow('API Requests',DBG.stats.reqs),
+    dbgRow('Page Load',Math.round(DBG.stats.t0)+'ms'),
+    dbgRow('Memory',performance.memory?((performance.memory.usedJSHeapSize/1048576).toFixed(1)+' MB'):'n/a'),
+  ].join('')}</div>`;
+}
+
+async function dbgPingHealth() {
+  document.getElementById('dbg-health-rows').innerHTML='Checking…';
+  try {
+    const t=performance.now();
+    const r=await fetch('/api/ping');
+    const ms=Math.round(performance.now()-t);
+    const d=await r.json();
+    document.getElementById('dbg-health-rows').innerHTML=[
+      dbgRow('Ping',ms+'ms'),
+      dbgRow('Status',r.ok?'✓ OK':'✗ '+r.status),
+      dbgRow('Redis',d.redis||'?'),
+      dbgRow('Uptime',Math.round(d.uptime||0)+'s'),
+    ].join('');
+  } catch(e) {
+    document.getElementById('dbg-health-rows').innerHTML='<span style="color:var(--red)">✗ '+e.message+'</span>';
+  }
+}
+
+// Intercept fetch for API tracking
+(()=>{
+  const orig=window.fetch;
+  window.fetch=async function(...args){
+    const t0=performance.now();
+    try{
+      const res=await orig.apply(this,args);
+      const ms=Math.round((performance.now()-t0)*10)/10;
+      DBG.lastCall={url:String(args[0]),method:args[1]?.method||'GET',ms,status:res.status,time:new Date().toLocaleTimeString()};
+      DBG.stats.reqs++;
+      if(DBG.on) dbgUpdateAPI();
+      return res;
+    }catch(err){
+      _dbgErr('Fetch',err.message);
+      throw err;
+    }
+  };
+})();
+
+function _dbgErr(ctx,msg){
+  DBG.errors.unshift({t:new Date().toLocaleTimeString(),ctx,msg:String(msg).slice(0,120)});
+  if(DBG.errors.length>10) DBG.errors.pop();
+  if(DBG.on) dbgUpdateErrors();
+}
+
+window.addEventListener('error',e=>_dbgErr('JS',`${e.filename?.split('/').pop()}:${e.lineno} ${e.message}`));
+window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.message||String(e.reason)));
+setInterval(()=>{ if(DBG.on) dbgUpdateState(); },2000);
+document.addEventListener('DOMContentLoaded',initDebug);
+</script>
 </body>
 </html>
