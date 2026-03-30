@@ -102,7 +102,9 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.socket?.remoteAddress || 'unknown';
+  const ip = req.headers['x-real-ip'] ||
+    (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+    req.socket?.remoteAddress || 'unknown';
   const rl = checkRateLimit(ip);
   if (!rl.allowed) return res.status(429).json({error: `Rate limit exceeded. Try again in ${rl.minutesLeft} minutes.`});
 
