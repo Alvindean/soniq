@@ -1235,7 +1235,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="genre-grid" id="genre-grid"></div>
 
       <!-- MOOD GRID -->
-      <label class="topic-label">Mood <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— select up to 2</span></label>
+      <label class="topic-label">Mood <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— pick 1–2 moods</span></label>
       <div class="mood-grid" id="mood-grid"></div>
       <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
 
@@ -2115,7 +2115,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <option value="rock">Rock</option><option value="country">Country</option><option value="edm">EDM</option>
             <option value="folk">Folk</option><option value="latin">Latin</option><option value="metal">Metal</option>
             <option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option><option value="altrock">Alt-Rock</option>
-            <option value="latin">Latin</option><option value="reggaeton">Reggaeton</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option><option value="blues">Blues</option><option value="punk">Punk</option>
+            <option value="reggaeton">Reggaeton</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option><option value="blues">Blues</option><option value="punk">Punk</option>
           </select>
         </div>
         <div class="fld">
@@ -6107,9 +6107,7 @@ function toggleMood(id,el){
     el.classList.remove('on');
   }else{
     if(S.selectedMoods.length>=2){
-      // deselect oldest
-      const old=S.selectedMoods.shift();
-      document.querySelector(`.mood-pill[data-mid="${old}"]`)?.classList.remove('on');
+      toast('Max 2 moods — deselect one first'); return;
     }
     S.selectedMoods.push(id);
     el.classList.add('on');
