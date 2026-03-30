@@ -129,6 +129,8 @@ a{color:var(--amber);text-decoration:none}
 .blend-trigger-hint{font-size:10px;color:var(--tx3)}
 .blend-arrow{font-size:10px;color:var(--tx4);transition:transform 0.2s}
 .blend-acc.open .blend-arrow{transform:rotate(90deg)}
+#adv-arrow{display:inline-block;transition:transform 0.2s}
+#adv-arrow.open{transform:rotate(180deg)}
 .blend-inner{display:none;padding:18px 16px;border-top:1px solid var(--b1)}
 .blend-acc.open .blend-inner{display:block}
 .blend-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
@@ -3628,7 +3630,7 @@ function toggleAdv(){
   const dot=document.getElementById('adv-dot');
   const open=body.style.display==='none';
   body.style.display=open?'block':'none';
-  arrow.style.transform=open?'rotate(180deg)':'';
+  arrow.classList.toggle('open',open);
   dot.style.background=open?'var(--cyan)':'var(--tx4)';
 }
 function toggleBlend(){
