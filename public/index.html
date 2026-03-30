@@ -1159,6 +1159,26 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 @media(max-width:580px){
   textarea,input,select{font-size:16px!important}
 }
+.variant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+  color: var(--tx1);
+  font-family: var(--font);
+}
+.variant-btn:hover { border-color: var(--amber); background: rgba(255,180,0,.06); }
+.variant-btn.selected { border-color: var(--amber); background: rgba(255,180,0,.1); }
+.variant-icon { font-size: 18px; line-height: 1; }
+.variant-name { font-size: 13px; font-weight: 700; color: var(--tx1); }
+.variant-desc { font-size: 11px; color: var(--tx3); line-height: 1.3; }
 
 </style>
 
@@ -1684,6 +1704,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="printBrief('res')" title="Print song brief">🖨 Print</button>
         <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
         <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
+        <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
       </div>
     </div>
 
@@ -1995,6 +2016,78 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════════
+     SONG VARIANTS MODAL
+══════════════════════════════════════════════════════ -->
+<div id="variants-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closeVariants()">
+  <div class="card" style="max-width:540px;margin:40px auto;position:relative">
+    <button onclick="closeVariants()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;line-height:1">✕</button>
+    <div class="ctitle">🎛️ Song Variants</div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:16px">Choose a variant to generate a new version of <strong id="variants-song-title" style="color:var(--tx1)"></strong></p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <button class="variant-btn" onclick="selectVariant('dj_remix')" data-variant="dj_remix">
+        <span class="variant-icon">🎧</span>
+        <span class="variant-name">DJ Remix</span>
+        <span class="variant-desc">Club structure, drop, extended outro</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('acoustic')" data-variant="acoustic">
+        <span class="variant-icon">🎸</span>
+        <span class="variant-name">Acoustic</span>
+        <span class="variant-desc">Stripped to guitar + voice</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('radio_edit')" data-variant="radio_edit">
+        <span class="variant-icon">📻</span>
+        <span class="variant-name">Radio Edit</span>
+        <span class="variant-desc">3-min hook-first cut</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('lofi')" data-variant="lofi">
+        <span class="variant-icon">🌙</span>
+        <span class="variant-name">Lo-fi</span>
+        <span class="variant-desc">Bedroom, vinyl, slow tempo</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('slowed_reverb')" data-variant="slowed_reverb">
+        <span class="variant-icon">🌊</span>
+        <span class="variant-name">Slowed + Reverb</span>
+        <span class="variant-desc">Emotional TikTok aesthetic</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('live_version')" data-variant="live_version">
+        <span class="variant-icon">🎤</span>
+        <span class="variant-name">Live Version</span>
+        <span class="variant-desc">Crowd, ad-libs, performance notes</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('trap_remix')" data-variant="trap_remix">
+        <span class="variant-icon">🔊</span>
+        <span class="variant-name">Trap Remix</span>
+        <span class="variant-desc">808s, hi-hats, new rap verse</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('gospel_version')" data-variant="gospel_version">
+        <span class="variant-icon">🙏</span>
+        <span class="variant-name">Gospel / Choir</span>
+        <span class="variant-desc">Uplifted, call + response, vamp</span>
+      </button>
+      <button class="variant-btn variant-btn-full" onclick="selectVariant('cinematic')" data-variant="cinematic" style="grid-column:1/-1">
+        <span class="variant-icon">🎬</span>
+        <span class="variant-name">Cinematic / Sync</span>
+        <span class="variant-desc">Orchestral, sync-safe lyrics, placement suggestions</span>
+      </button>
+    </div>
+
+    <div id="variant-generate-row" style="display:none;border-top:1px solid var(--b2);padding-top:14px;margin-top:4px">
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">Selected: <strong id="variant-selected-label" style="color:var(--amber)"></strong></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-gold" id="variant-go-btn" onclick="generateVariant()" style="flex:1">⚡ Generate Variant</button>
+        <button class="btn" onclick="selectVariant(null)">Clear</button>
+      </div>
+    </div>
+
+    <div id="variant-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px">
+      <div class="spin" style="margin:0 auto 10px"></div>
+      Generating variant…
+    </div>
+  </div>
+</div>
+
 <!-- ══════════════════════════════════
      BUILDER PAGE
 ══════════════════════════════════ -->
@@ -2109,7 +2202,40 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="mic-btn" id="pb-topic-mic-btn" onclick="toggleMicFor('pb-topic-mic-btn','pb-topic','inline')" title="Speak your topic" style="font-size:16px;padding:5px 9px;flex-shrink:0">🎤</button>
       </div>
     </div>
+    <div class="pbsec" id="pb-vocable-sec" style="margin-top:4px">
+      <div class="pblabel">Singalong Hook</div>
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+        <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--tx2)">
+          <input type="checkbox" id="pb-vocable" style="width:16px;height:16px;accent-color:var(--amber);cursor:pointer" onchange="pbUpdateVocable(this)"/>
+          Add vocable outro / singalong hook (na-na-na, ooh, hey)
+        </label>
+        <span id="pb-vocable-tag" style="font-size:11px;color:var(--amber);display:none;background:rgba(255,180,0,.1);padding:2px 8px;border-radius:20px"></span>
+      </div>
+    </div>
     <div id="pb-song-out" style="margin-top:14px"></div>
+    <details style="margin-top:16px">
+      <summary style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;cursor:pointer;user-select:none;padding:4px 0">Vocable DNA — cross-genre map ▸</summary>
+      <div style="margin-top:10px;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead>
+            <tr style="color:var(--tx3);text-transform:uppercase;letter-spacing:.05em">
+              <th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--b2)">Sound</th>
+              <th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--b2)">Genres</th>
+              <th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--b2)">Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:5px 8px;color:var(--amber);font-weight:700">yeah</td><td style="padding:5px 8px;color:var(--tx2)">Hip-hop · R&amp;B · Country · Rock · Pop · Gospel</td><td style="padding:5px 8px;color:var(--tx3)">Ad-lib → affirmation → anthem → congregation</td></tr>
+            <tr style="background:rgba(255,255,255,.02)"><td style="padding:5px 8px;color:var(--amber);font-weight:700">ooh</td><td style="padding:5px 8px;color:var(--tx2)">R&amp;B · Pop · Gospel · Soul · K-pop · Blues</td><td style="padding:5px 8px;color:var(--tx3)">Melisma → crowd hook → spiritual overwhelm</td></tr>
+            <tr><td style="padding:5px 8px;color:var(--amber);font-weight:700">hey</td><td style="padding:5px 8px;color:var(--tx2)">Afrobeats · Pop · Punk · Country · Rock</td><td style="padding:5px 8px;color:var(--tx3)">Call-response → section opener → collective fury</td></tr>
+            <tr style="background:rgba(255,255,255,.02)"><td style="padding:5px 8px;color:var(--amber);font-weight:700">na-na-na</td><td style="padding:5px 8px;color:var(--tx2)">Pop · Punk · Folk · Reggae</td><td style="padding:5px 8px;color:var(--tx3)">Singalong placeholder → nihilist filler → mantra</td></tr>
+            <tr><td style="padding:5px 8px;color:var(--amber);font-weight:700">ah / oh</td><td style="padding:5px 8px;color:var(--tx2)">Gospel · Soul · R&amp;B · Blues · Country</td><td style="padding:5px 8px;color:var(--tx3)">Spiritual overflow → emotional peak → field holler</td></tr>
+            <tr style="background:rgba(255,255,255,.02)"><td style="padding:5px 8px;color:var(--amber);font-weight:700">uh / ayy</td><td style="padding:5px 8px;color:var(--tx2)">Hip-hop · Trap · Reggaeton · Afrobeats</td><td style="padding:5px 8px;color:var(--tx3)">Rhythmic filler → dembow accent → groove punctuation</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:8px;font-size:10px;color:var(--tx4)">Lineage: Gospel → Soul → R&amp;B → Pop → Hip-hop → Afrobeats &nbsp;·&nbsp; Folk → Country → Pop &nbsp;·&nbsp; Blues → Rock → Punk</div>
+      </div>
+    </details>
   </div>
 </div>
 
@@ -4533,6 +4659,8 @@ function parseSongResult(raw,genre,topic){
   showSaveBar('res');
   const varBtn = document.getElementById('res-var-btn');
   if (varBtn) varBtn.disabled = false;
+  const variantsBtn = document.getElementById('variants-btn');
+  if (variantsBtn) variantsBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -5113,7 +5241,9 @@ async function generateFromBuilder(){
   out.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:16px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Generating song from your prompt…</span></div>';
   try{
     const system='You are a world-class songwriter. Write exactly the format requested. No extra commentary.';
-    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 440 chars — use the production prompt above as base, include genre, instruments (4-5), BPM, tempo feel, vocal style, counter-melody device. Optimise for Suno/Udio.]`;
+    const vocableChecked = document.getElementById('pb-vocable')?.checked;
+    const vocableInstruction = vocableChecked ? '\n\nVOCABLE INSTRUCTION: Include a singalong vocable section in the outro (na-na-na, ooh, hey, or genre-appropriate open vowel sounds). Tag it [Outro - singalong] for Suno compatibility.' : '';
+    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}${vocableInstruction}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 440 chars — use the production prompt above as base, include genre, instruments (4-5), BPM, tempo feel, vocal style, counter-melody device. Optimise for Suno/Udio.]`;
     const raw = await callClaude(fullPrompt, system, 2000);
     const title = parseSection(raw,'TITLE','LYRICS');
     const lyrics = parseSection(raw,'LYRICS','SUNO STYLE PROMPT');
@@ -5147,6 +5277,15 @@ function pbBpm(inp){
   const lbl=document.getElementById('pb-bpm-lbl');
   if(lbl) lbl.textContent=S.pb.bpm+' BPM';
   updBuilderPrompt();
+}
+function pbUpdateVocable(cb) {
+  const tag = document.getElementById('pb-vocable-tag');
+  if (cb.checked) {
+    tag.style.display = 'inline';
+    tag.textContent = '[Outro - singalong]';
+  } else {
+    tag.style.display = 'none';
+  }
 }
 function updBuilderPrompt(){
   const parts=[];
@@ -5619,6 +5758,96 @@ function setEra(el, val) {
   S.selectedEra = val;
   const desc = document.getElementById('era-desc');
   if (desc) desc.textContent = ERA_DESCS[val] || '';
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG VARIANTS
+// ═══════════════════════════════════════════════════════
+let _selectedVariant = null;
+
+const VARIANT_LABELS = {
+  dj_remix: 'DJ Remix',
+  acoustic: 'Acoustic Version',
+  radio_edit: 'Radio Edit',
+  lofi: 'Lo-fi Version',
+  slowed_reverb: 'Slowed + Reverb',
+  live_version: 'Live Version',
+  trap_remix: 'Trap Remix',
+  gospel_version: 'Gospel / Choir Version',
+  cinematic: 'Cinematic / Sync'
+};
+
+function openVariants() {
+  const song = S.currentSong;
+  if (!song) { toast('Generate a song first'); return; }
+  document.getElementById('variants-song-title').textContent = song.title || 'this song';
+  document.getElementById('variant-generate-row').style.display = 'none';
+  document.getElementById('variant-loading').style.display = 'none';
+  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+  _selectedVariant = null;
+  document.getElementById('variants-modal').style.display = 'block';
+}
+
+function closeVariants() {
+  document.getElementById('variants-modal').style.display = 'none';
+}
+
+function selectVariant(type) {
+  _selectedVariant = type;
+  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+  if (type) {
+    document.querySelector(`[data-variant="${type}"]`)?.classList.add('selected');
+    document.getElementById('variant-selected-label').textContent = VARIANT_LABELS[type] || type;
+    document.getElementById('variant-generate-row').style.display = 'block';
+  } else {
+    document.getElementById('variant-generate-row').style.display = 'none';
+  }
+}
+
+async function generateVariant() {
+  const song = S.currentSong;
+  if (!song || !_selectedVariant) return;
+
+  const loadingEl = document.getElementById('variant-loading');
+  const goBtn = document.getElementById('variant-go-btn');
+  loadingEl.style.display = 'block';
+  goBtn.disabled = true;
+
+  try {
+    const body = {
+      variant: _selectedVariant,
+      title: song.title,
+      lyrics: song.lyrics || song.content,
+      genre: song.genre,
+      genre2: song.genre2,
+      topic: song.topic,
+      max_tokens: 2048
+    };
+
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(window._soniqKey ? { 'x-api-key': window._soniqKey } : {}) },
+      body: JSON.stringify(body)
+    });
+
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const data = await resp.json();
+    const variantText = (Array.isArray(data.content) ? data.content.map(c=>c.text||'').join('') : data.content) || data.text || '';
+
+    if (!variantText) throw new Error('Empty response');
+
+    // Load into editor
+    closeVariants();
+    const label = VARIANT_LABELS[_selectedVariant] || _selectedVariant;
+    loadLyricsIntoEditor(variantText, `${song.title} (${label})`);
+    goPg('editor');
+    toast(`${label} generated — loaded into editor`);
+  } catch(e) {
+    toast('Variant generation failed: ' + e.message);
+  } finally {
+    loadingEl.style.display = 'none';
+    goBtn.disabled = false;
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6748,6 +6977,8 @@ async function importAndAnalyze() {
     showSaveBar('res');
     const varBtn = document.getElementById('res-var-btn');
     if (varBtn) varBtn.disabled = false;
+    const variantsBtn = document.getElementById('variants-btn');
+    if (variantsBtn) variantsBtn.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';

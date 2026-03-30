@@ -124,8 +124,27 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const { messages, system } = body || {};
+  let { messages, system } = body || {};
   const max_tokens = Math.min(Math.max(parseInt(body?.max_tokens) || 2048, 256), 4096);
+
+  if (body?.variant) {
+    const { buildVariantPrompt } = require('./brain');
+    const song = {
+      title: body.title || 'Untitled',
+      lyrics: body.lyrics || '',
+      genre: body.genre || '',
+      genre2: body.genre2 || '',
+      topic: body.topic || ''
+    };
+    try {
+      const variantPrompt = buildVariantPrompt(body.variant, song);
+      messages = [{ role: 'user', content: variantPrompt }];
+      system = 'You are Soniq, an expert music producer and songwriter. Follow the instructions exactly and output only the requested content.';
+    } catch(e) {
+      return res.status(400).json({ error: 'Unknown variant: ' + body.variant });
+    }
+  }
+
   if (!messages?.length) return res.status(400).json({error:'messages required'});
 
   const errors = [];
