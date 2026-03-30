@@ -5832,7 +5832,7 @@ async function generateVariant() {
 
     if (!resp.ok) throw new Error(`API error ${resp.status}`);
     const data = await resp.json();
-    const variantText = data.content || data.text || '';
+    const variantText = (Array.isArray(data.content) ? data.content.map(c=>c.text||'').join('') : data.content) || data.text || '';
 
     if (!variantText) throw new Error('Empty response');
 
