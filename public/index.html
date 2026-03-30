@@ -1739,6 +1739,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
         <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
         <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
+        <button class="btn" onclick="openCoach()" id="coach-btn" style="display:none" title="AI Feedback Coach — get expert notes on your lyrics">🎓 Coach</button>
       </div>
     </div>
 
@@ -2057,6 +2058,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">Copy Edited</button>
         <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
+        <button class="btn" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
@@ -2159,6 +2161,33 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Tap a version to restore it into the editor</div>
     <div id="vh-list" style="display:flex;flex-direction:column;gap:6px"></div>
     <div id="vh-empty" style="text-align:center;padding:24px;color:var(--tx4);font-size:13px;display:none">No versions saved yet.<br>Versions are saved automatically when you edit a song.</div>
+  </div>
+</div>
+
+<!-- AI FEEDBACK COACH MODAL -->
+<div id="coach-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:903;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeCoach()">
+  <div class="card" style="max-width:620px;margin:32px auto;position:relative">
+    <button onclick="closeCoach()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">🎓 AI Feedback Coach</div>
+    <div id="coach-song-info" style="font-size:12px;color:var(--tx3);margin-bottom:14px"></div>
+
+    <div id="coach-idle" style="text-align:center;padding:20px">
+      <p style="font-size:13px;color:var(--tx2);margin-bottom:16px">Get expert feedback on your lyrics across 9 dimensions — hook strength, emotional arc, specificity, rhyme &amp; flow, structure, genre authenticity, opening line, bridge, and Suno readiness.</p>
+      <button class="btn btn-gold" onclick="runCoach()" style="font-size:14px;padding:10px 24px">⚡ Analyze My Lyrics</button>
+    </div>
+
+    <div id="coach-loading" style="display:none;text-align:center;padding:32px">
+      <div class="spin" style="margin:0 auto 12px"></div>
+      <div style="font-size:13px;color:var(--tx3)">Analyzing your lyrics…</div>
+    </div>
+
+    <div id="coach-results" style="display:none">
+      <div id="coach-output" style="font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-wrap"></div>
+      <div style="margin-top:16px;display:flex;gap:8px">
+        <button class="btn" onclick="copyCoachFeedback()" style="flex:1">📋 Copy Feedback</button>
+        <button class="btn" onclick="resetCoach()">← New Analysis</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -4737,6 +4766,8 @@ function parseSongResult(raw,genre,topic){
   if (variantsBtn) variantsBtn.style.display = '';
   const vhBtn = document.getElementById('vh-btn');
   if (vhBtn) vhBtn.style.display = '';
+  const coachBtn = document.getElementById('coach-btn');
+  if (coachBtn) coachBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -6072,6 +6103,84 @@ function copyPlaylist(plIdx) {
 }
 
 // ═══════════════════════════════════════════════════════
+// AI FEEDBACK COACH
+// ═══════════════════════════════════════════════════════
+let _coachLyrics = '';
+let _coachGenre = '';
+let _coachTopic = '';
+let _coachFeedback = '';
+
+function openCoach(source) {
+  const song = source === 'editor' ? S.editorSong : (S.currentSong || S.editorSong);
+  if (!song) { toast('No song loaded — generate or load a song first'); return; }
+
+  _coachLyrics = song.lyrics || song.content || '';
+  _coachGenre = song.genre || '';
+  _coachTopic = song.topic || '';
+
+  if (!_coachLyrics.trim()) { toast('No lyrics to analyze'); return; }
+
+  document.getElementById('coach-song-info').textContent = `"${song.title || 'Untitled'}" · ${_coachGenre || 'unknown genre'}`;
+  resetCoach();
+  document.getElementById('coach-modal').style.display = 'block';
+}
+
+function closeCoach() {
+  document.getElementById('coach-modal').style.display = 'none';
+}
+
+function resetCoach() {
+  document.getElementById('coach-idle').style.display = 'block';
+  document.getElementById('coach-loading').style.display = 'none';
+  document.getElementById('coach-results').style.display = 'none';
+  _coachFeedback = '';
+}
+
+async function runCoach() {
+  if (!_coachLyrics) return;
+  document.getElementById('coach-idle').style.display = 'none';
+  document.getElementById('coach-loading').style.display = 'block';
+  document.getElementById('coach-results').style.display = 'none';
+
+  try {
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: [{
+          role: 'user',
+          content: `You are Soniq's AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant. Analyze these ${_coachGenre || ''} lyrics${_coachTopic ? ' about "' + _coachTopic + '"' : ''} across these 9 dimensions. For each give: a star rating (⭐-⭐⭐⭐⭐⭐), one sentence on what works, one specific fix if under 4 stars.\n\n**DIMENSIONS:** Hook Strength · Emotional Arc · Specificity · Rhyme & Flow · Structure · Genre Authenticity · Opening Line · Bridge/Turn · Suno Readiness\n\nAfter all 9: give STRONGEST MOMENT, WEAKEST MOMENT, ONE PRIORITY FIX, and GENRE VERDICT.\n\nLYRICS:\n${_coachLyrics}`
+        }],
+        max_tokens: 2048
+      })
+    });
+
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const data = await resp.json();
+    const text = Array.isArray(data.content)
+      ? data.content.map(c => c.text || '').join('')
+      : (data.content || data.text || '');
+
+    if (!text.trim()) throw new Error('Empty response');
+
+    _coachFeedback = text;
+    document.getElementById('coach-output').textContent = text;
+    document.getElementById('coach-loading').style.display = 'none';
+    document.getElementById('coach-results').style.display = 'block';
+  } catch(e) {
+    document.getElementById('coach-loading').style.display = 'none';
+    document.getElementById('coach-idle').style.display = 'block';
+    toast('Coach failed: ' + e.message);
+  }
+}
+
+function copyCoachFeedback() {
+  if (!_coachFeedback) return;
+  safeCopy(_coachFeedback);
+  toast('Feedback copied to clipboard');
+}
+
+// ═══════════════════════════════════════════════════════
 // VERSION HISTORY
 // ═══════════════════════════════════════════════════════
 const VH_KEY = 'soniq_versions';
@@ -7274,6 +7383,8 @@ async function importAndAnalyze() {
     if (variantsBtn) variantsBtn.style.display = '';
     const vhBtn2 = document.getElementById('vh-btn');
     if (vhBtn2) vhBtn2.style.display = '';
+    const coachBtn2 = document.getElementById('coach-btn');
+    if (coachBtn2) coachBtn2.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';
@@ -8252,6 +8363,8 @@ document.addEventListener('DOMContentLoaded', () => {
 .dbg-k{color:var(--tx3)}.dbg-v{color:var(--cyan);word-break:break-all;text-align:right;margin-left:10px}
 .dbg-action{width:100%;padding:7px 10px;background:var(--b2);border:1px solid var(--b3);color:var(--cyan);border-radius:4px;cursor:pointer;font-family:var(--mono);font-size:11px;font-weight:600}
 .dbg-err{padding:7px;background:var(--s3);border-left:3px solid var(--red);border-radius:3px;margin-bottom:5px;font-size:11px}
+#coach-output strong { color: var(--amber); }
+#coach-output { font-family: var(--font); }
 </style>
 
 <script>
