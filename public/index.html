@@ -2290,6 +2290,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 
   <div class="camp-progress" id="camp-progress" style="display:none"></div>
+  <div id="camp-output-header" style="display:none;margin-bottom:8px">
+    <button class="btn btn-amber" onclick="writeAllConcepts()">✍️ Write All Concepts</button>
+  </div>
   <div class="concepts-grid" id="concepts-grid"></div>
 </div>
 
@@ -6047,6 +6050,8 @@ async function generateCampaign() {
   btn.innerHTML = '<span class="gen-spinner"></span> Generating Campaign…';
   progress.style.display = 'flex';
   grid.innerHTML = '';
+  const campOutputHeader = document.getElementById('camp-output-header');
+  if (campOutputHeader) campOutputHeader.style.display = 'none';
 
   const progItems = Array.from({length: count}, (_, i) => {
     const d = document.createElement('div');
@@ -6154,6 +6159,7 @@ PRODUCTION NOTES:
     nextSteps.style.cssText = 'margin-top:16px;padding:14px 16px;background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r2);font-size:12px;color:var(--amber)';
     nextSteps.innerHTML = `<strong>✦ ${Math.min(count, conceptTexts.length)} concepts ready</strong> — click <em>Write Full Song</em> on any card to write it, or use <strong>Write All</strong> to generate all songs at once.`;
     grid.appendChild(nextSteps);
+    if (campOutputHeader) campOutputHeader.style.display = 'block';
   } catch(e) {
     grid.innerHTML = `<div class="concept-error">Error generating campaign: ${escHtml(e.message)}. Please try again.</div>`;
   }
