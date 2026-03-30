@@ -1889,4 +1889,59 @@ function buildVariantPrompt(variant, song) {
   return builder(song);
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt };
+// ═══════════════════════════════════════════════════════
+// AI FEEDBACK COACH
+// ═══════════════════════════════════════════════════════
+const FEEDBACK_DIMENSIONS = {
+  hook_strength:    { label: 'Hook Strength',    desc: 'Is the hook instantly memorable? Does it carry the emotional core? Would a stranger sing it back after one listen?' },
+  emotional_arc:    { label: 'Emotional Arc',    desc: 'Does the song travel emotionally? Verse 1 → Verse 2 → Bridge should escalate, not repeat the same emotional level.' },
+  specificity:      { label: 'Specificity',      desc: 'Are images concrete and specific (house number, dog name, exact feeling) or vague and generic? Specificity creates universality.' },
+  rhyme_scheme:     { label: 'Rhyme & Flow',     desc: 'Are rhymes forced or natural? Do they land on stressed syllables? Are there internal rhymes adding density?' },
+  structure:        { label: 'Structure',        desc: 'Does the section order serve the song? Is anything missing (pre-chorus tension, bridge reframe)? Does anything overstay its welcome?' },
+  genre_authenticity: { label: 'Genre Authenticity', desc: 'Does it sound like it belongs in this genre? Does it use the genre\'s conventions or fight them?' },
+  opening_line:     { label: 'Opening Line',     desc: 'The first line is the handshake. Is it strong enough to make someone stop scrolling? Does it establish world, character, or conflict immediately?' },
+  bridge:           { label: 'Bridge / Turn',    desc: 'Does the bridge offer a new perspective, reframe the chorus, or take the song somewhere unexpected? Or does it just repeat?' },
+  suno_readiness:   { label: 'Suno Readiness',   desc: 'Are section tags correct? Are any lines too long for natural delivery? Is the style prompt optimized for this genre?' }
+};
+
+function buildFeedbackPrompt(lyrics, genre, topic) {
+  const genreData = GENRE_BIBLE[genre] || {};
+  const genreDNA = genreData.dna || 'No genre-specific rules available.';
+  const genreKeys = genreData.keys ? genreData.keys.join('\n- ') : 'None';
+  const genreStructure = genreData.structure || 'Standard song structure.';
+  const genreVocables = genreData.vocables ? `Vocable signature: ${genreData.vocables.sounds} — ${genreData.vocables.notes}` : '';
+
+  return `You are Soniq's AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant who has worked across every genre. You give honest, specific, actionable feedback. You do not flatter. You identify what is working, what is not, and exactly how to fix it.
+
+GENRE: ${genre || 'unknown'}
+TOPIC/CONCEPT: ${topic || 'not specified'}
+
+GENRE RULES FOR ${(genre || '').toUpperCase()}:
+DNA: ${genreDNA}
+Structure: ${genreStructure}
+Key rules:
+- ${genreKeys}
+${genreVocables}
+
+LYRICS TO ANALYZE:
+${lyrics}
+
+YOUR TASK — Analyze these lyrics across 9 dimensions. For each dimension give:
+1. A score: ⭐⭐⭐⭐⭐ (5 = exceptional) — be honest, most songs score 2-3 on most dimensions
+2. One sentence on what is working
+3. One concrete, specific fix if score is under 4 — not vague advice, an actual rewrite suggestion or specific technique
+
+DIMENSIONS TO COVER:
+${Object.entries(FEEDBACK_DIMENSIONS).map(([k,v]) => `**${v.label}**: ${v.desc}`).join('\n')}
+
+OVERALL VERDICT:
+After the 9 dimensions, give:
+- STRONGEST MOMENT: The single best line or section in the song, and why it works
+- WEAKEST MOMENT: The single weakest line or section, with a specific rewrite
+- ONE PRIORITY FIX: If the writer could only fix one thing before recording this song, what is it?
+- GENRE VERDICT: Does this song belong in ${genre || 'its genre'}? What one production note would make it land harder?
+
+FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
