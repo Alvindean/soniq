@@ -3104,6 +3104,8 @@ const FUSION_DATA={
   'Afrobeats+Punk':{name:'Afro-Punk',tip:'Afropunk is a real movement. The DIY energy of punk + the groove of Afrobeats = a genuinely political, joyful sound.',q:{overall:68,compat:64,structural:66,commercial:66},artists:'TV on the Radio, Bloc Party, Santigold, badXchannels'}
 };
 
+let _soniqKey;
+
 // ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
@@ -3196,7 +3198,7 @@ async function callServerStream(action, params, onChunk, signal) {
   const res = await fetch('/api/stream', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({ action, params, userKey: (window._soniqKey && window._soniqKey !== 'server-side') ? window._soniqKey : undefined }),
+    body: JSON.stringify({ action, params, userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined }),
     signal
   });
   if (!res.ok) {
@@ -3261,7 +3263,7 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
   }
 
   // Local — call API directly
-  const apiKey = window._soniqKey;
+  const apiKey = _soniqKey;
   const isOpenRouter = apiKey && apiKey.startsWith('sk-or-');
   if (!apiKey || apiKey === 'server-side') { showKeyScreen('API key required'); throw new Error('enter-key'); }
   if (isOpenRouter) {
@@ -3275,7 +3277,7 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
       body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens:maxTok, messages:msgs})
     });
     if (res.status===401) {
-      localStorage.removeItem('soniq_api_key'); window._soniqKey=null;
+      localStorage.removeItem('soniq_api_key'); _soniqKey=null;
       showKeyScreen('API key rejected — check it at openrouter.ai/keys');
       throw new Error('enter-key');
     }
@@ -3293,7 +3295,7 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
       body: JSON.stringify(body)
     });
     if (res.status===401) {
-      localStorage.removeItem('soniq_api_key'); window._soniqKey=null;
+      localStorage.removeItem('soniq_api_key'); _soniqKey=null;
       showKeyScreen('API key rejected — check it at console.anthropic.com');
       throw new Error('enter-key');
     }
@@ -3321,7 +3323,7 @@ function saveKey() {
   if (!key) { if(errEl) errEl.textContent = 'Please enter your API key'; return; }
   if (!key.startsWith('sk-')) { if(errEl) errEl.textContent = 'Key must start with sk- — check you copied it fully'; return; }
   localStorage.setItem('soniq_api_key', key);
-  window._soniqKey = key;
+  _soniqKey = key;
   const banner = document.getElementById('key-banner');
   if (banner) banner.classList.remove('show');
   toast('✓ API key saved — ready to create!');
@@ -3338,7 +3340,7 @@ function saveApiKey() { saveKey(); }
 
   if (onVercel) {
     // Server has the key — hide banner, mark as ready
-    window._soniqKey = 'server-side';
+    _soniqKey = 'server-side';
     document.addEventListener('DOMContentLoaded', () => {
       const b = document.getElementById('key-banner');
       if (b) b.style.display = 'none';
@@ -3349,7 +3351,7 @@ function saveApiKey() { saveKey(); }
   // Local / file mode — check for stored key
   const stored = localStorage.getItem('soniq_api_key');
   if (stored) {
-    window._soniqKey = stored;
+    _soniqKey = stored;
     document.addEventListener('DOMContentLoaded', () => {
       const b = document.getElementById('key-banner');
       if (b) b.classList.remove('show');
@@ -5055,7 +5057,7 @@ async function generateFromBuilder(){
         <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Suno Style Prompt</div>
         <div id="pb-sty" class="styleout">${style}</div>
       </div>`;
-  }catch(e){out.innerHTML=`<div style="color:var(--red);font-size:13px;padding:12px 0">Error: ${e.message}</div>`;}
+  }catch(e){out.innerHTML=`<div style="color:var(--red);font-size:13px;padding:12px 0">Error: ${escHtml(e.message)}</div>`;}
   btn.disabled=false; btn.textContent='🎵 Generate Song';
 }
 function pbSingle(el,group){el.parentElement.querySelectorAll('.pbopt').forEach(o=>o.classList.remove('on'));el.classList.add('on');S.pb[group]=el.textContent.trim();updBuilderPrompt();}
@@ -5196,7 +5198,7 @@ async function generateFusion(){
       </div>`;
     toast('✓ Fusion song generated');
   }catch(e){
-    document.getElementById('fd-out').innerHTML=`<div style="color:var(--red);font-size:13px;padding:8px 0">⚠️ ${e.message}</div>`;
+    document.getElementById('fd-out').innerHTML=`<div style="color:var(--red);font-size:13px;padding:8px 0">⚠️ ${escHtml(e.message)}</div>`;
     toast('⚠️ Generation failed',3000);
   }
   btnDone('fd-gen-btn');
@@ -5411,7 +5413,7 @@ Respond with a JSON array only. No markdown, no explanation outside the array:
 
     renderTitleCards(prefix, titles, song);
   } catch (e) {
-    grid.innerHTML = `<div style="color:var(--red);font-size:13px;padding:12px 0">⚠️ Could not generate titles: ${e.message}. <button class="btn btn-sm" onclick="generateTitles('${prefix}',null)" style="margin-left:8px">Try again</button></div>`;
+    grid.innerHTML = `<div style="color:var(--red);font-size:13px;padding:12px 0">⚠️ Could not generate titles: ${escHtml(e.message)}. <button class="btn btn-sm" onclick="generateTitles('${prefix}',null)" style="margin-left:8px">Try again</button></div>`;
   }
 
   if (btn) { btn.disabled = false; btn.innerHTML = btn._orig; }
@@ -6081,7 +6083,7 @@ PRODUCTION NOTES:
       if (progItems[i]) { progItems[i].classList.remove('active'); progItems[i].classList.add('done'); progItems[i].innerHTML = `<span class="camp-prog-dot"></span> Concept ${i+1} ✓`; }
     }
   } catch(e) {
-    grid.innerHTML = `<div class="concept-error">Error generating campaign: ${e.message}. Please try again.</div>`;
+    grid.innerHTML = `<div class="concept-error">Error generating campaign: ${escHtml(e.message)}. Please try again.</div>`;
   }
 
   btn.disabled = false;
