@@ -342,13 +342,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .lr-param{font-size:10px;font-weight:700;padding:3px 9px;border-radius:99px}
 .lucky-hist-section{width:100%;max-width:640px;margin-top:28px}
 /* ── LUCKY GENRE ZONE ── */
-.gz-toggle{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx3);font-family:var(--font);font-size:11px;font-weight:600;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s;margin-bottom:12px;letter-spacing:0.02em}
+.gz-toggle{background:rgba(245,184,0,0.06);border:1px solid var(--amberline);border-radius:99px;color:var(--tx2);font-family:var(--font);font-size:11px;font-weight:600;padding:7px 16px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all 0.15s;margin-bottom:12px;letter-spacing:0.02em}
 .gz-toggle:hover{border-color:var(--amberline);color:var(--tx1)}
 .gz-toggle.active{border-color:var(--amber);color:var(--amber);background:rgba(245,184,0,0.08)}
 .gz-badge{background:var(--amber);color:#000;border-radius:99px;font-size:9px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center}
 .gz-arrow{font-size:9px;color:var(--tx4);transition:transform 0.2s;line-height:1}
 .gz-arrow.open{transform:rotate(180deg)}
-.genre-zone-panel{width:100%;max-width:500px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;animation:pgIn 0.2s ease}
+.genre-zone-panel{width:100%;max-width:500px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;animation:pgIn 0.2s ease;overflow:hidden;transition:max-height 0.2s ease}
 .gz-hint{font-size:10px;color:var(--tx4);margin-bottom:10px;text-align:center}
 .gz-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px}
 .gz-pill{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx3);font-size:11px;font-weight:600;padding:5px 13px;cursor:pointer;transition:all 0.15s;user-select:none}
@@ -1800,8 +1800,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <!-- Genre Zone toggle -->
     <button class="gz-toggle" id="gz-toggle-btn" onclick="toggleGenreZone()">
-      🎯 Genre Zone
-      <span class="gz-badge" id="gz-badge" style="display:none">0</span>
+      🎛 Filter Genres
+      <span class="gz-badge" id="gz-badge">All</span>
       <span class="gz-arrow" id="gz-arrow">▾</span>
     </button>
 
@@ -2194,6 +2194,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="card">
       <div class="ctitle">🔀 Genre Fusion Matrix + Quality Predictor</div>
       <div class="tipbox" style="margin-bottom:14px">Color brightness = fusion quality. Click any cell for formula + quality breakdown, then generate a song.</div>
+      <div style="font-size:11px;color:var(--tx4);margin-bottom:10px">Tap any cell to see fusion details</div>
       <div class="fwrap"><div id="fm"></div></div>
     </div>
     <div class="fdpanel" id="fd-panel">
@@ -3737,7 +3738,7 @@ function updateGenreZoneBadge(){
   const badge=document.getElementById('gz-badge');
   const btn=document.getElementById('gz-toggle-btn');
   const n=S.luckyLockedGenres.length;
-  if(badge){badge.style.display=n?'inline':'none';badge.textContent=n;}
+  if(badge){badge.style.display='inline';badge.textContent=n?n:'All';}
   if(btn)btn.classList.toggle('active',n>0);
 }
 
