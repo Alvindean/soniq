@@ -1180,6 +1180,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .variant-name { font-size: 13px; font-weight: 700; color: var(--tx1); }
 .variant-desc { font-size: 11px; color: var(--tx3); line-height: 1.3; }
 
+.vh-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.vh-item:hover { border-color: var(--amber); }
+.vh-item-info { display: flex; flex-direction: column; gap: 2px; }
+.vh-item-label { font-size: 13px; font-weight: 700; color: var(--tx1); }
+.vh-item-meta { font-size: 11px; color: var(--tx3); }
+.vh-item-restore { font-size: 11px; color: var(--amber); font-weight: 700; flex-shrink: 0; margin-left: 10px; }
+
 </style>
 
 </head>
@@ -1705,6 +1722,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
         <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
         <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
+        <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
       </div>
     </div>
 
@@ -1994,6 +2012,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="edstats">Lines: <span id="ed-total">0</span> &nbsp;·&nbsp; Avg syllables: <span id="ed-avg">0</span> &nbsp;·&nbsp; Over limit: <span id="ed-over" style="color:var(--red)">0</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">Copy Edited</button>
+        <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
@@ -2085,6 +2104,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="spin" style="margin:0 auto 10px"></div>
       Generating variant…
     </div>
+  </div>
+</div>
+
+<!-- VERSION HISTORY MODAL -->
+<div id="vh-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:901;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closeVH()">
+  <div class="card" style="max-width:500px;margin:40px auto;position:relative">
+    <button onclick="closeVH()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">🕐 Version History</div>
+    <div style="font-size:12px;color:var(--tx3);margin-bottom:14px">Tap a version to restore it into the editor</div>
+    <div id="vh-list" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div id="vh-empty" style="text-align:center;padding:24px;color:var(--tx4);font-size:13px;display:none">No versions saved yet.<br>Versions are saved automatically when you edit a song.</div>
   </div>
 </div>
 
@@ -4661,6 +4691,8 @@ function parseSongResult(raw,genre,topic){
   if (varBtn) varBtn.disabled = false;
   const variantsBtn = document.getElementById('variants-btn');
   if (variantsBtn) variantsBtn.style.display = '';
+  const vhBtn = document.getElementById('vh-btn');
+  if (vhBtn) vhBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -5078,6 +5110,11 @@ function clearLib(){
 // LYRIC EDITOR + SYLLABLE COUNTER
 // ═══════════════════════════════════════════════════════
 function loadLyricsIntoEditor(lyrics,title){
+  // Save current editor content as a version before replacing
+  if (S.editorSong && S.editorSong.lyrics) {
+    vhAddVersion(S.editorSong.title, S.editorSong.lyrics, S.editorSong.genre, 'Auto-save');
+  }
+  S.editorSong = { title: title || '', lyrics, genre: S.currentSong?.genre || '' };
   S.editorLines=lyrics.split('\n').map(l=>({text:l,isTag:/^\[/.test(l.trim()),isEmpty:!l.trim()}));
   renderEditor();
   document.getElementById('paste-modal').style.display='none';
@@ -5848,6 +5885,78 @@ async function generateVariant() {
     loadingEl.style.display = 'none';
     goBtn.disabled = false;
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// VERSION HISTORY
+// ═══════════════════════════════════════════════════════
+const VH_KEY = 'soniq_versions';
+const VH_MAX = 10;
+
+function vhLoad() {
+  try { return JSON.parse(localStorage.getItem(VH_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+
+function vhSave(data) {
+  try { localStorage.setItem(VH_KEY, JSON.stringify(data)); } catch(e) {}
+}
+
+function vhAddVersion(title, lyrics, genre, label) {
+  if (!title || !lyrics) return;
+  const data = vhLoad();
+  if (!data[title]) data[title] = [];
+  // Don't add duplicate if lyrics unchanged
+  if (data[title].length && data[title][0].lyrics === lyrics) return;
+  data[title].unshift({ ts: Date.now(), lyrics, genre: genre || '', label: label || `Edit ${data[title].length + 1}` });
+  if (data[title].length > VH_MAX) data[title] = data[title].slice(0, VH_MAX);
+  vhSave(data);
+}
+
+function openVH(title) {
+  const songTitle = title || S.currentSong?.title || S.editorSong?.title;
+  if (!songTitle) { toast('No song loaded'); return; }
+  const data = vhLoad();
+  const versions = data[songTitle] || [];
+  const listEl = document.getElementById('vh-list');
+  const emptyEl = document.getElementById('vh-empty');
+
+  listEl.innerHTML = '';
+  if (!versions.length) {
+    emptyEl.style.display = 'block';
+    listEl.style.display = 'none';
+  } else {
+    emptyEl.style.display = 'none';
+    listEl.style.display = 'flex';
+    versions.forEach((v, i) => {
+      const d = new Date(v.ts);
+      const dateStr = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const preview = v.lyrics.replace(/\[.*?\]/g,'').trim().split('\n').find(l=>l.trim()) || '';
+      const item = document.createElement('div');
+      item.className = 'vh-item';
+      item.innerHTML = `
+        <div class="vh-item-info">
+          <div class="vh-item-label">${escHtml(v.label)}</div>
+          <div class="vh-item-meta">${escHtml(dateStr)} · ${escHtml(v.genre || 'unknown genre')}</div>
+          <div class="vh-item-meta" style="color:var(--tx4);margin-top:2px">${escHtml(preview.slice(0,60))}…</div>
+        </div>
+        <div class="vh-item-restore">Restore →</div>`;
+      item.onclick = () => { restoreVersion(v, songTitle); };
+      listEl.appendChild(item);
+    });
+  }
+  document.getElementById('vh-modal').style.display = 'block';
+}
+
+function closeVH() {
+  document.getElementById('vh-modal').style.display = 'none';
+}
+
+function restoreVersion(v, title) {
+  closeVH();
+  loadLyricsIntoEditor(v.lyrics, title);
+  goPg('editor');
+  toast(`Restored: ${v.label}`);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6979,6 +7088,8 @@ async function importAndAnalyze() {
     if (varBtn) varBtn.disabled = false;
     const variantsBtn = document.getElementById('variants-btn');
     if (variantsBtn) variantsBtn.style.display = '';
+    const vhBtn2 = document.getElementById('vh-btn');
+    if (vhBtn2) vhBtn2.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';
