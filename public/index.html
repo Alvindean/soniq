@@ -4659,6 +4659,8 @@ function parseSongResult(raw,genre,topic){
   showSaveBar('res');
   const varBtn = document.getElementById('res-var-btn');
   if (varBtn) varBtn.disabled = false;
+  const variantsBtn = document.getElementById('variants-btn');
+  if (variantsBtn) variantsBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -6975,6 +6977,8 @@ async function importAndAnalyze() {
     showSaveBar('res');
     const varBtn = document.getElementById('res-var-btn');
     if (varBtn) varBtn.disabled = false;
+    const variantsBtn = document.getElementById('variants-btn');
+    if (variantsBtn) variantsBtn.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';
