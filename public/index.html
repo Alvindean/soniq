@@ -3366,12 +3366,18 @@ function saveApiKey() { saveKey(); }
 // ─── button loading state helpers ───
 function btnLoad(id,msg='Generating…'){const b=document.getElementById(id);if(b){b._orig=b.innerHTML;b.disabled=true;b.innerHTML=`<span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span style="margin-left:6px">${msg}</span>`;}return b;}
 function btnDone(id){const b=document.getElementById(id);if(b&&b._orig){b.disabled=false;b.innerHTML=b._orig;}}
-function showErr(containerId,msg){const el=document.getElementById(containerId);if(el)el.innerHTML=`<div class="card" style="border-color:var(--redline);color:var(--red);font-size:13px;padding:14px">⚠️ ${msg}</div>`;}
+function showErr(containerId,msg){const el=document.getElementById(containerId);if(el)el.innerHTML=`<div class="card" style="border-color:var(--redline);color:var(--red);font-size:13px;padding:14px">⚠️ ${escHtml(msg)}</div>`;}
 
 // ═══════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════
 function goPg(id,el){
+  // Clear album track context when leaving write page
+  if (id !== 'write' && S.albumTrack) {
+    S.albumTrack = null;
+    const banner = document.getElementById('album-track-banner');
+    if (banner) banner.style.display = 'none';
+  }
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   document.getElementById('pg-'+id).classList.add('on');
@@ -4672,9 +4678,14 @@ function persistLib(){
     localStorage.setItem('sce5_lib', JSON.stringify(S.library));
   } catch(e) {
     // localStorage full — trim and retry
-    S.library = S.library.slice(0, 50);
-    localStorage.setItem('soniq_library', JSON.stringify(S.library));
-    toast('⚠️ Library trimmed to 50 songs — storage full');
+    try {
+      S.library = S.library.slice(0, 50);
+      localStorage.setItem('soniq_library', JSON.stringify(S.library));
+      toast('⚠️ Library trimmed to 50 songs — storage full');
+    } catch(e2) {
+      toast('⚠️ Storage full — songs cannot be saved. Clear browser storage.');
+      console.error('Library save failed completely:', e2);
+    }
   }
   updateLibBadge();
 }
