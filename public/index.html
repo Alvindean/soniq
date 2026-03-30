@@ -6148,6 +6148,12 @@ PRODUCTION NOTES:
 
       if (progItems[i]) { progItems[i].classList.remove('active'); progItems[i].classList.add('done'); progItems[i].innerHTML = `<span class="camp-prog-dot"></span> Concept ${i+1} ✓`; }
     }
+
+    // Next-steps guidance banner
+    const nextSteps = document.createElement('div');
+    nextSteps.style.cssText = 'margin-top:16px;padding:14px 16px;background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r2);font-size:12px;color:var(--amber)';
+    nextSteps.innerHTML = `<strong>✦ ${Math.min(count, conceptTexts.length)} concepts ready</strong> — click <em>Write Full Song</em> on any card to write it, or use <strong>Write All</strong> to generate all songs at once.`;
+    grid.appendChild(nextSteps);
   } catch(e) {
     grid.innerHTML = `<div class="concept-error">Error generating campaign: ${escHtml(e.message)}. Please try again.</div>`;
   }
@@ -6164,6 +6170,19 @@ function loadConceptToWrite(idx) {
   goPg('write', document.querySelector('.nb'));
   document.getElementById('g-topic').value = angle || title;
   toast('✓ Concept loaded — hit Generate to write the full song');
+}
+
+async function writeAllConcepts() {
+  const cards = document.querySelectorAll('.concept-card');
+  if (!cards.length) { toast('Generate concepts first'); return; }
+  toast(`Writing ${cards.length} concepts sequentially…`);
+  for (let i = 0; i < cards.length; i++) {
+    if (S.cancelConcepts) break;
+    await loadConceptToWrite(i);
+    // Small delay between writes
+    await new Promise(r => setTimeout(r, 500));
+  }
+  toast('✓ All concepts loaded to Write page');
 }
 
 function cpText(text) {
