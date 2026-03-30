@@ -179,6 +179,8 @@ a{color:var(--amber);text-decoration:none}
 .gen-btn:active:not(:disabled){transform:translateY(0)}
 .gen-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;box-shadow:none}
 .gen-btn-icon{font-size:16px}
+.btn-import{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:var(--r4);border:1px solid var(--b3);background:var(--s3);color:var(--tx2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
+.btn-import:hover{border-color:var(--amberline);color:var(--tx1);background:var(--s4)}
 .gen-hint{font-size:11px;color:var(--tx3);line-height:1.5}
 
 /* ── RESULT ── */
@@ -305,6 +307,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── TOAST ── */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--s5);border:1px solid var(--b3);border-radius:var(--r4);padding:12px 24px;font-size:13px;font-weight:600;color:var(--tx1);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+@media(max-width:600px){.toast{bottom:80px;}}
 .tipbox{background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r2);padding:12px 16px;font-size:13px;color:var(--tx2);line-height:1.7;margin-top:12px}
 
 /* ── FEEL LUCKY ── */
@@ -526,6 +529,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 @media(max-width:440px){
   .genre-grid{grid-template-columns:repeat(auto-fill,minmax(74px,1fr))}
   .params{grid-template-columns:1fr 1fr}
+}
+@media(max-width:580px){
+  .spill,.qpill,.lane-pill,.mood-pill,.lpill{min-height:36px;padding:8px 12px;display:inline-flex;align-items:center;}
+  .nb{min-height:48px;padding:8px 6px;}
 }
 
 /* ── CONCEPT ENHANCE ── */
@@ -1625,7 +1632,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <span class="gen-btn-icon">🎵</span>
           Generate Complete Song
         </button>
-        <button class="btn btn-sm" onclick="showImportModal()" style="border-color:var(--cyanline);color:var(--cyan);background:var(--cyanbg)">↑ Import Lyrics</button>
+        <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
 
