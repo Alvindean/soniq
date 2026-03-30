@@ -1787,7 +1787,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="ie-chip" onclick="ieChip(this,'Tighten the lyrics — remove filler, increase specificity')">Tighten lyrics</span>
         <span class="ie-chip" onclick="ieChip(this,'Blend in more genre-specific vocabulary and phrasing')">Genre-authentic phrasing</span>
       </div>
-      <textarea class="ie-textarea" id="ie-input" placeholder="Describe your quick edit… e.g. 'Make the pre-chorus build more tension' or 'Change the title direction to something more mysterious'"></textarea>
+      <div style="position:relative">
+        <textarea class="ie-textarea" id="ie-input" placeholder="Describe your quick edit… e.g. 'Make the pre-chorus build more tension' or 'Change the title direction to something more mysterious'"></textarea>
+        <button class="mic-btn" style="position:absolute;bottom:8px;right:8px;font-size:13px;padding:3px 7px;opacity:.8" onclick="toggleMicFor('ie-mic-btn','ie-input','inline')" id="ie-mic-btn" title="Speak your edit instruction">🎤</button>
+      </div>
       <div class="ie-actions">
         <button class="btn btn-amber" id="ie-btn" onclick="instantEdit()">⚡ Apply Edit</button>
         <span style="font-size:11px;color:var(--tx3)">Preserves unchanged strengths — only refines what you ask for</span>
@@ -2101,7 +2104,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <!-- BUILDER SONG TOPIC -->
     <div style="margin-top:14px;display:none" id="pb-topic-row">
       <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Song Topic / Concept</div>
-      <input id="pb-topic" class="topic-input" style="font-size:14px;padding:12px 14px;margin-bottom:0" placeholder="What is this song about? (optional — leave blank for instrumental)" />
+      <div style="display:flex;align-items:center;gap:6px">
+        <input id="pb-topic" class="topic-input" style="font-size:14px;padding:12px 14px;margin-bottom:0;flex:1" placeholder="What is this song about? (optional — leave blank for instrumental)" />
+        <button class="mic-btn" id="pb-topic-mic-btn" onclick="toggleMicFor('pb-topic-mic-btn','pb-topic','inline')" title="Speak your topic" style="font-size:16px;padding:5px 9px;flex-shrink:0">🎤</button>
+      </div>
     </div>
     <div id="pb-song-out" style="margin-top:14px"></div>
   </div>
@@ -2163,7 +2169,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <option value="punk">Punk</option><option value="afrobeats">Afrobeats</option><option value="folk">Folk</option>
           </select>
         </div>
-        <div class="fld"><label>Topic</label><input type="text" id="f-topic" placeholder="e.g. rising from nothing…"/></div>
+        <div class="fld"><label>Topic</label><div style="display:flex;gap:6px;align-items:center"><input type="text" id="f-topic" placeholder="e.g. rising from nothing…" style="flex:1"/><button class="mic-btn" id="f-topic-mic-btn" onclick="toggleMicFor('f-topic-mic-btn','f-topic','inline')" title="Speak your topic" style="font-size:15px;padding:4px 8px;flex-shrink:0">🎤</button></div></div>
         <div class="fld"><label>Emotion</label>
           <select id="f-emotion">
             <option>Euphoria</option><option>Heartbreak</option><option>Empowerment</option>
@@ -2185,7 +2191,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="card">
       <div class="ctitle">⭐ Rate Any Song</div>
       <div class="fld">
-        <label>Song title, artist, and/or lyrics</label>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label style="margin:0">Song title, artist, and/or lyrics</label><button class="mic-btn" id="r-input-mic-btn" onclick="toggleMicFor('r-input-mic-btn','r-input','lines')" title="Speak lyrics or song info" style="font-size:15px;padding:3px 8px">🎤</button></div>
         <textarea id="r-input" placeholder="e.g. Song: Blinding Lights by The Weeknd&#10;Genre: Synth-pop&#10;[or paste lyrics directly]"></textarea>
       </div>
       <div class="g2">
@@ -5693,6 +5699,56 @@ function editorMic() {
     else toast('Mic error: ' + e.error);
   };
   rec.onend = () => { _editorMicRec = null; btn.classList.remove('recording'); btn.textContent = '🎤'; };
+  rec.start();
+}
+
+// Generic mic helper used by all voice-input buttons
+// mode: 'inline' → appends space-separated (for short concept inputs)
+//        'lines'  → appends each result on a new line (for lyric textareas)
+let _micForRec = null;
+let _micForBtn = null;
+function toggleMicFor(btnId, targetId, mode) {
+  const btn = document.getElementById(btnId);
+  const target = document.getElementById(targetId);
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) { toast('Speech recognition not supported in this browser. Try Chrome or Edge.'); return; }
+
+  if (_micForRec) {
+    _micForRec.stop();
+    return;
+  }
+
+  const rec = new SpeechRecognition();
+  rec.lang = 'en-US';
+  rec.continuous = mode === 'lines';
+  rec.interimResults = true;
+  rec.maxAlternatives = 1;
+
+  const existing = target.value;
+  let separator = '';
+  if (existing.trim()) separator = mode === 'lines' ? '\n' : ' ';
+  let finalTranscript = existing.replace(/\s+$/, '') + separator;
+
+  rec.onstart = () => {
+    _micForRec = rec; _micForBtn = btn;
+    btn.classList.add('recording'); btn.textContent = '⏹';
+    toast(mode === 'lines' ? 'Listening… speak your content, click ⏹ to stop' : 'Listening…', 3500);
+  };
+  rec.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript + (mode === 'lines' ? '\n' : ' ');
+      else interim += e.results[i][0].transcript;
+    }
+    target.value = (finalTranscript + interim).trimEnd();
+    if (target.scrollTop !== undefined) target.scrollTop = target.scrollHeight;
+  };
+  rec.onerror = (e) => {
+    if (e.error === 'not-allowed') toast('Mic access denied — allow microphone in your browser settings.');
+    else if (e.error === 'no-speech') toast('No speech detected. Try speaking closer to your mic.');
+    else toast('Mic error: ' + e.error);
+  };
+  rec.onend = () => { _micForRec = null; _micForBtn = null; btn.classList.remove('recording'); btn.textContent = '🎤'; };
   rec.start();
 }
 
