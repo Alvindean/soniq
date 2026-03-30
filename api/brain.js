@@ -1670,49 +1670,223 @@ DIRECTOR NOTES:
   return { system, prompt };
 }
 
-const VARIANT_PROMPTS = {
-  title: (song) => `Generate 5 creative song title alternatives for a song with the following details:
-Genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
-Topic: ${song.topic}
-Current title: ${song.title}
-
-Output only the 5 titles as a numbered list. No explanations.`,
-
-  lyrics: (song) => `Rewrite the following song lyrics, keeping the same structure and theme but with fresh word choices and imagery:
-
-Title: ${song.title}
-Genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
-Topic: ${song.topic}
-
-Current lyrics:
-${song.lyrics}
-
-Output only the new lyrics. Preserve section headers like [Verse 1], [Chorus], etc.`,
-
-  style: (song) => `Generate 3 alternative style/genre directions for the following song:
-
-Title: ${song.title}
-Current genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
-Topic: ${song.topic}
-
-For each alternative, provide: genre name, mood, and a one-sentence description of how it would sound. Output as a numbered list.`,
-
-  hook: (song) => `Write 3 alternative hook/chorus options for the following song:
-
-Title: ${song.title}
-Genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
-Topic: ${song.topic}
-
-Current lyrics context:
-${song.lyrics ? song.lyrics.slice(0, 500) : '(no lyrics provided)'}
-
-Output only the 3 hook alternatives as numbered sections. Each hook should be 4-8 lines.`
+// ═══════════════════════════════════════════════════════
+// SYNC BIBLE — Sync licensing + cinematic placement intelligence
+// ═══════════════════════════════════════════════════════
+const SYNC_BIBLE = {
+  what_is_sync: 'Sync licensing is placing music in film, TV, ads, trailers, games, or documentaries. A music supervisor pitches songs to directors/brands. The song must serve the visual — emotion first, lyrics second.',
+  placement_types: {
+    trailer: { tone:'Epic, building tension, emotional release at drop. Hybrid orchestral + electronic. No verses — pure arc from quiet to massive. Lyrics optional, often wordless or single repeated phrase.', suno:'"trailer music, hybrid orchestral, epic, tension build, Hans Zimmer influenced, percussion, 130 BPM"', structure:'Quiet intro (0:00-0:20) → build (0:20-0:50) → drop/peak (0:50-1:00) → resolve' },
+    tv_drama: { tone:'Emotionally honest, understated, supports not competes with dialogue. Often singer-songwriter or indie pop. Lyrics must be universally relatable — no specific names/places.', suno:'"indie folk, sparse production, emotional, close-mic vocal, fingerpicked guitar"', structure:'Standard VCVC — placed under scene, often fades as dialogue resumes' },
+    advertisement: { tone:'Upbeat, positive, brand-aligned emotion. 15-30-60 second versions. Hook in first 5 seconds. Product-neutral lyrics — joy, possibility, movement.', suno:'"upbeat pop, bright production, optimistic, commercial feel, memorable hook"', structure:'Hook-first, no intro, 30-60 seconds max' },
+    documentary: { tone:'Contemplative, minimal, serves the story. Acoustic or ambient. Lyrics can be more poetic/abstract.', suno:'"ambient folk, minimal, contemplative, acoustic, warm, 70 BPM"', structure:'Through-composed or loop-friendly, no hard drop' },
+    game_ost: { tone:'Loop-friendly, no obvious ending. Atmospheric, genre matches game world. Can be instrumental or vocal.', suno:'"game OST, atmospheric, loop-friendly, cinematic, [genre of game world]"', structure:'8 or 16 bar loop with natural join point — no obvious intro/outro' },
+    indie_film: { tone:'Raw, authentic, emotionally specific. Indie rock, folk, or lo-fi. Lyrics can be more literary and complex.', suno:'"indie rock, lo-fi, authentic, emotional, intimate production"', structure:'Standard song structure, placed at emotional scene peaks' }
+  },
+  lyric_rules: [
+    'No brand names, product names, or trademarks — supervisors cannot clear them',
+    'No specific dates, years, or time references that will date the placement',
+    'No character names or proper nouns unless the brief specifically calls for them',
+    'No profanity for network TV, ads, or family films — keep a clean version always',
+    'Universal emotional language — "you" not a specific person\'s name, "this city" not "New York"',
+    'Ambiguity is an asset — a lyric that could mean 10 things fits 10 different scenes',
+    'Avoid irony for ads and trailers — sincerity places better'
+  ],
+  emotional_cues: {
+    tension:    { desc:'Unresolved, building dread or anticipation', suno:'"dissonant strings, low drones, minor key, building percussion"' },
+    release:    { desc:'Resolution after tension, catharsis, relief', suno:'"major key shift, swelling strings, bright percussion hit"' },
+    yearning:   { desc:'Longing, nostalgia, bittersweet', suno:'"fingerpicked guitar, soft piano, minor to major, gentle strings"' },
+    triumph:    { desc:'Victory, achievement, earned joy', suno:'"full orchestra, snare march, brass, building to climax"' },
+    melancholy: { desc:'Quiet sadness, reflection, loss', suno:'"sparse piano, minimal production, slow tempo, minor key"' },
+    wonder:     { desc:'Awe, discovery, hope, expansiveness', suno:'"ambient pads, gentle piano, gradual orchestral build, major key"' },
+    urgency:    { desc:'Action, chase, countdown, stakes', suno:'"driving rhythm, staccato strings, tempo 140+ BPM, no pause"' },
+    intimacy:   { desc:'Connection, vulnerability, quiet truth', suno:'"close-mic vocal, single instrument, room sound, no reverb"' }
+  },
+  suno_cinematic_tags: [
+    '[Orchestral]','[Cinematic]','[No drums]','[Strings only]',
+    '[Trailer music]','[Emotional build]','[Score]','[Underscore]'
+  ],
+  strip_for_sync(lyrics) {
+    // Guidance: rewrite these patterns out of lyrics before sync placement
+    return [
+      'Replace all proper nouns (people, places, brands) with universal equivalents',
+      'Replace specific dates/years with "that night", "those days", "back then"',
+      'Replace city/location names with "this city", "back home", "somewhere new"',
+      'Replace any brand or product names with descriptive equivalents',
+      'Review for profanity — offer clean alternative lines'
+    ];
+  }
 };
 
+// ═══════════════════════════════════════════════════════
+// SONG VARIANT PROMPT BUILDERS
+// ═══════════════════════════════════════════════════════
+const VARIANT_PROMPTS = {
+
+  dj_remix: (song) => `You are a world-class DJ and electronic music producer reworking "${song.title}" for club play.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+YOUR TASK — Create a DJ Remix version:
+1. STRUCTURE REWRITE: Add a 16-bar intro build (filter sweep, percussion only, no full arrangement). Identify the drop point (where the full track hits — usually where the chorus was). Add a 8-bar breakdown (strip to kick + bass + vocal chop). Extend the outro to 16+ bars for DJ mixing out.
+2. LYRIC ADAPTATION: Lyrics stay mostly the same but the chorus hook gets repeated more (4-6x). Add [Build] [Drop] [Breakdown] [Outro - extended] section tags.
+3. SUNO STYLE: Rewrite the production style as: "club remix, electronic production, 4-on-the-floor kick, side-chain compression, filter sweep intro, [original genre] influences, DJ edit, 128 BPM"
+4. OUTPUT FORMAT:
+   REMIX TITLE: [title] (Club Remix)
+   SUNO STYLE: [production description]
+   STRUCTURE NOTE: [brief description of the structural changes]
+   [Full rewritten lyrics with DJ structure tags]`,
+
+  acoustic: (song) => `You are a master arranger stripping "${song.title}" down to its raw acoustic form.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+YOUR TASK — Create an Acoustic Version:
+1. ARRANGEMENT: Remove all electronic production, drums, bass synths. Rewrite for fingerpicked acoustic guitar and voice (add piano or cello as a second instrument only if it serves the song). The production becomes intimate — close-mic, room sound, human feel.
+2. STRUCTURE: Simplify if needed. Can remove a repeat chorus. Can add a new quiet bridge moment that the original production buried. Dynamics are created by adding/removing the second instrument, not volume.
+3. LYRICS: Keep original lyrics exactly. You may add a single new quiet bridge if the stripped arrangement creates space for one.
+4. SUNO STYLE: "acoustic, fingerpicked guitar, close-mic vocals, intimate, no drums, warm room reverb, [original genre] acoustic version"
+5. OUTPUT FORMAT:
+   ACOUSTIC TITLE: [title] (Acoustic)
+   SUNO STYLE: [production description]
+   ARRANGEMENT NOTE: [what was stripped, what was kept]
+   [Full lyrics with acoustic section tags]`,
+
+  radio_edit: (song) => `You are a professional radio editor cutting "${song.title}" to radio format.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+YOUR TASK — Create a Radio Edit (target: 3:00-3:30):
+1. CUT STRATEGY: Remove the intro if it's more than 4 bars before the first vocal. Cut one full verse if there are 3 verses. Remove or shorten the bridge. Bring the hook forward — it should hit within the first 45 seconds.
+2. STRUCTURE TARGET: Verse 1 → Pre-Chorus → Chorus → Verse 2 → Chorus → Bridge (shortened) → Final Chorus → Quick Outro (4 bars max).
+3. EDITS: Mark your cuts clearly with [CUT] annotations. The song must feel complete — no abrupt endings.
+4. HOOK: The strongest hook line must appear in the first 30 seconds. If it doesn't in the original, restructure so it does.
+5. OUTPUT FORMAT:
+   RADIO TITLE: [title] (Radio Edit)
+   RUNTIME NOTE: Estimated [X:XX] — cuts [describe what was removed]
+   [Full edited lyrics with structure tags and [CUT] annotations where applicable]`,
+
+  lofi: (song) => `You are a lo-fi producer creating a bedroom version of "${song.title}".
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+YOUR TASK — Create a Lo-fi Version:
+1. PRODUCTION REWRITE: The sound becomes: vinyl crackle, slightly off-tempo drums (human feel, not quantized), warm tape saturation, detuned slightly flat, reverb-heavy vocals pulled back in the mix, jazz-influenced chord voicings underneath.
+2. TEMPO: Slow down 10-15 BPM from the original feel. Lo-fi breathes slower.
+3. LYRICS: Keep original lyrics. Add intimate, introspective feel — remove any big anthem moments. If there's a big chorus shout, rewrite it as a quieter confession.
+4. STRUCTURE: Can cut repeats. Lo-fi songs often feel unfinished on purpose — 2:00-2:30 is ideal.
+5. SUNO STYLE: "lo-fi hip hop, vinyl crackle, warm tape, jazzy chords, slow tempo, bedroom pop, nostalgic, [original genre] lo-fi"
+6. OUTPUT FORMAT:
+   LO-FI TITLE: [title] (Lo-fi)
+   SUNO STYLE: [production description]
+   VIBE NOTE: [emotional shift from original]
+   [Full lyrics adapted for lo-fi feel]`,
+
+  slowed_reverb: (song) => `You are creating a slowed + reverb version of "${song.title}" for emotional/TikTok aesthetic.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+YOUR TASK — Create a Slowed + Reverb Version:
+1. CONCEPT: Slowed + reverb is about emotional magnification. The slower tempo makes every word hit harder. The reverb creates spaciousness — like the song is happening in a cathedral or an empty stadium at 3am.
+2. PRODUCTION NOTE: BPM reduced 15-20%. Heavy cathedral or hall reverb on everything. Vocals pitch-shifted slightly down with the tempo. No compression — let the dynamics breathe.
+3. LYRICS: Keep exactly. But add [Echo] tags where specific lines should have audible echo repeats of the last word or phrase. Identify the 2-3 most emotionally heavy lines — these are where the reverb effect will be most powerful.
+4. SUNO STYLE: "slowed, reverb, dreamy, emotional, [original genre], slow tempo, spacious, melancholic, atmospheric"
+5. OUTPUT FORMAT:
+   SLOWED TITLE: [title] (Slowed + Reverb)
+   SUNO STYLE: [production description]
+   KEY LINES: [list the 2-3 lines that hit hardest slowed down]
+   [Full lyrics with [Echo] annotations on key phrases]`,
+
+  live_version: (song) => `You are a live performance director staging "${song.title}" as a live concert version.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+YOUR TASK — Create a Live Version:
+1. INTRO: Add a spoken or sung performance intro — the artist addressing the crowd before the song starts. Keep it short (2-4 lines). Example: "This next song is about..." or a hummed intro that builds.
+2. EXTENDED OUTRO: Add a live outro — the crowd singalong moment, the artist calling back to the crowd, the final repeat of the hook with crowd energy. This is where the song becomes communal.
+3. DYNAMIC MOMENTS: Mark where the band would drop out for an acoustic moment ([Band drops], [Crowd sings]), where the energy peaks ([Full band in]), where a solo would go ([Guitar solo] or [Piano break]).
+4. LYRICS: Keep original but add these performance annotations. You may add 1-2 ad-lib lines that feel improvised/authentic.
+5. SUNO STYLE: "live recording, concert atmosphere, crowd noise, warm live sound, [original genre] live performance"
+6. OUTPUT FORMAT:
+   LIVE TITLE: [title] (Live)
+   VENUE NOTE: [describe the ideal venue for this song — intimate club, festival, arena]
+   [Full lyrics with live performance annotations]`,
+
+  trap_remix: (song) => `You are a trap producer flipping "${song.title}" into a trap banger.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+YOUR TASK — Create a Trap Remix:
+1. STRUCTURE: Add a trap intro (8 bars, beat only with ad-libs). The chorus becomes the trap hook — melodic but with 808 underpinning. Add a rap verse (8-16 bars) that reinterprets the song's theme in rap form. The rap verse sits between chorus repetitions.
+2. NEW RAP VERSE: Write 8-16 bars of original trap rap that speaks to the song's theme. Bar = 1 line. Internal rhymes. Ad-libs in parentheses. Bar 8 or 16 = the punchline.
+3. PRODUCTION: 808 bass, rolling hi-hats, trap snare on 2+4, melodic hook sampled/chopped from the original chorus.
+4. SUNO STYLE: "trap remix, 808 bass, rolling hi-hats, trap drums, melodic hook, [original genre] trap flip, auto-tune, 140 BPM"
+5. OUTPUT FORMAT:
+   TRAP TITLE: [title] (Trap Remix)
+   SUNO STYLE: [production description]
+   [Full lyrics with trap structure — include the new rap verse clearly marked [Rap Verse]]`,
+
+  gospel_version: (song) => `You are a gospel arranger transforming "${song.title}" into a gospel/choir version.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+YOUR TASK — Create a Gospel/Choir Version:
+1. LYRIC TRANSFORMATION: Rewrite the lyrics to elevate the theme spiritually. If the song is about love, it becomes divine love or community love. If it's about struggle, it becomes faith through struggle. Keep the emotional core — shift the frame to the spiritual/communal.
+2. STRUCTURE ADDITIONS: Add a call-and-response section (lead vocal line / choir response). Add a vamp at the end that builds and builds (the choir takes over, the lead ad-libs over the top). Add a [Testimony] section if a bridge exists.
+3. CHOIR ARRANGEMENT: Mark [Lead], [Choir], [Call], [Response], [Vamp] sections. The choir should first echo then harmonize then overtake the lead.
+4. SUNO STYLE: "gospel, choir, organ, clapping, soul, call and response, spiritual, uplifting, live church feel"
+5. OUTPUT FORMAT:
+   GOSPEL TITLE: [title] (Gospel Version)
+   SUNO STYLE: [production description]
+   THEME NOTE: [how the lyric theme was spiritually reframed]
+   [Full rewritten lyrics with choir annotations]`,
+
+  cinematic: (song) => `You are a composer and sync licensing specialist creating a cinematic/orchestral version of "${song.title}" for film/TV placement.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+SYNC LICENSING RULES YOU MUST FOLLOW:
+${SYNC_BIBLE.lyric_rules.map((r,i) => `${i+1}. ${r}`).join('\n')}
+
+YOUR TASK — Create a Cinematic/Sync-Ready Version:
+1. LYRIC AUDIT: First, identify any lyrics that violate sync rules (proper nouns, brand names, dates, explicit content). Rewrite those lines with universal equivalents.
+2. ARRANGEMENT: Rewrite for orchestral/cinematic production. Remove modern production elements. Add strings, piano, light percussion or no drums. The arrangement should support a visual scene, not compete with it.
+3. EMOTIONAL CUE: Identify the primary emotional cue of this song (tension / release / yearning / triumph / melancholy / wonder / intimacy). The arrangement should intensify that single emotion.
+4. PLACEMENT SUGGESTIONS: Based on the lyrics and emotion, suggest 2-3 ideal placement types (trailer / TV drama / ad / documentary / indie film) and why this song fits.
+5. SUNO STYLE: "cinematic, orchestral, strings, piano, emotional, [primary emotion], sync-ready, no drums, film score, [original genre] acoustic"
+6. OUTPUT FORMAT:
+   CINEMATIC TITLE: [title] (Cinematic)
+   SUNO STYLE: [production description]
+   SYNC AUDIT: [list any lyric changes made for sync + why]
+   PLACEMENT FIT: [2-3 ideal placements with brief reason each]
+   PRIMARY EMOTION: [the single emotional cue]
+   [Full sync-safe rewritten lyrics with orchestral section tags]`
+};
+
+// Main variant prompt assembler
 function buildVariantPrompt(variant, song) {
   const builder = VARIANT_PROMPTS[variant];
-  if (!builder) throw new Error('Unknown variant: ' + variant);
+  if (!builder) throw new Error(`Unknown variant: ${variant}`);
   return builder(song);
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildVariantPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt };
