@@ -1159,6 +1159,26 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 @media(max-width:580px){
   textarea,input,select{font-size:16px!important}
 }
+.variant-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 12px;
+  background: var(--s3);
+  border: 1px solid var(--b2);
+  border-radius: var(--r2);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+  color: var(--tx1);
+  font-family: var(--font);
+}
+.variant-btn:hover { border-color: var(--amber); background: rgba(255,180,0,.06); }
+.variant-btn.selected { border-color: var(--amber); background: rgba(255,180,0,.1); }
+.variant-icon { font-size: 18px; line-height: 1; }
+.variant-name { font-size: 13px; font-weight: 700; color: var(--tx1); }
+.variant-desc { font-size: 11px; color: var(--tx3); line-height: 1.3; }
 
 </style>
 
@@ -1684,6 +1704,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="printBrief('res')" title="Print song brief">🖨 Print</button>
         <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
         <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
+        <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
       </div>
     </div>
 
@@ -1991,6 +2012,78 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="btn-row">
       <button class="btn btn-gold" onclick="loadPasted()">Load into Editor</button>
       <button class="btn" onclick="document.getElementById('paste-modal').style.display='none'">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     SONG VARIANTS MODAL
+══════════════════════════════════════════════════════ -->
+<div id="variants-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:900;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closeVariants()">
+  <div class="card" style="max-width:540px;margin:40px auto;position:relative">
+    <button onclick="closeVariants()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;line-height:1">✕</button>
+    <div class="ctitle">🎛️ Song Variants</div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:16px">Choose a variant to generate a new version of <strong id="variants-song-title" style="color:var(--tx1)"></strong></p>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <button class="variant-btn" onclick="selectVariant('dj_remix')" data-variant="dj_remix">
+        <span class="variant-icon">🎧</span>
+        <span class="variant-name">DJ Remix</span>
+        <span class="variant-desc">Club structure, drop, extended outro</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('acoustic')" data-variant="acoustic">
+        <span class="variant-icon">🎸</span>
+        <span class="variant-name">Acoustic</span>
+        <span class="variant-desc">Stripped to guitar + voice</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('radio_edit')" data-variant="radio_edit">
+        <span class="variant-icon">📻</span>
+        <span class="variant-name">Radio Edit</span>
+        <span class="variant-desc">3-min hook-first cut</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('lofi')" data-variant="lofi">
+        <span class="variant-icon">🌙</span>
+        <span class="variant-name">Lo-fi</span>
+        <span class="variant-desc">Bedroom, vinyl, slow tempo</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('slowed_reverb')" data-variant="slowed_reverb">
+        <span class="variant-icon">🌊</span>
+        <span class="variant-name">Slowed + Reverb</span>
+        <span class="variant-desc">Emotional TikTok aesthetic</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('live_version')" data-variant="live_version">
+        <span class="variant-icon">🎤</span>
+        <span class="variant-name">Live Version</span>
+        <span class="variant-desc">Crowd, ad-libs, performance notes</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('trap_remix')" data-variant="trap_remix">
+        <span class="variant-icon">🔊</span>
+        <span class="variant-name">Trap Remix</span>
+        <span class="variant-desc">808s, hi-hats, new rap verse</span>
+      </button>
+      <button class="variant-btn" onclick="selectVariant('gospel_version')" data-variant="gospel_version">
+        <span class="variant-icon">🙏</span>
+        <span class="variant-name">Gospel / Choir</span>
+        <span class="variant-desc">Uplifted, call + response, vamp</span>
+      </button>
+      <button class="variant-btn variant-btn-full" onclick="selectVariant('cinematic')" data-variant="cinematic" style="grid-column:1/-1">
+        <span class="variant-icon">🎬</span>
+        <span class="variant-name">Cinematic / Sync</span>
+        <span class="variant-desc">Orchestral, sync-safe lyrics, placement suggestions</span>
+      </button>
+    </div>
+
+    <div id="variant-generate-row" style="display:none;border-top:1px solid var(--b2);padding-top:14px;margin-top:4px">
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:10px">Selected: <strong id="variant-selected-label" style="color:var(--amber)"></strong></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-gold" id="variant-go-btn" onclick="generateVariant()" style="flex:1">⚡ Generate Variant</button>
+        <button class="btn" onclick="selectVariant(null)">Clear</button>
+      </div>
+    </div>
+
+    <div id="variant-loading" style="display:none;text-align:center;padding:20px;color:var(--tx3);font-size:13px">
+      <div class="spin" style="margin:0 auto 10px"></div>
+      Generating variant…
     </div>
   </div>
 </div>
@@ -5663,6 +5756,96 @@ function setEra(el, val) {
   S.selectedEra = val;
   const desc = document.getElementById('era-desc');
   if (desc) desc.textContent = ERA_DESCS[val] || '';
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG VARIANTS
+// ═══════════════════════════════════════════════════════
+let _selectedVariant = null;
+
+const VARIANT_LABELS = {
+  dj_remix: 'DJ Remix',
+  acoustic: 'Acoustic Version',
+  radio_edit: 'Radio Edit',
+  lofi: 'Lo-fi Version',
+  slowed_reverb: 'Slowed + Reverb',
+  live_version: 'Live Version',
+  trap_remix: 'Trap Remix',
+  gospel_version: 'Gospel / Choir Version',
+  cinematic: 'Cinematic / Sync'
+};
+
+function openVariants() {
+  const song = S.currentSong;
+  if (!song) { toast('Generate a song first'); return; }
+  document.getElementById('variants-song-title').textContent = song.title || 'this song';
+  document.getElementById('variant-generate-row').style.display = 'none';
+  document.getElementById('variant-loading').style.display = 'none';
+  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+  _selectedVariant = null;
+  document.getElementById('variants-modal').style.display = 'block';
+}
+
+function closeVariants() {
+  document.getElementById('variants-modal').style.display = 'none';
+}
+
+function selectVariant(type) {
+  _selectedVariant = type;
+  document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('selected'));
+  if (type) {
+    document.querySelector(`[data-variant="${type}"]`)?.classList.add('selected');
+    document.getElementById('variant-selected-label').textContent = VARIANT_LABELS[type] || type;
+    document.getElementById('variant-generate-row').style.display = 'block';
+  } else {
+    document.getElementById('variant-generate-row').style.display = 'none';
+  }
+}
+
+async function generateVariant() {
+  const song = S.currentSong;
+  if (!song || !_selectedVariant) return;
+
+  const loadingEl = document.getElementById('variant-loading');
+  const goBtn = document.getElementById('variant-go-btn');
+  loadingEl.style.display = 'block';
+  goBtn.disabled = true;
+
+  try {
+    const body = {
+      variant: _selectedVariant,
+      title: song.title,
+      lyrics: song.lyrics || song.content,
+      genre: song.genre,
+      genre2: song.genre2,
+      topic: song.topic,
+      max_tokens: 2048
+    };
+
+    const resp = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(window._soniqKey ? { 'x-api-key': window._soniqKey } : {}) },
+      body: JSON.stringify(body)
+    });
+
+    if (!resp.ok) throw new Error(`API error ${resp.status}`);
+    const data = await resp.json();
+    const variantText = data.content || data.text || '';
+
+    if (!variantText) throw new Error('Empty response');
+
+    // Load into editor
+    closeVariants();
+    const label = VARIANT_LABELS[_selectedVariant] || _selectedVariant;
+    loadLyricsIntoEditor(variantText, `${song.title} (${label})`);
+    goPg('editor');
+    toast(`${label} generated — loaded into editor`);
+  } catch(e) {
+    toast('Variant generation failed: ' + e.message);
+  } finally {
+    loadingEl.style.display = 'none';
+    goBtn.disabled = false;
+  }
 }
 
 // ═══════════════════════════════════════════════════════
