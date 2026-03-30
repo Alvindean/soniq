@@ -64,7 +64,7 @@ module.exports = async function handler(req, res) {
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) return res.status(503).json({ error: 'ADMIN_PASSWORD not configured' });
 
-  const provided = req.headers['x-admin-key'] || req.query?.key || '';
+  const provided = req.headers['x-admin-key'] || '';
   if (!safeEqual(provided, adminPassword)) {
     // Add a small fixed delay to further blunt timing attacks
     await new Promise(r => setTimeout(r, 200));

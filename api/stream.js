@@ -169,13 +169,18 @@ module.exports = async function handler(req, res) {
   } else {
     // Legacy: client sends raw messages (for visual prompts, titles, etc.)
     messages = body.messages;
-    system = body.system;
+    system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
     // Cap max_tokens — never let a client request blow through credit limits
     max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
   }
 
   // Treat 'server-side' sentinel (set by client on Vercel) as no user key
   const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
+
+  // If using server key, never allow caller to override the system prompt
+  if (!userKey) {
+    system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
+  }
 
   if (!userKey) {
     // Use x-real-ip (set by Vercel, can't be spoofed) then fall back to last

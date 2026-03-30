@@ -145,6 +145,11 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // If using server key, never allow caller to override the system prompt
+  if (!userKey) {
+    system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
+  }
+
   if (!messages?.length) return res.status(400).json({error:'messages required'});
 
   const errors = [];

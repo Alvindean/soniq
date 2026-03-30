@@ -18,6 +18,22 @@
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
+const trackRateMap = new Map();
+const TRACK_LIMIT = 30;
+const TRACK_WINDOW = 60 * 60 * 1000;
+
+function checkTrackRate(ip) {
+  const now = Date.now();
+  const entry = trackRateMap.get(ip);
+  if (!entry || now - entry.start > TRACK_WINDOW) {
+    trackRateMap.set(ip, { count: 1, start: now });
+    return true;
+  }
+  if (entry.count >= TRACK_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
 // Fire-and-forget Redis REST calls via pipeline
 async function redisPipeline(commands) {
   if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
@@ -72,6 +88,13 @@ module.exports = async function handler(req, res) {
   }
 
   if (req.method !== 'POST') return res.status(405).end();
+
+  const ip = req.headers['x-real-ip'] ||
+    (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+    req.socket?.remoteAddress || 'unknown';
+  if (!checkTrackRate(ip)) {
+    return res.status(429).json({ error: 'Rate limit exceeded' });
+  }
 
   let body;
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
