@@ -4403,12 +4403,17 @@ function copyCopyrightClaim(ns) {
   const el = document.getElementById(ns + '-cp-claim');
   const btn = document.getElementById(ns + '-cp-btn');
   if (!el || !btn) return;
-  navigator.clipboard.writeText(el.textContent).then(() => {
+  const afterCopy = () => {
     btn.textContent = '✓ Copied!';
     btn.classList.add('copied');
     toast('© Copyright claim copied to clipboard');
     setTimeout(() => { btn.textContent = 'Copy Claim'; btn.classList.remove('copied'); }, 2500);
-  });
+  };
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(el.textContent).then(afterCopy).catch(() => { fallbackCopy(el.textContent, '© Copyright claim copied to clipboard'); afterCopy(); });
+  } else {
+    fallbackCopy(el.textContent, '© Copyright claim copied to clipboard'); afterCopy();
+  }
 }
 
 function parseSongResult(raw,genre,topic){
