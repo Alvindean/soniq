@@ -3438,7 +3438,27 @@ document.addEventListener('click',e=>{
 // UTILITIES
 // ═══════════════════════════════════════════════════════
 function toast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
-function cpField(id){const el=document.getElementById(id);if(!el)return;navigator.clipboard.writeText(el.textContent||el.innerText).then(()=>toast('✓ Copied to clipboard'));}
+function safeCopy(text, label) {
+  const msg = label || 'Copied';
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(() => toast('✓ ' + msg)).catch(() => fallbackCopy(text, msg));
+  } else {
+    fallbackCopy(text, msg);
+  }
+}
+function fallbackCopy(text, msg) {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;top:-999px;left:-999px;opacity:0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    toast('✓ ' + (msg || 'Copied'));
+  } catch(e) {
+    toast('⚠️ Copy failed — select and copy manually');
+  }
+}
+function cpField(id){const el=document.getElementById(id);if(!el)return;safeCopy(el.textContent||el.innerText,'Copied to clipboard');}
 function cpBriefPrompt(prefix){
   const el=document.getElementById(prefix==='res'?'res-title':'lres-title');
   // Get the prompt from brief-core-prompt span inside the brief-output
@@ -3446,7 +3466,7 @@ function cpBriefPrompt(prefix){
   const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
   const text=briefEl?.textContent||song?.style||'';
   if(!text){toast('Generate a song first');return;}
-  navigator.clipboard.writeText(text).then(()=>toast('✓ Song prompt copied'));
+  safeCopy(text, 'Song prompt copied');
 }
 function countSyl(word){word=word.toLowerCase().replace(/[^a-z]/g,'');if(!word)return 0;if(word.length<=3)return 1;word=word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');word=word.replace(/^y/,'');const m=word.match(/[aeiouy]{1,2}/g);return m?m.length:1;}
 function lineSyl(line){return line.replace(/\[.*?\]/g,'').trim().split(/\s+/).filter(Boolean).reduce((s,w)=>s+countSyl(w),0);}
