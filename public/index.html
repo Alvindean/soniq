@@ -1181,6 +1181,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <button class="kb-save" onclick="saveKey()">Save &amp; Start →</button>
   </div>
   <div class="kb-err" id="kb-err"></div>
+  <div style="margin-top:8px;font-size:11px;color:var(--tx4)">
+    <a id="kb-clear-link" href="#" style="display:none;color:var(--red);text-decoration:underline" onclick="event.preventDefault();clearSavedKey()">Clear saved key</a>
+  </div>
 </div>
 
 <!-- HEADER -->
@@ -1970,7 +1973,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
     <div class="edbody" id="ed-body">
-      <div style="text-align:center;padding:48px 20px;color:var(--tx4);font-size:13px">Generate a song then click <strong style="color:var(--tx2)">Edit</strong>, or click <strong style="color:var(--tx2)">Paste Lyrics</strong> to load any lyrics.</div>
+      <div style="text-align:center;padding:48px 20px;color:var(--tx4);font-size:13px">Generate a song on the Write page, then click <strong style="color:var(--tx2)">✏️ Edit</strong> to load it here for syllable editing, or click <strong style="color:var(--tx2)">Paste Lyrics</strong> to load any lyrics.</div>
     </div>
   </div>
   <div class="card" id="paste-modal" style="display:none">
@@ -3318,11 +3321,33 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
 function showKeyScreen(msg) {
   const banner = document.getElementById('key-banner');
   if (banner) banner.classList.add('show');
+  // Pre-fill with masked key if one is stored
+  const stored = localStorage.getItem('soniq_api_key');
+  const input = document.getElementById('kb-input');
+  if (stored && input) {
+    input.placeholder = stored.slice(0, 8) + '…' + stored.slice(-4);
+    input.value = '';
+  }
+  // Show/hide clear key link
+  const clearLink = document.getElementById('kb-clear-link');
+  if (clearLink) clearLink.style.display = stored ? 'inline' : 'none';
   if (msg) {
     const err = document.getElementById('kb-err');
     if (err) err.textContent = msg;
   }
-  setTimeout(() => document.getElementById('kb-input')?.focus(), 50);
+  setTimeout(() => input?.focus(), 50);
+}
+
+function clearSavedKey() {
+  localStorage.removeItem('soniq_api_key');
+  _soniqKey = null;
+  const input = document.getElementById('kb-input');
+  if (input) { input.value = ''; input.placeholder = 'sk-or-v1-... or sk-ant-api03-...'; }
+  const clearLink = document.getElementById('kb-clear-link');
+  if (clearLink) clearLink.style.display = 'none';
+  const keyBtn = document.querySelector('button[onclick="showKeyScreen()"]');
+  if (keyBtn) keyBtn.innerHTML = '🔑 Add API Key';
+  toast('API key cleared');
 }
 
 function saveKey() {
@@ -3335,6 +3360,8 @@ function saveKey() {
   _soniqKey = key;
   const banner = document.getElementById('key-banner');
   if (banner) banner.classList.remove('show');
+  const keyBtn = document.querySelector('button[onclick="showKeyScreen()"]');
+  if (keyBtn) keyBtn.innerHTML = '🔑 Change Key';
   toast('✓ API key saved — ready to create!');
 }
 
@@ -3364,6 +3391,8 @@ function saveApiKey() { saveKey(); }
     document.addEventListener('DOMContentLoaded', () => {
       const b = document.getElementById('key-banner');
       if (b) b.classList.remove('show');
+      const keyBtn = document.querySelector('button[onclick="showKeyScreen()"]');
+      if (keyBtn) keyBtn.innerHTML = '🔑 Change Key';
     });
   } else {
     document.addEventListener('DOMContentLoaded', () => {
@@ -3600,7 +3629,7 @@ function onRapStyleSelect(styleId) {
   S.rapStyle = styleId;
   S.rapLabActive = true;
   const defaults = RAP_DIM_DEFAULTS[styleId] || {};
-  S.rapDimensions = { ...S.rapDimensions, ...defaults };
+  S.rapDimensions = { ...defaults };
   // Update card selection
   document.querySelectorAll('.rl-style-card').forEach(c => c.classList.toggle('on', c.dataset.style === styleId));
   // Show dimensions panel
@@ -3827,6 +3856,9 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 }
 
 function feelLucky(){
+  const luckyBtn = document.getElementById('lucky-btn');
+  if (luckyBtn?.disabled) return;
+  btnLoad('lucky-btn', 'Spinning…');
   // Cancel any in-flight lucky generation
   if (S.luckyController) { S.luckyController.abort(); S.luckyController = null; }
   S.luckyController = new AbortController();
@@ -3865,7 +3897,6 @@ function feelLucky(){
   setTimeout(()=>orb.classList.remove('spinning'),1200);
 
   // Spin wheel, then generate
-  btnLoad('lucky-btn','Spinning…');
   document.getElementById('lucky-hint').textContent=`Selecting: ${fd?.name||g1+' × '+g2}…`;
   const g1Label=GENRE_LABELS[g1]||g1;
   const g2Label=GENRE_LABELS[g2]||g2;
@@ -4073,6 +4104,9 @@ function loadLuckyHistItem(i){
 const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
 
 async function generateSong(){
+  const genBtn = document.getElementById('gen-btn');
+  if (genBtn?.disabled) return; // prevent double-fire
+  btnLoad('gen-btn', 'Writing song…');
   const genre=S.selectedGenre||'pop';
   const genreLabel=GENRE_LABELS[genre]||genre;
   const topic=document.getElementById('g-topic').value.trim();
@@ -4286,7 +4320,6 @@ DIRECTOR NOTES:
 4. [tip 4]
 5. [tip 5]`;
 
-  btnLoad('gen-btn','Writing song…');
   const out=document.getElementById('gen-out');
   out.classList.add('visible');
   document.getElementById('loaded-banner').style.display='none';
@@ -6243,22 +6276,32 @@ function writeAlbumTrack(index) {
 async function writeAllTracks() {
   const alb = S.albumData;
   if (!alb?.trackList?.length) { toast('Generate an album concept first, then come back here'); return; }
+  const writeBtn = document.querySelector('[onclick="writeAllTracks()"]');
+  if (writeBtn) { writeBtn.disabled = true; writeBtn.textContent = '⏳ Writing…'; }
+  S.cancelAllTracks = false;
+  if (writeBtn) writeBtn.onclick = () => { S.cancelAllTracks = true; writeBtn.textContent = 'Cancelling…'; };
+  toast(`Writing ${alb.trackList.length} tracks — est. ${alb.trackList.length * 4}s`);
   const out = document.getElementById('alb-tracks-written');
   out.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Writing all tracks…</span></div>';
   const results = [];
-  for (let i = 0; i < alb.trackList.length; i++) {
-    const tr = alb.trackList[i];
-    out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
-    try {
-      const prompt = `Write a complete, production-ready song for this album track.\n\nAlbum: "${alb.name}"\nTrack role: ${tr.ttype}\nDescription: ${tr.desc}\nAlbum genre: ${alb.genre || 'pop'}\nAlbum arc context: ${alb.arc || 'part of a cohesive album'}\nTrack position: ${i+1} of ${alb.trackList.length}\n\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds\n- Every line specific — no vague emotions, no clichés\n- Dynamic contrast verse vs chorus\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style + counter-melody device]`;
-      const raw = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
-      const title  = parseSection(raw,'TITLE','LYRICS');
-      const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
-      const style  = parseSection(raw,'SONG PROMPT', null);
-      results.push({i, ttype:tr.ttype, title, lyrics, style});
-    } catch(e) {
-      results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
+  try {
+    for (let i = 0; i < alb.trackList.length; i++) {
+      if (S.cancelAllTracks) break;
+      const tr = alb.trackList[i];
+      out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
+      try {
+        const prompt = `Write a complete, production-ready song for this album track.\n\nAlbum: "${alb.name}"\nTrack role: ${tr.ttype}\nDescription: ${tr.desc}\nAlbum genre: ${alb.genre || 'pop'}\nAlbum arc context: ${alb.arc || 'part of a cohesive album'}\nTrack position: ${i+1} of ${alb.trackList.length}\n\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds\n- Every line specific — no vague emotions, no clichés\n- Dynamic contrast verse vs chorus\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style + counter-melody device]`;
+        const raw = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
+        const title  = parseSection(raw,'TITLE','LYRICS');
+        const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
+        const style  = parseSection(raw,'SONG PROMPT', null);
+        results.push({i, ttype:tr.ttype, title, lyrics, style});
+      } catch(e) {
+        results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
+      }
     }
+  } finally {
+    if (writeBtn) { writeBtn.disabled = false; writeBtn.textContent = '✍️ Write All Tracks'; writeBtn.onclick = () => writeAllTracks(); }
   }
   out.innerHTML = results.map(r => `
     <div style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
