@@ -805,7 +805,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── VARIATIONS ── */
 .var-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:var(--r2);border:1px solid var(--b2);background:var(--s2);color:var(--tx2);font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;margin-left:8px}
 .var-btn:hover:not(:disabled){background:var(--s3);border-color:var(--b3)}
-.var-btn:disabled{opacity:.35;cursor:not-allowed}
+.var-btn:disabled{opacity:.35;cursor:not-allowed;position:relative}
 .var-results{margin-top:14px;display:none}
 .var-results.show{display:block}
 .var-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
@@ -1135,6 +1135,21 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .rl-dpill:hover{color:var(--tx2);border-color:var(--b3)}
 .rl-dpill.on{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
 .rl-agent-badge{font-size:10px;color:var(--tx4);padding:6px 0;font-style:italic}
+
+/* ── SCROLL HINTS ── */
+.nav,.otabs,.album-tabs,.hist-items{
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+}
+/* Show thin scrollbar on desktop for discoverability */
+@media(hover:hover){
+  .otabs::-webkit-scrollbar,.album-tabs::-webkit-scrollbar,.hist-items::-webkit-scrollbar{display:block;height:2px}
+  .otabs::-webkit-scrollbar-track,.album-tabs::-webkit-scrollbar-track,.hist-items::-webkit-scrollbar-track{background:var(--s2)}
+  .otabs::-webkit-scrollbar-thumb,.album-tabs::-webkit-scrollbar-thumb,.hist-items::-webkit-scrollbar-thumb{background:var(--b3);border-radius:1px}
+}
+@media(max-width:580px){
+  textarea,input,select{font-size:16px!important}
+}
 
 </style>
 
@@ -1651,7 +1666,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
-        <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled>✨ Variations</button>
+        <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
         <button class="like-btn" id="res-like-btn" onclick="setLike('res',true)" title="Like this song">👍</button>
         <button class="dislike-btn" id="res-dislike-btn" onclick="setLike('res',false)" title="Dislike">👎</button>
         <button class="btn btn-sm" onclick="printBrief('res')" title="Print song brief">🖨 Print</button>
@@ -2251,7 +2266,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <select id="camp-platform" class="camp-select">
           <option value="suno">Suno AI</option>
           <option value="udio">Udio</option>
-          <option value="both">Both (dual prompts)</option>
+          <option value="both">Both Suno + Udio (outputs 2 style prompts)</option>
           <option value="general">General / No platform</option>
         </select>
       </div>
@@ -4802,7 +4817,7 @@ function delFromLib(idx){
 }
 
 function clearLib(){
-  if(!confirm(`Clear all ${S.library.length} saved songs? This cannot be undone.`)) return;
+  if (!confirm('Delete all saved songs? This cannot be undone.')) return;
   S.library = [];
   persistLib();
   renderLib();
@@ -5947,6 +5962,7 @@ For each concept, provide:
 4. A production prompt optimized for ${platformDesc}
 5. A one-line artist hook (memorable phrase or lyric)
 6. Brief production notes
+${platform === 'both' ? '\n\nFor each concept, provide TWO style prompts:\nSUNO PROMPT: [optimized for Suno]\nUDIO PROMPT: [optimized for Udio]' : `\n\nStyle prompt format: optimized for ${platformDesc}.`}
 
 Format each concept clearly with these exact headers:
 CONCEPT [N]:
@@ -5955,7 +5971,7 @@ ANGLE:
 HOOK LINE:
 LYRICS:
 [full lyrics here]
-PRODUCTION PROMPT:
+${platform === 'both' ? 'SUNO PROMPT:\nUDIO PROMPT:' : 'PRODUCTION PROMPT:'}
 PRODUCTION NOTES:
 ---`;
 
@@ -5972,7 +5988,9 @@ PRODUCTION NOTES:
       const titleMatch = ct.match(/TITLE:\s*(.+)/i);
       const angleMatch = ct.match(/ANGLE:\s*([\s\S]+?)(?=HOOK LINE:|LYRICS:|$)/i);
       const hookMatch = ct.match(/HOOK LINE:\s*(.+)/i);
-      const lyricsMatch = ct.match(/LYRICS:\s*([\s\S]+?)(?=PRODUCTION PROMPT:|PRODUCTION NOTES:|---$|$)/i);
+      const lyricsMatch = ct.match(/LYRICS:\s*([\s\S]+?)(?=SUNO PROMPT:|UDIO PROMPT:|PRODUCTION PROMPT:|PRODUCTION NOTES:|---$|$)/i);
+      const sunoPromptMatch = ct.match(/SUNO PROMPT:\s*([\s\S]+?)(?=UDIO PROMPT:|PRODUCTION NOTES:|---$|$)/i);
+      const udioPromptMatch = ct.match(/UDIO PROMPT:\s*([\s\S]+?)(?=PRODUCTION NOTES:|---$|$)/i);
       const promptMatch = ct.match(/PRODUCTION PROMPT:\s*([\s\S]+?)(?=PRODUCTION NOTES:|---$|$)/i);
       const notesMatch = ct.match(/PRODUCTION NOTES:\s*([\s\S]+?)(?=---|$)/i);
 
@@ -5980,6 +5998,8 @@ PRODUCTION NOTES:
       const angle = angleMatch?.[1]?.trim() || '';
       const hookLine = hookMatch?.[1]?.trim() || '';
       const lyrics = lyricsMatch?.[1]?.trim() || '';
+      const sunoPrompt = sunoPromptMatch?.[1]?.trim() || '';
+      const udioPrompt = udioPromptMatch?.[1]?.trim() || '';
       const productionPrompt = promptMatch?.[1]?.trim() || '';
       const notes = notesMatch?.[1]?.trim() || '';
 
@@ -5998,7 +6018,10 @@ PRODUCTION NOTES:
         <div class="concept-body">
           ${hookLine ? `<div class="concept-section-title">Hook Line</div><div class="concept-hook">"${hookLine}"</div>` : ''}
           ${lyrics ? `<div class="concept-section-title">Lyrics Preview</div><div class="concept-lyrics">${lyrics.slice(0,400).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>')}${lyrics.length>400?'…':''}</div>` : ''}
-          ${productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${productionPrompt}</div>` : ''}
+          ${platform === 'both'
+            ? (sunoPrompt ? `<div class="concept-section-title">Suno Prompt</div><div class="concept-prompt">${sunoPrompt}</div>` : '')
+              + (udioPrompt ? `<div class="concept-section-title">Udio Prompt</div><div class="concept-prompt">${udioPrompt}</div>` : '')
+            : (productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${productionPrompt}</div>` : '')}
           ${notes ? `<div class="concept-section-title">Production Notes</div><div class="concept-brief">${notes}</div>` : ''}
         </div>
         <div class="concept-actions">
