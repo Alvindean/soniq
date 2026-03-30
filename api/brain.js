@@ -1670,4 +1670,49 @@ DIRECTOR NOTES:
   return { system, prompt };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE };
+const VARIANT_PROMPTS = {
+  title: (song) => `Generate 5 creative song title alternatives for a song with the following details:
+Genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
+Topic: ${song.topic}
+Current title: ${song.title}
+
+Output only the 5 titles as a numbered list. No explanations.`,
+
+  lyrics: (song) => `Rewrite the following song lyrics, keeping the same structure and theme but with fresh word choices and imagery:
+
+Title: ${song.title}
+Genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
+Topic: ${song.topic}
+
+Current lyrics:
+${song.lyrics}
+
+Output only the new lyrics. Preserve section headers like [Verse 1], [Chorus], etc.`,
+
+  style: (song) => `Generate 3 alternative style/genre directions for the following song:
+
+Title: ${song.title}
+Current genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
+Topic: ${song.topic}
+
+For each alternative, provide: genre name, mood, and a one-sentence description of how it would sound. Output as a numbered list.`,
+
+  hook: (song) => `Write 3 alternative hook/chorus options for the following song:
+
+Title: ${song.title}
+Genre: ${song.genre}${song.genre2 ? ' / ' + song.genre2 : ''}
+Topic: ${song.topic}
+
+Current lyrics context:
+${song.lyrics ? song.lyrics.slice(0, 500) : '(no lyrics provided)'}
+
+Output only the 3 hook alternatives as numbered sections. Each hook should be 4-8 lines.`
+};
+
+function buildVariantPrompt(variant, song) {
+  const builder = VARIANT_PROMPTS[variant];
+  if (!builder) throw new Error('Unknown variant: ' + variant);
+  return builder(song);
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildVariantPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE };
