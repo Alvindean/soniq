@@ -1227,6 +1227,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .profile-song-meta{font-size:10px;color:var(--tx3);margin-top:1px}
 .profile-song-liked{color:var(--amber);font-size:12px;flex-shrink:0}
 
+.founding-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.founding-badge.tier1 {
+  background: linear-gradient(135deg, rgba(251,146,60,0.2), rgba(239,68,68,0.2));
+  border: 1px solid rgba(251,146,60,0.5);
+  color: #fb923c;
+}
+.founding-badge.tier2 {
+  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.2));
+  border: 1px solid rgba(124,58,237,0.4);
+  color: #a78bfa;
+}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -2251,7 +2273,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
         <input id="auth-signup-password" type="password" autocomplete="new-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
       </div>
-      <button class="btn btn-amber" onclick="authSignUp()" id="auth-signup-btn" style="width:100%;padding:10px;font-size:14px">Create Account</button>
+      <div id="founding-offer" style="text-align:center;margin-top:8px;font-size:0.8rem;color:#fb923c;display:none">
+        🔥 <strong>Early Founder</strong> — lock in $5/mo forever · <span id="founding-spots">...</span> spots left
+      </div>
+      <button class="btn btn-amber" onclick="authSignUp()" id="auth-signup-btn" style="width:100%;padding:10px;font-size:14px;margin-top:10px">Create Account</button>
     </div>
 
     <div id="auth-success" style="display:none;text-align:center;padding:20px">
@@ -2876,6 +2901,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div style="height:4px;background:var(--bg3);border-radius:99px;overflow:hidden">
           <div id="profile-xp-bar" style="height:100%;background:linear-gradient(90deg,var(--amber),var(--violet));border-radius:99px;width:0%;transition:width .6s ease"></div>
         </div>
+      </div>
+
+      <!-- Founding badge -->
+      <div id="profile-founding-badge-wrap" style="margin-top:12px;display:none">
+        <div id="profile-founding-badge"></div>
       </div>
 
       <!-- Stats strip -->
@@ -3653,7 +3683,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
-  luckyHistory:[],sessionHistory:[],user:null,session:null,supabase:null,pubTier:'admin',editorSong:null,
+  luckyHistory:[],sessionHistory:[],user:null,session:null,supabase:null,pubTier:'admin',editorSong:null,foundingStatus:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
@@ -6476,7 +6506,7 @@ function copyCoachFeedback() {
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
-    if (event === 'SIGNED_IN') closeAuth();
+    if (event === 'SIGNED_IN') { closeAuth(); loadFoundingStatus(); }
     if (event === 'PASSWORD_RECOVERY') {
       openPasswordResetModal();
     }
@@ -6485,6 +6515,7 @@ function copyCoachFeedback() {
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
+    loadFoundingStatus();
   });
   // Handle password reset redirect
   if (new URLSearchParams(location.search).get('reset') === '1') {
@@ -6508,12 +6539,66 @@ function updateAuthUI() {
   }
 }
 
+async function loadFoundingStatus() {
+  try {
+    const res = await fetch('/api/founding');
+    if (res.ok) {
+      const data = await res.json();
+      // Update founding offer element in auth modal
+      const offerEl = document.getElementById('founding-offer');
+      const spotsEl = document.getElementById('founding-spots');
+      if (offerEl && spotsEl) {
+        if (data.tier === 1) {
+          offerEl.innerHTML = '🔥 <strong>Early Founder</strong> — lock in $5/mo forever · <span id="founding-spots">' + (data.spots_left ?? '...') + '</span> spots left';
+          offerEl.style.display = '';
+          offerEl.style.color = '#fb923c';
+        } else if (data.tier === 2) {
+          offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — lock in $9/mo forever · <span id="founding-spots">' + (data.spots_left ?? '...') + '</span> spots left';
+          offerEl.style.display = '';
+          offerEl.style.color = '#a78bfa';
+        } else {
+          offerEl.style.display = 'none';
+        }
+      }
+    }
+  } catch (e) {}
+
+  // If user is logged in, also fetch their founding status
+  if (S.user) {
+    try {
+      const res2 = await fetch('/api/founding?user_id=' + encodeURIComponent(S.user.id));
+      if (res2.ok) {
+        S.foundingStatus = await res2.json();
+        renderProfileFoundingBadge();
+      }
+    } catch (e) {}
+  }
+}
+
+function renderProfileFoundingBadge() {
+  const wrap = document.getElementById('profile-founding-badge-wrap');
+  const badge = document.getElementById('profile-founding-badge');
+  if (!wrap || !badge) return;
+  const fs = S.foundingStatus;
+  if (!fs || !fs.is_founder) { wrap.style.display = 'none'; return; }
+  if (fs.tier === 1) {
+    badge.innerHTML = '<div class="founding-badge tier1">🔥 Early Founder</div>';
+  } else if (fs.tier === 2) {
+    badge.innerHTML = '<div class="founding-badge tier2">⚡ Founding Member</div>';
+  } else {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+}
+
 function openAuth(reason) {
   const title = document.getElementById('auth-modal-title');
   if (reason && title) title.textContent = reason;
   else if (title) title.textContent = 'Sign in to Soniq';
   document.getElementById('auth-error').style.display = 'none';
   document.getElementById('auth-modal').style.display = 'block';
+  loadFoundingStatus();
 }
 
 function closeAuth() {
