@@ -1740,6 +1740,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
         <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
         <button class="btn" onclick="openCoach()" id="coach-btn" style="display:none" title="AI Feedback Coach — get expert notes on your lyrics">🎓 Coach</button>
+        <button class="btn btn-green" onclick="openPublish()" id="publish-btn" style="display:none" title="Register this song for publishing royalties">📜 Publish</button>
       </div>
     </div>
 
@@ -2187,6 +2188,99 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn" onclick="copyCoachFeedback()" style="flex:1">📋 Copy Feedback</button>
         <button class="btn" onclick="resetCoach()">← New Analysis</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISHING MODAL -->
+<div id="pub-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:910;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closePublish()">
+  <div class="card" style="max-width:560px;margin:32px auto;position:relative">
+    <button onclick="closePublish()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">📜 Publish &amp; Register</div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:18px">Register your song with a PRO (BMI/ASCAP) and start collecting royalties. Soniq handles the paperwork.</p>
+
+    <!-- Tier selection -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Choose publishing tier</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <button class="pub-tier-btn" data-tier="admin" onclick="selectPubTier('admin')" style="border:1px solid var(--brd);border-radius:8px;padding:10px 6px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-size:11px;text-align:center;transition:all .2s">
+          <div style="font-size:16px;margin-bottom:4px">📋</div>
+          <div style="font-weight:600;margin-bottom:3px">Admin</div>
+          <div style="color:var(--tx3);font-size:10px">You keep 85%<br>Soniq takes 15%</div>
+        </button>
+        <button class="pub-tier-btn" data-tier="copub" onclick="selectPubTier('copub')" style="border:1px solid var(--brd);border-radius:8px;padding:10px 6px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-size:11px;text-align:center;transition:all .2s">
+          <div style="font-size:16px;margin-bottom:4px">🤝</div>
+          <div style="font-weight:600;margin-bottom:3px">Co-Pub</div>
+          <div style="color:var(--tx3);font-size:10px">You keep 75%<br>Soniq takes 25%</div>
+        </button>
+        <button class="pub-tier-btn" data-tier="sync" onclick="selectPubTier('sync')" style="border:1px solid var(--brd);border-radius:8px;padding:10px 6px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-size:11px;text-align:center;transition:all .2s">
+          <div style="font-size:16px;margin-bottom:4px">🎬</div>
+          <div style="font-weight:600;margin-bottom:3px">Sync Pitch</div>
+          <div style="color:var(--tx3);font-size:10px">You keep 65%<br>Soniq takes 35%</div>
+        </button>
+      </div>
+      <div id="pub-tier-desc" style="font-size:11px;color:var(--tx3);margin-top:8px;min-height:32px;padding:6px 8px;background:var(--bg3);border-radius:6px"></div>
+    </div>
+
+    <!-- Song info -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Song title</div>
+      <input id="pub-song-title" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Song title">
+    </div>
+
+    <!-- Writer info -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Your legal name *</div>
+        <input id="pub-writer-name" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Full legal name">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">PRO affiliation *</div>
+        <select id="pub-pro" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box">
+          <option value="">Select PRO</option>
+          <option value="bmi">BMI</option>
+          <option value="ascap">ASCAP</option>
+          <option value="sesac">SESAC</option>
+          <option value="socan">SOCAN (Canada)</option>
+          <option value="prs">PRS (UK)</option>
+          <option value="none">Not registered yet</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">IPI / CAE Number <span style="font-style:italic;text-transform:none">(optional — from your PRO profile)</span></div>
+      <input id="pub-ipi" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="e.g. 00123456789">
+    </div>
+
+    <!-- ISRC -->
+    <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">ISRC (auto-generated)</div>
+        <code id="pub-isrc-display" style="font-size:14px;color:var(--amber);font-weight:700;letter-spacing:.06em">—</code>
+      </div>
+      <div style="font-size:10px;color:var(--tx3);max-width:180px;text-align:right">International Standard Recording Code — your song's unique global ID</div>
+    </div>
+
+    <!-- Agreement -->
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:16px;cursor:pointer">
+      <input type="checkbox" id="pub-agree" style="margin-top:2px;flex-shrink:0">
+      <span>I agree that Soniq will administer publishing on my behalf per the selected tier. I confirm I am the sole/primary writer of this song.</span>
+    </label>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-green" onclick="submitPublish()" style="flex:1;font-size:14px;padding:10px" id="pub-submit-btn">📜 Register Song</button>
+      <button class="btn" onclick="closePublish()">Cancel</button>
+    </div>
+
+    <!-- Confirmation state -->
+    <div id="pub-confirm" style="display:none;text-align:center;padding:24px">
+      <div style="font-size:36px;margin-bottom:12px">✅</div>
+      <div style="font-size:16px;font-weight:700;color:var(--tx1);margin-bottom:6px">Song Registered!</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:4px" id="pub-confirm-title"></div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">ISRC: <code id="pub-confirm-isrc" style="color:var(--amber)"></code></div>
+      <p style="font-size:11px;color:var(--tx3);margin-bottom:16px">Our team will register this with your PRO within 5 business days. You'll receive a confirmation email once it's live.</p>
+      <button class="btn" onclick="closePublish()">Done</button>
     </div>
   </div>
 </div>
@@ -3374,7 +3468,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
-  luckyHistory:[],sessionHistory:[],editorSong:null,
+  luckyHistory:[],sessionHistory:[],pubTier:'admin',editorSong:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
@@ -4668,7 +4762,8 @@ function buildClaimString(title, ts, name) {
   const d = new Date(ts);
   const iso = d.toISOString().replace('T',' ').slice(0,19) + ' UTC';
   const yr  = d.getFullYear();
-  const base = `© ${yr}${name ? ' ' + name : ''}. Original song "${title}" — Created ${iso}. All rights reserved.`;
+  const writer = name ? name : 'Unknown Writer';
+  const base = `© ${yr} ${writer} / Soniq Publishing (Alvin Dean Warren). Original song "${title}" — Created ${iso}. All rights reserved.`;
   const id   = 'SONIQ-' + ts.toString(36).toUpperCase();
   return `${base} [${id}]`;
 }
@@ -4768,6 +4863,8 @@ function parseSongResult(raw,genre,topic){
   if (vhBtn) vhBtn.style.display = '';
   const coachBtn = document.getElementById('coach-btn');
   if (coachBtn) coachBtn.style.display = '';
+  const publishBtn = document.getElementById('publish-btn');
+  if (publishBtn) publishBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -6181,6 +6278,108 @@ function copyCoachFeedback() {
   toast('Feedback copied to clipboard');
 }
 
+// ─── PUBLISHING ────────────────────────────────────────────────
+function generateISRC() {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const seq = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
+  return 'US-SQX-' + year + '-' + seq;
+}
+
+function openPublish() {
+  const song = S.currentSong;
+  document.getElementById('pub-song-title').value = song ? song.title : '';
+  document.getElementById('pub-isrc-display').textContent = generateISRC();
+  document.getElementById('pub-writer-name').value = '';
+  document.getElementById('pub-pro').value = '';
+  document.getElementById('pub-ipi').value = '';
+  document.getElementById('pub-agree').checked = false;
+  document.getElementById('pub-confirm').style.display = 'none';
+  document.querySelector('#pub-modal .card > *:not(#pub-confirm)') && Array.from(document.querySelectorAll('#pub-modal .card > *:not(button[onclick="closePublish()"])')).forEach(el => el.style.display !== 'none' && el.id !== 'pub-confirm' ? '' : '');
+  // Reset to form view
+  const card = document.querySelector('#pub-modal .card');
+  Array.from(card.children).forEach(el => { if (el.id !== 'pub-confirm') el.style.display = ''; });
+  document.getElementById('pub-confirm').style.display = 'none';
+  S.pubTier = 'admin';
+  selectPubTier('admin');
+  document.getElementById('pub-modal').style.display = 'block';
+}
+
+function closePublish() {
+  document.getElementById('pub-modal').style.display = 'none';
+}
+
+const PUB_TIER_DESCS = {
+  admin: 'We register your song with your PRO and collect royalties on your behalf. You receive 85% of all collected royalties. Best for independent artists who want hands-off admin.',
+  copub: 'Soniq becomes your co-publisher and actively promotes your song. You receive 75% of royalties. We pursue sync licensing and playlist placements on your behalf.',
+  sync: 'Our sync team pitches your song to film, TV, advertising, and brand campaigns. You receive 65% of all sync fees and royalties. Best for cinematic and radio-ready songs.'
+};
+
+function selectPubTier(tier) {
+  S.pubTier = tier;
+  document.querySelectorAll('.pub-tier-btn').forEach(btn => {
+    const isSelected = btn.dataset.tier === tier;
+    btn.style.borderColor = isSelected ? 'var(--amber)' : 'var(--brd)';
+    btn.style.background = isSelected ? 'rgba(251,191,36,.12)' : 'var(--bg2)';
+    btn.style.color = isSelected ? 'var(--amber)' : 'var(--tx2)';
+  });
+  const desc = document.getElementById('pub-tier-desc');
+  if (desc) desc.textContent = PUB_TIER_DESCS[tier] || '';
+}
+
+async function submitPublish() {
+  const writerName = (document.getElementById('pub-writer-name').value || '').trim();
+  const pro = document.getElementById('pub-pro').value;
+  const ipi = (document.getElementById('pub-ipi').value || '').trim();
+  const title = (document.getElementById('pub-song-title').value || '').trim();
+  const isrc = document.getElementById('pub-isrc-display').textContent;
+  const tier = S.pubTier || 'admin';
+  const agreed = document.getElementById('pub-agree').checked;
+
+  if (!writerName) { toast('Please enter your legal name'); return; }
+  if (!pro) { toast('Please select your PRO affiliation'); return; }
+  if (!agreed) { toast('Please agree to the publishing terms'); return; }
+
+  const btn = document.getElementById('pub-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Registering…';
+
+  try {
+    const resp = await fetch('/api/publish', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        isrc,
+        writer_name: writerName,
+        pro,
+        ipi: ipi || null,
+        tier,
+        genre: S.currentSong?.genre || null,
+        topic: S.currentSong?.topic || null,
+        song_id: S.currentSong?.id || null
+      })
+    });
+
+    if (!resp.ok) throw new Error('server error');
+
+    // Save locally
+    const pubs = JSON.parse(localStorage.getItem('soniq_published') || '[]');
+    pubs.unshift({ title, isrc, tier, pro, ts: Date.now() });
+    localStorage.setItem('soniq_published', JSON.stringify(pubs.slice(0, 50)));
+
+    // Show confirmation
+    const card = document.querySelector('#pub-modal .card');
+    Array.from(card.children).forEach(el => { el.style.display = el.id === 'pub-confirm' ? '' : 'none'; });
+    document.getElementById('pub-confirm-title').textContent = '"' + title + '" — ' + tier.charAt(0).toUpperCase() + tier.slice(1) + ' Publishing';
+    document.getElementById('pub-confirm-isrc').textContent = isrc;
+
+  } catch(e) {
+    toast('Registration failed — please try again');
+    btn.disabled = false;
+    btn.textContent = '📜 Register Song';
+  }
+}
+
 // ═══════════════════════════════════════════════════════
 // VERSION HISTORY
 // ═══════════════════════════════════════════════════════
@@ -7386,6 +7585,8 @@ async function importAndAnalyze() {
     if (vhBtn2) vhBtn2.style.display = '';
     const coachBtn2 = document.getElementById('coach-btn');
     if (coachBtn2) coachBtn2.style.display = '';
+    const publishBtn2 = document.getElementById('publish-btn');
+    if (publishBtn2) publishBtn2.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';
