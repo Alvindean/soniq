@@ -4852,9 +4852,9 @@ function renderLuckyHistory(){
   if(hist)hist.style.display='block';
   grid.innerHTML=S.luckyHistory.map((s,i)=>`
     <div class="libcard" onclick="loadLuckyHistItem(${i})">
-      <div class="lc-title">${s.title||'Untitled'}</div>
-      <div class="lc-meta"><span class="bdg bdg-gold">${s.genre||'?'}</span></div>
-      <div class="lc-preview">${(s.topic||'')}</div>
+      <div class="lc-title">${escHtml(s.title||'Untitled')}</div>
+      <div class="lc-meta"><span class="bdg bdg-gold">${escHtml(s.genre||'?')}</span></div>
+      <div class="lc-preview">${escHtml(s.topic||'')}</div>
     </div>`).join('');
 }
 
@@ -6476,9 +6476,11 @@ async function generateVariant() {
       max_tokens: 2048
     };
 
+    const variantHeaders = { 'Content-Type': 'application/json' };
+    if (S.session?.access_token) variantHeaders['Authorization'] = 'Bearer ' + S.session.access_token;
     const resp = await fetch('/api/generate', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...(window._soniqKey ? { 'x-api-key': window._soniqKey } : {}) },
+      headers: variantHeaders,
       body: JSON.stringify(body)
     });
 
@@ -6805,30 +6807,33 @@ async function openUpgradeModal() {
     const urgency        = document.getElementById('upgrade-urgency');
     const urgencyClaimed = document.getElementById('upgrade-urgency-claimed');
     const urgencySuffix  = document.getElementById('upgrade-urgency-suffix');
-    if (data.tier === 1) {
+    const currentTier = data.current_tier;
+    const t1SpotsLeft = data.tier1?.spots_left ?? 500;
+    const t2SpotsLeft = data.tier2?.spots_left ?? 1500;
+    if (currentTier === 1) {
       tierWrap.className   = 'upgrade-tier-wrap tier1';
       tierIcon.textContent = '🔥';
       tierName.className   = 'upgrade-tier-name tier1';
       tierName.innerHTML   = 'Early Founder<span class="price-forever" style="color:#fb923c">$5/mo forever</span>';
-      tierSpot.textContent = (data.spots_left ?? '…') + ' of 500 spots left';
+      tierSpot.textContent = t1SpotsLeft + ' of 500 spots left';
       tierBadge.className  = 'upgrade-tier-badge tier1';
       tierBadge.textContent= 'Founding';
       if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn tier1';
       if (ctaPrice) ctaPrice.textContent = '$5';
-      if (urgencyClaimed) urgencyClaimed.textContent = 500 - (data.spots_left ?? 500);
+      if (urgencyClaimed) urgencyClaimed.textContent = 500 - t1SpotsLeft;
       if (urgencySuffix) urgencySuffix.textContent = 'of 500 claimed';
       if (urgency) urgency.style.display = '';
-    } else if (data.tier === 2) {
+    } else if (currentTier === 2) {
       tierWrap.className   = 'upgrade-tier-wrap';
       tierIcon.textContent = '⚡';
       tierName.className   = 'upgrade-tier-name';
       tierName.innerHTML   = 'Founding Member<span class="price-forever">$10/mo forever</span>';
-      tierSpot.textContent = (data.spots_left ?? '…') + ' of 1500 spots left';
+      tierSpot.textContent = t2SpotsLeft + ' of 1500 spots left';
       tierBadge.className  = 'upgrade-tier-badge';
       tierBadge.textContent= 'Founding';
       if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
       if (ctaPrice) ctaPrice.textContent = '$10';
-      if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - (data.spots_left ?? 1500));
+      if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - t2SpotsLeft);
       if (urgencySuffix) urgencySuffix.textContent = 'of 2000 founding spots claimed';
       if (urgency) urgency.style.display = '';
     } else {
@@ -6861,12 +6866,12 @@ async function loadFoundingStatus() {
       const offerEl = document.getElementById('founding-offer');
       const spotsEl = document.getElementById('founding-spots');
       if (offerEl && spotsEl) {
-        if (data.tier === 1) {
-          offerEl.innerHTML = '🔥 <strong>Early Founder</strong> — lock in $5/mo forever · <span id="founding-spots">' + (data.spots_left ?? '...') + '</span> spots left';
+        if (data.current_tier === 1) {
+          offerEl.innerHTML = '🔥 <strong>Early Founder</strong> — lock in $5/mo forever · <span id="founding-spots">' + (data.tier1?.spots_left ?? '...') + '</span> spots left';
           offerEl.style.display = '';
           offerEl.style.color = '#fb923c';
-        } else if (data.tier === 2) {
-          offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — lock in $9/mo forever · <span id="founding-spots">' + (data.spots_left ?? '...') + '</span> spots left';
+        } else if (data.current_tier === 2) {
+          offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — lock in $9/mo forever · <span id="founding-spots">' + (data.tier2?.spots_left ?? '...') + '</span> spots left';
           offerEl.style.display = '';
           offerEl.style.color = '#a78bfa';
         } else {
@@ -7381,7 +7386,7 @@ function renderHistory() {
   if (S.sessionHistory.length < 2) { bar.classList.remove('show'); return; }
   bar.classList.add('show');
   items.innerHTML = S.sessionHistory.map((h, i) =>
-    `<span class="hist-chip${i===0?' current':''}" onclick="loadFromHistory(${i})" title="${h.title}">${h.title}</span>`
+    `<span class="hist-chip${i===0?' current':''}" onclick="loadFromHistory(${i})" title="${escHtml(h.title)}">${escHtml(h.title)}</span>`
   ).join('');
 }
 
@@ -7445,7 +7450,7 @@ function exportPDF() {
   if (!song) { toast('Generate a song first'); return; }
   const meta = document.getElementById('print-meta');
   if (meta) {
-    meta.innerHTML = `<strong>${song.title||'Untitled'}</strong> · Genre: ${song.genre||''} · Generated by SONIQ · ${new Date().toLocaleDateString()}`;
+    meta.innerHTML = `<strong>${escHtml(song.title||'Untitled')}</strong> · Genre: ${escHtml(song.genre||'')} · Generated by SONIQ · ${new Date().toLocaleDateString()}`;
   }
   window.print();
 }
@@ -7528,9 +7533,9 @@ Return ONLY valid JSON array:
     grid.innerHTML = vars.map((v, i) => `
       <div class="var-card" onclick="selectVariation(this, '${prefix}', ${i})">
         <div class="var-num">Variation ${i+1}</div>
-        <div class="var-title">${v.title||''}</div>
-        <div class="var-verdict">${v.verdict||''}</div>
-        <div class="var-preview">${v.previewLine||''}</div>
+        <div class="var-title">${escHtml(v.title||'')}</div>
+        <div class="var-verdict">${escHtml(v.verdict||'')}</div>
+        <div class="var-preview">${escHtml(v.previewLine||'')}</div>
         <button class="var-load-btn" onclick="event.stopPropagation();loadVariation('${prefix}',${i})">Load this variation →</button>
       </div>`).join('');
     btn.textContent = '✨ Variations';
@@ -8061,8 +8066,8 @@ async function writeAllTracks() {
           <button class="btn btn-sm btn-gold" onclick="safeCopy('${r.style.replace(/'/g,"\\'")}','Style copied')">Copy Style</button>
         </div>
       </div>
-      <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${r.lyrics}</pre>
-      <div class="styleout" style="font-size:11px">${r.style}</div>
+      <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${escHtml(r.lyrics||'')}</pre>
+      <div class="styleout" style="font-size:11px">${escHtml(r.style||'')}</div>
     </div>`).join('');
   toast(`✓ ${results.length} tracks written`);
 }
@@ -9617,7 +9622,7 @@ function dbgUpdateState() {
 
 function dbgUpdateErrors() {
   document.getElementById('dbg-pane-errors').innerHTML=`<div class="dbg-label">Error Log</div>${
-    DBG.errors.length?DBG.errors.map(e=>`<div class="dbg-err"><span style="color:var(--tx3)">${e.t}</span> <strong>${e.ctx}:</strong> ${e.msg}</div>`).join('')
+    DBG.errors.length?DBG.errors.map(e=>`<div class="dbg-err"><span style="color:var(--tx3)">${escHtml(e.t||'')}</span> <strong>${escHtml(e.ctx||'')}:</strong> ${escHtml(e.msg||'')}</div>`).join('')
     :'<div style="color:var(--tx3);font-size:12px;padding:8px">No errors</div>'
   }`;
 }

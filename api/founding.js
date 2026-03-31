@@ -238,6 +238,17 @@ async function handlePost(req, res) {
   const countKey  = `soniq:founding:tier${tier}:count`;
   const activeKey = `soniq:founding:tier${tier}:active`;
 
+  // Check if this user has already claimed any founding tier (prevent double-claim)
+  const existingRecord = await redisCommand('GET', `soniq:founding:user:${user_id}`);
+  if (existingRecord) {
+    let existing;
+    try { existing = JSON.parse(existingRecord); } catch { existing = {}; }
+    return res.status(409).json({
+      error:   'already_claimed',
+      message: `You have already claimed a founding tier (Tier ${existing.tier || '?'})`,
+    });
+  }
+
   // Check tier is active before incrementing
   const activeFlag = await redisCommand('GET', activeKey);
   if (activeFlag !== '1') {
@@ -279,7 +290,8 @@ async function handlePost(req, res) {
     }
   }
 
-  // Persist user record
+  // Persist user record using SET NX (only set if key does not exist) to prevent
+  // a TOCTOU race where two concurrent requests both pass the existence check above.
   const userRecord = {
     tier,
     label:         tierInfo.label,
@@ -288,9 +300,17 @@ async function handlePost(req, res) {
     claimed_at:    new Date().toISOString(),
   };
 
-  await redisPipeline([
-    ['SET', `soniq:founding:user:${user_id}`, JSON.stringify(userRecord)],
-  ]);
+  const setResult = await redisCommand('SET', `soniq:founding:user:${user_id}`, JSON.stringify(userRecord), 'NX');
+  if (setResult === null) {
+    // Another concurrent request already wrote the record — decrement and reject
+    await redisCommand('DECR', countKey);
+    let existing;
+    try { existing = JSON.parse(await redisCommand('GET', `soniq:founding:user:${user_id}`) || '{}'); } catch { existing = {}; }
+    return res.status(409).json({
+      error:   'already_claimed',
+      message: `You have already claimed a founding tier (Tier ${existing.tier || '?'})`,
+    });
+  }
 
   return res.status(200).json({
     ok:            true,

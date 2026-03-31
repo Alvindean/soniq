@@ -66,13 +66,13 @@ const ALLOWED_PROS  = new Set(['bmi', 'ascap', 'sesac', 'socan', 'prs', 'none'])
 
 module.exports = async function handler(req, res) {
   const origin  = req.headers.origin || '';
-  const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+  const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
   const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
-  const cors = allowed.includes(origin) || isPreview ? origin : 'https://soniq.vercel.app';
+  const cors = allowed.includes(origin) || isPreview ? origin : 'https://www.mysoniq.com';
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 

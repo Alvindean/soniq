@@ -139,9 +139,9 @@ async function pipeSSE(r, res, extractText) {
 
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
-  const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+  const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
   const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
-  const cors = allowed.includes(origin) || isPreview ? origin : 'https://soniq.vercel.app';
+  const cors = allowed.includes(origin) || isPreview ? origin : 'https://www.mysoniq.com';
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -250,8 +250,9 @@ module.exports = async function handler(req, res) {
   // Treat 'server-side' sentinel (set by client on Vercel) as no user key
   const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
 
-  // If using server key, never allow caller to override the system prompt
-  if (!userKey) {
+  // If using server key and this is a legacy raw-message request (no action/variant),
+  // lock the system prompt. For brain-built prompts (action/variant), keep their specialized system.
+  if (!userKey && !body.action && !body.variant) {
     system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
   }
 

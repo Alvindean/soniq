@@ -11,6 +11,16 @@ const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM = 'SONIQ <info@mysoniq.com>';
 const REPLY_TO = 'info@mysoniq.com';
 
+// Escape HTML special characters to prevent injection into email body
+function escHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 const ALLOWED_ORIGINS = [
   'https://www.mysoniq.com',
   'https://mysoniq.com',
@@ -37,7 +47,7 @@ const EMAILS = {
         <!-- Body -->
         <tr><td style="background:#0f0f1a;border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:40px">
 
-          <p style="font-size:1.1rem;font-weight:600;margin:0 0 16px">Welcome to SONIQ${name ? ', ' + name : ''}.</p>
+          <p style="font-size:1.1rem;font-weight:600;margin:0 0 16px">Welcome to SONIQ${name ? ', ' + escHtml(name) : ''}.</p>
 
           <p style="color:#8b8aab;line-height:1.7;margin:0 0 24px">You just got access to the same intelligence we built for working songwriters, producers, and sync-ready artists.</p>
 
@@ -88,7 +98,7 @@ const EMAILS = {
 
         <tr><td style="background:#0f0f1a;border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:40px">
 
-          <p style="font-size:1.1rem;font-weight:600;margin:0 0 16px">3 songs a day goes fast${name ? ', ' + name : ''}.</p>
+          <p style="font-size:1.1rem;font-weight:600;margin:0 0 16px">3 songs a day goes fast${name ? ', ' + escHtml(name) : ''}.</p>
 
           <p style="color:#8b8aab;line-height:1.7;margin:0 0 16px">Until you're in a session and you want to try the same concept across three different genres. Or run a variant with a darker tone. Or find a fusion that's working and push it further.</p>
 
@@ -136,12 +146,25 @@ module.exports = async function handler(req, res) {
 
   if (!RESEND_API_KEY) return res.status(503).json({ error: 'Email service not configured' });
 
+  // Require a valid internal secret so this endpoint cannot be used as an open relay
+  const internalSecret = process.env.INTERNAL_API_SECRET;
+  if (internalSecret) {
+    const provided = req.headers['x-internal-secret'] || '';
+    if (provided !== internalSecret) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  }
+
   const { type, email, name } = req.body || {};
   if (!type || !email) return res.status(400).json({ error: 'type and email required' });
   if (!EMAILS[type]) return res.status(400).json({ error: 'Unknown email type' });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Invalid email' });
+  if (email.length > 254) return res.status(400).json({ error: 'Invalid email' });
 
-  const template = EMAILS[type](name || '');
+  // Sanitize name: strip control characters, limit length
+  const safeName = name ? String(name).replace(/[\x00-\x1f\x7f]/g, '').slice(0, 100).trim() : '';
+
+  const template = EMAILS[type](safeName);
 
   try {
     const r = await fetch('https://api.resend.com/emails', {
