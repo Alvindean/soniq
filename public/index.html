@@ -4781,6 +4781,14 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
     setTimeout(loadGlobalCounter, 1500);
   }).catch(e=>{
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('lucky-btn');return;}
+    if(e.code==='auth_required'){btnDone('lucky-btn');return;}
+    if(e.code==='limit_reached'){
+      lyricsEl.innerHTML=apiErrHtml(e.message,'limit_reached');
+      document.getElementById('lres-title').textContent='Daily Limit Reached';
+      btnDone('lucky-btn');
+      showFoundingUpsell();
+      return;
+    }
     lyricsEl.innerHTML=apiErrHtml(e.message);
     document.getElementById('lres-title').textContent='Error';
     btnDone('lucky-btn');
@@ -9818,7 +9826,7 @@ function updateProgressIndicator() {
   var prog = document.getElementById('gen-progress');
   var label = document.getElementById('gp-label');
   if (!prog || !label) return;
-  var isFounder = typeof S !== 'undefined' && (S.foundingTier === 1 || S.foundingTier === 2);
+  var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
   if (isFounder) { prog.classList.remove('show'); return; }
   var count = getDailySongCount();
   prog.classList.add('show');
@@ -9842,7 +9850,7 @@ function showGenNudge(songNum) {
   var el = document.getElementById('gen-nudge');
   var txt = document.getElementById('gn-text');
   if (!el || !txt) return;
-  var isFounder = typeof S !== 'undefined' && (S.foundingTier === 1 || S.foundingTier === 2);
+  var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
   if (isFounder) return;
   var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
   if (remaining > 0) {
