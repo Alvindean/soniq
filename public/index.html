@@ -7289,6 +7289,7 @@ function vhAddVersion(title, lyrics, genre, label) {
 }
 
 function openVH(title) {
+  if (!requirePaid('Version History')) return;
   const songTitle = title || S.currentSong?.title || S.editorSong?.title;
   if (!songTitle) { toast('No song loaded'); return; }
   const data = vhLoad();
@@ -8916,17 +8917,20 @@ function calcHookScore(prefix) {
 // Only studio / studio_annual plans can access Studio features.
 // ═══════════════════════════════════════════════════════
 const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
+const PAID_PLANS   = new Set(['pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
 
 function requireStudio(featureName) {
   if (STUDIO_PLANS.has(S.plan)) return true;
-  // Not signed in
-  if (!S.user) {
-    toast('Sign in to access ' + featureName);
-    openAuth('Sign in to access ' + featureName);
-    return false;
-  }
-  // Signed in but not Studio
+  if (!S.user) { openAuth('Sign in to access ' + featureName); return false; }
   toast('⚡ ' + featureName + ' is a Studio feature — upgrade to Studio to unlock');
+  openUpgradeModal();
+  return false;
+}
+
+function requirePaid(featureName) {
+  if (PAID_PLANS.has(S.plan)) return true;
+  if (!S.user) { openAuth('Sign in to access ' + featureName); return false; }
+  toast('⬆️ ' + featureName + ' is available on paid plans — upgrade to unlock');
   openUpgradeModal();
   return false;
 }

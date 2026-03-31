@@ -1087,12 +1087,158 @@
     .fade-in {
       opacity: 0;
       transform: translateY(24px);
-      transition: opacity 0.55s ease, transform 0.55s ease;
+      transition: opacity 0.6s cubic-bezier(0.16,1,0.3,1), transform 0.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── HERO EQ BARS ── */
+    .hero-eq {
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 4px;
+      height: 52px;
+      margin: 0 auto 36px;
+      opacity: 0.55;
+    }
+    .eq-bar {
+      width: 5px;
+      border-radius: 3px 3px 1px 1px;
+      background: linear-gradient(to top, #7c3aed, #a855f7, #06b6d4);
+      animation: eq-dance var(--d) var(--delay, 0s) ease-in-out infinite alternate;
+    }
+    @keyframes eq-dance {
+      0%   { height: 4px;  opacity: 0.5; }
+      100% { height: var(--h); opacity: 1; }
     }
 
-    .fade-in.visible {
-      opacity: 1;
-      transform: translateY(0);
+    /* ── GENRE CYCLE ── */
+    .hero-genre-cycle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      letter-spacing: 0.04em;
+      margin-bottom: 40px;
+    }
+    .genre-cycle-label { color: var(--violet-light); font-weight: 600; }
+    #genre-cycle-text {
+      color: var(--text-muted);
+      font-weight: 600;
+      transition: opacity 0.3s ease;
+    }
+    #genre-cycle-text.fading { opacity: 0; }
+
+    /* ── FEATURE CARD — enhanced hover ── */
+    .feature-card {
+      transition: all 0.35s cubic-bezier(0.16,1,0.3,1);
+    }
+    .feature-card:hover {
+      border-color: rgba(124,58,237,0.5);
+      background: rgba(20,20,35,0.95);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(124,58,237,0.15), 0 0 0 1px rgba(124,58,237,0.2);
+    }
+    .feature-card.visible {
+      transition-delay: 0s !important;
+    }
+
+    /* ── PRICING CARD — beacon + shimmer ── */
+    .pricing-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .pricing-card.featured {
+      animation: pricing-beacon 3s ease-out infinite;
+    }
+    @keyframes pricing-beacon {
+      0%   { box-shadow: 0 0 0 0 rgba(124,58,237,0.45), 0 24px 80px rgba(124,58,237,0.25); }
+      60%  { box-shadow: 0 0 0 14px rgba(124,58,237,0), 0 24px 80px rgba(124,58,237,0.25); }
+      100% { box-shadow: 0 0 0 0 rgba(124,58,237,0),   0 24px 80px rgba(124,58,237,0.25); }
+    }
+    .pricing-card.featured::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.06) 50%, transparent 60%);
+      animation: card-shimmer 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes card-shimmer {
+      0%   { left: -120%; }
+      45%  { left: 160%; }
+      100% { left: 160%; }
+    }
+
+    /* ── STEP NUMBER — pulse on hover ── */
+    .step:hover .step-number {
+      transform: scale(1.12);
+      box-shadow: 0 0 0 8px rgba(124,58,237,0.15);
+    }
+    .step-number {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* ── SECTION LABEL — animated underline ── */
+    .section-label {
+      position: relative;
+    }
+    .section-label::after {
+      content: '';
+      position: absolute;
+      bottom: -3px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      border-radius: 1px;
+      transition: width 0.6s cubic-bezier(0.16,1,0.3,1) 0.3s;
+    }
+    .visible .section-label::after,
+    section .section-label::after { width: 100%; }
+
+    /* ── STAT NUMBER — glow when counted ── */
+    .stat-number.done {
+      animation: stat-pop 0.5s cubic-bezier(0.16,1,0.3,1) forwards;
+    }
+    @keyframes stat-pop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── CTA BTN — subtle shimmer ── */
+    .btn-primary {
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+      animation: btn-shine 3.5s ease-in-out infinite;
+    }
+    @keyframes btn-shine {
+      0%   { left: -100%; }
+      40%  { left: 160%; }
+      100% { left: 160%; }
+    }
+
+    /* ── TESTIMONIAL CARD — hover lift ── */
+    .testimonial-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .testimonial-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(124,58,237,0.3);
+      box-shadow: 0 12px 40px rgba(124,58,237,0.1);
     }
   </style>
 </head>
@@ -1134,11 +1280,39 @@
         🔥 <strong id="hero-founding-text">Early Founder — $5/mo</strong> · <span id="hero-spots-left">…</span> spots left
       </div>
 
+      <div class="hero-eq" aria-hidden="true">
+        <div class="eq-bar" style="--h:14px;--d:0.7s;--delay:0.00s"></div>
+        <div class="eq-bar" style="--h:32px;--d:0.9s;--delay:0.05s"></div>
+        <div class="eq-bar" style="--h:22px;--d:0.6s;--delay:0.10s"></div>
+        <div class="eq-bar" style="--h:44px;--d:0.8s;--delay:0.15s"></div>
+        <div class="eq-bar" style="--h:18px;--d:1.1s;--delay:0.20s"></div>
+        <div class="eq-bar" style="--h:38px;--d:0.7s;--delay:0.05s"></div>
+        <div class="eq-bar" style="--h:26px;--d:0.9s;--delay:0.12s"></div>
+        <div class="eq-bar" style="--h:50px;--d:0.6s;--delay:0.08s"></div>
+        <div class="eq-bar" style="--h:30px;--d:1.0s;--delay:0.18s"></div>
+        <div class="eq-bar" style="--h:42px;--d:0.8s;--delay:0.03s"></div>
+        <div class="eq-bar" style="--h:16px;--d:0.7s;--delay:0.22s"></div>
+        <div class="eq-bar" style="--h:36px;--d:1.2s;--delay:0.07s"></div>
+        <div class="eq-bar" style="--h:24px;--d:0.9s;--delay:0.14s"></div>
+        <div class="eq-bar" style="--h:46px;--d:0.6s;--delay:0.11s"></div>
+        <div class="eq-bar" style="--h:20px;--d:0.8s;--delay:0.19s"></div>
+        <div class="eq-bar" style="--h:34px;--d:1.0s;--delay:0.06s"></div>
+        <div class="eq-bar" style="--h:12px;--d:0.7s;--delay:0.23s"></div>
+        <div class="eq-bar" style="--h:40px;--d:0.9s;--delay:0.09s"></div>
+        <div class="eq-bar" style="--h:28px;--d:1.1s;--delay:0.16s"></div>
+        <div class="eq-bar" style="--h:48px;--d:0.8s;--delay:0.02s"></div>
+      </div>
+
       <div class="hero-cta">
         <a href="/app" class="btn btn-primary">Start Writing Free →</a>
         <a href="#pricing" class="btn btn-ghost" id="hero-founding-cta" style="display:none">Lock In Founder Price →</a>
         <a href="#how-it-works" class="btn btn-ghost" id="hero-see-how">See How It Works ↓</a>
       </div>
+
+      <p class="hero-genre-cycle">
+        <span class="genre-cycle-label">Now generating:</span>
+        <span id="genre-cycle-text">Hip-Hop</span>
+      </p>
 
       <form class="hero-email" id="email-form">
         <input type="email" id="email-input" placeholder="Enter your email for early access..." required />
@@ -1307,7 +1481,9 @@
         <ul class="pricing-features">
           <li>3 generations / day</li>
           <li>All 24 genres</li>
-          <li>Lyrics + Song Prompt</li>
+          <li>Full lyrics + production brief</li>
+          <li>Music theory + visual direction</li>
+          <li>SONIQ-ID copyright timestamp</li>
         </ul>
         <a href="/app" class="btn btn-outline-violet pricing-cta">Get Started →</a>
       </div>
@@ -1375,19 +1551,19 @@
   <div class="stats">
     <div class="stats-grid">
       <div class="fade-in">
-        <div class="stat-number">24</div>
+        <div class="stat-number" data-count="24" id="stat-genres">24</div>
         <div class="stat-label">Genres</div>
       </div>
       <div class="fade-in" style="transition-delay:0.1s">
-        <div class="stat-number">63</div>
+        <div class="stat-number" data-count="63" id="stat-examples">63</div>
         <div class="stat-label">Rule-breaking song examples</div>
       </div>
       <div class="fade-in" style="transition-delay:0.2s">
-        <div class="stat-number">10</div>
+        <div class="stat-number" data-count="10" id="stat-tools">10</div>
         <div class="stat-label">Production tools per song</div>
       </div>
       <div class="fade-in" style="transition-delay:0.3s">
-        <div class="stat-number">∞</div>
+        <div class="stat-number" id="stat-infinite">∞</div>
         <div class="stat-label">Songs possible</div>
       </div>
     </div>
@@ -1632,6 +1808,60 @@
         }
       } catch (e) { /* fail silently */ }
     })();
+
+    // ── GENRE CYCLE ──
+    (function() {
+      const genres = ['Hip-Hop', 'R&B', 'Afrobeats', 'Pop', 'Country', 'Electronic', 'Latin', 'Drill', 'Singer-Songwriter', 'Trap Soul'];
+      const el = document.getElementById('genre-cycle-text');
+      if (!el) return;
+      let idx = 0;
+      setInterval(() => {
+        el.classList.add('fading');
+        setTimeout(() => {
+          idx = (idx + 1) % genres.length;
+          el.textContent = genres[idx];
+          el.classList.remove('fading');
+        }, 300);
+      }, 2200);
+    })();
+
+    // ── STATS COUNTER ──
+    (function() {
+      const counters = [
+        { id: 'stat-genres',   target: 24 },
+        { id: 'stat-examples', target: 63 },
+        { id: 'stat-tools',    target: 10 },
+      ];
+
+      function animateCount(el, target, duration) {
+        const start = performance.now();
+        (function tick(now) {
+          const p = Math.min((now - start) / duration, 1);
+          const ease = 1 - Math.pow(1 - p, 3);
+          el.textContent = Math.round(ease * target);
+          if (p < 1) requestAnimationFrame(tick);
+          else { el.textContent = target; el.classList.add('done'); }
+        })(start);
+      }
+
+      const statsObs = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          counters.forEach(({ id, target }) => {
+            const el = document.getElementById(id);
+            if (el && el.dataset.counted !== '1') {
+              el.dataset.counted = '1';
+              animateCount(el, target, 1200);
+            }
+          });
+          statsObs.disconnect();
+        });
+      }, { threshold: 0.3 });
+
+      const statsSection = document.querySelector('.stats');
+      if (statsSection) statsObs.observe(statsSection);
+    })();
+
   </script>
 </body>
 </html>
