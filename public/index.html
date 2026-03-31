@@ -3961,6 +3961,8 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal) {
 async function callServerStream(action, params, onChunk, signal) {
   const headers = {'Content-Type': 'application/json'};
   if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
+  const _adminTok = localStorage.getItem('soniq_admin_token');
+  if (window.__soniqAdmin && _adminTok) headers['X-Admin-Token'] = _adminTok;
   const res = await fetch('/api/stream', {
     method: 'POST',
     headers,
@@ -4018,6 +4020,8 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
   if (isVercel) {
     const genHeaders = {'Content-Type': 'application/json'};
     if (S.session?.access_token) genHeaders['Authorization'] = 'Bearer ' + S.session.access_token;
+    const _adminTok = localStorage.getItem('soniq_admin_token');
+    if (window.__soniqAdmin && _adminTok) genHeaders['X-Admin-Token'] = _adminTok;
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: genHeaders,

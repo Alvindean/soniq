@@ -122,39 +122,55 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
 
-  // ── Auth check ──────────────────────────────────────────────────
-  const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
-  if (!token) {
-    return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
+  // ── Admin bypass check ─────────────────────────────────────────
+  const { createHmac } = require('crypto');
+  const adminTokenHeader = req.headers['x-admin-token'] || '';
+  let isAdmin = false;
+  if (adminTokenHeader) {
+    const secret = process.env.ADMIN_TOKEN_SECRET || 'soniq-default-secret';
+    const adminPw = process.env.ADMIN_PASSWORD || '';
+    const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
+    isAdmin = (adminTokenHeader === expected);
   }
 
-  const supabase = getSupabaseClient(token);
-  if (!supabase) return res.status(503).json({ error: 'auth service unavailable' });
-
-  const { data: { user }, error: authErr } = await supabase.auth.getUser();
-  if (authErr || !user) {
-    return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
+  // ── Auth check ──────────────────────────────────────────────────
+  let user = isAdmin ? { id: 'admin' } : null;
+  let supabase = null;
+  if (!isAdmin) {
+    const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
+    if (!token) {
+      return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
+    }
+    supabase = getSupabaseClient(token);
+    if (!supabase) return res.status(503).json({ error: 'auth service unavailable' });
+    const { data: { user: u }, error: authErr } = await supabase.auth.getUser();
+    if (authErr || !u) {
+      return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
+    }
+    user = u;
   }
 
   // ── Plan lookup + rate limiting ─────────────────────────────────
-  let plan = 'free';
-  try {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('plan')
-      .eq('id', user.id)
-      .single();
-    if (profile?.plan) plan = profile.plan;
-  } catch (e) {
-    console.error('Profile fetch error:', e.message);
+  let plan = isAdmin ? 'studio' : 'free';
+  if (!isAdmin) {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', user.id)
+        .single();
+      if (profile?.plan) plan = profile.plan;
+    } catch (e) {
+      console.error('Profile fetch error:', e.message);
+    }
   }
 
   const limit = PLAN_LIMITS[plan] ?? 3;
-  if (isFinite(limit)) {
+  if (!isAdmin && isFinite(limit)) {
     const dateKey = getTodayDate();
     const redisKey = `soniq:ratelimit:daily:${user.id}:${dateKey}`;
     const current = parseInt(await redisGet(redisKey) || '0', 10);
@@ -234,7 +250,7 @@ module.exports = async function handler(req, res) {
     try {
       const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
       // Increment rate-limit counter after successful generation
-      if (isFinite(limit)) {
+      if (!isAdmin && isFinite(limit)) {
         const dateKey = getTodayDate();
         redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
       }
@@ -249,7 +265,7 @@ module.exports = async function handler(req, res) {
     try {
       const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
       // Increment rate-limit counter after successful generation
-      if (isFinite(limit)) {
+      if (!isAdmin && isFinite(limit)) {
         const dateKey = getTodayDate();
         redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
       }
