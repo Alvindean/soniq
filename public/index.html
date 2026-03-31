@@ -5309,6 +5309,7 @@ function parseSongResult(raw,genre,topic){
   toast('✓ Song generated: "'+title+'"');
   trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
+  onboardingPostGenerate();
 }
 
 // ─── BRIEF RENDERER ───────────────────────────────────────────
@@ -6734,6 +6735,7 @@ function copyCoachFeedback() {
     if (event === 'SIGNED_IN') {
       closeAuth();
       loadFoundingStatus();
+      initOnboarding();
       // Resume any generation that was blocked by the auth gate
       if (S._pendingGenerate) {
         const pending = S._pendingGenerate;
