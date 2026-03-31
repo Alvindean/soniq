@@ -2536,7 +2536,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="upgrade-tier-icon" id="upgrade-tier-icon">⚡</div>
         <div class="upgrade-tier-body">
           <div class="upgrade-tier-name" id="upgrade-tier-name">
-            Founding Member<span class="price-forever" id="upgrade-price-label">$10/mo forever</span>
+            Founding Member<span class="price-forever" id="upgrade-price-label">$9.99/mo forever</span>
           </div>
           <div class="upgrade-tier-spot" id="upgrade-tier-spot">Loading spots…</div>
         </div>
@@ -2556,7 +2556,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="upgrade-urgency" id="upgrade-urgency">Founding spots are going fast — <span id="upgrade-urgency-claimed">…</span> <span id="upgrade-urgency-suffix">of 500 claimed</span></div>
 
     <div class="upgrade-actions">
-      <a id="upgrade-cta-btn" href="/app#account" class="upgrade-cta-btn">Lock In <span id="upgrade-cta-price">$10</span> Forever →</a>
+      <button id="upgrade-cta-btn" onclick="startCheckout()" class="upgrade-cta-btn">Lock In <span id="upgrade-cta-price">$9.99</span> Forever →</button>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px">
+        <button onclick="startCheckout('annual')" style="font-size:12px;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline">Annual (save 30%) →</button>
+        <button onclick="startCheckout('studio')" style="font-size:12px;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline">Studio $49/mo →</button>
+      </div>
       <button class="upgrade-dismiss" onclick="closeUpgradeModal()">Maybe later</button>
     </div>
   </div>
@@ -6853,12 +6857,12 @@ async function openUpgradeModal() {
       tierWrap.className   = 'upgrade-tier-wrap';
       tierIcon.textContent = '⚡';
       tierName.className   = 'upgrade-tier-name';
-      tierName.innerHTML   = 'Founding Member<span class="price-forever">$10/mo forever</span>';
+      tierName.innerHTML   = 'Founding Member<span class="price-forever">$9.99/mo forever</span>';
       tierSpot.textContent = t2SpotsLeft + ' of 1500 spots left';
       tierBadge.className  = 'upgrade-tier-badge';
       tierBadge.textContent= 'Founding';
       if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
-      if (ctaPrice) ctaPrice.textContent = '$10';
+      if (ctaPrice) ctaPrice.textContent = '$9.99';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - t2SpotsLeft);
       if (urgencySuffix) urgencySuffix.textContent = 'of 2000 founding spots claimed';
       if (urgency) urgency.style.display = '';
@@ -6881,6 +6885,62 @@ function closeUpgradeModal() {
   const modal = document.getElementById('upgrade-modal');
   if (modal) modal.classList.remove('open');
   document.body.style.overflow = '';
+}
+
+// Direct Stripe Payment Links (fallback if checkout API unavailable)
+const STRIPE_PAYMENT_LINKS = {
+  founding_t1:        'https://buy.stripe.com/4gM14o8D32eI1Ja2Kn5Vu09',
+  founding_t1_annual: 'https://buy.stripe.com/5kQcN606xdXq4Vmet55Vu0a',
+  founding_t2:        'https://buy.stripe.com/cNi00k8D36uY0F64Sv5Vu0b',
+  founding_t2_annual: 'https://buy.stripe.com/9B6eVe3iJ06AfA04Sv5Vu0c',
+  pro:                'https://buy.stripe.com/8x2bJ2g5v2eI4VmbgT5Vu0d',
+  pro_annual:         'https://buy.stripe.com/dRmcN606x6uY87y0Cf5Vu0e',
+  studio:             'https://buy.stripe.com/7sYcN63iJ4mQdrSdp15Vu0f',
+  studio_annual:      'https://buy.stripe.com/aFa6oIaLb4mQafGgBd5Vu0g',
+};
+
+async function startCheckout(variant) {
+  // Determine which plan to use based on current tier shown in modal
+  const priceEl = document.getElementById('upgrade-cta-price');
+  const price = priceEl ? priceEl.textContent.trim() : '';
+  let basePlan = 'pro';
+  if (price === '$5') basePlan = 'founding_t1';
+  else if (price === '$9.99') basePlan = 'founding_t2';
+  else if (price === '$19') basePlan = 'pro';
+
+  let plan = basePlan;
+  if (variant === 'annual') plan = basePlan + '_annual';
+  if (variant === 'studio') plan = 'studio';
+  if (variant === 'studio_annual') plan = 'studio_annual';
+
+  const btn = document.getElementById('upgrade-cta-btn');
+  if (btn) { btn.textContent = 'Loading…'; btn.disabled = true; }
+
+  try {
+    const session = S.supabase ? await S.supabase.auth.getSession() : null;
+    const token = session?.data?.session?.access_token;
+    if (!token) {
+      // Not logged in — fall through to payment link
+      throw new Error('no session');
+    }
+    const resp = await fetch('/api/stripe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ plan }),
+    });
+    const data = await resp.json();
+    if (data.url) {
+      window.location.href = data.url;
+      return;
+    }
+    throw new Error(data.error || 'no url');
+  } catch (e) {
+    // Fallback: direct Stripe payment link
+    const link = STRIPE_PAYMENT_LINKS[plan] || STRIPE_PAYMENT_LINKS['pro'];
+    window.open(link, '_blank', 'noopener');
+  } finally {
+    if (btn) { btn.textContent = 'Lock In ' + (priceEl ? priceEl.outerHTML : '') + ' Forever →'; btn.disabled = false; }
+  }
 }
 
 async function loadFoundingStatus() {

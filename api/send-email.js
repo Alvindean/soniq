@@ -54,7 +54,7 @@ const EMAILS = {
 
           <p style="color:#f1f0ff;font-weight:500;margin:0 0 12px">Here's what's waiting for you right now:</p>
           <ul style="color:#8b8aab;line-height:1.9;padding-left:20px;margin:0 0 24px">
-            <li><strong style="color:#f1f0ff">21 genre DNAs</strong> — structural rules, production formulas, and the outlier songs that broke the rules but still charted</li>
+            <li><strong style="color:#f1f0ff">24 genre DNAs</strong> — structural rules, production formulas, and the outlier songs that broke the rules but still charted</li>
             <li><strong style="color:#f1f0ff">Music theory layer</strong> — modes, chord psychology, harmony controls baked in</li>
             <li><strong style="color:#f1f0ff">Production brief</strong> — BPM, instrumentation, arrangement notes, ready for the studio</li>
             <li><strong style="color:#f1f0ff">Visual direction</strong> — music video concept, cover art prompts, artist visual</li>
