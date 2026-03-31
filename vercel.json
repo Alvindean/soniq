@@ -36,6 +36,9 @@
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/admin", "dest": "/admin.html" },
     { "src": "/legal/(.*)", "dest": "/legal/$1" },
+    { "src": "/blog", "dest": "/blog/index.html" },
+    { "src": "/blog/(.*)\\.html", "dest": "/blog/$1.html" },
+    { "src": "/blog/(.*)", "dest": "/blog/$1.html" },
     { "src": "/app", "dest": "/index.html" },
     { "src": "/", "dest": "/landing.html" },
     { "src": "/(.*)", "dest": "/index.html" }
