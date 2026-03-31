@@ -6,6 +6,28 @@
  */
 const { createClient } = require('@supabase/supabase-js');
 
+const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+async function checkExportRate(userId) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return true;
+  const key = `soniq:export_rate:${userId}`;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/incr/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const d = await r.json();
+    if (d.result === 1) {
+      await fetch(`${UPSTASH_URL}/expire/${encodeURIComponent(key)}/86400`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+      });
+    }
+    return d.result <= 3;
+  } catch { return true; }
+}
+
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
   const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
@@ -29,6 +51,8 @@ module.exports = async function handler(req, res) {
 
   const { data: { user }, error: authErr } = await supabase.auth.getUser();
   if (authErr || !user) return res.status(401).json({ error: 'invalid token' });
+
+  if (!await checkExportRate(user.id)) return res.status(429).json({ error: 'Export limit reached. Try again in 24 hours.' });
 
   const [profile, songs, registrations, royalties, payouts] = await Promise.all([
     supabase.from('profiles').select('*').eq('id', user.id).single(),
