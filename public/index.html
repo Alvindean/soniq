@@ -4526,7 +4526,7 @@ function apiErrHtml(msg, errCode) {
   if (isAuthRequired) {
     hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account to generate your song — 3 free songs every day\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
   } else if (isLimitReached) {
-    hint = '<br><br>You\'ve used your 3 free songs today. Upgrade to Pro or lock in a Founding tier price.<br><button class="btn btn-amber" onclick="showFoundingUpsell()" style="margin-top:8px;font-size:13px">View Founding Offer</button>';
+    hint = '<br><br>You\'ve used your 3 free songs today. Upgrade to unlock unlimited generations.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock Unlimited →</button>';
   } else if (isCredits) {
     hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
   } else if (isKey) {
@@ -6767,15 +6767,84 @@ function updateAuthUI() {
   const authBtn = document.getElementById('nav-auth-btn');
   const signOutBtn = document.getElementById('nav-signout-btn');
   const userInfo = document.getElementById('nav-user-info');
+  const upgradeBtn = document.getElementById('nav-upgrade-btn');
   if (S.user) {
     if (authBtn) authBtn.style.display = 'none';
     if (signOutBtn) signOutBtn.style.display = '';
     if (userInfo) { userInfo.style.display = ''; userInfo.textContent = S.user.email?.split('@')[0] || 'Account'; }
+    // Show upgrade button only for free users (not founders / pro)
+    const isPaid = S.foundingStatus?.is_founder || S.foundingStatus?.is_pro;
+    if (upgradeBtn) upgradeBtn.style.display = isPaid ? 'none' : '';
   } else {
     if (authBtn) authBtn.style.display = '';
     if (signOutBtn) signOutBtn.style.display = 'none';
     if (userInfo) userInfo.style.display = 'none';
+    if (upgradeBtn) upgradeBtn.style.display = 'none';
   }
+}
+
+// ─── UPGRADE MODAL ─────────────────────────────────────────────
+async function openUpgradeModal() {
+  const modal = document.getElementById('upgrade-modal');
+  if (!modal) return;
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  try {
+    const res = await fetch('/api/founding');
+    if (!res.ok) return;
+    const data = await res.json();
+    const tierWrap       = document.getElementById('upgrade-tier-container');
+    const tierIcon       = document.getElementById('upgrade-tier-icon');
+    const tierName       = document.getElementById('upgrade-tier-name');
+    const tierSpot       = document.getElementById('upgrade-tier-spot');
+    const tierBadge      = document.getElementById('upgrade-tier-badge');
+    const ctaBtn         = document.getElementById('upgrade-cta-btn');
+    const ctaPrice       = document.getElementById('upgrade-cta-price');
+    const urgency        = document.getElementById('upgrade-urgency');
+    const urgencyClaimed = document.getElementById('upgrade-urgency-claimed');
+    if (data.tier === 1) {
+      tierWrap.className   = 'upgrade-tier-wrap tier1';
+      tierIcon.textContent = '🔥';
+      tierName.className   = 'upgrade-tier-name tier1';
+      tierName.innerHTML   = 'Early Founder<span class="price-forever" style="color:#fb923c">$5/mo forever</span>';
+      tierSpot.textContent = (data.spots_left ?? '…') + ' of 500 spots left';
+      tierBadge.className  = 'upgrade-tier-badge tier1';
+      tierBadge.textContent= 'Founding';
+      if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn tier1';
+      if (ctaPrice) ctaPrice.textContent = '$5';
+      if (urgencyClaimed) urgencyClaimed.textContent = 500 - (data.spots_left ?? 500);
+      if (urgency) urgency.style.display = '';
+    } else if (data.tier === 2) {
+      tierWrap.className   = 'upgrade-tier-wrap';
+      tierIcon.textContent = '⚡';
+      tierName.className   = 'upgrade-tier-name';
+      tierName.innerHTML   = 'Founding Member<span class="price-forever">$10/mo forever</span>';
+      tierSpot.textContent = (data.spots_left ?? '…') + ' of 1500 spots left';
+      tierBadge.className  = 'upgrade-tier-badge';
+      tierBadge.textContent= 'Founding';
+      if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
+      if (ctaPrice) ctaPrice.textContent = '$10';
+      if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - (data.spots_left ?? 1500));
+      if (urgency) urgency.style.display = '';
+    } else {
+      tierWrap.className   = 'upgrade-tier-wrap';
+      tierIcon.textContent = '✦';
+      tierName.className   = 'upgrade-tier-name';
+      tierName.innerHTML   = 'Pro<span class="price-forever">$19/mo</span>';
+      tierSpot.textContent = 'Unlimited generations, all features';
+      tierBadge.className  = 'upgrade-tier-badge';
+      tierBadge.textContent= 'Pro';
+      if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
+      if (ctaPrice) ctaPrice.textContent = '$19';
+      if (urgency) urgency.style.display = 'none';
+    }
+  } catch (e) { /* silently fail — modal still shows */ }
+}
+
+function closeUpgradeModal() {
+  const modal = document.getElementById('upgrade-modal');
+  if (modal) modal.classList.remove('open');
+  document.body.style.overflow = '';
 }
 
 async function loadFoundingStatus() {
@@ -6809,6 +6878,7 @@ async function loadFoundingStatus() {
       if (res2.ok) {
         S.foundingStatus = await res2.json();
         renderProfileFoundingBadge();
+        updateAuthUI(); // refresh upgrade button visibility after founding status loads
       }
     } catch (e) {}
   }
@@ -6841,42 +6911,8 @@ function openAuth(reason) {
 }
 
 async function showFoundingUpsell() {
-  // Build or reuse a upsell modal
-  let modal = document.getElementById('founding-upsell-modal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'founding-upsell-modal';
-    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:960;overflow-y:auto;padding:16px;box-sizing:border-box';
-    modal.innerHTML = `<div class="card" style="max-width:480px;margin:80px auto;position:relative">
-      <button onclick="document.getElementById('founding-upsell-modal').style.display='none'" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:20px;cursor:pointer;line-height:1">×</button>
-      <div class="ctitle" style="margin-bottom:6px">You've hit your daily limit</div>
-      <div style="color:var(--tx2);font-size:13px;margin-bottom:20px">3 free songs used today. Lock in a founding rate before spots run out — these prices go up when we launch.</div>
-      <div id="fu-founding-info" style="margin-bottom:20px;padding:14px;border-radius:10px;background:var(--s2);border:1px solid var(--brd);font-size:13px;color:var(--tx2)">Loading offer…</div>
-      <div style="display:flex;flex-direction:column;gap:10px">
-        <a href="https://buy.stripe.com/soniq-founding" target="_blank" class="btn btn-amber" style="text-align:center;padding:12px;font-size:14px;font-weight:700;text-decoration:none">Lock In Founding Price →</a>
-        <button onclick="document.getElementById('founding-upsell-modal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:4px">Maybe later</button>
-      </div>
-    </div>`;
-    document.body.appendChild(modal);
-  }
-  modal.style.display = 'block';
-  // Load live founding counter
-  try {
-    const res = await fetch('/api/founding');
-    if (res.ok) {
-      const data = await res.json();
-      const infoEl = document.getElementById('fu-founding-info');
-      if (infoEl) {
-        if (data.tier === 1) {
-          infoEl.innerHTML = '🔥 <strong style="color:#fb923c">Early Founder — $5/mo forever</strong><br><span style="font-size:12px">' + (data.spots_left ?? '...') + ' spots remaining at this price. After that: $10/mo tier.</span>';
-        } else if (data.tier === 2) {
-          infoEl.innerHTML = '⚡ <strong style="color:#a78bfa">Founding Member — $10/mo forever</strong><br><span style="font-size:12px">' + (data.spots_left ?? '...') + ' spots remaining at this price. After that: $19/mo standard.</span>';
-        } else {
-          infoEl.innerHTML = '🚀 <strong>Pro — $19/mo</strong><br><span style="font-size:12px">Unlimited songs every day. Cancel anytime.</span>';
-        }
-      }
-    }
-  } catch (e) {}
+  // Delegates to the new upgrade modal
+  openUpgradeModal();
 }
 
 function closeAuth() {
@@ -9631,6 +9667,201 @@ function _dbgErr(ctx,msg){
   if(DBG.errors.length>10) DBG.errors.pop();
   if(DBG.on) dbgUpdateErrors();
 }
+
+// ══════════════════════════════════════════════════════════════
+//  ONBOARDING  (SONIQ v1)
+// ══════════════════════════════════════════════════════════════
+
+const OB_KEY = 'soniq:onboarding:v1:complete';
+const OB_DAILY_KEY = 'soniq:daily:songs';
+const OB_DAILY_DATE_KEY = 'soniq:daily:date';
+const OB_FREE_LIMIT = 3;
+
+const OB_STEPS = [
+  {
+    targetId: 'genre-grid',
+    title: 'Step 1 of 3',
+    body: '<strong>Pick your genre</strong> — or blend two for a fusion sound no one else has made.',
+    next: 'Got it →',
+  },
+  {
+    targetId: 'g-topic',
+    title: 'Step 2 of 3',
+    body: '<strong>Describe your song concept</strong> — one line is enough. The more specific, the better.',
+    next: 'Next →',
+  },
+  {
+    targetId: 'gen-btn',
+    title: 'Step 3 of 3',
+    body: '<strong>Hit Generate.</strong> Full song — lyrics, production brief, theory &amp; visuals — in seconds.',
+    next: "Let's go ✶",
+  },
+];
+
+let _obStep = -1;
+
+function initOnboarding() {
+  if (localStorage.getItem(OB_KEY)) return;
+  if (typeof S === 'undefined' || !S.user) return;
+  updateEmptyState();
+  setTimeout(function(){ showOnboardingStep(0); }, 800);
+}
+
+function showOnboardingStep(n) {
+  if (n >= OB_STEPS.length) { completeOnboarding(); return; }
+  _obStep = n;
+  var step = OB_STEPS[n];
+  var target = document.getElementById(step.targetId);
+  if (!target) { showOnboardingStep(n + 1); return; }
+
+  var rect = target.getBoundingClientRect();
+  var PAD = 6;
+  var hl = document.getElementById('ob-highlight');
+  hl.style.cssText =
+    'display:block;' +
+    'top:' + (rect.top - PAD + window.scrollY) + 'px;' +
+    'left:' + (rect.left - PAD) + 'px;' +
+    'width:' + (rect.width + PAD * 2) + 'px;' +
+    'height:' + (rect.height + PAD * 2) + 'px;';
+
+  var tip = document.getElementById('ob-tip');
+  var dotsHtml = OB_STEPS.map(function(_, i){
+    return '<div class="ob-dot' + (i === n ? ' on' : '') + '"></div>';
+  }).join('');
+  tip.innerHTML =
+    '<div class="ob-tip-step">' + step.title + '</div>' +
+    '<div class="ob-tip-body">' + step.body + '</div>' +
+    '<div class="ob-tip-footer">' +
+      '<div class="ob-dots">' + dotsHtml + '</div>' +
+      '<div style="display:flex;gap:8px;align-items:center">' +
+        '<button class="ob-skip" onclick="completeOnboarding()">Skip</button>' +
+        '<button class="ob-btn" onclick="showOnboardingStep(' + (n + 1) + ')">' + step.next + '</button>' +
+      '</div>' +
+    '</div>';
+
+  tip.style.display = 'block';
+  var tipH = 140;
+  var spaceBelow = window.innerHeight - rect.bottom;
+  var tipTop = (spaceBelow > tipH + 24)
+    ? rect.bottom + window.scrollY + 14
+    : rect.top + window.scrollY - tipH - 14;
+  var tipLeft = Math.min(Math.max(rect.left, 12), window.innerWidth - 316);
+  tip.style.top = tipTop + 'px';
+  tip.style.left = tipLeft + 'px';
+
+  document.getElementById('ob-backdrop').classList.add('on');
+  target.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function completeOnboarding() {
+  localStorage.setItem(OB_KEY, '1');
+  _obStep = -1;
+  document.getElementById('ob-backdrop').classList.remove('on');
+  document.getElementById('ob-highlight').style.display = 'none';
+  document.getElementById('ob-tip').style.display = 'none';
+}
+
+// ── EMPTY STATE ───────────────────────────────────────────────
+
+function prefillConcept(text) {
+  var inp = document.getElementById('g-topic');
+  if (inp) {
+    inp.value = text;
+    inp.focus();
+    inp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  updateEmptyState();
+}
+
+function updateEmptyState() {
+  var es = document.getElementById('empty-state');
+  if (!es) return;
+  if (getDailySongCount() === 0) {
+    es.classList.add('show');
+  } else {
+    es.classList.remove('show');
+  }
+}
+
+// ── DAILY PROGRESS ────────────────────────────────────────────
+
+function getDailySongCount() {
+  var today = new Date().toDateString();
+  var saved = localStorage.getItem(OB_DAILY_DATE_KEY);
+  if (saved !== today) {
+    localStorage.setItem(OB_DAILY_DATE_KEY, today);
+    localStorage.setItem(OB_DAILY_KEY, '0');
+    return 0;
+  }
+  return parseInt(localStorage.getItem(OB_DAILY_KEY) || '0', 10);
+}
+
+function incrementDailySongCount() {
+  var today = new Date().toDateString();
+  localStorage.setItem(OB_DAILY_DATE_KEY, today);
+  var next = getDailySongCount() + 1;
+  localStorage.setItem(OB_DAILY_KEY, String(next));
+  return next;
+}
+
+function updateProgressIndicator() {
+  var prog = document.getElementById('gen-progress');
+  var label = document.getElementById('gp-label');
+  if (!prog || !label) return;
+  var isFounder = typeof S !== 'undefined' && (S.foundingTier === 1 || S.foundingTier === 2);
+  if (isFounder) { prog.classList.remove('show'); return; }
+  var count = getDailySongCount();
+  prog.classList.add('show');
+  label.textContent = count === 0
+    ? (OB_FREE_LIMIT + ' free songs today')
+    : ('Song ' + count + ' of ' + OB_FREE_LIMIT + ' today');
+  for (var i = 1; i <= OB_FREE_LIMIT; i++) {
+    var pip = document.getElementById('gp-pip-' + i);
+    if (!pip) continue;
+    pip.classList.remove('used', 'current');
+    if (i < count) pip.classList.add('used');
+    else if (i === count) pip.classList.add('current');
+  }
+}
+
+// ── POST-GENERATION NUDGE ─────────────────────────────────────
+
+var _nudgeTimer = null;
+
+function showGenNudge(songNum) {
+  var el = document.getElementById('gen-nudge');
+  var txt = document.getElementById('gn-text');
+  if (!el || !txt) return;
+  var isFounder = typeof S !== 'undefined' && (S.foundingTier === 1 || S.foundingTier === 2);
+  if (isFounder) return;
+  var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
+  if (remaining > 0) {
+    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited with Early Founder pricing.';
+  } else {
+    txt.innerHTML = 'You’ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong> for today. Upgrade to keep creating.';
+  }
+  el.classList.add('show');
+  if (_nudgeTimer) clearTimeout(_nudgeTimer);
+  _nudgeTimer = setTimeout(closeGenNudge, 9000);
+}
+
+function closeGenNudge() {
+  var el = document.getElementById('gen-nudge');
+  if (el) el.classList.remove('show');
+  if (_nudgeTimer) { clearTimeout(_nudgeTimer); _nudgeTimer = null; }
+}
+
+function onboardingPostGenerate() {
+  var num = incrementDailySongCount();
+  updateProgressIndicator();
+  updateEmptyState();
+  showGenNudge(num);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  updateProgressIndicator();
+  updateEmptyState();
+});
 
 window.addEventListener('error',e=>_dbgErr('JS',`${e.filename?.split('/').pop()}:${e.lineno} ${e.message}`));
 window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.message||String(e.reason)));
