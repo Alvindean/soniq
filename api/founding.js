@@ -95,6 +95,10 @@ async function handleGet(req, res) {
 
   // User-specific founding status
   if (user_id) {
+    // Validate user_id is a UUID to prevent garbage Redis key lookups
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(user_id)) {
+      return res.status(400).json({ error: 'invalid user_id' });
+    }
     const raw = await redisCommand('GET', `soniq:founding:user:${user_id}`);
     if (!raw) {
       return res.status(200).json({ is_founder: false });
@@ -122,7 +126,9 @@ async function handleGet(req, res) {
     ['GET', 'soniq:founding:tier2:active'],
   ]);
 
-  // Fail-open: if Redis unavailable, show tier1 as active with 0 claimed
+  // Fail-closed: if Redis unavailable, do NOT show founding tiers as active.
+  // Sending users into a checkout flow that will immediately reject them is worse
+  // than showing the regular price until Redis recovers.
   const fallback = {
     tier1: {
       spots_total:    500,
@@ -130,27 +136,27 @@ async function handleGet(req, res) {
       spots_left:     500,
       price_monthly:  5,
       price_annual:   42,
-      active:         true,
+      active:         false,
       label:          'Early Founder',
     },
     tier2: {
       spots_total:    1500,
       spots_claimed:  0,
       spots_left:     1500,
-      price_monthly:  10,
+      price_monthly:  9.99,
       price_annual:   84,
       active:         false,
       label:          'Founding Member',
     },
-    current_tier:           1,
-    current_price_monthly:  5,
-    current_price_annual:   42,
+    current_tier:           3,
+    current_price_monthly:  19,
+    current_price_annual:   114,
     regular_price_monthly:  19,
     regular_price_annual:   114,
   };
 
   if (!pipeline) {
-    console.error('Redis unavailable — returning fallback tier status');
+    console.error('Redis unavailable — returning fail-closed tier status');
     return res.status(200).json(fallback);
   }
 
