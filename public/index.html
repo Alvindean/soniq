@@ -6762,6 +6762,7 @@ function copyCoachFeedback() {
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
   S.supabase.auth.onAuthStateChange((event, session) => {
+    if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -6786,7 +6787,7 @@ function copyCoachFeedback() {
     }
   });
   S.supabase.auth.getSession().then(({ data: { session } }) => {
-    // Don't overwrite admin mock session
+    if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -8921,7 +8922,7 @@ const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
 const PAID_PLANS   = new Set(['pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
 
 function requireStudio(featureName) {
-  if (STUDIO_PLANS.has(S.plan)) return true;
+  if (window.__soniqAdmin || STUDIO_PLANS.has(S.plan)) return true;
   if (!S.user) { openAuth('Sign in to access ' + featureName); return false; }
   toast('⚡ ' + featureName + ' is a Studio feature — upgrade to Studio to unlock');
   openUpgradeModal();
@@ -8929,7 +8930,7 @@ function requireStudio(featureName) {
 }
 
 function requirePaid(featureName) {
-  if (PAID_PLANS.has(S.plan)) return true;
+  if (window.__soniqAdmin || PAID_PLANS.has(S.plan)) return true;
   if (!S.user) { openAuth('Sign in to access ' + featureName); return false; }
   toast('⬆️ ' + featureName + ' is available on paid plans — upgrade to unlock');
   openUpgradeModal();
