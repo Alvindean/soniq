@@ -29,6 +29,37 @@ const ALLOWED_ORIGINS = [
 ];
 
 const EMAILS = {
+  waitlist_signup: (name, email) => ({
+    subject: 'You\'re on the SONIQ waitlist.',
+    html: `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="background:#0a0a0f;color:#f1f0ff;font-family:'Inter',system-ui,sans-serif;margin:0;padding:0">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#0a0a0f;padding:40px 20px">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%">
+        <tr><td style="padding:0 0 32px 0">
+          <span style="font-size:1.4rem;font-weight:800;color:#9d5af5;letter-spacing:-0.02em">SONIQ</span>
+        </td></tr>
+        <tr><td style="background:#0f0f1a;border:1px solid rgba(124,58,237,0.2);border-radius:12px;padding:40px">
+          <p style="font-size:1.1rem;font-weight:600;margin:0 0 16px">You're on the list${name ? ', ' + escHtml(name) : ''}.</p>
+          <p style="color:#8b8aab;line-height:1.7;margin:0 0 24px">We'll send you early access when your spot opens. In the meantime, you can start writing free right now — 3 songs a day, all 24 genres, no credit card.</p>
+          <table cellpadding="0" cellspacing="0"><tr><td>
+            <a href="https://www.mysoniq.com/app" style="display:inline-block;background:#7c3aed;color:#fff;text-decoration:none;padding:14px 28px;border-radius:8px;font-weight:600;font-size:0.95rem;box-shadow:0 0 24px rgba(124,58,237,0.35)">Start Writing Free →</a>
+          </td></tr></table>
+        </td></tr>
+        <tr><td style="padding:24px 0 0;color:#5a597a;font-size:0.8rem;line-height:1.6">
+          <p>SONIQ / Nu Wav Media LLC · <a href="https://www.mysoniq.com/legal/privacy.html" style="color:#5a597a">Privacy</a> · <a href="https://www.mysoniq.com/legal/terms.html" style="color:#5a597a">Terms</a></p>
+          <p style="margin-top:4px">You're receiving this because you signed up at mysoniq.com.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  }),
+
   welcome: (name) => ({
     subject: 'Your studio is ready.',
     html: `
@@ -147,13 +178,6 @@ module.exports = async function handler(req, res) {
 
   if (!RESEND_API_KEY) return res.status(503).json({ error: 'Email service not configured' });
 
-  // Require a valid internal secret so this endpoint cannot be used as an open relay.
-  // Fail-closed: if the secret env var is not set, block all requests.
-  const internalSecret = process.env.INTERNAL_API_SECRET;
-  if (!internalSecret) return res.status(503).json({ error: 'Email service not configured' });
-  const provided = req.headers['x-internal-secret'] || '';
-  if (provided !== internalSecret) return res.status(401).json({ error: 'Unauthorized' });
-
   const { type, email, name } = req.body || {};
   if (!type || !email) return res.status(400).json({ error: 'type and email required' });
   if (!EMAILS[type]) return res.status(400).json({ error: 'Unknown email type' });
@@ -163,7 +187,16 @@ module.exports = async function handler(req, res) {
   // Sanitize name: strip control characters, limit length
   const safeName = name ? String(name).replace(/[\x00-\x1f\x7f]/g, '').slice(0, 100).trim() : '';
 
-  const template = EMAILS[type](safeName);
+  // waitlist_signup is a public type — no internal secret required.
+  // All other types require a valid internal secret to prevent open relay.
+  if (type !== 'waitlist_signup') {
+    const internalSecret = process.env.INTERNAL_API_SECRET;
+    if (!internalSecret) return res.status(503).json({ error: 'Email service not configured' });
+    const provided = req.headers['x-internal-secret'] || '';
+    if (provided !== internalSecret) return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const template = EMAILS[type](safeName, email);
 
   try {
     const r = await fetch('https://api.resend.com/emails', {

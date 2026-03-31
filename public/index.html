@@ -6841,6 +6841,7 @@ async function openUpgradeModal() {
     const t1SpotsLeft = data.tier1?.spots_left ?? 500;
     const t2SpotsLeft = data.tier2?.spots_left ?? 1500;
     if (currentTier === 1) {
+      currentCheckoutPlan  = 'founding_t1';
       tierWrap.className   = 'upgrade-tier-wrap tier1';
       tierIcon.textContent = '🔥';
       tierName.className   = 'upgrade-tier-name tier1';
@@ -6854,6 +6855,7 @@ async function openUpgradeModal() {
       if (urgencySuffix) urgencySuffix.textContent = 'of 500 claimed';
       if (urgency) urgency.style.display = '';
     } else if (currentTier === 2) {
+      currentCheckoutPlan  = 'founding_t2';
       tierWrap.className   = 'upgrade-tier-wrap';
       tierIcon.textContent = '⚡';
       tierName.className   = 'upgrade-tier-name';
@@ -6867,6 +6869,7 @@ async function openUpgradeModal() {
       if (urgencySuffix) urgencySuffix.textContent = 'of 2000 founding spots claimed';
       if (urgency) urgency.style.display = '';
     } else {
+      currentCheckoutPlan  = 'pro';
       tierWrap.className   = 'upgrade-tier-wrap';
       tierIcon.textContent = '✦';
       tierName.className   = 'upgrade-tier-name';
@@ -6899,29 +6902,35 @@ const STRIPE_PAYMENT_LINKS = {
   studio_annual:      'https://buy.stripe.com/aFa6oIaLb4mQafGgBd5Vu0g',
 };
 
-async function startCheckout(variant) {
-  // Determine which plan to use based on current tier shown in modal
-  const priceEl = document.getElementById('upgrade-cta-price');
-  const price = priceEl ? priceEl.textContent.trim() : '';
-  let basePlan = 'pro';
-  if (price === '$5') basePlan = 'founding_t1';
-  else if (price === '$9.99') basePlan = 'founding_t2';
-  else if (price === '$19') basePlan = 'pro';
+// Tracks which plan is currently shown in the upgrade modal — set by loadUpgradeTier()
+let currentCheckoutPlan = 'pro';
 
+async function startCheckout(variant) {
+  let basePlan = currentCheckoutPlan;
   let plan = basePlan;
   if (variant === 'annual') plan = basePlan + '_annual';
   if (variant === 'studio') plan = 'studio';
   if (variant === 'studio_annual') plan = 'studio_annual';
 
   const btn = document.getElementById('upgrade-cta-btn');
+  const priceEl = document.getElementById('upgrade-cta-price');
   if (btn) { btn.textContent = 'Loading…'; btn.disabled = true; }
 
   try {
     const session = S.supabase ? await S.supabase.auth.getSession() : null;
     const token = session?.data?.session?.access_token;
     if (!token) {
-      // Not logged in — fall through to payment link
-      throw new Error('no session');
+      // Not signed in — prompt sign-in instead of sending to payment link without a user account
+      if (btn) { btn.textContent = 'Lock In ' + (priceEl ? priceEl.outerHTML : '') + ' Forever →'; btn.disabled = false; }
+      // Open auth modal so they can sign in first
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) {
+        authModal.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      } else {
+        window.location.href = '/app#account';
+      }
+      return;
     }
     const resp = await fetch('/api/stripe', {
       method: 'POST',
@@ -6935,9 +6944,11 @@ async function startCheckout(variant) {
     }
     throw new Error(data.error || 'no url');
   } catch (e) {
-    // Fallback: direct Stripe payment link
-    const link = STRIPE_PAYMENT_LINKS[plan] || STRIPE_PAYMENT_LINKS['pro'];
-    window.open(link, '_blank', 'noopener');
+    // Only use payment links as fallback for non-auth errors (API down, etc.)
+    if (e.message !== 'no session') {
+      const link = STRIPE_PAYMENT_LINKS[plan] || STRIPE_PAYMENT_LINKS['pro'];
+      window.open(link, '_blank', 'noopener');
+    }
   } finally {
     if (btn) { btn.textContent = 'Lock In ' + (priceEl ? priceEl.outerHTML : '') + ' Forever →'; btn.disabled = false; }
   }
