@@ -15,7 +15,8 @@
     "api/publish-list.js":   { "maxDuration": 10 },
     "api/auth-verify.js":    { "maxDuration": 10 },
     "api/account-delete.js": { "maxDuration": 15 },
-    "api/data-export.js":    { "maxDuration": 30 }
+    "api/data-export.js":    { "maxDuration": 30 },
+    "api/send-email.js":     { "maxDuration": 15 }
   },
   "headers": [
     {

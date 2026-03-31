@@ -6599,6 +6599,12 @@ async function authSignUp() {
     options: { data: { full_name: name } }
   });
   if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Create Account'; return; }
+  // Fire welcome email (non-blocking)
+  fetch('/api/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'welcome', email, name })
+  }).catch(() => {});
   document.getElementById('auth-form-signup').style.display = 'none';
   const succ = document.getElementById('auth-success');
   succ.style.display = '';
