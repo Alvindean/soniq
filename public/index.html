@@ -1847,6 +1847,15 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           Generate Complete Song
         </button>
         <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
+        <!-- DAILY PROGRESS INDICATOR -->
+        <div class="gen-progress" id="gen-progress">
+          <div class="gp-pips" id="gp-pips">
+            <div class="gp-pip" id="gp-pip-1"></div>
+            <div class="gp-pip" id="gp-pip-2"></div>
+            <div class="gp-pip" id="gp-pip-3"></div>
+          </div>
+          <span id="gp-label">Song 1 of 3 today</span>
+        </div>
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
 
