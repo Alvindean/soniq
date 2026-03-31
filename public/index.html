@@ -3869,6 +3869,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
+  plan: 'free',
   luckyHistory:[],sessionHistory:[],user:null,session:null,supabase:null,pubTier:'admin',editorSong:null,foundingStatus:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
@@ -6978,7 +6979,7 @@ async function loadFoundingStatus() {
     }
   } catch (e) {}
 
-  // If user is logged in, also fetch their founding status
+  // If user is logged in, also fetch their founding status and plan
   if (S.user) {
     try {
       const res2 = await fetch('/api/founding?user_id=' + encodeURIComponent(S.user.id));
@@ -6988,6 +6989,18 @@ async function loadFoundingStatus() {
         updateAuthUI(); // refresh upgrade button visibility after founding status loads
       }
     } catch (e) {}
+
+    // Fetch plan from profiles table so Studio feature gating works client-side
+    if (S.supabase) {
+      try {
+        const { data: profile } = await S.supabase
+          .from('profiles')
+          .select('plan')
+          .eq('id', S.user.id)
+          .single();
+        S.plan = profile?.plan || 'free';
+      } catch (e) { S.plan = 'free'; }
+    }
   }
 }
 
@@ -7543,6 +7556,7 @@ function downloadConcept(idx) {
 // EXPORT PDF (print)
 // ═══════════════════════════════════════════════════════
 function exportPDF() {
+  if (!requireStudio('PDF Export')) return;
   const song = S.currentSong;
   if (!song) { toast('Generate a song first'); return; }
   const meta = document.getElementById('print-meta');
@@ -8897,9 +8911,30 @@ function calcHookScore(prefix) {
 }
 
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// STUDIO PLAN GATE
+// Only studio / studio_annual plans can access Studio features.
+// ═══════════════════════════════════════════════════════
+const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
+
+function requireStudio(featureName) {
+  if (STUDIO_PLANS.has(S.plan)) return true;
+  // Not signed in
+  if (!S.user) {
+    toast('Sign in to access ' + featureName);
+    openAuth('Sign in to access ' + featureName);
+    return false;
+  }
+  // Signed in but not Studio
+  toast('⚡ ' + featureName + ' is a Studio feature — upgrade to Studio to unlock');
+  openUpgradeModal();
+  return false;
+}
+
 // FEATURE 4: PDF / PRINT EXPORT
 // ═══════════════════════════════════════════════════════
 function printBrief(prefix) {
+  if (!requireStudio('PDF Export')) return;
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   if (!song) { toast('Generate a song first'); return; }
   const printDiv = document.getElementById('print-meta');
@@ -8951,6 +8986,7 @@ function updateBlendPreview() {
 // FEATURE 6: ARTIST VOICE PROFILE
 // ═══════════════════════════════════════════════════════
 function saveVoiceProfile() {
+  if (!requireStudio('Artist Voice Profile')) return;
   const name = document.getElementById('voice-name')?.value || '';
   const influences = document.getElementById('voice-influences')?.value || '';
   const forbidden = document.getElementById('voice-forbidden')?.value || '';
@@ -9087,6 +9123,7 @@ function updateShareHash(song) {
 }
 
 function shareLink(prefix) {
+  if (!requireStudio('Shareable Brief Links')) return;
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   if (!song) { toast('Generate a song first'); return; }
   try {
@@ -9157,6 +9194,7 @@ function checkShareLink() {
 // FEATURE 10: BATCH MODE
 // ═══════════════════════════════════════════════════════
 async function batchGenerate() {
+  if (!requireStudio('Batch ×3')) return;
   if (!S.currentSong) { toast('Generate a song first, then use Batch x3'); return; }
   const genre = S.currentSong.genre || S.selectedGenre || 'pop';
   const topic = S.currentSong.topic || document.getElementById('g-topic')?.value || '';
