@@ -4763,7 +4763,7 @@ function buildClaimString(title, ts, name) {
   const iso = d.toISOString().replace('T',' ').slice(0,19) + ' UTC';
   const yr  = d.getFullYear();
   const writer = name ? name : 'Unknown Writer';
-  const base = `© ${yr} ${writer} / Soniq Publishing (Alvin Dean Warren). Original song "${title}" — Created ${iso}. All rights reserved.`;
+  const base = `© ${yr} ${writer} / Nu Wav Media (Alvin Dean Warren). Original song "${title}" — Created ${iso}. All rights reserved.`;
   const id   = 'SONIQ-' + ts.toString(36).toUpperCase();
   return `${base} [${id}]`;
 }
