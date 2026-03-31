@@ -15,6 +15,7 @@
     "api/admin-session.js":  { "maxDuration": 10 },
     "api/stripe-checkout.js": { "maxDuration": 30 },
     "api/stripe-webhook.js": { "maxDuration": 30 }
+    "api/send-email.js":     { "maxDuration": 15 },
   },
   "headers": [
     {
