@@ -81,7 +81,7 @@ async function orFetch(apiKey, orMsgs, max_tokens) {
       'HTTP-Referer': 'https://soniq.vercel.app',
       'X-Title': 'SONIQ'
     },
-    body: JSON.stringify({model: 'anthropic/claude-sonnet-4-5-20251001', max_tokens, stream: true, messages: orMsgs})
+    body: JSON.stringify({model: 'anthropic/claude-sonnet-4-5', max_tokens, stream: true, messages: orMsgs})
   });
 }
 
