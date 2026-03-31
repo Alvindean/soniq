@@ -2320,7 +2320,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <!-- Agreement -->
     <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:16px;cursor:pointer">
       <input type="checkbox" id="pub-agree" style="margin-top:2px;flex-shrink:0">
-      <span>I agree that Soniq will administer publishing on my behalf per the selected tier. I confirm I am the sole/primary writer of this song.</span>
+      <span>I agree to the <a href="/legal/copublishing.html" target="_blank" style="color:var(--amber)">Co-Publishing Agreement (v1.0)</a> and authorize Nu Wav Media LLC to administer publishing per the selected tier. I confirm I am the sole/primary writer of this song.</span>
     </label>
 
     <div style="display:flex;gap:8px">
@@ -5764,7 +5764,7 @@ function renderBiblePills(){
 function showBible(id,label){
   const b=GENRE_BIBLE[id];
   if(!b){document.getElementById('bible-content').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--tx2)">Use the <strong>Analyzer</strong> for an AI-powered deep dive into ${label} songs. Genre Bible covers the 6 newest genres.</p></div>`;return;}
-  document.getElementById('bible-content').innerHTML=`<div class="card bible"><div style="font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-0.4px">${label}</div><h4>Genre DNA</h4><p>${b.dna}</p><h4>Structure Approach</h4><p>${b.structure}</p><h4>Suno Production Tips</h4><p>${b.suno}</p><h4>Key Songwriting Rules</h4><ul>${b.keys.map(k=>`<li>${k}</li>`).join('')}</ul><h4>Artists to Study</h4><p class="artists">${b.artists}</p></div>`;
+  document.getElementById('bible-content').innerHTML=`<div class="card bible"><div style="font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-0.4px">${escHtml(label)}</div><h4>Genre DNA</h4><p>${escHtml(b.dna)}</p><h4>Structure Approach</h4><p>${escHtml(b.structure)}</p><h4>Suno Production Tips</h4><p>${escHtml(b.suno)}</p><h4>Key Songwriting Rules</h4><ul>${b.keys.map(k=>`<li>${escHtml(k)}</li>`).join('')}</ul><h4>Artists to Study</h4><p class="artists">${escHtml(b.artists)}</p></div>`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -7990,7 +7990,7 @@ async function generateSynopsis() {
       const colon = line.indexOf(':');
       if (colon < 0) return `<div style="font-size:13px;color:var(--tx2);margin-bottom:6px">${line}</div>`;
       const k = line.slice(0, colon).trim(), v = line.slice(colon+1).trim();
-      return `<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${k}</div><div style="font-size:13px;color:var(--tx2)">${v}</div></div>`;
+      return `<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${escHtml(k)}</div><div style="font-size:13px;color:var(--tx2)">${escHtml(v)}</div></div>`;
     }).join('');
     document.getElementById('synopsis-card').classList.add('visible');
   } catch(e) { toast('⚠️ ' + e.message); }

@@ -12,6 +12,8 @@
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
+const { createClient } = require('@supabase/supabase-js');
+
 // Simple in-memory rate limit: max 10 registrations per IP per hour
 const pubRateMap = new Map();
 const PUB_LIMIT  = 10;
@@ -45,6 +47,15 @@ async function redisPipeline(commands) {
   }
 }
 
+function getSupabaseClient(token) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, {
+    global: { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+  });
+}
+
 // Validate ISRC format: CC-XXX-YY-NNNNN
 function isValidISRC(isrc) {
   return /^[A-Z]{2}-[A-Z0-9]{3}-\d{2}-\d{5}$/.test(isrc || '');
@@ -73,11 +84,21 @@ module.exports = async function handler(req, res) {
     return res.status(429).json({ error: 'Rate limit exceeded' });
   }
 
+  // Require authentication
+  const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
+  if (!token) return res.status(401).json({ error: 'authentication required' });
+
+  const supabase = getSupabaseClient(token);
+  if (!supabase) return res.status(503).json({ error: 'auth service unavailable' });
+
+  const { data: { user }, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !user) return res.status(401).json({ error: 'invalid or expired token' });
+
   let body;
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).json({ error: 'invalid json' }); }
 
-  const safeStr = (v, max = 200) => v ? String(v).replace(/[<>"']/g, '').slice(0, max).trim() : null;
+  const safeStr = (v, max = 200) => v ? String(v).replace(/[<>"]/g, '').slice(0, max).trim() : null;
 
   const title       = safeStr(body?.title, 200);
   const isrc        = safeStr(body?.isrc, 20);
@@ -114,7 +135,7 @@ module.exports = async function handler(req, res) {
     copyright_notice: `© ${new Date().getFullYear()} ${writer_name} / Nu Wav Media LLC (Alvin Dean Warren). All rights reserved.`,
     genre: genre || null,
     topic: topic || null,
-    song_id: song_id || null,
+    song_id: null,
     status: 'pending',  // pending → registered → active
     ts: Date.now()
   });
@@ -135,6 +156,33 @@ module.exports = async function handler(req, res) {
 
   // Fire-and-forget
   redisPipeline(commands);
+
+  // Store durable E-SIGN consent record in Supabase
+  try {
+    await supabase.from('publishing_registrations').insert({
+      user_id: user.id,
+      song_id: null,  // songs not yet synced to DB — set null to avoid FK violation
+      title: title || 'Untitled',
+      isrc: isrc || null,
+      writer_name,
+      pro,
+      ipi: ipi || null,
+      tier,
+      soniq_share,
+      writer_share,
+      publisher_name: 'Nu Wav Media LLC',
+      publisher_owner: 'Alvin Dean Warren',
+      genre: genre || null,
+      topic: topic || null,
+      status: 'pending',
+      consent_ip: ip,
+      consent_timestamp: new Date().toISOString(),
+      terms_version: 'v1.0'
+    });
+  } catch (dbErr) {
+    console.error('Supabase insert error:', dbErr.message);
+    // Don't fail the request — Redis record is the fallback
+  }
 
   return res.status(200).json({
     ok: true,

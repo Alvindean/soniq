@@ -3,12 +3,17 @@
   "name": "soniq",
   "outputDirectory": "public",
   "functions": {
-    "api/stream.js":    { "maxDuration": 60 },
-    "api/generate.js":  { "maxDuration": 60 },
-    "api/track.js":     { "maxDuration": 10 },
-    "api/admin.js":     { "maxDuration": 15 },
-    "api/rapstats.js":  { "maxDuration": 10 },
-    "api/ping.js":      { "maxDuration": 5 }
+    "api/stream.js":         { "maxDuration": 60 },
+    "api/generate.js":       { "maxDuration": 60 },
+    "api/track.js":          { "maxDuration": 10 },
+    "api/admin.js":          { "maxDuration": 15 },
+    "api/rapstats.js":       { "maxDuration": 10 },
+    "api/ping.js":           { "maxDuration": 5 },
+    "api/publish.js":        { "maxDuration": 15 },
+    "api/publish-list.js":   { "maxDuration": 10 },
+    "api/auth-verify.js":    { "maxDuration": 10 },
+    "api/account-delete.js": { "maxDuration": 15 },
+    "api/data-export.js":    { "maxDuration": 30 }
   },
   "headers": [
     {
@@ -17,7 +22,7 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io; img-src 'self' data:; frame-ancestors 'none'" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io https://gotrwbhkavkqmxtnxkkj.supabase.co https://*.supabase.co; img-src 'self' data:; frame-ancestors 'none'" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]
@@ -27,6 +32,7 @@
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/landing", "dest": "/landing.html" },
     { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/legal/(.*)", "dest": "/legal/$1" },
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
