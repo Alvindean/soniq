@@ -125,7 +125,7 @@ module.exports = async function handler(req, res) {
   // ── Server-side prompt building (protects IP) ──
   let messages, system, max_tokens;
   if (body.variant) {
-    const { buildVariantPrompt } = require('./brain');
+    const { buildVariantPrompt } = require('./_brain');
     const song = {
       title: body.title || 'Untitled',
       lyrics: body.lyrics || '',
@@ -144,7 +144,7 @@ module.exports = async function handler(req, res) {
     }
   } else if (body.action === 'generate' || body.action === 'lucky') {
     try {
-      const brain = require('./brain');
+      const brain = require('./_brain');
       let built;
       if (body.action === 'generate') {
         const p = body.params || {};

@@ -6469,8 +6469,8 @@ function copyCoachFeedback() {
 // ─── SUPABASE AUTH ─────────────────────────────────────────────
 (function initSupabase() {
   const url = 'https://gotrwbhkavkqmxtnxkkj.supabase.co';
-  const key = 'SUPABASE_ANON_KEY_PLACEHOLDER';
-  if (key === 'SUPABASE_ANON_KEY_PLACEHOLDER' || !window.supabase) return;
+  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
+  if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
   S.supabase.auth.onAuthStateChange((event, session) => {
     S.session = session;
