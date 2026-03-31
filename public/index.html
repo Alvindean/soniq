@@ -5,6 +5,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SONIQ — AI Song Creation Studio</title>
+<meta name="description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 21 genres. Free to start." />
+<link rel="canonical" href="https://www.mysoniq.com/app" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="SONIQ" />
+<meta property="og:title" content="SONIQ — AI Song Creation Studio" />
+<meta property="og:description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 21 genres. Free to start." />
+<meta property="og:url" content="https://www.mysoniq.com/app" />
+<meta property="og:image" content="https://www.mysoniq.com/og-image.png" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:site" content="@mysoniq" />
+<meta name="twitter:title" content="SONIQ — AI Song Creation Studio" />
+<meta name="twitter:description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration." />
+<meta name="twitter:image" content="https://www.mysoniq.com/og-image.png" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="alternate icon" href="/favicon.ico" />
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1403,6 +1418,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
   <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <a href="/" style="font-size:11px;color:var(--tx3);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--b1);white-space:nowrap" title="Back to mysoniq.com">◈ SONIQ</a>
       <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
       <button id="nav-upgrade-btn" onclick="openUpgradeModal()" style="display:none" title="Upgrade to Pro">✦ Upgrade</button>
       <button id="nav-auth-btn" onclick="openAuth()" class="btn btn-sm" style="font-size:11px;padding:4px 10px">Sign In</button>
@@ -1901,6 +1917,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="dislike-btn" id="res-dislike-btn" onclick="setLike('res',false)" title="Dislike">👎</button>
         <button class="btn btn-sm" onclick="printBrief('res')" title="Print song brief">🖨 Print</button>
         <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
+        <button class="btn btn-sm" onclick="shareOnX('res')" title="Share on X / Twitter" style="background:#000;color:#fff;border-color:#333">𝕏 Post</button>
         <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
         <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
         <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
@@ -2099,6 +2116,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="dislike-btn" id="lres-dislike-btn" onclick="setLike('lres',false)" title="Dislike">👎</button>
         <button class="btn btn-sm" onclick="printBrief('lres')" title="Print song brief">🖨 Print</button>
         <button class="btn btn-sm" onclick="shareLink('lres')" title="Copy share link">🔗 Share</button>
+        <button class="btn btn-sm" onclick="shareOnX('lres')" title="Share on X / Twitter" style="background:#000;color:#fff;border-color:#333">𝕏 Post</button>
       </div>
     </div>
     <!-- COPYRIGHT STRIP -->
@@ -9071,6 +9089,21 @@ function shareLink(prefix) {
       fallbackShare();
     }
   } catch(e) { toast('⚠️ Could not create share link'); }
+}
+
+function shareOnX(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song) { toast('Generate a song first'); return; }
+  try {
+    const json = JSON.stringify(song);
+    const encoded = btoa(unescape(encodeURIComponent(json)));
+    const url = window.location.origin + window.location.pathname + '#share=' + encoded;
+    const title = song.title ? `"${song.title}"` : 'a song';
+    const genre = song.genre || '';
+    const text = `Just generated ${title}${genre ? ` (${genre})` : ''} using SONIQ — AI songwriting with full genre DNA, music theory, and production brief. Check it out:`;
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}&via=mysoniq`;
+    window.open(tweetUrl, '_blank', 'noopener,width=600,height=400');
+  } catch(e) { toast('⚠️ Could not open X share'); }
 }
 
 function checkShareLink() {
