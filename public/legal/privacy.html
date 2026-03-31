@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Soniq</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #0f0f0f;
+      color: #e8e8e8;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    a {
+      color: #fbbf24;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+
+    header {
+      background-color: #161616;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .back-link {
+      color: #fbbf24;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .site-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fbbf24;
+      letter-spacing: 0.05em;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    .doc-header {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .doc-header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 12px;
+    }
+
+    .doc-meta {
+      font-size: 13px;
+      color: #888;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .doc-meta .dot { color: #fbbf24; }
+
+    .intro {
+      background-color: #161616;
+      border-left: 3px solid #fbbf24;
+      padding: 16px 20px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 40px;
+      font-size: 15px;
+      color: #c0c0c0;
+    }
+
+    .compliance-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .badge {
+      background-color: #1c1c1c;
+      border: 1px solid #2a2a2a;
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 100px;
+      letter-spacing: 0.05em;
+    }
+
+    section {
+      margin-bottom: 40px;
+    }
+
+    .section-number {
+      font-size: 12px;
+      font-weight: 600;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #ffffff;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #222;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #e0e0e0;
+      margin: 18px 0 8px;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #d0d0d0;
+    }
+
+    ul, ol {
+      margin: 12px 0 12px 24px;
+      color: #d0d0d0;
+    }
+
+    li {
+      margin-bottom: 8px;
+    }
+
+    .highlight { color: #fbbf24; font-weight: 500; }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .data-table th {
+      background-color: #1c1c1c;
+      color: #fbbf24;
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid #2a2a2a;
+      font-weight: 600;
+    }
+
+    .data-table td {
+      padding: 10px 14px;
+      border: 1px solid #2a2a2a;
+      color: #d0d0d0;
+      vertical-align: top;
+    }
+
+    .data-table tr:nth-child(even) td {
+      background-color: #141414;
+    }
+
+    .rights-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .rights-card {
+      background-color: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .rights-card h4 {
+      color: #fbbf24;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .rights-card p {
+      font-size: 13px;
+      color: #aaa;
+      margin: 0;
+    }
+
+    .no-sell-banner {
+      background-color: #1a1400;
+      border: 1px solid #4a3800;
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: #fbbf24;
+      font-weight: 500;
+    }
+
+    .contact-box {
+      background-color: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-top: 8px;
+    }
+
+    .contact-box p { margin-bottom: 4px; }
+
+    footer {
+      text-align: center;
+      padding: 32px;
+      border-top: 1px solid #1e1e1e;
+      color: #555;
+      font-size: 13px;
+    }
+
+    footer a { color: #888; }
+
+    @media (max-width: 600px) {
+      .container { padding: 32px 20px 60px; }
+      .doc-header h1 { font-size: 24px; }
+      header { padding: 14px 20px; }
+      .rights-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="back-link">&#8592; Back to Soniq</a>
+    <span class="site-name">SONIQ</span>
+  </header>
+
+  <div class="container">
+
+    <div class="doc-header">
+      <h1>Privacy Policy</h1>
+      <div class="doc-meta">
+        <span><span class="dot">&#9679;</span> Last updated: March 31, 2026</span>
+        <span><span class="dot">&#9679;</span> Effective: March 31, 2026</span>
+        <span><span class="dot">&#9679;</span> Nu Wav Media LLC</span>
+      </div>
+      <div class="compliance-badges">
+        <span class="badge">GDPR Compliant</span>
+        <span class="badge">CCPA Compliant</span>
+        <span class="badge">E-SIGN Act</span>
+      </div>
+    </div>
+
+    <div class="intro">
+      Your privacy matters to us. This Privacy Policy explains what data Soniq collects, why we collect it, how we use it, and your rights as a user. We do not sell your personal data.
+    </div>
+
+    <!-- Section 1 -->
+    <section>
+      <div class="section-number">Section 1</div>
+      <h2>What We Collect</h2>
+      <p>We collect only the data necessary to provide and improve the Service. Below is a complete breakdown:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Data Type</th>
+            <th>What It Includes</th>
+            <th>When Collected</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Account Information</strong></td>
+            <td>Email address, display name, password (hashed)</td>
+            <td>At registration</td>
+          </tr>
+          <tr>
+            <td><strong>Usage Data</strong></td>
+            <td>Genre selections, generation counts — <em>anonymized, no PII</em></td>
+            <td>During active use</td>
+          </tr>
+          <tr>
+            <td><strong>Device Identifier</strong></td>
+            <td>Anonymous device ID for rate limiting; not tied to identity</td>
+            <td>On first access</td>
+          </tr>
+          <tr>
+            <td><strong>Publishing Data</strong></td>
+            <td>Legal name, PRO affiliation, IPI/CAE number — <em>only when you opt into publishing</em></td>
+            <td>Publishing opt-in only</td>
+          </tr>
+          <tr>
+            <td><strong>IP Address</strong></td>
+            <td>Used for rate limiting and consent logging; not sold or profiled</td>
+            <td>On each request</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="no-sell-banner">
+        We do not sell, rent, or trade your personal information to any third party.
+      </div>
+    </section>
+
+    <!-- Section 2 -->
+    <section>
+      <div class="section-number">Section 2</div>
+      <h2>How We Use Your Data</h2>
+
+      <h3>Service Operation</h3>
+      <p>Account information is used to authenticate you, maintain your session, associate your compositions with your account, and deliver the features you have subscribed to.</p>
+
+      <h3>Anti-Abuse and Security</h3>
+      <p>Device IDs and IP addresses are used to enforce usage rate limits, detect fraudulent activity, and protect the platform from abuse. This data is retained for no longer than 90 days for security purposes.</p>
+
+      <h3>Publishing Administration</h3>
+      <p>When you opt into publishing services, your legal name, PRO affiliation, and IPI number are used exclusively to register your compositions with the relevant Performing Rights Organizations and to administer royalty collection on your behalf. This data is shared only with the PROs necessary to process your registrations.</p>
+
+      <h3>Aggregate Music Trend Analysis</h3>
+      <p>We may analyze anonymized, aggregated usage patterns — such as popular genres, generation volumes, or feature usage trends — to improve the platform and understand musical trends. <span class="highlight">No personally identifiable information is included in this analysis.</span></p>
+    </section>
+
+    <!-- Section 3 -->
+    <section>
+      <div class="section-number">Section 3</div>
+      <h2>Third-Party Service Providers</h2>
+      <p>We use the following trusted third-party services to operate Soniq. Each provider has been evaluated for data handling practices consistent with this policy:</p>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Provider</th>
+            <th>Purpose</th>
+            <th>Data Shared</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Anthropic API</strong></td>
+            <td>AI lyrics and song generation</td>
+            <td>Song prompts only — <strong>no PII is transmitted</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Upstash Redis</strong></td>
+            <td>Rate limiting and analytics</td>
+            <td>Anonymous device ID and request counts</td>
+          </tr>
+          <tr>
+            <td><strong>Supabase</strong></td>
+            <td>User accounts and publishing records</td>
+            <td>Account info and publishing metadata (encrypted at rest)</td>
+          </tr>
+          <tr>
+            <td><strong>Stripe</strong></td>
+            <td>Subscription payment processing</td>
+            <td>Payment details — <strong>we never store card data</strong>; all card data is handled exclusively by Stripe</td>
+          </tr>
+          <tr>
+            <td><strong>Vercel</strong></td>
+            <td>Platform hosting and deployment</td>
+            <td>Standard web server logs (IP, request paths — retained per Vercel's policy)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>We do not permit these providers to use your data for their own marketing purposes. We enter into data processing agreements with providers as required by GDPR and applicable law.</p>
+    </section>
+
+    <!-- Section 4 -->
+    <section>
+      <div class="section-number">Section 4</div>
+      <h2>Your Privacy Rights</h2>
+      <p>Depending on your jurisdiction, you have the following rights regarding your personal data. We honor these rights for all users globally, regardless of whether local law requires it.</p>
+
+      <div class="rights-grid">
+        <div class="rights-card">
+          <h4>Access Your Data</h4>
+          <p>Request a copy of all personal data we hold about you. Email us at legal@nuwavmedia.com.</p>
+        </div>
+        <div class="rights-card">
+          <h4>Delete Your Account</h4>
+          <p>Permanently delete your account and associated data via Settings &gt; Delete Account. Publishing records may be retained as required by PRO contracts.</p>
+        </div>
+        <div class="rights-card">
+          <h4>Data Portability</h4>
+          <p>Export your songs, compositions, and account data at any time via Settings &gt; Export Data.</p>
+        </div>
+        <div class="rights-card">
+          <h4>Opt-Out of Analytics</h4>
+          <p>Disable anonymized usage analytics via the toggle in Settings &gt; Privacy.</p>
+        </div>
+        <div class="rights-card">
+          <h4>Correct Your Data</h4>
+          <p>Update inaccurate account information directly in Settings, or contact us for publishing record corrections.</p>
+        </div>
+        <div class="rights-card">
+          <h4>Restrict Processing</h4>
+          <p>Request that we limit how we process your data in certain circumstances. Contact legal@nuwavmedia.com.</p>
+        </div>
+      </div>
+
+      <p>
+        <strong style="color:#fff;">CCPA Rights (California Residents).</strong> California residents have the right to know what personal information is collected, the right to delete personal information, the right to opt-out of sale (we do not sell your data), and the right to non-discrimination for exercising these rights.
+      </p>
+      <p>
+        <strong style="color:#fff;">GDPR Rights (EU/EEA Residents).</strong> If you are located in the EU or EEA, you have the right to lodge a complaint with your local supervisory authority if you believe we have handled your data improperly.
+      </p>
+      <p>To exercise any of these rights, contact us at <a href="mailto:legal@nuwavmedia.com">legal@nuwavmedia.com</a>. We will respond within 30 days.</p>
+    </section>
+
+    <!-- Section 5 -->
+    <section>
+      <div class="section-number">Section 5</div>
+      <h2>Cookies and Tracking</h2>
+      <p>Soniq uses a minimal, privacy-first approach to cookies:</p>
+      <ul>
+        <li><strong style="color:#e0e0e0;">Session cookies:</strong> Used solely to maintain your authenticated session while you are logged in. These expire when you close your browser or log out.</li>
+        <li><strong style="color:#e0e0e0;">No tracking cookies:</strong> We do not use persistent tracking cookies, behavioral profiling cookies, or fingerprinting techniques.</li>
+        <li><strong style="color:#e0e0e0;">No third-party ad cookies:</strong> We do not allow advertising networks or third-party trackers to set cookies on Soniq.</li>
+      </ul>
+      <p>You can configure your browser to block or delete cookies at any time. Blocking session cookies will require you to log in on each visit.</p>
+    </section>
+
+    <!-- Section 6 -->
+    <section>
+      <div class="section-number">Section 6</div>
+      <h2>Children's Privacy</h2>
+      <p>
+        Soniq is intended for users who are at least <span class="highlight">13 years of age</span>. Users under 13 are not permitted to create accounts or use the Service. Users between 13 and 17 may access limited creative features of the platform with verifiable parental consent, but are not eligible for publishing services.
+      </p>
+      <p>
+        <span class="highlight">Publishing features require users to be at least 18 years old.</span> By opting into publishing services, you confirm that you meet this age requirement.
+      </p>
+      <p>
+        If we become aware that a child under 13 has provided personal information without appropriate consent, we will delete that information promptly. If you believe a minor has used the Service improperly, please contact us at <a href="mailto:legal@nuwavmedia.com">legal@nuwavmedia.com</a>.
+      </p>
+    </section>
+
+    <!-- Section 7 -->
+    <section>
+      <div class="section-number">Section 7</div>
+      <h2>Data Retention</h2>
+      <p>We retain your personal data only as long as necessary to provide the Service or as required by applicable law:</p>
+      <ul>
+        <li><strong style="color:#e0e0e0;">Account data:</strong> Retained for the duration of your account. Deleted within 30 days of account deletion request, subject to any legal holds.</li>
+        <li><strong style="color:#e0e0e0;">Publishing records:</strong> Retained for the duration of any active publishing agreement plus 7 years, as required for royalty accounting compliance.</li>
+        <li><strong style="color:#e0e0e0;">IP and security logs:</strong> Retained for up to 90 days.</li>
+        <li><strong style="color:#e0e0e0;">Aggregated/anonymized analytics:</strong> May be retained indefinitely as they contain no personal information.</li>
+      </ul>
+    </section>
+
+    <!-- Section 8 -->
+    <section>
+      <div class="section-number">Section 8</div>
+      <h2>Contact Us</h2>
+      <p>For privacy inquiries, data requests, or to exercise your rights, please contact our Privacy Team:</p>
+      <div class="contact-box">
+        <p><strong style="color:#fff;">Nu Wav Media LLC — Privacy Team</strong></p>
+        <p>Email: <a href="mailto:legal@nuwavmedia.com">legal@nuwavmedia.com</a></p>
+        <p>Response time: Within 30 days of verified request</p>
+        <p>Platform: <a href="/">soniq.app</a></p>
+      </div>
+    </section>
+
+  </div>
+
+  <footer>
+    <p>&copy; 2026 Nu Wav Media LLC. All rights reserved. &nbsp;|&nbsp;
+      <a href="/legal/terms.html">Terms</a> &nbsp;|&nbsp;
+      <a href="/legal/privacy.html">Privacy</a> &nbsp;|&nbsp;
+      <a href="/legal/copublishing.html">Co-Publishing</a>
+    </p>
+  </footer>
+
+</body>
+</html>

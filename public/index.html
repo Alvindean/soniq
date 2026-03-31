@@ -1215,6 +1215,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -1264,6 +1265,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
   <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
+      <button id="nav-auth-btn" onclick="openAuth()" class="btn btn-sm" style="font-size:11px;padding:4px 10px">Sign In</button>
+      <button id="nav-signout-btn" onclick="authSignOut()" class="btn btn-sm" style="display:none;font-size:11px;padding:4px 10px;color:var(--tx3)">Sign Out</button>
+    </div>
 </nav>
 
 <!-- ══════════════════════════════════
@@ -2188,6 +2194,55 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn" onclick="copyCoachFeedback()" style="flex:1">📋 Copy Feedback</button>
         <button class="btn" onclick="resetCoach()">← New Analysis</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div id="auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:950;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeAuth()">
+  <div class="card" style="max-width:420px;margin:60px auto;position:relative">
+    <button onclick="closeAuth()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle" id="auth-modal-title">Sign in to Soniq</div>
+    <div id="auth-tabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--brd)">
+      <button id="auth-tab-signin" onclick="authTab('signin')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--amber);color:var(--amber);font-size:13px;cursor:pointer;font-weight:600">Sign In</button>
+      <button id="auth-tab-signup" onclick="authTab('signup')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx3);font-size:13px;cursor:pointer">Create Account</button>
+    </div>
+
+    <div id="auth-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:8px 12px;font-size:12px;color:#f87171;margin-bottom:12px"></div>
+
+    <div id="auth-form-signin">
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Email</div>
+        <input id="auth-email" type="email" autocomplete="email" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="you@example.com">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
+        <input id="auth-password" type="password" autocomplete="current-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="••••••••">
+      </div>
+      <button class="btn btn-amber" onclick="authSignIn()" id="auth-signin-btn" style="width:100%;padding:10px;font-size:14px;margin-bottom:10px">Sign In</button>
+      <button onclick="authForgotPassword()" style="width:100%;background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:4px">Forgot password?</button>
+    </div>
+
+    <div id="auth-form-signup" style="display:none">
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Full Name</div>
+        <input id="auth-signup-name" type="text" autocomplete="name" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Your name">
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Email</div>
+        <input id="auth-signup-email" type="email" autocomplete="email" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="you@example.com">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
+        <input id="auth-signup-password" type="password" autocomplete="new-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+      </div>
+      <button class="btn btn-amber" onclick="authSignUp()" id="auth-signup-btn" style="width:100%;padding:10px;font-size:14px">Create Account</button>
+    </div>
+
+    <div id="auth-success" style="display:none;text-align:center;padding:20px">
+      <div style="font-size:32px;margin-bottom:10px">✅</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tx1);margin-bottom:6px" id="auth-success-msg"></div>
+      <div style="font-size:12px;color:var(--tx3)" id="auth-success-sub"></div>
     </div>
   </div>
 </div>
@@ -3468,7 +3523,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
-  luckyHistory:[],sessionHistory:[],pubTier:'admin',editorSong:null,
+  luckyHistory:[],sessionHistory:[],user:null,session:null,supabase:null,pubTier:'admin',editorSong:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
