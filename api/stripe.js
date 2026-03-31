@@ -99,6 +99,48 @@ async function redisIncr(key) {
   } catch { return null; }
 }
 
+async function redisDecr(key) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/decr/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
+    });
+    const d = await r.json();
+    return d.result;
+  } catch { return null; }
+}
+
+// SET key value [EX seconds]
+async function redisSet(key, value, exSeconds) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
+  try {
+    const parts = [encodeURIComponent(key), encodeURIComponent(value)];
+    if (exSeconds) parts.push('ex', encodeURIComponent(exSeconds));
+    const r = await fetch(`${UPSTASH_URL}/set/${parts.join('/')}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
+    });
+    const d = await r.json();
+    return d.result;
+  } catch { return null; }
+}
+
+async function redisDel(key) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/del/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` },
+    });
+    const d = await r.json();
+    return d.result;
+  } catch { return null; }
+}
+
+// Tier spot limits (single source of truth)
+const FOUNDING_TIER_LIMITS = { 1: 500, 2: 1500 };
+
 function getSupabaseAdmin() {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY;
@@ -136,26 +178,48 @@ async function handleCheckout(req, res) {
     return res.status(503).json({ error: `Price not configured for plan: ${plan}` });
   }
 
-  // Check founding tier availability
-  if (plan === 'founding_t1' || plan === 'founding_t1_annual') {
-    const active = await redisGet('soniq:founding:tier1:active');
-    if (active !== '1') return res.status(400).json({ error: 'Founding tier 1 is no longer available' });
-    const count = parseInt(await redisGet('soniq:founding:tier1:count') || '0', 10);
-    if (count >= 500) return res.status(400).json({ error: 'Founding tier 1 is sold out' });
-  }
-  if (plan === 'founding_t2' || plan === 'founding_t2_annual') {
-    const active = await redisGet('soniq:founding:tier2:active');
-    if (active !== '1') return res.status(400).json({ error: 'Founding tier 2 is not yet available' });
-    const count = parseInt(await redisGet('soniq:founding:tier2:count') || '0', 10);
-    if (count >= 1500) return res.status(400).json({ error: 'Founding tier 2 is sold out' });
+  // Reserve a founding tier spot atomically at checkout creation time.
+  // This prevents the race condition where many concurrent users all pass
+  // the read check before any webhook fires to increment the counter.
+  let foundingTierNum = null;
+  if (plan === 'founding_t1' || plan === 'founding_t1_annual') foundingTierNum = 1;
+  if (plan === 'founding_t2' || plan === 'founding_t2_annual') foundingTierNum = 2;
+
+  if (foundingTierNum !== null) {
+    const activeKey = `soniq:founding:tier${foundingTierNum}:active`;
+    const countKey  = `soniq:founding:tier${foundingTierNum}:count`;
+    const limit     = FOUNDING_TIER_LIMITS[foundingTierNum];
+
+    const active = await redisGet(activeKey);
+    if (active !== '1') {
+      return res.status(400).json({ error: `Founding tier ${foundingTierNum} is no longer available` });
+    }
+
+    // Atomically reserve a spot — INCR first, then check
+    const newCount = await redisIncr(countKey);
+    if (newCount === null) {
+      return res.status(503).json({ error: 'Service temporarily unavailable' });
+    }
+    if (newCount > limit) {
+      await redisDecr(countKey); // return the spot
+      // Auto-close this tier
+      await redisSet(activeKey, '0');
+      return res.status(400).json({ error: `Founding tier ${foundingTierNum} is sold out` });
+    }
+    // If this was the last spot, close the tier and open the next one
+    if (newCount === limit) {
+      await redisSet(activeKey, '0');
+      if (foundingTierNum === 1) await redisSet('soniq:founding:tier2:active', '1');
+    }
   }
 
   const origin = req.headers.origin || 'https://www.mysoniq.com';
   const successUrl = `${origin}/app?checkout=success&plan=${plan}`;
   const cancelUrl  = `${origin}/app`;
 
+  let session;
   try {
-    const session = await stripe.checkout.sessions.create({
+    session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
@@ -176,11 +240,22 @@ async function handleCheckout(req, res) {
       },
     });
 
-    return res.status(200).json({ url: session.url, session_id: session.id });
   } catch (err) {
     console.error('Stripe checkout error:', err.message);
+    // Release the reserved founding spot if Stripe session creation failed
+    if (foundingTierNum !== null) {
+      await redisDecr(`soniq:founding:tier${foundingTierNum}:count`);
+    }
     return res.status(500).json({ error: 'Failed to create checkout session' });
   }
+
+  // Store session reservation so the webhook knows this spot was already counted.
+  // TTL: 2 hours (well within Stripe's 24h session window; expired sessions release the spot).
+  if (foundingTierNum !== null) {
+    await redisSet(`soniq:founding:reserve:${session.id}`, String(foundingTierNum), 7200);
+  }
+
+  return res.status(200).json({ url: session.url, session_id: session.id });
 }
 
 // ── WEBHOOK HANDLER ───────────────────────────────────────────────
@@ -220,9 +295,18 @@ async function handleWebhook(req, res) {
         break;
       }
 
-      // Increment founding counter atomically
-      if (plan === 'founding_t1' || plan === 'founding_t1_annual') await redisIncr('soniq:founding:tier1:count');
-      if (plan === 'founding_t2' || plan === 'founding_t2_annual') await redisIncr('soniq:founding:tier2:count');
+      // Founding counter: spot was already reserved (INCRed) at checkout creation time.
+      // Only increment here if there is no reservation key (legacy session or edge case).
+      const reserveKey = `soniq:founding:reserve:${session.id}`;
+      const reservation = await redisGet(reserveKey);
+      if (!reservation) {
+        // No reservation found — increment now (fallback for sessions created before this fix)
+        if (plan === 'founding_t1' || plan === 'founding_t1_annual') await redisIncr('soniq:founding:tier1:count');
+        if (plan === 'founding_t2' || plan === 'founding_t2_annual') await redisIncr('soniq:founding:tier2:count');
+      } else {
+        // Reservation exists — spot already counted; just clean it up
+        await redisDel(reserveKey);
+      }
 
       // Update user profile
       if (supabase) {
@@ -284,6 +368,29 @@ async function handleWebhook(req, res) {
         .from('profiles')
         .update({ subscription_status: 'past_due' })
         .eq('stripe_customer_id', invoice.customer);
+      break;
+    }
+
+    case 'checkout.session.expired': {
+      // Release the reserved founding spot so it becomes available again
+      const session   = event.data.object;
+      const sessionId = session.id;
+      const reserveKey = `soniq:founding:reserve:${sessionId}`;
+      const tierStr = await redisGet(reserveKey);
+      if (tierStr) {
+        const tierNum = parseInt(tierStr, 10);
+        const countKey  = `soniq:founding:tier${tierNum}:count`;
+        const activeKey = `soniq:founding:tier${tierNum}:active`;
+        await redisDecr(countKey);
+        await redisDel(reserveKey);
+        // Re-open the tier if it was auto-closed when this spot was reserved
+        const newCount = parseInt(await redisGet(countKey) || '0', 10);
+        const limit = FOUNDING_TIER_LIMITS[tierNum];
+        if (newCount < limit) {
+          await redisSet(activeKey, '1');
+          console.log(`Founding tier ${tierNum} reopened after session expiry ${sessionId}`);
+        }
+      }
       break;
     }
 
