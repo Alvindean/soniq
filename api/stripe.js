@@ -28,8 +28,22 @@
  *   UPSTASH_REDIS_REST_TOKEN
  */
 
+if (!process.env.STRIPE_SECRET_KEY) {
+  console.error('FATAL: STRIPE_SECRET_KEY is not set');
+}
+
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+
+// Buffer the raw request body (needed when bodyParser: false)
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', chunk => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks)));
+    req.on('error', reject);
+  });
+}
 
 const ALLOWED_ORIGINS = [
   'https://www.mysoniq.com',
@@ -107,8 +121,10 @@ async function handleCheckout(req, res) {
   if (authErr || !user) return res.status(401).json({ error: 'Invalid or expired token' });
 
   let body;
-  try { body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {}); }
-  catch { return res.status(400).json({ error: 'Invalid JSON' }); }
+  try {
+    const rawBody = await getRawBody(req);
+    body = JSON.parse(rawBody.toString() || '{}');
+  } catch { return res.status(400).json({ error: 'Invalid JSON' }); }
 
   const { plan } = body;
   if (!plan || !PLAN_TO_PRICE[plan]) {
@@ -177,13 +193,14 @@ async function handleWebhook(req, res) {
     return res.status(500).json({ error: 'Webhook not configured' });
   }
 
+  let rawBody;
+  try { rawBody = await getRawBody(req); } catch {
+    return res.status(400).json({ error: 'Failed to read request body' });
+  }
+
   let event;
   try {
-    // Vercel provides raw body via req.body when Content-Type is application/json
-    // For webhooks, Stripe sends raw JSON — we need the raw string for signature verification
-    const rawBody = typeof req.body === 'string'
-      ? req.body
-      : JSON.stringify(req.body);
+    // Default tolerance: 300s — do not override, protects against replay attacks.
     event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
@@ -279,7 +296,7 @@ async function handleWebhook(req, res) {
 }
 
 // ── MAIN HANDLER ──────────────────────────────────────────────────
-module.exports = async function handler(req, res) {
+async function handler(req, res) {
   const origin = req.headers.origin || '';
   const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
   const cors = ALLOWED_ORIGINS.includes(origin) || isPreview ? origin : ALLOWED_ORIGINS[0];
@@ -297,4 +314,9 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   return handleCheckout(req, res);
-};
+}
+
+module.exports = handler;
+// Vercel: disable body parsing so webhook receives raw bytes for Stripe signature verification.
+// The checkout path re-parses JSON from the buffered raw body via getRawBody().
+module.exports.config = { api: { bodyParser: false } };

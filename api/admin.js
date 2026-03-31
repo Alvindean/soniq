@@ -1,6 +1,6 @@
 /**
  * SONIQ — Admin analytics API
- * GET /api/admin?key=<ADMIN_PASSWORD>
+ * Headers: x-admin-key: <ADMIN_PASSWORD>
  *
  * Returns JSON with:
  *   total_songs, top_genres, top_fusions, top_topics,
@@ -10,18 +10,14 @@
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-// Timing-safe string comparison to prevent timing attacks
+const { timingSafeEqual, createHash } = require('crypto');
+
+// Timing-safe string comparison — hashes both values to normalize length before comparison
 function safeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
-  if (a.length !== b.length) {
-    // Still do a comparison to consume similar time
-    let diff = 0;
-    for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ (b.charCodeAt(i % b.length) || 0);
-    return false;
-  }
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
+  const ha = createHash('sha256').update(a).digest();
+  const hb = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ha, hb);
 }
 
 async function redisCmd(command) {

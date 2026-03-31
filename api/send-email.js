@@ -147,14 +147,12 @@ module.exports = async function handler(req, res) {
 
   if (!RESEND_API_KEY) return res.status(503).json({ error: 'Email service not configured' });
 
-  // Require a valid internal secret so this endpoint cannot be used as an open relay
+  // Require a valid internal secret so this endpoint cannot be used as an open relay.
+  // Fail-closed: if the secret env var is not set, block all requests.
   const internalSecret = process.env.INTERNAL_API_SECRET;
-  if (internalSecret) {
-    const provided = req.headers['x-internal-secret'] || '';
-    if (provided !== internalSecret) {
-      return res.status(401).json({ error: 'Unauthorized' });
-    }
-  }
+  if (!internalSecret) return res.status(503).json({ error: 'Email service not configured' });
+  const provided = req.headers['x-internal-secret'] || '';
+  if (provided !== internalSecret) return res.status(401).json({ error: 'Unauthorized' });
 
   const { type, email, name } = req.body || {};
   if (!type || !email) return res.status(400).json({ error: 'type and email required' });

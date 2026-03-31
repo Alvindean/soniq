@@ -94,8 +94,9 @@ module.exports = async function handler(req, res) {
 
   if (req.method !== 'POST') return res.status(405).end();
 
-  const ip = req.headers['x-real-ip'] ||
-    (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
+  // Use Vercel-trusted headers only — x-forwarded-for is user-controlled and spoofable
+  const ip = req.headers['x-vercel-forwarded-for'] ||
+    req.headers['x-real-ip'] ||
     req.socket?.remoteAddress || 'unknown';
 
   if (!checkPubRate(ip)) {
