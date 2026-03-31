@@ -1,7 +1,10 @@
 {
   "version": 2,
   "name": "soniq",
+  "framework": null,
+  "buildCommand": "",
   "outputDirectory": "public",
+  "installCommand": "npm ci",
   "functions": {
     "api/stream.js":         { "maxDuration": 60 },
     "api/generate.js":       { "maxDuration": 60 },
