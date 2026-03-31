@@ -1213,6 +1213,20 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .pl-picker-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--s3); border: 1px solid var(--b2); border-radius: var(--r2); cursor: pointer; }
 .pl-picker-item.selected { border-color: var(--amber); background: rgba(255,180,0,.08); }
 
+/* ── PROFILE PAGE ─────────────────────────── */
+.ach-badge{border:1px solid var(--brd);border-radius:10px;padding:10px 8px;text-align:center;background:var(--bg2);transition:all .2s;opacity:.35;filter:grayscale(1)}
+.ach-badge.unlocked{opacity:1;filter:none;border-color:var(--amberline);background:var(--amberbg)}
+.ach-badge .ach-b-icon{font-size:22px;margin-bottom:4px}
+.ach-badge .ach-b-name{font-size:10px;font-weight:700;color:var(--tx2);line-height:1.2}
+.ach-badge .ach-b-desc{font-size:9px;color:var(--tx3);margin-top:2px;line-height:1.3}
+.profile-song-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--brd)}
+.profile-song-row:last-child{border-bottom:none}
+.profile-song-num{font-size:10px;color:var(--tx4);width:16px;text-align:right;flex-shrink:0}
+.profile-song-info{flex:1;min-width:0}
+.profile-song-title{font-size:13px;font-weight:600;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.profile-song-meta{font-size:10px;color:var(--tx3);margin-top:1px}
+.profile-song-liked{color:var(--amber);font-size:12px;flex-shrink:0}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -1265,6 +1279,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
   <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+  <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
       <button id="nav-auth-btn" onclick="openAuth()" class="btn btn-sm" style="font-size:11px;padding:4px 10px">Sign In</button>
@@ -2824,6 +2839,121 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 </div>
 
+</div>
+
+<!-- ══════════════════════════════════
+     PROFILE PAGE
+══════════════════════════════════ -->
+<div id="pg-profile" class="pg" style="display:none;padding:0">
+
+  <!-- PROFILE HEADER BANNER -->
+  <div id="profile-banner" style="background:linear-gradient(135deg,#1a0a2e 0%,#0f0f1a 40%,#0a1a0f 100%);padding:32px 20px 0;position:relative;overflow:hidden">
+    <!-- Decorative blobs -->
+    <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(251,191,36,.08) 0%,transparent 70%);pointer-events:none"></div>
+    <div style="position:absolute;bottom:0;left:-20px;width:160px;height:160px;background:radial-gradient(circle,rgba(139,92,246,.06) 0%,transparent 70%);pointer-events:none"></div>
+
+    <div style="max-width:680px;margin:0 auto;position:relative">
+      <!-- Avatar + name row -->
+      <div style="display:flex;align-items:flex-end;gap:18px;margin-bottom:20px">
+        <div id="profile-avatar" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(251,191,36,.3)">?</div>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <div id="profile-display-name" style="font-size:22px;font-weight:800;color:var(--tx1);letter-spacing:-.4px">Artist Name</div>
+            <div id="profile-level-badge" style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--amberbg);border:1px solid var(--amberline);color:var(--amber)">ROOKIE</div>
+          </div>
+          <div id="profile-artist-tag" style="font-size:12px;color:var(--tx3);margin-top:2px"></div>
+          <div id="profile-bio" style="font-size:12px;color:var(--tx2);margin-top:4px;font-style:italic"></div>
+        </div>
+        <button onclick="openProfileEdit()" class="btn btn-sm" style="flex-shrink:0;font-size:11px">✏️ Edit</button>
+      </div>
+
+      <!-- XP bar -->
+      <div style="margin-bottom:0">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--tx3);margin-bottom:4px">
+          <span id="profile-xp-label">Level 1 — Rookie</span>
+          <span id="profile-xp-nums">0 / 100 XP</span>
+        </div>
+        <div style="height:4px;background:var(--bg3);border-radius:99px;overflow:hidden">
+          <div id="profile-xp-bar" style="height:100%;background:linear-gradient(90deg,var(--amber),var(--violet));border-radius:99px;width:0%;transition:width .6s ease"></div>
+        </div>
+      </div>
+
+      <!-- Stats strip -->
+      <div style="display:flex;gap:0;margin-top:20px;border-top:1px solid rgba(255,255,255,.06)">
+        <div style="flex:1;padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
+          <div id="pstat-songs" style="font-size:20px;font-weight:800;color:var(--tx1)">0</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Songs</div>
+        </div>
+        <div style="flex:1;padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
+          <div id="pstat-liked" style="font-size:20px;font-weight:800;color:var(--amber)">0</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Liked</div>
+        </div>
+        <div style="flex:1;padding:12px 8px;text-align:center;border-right:1px solid rgba(255,255,255,.06)">
+          <div id="pstat-published" style="font-size:20px;font-weight:800;color:#34d399">0</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Published</div>
+        </div>
+        <div style="flex:1;padding:12px 8px;text-align:center">
+          <div id="pstat-streak" style="font-size:20px;font-weight:800;color:#f97316">0🔥</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Day Streak</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE BODY -->
+  <div style="max-width:680px;margin:0 auto;padding:20px">
+
+    <!-- TOP GENRE + ANTHEM row -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="card" style="padding:14px">
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Top Genre</div>
+        <div id="profile-top-genre" style="font-size:18px;font-weight:700;color:var(--tx1)">—</div>
+        <div id="profile-genre-count" style="font-size:11px;color:var(--tx3);margin-top:2px"></div>
+      </div>
+      <div class="card" style="padding:14px">
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">My Anthem 🎵</div>
+        <div id="profile-anthem-title" style="font-size:14px;font-weight:700;color:var(--amber);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+        <div id="profile-anthem-genre" style="font-size:11px;color:var(--tx3);margin-top:2px"></div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🏆 Achievements</div>
+      <div id="profile-achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px"></div>
+    </div>
+
+    <!-- RECENT SONGS -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎶 Recent Songs</div>
+      <div id="profile-songs-list"></div>
+      <div id="profile-no-songs" style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">No songs yet — go write one!</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE EDIT MODAL -->
+<div id="profile-edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:920;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeProfileEdit()">
+  <div class="card" style="max-width:480px;margin:60px auto;position:relative">
+    <button onclick="closeProfileEdit()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">✏️ Edit Profile</div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Display Name</div>
+      <input id="pedit-name" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Your name">
+    </div>
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Artist Name / Stage Name</div>
+      <input id="pedit-artist" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="e.g. Alvo, DJ Nova, etc.">
+    </div>
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Bio <span style="text-transform:none;font-style:italic">(max 120 chars)</span></div>
+      <textarea id="pedit-bio" maxlength="120" rows="2" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box;resize:none" placeholder="Songwriter, beatmaker, storyteller..."></textarea>
+    </div>
+    <button class="btn btn-amber" onclick="saveProfileEdit()" style="width:100%;padding:10px;font-size:14px">Save Profile</button>
+  </div>
+</div>
+
 </div><!-- /wrap -->
 
 <script>
@@ -3821,6 +3951,7 @@ function goPg(id,el){
   if(id==='library')renderLib();
   if(id==='builder')initBuilder();
   if(id==='lucky')renderLuckyHistory();
+  if(id==='profile')loadProfilePage();
 }
 function goStab(ns,id,el){
   const pre=ns+'-spane-';
@@ -6106,6 +6237,7 @@ async function generateVariant() {
     const label = VARIANT_LABELS[_selectedVariant] || _selectedVariant;
     loadLyricsIntoEditor(variantText, `${song.title} (${label})`);
     navTo('editor');
+    checkAchievements('variant_made');
     toast(`${label} generated — loaded into editor`);
   } catch(e) {
     toast('Variant generation failed: ' + e.message);
@@ -6291,6 +6423,7 @@ function resetCoach() {
 
 async function runCoach() {
   if (!_coachLyrics) return;
+  checkAchievements('coach_used');
   document.getElementById('coach-idle').style.display = 'none';
   document.getElementById('coach-loading').style.display = 'block';
   document.getElementById('coach-results').style.display = 'none';
@@ -6589,6 +6722,7 @@ async function submitPublish() {
     const pubs = JSON.parse(localStorage.getItem('soniq_published') || '[]');
     pubs.unshift({ title, isrc, tier, pro, ts: Date.now() });
     localStorage.setItem('soniq_published', JSON.stringify(pubs.slice(0, 50)));
+    checkAchievements('song_published');
 
     // Show confirmation
     const card = document.querySelector('#pub-modal .card');
@@ -8622,12 +8756,82 @@ async function loadGlobalCounter() {
   } catch(e) {}
 }
 
-// ── Achievements (localStorage-based) ─────────────────
+// ─── XP + LEVELS ──────────────────────────────────────────────
+const LEVELS = [
+  { name: 'Rookie',      min: 0,    color: '#94a3b8' },
+  { name: 'Songwriter',  min: 100,  color: '#34d399' },
+  { name: 'Hit Maker',   min: 300,  color: '#60a5fa' },
+  { name: 'Producer',    min: 600,  color: '#a78bfa' },
+  { name: 'Platinum',    min: 1000, color: '#fbbf24' },
+  { name: 'Legend',      min: 2000, color: '#f97316' }
+];
+
+const XP_VALUES = {
+  song_generated: 10,
+  song_liked: 5,
+  variant_made: 15,
+  song_published: 50,
+  achievement_unlocked: 25
+};
+
+function getXPState() {
+  try { return JSON.parse(localStorage.getItem('soniq_xp') || '{"xp":0,"level":0}'); } catch { return {xp:0,level:0}; }
+}
+function saveXPState(s) {
+  try { localStorage.setItem('soniq_xp', JSON.stringify(s)); } catch {}
+}
+
+function awardXP(type) {
+  const val = XP_VALUES[type] || 0;
+  if (!val) return;
+  const st = getXPState();
+  st.xp = (st.xp || 0) + val;
+  const newLevel = LEVELS.reduce((acc, l, i) => st.xp >= l.min ? i : acc, 0);
+  if (newLevel > (st.level || 0)) {
+    st.level = newLevel;
+    saveXPState(st);
+    setTimeout(() => showLevelUpToast(newLevel), 1200);
+  } else {
+    saveXPState(st);
+  }
+}
+
+function showLevelUpToast(levelIdx) {
+  const lv = LEVELS[levelIdx];
+  if (!lv) return;
+  let el = document.getElementById('levelup-toast');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'levelup-toast';
+    el.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(40px);background:linear-gradient(135deg,#1a1408,#2a1f08);border:1px solid var(--amberline);border-radius:12px;padding:14px 20px;z-index:9999;display:flex;align-items:center;gap:12px;min-width:260px;opacity:0;transition:all .4s ease;pointer-events:none';
+    el.innerHTML = '<div style="font-size:28px">⭐</div><div><div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em">Level Up!</div><div id="lu-name" style="font-size:16px;font-weight:800;color:var(--amber)"></div></div>';
+    document.body.appendChild(el);
+  }
+  document.getElementById('lu-name').textContent = lv.name;
+  el.style.opacity = '1'; el.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity='0'; el.style.transform='translateX(-50%) translateY(40px)'; }, 3500);
+}
+
+function getCurrentLevel() {
+  const xp = getXPState().xp || 0;
+  let lvl = 0;
+  LEVELS.forEach((l, i) => { if (xp >= l.min) lvl = i; });
+  return lvl;
+}
+
+// ─── ACHIEVEMENTS ─────────────────────────────────────────────
 const ACHIEVEMENTS = {
-  first_song:      { icon: '🎵', name: 'First Song!',     desc: 'You wrote your first song with SONIQ' },
-  genre_explorer:  { icon: '🗺️', name: 'Genre Explorer',  desc: 'Generated songs in 5 different genres' },
-  lucky_7:         { icon: '🎲', name: 'Lucky 7',          desc: 'Used Feel Lucky 7 times' },
-  hit_maker:       { icon: '👑', name: 'Hit Maker',        desc: 'Liked 10 songs — you know quality' }
+  first_song:       { icon: '🎵', name: 'First Song',       desc: 'Generated your first song', xp: 25 },
+  genre_explorer:   { icon: '🗺️', name: 'Genre Explorer',   desc: 'Wrote in 5 different genres', xp: 50 },
+  lucky_7:          { icon: '🎲', name: 'Lucky 7',           desc: 'Used Feel Lucky 7 times', xp: 30 },
+  hit_maker:        { icon: '👑', name: 'Hit Maker',         desc: 'Liked 10 of your own songs', xp: 40 },
+  prolific:         { icon: '📝', name: 'Prolific',          desc: 'Generated 25 songs', xp: 75 },
+  publisher:        { icon: '📜', name: 'Published',         desc: 'Registered your first song', xp: 100 },
+  variant_king:     { icon: '🎛️', name: 'Variant King',      desc: 'Generated 5 song variants', xp: 50 },
+  coach_student:    { icon: '🎓', name: 'Coachable',         desc: 'Used the AI Feedback Coach', xp: 25 },
+  on_a_roll:        { icon: '🔥', name: 'On a Roll',         desc: '3-day generation streak', xp: 60 },
+  rap_god:          { icon: '🎤', name: 'Rap God',           desc: 'Generated 10 Hip-Hop songs', xp: 40 }
 };
 
 function getAchState() {
@@ -8659,48 +8863,204 @@ function showAchievementToast(key) {
 function checkAchievements(trigger, extra) {
   const st = getAchState();
 
+  function unlock(key) {
+    if (st[key]) return;
+    st[key] = true;
+    saveAchState(st);
+    awardXP('achievement_unlocked');
+    setTimeout(() => showAchievementToast(key), 1800);
+  }
+
   if (trigger === 'song_generated') {
-    if (!st.first_song) {
-      st.first_song = true;
-      saveAchState(st);
-      setTimeout(() => showAchievementToast('first_song'), 1800);
-    }
-    // genre_explorer: track unique genres
+    awardXP('song_generated');
+    // Update streak
+    updateStreak();
+    unlock('first_song');
+    // genre_explorer
     const genres = st.genres || [];
     if (extra?.genre && !genres.includes(extra.genre)) {
       genres.push(extra.genre);
       st.genres = genres;
-      if (genres.length >= 5 && !st.genre_explorer) {
-        st.genre_explorer = true;
-        saveAchState(st);
-        setTimeout(() => showAchievementToast('genre_explorer'), 2400);
-      } else {
-        saveAchState(st);
-      }
+      saveAchState(st);
+      if (genres.length >= 5) unlock('genre_explorer');
     }
-  }
-
-  if (trigger === 'feel_lucky') {
-    st.lucky_count = (st.lucky_count || 0) + 1;
-    if (st.lucky_count >= 7 && !st.lucky_7) {
-      st.lucky_7 = true;
+    // prolific: 25 songs
+    st.song_count = (st.song_count || 0) + 1;
+    saveAchState(st);
+    if (st.song_count >= 25) unlock('prolific');
+    // rap_god: 10 hip-hop
+    if (extra?.genre === 'hiphop') {
+      st.hiphop_count = (st.hiphop_count || 0) + 1;
       saveAchState(st);
-      setTimeout(() => showAchievementToast('lucky_7'), 1800);
-    } else {
-      saveAchState(st);
+      if (st.hiphop_count >= 10) unlock('rap_god');
     }
   }
 
   if (trigger === 'song_liked') {
-    st.like_count = (st.like_count || 0) + 1;
-    if (st.like_count >= 10 && !st.hit_maker) {
-      st.hit_maker = true;
-      saveAchState(st);
-      setTimeout(() => showAchievementToast('hit_maker'), 1200);
-    } else {
-      saveAchState(st);
-    }
+    awardXP('song_liked');
+    st.liked_count = (st.liked_count || 0) + 1;
+    saveAchState(st);
+    if (st.liked_count >= 10) unlock('hit_maker');
   }
+
+  if (trigger === 'feel_lucky') {
+    st.lucky_count = (st.lucky_count || 0) + 1;
+    saveAchState(st);
+    if (st.lucky_count >= 7) unlock('lucky_7');
+  }
+
+  if (trigger === 'variant_made') {
+    awardXP('variant_made');
+    st.variant_count = (st.variant_count || 0) + 1;
+    saveAchState(st);
+    if (st.variant_count >= 5) unlock('variant_king');
+  }
+
+  if (trigger === 'coach_used') {
+    unlock('coach_student');
+  }
+
+  if (trigger === 'song_published') {
+    awardXP('song_published');
+    unlock('publisher');
+  }
+}
+
+function updateStreak() {
+  const today = new Date().toDateString();
+  const st = getAchState();
+  if (st.streak_date === today) return;
+  const yesterday = new Date(Date.now() - 86400000).toDateString();
+  if (st.streak_date === yesterday) {
+    st.streak = (st.streak || 0) + 1;
+  } else {
+    st.streak = 1;
+  }
+  st.streak_date = today;
+  saveAchState(st);
+  if (st.streak >= 3) checkAchievements._unlockOnRoll || (() => {
+    const s2 = getAchState();
+    if (!s2.on_a_roll) { s2.on_a_roll = true; saveAchState(s2); showAchievementToast('on_a_roll'); awardXP('achievement_unlocked'); }
+  })();
+}
+
+// ─── PROFILE PAGE ─────────────────────────────────────────────
+function loadProfilePage() {
+  const lib = JSON.parse(localStorage.getItem('soniq_library') || '[]');
+  const ach = getAchState();
+  const xpSt = getXPState();
+  const published = JSON.parse(localStorage.getItem('soniq_published') || '[]');
+  const xp = xpSt.xp || 0;
+  const levelIdx = getCurrentLevel();
+  const level = LEVELS[levelIdx];
+  const nextLevel = LEVELS[levelIdx + 1];
+
+  // Avatar letter
+  const profileData = JSON.parse(localStorage.getItem('soniq_profile') || '{}');
+  const name = profileData.display_name || S.user?.email?.split('@')[0] || 'Artist';
+  const artist = profileData.artist_name || '';
+  const bio = profileData.bio || '';
+
+  document.getElementById('profile-avatar').textContent = (name[0] || '?').toUpperCase();
+  document.getElementById('profile-display-name').textContent = name;
+  document.getElementById('profile-artist-tag').textContent = artist ? '@' + artist.toLowerCase().replace(/\s+/g,'.') : '';
+  document.getElementById('profile-bio').textContent = bio;
+
+  // Level badge
+  const badge = document.getElementById('profile-level-badge');
+  badge.textContent = level.name.toUpperCase();
+  badge.style.color = level.color;
+  badge.style.borderColor = level.color + '60';
+  badge.style.background = level.color + '18';
+
+  // XP bar
+  const xpInLevel = xp - level.min;
+  const xpForNext = nextLevel ? nextLevel.min - level.min : 1000;
+  const pct = nextLevel ? Math.min(100, Math.round(xpInLevel / xpForNext * 100)) : 100;
+  document.getElementById('profile-xp-bar').style.width = pct + '%';
+  document.getElementById('profile-xp-label').textContent = `Level ${levelIdx + 1} — ${level.name}`;
+  document.getElementById('profile-xp-nums').textContent = nextLevel ? `${xp} / ${nextLevel.min} XP` : `${xp} XP — MAX LEVEL`;
+
+  // Stats
+  document.getElementById('pstat-songs').textContent = ach.song_count || 0;
+  document.getElementById('pstat-liked').textContent = ach.liked_count || 0;
+  document.getElementById('pstat-published').textContent = published.length;
+  document.getElementById('pstat-streak').textContent = (ach.streak || 0) + '🔥';
+
+  // Top genre
+  const genreMap = {};
+  lib.forEach(s => { if (s.genre) genreMap[s.genre] = (genreMap[s.genre]||0)+1; });
+  const topGenre = Object.entries(genreMap).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('profile-top-genre').textContent = topGenre ? topGenre[0].charAt(0).toUpperCase()+topGenre[0].slice(1) : '—';
+  document.getElementById('profile-genre-count').textContent = topGenre ? topGenre[1] + ' songs' : '';
+
+  // Anthem (most liked or first)
+  const liked = lib.find(s => s.liked);
+  const anthem = liked || lib[0];
+  document.getElementById('profile-anthem-title').textContent = anthem ? anthem.title : '—';
+  document.getElementById('profile-anthem-genre').textContent = anthem ? anthem.genre || '' : 'Write a song to set your anthem';
+
+  // Achievements grid
+  const grid = document.getElementById('profile-achievements-grid');
+  grid.innerHTML = Object.entries(ACHIEVEMENTS).map(([key, a]) => {
+    const unlocked = !!ach[key];
+    return `<div class="ach-badge ${unlocked?'unlocked':''}">
+      <div class="ach-b-icon">${a.icon}</div>
+      <div class="ach-b-name">${escHtml(a.name)}</div>
+      <div class="ach-b-desc">${escHtml(a.desc)}</div>
+      ${unlocked ? `<div style="font-size:9px;color:var(--amber);margin-top:3px">+${a.xp} XP</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Recent songs
+  const songsEl = document.getElementById('profile-songs-list');
+  const noSongs = document.getElementById('profile-no-songs');
+  if (lib.length === 0) {
+    songsEl.innerHTML = '';
+    noSongs.style.display = '';
+  } else {
+    noSongs.style.display = 'none';
+    songsEl.innerHTML = lib.slice(0,10).map((s,i) => `
+      <div class="profile-song-row">
+        <div class="profile-song-num">${i+1}</div>
+        <div class="profile-song-info">
+          <div class="profile-song-title">${escHtml(s.title || 'Untitled')}</div>
+          <div class="profile-song-meta">${escHtml(s.genre||'')}${s.ts ? ' · '+new Date(s.ts).toLocaleDateString() : ''}</div>
+        </div>
+        ${s.liked ? '<div class="profile-song-liked">♥</div>' : ''}
+      </div>`).join('');
+  }
+}
+
+function openProfileEdit() {
+  const d = JSON.parse(localStorage.getItem('soniq_profile') || '{}');
+  document.getElementById('pedit-name').value = d.display_name || S.user?.email?.split('@')[0] || '';
+  document.getElementById('pedit-artist').value = d.artist_name || '';
+  document.getElementById('pedit-bio').value = d.bio || '';
+  document.getElementById('profile-edit-modal').style.display = 'block';
+}
+
+function closeProfileEdit() {
+  document.getElementById('profile-edit-modal').style.display = 'none';
+}
+
+function saveProfileEdit() {
+  const d = {
+    display_name: document.getElementById('pedit-name').value.trim().slice(0,60),
+    artist_name:  document.getElementById('pedit-artist').value.trim().slice(0,40),
+    bio:          document.getElementById('pedit-bio').value.trim().slice(0,120)
+  };
+  localStorage.setItem('soniq_profile', JSON.stringify(d));
+  // Sync to Supabase if logged in
+  if (S.supabase && S.user) {
+    S.supabase.from('profiles').update({
+      display_name: d.display_name,
+      artist_name:  d.artist_name
+    }).eq('id', S.user.id).then(() => {});
+  }
+  closeProfileEdit();
+  loadProfilePage();
+  toast('✓ Profile saved');
 }
 
 // Load counter when lucky page is viewed
