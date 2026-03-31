@@ -6335,9 +6335,9 @@ function copyCoachFeedback() {
 
 // ─── SUPABASE AUTH ─────────────────────────────────────────────
 (function initSupabase() {
-  const url = 'SUPABASE_URL_PLACEHOLDER';
+  const url = 'https://gotrwbhkavkqmxtnxkkj.supabase.co';
   const key = 'SUPABASE_ANON_KEY_PLACEHOLDER';
-  if (url === 'SUPABASE_URL_PLACEHOLDER' || !window.supabase) return;
+  if (key === 'SUPABASE_ANON_KEY_PLACEHOLDER' || !window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
   S.supabase.auth.onAuthStateChange((event, session) => {
     S.session = session;
