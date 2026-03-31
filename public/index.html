@@ -6333,6 +6333,124 @@ function copyCoachFeedback() {
   toast('Feedback copied to clipboard');
 }
 
+// ─── SUPABASE AUTH ─────────────────────────────────────────────
+(function initSupabase() {
+  const url = 'SUPABASE_URL_PLACEHOLDER';
+  const key = 'SUPABASE_ANON_KEY_PLACEHOLDER';
+  if (url === 'SUPABASE_URL_PLACEHOLDER' || !window.supabase) return;
+  S.supabase = window.supabase.createClient(url, key);
+  S.supabase.auth.onAuthStateChange((event, session) => {
+    S.session = session;
+    S.user = session?.user || null;
+    updateAuthUI();
+    if (event === 'SIGNED_IN') closeAuth();
+  });
+  S.supabase.auth.getSession().then(({ data: { session } }) => {
+    S.session = session;
+    S.user = session?.user || null;
+    updateAuthUI();
+  });
+})();
+
+function updateAuthUI() {
+  const authBtn = document.getElementById('nav-auth-btn');
+  const signOutBtn = document.getElementById('nav-signout-btn');
+  const userInfo = document.getElementById('nav-user-info');
+  if (S.user) {
+    if (authBtn) authBtn.style.display = 'none';
+    if (signOutBtn) signOutBtn.style.display = '';
+    if (userInfo) { userInfo.style.display = ''; userInfo.textContent = S.user.email?.split('@')[0] || 'Account'; }
+  } else {
+    if (authBtn) authBtn.style.display = '';
+    if (signOutBtn) signOutBtn.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'none';
+  }
+}
+
+function openAuth(reason) {
+  const title = document.getElementById('auth-modal-title');
+  if (reason && title) title.textContent = reason;
+  else if (title) title.textContent = 'Sign in to Soniq';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-modal').style.display = 'block';
+}
+
+function closeAuth() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+function authTab(tab) {
+  document.getElementById('auth-form-signin').style.display = tab === 'signin' ? '' : 'none';
+  document.getElementById('auth-form-signup').style.display = tab === 'signup' ? '' : 'none';
+  document.getElementById('auth-success').style.display = 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-tab-signin').style.borderBottomColor = tab === 'signin' ? 'var(--amber)' : 'transparent';
+  document.getElementById('auth-tab-signin').style.color = tab === 'signin' ? 'var(--amber)' : 'var(--tx3)';
+  document.getElementById('auth-tab-signup').style.borderBottomColor = tab === 'signup' ? 'var(--amber)' : 'transparent';
+  document.getElementById('auth-tab-signup').style.color = tab === 'signup' ? 'var(--amber)' : 'var(--tx3)';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+async function authSignIn() {
+  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { showAuthError('Please enter your email and password'); return; }
+  const btn = document.getElementById('auth-signin-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { error } = await S.supabase.auth.signInWithPassword({ email, password });
+  if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Sign In'; }
+  else { btn.textContent = 'Sign In'; btn.disabled = false; }
+}
+
+async function authSignUp() {
+  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  const name = document.getElementById('auth-signup-name').value.trim();
+  const email = document.getElementById('auth-signup-email').value.trim();
+  const password = document.getElementById('auth-signup-password').value;
+  if (!name || !email || !password) { showAuthError('All fields are required'); return; }
+  if (password.length < 8) { showAuthError('Password must be at least 8 characters'); return; }
+  const btn = document.getElementById('auth-signup-btn');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  const { error } = await S.supabase.auth.signUp({
+    email, password,
+    options: { data: { full_name: name } }
+  });
+  if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Create Account'; return; }
+  document.getElementById('auth-form-signup').style.display = 'none';
+  const succ = document.getElementById('auth-success');
+  succ.style.display = '';
+  document.getElementById('auth-success-msg').textContent = 'Check your email!';
+  document.getElementById('auth-success-sub').textContent = 'We sent a confirmation link to ' + email;
+  btn.disabled = false; btn.textContent = 'Create Account';
+}
+
+async function authSignOut() {
+  if (!S.supabase) return;
+  await S.supabase.auth.signOut();
+  toast('Signed out');
+}
+
+async function authForgotPassword() {
+  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { showAuthError('Enter your email address first'); return; }
+  const { error } = await S.supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/?reset=1'
+  });
+  if (error) { showAuthError(error.message); return; }
+  document.getElementById('auth-form-signin').style.display = 'none';
+  const succ = document.getElementById('auth-success');
+  succ.style.display = '';
+  document.getElementById('auth-success-msg').textContent = 'Reset email sent!';
+  document.getElementById('auth-success-sub').textContent = 'Check your inbox for a password reset link.';
+}
+
 // ─── PUBLISHING ────────────────────────────────────────────────
 function generateISRC() {
   const year = new Date().getFullYear().toString().slice(-2);
@@ -6341,6 +6459,10 @@ function generateISRC() {
 }
 
 function openPublish() {
+  if (!S.user) {
+    openAuth('Sign in to register your song for publishing');
+    return;
+  }
   const song = S.currentSong;
   document.getElementById('pub-song-title').value = song ? song.title : '';
   document.getElementById('pub-isrc-display').textContent = generateISRC();
@@ -6399,9 +6521,11 @@ async function submitPublish() {
   btn.textContent = 'Registering…';
 
   try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
     const resp = await fetch('/api/publish', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({
         title,
         isrc,
