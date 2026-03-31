@@ -6762,8 +6762,6 @@ function copyCoachFeedback() {
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
   S.supabase.auth.onAuthStateChange((event, session) => {
-    // Don't overwrite admin mock session with null
-    if (!session && localStorage.getItem(ADMIN_TOKEN_KEY)) return;
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -6789,7 +6787,6 @@ function copyCoachFeedback() {
   });
   S.supabase.auth.getSession().then(({ data: { session } }) => {
     // Don't overwrite admin mock session
-    if (!session && localStorage.getItem(ADMIN_TOKEN_KEY)) return;
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -6802,68 +6799,6 @@ function copyCoachFeedback() {
   }
 })();
 
-// ─── ADMIN BYPASS ──────────────────────────────────────────────
-// Usage: /app?admin=YOUR_PASSWORD  (one-time — token stored in localStorage)
-// Subsequent visits: no URL param needed, token auto-detected.
-const ADMIN_TOKEN_KEY = 'soniq_admin_token';
-
-async function initAdminBypass() {
-  const params = new URLSearchParams(location.search);
-  const passwordParam = params.get('admin');
-
-  // Check stored token first
-  const storedToken = localStorage.getItem(ADMIN_TOKEN_KEY);
-
-  if (storedToken) {
-    // Token is a server-issued HMAC — trust it for this session.
-    // It can only be obtained by knowing the correct ADMIN_PASSWORD.
-    applyAdminSession();
-    return;
-  }
-
-  if (!passwordParam) return;
-
-  // Strip param from URL immediately (before async call)
-  params.delete('admin');
-  const newSearch = params.toString();
-  history.replaceState(null, '', location.pathname + (newSearch ? '?' + newSearch : ''));
-
-  try {
-    const r = await fetch('/api/admin-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: passwordParam }),
-    });
-    if (!r.ok) { toast('Admin access denied'); return; }
-    const data = await r.json();
-    if (data.ok && data.token) {
-      localStorage.setItem(ADMIN_TOKEN_KEY, data.token);
-      applyAdminSession();
-      toast('Admin mode active — full Studio access');
-    }
-  } catch (e) {
-    console.error('Admin bypass error:', e);
-  }
-}
-
-function applyAdminSession() {
-  // Set plan to studio and create a mock user so all auth/plan gates pass
-  S.plan = 'studio';
-  if (!S.user) {
-    S.user = { id: 'admin', email: 'admin@mysoniq.com', app_metadata: {}, user_metadata: {} };
-    S.session = { user: S.user };
-    updateAuthUI();
-  }
-}
-
-function clearAdminSession() {
-  localStorage.removeItem(ADMIN_TOKEN_KEY);
-  location.reload();
-}
-
-// Run admin bypass check on load (before Supabase auth resolves)
-initAdminBypass();
-
 function updateAuthUI() {
   const authBtn = document.getElementById('nav-auth-btn');
   const signOutBtn = document.getElementById('nav-signout-btn');
@@ -6872,10 +6807,9 @@ function updateAuthUI() {
   if (S.user) {
     if (authBtn) authBtn.style.display = 'none';
     if (signOutBtn) signOutBtn.style.display = '';
-    const displayName = S.user.id === 'admin' ? 'Admin' : (S.user.email?.split('@')[0] || 'Account');
-    if (userInfo) { userInfo.style.display = ''; userInfo.textContent = displayName; }
-    // Show upgrade button only for free users (not founders / pro / admin)
-    const isPaid = S.user.id === 'admin' || S.foundingStatus?.is_founder || S.foundingStatus?.is_pro || PAID_PLANS.has(S.plan);
+    if (userInfo) { userInfo.style.display = ''; userInfo.textContent = S.user.email?.split('@')[0] || 'Account'; }
+    // Show upgrade button only for free users (not founders / pro)
+    const isPaid = S.foundingStatus?.is_founder || S.foundingStatus?.is_pro;
     if (upgradeBtn) upgradeBtn.style.display = isPaid ? 'none' : '';
   } else {
     if (authBtn) authBtn.style.display = '';
@@ -9346,6 +9280,44 @@ renderLib();
 updateLibBadge();
 loadVoiceProfile();
 checkShareLink();
+
+// ── ADMIN BYPASS ──
+(async function adminBypass() {
+  const params = new URLSearchParams(window.location.search);
+  const adminPw = params.get('admin');
+
+  if (adminPw) {
+    try {
+      const res = await fetch('/api/admin-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPw })
+      });
+      const data = await res.json();
+      if (data.ok && data.token) {
+        localStorage.setItem('soniq_admin_token', data.token);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    } catch (e) { console.error('Admin bypass failed:', e); }
+  }
+
+  const token = localStorage.getItem('soniq_admin_token');
+  if (token) {
+    if (typeof S !== 'undefined') {
+      S.plan = 'studio';
+      S.user = S.user || { id: 'admin', email: 'admin@mysoniq.com' };
+      S.isAdmin = true;
+    }
+    window.__soniqAdmin = true;
+    console.log('%c★ SONIQ Admin Mode Active', 'color: #f5c000; font-size: 14px; font-weight: bold');
+  }
+})();
+
+// Global admin clear function
+window.clearAdminSession = function() {
+  localStorage.removeItem('soniq_admin_token');
+  window.location.reload();
+};
 </script>
 <!-- ══ ANALYTICS + GAMIFICATION ══ -->
 <script>
