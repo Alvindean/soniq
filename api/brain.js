@@ -1886,7 +1886,14 @@ YOUR TASK — Create a Cinematic/Sync-Ready Version:
 function buildVariantPrompt(variant, song) {
   const builder = VARIANT_PROMPTS[variant];
   if (!builder) throw new Error(`Unknown variant: ${variant}`);
-  return builder(song);
+  const safeSong = {
+    title: sanitizeInput(song.title || 'Untitled', 200),
+    lyrics: sanitizeInput(song.lyrics || '', 8000),
+    genre: sanitizeInput(song.genre || '', 50),
+    genre2: sanitizeInput(song.genre2 || '', 50),
+    topic: sanitizeInput(song.topic || '', 300)
+  };
+  return builder(safeSong);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -1905,6 +1912,9 @@ const FEEDBACK_DIMENSIONS = {
 };
 
 function buildFeedbackPrompt(lyrics, genre, topic) {
+  lyrics = sanitizeInput(lyrics || '', 8000);
+  genre = sanitizeInput(genre || '', 50);
+  topic = sanitizeInput(topic || '', 300);
   const genreData = GENRE_BIBLE[genre] || {};
   const genreDNA = genreData.dna || 'No genre-specific rules available.';
   const genreKeys = genreData.keys ? genreData.keys.join('\n- ') : 'None';

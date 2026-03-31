@@ -1215,6 +1215,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 </style>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -1264,6 +1265,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
   <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+      <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
+      <button id="nav-auth-btn" onclick="openAuth()" class="btn btn-sm" style="font-size:11px;padding:4px 10px">Sign In</button>
+      <button id="nav-signout-btn" onclick="authSignOut()" class="btn btn-sm" style="display:none;font-size:11px;padding:4px 10px;color:var(--tx3)">Sign Out</button>
+    </div>
 </nav>
 
 <!-- ══════════════════════════════════
@@ -1740,6 +1746,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
         <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
         <button class="btn" onclick="openCoach()" id="coach-btn" style="display:none" title="AI Feedback Coach — get expert notes on your lyrics">🎓 Coach</button>
+        <button class="btn btn-green" onclick="openPublish()" id="publish-btn" style="display:none" title="Register this song for publishing royalties">📜 Publish</button>
       </div>
     </div>
 
@@ -2187,6 +2194,148 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn" onclick="copyCoachFeedback()" style="flex:1">📋 Copy Feedback</button>
         <button class="btn" onclick="resetCoach()">← New Analysis</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div id="auth-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:950;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeAuth()">
+  <div class="card" style="max-width:420px;margin:60px auto;position:relative">
+    <button onclick="closeAuth()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle" id="auth-modal-title">Sign in to Soniq</div>
+    <div id="auth-tabs" style="display:flex;gap:0;margin-bottom:20px;border-bottom:1px solid var(--brd)">
+      <button id="auth-tab-signin" onclick="authTab('signin')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid var(--amber);color:var(--amber);font-size:13px;cursor:pointer;font-weight:600">Sign In</button>
+      <button id="auth-tab-signup" onclick="authTab('signup')" style="flex:1;padding:8px;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx3);font-size:13px;cursor:pointer">Create Account</button>
+    </div>
+
+    <div id="auth-error" style="display:none;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);border-radius:6px;padding:8px 12px;font-size:12px;color:#f87171;margin-bottom:12px"></div>
+
+    <div id="auth-form-signin">
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Email</div>
+        <input id="auth-email" type="email" autocomplete="email" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="you@example.com">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
+        <input id="auth-password" type="password" autocomplete="current-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="••••••••">
+      </div>
+      <button class="btn btn-amber" onclick="authSignIn()" id="auth-signin-btn" style="width:100%;padding:10px;font-size:14px;margin-bottom:10px">Sign In</button>
+      <button onclick="authForgotPassword()" style="width:100%;background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:4px">Forgot password?</button>
+    </div>
+
+    <div id="auth-form-signup" style="display:none">
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Full Name</div>
+        <input id="auth-signup-name" type="text" autocomplete="name" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Your name">
+      </div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Email</div>
+        <input id="auth-signup-email" type="email" autocomplete="email" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="you@example.com">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
+        <input id="auth-signup-password" type="password" autocomplete="new-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+      </div>
+      <button class="btn btn-amber" onclick="authSignUp()" id="auth-signup-btn" style="width:100%;padding:10px;font-size:14px">Create Account</button>
+    </div>
+
+    <div id="auth-success" style="display:none;text-align:center;padding:20px">
+      <div style="font-size:32px;margin-bottom:10px">✅</div>
+      <div style="font-size:15px;font-weight:700;color:var(--tx1);margin-bottom:6px" id="auth-success-msg"></div>
+      <div style="font-size:12px;color:var(--tx3)" id="auth-success-sub"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PUBLISHING MODAL -->
+<div id="pub-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:910;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closePublish()">
+  <div class="card" style="max-width:560px;margin:32px auto;position:relative">
+    <button onclick="closePublish()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">📜 Publish &amp; Register</div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:18px">Register your song with a PRO (BMI/ASCAP) and start collecting royalties. Soniq handles the paperwork.</p>
+
+    <!-- Tier selection -->
+    <div style="margin-bottom:18px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Choose publishing tier</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <button class="pub-tier-btn" data-tier="admin" onclick="selectPubTier('admin')" style="border:1px solid var(--brd);border-radius:8px;padding:10px 6px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-size:11px;text-align:center;transition:all .2s">
+          <div style="font-size:16px;margin-bottom:4px">📋</div>
+          <div style="font-weight:600;margin-bottom:3px">Admin</div>
+          <div style="color:var(--tx3);font-size:10px">You keep 85%<br>Soniq takes 15%</div>
+        </button>
+        <button class="pub-tier-btn" data-tier="copub" onclick="selectPubTier('copub')" style="border:1px solid var(--brd);border-radius:8px;padding:10px 6px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-size:11px;text-align:center;transition:all .2s">
+          <div style="font-size:16px;margin-bottom:4px">🤝</div>
+          <div style="font-weight:600;margin-bottom:3px">Co-Pub</div>
+          <div style="color:var(--tx3);font-size:10px">You keep 75%<br>Soniq takes 25%</div>
+        </button>
+        <button class="pub-tier-btn" data-tier="sync" onclick="selectPubTier('sync')" style="border:1px solid var(--brd);border-radius:8px;padding:10px 6px;cursor:pointer;background:var(--bg2);color:var(--tx2);font-size:11px;text-align:center;transition:all .2s">
+          <div style="font-size:16px;margin-bottom:4px">🎬</div>
+          <div style="font-weight:600;margin-bottom:3px">Sync Pitch</div>
+          <div style="color:var(--tx3);font-size:10px">You keep 65%<br>Soniq takes 35%</div>
+        </button>
+      </div>
+      <div id="pub-tier-desc" style="font-size:11px;color:var(--tx3);margin-top:8px;min-height:32px;padding:6px 8px;background:var(--bg3);border-radius:6px"></div>
+    </div>
+
+    <!-- Song info -->
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Song title</div>
+      <input id="pub-song-title" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Song title">
+    </div>
+
+    <!-- Writer info -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Your legal name *</div>
+        <input id="pub-writer-name" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Full legal name">
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">PRO affiliation *</div>
+        <select id="pub-pro" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box">
+          <option value="">Select PRO</option>
+          <option value="bmi">BMI</option>
+          <option value="ascap">ASCAP</option>
+          <option value="sesac">SESAC</option>
+          <option value="socan">SOCAN (Canada)</option>
+          <option value="prs">PRS (UK)</option>
+          <option value="none">Not registered yet</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">IPI / CAE Number <span style="font-style:italic;text-transform:none">(optional — from your PRO profile)</span></div>
+      <input id="pub-ipi" style="width:100%;padding:8px 10px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="e.g. 00123456789">
+    </div>
+
+    <!-- ISRC -->
+    <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">ISRC (auto-generated)</div>
+        <code id="pub-isrc-display" style="font-size:14px;color:var(--amber);font-weight:700;letter-spacing:.06em">—</code>
+      </div>
+      <div style="font-size:10px;color:var(--tx3);max-width:180px;text-align:right">International Standard Recording Code — your song's unique global ID</div>
+    </div>
+
+    <!-- Agreement -->
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:16px;cursor:pointer">
+      <input type="checkbox" id="pub-agree" style="margin-top:2px;flex-shrink:0">
+      <span>I agree to the <a href="/legal/copublishing.html" target="_blank" style="color:var(--amber)">Co-Publishing Agreement (v1.0)</a> and authorize Nu Wav Media LLC to administer publishing per the selected tier. I confirm I am the sole/primary writer of this song.</span>
+    </label>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-green" onclick="submitPublish()" style="flex:1;font-size:14px;padding:10px" id="pub-submit-btn">📜 Register Song</button>
+      <button class="btn" onclick="closePublish()">Cancel</button>
+    </div>
+
+    <!-- Confirmation state -->
+    <div id="pub-confirm" style="display:none;text-align:center;padding:24px">
+      <div style="font-size:36px;margin-bottom:12px">✅</div>
+      <div style="font-size:16px;font-weight:700;color:var(--tx1);margin-bottom:6px">Song Registered!</div>
+      <div style="font-size:12px;color:var(--tx2);margin-bottom:4px" id="pub-confirm-title"></div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">ISRC: <code id="pub-confirm-isrc" style="color:var(--amber)"></code></div>
+      <p style="font-size:11px;color:var(--tx3);margin-bottom:16px">Our team will register this with your PRO within 5 business days. You'll receive a confirmation email once it's live.</p>
+      <button class="btn" onclick="closePublish()">Done</button>
     </div>
   </div>
 </div>
@@ -3374,7 +3523,7 @@ const S={selectedGenre:'pop',
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
-  luckyHistory:[],sessionHistory:[],editorSong:null,
+  luckyHistory:[],sessionHistory:[],user:null,session:null,supabase:null,pubTier:'admin',editorSong:null,
   currentSong:null,luckyCurrentSong:null,editorLines:[],
   selectedSong:null,currentFusion:null,
   pb:{genre:'',era:'',bpm:100,instr:[],energy:'mid-energy groove',texture:[],voice:''},
@@ -4294,7 +4443,7 @@ function parseLuckyResult(raw,fusionName,meta){
   out.classList.add('visible');
   document.getElementById('lres-title').textContent=title;
   document.getElementById('lres-verdict').textContent=verdict;
-  document.getElementById('lres-lyrics-text').innerHTML=(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -4352,7 +4501,7 @@ function loadLuckyHistItem(i){
   const out=document.getElementById('lucky-out');out.style.display='block';out.classList.add('visible');
   document.getElementById('lres-title').textContent=song.title||'Untitled';
   document.getElementById('lres-verdict').textContent=song.verdict||'';
-  document.getElementById('lres-lyrics-text').innerHTML=(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   renderBrief('lres', song.style||'', song.brief||'');
   document.getElementById('lres-structure-text').textContent=song.structure||'';
   document.getElementById('lres-dopamine-text').textContent=song.dopamine||'';
@@ -4668,7 +4817,8 @@ function buildClaimString(title, ts, name) {
   const d = new Date(ts);
   const iso = d.toISOString().replace('T',' ').slice(0,19) + ' UTC';
   const yr  = d.getFullYear();
-  const base = `© ${yr}${name ? ' ' + name : ''}. Original song "${title}" — Created ${iso}. All rights reserved.`;
+  const writer = name ? name : 'Unknown Writer';
+  const base = `© ${yr} ${writer} / Nu Wav Media LLC (Alvin Dean Warren). Original song "${title}" — Created ${iso}. All rights reserved.`;
   const id   = 'SONIQ-' + ts.toString(36).toUpperCase();
   return `${base} [${id}]`;
 }
@@ -4735,7 +4885,7 @@ function parseSongResult(raw,genre,topic){
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;
-  document.getElementById('res-lyrics-text').innerHTML=(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('res-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -4768,6 +4918,8 @@ function parseSongResult(raw,genre,topic){
   if (vhBtn) vhBtn.style.display = '';
   const coachBtn = document.getElementById('coach-btn');
   if (coachBtn) coachBtn.style.display = '';
+  const publishBtn = document.getElementById('publish-btn');
+  if (publishBtn) publishBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -4821,34 +4973,34 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
         <span style="font-size:10px;color:var(--tx3);font-weight:400">Copy this into your AI music platform's style/genre field</span>
         ${cpBtn('brief-core-prompt', 'Copy Prompt')}
       </div>
-      <div class="brief-prompt-box" id="brief-core-prompt">${corePrompt}</div>
+      <div class="brief-prompt-box" id="brief-core-prompt">${escHtml(corePrompt)}</div>
       <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/440 characters</div>
     </div>
 
     <div class="brief-grid">
       ${tempoKey ? `<div class="brief-block brief-block-amber">
         <div class="brief-block-label">🎚 Tempo & Key</div>
-        <div class="brief-block-body">${tempoKey}</div>
+        <div class="brief-block-body">${escHtml(tempoKey)}</div>
       </div>` : ''}
       ${sonic ? `<div class="brief-block brief-block-violet">
         <div class="brief-block-label">🔊 Sonic References</div>
-        <div class="brief-block-body">${sonic}</div>
+        <div class="brief-block-body">${escHtml(sonic)}</div>
       </div>` : ''}
     </div>
 
     ${arrange ? `<div class="brief-section">
       <div class="brief-section-label">🎸 Arrangement Blueprint</div>
-      <div class="brief-section-body">${arrange.replace(/\//g,'<br>→ ')}</div>
+      <div class="brief-section-body">${escHtml(arrange).replace(/\//g,'<br>→ ')}</div>
     </div>` : ''}
 
     ${vocal ? `<div class="brief-section">
       <div class="brief-section-label">🎤 Vocal Direction</div>
-      <div class="brief-section-body">${vocal.replace(/\//g,'<br>→ ')}</div>
+      <div class="brief-section-body">${escHtml(vocal).replace(/\//g,'<br>→ ')}</div>
     </div>` : ''}
 
     ${platTips ? `<div class="brief-section brief-tips">
       <div class="brief-section-label">💡 Platform Tips</div>
-      <div class="brief-section-body">${platTips.split(/\n|\d\.\s/).filter(t=>t.trim()).map(t=>`<div class="brief-tip">→ ${t.trim()}</div>`).join('')}</div>
+      <div class="brief-section-body">${platTips.split(/\n|\d\.\s/).filter(t=>t.trim()).map(t=>`<div class="brief-tip">→ ${escHtml(t.trim())}</div>`).join('')}</div>
     </div>` : ''}
 
     ${countermelodyRaw ? (() => {
@@ -4860,12 +5012,12 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
       const howTo = cmLines['HOW TO PROMPT'] || '';
       return `<div class="brief-section cm-section">
         <div class="brief-section-label">🎵 Countermelody</div>
-        <div class="cm-device">${cmLines['DEVICE'] || ''}</div>
-        ${cmLines['WHAT IT DOES'] ? `<div class="brief-section-body" style="margin-top:6px">${cmLines['WHAT IT DOES']}</div>` : ''}
-        ${cmLines['SECTION MAP'] ? `<div class="cm-map">Sections: ${cmLines['SECTION MAP']}</div>` : ''}
+        <div class="cm-device">${escHtml(cmLines['DEVICE'] || '')}</div>
+        ${cmLines['WHAT IT DOES'] ? `<div class="brief-section-body" style="margin-top:6px">${escHtml(cmLines['WHAT IT DOES'])}</div>` : ''}
+        ${cmLines['SECTION MAP'] ? `<div class="cm-map">Sections: ${escHtml(cmLines['SECTION MAP'])}</div>` : ''}
         ${howTo ? `<div class="cm-prompt-row">
           <span class="cm-prompt-label">Add to prompt:</span>
-          <span class="cm-prompt-chip" id="${prefix}-cm-prompt">${howTo}</span>
+          <span class="cm-prompt-chip" id="${prefix}-cm-prompt">${escHtml(howTo)}</span>
           <button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${prefix}-cm-prompt').textContent,'Counter-melody added to clipboard')">Copy</button>
         </div>` : ''}
       </div>`;
@@ -4904,12 +5056,12 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
 
   const metaHtml = (bpm || key || timeSig) ? `
     <div class="chord-meta">
-      ${bpm ? `<div class="chord-meta-pill"><span class="chord-meta-label">BPM</span><span class="chord-meta-val">${bpm}</span></div>` : ''}
-      ${key ? `<div class="chord-meta-pill"><span class="chord-meta-label">Key</span><span class="chord-meta-val">${key}</span></div>` : ''}
-      ${timeSig ? `<div class="chord-meta-pill"><span class="chord-meta-label">Time</span><span class="chord-meta-val">${timeSig}</span></div>` : ''}
-      ${keyPsych ? `<div class="chord-meta-pill key-psych-pill" title="${keyPsych.feel}"><span class="chord-meta-label">Tension</span><span class="chord-meta-val">${keyPsych.tension}</span></div>` : ''}
+      ${bpm ? `<div class="chord-meta-pill"><span class="chord-meta-label">BPM</span><span class="chord-meta-val">${escHtml(bpm)}</span></div>` : ''}
+      ${key ? `<div class="chord-meta-pill"><span class="chord-meta-label">Key</span><span class="chord-meta-val">${escHtml(key)}</span></div>` : ''}
+      ${timeSig ? `<div class="chord-meta-pill"><span class="chord-meta-label">Time</span><span class="chord-meta-val">${escHtml(timeSig)}</span></div>` : ''}
+      ${keyPsych ? `<div class="chord-meta-pill key-psych-pill" title="${escHtml(keyPsych.feel)}"><span class="chord-meta-label">Tension</span><span class="chord-meta-val">${escHtml(keyPsych.tension)}</span></div>` : ''}
     </div>
-    ${keyPsych ? `<div class="key-psych-bar"><span class="key-psych-feel">${keyPsych.feel}</span><div class="key-bright-bar"><div class="key-bright-fill" style="width:${keyPsych.bright*10}%"></div></div></div>` : ''}` : '';
+    ${keyPsych ? `<div class="key-psych-bar"><span class="key-psych-feel">${escHtml(keyPsych.feel)}</span><div class="key-bright-bar"><div class="key-bright-fill" style="width:${keyPsych.bright*10}%"></div></div></div>` : ''}` : '';
 
   const sectionHtml = sections.map(s => {
     const [name, rest] = s.split('→').map(x => x.trim());
@@ -4919,10 +5071,10 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
     const outlierSymbols = ['♭II','♭VII','♭VI','♭III','#IV','+6','sus'];
     const hasOutlier = outlierSymbols.some(sym => numeralsRaw.includes(sym));
     return `<div class="chord-row${hasOutlier?' chord-row-outlier':''}">
-      <div class="chord-row-name">${name}${hasOutlier?' <span class="outlier-badge">outlier</span>':''}</div>
+      <div class="chord-row-name">${escHtml(name)}${hasOutlier?' <span class="outlier-badge">outlier</span>':''}</div>
       <div class="chord-row-body">
-        <div class="chord-numerals">${numeralsRaw}</div>
-        ${parts.slice(1).map(p => `<div class="chord-feel">${p}</div>`).join('')}
+        <div class="chord-numerals">${escHtml(numeralsRaw)}</div>
+        ${parts.slice(1).map(p => `<div class="chord-feel">${escHtml(p)}</div>`).join('')}
       </div>
     </div>`;
   }).join('');
@@ -4939,16 +5091,16 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
     const archetype= getTA('PROGRESSION ARCHETYPE');
     theoryHtml = `<div class="theory-analysis">
       <div class="theory-header">🎼 Theory Analysis</div>
-      ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${scale}</span></div>` : ''}
-      ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${keyFeel}</span></div>` : ''}
-      ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${outliers}</span></div>` : ''}
-      ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${vl}</span></div>` : ''}
-      ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${tension}</span></div>` : ''}
-      ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${archetype}</span></div>` : ''}
+      ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${escHtml(scale)}</span></div>` : ''}
+      ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${escHtml(keyFeel)}</span></div>` : ''}
+      ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${escHtml(outliers)}</span></div>` : ''}
+      ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${escHtml(vl)}</span></div>` : ''}
+      ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${escHtml(tension)}</span></div>` : ''}
+      ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${escHtml(archetype)}</span></div>` : ''}
     </div>`;
   }
 
-  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+chordsRaw+'</div>'}</div>` + theoryHtml;
+  el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+escHtml(chordsRaw)+'</div>'}</div>` + theoryHtml;
   showEmptyTabState(prefix + '-chords-text', 'Chord analysis not available for this genre');
 }
 
@@ -5123,7 +5275,8 @@ function escHtml(str){
     .replace(/&/g,'&amp;')
     .replace(/</g,'&lt;')
     .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
 }
 
 function loadFromLibIdx(idx){
@@ -5141,7 +5294,7 @@ function loadSongIntoOutput(song){
   document.getElementById('loaded-banner').style.display = 'flex';
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
-  document.getElementById('res-lyrics-text').innerHTML = (song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  document.getElementById('res-lyrics-text').innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   renderBrief('res', song.style||'', song.brief||'');
   document.getElementById('res-structure-text').textContent = song.structure || '';
   document.getElementById('res-dopamine-text').textContent = song.dopamine || '';
@@ -5567,7 +5720,7 @@ async function runAnalysis(){
   document.getElementById('a-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Analyzing songs…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a musicologist, neuroscientist, and hit songwriter. Provide detailed, actionable analysis.');
-    document.getElementById('a-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    document.getElementById('a-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   }catch(e){showErr('a-out',e.message);}
   btnDone('a-btn');
 }
@@ -5588,7 +5741,7 @@ async function buildBlueprint(){
   document.getElementById('f-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Building blueprint…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a hit songwriter and music producer. Build practical, detailed song blueprints.');
-    document.getElementById('f-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    document.getElementById('f-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   }catch(e){showErr('f-out',e.message);}
   btnDone('f-btn');
 }
@@ -5611,7 +5764,7 @@ function renderBiblePills(){
 function showBible(id,label){
   const b=GENRE_BIBLE[id];
   if(!b){document.getElementById('bible-content').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--tx2)">Use the <strong>Analyzer</strong> for an AI-powered deep dive into ${label} songs. Genre Bible covers the 6 newest genres.</p></div>`;return;}
-  document.getElementById('bible-content').innerHTML=`<div class="card bible"><div style="font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-0.4px">${label}</div><h4>Genre DNA</h4><p>${b.dna}</p><h4>Structure Approach</h4><p>${b.structure}</p><h4>Suno Production Tips</h4><p>${b.suno}</p><h4>Key Songwriting Rules</h4><ul>${b.keys.map(k=>`<li>${k}</li>`).join('')}</ul><h4>Artists to Study</h4><p class="artists">${b.artists}</p></div>`;
+  document.getElementById('bible-content').innerHTML=`<div class="card bible"><div style="font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-0.4px">${escHtml(label)}</div><h4>Genre DNA</h4><p>${escHtml(b.dna)}</p><h4>Structure Approach</h4><p>${escHtml(b.structure)}</p><h4>Suno Production Tips</h4><p>${escHtml(b.suno)}</p><h4>Key Songwriting Rules</h4><ul>${b.keys.map(k=>`<li>${escHtml(k)}</li>`).join('')}</ul><h4>Artists to Study</h4><p class="artists">${escHtml(b.artists)}</p></div>`;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5626,7 +5779,7 @@ async function rateSong(){
   document.getElementById('r-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Rating song…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a music industry expert, neuroscientist, and hit songwriter. Provide detailed, honest song ratings.');
-    document.getElementById('r-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${raw.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    document.getElementById('r-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   }catch(e){showErr('r-out',e.message);}
   btnDone('r-btn');
 }
@@ -5763,11 +5916,11 @@ function renderTitleCards(prefix, titles, song) {
     return `<div class="tc-card${isSelected ? ' selected' : ''}" id="${prefix}-tc-${i}" onclick="selectTitle('${prefix}',${i},${JSON.stringify(t.title).replace(/"/g,'&quot;')})">
       <div class="tc-num">${i + 1}</div>
       <div class="tc-body">
-        <div class="tc-type ${cls}">${t.type}</div>
-        <div class="tc-title-text">${t.title}</div>
-        <div class="tc-why">${t.why}</div>
+        <div class="tc-type ${cls}">${escHtml(t.type)}</div>
+        <div class="tc-title-text">${escHtml(t.title)}</div>
+        <div class="tc-why">${escHtml(t.why)}</div>
       </div>
-      <button class="tc-use-btn" onclick="event.stopPropagation();applyTitle('${prefix}','${t.title.replace(/'/g,"\\'")}')">Use this</button>
+      <button class="tc-use-btn" onclick="event.stopPropagation();applyTitle('${prefix}',this.closest('.tc-card').querySelector('.tc-title-text').textContent)">Use this</button>
     </div>`;
   }).join('');
 }
@@ -6178,6 +6331,276 @@ function copyCoachFeedback() {
   if (!_coachFeedback) return;
   safeCopy(_coachFeedback);
   toast('Feedback copied to clipboard');
+}
+
+// ─── SUPABASE AUTH ─────────────────────────────────────────────
+(function initSupabase() {
+  const url = 'https://gotrwbhkavkqmxtnxkkj.supabase.co';
+  const key = 'SUPABASE_ANON_KEY_PLACEHOLDER';
+  if (key === 'SUPABASE_ANON_KEY_PLACEHOLDER' || !window.supabase) return;
+  S.supabase = window.supabase.createClient(url, key);
+  S.supabase.auth.onAuthStateChange((event, session) => {
+    S.session = session;
+    S.user = session?.user || null;
+    updateAuthUI();
+    if (event === 'SIGNED_IN') closeAuth();
+    if (event === 'PASSWORD_RECOVERY') {
+      openPasswordResetModal();
+    }
+  });
+  S.supabase.auth.getSession().then(({ data: { session } }) => {
+    S.session = session;
+    S.user = session?.user || null;
+    updateAuthUI();
+  });
+  // Handle password reset redirect
+  if (new URLSearchParams(location.search).get('reset') === '1') {
+    openPasswordResetModal();
+    history.replaceState(null, '', '/');
+  }
+})();
+
+function updateAuthUI() {
+  const authBtn = document.getElementById('nav-auth-btn');
+  const signOutBtn = document.getElementById('nav-signout-btn');
+  const userInfo = document.getElementById('nav-user-info');
+  if (S.user) {
+    if (authBtn) authBtn.style.display = 'none';
+    if (signOutBtn) signOutBtn.style.display = '';
+    if (userInfo) { userInfo.style.display = ''; userInfo.textContent = S.user.email?.split('@')[0] || 'Account'; }
+  } else {
+    if (authBtn) authBtn.style.display = '';
+    if (signOutBtn) signOutBtn.style.display = 'none';
+    if (userInfo) userInfo.style.display = 'none';
+  }
+}
+
+function openAuth(reason) {
+  const title = document.getElementById('auth-modal-title');
+  if (reason && title) title.textContent = reason;
+  else if (title) title.textContent = 'Sign in to Soniq';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-modal').style.display = 'block';
+}
+
+function closeAuth() {
+  document.getElementById('auth-modal').style.display = 'none';
+}
+
+// ─── PASSWORD RESET MODAL ──────────────────────────────────────
+function openPasswordResetModal() {
+  // Insert modal if not present
+  if (!document.getElementById('pwd-reset-modal')) {
+    const m = document.createElement('div');
+    m.id = 'pwd-reset-modal';
+    m.style.cssText = 'display:block;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:960;overflow-y:auto;padding:16px;box-sizing:border-box';
+    m.innerHTML = `<div class="card" style="max-width:400px;margin:80px auto;position:relative">
+      <div class="ctitle">Set New Password</div>
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">New Password</div>
+        <input id="pwd-reset-new" type="password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+      </div>
+      <div id="pwd-reset-error" style="display:none;color:#f87171;font-size:12px;margin-bottom:10px"></div>
+      <button class="btn btn-amber" onclick="submitPasswordReset()" style="width:100%;padding:10px;font-size:14px">Update Password</button>
+    </div>`;
+    document.body.appendChild(m);
+  } else {
+    document.getElementById('pwd-reset-modal').style.display = 'block';
+  }
+}
+
+async function submitPasswordReset() {
+  if (!S.supabase) return;
+  const pwd = (document.getElementById('pwd-reset-new')?.value || '').trim();
+  const errEl = document.getElementById('pwd-reset-error');
+  if (pwd.length < 8) { if(errEl){errEl.textContent='Password must be at least 8 characters';errEl.style.display='';} return; }
+  const { error } = await S.supabase.auth.updateUser({ password: pwd });
+  if (error) { if(errEl){errEl.textContent=error.message;errEl.style.display='';} return; }
+  const m = document.getElementById('pwd-reset-modal');
+  if (m) m.style.display = 'none';
+  toast('✓ Password updated successfully');
+  // Clean URL
+  history.replaceState(null, '', '/');
+}
+
+function authTab(tab) {
+  document.getElementById('auth-form-signin').style.display = tab === 'signin' ? '' : 'none';
+  document.getElementById('auth-form-signup').style.display = tab === 'signup' ? '' : 'none';
+  document.getElementById('auth-success').style.display = 'none';
+  document.getElementById('auth-error').style.display = 'none';
+  document.getElementById('auth-tab-signin').style.borderBottomColor = tab === 'signin' ? 'var(--amber)' : 'transparent';
+  document.getElementById('auth-tab-signin').style.color = tab === 'signin' ? 'var(--amber)' : 'var(--tx3)';
+  document.getElementById('auth-tab-signup').style.borderBottomColor = tab === 'signup' ? 'var(--amber)' : 'transparent';
+  document.getElementById('auth-tab-signup').style.color = tab === 'signup' ? 'var(--amber)' : 'var(--tx3)';
+}
+
+function showAuthError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = '';
+}
+
+async function authSignIn() {
+  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  if (!email || !password) { showAuthError('Please enter your email and password'); return; }
+  const btn = document.getElementById('auth-signin-btn');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  const { error } = await S.supabase.auth.signInWithPassword({ email, password });
+  if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Sign In'; }
+  else { btn.textContent = 'Sign In'; btn.disabled = false; }
+}
+
+async function authSignUp() {
+  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  const name = document.getElementById('auth-signup-name').value.trim();
+  const email = document.getElementById('auth-signup-email').value.trim();
+  const password = document.getElementById('auth-signup-password').value;
+  if (!name || !email || !password) { showAuthError('All fields are required'); return; }
+  if (password.length < 8) { showAuthError('Password must be at least 8 characters'); return; }
+  const btn = document.getElementById('auth-signup-btn');
+  btn.disabled = true; btn.textContent = 'Creating account…';
+  const { error } = await S.supabase.auth.signUp({
+    email, password,
+    options: { data: { full_name: name } }
+  });
+  if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Create Account'; return; }
+  document.getElementById('auth-form-signup').style.display = 'none';
+  const succ = document.getElementById('auth-success');
+  succ.style.display = '';
+  document.getElementById('auth-success-msg').textContent = 'Check your email!';
+  document.getElementById('auth-success-sub').textContent = 'We sent a confirmation link to ' + email;
+  btn.disabled = false; btn.textContent = 'Create Account';
+}
+
+async function authSignOut() {
+  if (!S.supabase) return;
+  await S.supabase.auth.signOut();
+  toast('Signed out');
+}
+
+async function authForgotPassword() {
+  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  const email = document.getElementById('auth-email').value.trim();
+  if (!email) { showAuthError('Enter your email address first'); return; }
+  const { error } = await S.supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: window.location.origin + '/?reset=1'
+  });
+  if (error) { showAuthError(error.message); return; }
+  document.getElementById('auth-form-signin').style.display = 'none';
+  const succ = document.getElementById('auth-success');
+  succ.style.display = '';
+  document.getElementById('auth-success-msg').textContent = 'Reset email sent!';
+  document.getElementById('auth-success-sub').textContent = 'Check your inbox for a password reset link.';
+}
+
+// ─── PUBLISHING ────────────────────────────────────────────────
+function generateISRC() {
+  const year = new Date().getFullYear().toString().slice(-2);
+  const seq = Math.floor(Math.random() * 99999).toString().padStart(5, '0');
+  return 'US-SQX-' + year + '-' + seq;
+}
+
+function openPublish() {
+  if (!S.user) {
+    openAuth('Sign in to register your song for publishing');
+    return;
+  }
+  const song = S.currentSong;
+  document.getElementById('pub-song-title').value = song ? song.title : '';
+  document.getElementById('pub-isrc-display').textContent = generateISRC();
+  document.getElementById('pub-writer-name').value = '';
+  document.getElementById('pub-pro').value = '';
+  document.getElementById('pub-ipi').value = '';
+  document.getElementById('pub-agree').checked = false;
+  document.getElementById('pub-confirm').style.display = 'none';
+  document.querySelector('#pub-modal .card > *:not(#pub-confirm)') && Array.from(document.querySelectorAll('#pub-modal .card > *:not(button[onclick="closePublish()"])')).forEach(el => el.style.display !== 'none' && el.id !== 'pub-confirm' ? '' : '');
+  // Reset to form view
+  const card = document.querySelector('#pub-modal .card');
+  Array.from(card.children).forEach(el => { if (el.id !== 'pub-confirm') el.style.display = ''; });
+  document.getElementById('pub-confirm').style.display = 'none';
+  S.pubTier = 'admin';
+  selectPubTier('admin');
+  document.getElementById('pub-modal').style.display = 'block';
+}
+
+function closePublish() {
+  document.getElementById('pub-modal').style.display = 'none';
+}
+
+const PUB_TIER_DESCS = {
+  admin: 'We register your song with your PRO and collect royalties on your behalf. You receive 85% of all collected royalties. Best for independent artists who want hands-off admin.',
+  copub: 'Soniq becomes your co-publisher and actively promotes your song. You receive 75% of royalties. We pursue sync licensing and playlist placements on your behalf.',
+  sync: 'Our sync team pitches your song to film, TV, advertising, and brand campaigns. You receive 65% of all sync fees and royalties. Best for cinematic and radio-ready songs.'
+};
+
+function selectPubTier(tier) {
+  S.pubTier = tier;
+  document.querySelectorAll('.pub-tier-btn').forEach(btn => {
+    const isSelected = btn.dataset.tier === tier;
+    btn.style.borderColor = isSelected ? 'var(--amber)' : 'var(--brd)';
+    btn.style.background = isSelected ? 'rgba(251,191,36,.12)' : 'var(--bg2)';
+    btn.style.color = isSelected ? 'var(--amber)' : 'var(--tx2)';
+  });
+  const desc = document.getElementById('pub-tier-desc');
+  if (desc) desc.textContent = PUB_TIER_DESCS[tier] || '';
+}
+
+async function submitPublish() {
+  const writerName = (document.getElementById('pub-writer-name').value || '').trim();
+  const pro = document.getElementById('pub-pro').value;
+  const ipi = (document.getElementById('pub-ipi').value || '').trim();
+  const title = (document.getElementById('pub-song-title').value || '').trim();
+  const isrc = document.getElementById('pub-isrc-display').textContent;
+  const tier = S.pubTier || 'admin';
+  const agreed = document.getElementById('pub-agree').checked;
+
+  if (!writerName) { toast('Please enter your legal name'); return; }
+  if (!pro) { toast('Please select your PRO affiliation'); return; }
+  if (!agreed) { toast('Please agree to the publishing terms'); return; }
+
+  const btn = document.getElementById('pub-submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Registering…';
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
+    const resp = await fetch('/api/publish', {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        title,
+        isrc,
+        writer_name: writerName,
+        pro,
+        ipi: ipi || null,
+        tier,
+        genre: S.currentSong?.genre || null,
+        topic: S.currentSong?.topic || null,
+        song_id: S.currentSong?.id || null
+      })
+    });
+
+    if (!resp.ok) throw new Error('server error');
+
+    // Save locally
+    const pubs = JSON.parse(localStorage.getItem('soniq_published') || '[]');
+    pubs.unshift({ title, isrc, tier, pro, ts: Date.now() });
+    localStorage.setItem('soniq_published', JSON.stringify(pubs.slice(0, 50)));
+
+    // Show confirmation
+    const card = document.querySelector('#pub-modal .card');
+    Array.from(card.children).forEach(el => { el.style.display = el.id === 'pub-confirm' ? '' : 'none'; });
+    document.getElementById('pub-confirm-title').textContent = '"' + title + '" — ' + tier.charAt(0).toUpperCase() + tier.slice(1) + ' Publishing';
+    document.getElementById('pub-confirm-isrc').textContent = isrc;
+
+  } catch(e) {
+    toast('Registration failed — please try again');
+    btn.disabled = false;
+    btn.textContent = '📜 Register Song';
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6862,21 +7285,21 @@ PRODUCTION NOTES:
       card.innerHTML = `
         <div class="concept-card-hdr">
           <div class="concept-num">Concept ${i+1} of ${count}</div>
-          <div class="concept-title">${title}</div>
-          <div class="concept-angle">${angle}</div>
+          <div class="concept-title">${escHtml(title)}</div>
+          <div class="concept-angle">${escHtml(angle)}</div>
           <div class="concept-meta">
             <span class="concept-tag concept-tag-genre">${genreLabel}</span>
             <span class="concept-tag concept-tag-mood">${moodDesc}</span>
           </div>
         </div>
         <div class="concept-body">
-          ${hookLine ? `<div class="concept-section-title">Hook Line</div><div class="concept-hook">"${hookLine}"</div>` : ''}
-          ${lyrics ? `<div class="concept-section-title">Lyrics Preview</div><div class="concept-lyrics">${lyrics.slice(0,400).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>')}${lyrics.length>400?'…':''}</div>` : ''}
+          ${hookLine ? `<div class="concept-section-title">Hook Line</div><div class="concept-hook">"${escHtml(hookLine)}"</div>` : ''}
+          ${lyrics ? `<div class="concept-section-title">Lyrics Preview</div><div class="concept-lyrics">${escHtml(lyrics.slice(0,400)).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>')}${lyrics.length>400?'…':''}</div>` : ''}
           ${platform === 'both'
-            ? (sunoPrompt ? `<div class="concept-section-title">Suno Prompt</div><div class="concept-prompt">${sunoPrompt}</div>` : '')
-              + (udioPrompt ? `<div class="concept-section-title">Udio Prompt</div><div class="concept-prompt">${udioPrompt}</div>` : '')
-            : (productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${productionPrompt}</div>` : '')}
-          ${notes ? `<div class="concept-section-title">Production Notes</div><div class="concept-brief">${notes}</div>` : ''}
+            ? (sunoPrompt ? `<div class="concept-section-title">Suno Prompt</div><div class="concept-prompt">${escHtml(sunoPrompt)}</div>` : '')
+              + (udioPrompt ? `<div class="concept-section-title">Udio Prompt</div><div class="concept-prompt">${escHtml(udioPrompt)}</div>` : '')
+            : (productionPrompt ? `<div class="concept-section-title">Production Prompt</div><div class="concept-prompt">${escHtml(productionPrompt)}</div>` : '')}
+          ${notes ? `<div class="concept-section-title">Production Notes</div><div class="concept-brief">${escHtml(notes)}</div>` : ''}
         </div>
         <div class="concept-actions">
           <button class="btn btn-sm btn-gold" onclick="loadConceptToWrite(${i})">✍️ Write Full Song</button>
@@ -7184,10 +7607,10 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     const titlesRaw = raw.match(/POSSIBLE TITLES:\s*(.+)/)?.[1]?.trim() || '';
 
     document.getElementById('alb-name').textContent = name;
-    document.getElementById('alb-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${t.trim()}</span>`).join('');
+    document.getElementById('alb-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${escHtml(t.trim())}</span>`).join('');
     document.getElementById('alb-summary').textContent = summary;
     document.getElementById('alb-arc').textContent = arc;
-    document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${l.replace(/^-\s*/,'')}</li>`).join('');
+    document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
 
     const trackList = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
       const [ttype,desc,role] = l.split('|').map(s=>s.trim());
@@ -7196,18 +7619,18 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     S.albumData = S.albumData || {};
     S.albumData.trackList = trackList;
     document.getElementById('alb-track-types').innerHTML = trackList.map((tr,i)=>
-      `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${tr.ttype}</div><div class="gap-role-desc">${tr.desc} — ${tr.role}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">✦ Write This Track</button></div>`
+      `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${escHtml(tr.ttype)}</div><div class="gap-role-desc">${escHtml(tr.desc)} — ${escHtml(tr.role)}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">✦ Write This Track</button></div>`
     ).join('');
 
     const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
     document.getElementById('alb-palette').innerHTML = paletteRaw.split('\n').filter(l=>l.includes('|')).map((l,i)=>{
       const [label,desc] = l.split('|').map(s=>s.trim());
       const col = PALETTE_COLORS[i % PALETTE_COLORS.length];
-      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${col};flex-shrink:0"></div><div><div style="font-size:12px;font-weight:700;color:var(--tx1)">${label||''}</div><div style="font-size:11px;color:var(--tx3)">${desc||''}</div></div></div>`;
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${col};flex-shrink:0"></div><div><div style="font-size:12px;font-weight:700;color:var(--tx1)">${escHtml(label||'')}</div><div style="font-size:11px;color:var(--tx3)">${escHtml(desc||'')}</div></div></div>`;
     }).join('');
     document.getElementById('alb-prod-refs').textContent = prodStyle;
     document.getElementById('alb-visual').textContent = visual;
-    document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent='${t.trim().replace(/'/g,"\\'")}';toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${t.trim()}</div></div></div>`).join('');
+    document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent=this.querySelector('.gap-role-name').textContent;toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${escHtml(t.trim())}</div></div></div>`).join('');
 
     S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes, type};
     toast('🎼 Album concept generated!');
@@ -7367,7 +7790,7 @@ async function importAndAnalyze() {
     // Populate output card (same as generateSong)
     document.getElementById('res-title').textContent   = title;
     document.getElementById('res-verdict').textContent = verdict;
-    document.getElementById('res-lyrics-text').innerHTML = lyrics.replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    document.getElementById('res-lyrics-text').innerHTML = escHtml(lyrics).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
     document.getElementById('res-structure-text').textContent = structure;
     document.getElementById('res-dopamine-text').textContent  = dopamine;
     document.getElementById('res-notes-text').textContent     = notes;
@@ -7385,6 +7808,8 @@ async function importAndAnalyze() {
     if (vhBtn2) vhBtn2.style.display = '';
     const coachBtn2 = document.getElementById('coach-btn');
     if (coachBtn2) coachBtn2.style.display = '';
+    const publishBtn2 = document.getElementById('publish-btn');
+    if (publishBtn2) publishBtn2.style.display = '';
     generateScoreDashboard('res', lyrics, genre);
     document.getElementById('instant-edit-card')?.classList.add('visible');
     document.getElementById('gen-out').style.display = '';
@@ -7609,7 +8034,7 @@ async function generateSynopsis() {
       const colon = line.indexOf(':');
       if (colon < 0) return `<div style="font-size:13px;color:var(--tx2);margin-bottom:6px">${line}</div>`;
       const k = line.slice(0, colon).trim(), v = line.slice(colon+1).trim();
-      return `<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${k}</div><div style="font-size:13px;color:var(--tx2)">${v}</div></div>`;
+      return `<div style="margin-bottom:12px"><div style="font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px">${escHtml(k)}</div><div style="font-size:13px;color:var(--tx2)">${escHtml(v)}</div></div>`;
     }).join('');
     document.getElementById('synopsis-card').classList.add('visible');
   } catch(e) { toast('⚠️ ' + e.message); }
@@ -7639,7 +8064,7 @@ async function instantEdit() {
       (chunk, text) => { full = text; });
     const newLyrics = full.trim();
     S.currentSong.lyrics = newLyrics;
-    lyricsEl.innerHTML = newLyrics.replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+    lyricsEl.innerHTML = escHtml(newLyrics).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
     toast('⚡ Edit applied!');
     inp.value = '';
     document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
@@ -7945,7 +8370,7 @@ async function revise(prefix, instruction) {
     const newLyrics = full.trim();
     if (prefix === 'res') S.currentSong.lyrics = newLyrics;
     else S.luckyCurrentSong.lyrics = newLyrics;
-    if (lyricsEl) lyricsEl.innerHTML = newLyrics.replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    if (lyricsEl) lyricsEl.innerHTML = escHtml(newLyrics).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
     pushVersion(prefix);
     renderVersionBar(prefix);
     calcHookScore(prefix);
@@ -7992,7 +8417,7 @@ function loadVersion(prefix, idx) {
   if (prefix === 'res') S.currentSong = {...v};
   else S.luckyCurrentSong = {...v};
   const lyricsEl = document.getElementById(prefix + '-lyrics-text');
-  if (lyricsEl) lyricsEl.innerHTML = (v.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  if (lyricsEl) lyricsEl.innerHTML = escHtml(v.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   const titleEl = document.getElementById(prefix === 'res' ? 'res-title' : 'lres-title');
   if (titleEl) titleEl.textContent = v.title || 'Untitled';
   renderVersionBar(prefix);
@@ -8047,7 +8472,7 @@ function checkShareLink() {
     const verdictEl = document.getElementById('res-verdict');
     if (verdictEl) verdictEl.textContent = song.verdict || '';
     const lyricsEl = document.getElementById('res-lyrics-text');
-    if (lyricsEl) lyricsEl.innerHTML = (song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    if (lyricsEl) lyricsEl.innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
     renderBrief('res', song.style||'', song.brief||'');
     const structEl = document.getElementById('res-structure-text');
     if (structEl) structEl.textContent = song.structure || '';
@@ -8133,7 +8558,7 @@ function useBatchSong(idx) {
   const song = results[idx];
   S.currentSong = song;
   const lyricsEl = document.getElementById('res-lyrics-text');
-  if (lyricsEl) lyricsEl.innerHTML = (song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  if (lyricsEl) lyricsEl.innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   const titleEl = document.getElementById('res-title');
   if (titleEl) titleEl.textContent = song.title || 'Untitled';
   document.getElementById('batch-overlay').style.display = 'none';

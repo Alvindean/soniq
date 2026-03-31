@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Co-Publishing Agreement — Soniq</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: #0f0f0f;
+      color: #e8e8e8;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    a {
+      color: #fbbf24;
+      text-decoration: none;
+    }
+    a:hover { text-decoration: underline; }
+
+    header {
+      background-color: #161616;
+      border-bottom: 1px solid #2a2a2a;
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .back-link {
+      color: #fbbf24;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .site-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fbbf24;
+      letter-spacing: 0.05em;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* Document wrapper gives a "formal document" feel */
+    .legal-document {
+      background-color: #111111;
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      padding: 48px 52px;
+    }
+
+    .doc-title-block {
+      text-align: center;
+      margin-bottom: 36px;
+      padding-bottom: 28px;
+      border-bottom: 2px solid #fbbf24;
+    }
+
+    .doc-title-block h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .doc-title-block .subtitle {
+      font-size: 14px;
+      color: #888;
+      letter-spacing: 0.02em;
+    }
+
+    .doc-meta {
+      font-size: 13px;
+      color: #888;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .doc-meta .dot { color: #fbbf24; }
+
+    .parties-block {
+      background-color: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 22px 28px;
+      margin-bottom: 36px;
+    }
+
+    .parties-block h2 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 14px;
+      border: none;
+      padding: 0;
+    }
+
+    .party-row {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 8px 16px;
+      margin-bottom: 12px;
+      font-size: 15px;
+    }
+
+    .party-row:last-child { margin-bottom: 0; }
+
+    .party-label {
+      color: #888;
+      font-weight: 500;
+      font-size: 13px;
+      padding-top: 2px;
+    }
+
+    .party-value {
+      color: #e0e0e0;
+    }
+
+    .party-value strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .recitals {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 32px;
+      line-height: 1.8;
+      font-style: italic;
+    }
+
+    .recitals strong {
+      color: #e0e0e0;
+      font-style: normal;
+    }
+
+    /* Section styles */
+    .legal-section {
+      margin-bottom: 36px;
+    }
+
+    .legal-section-header {
+      display: flex;
+      align-items: baseline;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+
+    .section-num {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fbbf24;
+      min-width: 28px;
+      font-family: 'Courier New', monospace;
+    }
+
+    .legal-section h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    p {
+      margin-bottom: 12px;
+      color: #d0d0d0;
+    }
+
+    .subsection {
+      margin: 12px 0;
+    }
+
+    .subsection-label {
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+
+    .clause-list {
+      list-style: none;
+      margin: 12px 0;
+      padding: 0;
+    }
+
+    .clause-list li {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: #d0d0d0;
+    }
+
+    .clause-list .clause-alpha {
+      color: #fbbf24;
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    /* Tier table */
+    .tier-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+
+    .tier-table th {
+      background-color: #1c1c1c;
+      color: #fbbf24;
+      text-align: left;
+      padding: 10px 14px;
+      border: 1px solid #2a2a2a;
+      font-weight: 600;
+    }
+
+    .tier-table td {
+      padding: 10px 14px;
+      border: 1px solid #2a2a2a;
+      color: #d0d0d0;
+      vertical-align: top;
+    }
+
+    .tier-table tr:nth-child(even) td {
+      background-color: #141414;
+    }
+
+    .tier-table .tier-name {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .tier-table .pct {
+      color: #fbbf24;
+      font-weight: 700;
+    }
+
+    /* Highlight boxes */
+    .important-box {
+      background-color: #1a1400;
+      border: 1px solid #4a3800;
+      border-left: 3px solid #fbbf24;
+      border-radius: 0 6px 6px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+      font-size: 14px;
+      color: #e0c060;
+    }
+
+    .highlight { color: #fbbf24; font-weight: 500; }
+
+    /* E-Sign section gets special treatment */
+    .esign-section {
+      background-color: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-top: 16px;
+    }
+
+    .esign-section p { margin-bottom: 10px; }
+    .esign-section p:last-child { margin-bottom: 0; }
+
+    .esign-badge {
+      display: inline-block;
+      background-color: #1c1c1c;
+      border: 1px solid #3a3a00;
+      color: #fbbf24;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 100px;
+      letter-spacing: 0.08em;
+      margin-bottom: 12px;
+    }
+
+    .statute-ref {
+      font-size: 12px;
+      color: #666;
+      font-family: 'Courier New', monospace;
+      margin-left: 4px;
+    }
+
+    /* Signature / entire agreement block */
+    .entire-agreement-box {
+      background-color: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-top: 14px;
+      font-size: 14px;
+      color: #aaa;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .contact-box {
+      background-color: #161616;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 20px 24px;
+      margin-top: 32px;
+    }
+
+    .contact-box p { margin-bottom: 4px; }
+
+    /* Version stamp */
+    .version-stamp {
+      text-align: center;
+      margin-top: 36px;
+      padding-top: 20px;
+      border-top: 1px solid #1e1e1e;
+      font-size: 12px;
+      color: #444;
+      font-family: 'Courier New', monospace;
+    }
+
+    footer {
+      text-align: center;
+      padding: 32px;
+      border-top: 1px solid #1e1e1e;
+      color: #555;
+      font-size: 13px;
+      margin-top: 32px;
+    }
+
+    footer a { color: #888; }
+
+    @media (max-width: 650px) {
+      .container { padding: 24px 16px 60px; }
+      .legal-document { padding: 28px 22px; }
+      .doc-title-block h1 { font-size: 20px; }
+      header { padding: 14px 20px; }
+      .party-row { grid-template-columns: 1fr; gap: 2px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="/" class="back-link">&#8592; Back to Soniq</a>
+    <span class="site-name">SONIQ</span>
+  </header>
+
+  <div class="container">
+    <div class="legal-document">
+
+      <!-- Document Title -->
+      <div class="doc-title-block">
+        <h1>Music Co-Publishing Agreement</h1>
+        <div class="subtitle">Nu Wav Media LLC &mdash; Nu Wav Media LLC</div>
+        <div class="doc-meta">
+          <span><span class="dot">&#9679;</span> Last updated: March 31, 2026</span>
+          <span><span class="dot">&#9679;</span> Effective: March 31, 2026</span>
+          <span><span class="dot">&#9679;</span> Agreement Version 1.0</span>
+        </div>
+      </div>
+
+      <!-- Parties -->
+      <div class="parties-block">
+        <h2>Parties to This Agreement</h2>
+        <div class="party-row">
+          <div class="party-label">WRITER</div>
+          <div class="party-value">
+            The registered Soniq user accepting this agreement (the <strong>"Writer"</strong>), whose legal name, PRO affiliation, and IPI/CAE number are recorded at the time of publishing opt-in.
+          </div>
+        </div>
+        <div class="party-row">
+          <div class="party-label">PUBLISHER</div>
+          <div class="party-value">
+            <strong>Nu Wav Media LLC</strong>, a limited liability company, <strong>Alvin Dean Warren</strong>, Managing Member (the <strong>"Publisher"</strong>).
+          </div>
+        </div>
+      </div>
+
+      <!-- Recitals -->
+      <div class="recitals">
+        <strong>RECITALS.</strong> WHEREAS, Writer desires to have certain musical compositions administered and/or co-published by Publisher through the Soniq platform; and WHEREAS, Publisher desires to provide such services under the terms set forth herein; NOW, THEREFORE, in consideration of the mutual promises contained in this Agreement and other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:
+      </div>
+
+      <!-- 1. Definitions -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">1.</span>
+          <h2>Definitions</h2>
+        </div>
+        <p>As used in this Agreement, the following terms have the meanings set forth below:</p>
+        <ul class="clause-list">
+          <li>
+            <span class="clause-alpha">(a)</span>
+            <span><span class="subsection-label">"Composition"</span> means any original musical work, including music and/or lyrics, created by or on behalf of Writer and registered through the Soniq platform under this Agreement.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(b)</span>
+            <span><span class="subsection-label">"Master"</span> means any sound recording embodying a Composition. For clarity, Publisher's rights under this Agreement extend to the Composition only; Masters are not subject to this Agreement unless separately agreed in writing.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(c)</span>
+            <span><span class="subsection-label">"Royalties"</span> means all income, fees, advances, and proceeds derived from the exploitation of a Composition, including but not limited to performance royalties, mechanical royalties, synchronization fees, and digital streaming income.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(d)</span>
+            <span><span class="subsection-label">"Territory"</span> means the entire world and all its territories, possessions, and jurisdictions.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(e)</span>
+            <span><span class="subsection-label">"Net Receipts"</span> means gross Royalties received by Publisher from third parties with respect to a Composition, less only: (i) actual, documented third-party collection costs; and (ii) applicable withholding taxes required by law. No internal overhead, administrative fees, or sub-publishing commissions shall be deducted from Net Receipts beyond the Publisher's share established in Section 3.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(f)</span>
+            <span><span class="subsection-label">"PRO"</span> means any Performing Rights Organization, including but not limited to ASCAP, BMI, SESAC, GMR, or any equivalent organization in any territory.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(g)</span>
+            <span><span class="subsection-label">"Writer's Share"</span> means the songwriter's performance royalty share, being fifty percent (50%) of the total performance royalty of a Composition as typically distributed by PROs. Writer retains this share in its entirety at all times.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(h)</span>
+            <span><span class="subsection-label">"Publisher's Share"</span> means the publisher's performance royalty share, being fifty percent (50%) of the total performance royalty of a Composition. The portion of the Publisher's Share retained by Publisher versus Writer is determined by the publishing tier selected under Section 3.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 2. Grant of Rights -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">2.</span>
+          <h2>Grant of Rights</h2>
+        </div>
+        <p>
+          Subject to the terms of this Agreement and the tier selected by Writer at the time of publishing opt-in, Writer hereby grants to Publisher the rights described in this Section with respect to each Composition registered under this Agreement.
+        </p>
+
+        <table class="tier-table">
+          <thead>
+            <tr>
+              <th>Tier</th>
+              <th>Publisher's Share Retained</th>
+              <th>Rights Granted</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tier-name">Publishing Admin</td>
+              <td class="pct">15%</td>
+              <td>Publisher administers PRO registration and royalty collection only. No co-ownership of copyright is transferred. Publisher acts as an administrative representative.</td>
+            </tr>
+            <tr>
+              <td class="tier-name">Co-Publishing</td>
+              <td class="pct">25%</td>
+              <td>Publisher shares co-ownership of the Publisher's Share of the Composition. Publisher may sub-publish, license mechanicals, and collect all Publisher's Share income in the Territory.</td>
+            </tr>
+            <tr>
+              <td class="tier-name">Sync Pitching</td>
+              <td class="pct">35%</td>
+              <td>All Co-Publishing rights, plus Publisher actively pitches Compositions for synchronization licensing in film, television, advertising, and other media. The higher Publisher's Share reflects the active licensing effort and marketing investment.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>
+          In each case, Publisher's rights are limited to the Publisher's Share percentage specified above. All rights not expressly granted to Publisher herein are reserved by Writer.
+        </p>
+      </div>
+
+      <!-- 3. Writer's Share -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">3.</span>
+          <h2>Writer's Share</h2>
+        </div>
+        <div class="important-box">
+          Writer retains 100% of the songwriter's performance royalty share (Writer's Share) at all PROs, in all territories, at all times. Publisher's percentage applies only to the Publisher's Share portion of performance royalties and other publishing income.
+        </div>
+        <p>
+          By way of illustration: if a Composition generates $100.00 in total performance royalties, the PRO will typically split this as $50.00 Writer's Share and $50.00 Publisher's Share. Writer receives the full $50.00 Writer's Share directly from the PRO. Of the $50.00 Publisher's Share received by Publisher, Writer is entitled to the difference between the Publisher's Share and Publisher's retained percentage under the applicable tier, as follows:
+        </p>
+        <ul class="clause-list">
+          <li>
+            <span class="clause-alpha">(a)</span>
+            <span><span class="subsection-label">Publishing Admin (15%):</span> Writer receives $50.00 (Writer's Share) + $42.50 (85% of Publisher's Share) = <span class="highlight">$92.50</span> total.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(b)</span>
+            <span><span class="subsection-label">Co-Publishing (25%):</span> Writer receives $50.00 + $37.50 (75% of Publisher's Share) = <span class="highlight">$87.50</span> total.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(c)</span>
+            <span><span class="subsection-label">Sync Pitching (35%):</span> Writer receives $50.00 + $32.50 (65% of Publisher's Share) = <span class="highlight">$82.50</span> total.</span>
+          </li>
+        </ul>
+        <p>
+          Nothing in this Agreement shall be construed to reduce Writer's direct songwriter royalties received from any PRO or mechanical rights organization.
+        </p>
+      </div>
+
+      <!-- 4. Term -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">4.</span>
+          <h2>Term</h2>
+        </div>
+        <p>
+          The initial term of this Agreement shall be <span class="highlight">three (3) years</span> from the date on which the first Composition is registered under this Agreement (the "Initial Term"). Upon expiration of the Initial Term, this Agreement shall automatically renew for successive one (1) year periods (each a "Renewal Term") unless either party provides written notice of non-renewal to the other party at least <span class="highlight">sixty (60) days</span> prior to the expiration of the then-current term.
+        </p>
+        <p>
+          Written notice of non-renewal may be delivered by email to <a href="mailto:legal@nuwavmedia.com">legal@nuwavmedia.com</a> (from Publisher to Writer) or via the account termination process described in the Soniq Terms of Service (from Writer to Publisher).
+        </p>
+        <p>
+          The Term applies to this Agreement as a whole. Individual Compositions registered during the Term remain subject to this Agreement for the duration of the applicable Term in which they were registered, unless otherwise agreed in writing.
+        </p>
+      </div>
+
+      <!-- 5. Territory -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">5.</span>
+          <h2>Territory</h2>
+        </div>
+        <p>
+          The rights granted to Publisher under this Agreement apply worldwide, including all countries, territories, and possessions now existing or hereafter coming into existence. Publisher shall use commercially reasonable efforts to register Compositions and collect Royalties in all significant markets in the Territory.
+        </p>
+      </div>
+
+      <!-- 6. Royalty Accounting -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">6.</span>
+          <h2>Royalty Accounting</h2>
+        </div>
+        <p>
+          Publisher shall maintain accurate books and records relating to all Royalties received with respect to each Composition registered under this Agreement.
+        </p>
+        <ul class="clause-list">
+          <li>
+            <span class="clause-alpha">(a)</span>
+            <span><span class="subsection-label">Accounting Statements.</span> Publisher shall render accounting statements to Writer within <span class="highlight">ninety (90) days</span> after the close of each calendar quarter in which Royalties are received by Publisher. Statements shall be made available through Writer's Soniq account dashboard.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(b)</span>
+            <span><span class="subsection-label">Payment.</span> Publisher shall remit any amounts due to Writer simultaneously with the delivery of each accounting statement, via the payment method on file in Writer's Soniq account.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(c)</span>
+            <span><span class="subsection-label">Objections.</span> Writer shall have one (1) year from receipt of each accounting statement to object to its contents in writing. Statements not objected to within this period shall be deemed accepted.</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(d)</span>
+            <span><span class="subsection-label">Audit Rights.</span> Writer, upon reasonable written notice and no more than once per calendar year, may audit Publisher's books and records relating to Royalties due under this Agreement at Writer's expense, unless the audit reveals an underpayment of more than ten percent (10%), in which case Publisher shall bear the audit costs.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 7. Registration -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">7.</span>
+          <h2>Registration</h2>
+        </div>
+        <p>
+          Upon receipt of complete and accurate song metadata from Writer (including title, all writer names and PRO affiliations, ISRC if available, and tier selection), Publisher shall register each Composition with the applicable PRO(s) and any relevant mechanical rights organizations within <span class="highlight">thirty (30) business days</span>.
+        </p>
+        <p>
+          "Complete song metadata" means all information required by the relevant PRO for a valid work registration. Publisher shall notify Writer if submitted metadata is incomplete and shall have no obligation to register until complete metadata is received.
+        </p>
+        <p>
+          Publisher shall provide Writer with confirmation of each successful registration, including the assigned work registration number, within ten (10) business days of registration.
+        </p>
+      </div>
+
+      <!-- 8. Representations and Warranties -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">8.</span>
+          <h2>Representations and Warranties</h2>
+        </div>
+        <p>Writer represents, warrants, and covenants to Publisher that, with respect to each Composition registered hereunder:</p>
+        <ul class="clause-list">
+          <li>
+            <span class="clause-alpha">(a)</span>
+            <span>Writer is the <span class="highlight">sole author</span> or a principal co-author of the Composition and has full right, power, and authority to enter into this Agreement;</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(b)</span>
+            <span>The Composition is <span class="highlight">wholly original</span> with Writer and does not infringe upon or violate any copyright, trademark, right of publicity, or other proprietary right of any third party;</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(c)</span>
+            <span>There are <span class="highlight">no conflicting agreements</span>, encumbrances, or claims outstanding with respect to the Composition that would prevent Writer from granting the rights provided herein;</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(d)</span>
+            <span>Writer is <span class="highlight">at least 18 years of age</span> and legally competent to enter into this Agreement;</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(e)</span>
+            <span>Writer will promptly notify Publisher in writing if any of the foregoing representations become inaccurate.</span>
+          </li>
+        </ul>
+        <p>
+          Writer shall indemnify, defend, and hold harmless Publisher and its members, managers, and agents from and against any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from any breach of Writer's representations and warranties hereunder.
+        </p>
+      </div>
+
+      <!-- 9. Reversion -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">9.</span>
+          <h2>Reversion of Rights</h2>
+        </div>
+        <p>
+          Notwithstanding any other provision of this Agreement, all rights in a Composition shall automatically revert to Writer upon the occurrence of either of the following:
+        </p>
+        <ul class="clause-list">
+          <li>
+            <span class="clause-alpha">(a)</span>
+            <span><span class="subsection-label">Failure to Register.</span> Publisher fails to register the Composition with the applicable PRO(s) within <span class="highlight">sixty (60) days</span> of receiving complete song metadata from Writer, as described in Section 7; or</span>
+          </li>
+          <li>
+            <span class="clause-alpha">(b)</span>
+            <span><span class="subsection-label">Failure to Collect.</span> Publisher fails to collect or distribute any Royalties derived from a documented commercial exploitation (e.g., a confirmed sync placement, broadcast, or streaming use) within <span class="highlight">twelve (12) months</span> of the date such exploitation was confirmed in writing.</span>
+          </li>
+        </ul>
+        <p>
+          Reversion under this Section is Writer's sole and exclusive remedy for Publisher's failure to perform the specific obligations described above, and shall not constitute a waiver of any other rights or remedies available to Writer at law or in equity.
+        </p>
+        <p>
+          To trigger reversion, Writer must provide Publisher with written notice of the alleged failure. Publisher shall have <span class="highlight">thirty (30) days</span> from receipt of such notice to cure the failure before reversion becomes effective.
+        </p>
+      </div>
+
+      <!-- 10. Electronic Consent -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">10.</span>
+          <h2>Electronic Consent and Signature</h2>
+        </div>
+        <div class="esign-section">
+          <div class="esign-badge">E-SIGN ACT COMPLIANT</div>
+          <p>
+            By checking the publishing opt-in checkbox and submitting your song registration through the Soniq platform, you acknowledge and agree that such action constitutes your <span class="highlight">valid electronic signature</span> to this Agreement, legally equivalent to a handwritten signature, in accordance with the <strong style="color:#fff;">Electronic Signatures in Global and National Commerce Act</strong> <span class="statute-ref">(E-SIGN Act, 15 U.S.C. § 7001 et seq.)</span> and applicable state electronic signature laws.
+          </p>
+          <p>
+            You further acknowledge that you have had the opportunity to review this Agreement in full prior to signing, that you understand its terms, and that you are entering into it voluntarily.
+          </p>
+          <p>
+            As evidence of your electronic consent, the following data points are recorded and retained by Publisher at the time of your agreement:
+          </p>
+          <ul style="margin: 10px 0 10px 24px; color: #d0d0d0; font-size: 14px;">
+            <li style="margin-bottom:6px;"><strong style="color:#e0e0e0;">IP address</strong> from which consent was submitted</li>
+            <li style="margin-bottom:6px;"><strong style="color:#e0e0e0;">Timestamp</strong> (UTC) of the consent action</li>
+            <li style="margin-bottom:6px;"><strong style="color:#e0e0e0;">Agreement version</strong> accepted (currently: Version 1.0, March 31, 2026)</li>
+            <li style="margin-bottom:6px;"><strong style="color:#e0e0e0;">Account identifier</strong> associated with the agreeing user</li>
+          </ul>
+          <p style="font-size: 14px; color: #aaa;">
+            These records are retained for the duration of this Agreement plus seven (7) years and may be used as evidence of your consent in any legal proceeding.
+          </p>
+        </div>
+      </div>
+
+      <!-- 11. Governing Law -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">11.</span>
+          <h2>Governing Law</h2>
+        </div>
+        <p>
+          This Agreement shall be governed by and construed in accordance with the laws of the State of <span class="highlight">California</span>, without giving effect to any choice of law or conflict of law provision or rule. Any dispute arising under or related to this Agreement that cannot be resolved by the parties through good-faith negotiation within thirty (30) days shall be resolved by binding arbitration under the rules of the American Arbitration Association, with proceedings to be conducted in <span class="highlight">California</span>.
+        </p>
+        <p>
+          Nothing in this Section shall limit either party's right to seek emergency injunctive or other equitable relief in any court of competent jurisdiction to prevent irreparable harm.
+        </p>
+      </div>
+
+      <!-- 12. Entire Agreement -->
+      <div class="legal-section">
+        <div class="legal-section-header">
+          <span class="section-num">12.</span>
+          <h2>Entire Agreement</h2>
+        </div>
+        <p>
+          This Agreement, together with Soniq's <a href="/legal/terms.html">Terms of Service</a> and <a href="/legal/privacy.html">Privacy Policy</a>, constitutes the entire agreement between Writer and Publisher with respect to the subject matter hereof and supersedes all prior negotiations, understandings, and agreements, whether oral or written, relating to the publishing administration and/or co-publishing of Compositions through the Soniq platform.
+        </p>
+        <p>
+          This Agreement may not be modified except by a written instrument signed by authorized representatives of both parties, or by Publisher updating the Agreement and providing Writer with thirty (30) days' written notice, during which period Writer may terminate by written notice without penalty.
+        </p>
+        <p>
+          If any provision of this Agreement is held to be invalid, illegal, or unenforceable, such provision shall be modified to the minimum extent necessary to make it valid and enforceable, and the remaining provisions shall continue in full force and effect.
+        </p>
+        <p>
+          The failure of either party to enforce any provision of this Agreement shall not be deemed a waiver of that party's right to enforce such provision in the future.
+        </p>
+
+        <div class="entire-agreement-box">
+          BY ELECTRONICALLY ACCEPTING THIS AGREEMENT THROUGH THE SONIQ PLATFORM, WRITER ACKNOWLEDGES HAVING READ, UNDERSTOOD, AND AGREED TO ALL TERMS AND CONDITIONS SET FORTH HEREIN.
+        </div>
+      </div>
+
+      <!-- Contact -->
+      <div class="contact-box">
+        <p><strong style="color:#fff;">Publisher Contact — Nu Wav Media LLC</strong></p>
+        <p>Alvin Dean Warren, Managing Member</p>
+        <p>Email: <a href="mailto:legal@nuwavmedia.com">legal@nuwavmedia.com</a></p>
+        <p>Platform: <a href="/">soniq.app</a></p>
+      </div>
+
+      <!-- Version stamp -->
+      <div class="version-stamp">
+        Agreement Version 1.0 &nbsp;&mdash;&nbsp; Effective March 31, 2026 &nbsp;&mdash;&nbsp; Nu Wav Media LLC
+      </div>
+
+    </div><!-- /.legal-document -->
+  </div><!-- /.container -->
+
+  <footer>
+    <p>&copy; 2026 Nu Wav Media LLC. All rights reserved. &nbsp;|&nbsp;
+      <a href="/legal/terms.html">Terms</a> &nbsp;|&nbsp;
+      <a href="/legal/privacy.html">Privacy</a> &nbsp;|&nbsp;
+      <a href="/legal/copublishing.html">Co-Publishing</a>
+    </p>
+  </footer>
+
+</body>
+</html>
