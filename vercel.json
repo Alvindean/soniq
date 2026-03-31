@@ -11,7 +11,6 @@
     "api/track.js":          { "maxDuration": 10 },
     "api/admin.js":          { "maxDuration": 15 },
     "api/rapstats.js":       { "maxDuration": 10 },
-    "api/ping.js":           { "maxDuration": 5 },
     "api/publish.js":        { "maxDuration": 15 },
     "api/publish-list.js":   { "maxDuration": 10 },
     "api/auth-verify.js":    { "maxDuration": 10 },
