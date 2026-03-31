@@ -10,7 +10,7 @@
 ## Product Hunt Listing
 
 ### Tagline (60 chars)
-`AI songwriting with the DNA of 21 genres`
+`AI songwriting with the DNA of 24 genres`
 
 ### Description (260 chars)
 `SONIQ writes complete songs with full production briefs, music theory analysis, sync metadata, and visual direction — built for artists, producers, and music supervisors. Publishing registration through Nu Wav Media LLC included.`
@@ -34,7 +34,7 @@
 >
 > Real songs have structure. Genre DNA. Theory underneath the chords. A visual world around the sound. A sync value. A publishing footprint.
 >
-> SONIQ does all of that — 21 genres with their actual structural rules, music theory layer (modes, chord psychology, key selection), production briefs for your engineer, visual direction for your creative team, sync metadata for licensing, and copyright timestamping + PRO registration for every song you make.
+> SONIQ does all of that — 24 genres with their actual structural rules, music theory layer (modes, chord psychology, key selection), production briefs for your engineer, visual direction for your creative team, sync metadata for licensing, and copyright timestamping + PRO registration for every song you make.
 >
 > We're offering **500 Early Founder spots at $5/mo locked forever** for PH hunters today. After that it goes to $10, then $19.
 >
@@ -51,7 +51,7 @@
 2. **Producer YouTubers:** follow > 100K who cover AI tools
 3. **PH power users with music interest:** search PH for users who've upvoted music tools
 4. **Message template:**
-   > "Hey [name] — launching an AI songwriting studio on PH next [day]. Built for real music people — 21 genre DNAs, full theory layer, publishing registration. Would mean a lot if you'd hunt it. Happy to give you early access. — Alvin"
+   > "Hey [name] — launching an AI songwriting studio on PH next [day]. Built for real music people — 24 genre DNAs, full theory layer, publishing registration. Would mean a lot if you'd hunt it. Happy to give you early access. — Alvin"
 
 ---
 
@@ -117,7 +117,7 @@
 **Tweet 1:**
 > We just launched SONIQ on @ProductHunt 🎵
 >
-> AI songwriting with the actual DNA of 21 genres — not just lyrics generation.
+> AI songwriting with the actual DNA of 24 genres — not just lyrics generation.
 >
 > Here's what makes it different 🧵
 
@@ -132,7 +132,7 @@
 > → Sync metadata for licensing
 
 **Tweet 3:**
-> It's built on the DNA of 21 genres.
+> It's built on the DNA of 24 genres.
 >
 > Not "pop" as a vibe — pop as structural rules:
 > Verse-PreChorus-Chorus-Bridge architecture, hook placement windows, production formulas that actually work.
@@ -175,7 +175,7 @@
 ## Response Templates for PH Comments
 
 **"How is this different from ChatGPT?"**
-> ChatGPT writes words. SONIQ writes songs — with the structural DNA of 21 genres, music theory baked in (not bolted on), production briefs your engineer can actually use, sync metadata for licensing, and publishing registration built in. The genre knowledge alone took months to build. Try generating a trap song vs a singer-songwriter track and see the difference.
+> ChatGPT writes words. SONIQ writes songs — with the structural DNA of 24 genres, music theory baked in (not bolted on), production briefs your engineer can actually use, sync metadata for licensing, and publishing registration built in. The genre knowledge alone took months to build. Try generating a trap song vs a singer-songwriter track and see the difference.
 
 **"AI can't replace real songwriting"**
 > It doesn't try to. SONIQ kills the blank page — the structural blueprint, the theory foundation, the production direction. The idea, the emotion, the performance? Still entirely yours. Every tool a serious songwriter uses is a tool.

@@ -22,7 +22,7 @@
 >
 > Hip-Hop has structural rules. R&B has hook placement windows. Singer-songwriter has chord progressions that signal authenticity.
 >
-> SONIQ has the DNA of 21 genres built in — not vibes, actual rules.
+> SONIQ has the DNA of 24 genres built in — not vibes, actual rules.
 >
 > Try it free → mysoniq.com
 
@@ -130,7 +130,7 @@
 >
 > SONIQ gives you a complete foundation — genre DNA, music theory, production brief, visual direction, and sync metadata — in seconds.
 >
-> 21 genres. Built for real music people.
+> 24 genres. Built for real music people.
 >
 > Free to start → mysoniq.com (link in bio)
 >
@@ -274,7 +274,7 @@
 >
 > "Just kidding. But SONIQ is genuinely one of those tools that once you use it, you can't go back."
 >
-> "It's not ChatGPT for lyrics. It has the actual structural DNA of 21 genres built in."
+> "It's not ChatGPT for lyrics. It has the actual structural DNA of 24 genres built in."
 >
 > "Hip-hop has different rules than R&B. R&B has different rules than country. SONIQ knows them all."
 >
@@ -302,7 +302,7 @@
 >
 > The problem I was trying to solve: most AI writing tools treat songs like text documents. They don't know that a trap song has different structural rules than a singer-songwriter track. They don't know about hook placement windows, chord psychology, or sync metadata.
 >
-> SONIQ is built on the DNA of 21 genres — actual structural rules, production formulas, theory frameworks. It outputs full lyrics, a production brief (BPM, instrumentation, arrangement), a music theory breakdown, visual direction, and sync metadata.
+> SONIQ is built on the DNA of 24 genres — actual structural rules, production formulas, theory frameworks. It outputs full lyrics, a production brief (BPM, instrumentation, arrangement), a music theory breakdown, visual direction, and sync metadata.
 >
 > It also has PRO registration built in through Nu Wav Media LLC — ISRC codes, BMI/ASCAP/SESAC registration, co-publishing agreements.
 >
@@ -317,7 +317,7 @@
 
 > EDM producers — I built a tool that might help with the early concept phase.
 >
-> SONIQ generates complete song briefs: concept, structure, production direction (BPM range, instrumentation, arrangement breakdown), and sync metadata. It has 21 genre DNAs including Electronic, with subgenre rules for techno, house, drum & bass, ambient, etc.
+> SONIQ generates complete song briefs: concept, structure, production direction (BPM range, instrumentation, arrangement breakdown), and sync metadata. It has 24 genre DNAs including Electronic, with subgenre rules for techno, house, drum & bass, ambient, etc.
 >
 > The production brief is the part I think matters most here — you get a real starting point for the session instead of staring at an empty project.
 >
