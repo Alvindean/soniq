@@ -1397,7 +1397,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="hdr-icon">🎵</div>
     <div>
       <div class="hdr-title"><span>SON</span>IQ</div>
-      <div class="hdr-sub">AI Song Creation Studio · 18 Genres · AI Ready</div>
+      <div class="hdr-sub">AI Song Creation Studio · 24 Genres · AI Ready</div>
     </div>
   </div>
   <div class="hdr-tags">
@@ -10023,7 +10023,8 @@ function updateProgressIndicator() {
   var label = document.getElementById('gp-label');
   if (!prog || !label) return;
   var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
-  if (isFounder) { prog.classList.remove('show'); return; }
+  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
+  if (window.__soniqAdmin || isFounder || isPaid) { prog.classList.remove('show'); return; }
   var count = getDailySongCount();
   prog.classList.add('show');
   label.textContent = count === 0
@@ -10047,7 +10048,8 @@ function showGenNudge(songNum) {
   var txt = document.getElementById('gn-text');
   if (!el || !txt) return;
   var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
-  if (isFounder) return;
+  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
+  if (window.__soniqAdmin || isFounder || isPaid) return;
   var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
   if (remaining > 0) {
     txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited with Early Founder pricing.';
