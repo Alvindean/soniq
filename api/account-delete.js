@@ -6,6 +6,28 @@
  */
 const { createClient } = require('@supabase/supabase-js');
 
+const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+async function checkDeleteRate(userId) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return true;
+  const key = `soniq:delete_rate:${userId}`;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/incr/${encodeURIComponent(key)}`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const d = await r.json();
+    if (d.result === 1) {
+      await fetch(`${UPSTASH_URL}/expire/${encodeURIComponent(key)}/3600`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+      });
+    }
+    return d.result <= 3; // max 3 delete attempts per user per hour
+  } catch { return true; }
+}
+
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
   const allowed = ['https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
@@ -30,6 +52,17 @@ module.exports = async function handler(req, res) {
 
   const { data: { user }, error: authErr } = await supabase.auth.getUser();
   if (authErr || !user) return res.status(401).json({ error: 'invalid token' });
+
+  // Rate limit: max 3 delete attempts per user per hour
+  if (!await checkDeleteRate(user.id)) {
+    return res.status(429).json({ error: 'Too many delete attempts. Please try again later.' });
+  }
+
+  // Email confirmation: require user to confirm their email address
+  const confirm_email = (req.body?.confirm_email || '').trim();
+  if (!confirm_email || confirm_email.toLowerCase() !== user.email.toLowerCase()) {
+    return res.status(400).json({ error: 'Please confirm your email address to delete your account' });
+  }
 
   // Service-role client to delete the auth user
   const adminClient = createClient(
