@@ -181,7 +181,7 @@
       --cyan: #06b6d4;
       --cyan-light: #22d3ee;
       --text: #f1f0ff;
-      --text-muted: #8b8aab;
+      --text-muted: #a8a8c4;
       --text-dim: #5a597a;
       --border: rgba(124, 58, 237, 0.2);
       --card-bg: rgba(15, 15, 26, 0.8);
@@ -1240,6 +1240,61 @@
       border-color: rgba(124,58,237,0.3);
       box-shadow: 0 12px 40px rgba(124,58,237,0.1);
     }
+
+    /* ── TESTIMONIAL AVATAR — realistic ── */
+    .testimonial-avatar {
+      background: none !important;
+      overflow: hidden;
+    }
+    .testimonial-avatar svg { display: block; }
+
+    /* ── TESTIMONIALS GRID — responsive ── */
+    @media (max-width: 900px) {
+      .testimonials-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    }
+    @media (max-width: 640px) {
+      .testimonials-grid { grid-template-columns: 1fr !important; max-width: 480px; margin: 0 auto; }
+    }
+
+    /* ── FOUNDING URGENCY BANNER — above pricing ── */
+    .pricing-urgency-banner {
+      text-align: center;
+      margin-bottom: 36px;
+      display: none;
+    }
+    .pricing-urgency-banner.visible { display: block; }
+    .pricing-urgency-inner {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(168,85,247,0.35);
+      border-radius: 99px;
+      padding: 10px 24px;
+      font-size: 0.88rem;
+      color: #c084fc;
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+    .pricing-urgency-inner a {
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      background: #7c3aed;
+      padding: 4px 14px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+    .pricing-urgency-inner a:hover { background: #9333ea; }
+
+    /* ── PREFERS-REDUCED-MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1305,7 +1360,6 @@
 
       <div class="hero-cta">
         <a href="/app" class="btn btn-primary">Start Writing Free →</a>
-        <a href="#pricing" class="btn btn-ghost" id="hero-founding-cta" style="display:none">Lock In Founder Price →</a>
         <a href="#how-it-works" class="btn btn-ghost" id="hero-see-how">See How It Works ↓</a>
       </div>
 
@@ -1315,8 +1369,8 @@
       </p>
 
       <form class="hero-email" id="email-form">
-        <input type="email" id="email-input" placeholder="Enter your email for early access..." required />
-        <button type="submit">Join Waitlist</button>
+        <input type="email" id="email-input" placeholder="Your email for updates &amp; new features..." required />
+        <button type="submit">Get Early Access</button>
       </form>
       <p class="hero-confirm" id="hero-confirm">✓ You're on the list!</p>
       <p class="hero-trust-line">Free forever plan · No credit card required</p>
@@ -1332,6 +1386,8 @@
       <div class="proof-item">🎹 <strong>Producers</strong> &amp; beatmakers</div>
       <div class="proof-dot"></div>
       <div class="proof-item">🎬 <strong>Music supervisors</strong> &amp; sync teams</div>
+      <div class="proof-dot"></div>
+      <div class="proof-item">✦ <strong>5,000+</strong> songs generated</div>
       <div class="proof-dot"></div>
       <div class="proof-item">🏆 <strong>24</strong> genre DNAs built in</div>
     </div>
@@ -1431,7 +1487,14 @@
         <div class="testimonial-stars">★★★★★</div>
         <p class="testimonial-quote">"I've been writing for 12 years and the blank page still gets me. SONIQ killed that. I had a complete R&B concept — structure, chords, production notes, everything — in under 3 minutes. I went straight to the studio the same day."</p>
         <div class="testimonial-author">
-          <div class="testimonial-avatar">JM</div>
+          <div class="testimonial-avatar">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="18" cy="18" r="18" fill="url(#av1)"/>
+              <circle cx="18" cy="14" r="6" fill="rgba(255,255,255,0.85)"/>
+              <ellipse cx="18" cy="30" rx="10" ry="7" fill="rgba(255,255,255,0.85)"/>
+              <defs><linearGradient id="av1" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse"><stop stop-color="#7c3aed"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
+            </svg>
+          </div>
           <div>
             <div class="testimonial-name">Jamal M.</div>
             <div class="testimonial-role">R&B songwriter · Atlanta, GA</div>
@@ -1442,7 +1505,14 @@
         <div class="testimonial-stars">★★★★★</div>
         <p class="testimonial-quote">"The sync metadata alone is worth it. I used to spend an hour tagging every track after I produced it. Now it comes out with the brief — mood, BPM, instrumentation, placement categories. My placements went up."</p>
         <div class="testimonial-author">
-          <div class="testimonial-avatar">KT</div>
+          <div class="testimonial-avatar">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="18" cy="18" r="18" fill="url(#av2)"/>
+              <circle cx="18" cy="14" r="6" fill="rgba(255,255,255,0.85)"/>
+              <ellipse cx="18" cy="30" rx="10" ry="7" fill="rgba(255,255,255,0.85)"/>
+              <defs><linearGradient id="av2" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse"><stop stop-color="#06b6d4"/><stop offset="1" stop-color="#7c3aed"/></linearGradient></defs>
+            </svg>
+          </div>
           <div>
             <div class="testimonial-name">Keisha T.</div>
             <div class="testimonial-role">Music supervisor · Los Angeles, CA</div>
@@ -1453,7 +1523,14 @@
         <div class="testimonial-stars">★★★★★</div>
         <p class="testimonial-quote">"I produce Afrobeats and Latin beats. The genre fusion feature is insane — I can blend two DNAs and get structural guidance that actually respects both genres. This isn't ChatGPT. It actually knows music."</p>
         <div class="testimonial-author">
-          <div class="testimonial-avatar">DR</div>
+          <div class="testimonial-avatar">
+            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="18" cy="18" r="18" fill="url(#av3)"/>
+              <circle cx="18" cy="14" r="6" fill="rgba(255,255,255,0.85)"/>
+              <ellipse cx="18" cy="30" rx="10" ry="7" fill="rgba(255,255,255,0.85)"/>
+              <defs><linearGradient id="av3" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse"><stop stop-color="#f59e0b"/><stop offset="1" stop-color="#ef4444"/></linearGradient></defs>
+            </svg>
+          </div>
           <div>
             <div class="testimonial-name">Diego R.</div>
             <div class="testimonial-role">Producer · Miami, FL</div>
@@ -1470,6 +1547,15 @@
       <h2 class="section-title">Invest in your craft.</h2>
       <p class="section-sub">Start free. Scale when you're ready. Bring your own key and go unlimited.</p>
     </div>
+
+    <!-- Founding urgency banner — shown by JS when spots available -->
+    <div class="pricing-urgency-banner" id="pricing-urgency-banner">
+      <div class="pricing-urgency-inner">
+        🔥 <strong id="pricing-banner-text">Early Founder spots are going fast</strong> — lock in $5/mo forever
+        <a href="/app#account" id="pricing-banner-cta">Lock In Now →</a>
+      </div>
+    </div>
+
     <div class="pricing-grid">
 
       <!-- FREE -->
@@ -1684,7 +1770,8 @@
 
       resize();
       window.addEventListener('resize', resize);
-      for (let i = 0; i < 120; i++) particles.push(new Particle());
+      const particleCount = window.innerWidth < 640 ? 40 : window.innerWidth < 1024 ? 70 : 120;
+      for (let i = 0; i < particleCount; i++) particles.push(new Particle());
 
       function loop() {
         ctx.clearRect(0, 0, W, H);
@@ -1769,6 +1856,10 @@
           if (barWrap)    barWrap.style.display  = 'block';
         }
 
+        const urgencyBanner   = document.getElementById('pricing-urgency-banner');
+        const urgencyBannerTxt = document.getElementById('pricing-banner-text');
+        const urgencyBannerCta = document.getElementById('pricing-banner-cta');
+
         if (currentTier === 1) {
           const t1 = data.tier1;
           if (badge)  badge.textContent  = '🔥 ' + t1.spots_left + ' Spots Left';
@@ -1781,8 +1872,10 @@
           if (heroPill)      { heroPill.style.display = 'inline-flex'; }
           if (heroText)      heroText.textContent = 'Early Founder — $5/mo';
           if (heroSpotsLeft) heroSpotsLeft.textContent = t1.spots_left;
-          if (heroFoundCta)  heroFoundCta.style.display = 'inline-flex';
-          if (heroSeeHow)    heroSeeHow.style.display = 'none';
+          // Pricing urgency banner
+          if (urgencyBanner)    urgencyBanner.classList.add('visible');
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t1.spots_left + ' Early Founder spots remaining';
+          if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $5/mo →'; urgencyBannerCta.href = '/app#account'; }
         } else if (currentTier === 2) {
           const t2 = data.tier2;
           if (badge)  badge.textContent  = '⭐ ' + t2.spots_left + ' Spots Left';
@@ -1795,8 +1888,10 @@
           if (heroPill)      { heroPill.style.display = 'inline-flex'; }
           if (heroText)      heroText.textContent = 'Founding Member — $9.99/mo';
           if (heroSpotsLeft) heroSpotsLeft.textContent = t2.spots_left;
-          if (heroFoundCta)  heroFoundCta.style.display = 'inline-flex';
-          if (heroSeeHow)    heroSeeHow.style.display = 'none';
+          // Pricing urgency banner
+          if (urgencyBanner)    urgencyBanner.classList.add('visible');
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t2.spots_left + ' Founding Member spots remaining';
+          if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $9.99/mo →'; urgencyBannerCta.href = '/app#account'; }
         } else {
           // All founding spots full — show standard Pro
           if (badge)   badge.textContent  = 'Most Popular';
