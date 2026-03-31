@@ -3886,6 +3886,16 @@ const S={selectedGenre:'pop',
   luckyController: null, // AbortController for lucky generate
 };
 
+// ── ADMIN SESSION — synchronous check (must run before Supabase init) ──
+// Token is set on first visit with ?admin=PASSWORD and persisted in localStorage.
+// Subsequent page loads unlock instantly without any network call.
+if (localStorage.getItem('soniq_admin_token')) {
+  window.__soniqAdmin = true;
+  S.plan = 'studio';
+  S.isAdmin = true;
+  S.user = { id: 'admin', email: 'admin@mysoniq.com', app_metadata: {}, user_metadata: {} };
+}
+
 // ═══════════════════════════════════════════════════════
 // ANTHROPIC API CALL
 // ═══════════════════════════════════════════════════════
@@ -4643,7 +4653,7 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 }
 
 function feelLucky(){
-  if (!S.user) {
+  if (!S.user && !window.__soniqAdmin) {
     openAuth('Create your free account to generate your song — 3 free songs every day');
     S._pendingGenerate = 'lucky';
     return;
@@ -4907,7 +4917,7 @@ function loadLuckyHistItem(i){
 const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
 
 async function generateSong(){
-  if (!S.user) {
+  if (!S.user && !window.__soniqAdmin) {
     openAuth('Create your free account to generate your song — 3 free songs every day');
     S._pendingGenerate = 'song';
     return;
@@ -5905,7 +5915,7 @@ function initBuilder(){
 }
 
 async function generateFromBuilder(){
-  if (!S.user) {
+  if (!S.user && !window.__soniqAdmin) {
     openAuth('Create your free account to generate your song — 3 free songs every day');
     S._pendingGenerate = 'builder';
     return;
@@ -6061,7 +6071,7 @@ function showFusion(g1,g2){
 }
 
 async function generateFusion(){
-  if (!S.user) {
+  if (!S.user && !window.__soniqAdmin) {
     openAuth('Create your free account to generate your song — 3 free songs every day');
     S._pendingGenerate = 'fusion';
     return;
@@ -7163,7 +7173,7 @@ function generateISRC() {
 }
 
 function openPublish() {
-  if (!S.user) {
+  if (!S.user && !window.__soniqAdmin) {
     openAuth('Sign in to register your song for publishing');
     return;
   }
