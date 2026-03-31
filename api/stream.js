@@ -156,11 +156,26 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).end();
 
+  // ── Admin bypass check ─────────────────────────────────────────
+  const adminTokenHeader = req.headers['x-admin-token'] || '';
+  if (adminTokenHeader) {
+    const { createHmac } = require('crypto');
+    const secret = process.env.ADMIN_TOKEN_SECRET || 'soniq-default-secret';
+    const adminPw = process.env.ADMIN_PASSWORD || '';
+    const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
+    if (adminTokenHeader === expected) {
+      // Valid admin — skip auth, grant unlimited access
+      req._adminBypass = true;
+      req._adminPlan = 'studio';
+    }
+  }
+
   // ── Auth check ──────────────────────────────────────────────────
+  if (!req._adminBypass) {
   const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
   if (!token) {
     return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
@@ -173,22 +188,30 @@ module.exports = async function handler(req, res) {
   if (authErr || !user) {
     return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
   }
+  req._user = user;
+  req._supabase = supabase;
+  }
 
   // ── Plan lookup + rate limiting ─────────────────────────────────
-  let plan = 'free';
-  try {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('plan')
-      .eq('id', user.id)
-      .single();
-    if (profile?.plan) plan = profile.plan;
-  } catch (e) {
-    console.error('Profile fetch error:', e.message);
+  const user    = req._adminBypass ? { id: 'admin' } : req._user;
+  const supabase = req._adminBypass ? null : req._supabase;
+
+  let plan = req._adminBypass ? req._adminPlan : 'free';
+  if (!req._adminBypass) {
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('plan')
+        .eq('id', user.id)
+        .single();
+      if (profile?.plan) plan = profile.plan;
+    } catch (e) {
+      console.error('Profile fetch error:', e.message);
+    }
   }
 
   const limit = PLAN_LIMITS[plan] ?? 3;
-  if (isFinite(limit)) {
+  if (!req._adminBypass && isFinite(limit)) {
     const dateKey = getTodayDate();
     const redisKey = `soniq:ratelimit:daily:${user.id}:${dateKey}`;
     const current = parseInt(await redisGet(redisKey) || '0', 10);
@@ -288,7 +311,7 @@ module.exports = async function handler(req, res) {
 
   // Helper: increment rate limit after successful stream
   const recordUsage = () => {
-    if (isFinite(limit)) {
+    if (!req._adminBypass && isFinite(limit)) {
       const dateKey = getTodayDate();
       redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
     }
