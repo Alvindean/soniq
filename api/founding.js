@@ -21,7 +21,7 @@ const { createClient } = require('@supabase/supabase-js');
 
 const TIERS = {
   1: { label: 'Early Founder',   spots_total: 500,  price_monthly: 5,  price_annual: 42,  badge_emoji: '🔥' },
-  2: { label: 'Founding Member', spots_total: 1500, price_monthly: 10, price_annual: 84,  badge_emoji: '⭐' },
+  2: { label: 'Founding Member', spots_total: 1500, price_monthly: 9.99, price_annual: 84,  badge_emoji: '⭐' },
   3: { label: 'Regular Pro',     spots_total: null, price_monthly: 19, price_annual: 114, badge_emoji: null },
 };
 

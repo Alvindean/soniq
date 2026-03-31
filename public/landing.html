@@ -1072,9 +1072,9 @@
         } else if (data.tier === 2) {
           if (badge)  badge.textContent  = '⚡ Founding Member';
           if (name)   name.textContent   = 'Founding Member';
-          if (price)  price.innerHTML    = '$10<span>/mo</span>';
+          if (price)  price.innerHTML    = '$9.99<span>/mo</span>';
           if (period) period.innerHTML   = 'locked in forever · <span class="founding-spots-remaining">' + (data.spots_left ?? '…') + '</span> spots left';
-          if (cta)  { cta.textContent  = 'Lock In $10 Forever →'; cta.href = '/app#account'; }
+          if (cta)  { cta.textContent  = 'Lock In $9.99 Forever →'; cta.href = '/app#account'; }
         } else {
           // All founding spots full — show standard Pro
           const card = document.getElementById('pricing-founding-card');

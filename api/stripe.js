@@ -2,7 +2,8 @@
  * SONIQ — Stripe integration
  *
  * POST /api/stripe               → create checkout session
- *   Body: { plan: 'founding_t1' | 'founding_t2' | 'pro' | 'pro_annual', userId, userEmail }
+ *   Body: { plan: 'founding_t1' | 'founding_t1_annual' | 'founding_t2' | 'founding_t2_annual'
+ *                | 'pro' | 'pro_annual' | 'studio' | 'studio_annual' }
  *   Headers: Authorization: Bearer <supabase_jwt>
  *
  * POST /api/stripe?webhook=1     → Stripe webhook handler
@@ -11,13 +12,18 @@
  *
  * Env vars required:
  *   STRIPE_SECRET_KEY
- *   STRIPE_WEBHOOK_SECRET          (whsec_...)
- *   STRIPE_PRICE_FOUNDING_T1       (price_... $5/mo)
- *   STRIPE_PRICE_FOUNDING_T2       (price_... $10/mo)
- *   STRIPE_PRICE_PRO_MONTHLY       (price_... $19/mo)
- *   STRIPE_PRICE_PRO_ANNUAL        (price_... $114/yr)
+ *   STRIPE_WEBHOOK_SECRET                (whsec_...)
+ *   STRIPE_FOUNDING_T1_PRICE_ID          price_1TGuKzIZ86EsfktXD9VbT2xE  ($5/mo)
+ *   STRIPE_FOUNDING_T1_ANNUAL_PRICE_ID   price_1TGv2nIZ86EsfktXb6HFAoF2  ($42/yr)
+ *   STRIPE_FOUNDING_T2_PRICE_ID          price_1TGuL0IZ86EsfktXNnLXxZQC  ($9.99/mo)
+ *   STRIPE_FOUNDING_T2_ANNUAL_PRICE_ID   price_1TGv2oIZ86EsfktXBMXudIu2  ($84/yr)
+ *   STRIPE_PRO_PRICE_ID                  price_1TGuL1IZ86EsfktXZIKAkAuR  ($19/mo)
+ *   STRIPE_PRO_ANNUAL_PRICE_ID           price_1TGv2pIZ86EsfktXbyG8XGKt  ($114/yr)
+ *   STRIPE_STUDIO_PRICE_ID               price_1TGuL2IZ86EsfktX3hxg1usk  ($49/mo)
+ *   STRIPE_STUDIO_ANNUAL_PRICE_ID        price_1TGv2pIZ86EsfktXOjqXBWIs  ($468/yr)
  *   SUPABASE_URL
- *   SUPABASE_SERVICE_KEY           (service role — needed for admin writes)
+ *   SUPABASE_ANON_KEY
+ *   SUPABASE_SERVICE_KEY                 (service role — needed for admin writes)
  *   UPSTASH_REDIS_REST_URL
  *   UPSTASH_REDIS_REST_TOKEN
  */
@@ -32,17 +38,25 @@ const ALLOWED_ORIGINS = [
 ];
 
 const PLAN_TO_PRICE = {
-  founding_t1: process.env.STRIPE_PRICE_FOUNDING_T1,
-  founding_t2: process.env.STRIPE_PRICE_FOUNDING_T2,
-  pro:         process.env.STRIPE_PRICE_PRO_MONTHLY,
-  pro_annual:  process.env.STRIPE_PRICE_PRO_ANNUAL,
+  founding_t1:        process.env.STRIPE_FOUNDING_T1_PRICE_ID,
+  founding_t1_annual: process.env.STRIPE_FOUNDING_T1_ANNUAL_PRICE_ID,
+  founding_t2:        process.env.STRIPE_FOUNDING_T2_PRICE_ID,
+  founding_t2_annual: process.env.STRIPE_FOUNDING_T2_ANNUAL_PRICE_ID,
+  pro:                process.env.STRIPE_PRO_PRICE_ID,
+  pro_annual:         process.env.STRIPE_PRO_ANNUAL_PRICE_ID,
+  studio:             process.env.STRIPE_STUDIO_PRICE_ID,
+  studio_annual:      process.env.STRIPE_STUDIO_ANNUAL_PRICE_ID,
 };
 
 const PLAN_LABELS = {
-  founding_t1: 'Early Founder — $5/mo locked forever',
-  founding_t2: 'Founding Member — $10/mo locked forever',
-  pro:         'Pro — $19/mo',
-  pro_annual:  'Pro Annual — $114/yr',
+  founding_t1:        'Early Founder — $5/mo locked forever',
+  founding_t1_annual: 'Early Founder Annual — $42/yr locked forever',
+  founding_t2:        'Founding Member — $9.99/mo locked forever',
+  founding_t2_annual: 'Founding Member Annual — $84/yr locked forever',
+  pro:                'Pro — $19/mo',
+  pro_annual:         'Pro Annual — $114/yr (50% off)',
+  studio:             'Studio — $49/mo',
+  studio_annual:      'Studio Annual — $468/yr (20% off)',
 };
 
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
@@ -107,13 +121,13 @@ async function handleCheckout(req, res) {
   }
 
   // Check founding tier availability
-  if (plan === 'founding_t1') {
+  if (plan === 'founding_t1' || plan === 'founding_t1_annual') {
     const active = await redisGet('soniq:founding:tier1:active');
     if (active !== '1') return res.status(400).json({ error: 'Founding tier 1 is no longer available' });
     const count = parseInt(await redisGet('soniq:founding:tier1:count') || '0', 10);
     if (count >= 500) return res.status(400).json({ error: 'Founding tier 1 is sold out' });
   }
-  if (plan === 'founding_t2') {
+  if (plan === 'founding_t2' || plan === 'founding_t2_annual') {
     const active = await redisGet('soniq:founding:tier2:active');
     if (active !== '1') return res.status(400).json({ error: 'Founding tier 2 is not yet available' });
     const count = parseInt(await redisGet('soniq:founding:tier2:count') || '0', 10);
@@ -190,8 +204,8 @@ async function handleWebhook(req, res) {
       }
 
       // Increment founding counter atomically
-      if (plan === 'founding_t1') await redisIncr('soniq:founding:tier1:count');
-      if (plan === 'founding_t2') await redisIncr('soniq:founding:tier2:count');
+      if (plan === 'founding_t1' || plan === 'founding_t1_annual') await redisIncr('soniq:founding:tier1:count');
+      if (plan === 'founding_t2' || plan === 'founding_t2_annual') await redisIncr('soniq:founding:tier2:count');
 
       // Update user profile
       if (supabase) {
