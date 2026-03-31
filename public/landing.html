@@ -411,6 +411,24 @@
       margin-bottom: 28px;
     }
 
+    .hero-founding-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 18px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(168,85,247,0.4);
+      border-radius: 99px;
+      font-size: 0.88rem;
+      color: #c084fc;
+      margin-bottom: 20px;
+      animation: pulse-border 2s ease-in-out infinite;
+    }
+    @keyframes pulse-border {
+      0%, 100% { border-color: rgba(168,85,247,0.4); }
+      50%       { border-color: rgba(168,85,247,0.85); box-shadow: 0 0 12px rgba(168,85,247,0.3); }
+    }
+
     .hero-badge::before {
       content: '';
       width: 6px;
@@ -778,6 +796,32 @@
       font-style: italic;
     }
 
+    .spots-bar-wrap {
+      margin: 12px 0 4px;
+    }
+    .spots-bar-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .spots-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #7c3aed, #a855f7);
+      border-radius: 99px;
+      transition: width 0.6s ease;
+      width: 0%;
+    }
+    .spots-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-top: 5px;
+    }
+    .spots-bar-label .spots-claimed { color: #a855f7; font-weight: 600; }
+
     /* ── STATS ── */
     .stats {
       background: var(--bg3);
@@ -942,9 +986,14 @@
       <h1>Write songs that actually hit.</h1>
       <p class="hero-sub">AI songwriting with the DNA of 24 genres, full music theory, production briefs, and visual direction — built for artists and the industry.</p>
 
+      <div class="hero-founding-pill" id="hero-founding-pill" style="display:none">
+        🔥 <strong id="hero-founding-text">Early Founder — $5/mo</strong> · <span id="hero-spots-left">…</span> spots left
+      </div>
+
       <div class="hero-cta">
         <a href="/app" class="btn btn-primary">Start Writing Free →</a>
-        <a href="#how-it-works" class="btn btn-ghost">See How It Works ↓</a>
+        <a href="#pricing" class="btn btn-ghost" id="hero-founding-cta" style="display:none">Lock In Founder Price →</a>
+        <a href="#how-it-works" class="btn btn-ghost" id="hero-see-how">See How It Works ↓</a>
       </div>
 
       <form class="hero-email" id="email-form">
@@ -1048,10 +1097,19 @@
 
       <!-- FOUNDING / PRO — shown dynamically -->
       <div class="pricing-card featured fade-in" style="transition-delay:0.12s" id="pricing-founding-card">
-        <div class="pricing-badge" id="pricing-founding-badge">🔥 Founding</div>
+        <div class="pricing-badge" id="pricing-founding-badge">🔥 500 Spots Only</div>
         <div class="pricing-name" id="pricing-founding-name">Early Founder</div>
         <div class="pricing-price" id="pricing-founding-price">$5<span>/mo</span></div>
-        <div class="pricing-period" id="pricing-founding-period">locked in forever · <span class="founding-spots-remaining" id="founding-spots-t1">…</span> spots left</div>
+        <div class="pricing-period" id="pricing-founding-period">locked in forever</div>
+        <div class="spots-bar-wrap" id="spots-bar-wrap">
+          <div class="spots-bar-track">
+            <div class="spots-bar-fill" id="spots-bar-fill"></div>
+          </div>
+          <div class="spots-bar-label">
+            <span><span class="spots-claimed" id="spots-claimed-num">…</span> spots claimed</span>
+            <span id="spots-total-label">of 500</span>
+          </div>
+        </div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Unlimited generations</li>
@@ -1279,38 +1337,69 @@
         if (!res.ok) return;
         const data = await res.json();
 
-        // Update all elements with class founding-spots-remaining
-        document.querySelectorAll('.founding-spots-remaining').forEach(el => {
-          el.textContent = data.spots_left ?? '…';
-        });
+        const badge      = document.getElementById('pricing-founding-badge');
+        const name       = document.getElementById('pricing-founding-name');
+        const price      = document.getElementById('pricing-founding-price');
+        const period     = document.getElementById('pricing-founding-period');
+        const cta        = document.getElementById('pricing-founding-cta');
+        const barWrap    = document.getElementById('spots-bar-wrap');
+        const barFill    = document.getElementById('spots-bar-fill');
+        const claimedNum = document.getElementById('spots-claimed-num');
+        const totalLabel = document.getElementById('spots-total-label');
 
-        // Update the featured pricing card dynamically
-        const badge    = document.getElementById('pricing-founding-badge');
-        const name     = document.getElementById('pricing-founding-name');
-        const price    = document.getElementById('pricing-founding-price');
-        const period   = document.getElementById('pricing-founding-period');
-        const cta      = document.getElementById('pricing-founding-cta');
+        // Hero pill elements
+        const heroPill      = document.getElementById('hero-founding-pill');
+        const heroText      = document.getElementById('hero-founding-text');
+        const heroSpotsLeft = document.getElementById('hero-spots-left');
+        const heroFoundCta  = document.getElementById('hero-founding-cta');
+        const heroSeeHow    = document.getElementById('hero-see-how');
 
-        if (data.tier === 1) {
-          if (badge)  badge.textContent  = '🔥 500 Spots Only';
+        const currentTier = data.current_tier;
+
+        function updateBar(claimed, total) {
+          const pct = total > 0 ? Math.min(100, (claimed / total) * 100) : 0;
+          if (barFill)    barFill.style.width    = pct + '%';
+          if (claimedNum) claimedNum.textContent = claimed;
+          if (totalLabel) totalLabel.textContent = 'of ' + total;
+          if (barWrap)    barWrap.style.display  = 'block';
+        }
+
+        if (currentTier === 1) {
+          const t1 = data.tier1;
+          if (badge)  badge.textContent  = '🔥 ' + t1.spots_left + ' Spots Left';
           if (name)   name.textContent   = 'Early Founder';
           if (price)  price.innerHTML    = '$5<span>/mo</span>';
-          if (period) period.innerHTML   = 'locked in forever · <span class="founding-spots-remaining">' + (data.spots_left ?? '…') + '</span> spots left';
-          if (cta)  { cta.textContent  = 'Lock In $5 Forever →'; cta.href = '/app#account'; }
-        } else if (data.tier === 2) {
-          if (badge)  badge.textContent  = '⚡ Founding Member';
+          if (period) period.textContent = 'price locked forever once you join';
+          if (cta)  { cta.textContent    = 'Lock In $5 Forever →'; cta.href = '/app#account'; }
+          updateBar(t1.spots_claimed, t1.spots_total);
+          // Hero pill
+          if (heroPill)      { heroPill.style.display = 'inline-flex'; }
+          if (heroText)      heroText.textContent = 'Early Founder — $5/mo';
+          if (heroSpotsLeft) heroSpotsLeft.textContent = t1.spots_left;
+          if (heroFoundCta)  heroFoundCta.style.display = 'inline-flex';
+          if (heroSeeHow)    heroSeeHow.style.display = 'none';
+        } else if (currentTier === 2) {
+          const t2 = data.tier2;
+          if (badge)  badge.textContent  = '⭐ ' + t2.spots_left + ' Spots Left';
           if (name)   name.textContent   = 'Founding Member';
           if (price)  price.innerHTML    = '$9.99<span>/mo</span>';
-          if (period) period.innerHTML   = 'locked in forever · <span class="founding-spots-remaining">' + (data.spots_left ?? '…') + '</span> spots left';
-          if (cta)  { cta.textContent  = 'Lock In $9.99 Forever →'; cta.href = '/app#account'; }
+          if (period) period.textContent = 'price locked forever once you join';
+          if (cta)  { cta.textContent    = 'Lock In $9.99 Forever →'; cta.href = '/app#account'; }
+          updateBar(t2.spots_claimed, t2.spots_total);
+          // Hero pill
+          if (heroPill)      { heroPill.style.display = 'inline-flex'; }
+          if (heroText)      heroText.textContent = 'Founding Member — $9.99/mo';
+          if (heroSpotsLeft) heroSpotsLeft.textContent = t2.spots_left;
+          if (heroFoundCta)  heroFoundCta.style.display = 'inline-flex';
+          if (heroSeeHow)    heroSeeHow.style.display = 'none';
         } else {
           // All founding spots full — show standard Pro
-          const card = document.getElementById('pricing-founding-card');
-          if (card) card.querySelector('.pricing-badge').textContent = 'Most Popular';
-          if (name)   name.textContent   = 'Pro';
-          if (price)  price.innerHTML    = '$19<span>/mo</span>';
-          if (period) period.textContent = 'billed monthly';
-          if (cta)  { cta.textContent  = 'Start Free Trial →'; cta.href = '/app'; }
+          if (badge)   badge.textContent  = 'Most Popular';
+          if (name)    name.textContent   = 'Pro';
+          if (price)   price.innerHTML    = '$19<span>/mo</span>';
+          if (period)  period.textContent = 'billed monthly';
+          if (cta)   { cta.textContent    = 'Start Free Trial →'; cta.href = '/app'; }
+          if (barWrap) barWrap.style.display = 'none';
         }
       } catch (e) { /* fail silently */ }
     })();
