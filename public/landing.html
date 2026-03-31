@@ -870,19 +870,19 @@
         <div class="pricing-period">forever free</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>5 generations / day</li>
+          <li>3 generations / day</li>
           <li>All 21 genres</li>
           <li>Lyrics + Song Prompt</li>
         </ul>
         <a href="/app" class="btn btn-outline-violet pricing-cta">Get Started →</a>
       </div>
 
-      <!-- PRO -->
-      <div class="pricing-card featured fade-in" style="transition-delay:0.12s">
-        <div class="pricing-badge">Most Popular</div>
-        <div class="pricing-name">Pro</div>
-        <div class="pricing-price">$12<span>/mo</span></div>
-        <div class="pricing-period">billed monthly</div>
+      <!-- FOUNDING / PRO — shown dynamically -->
+      <div class="pricing-card featured fade-in" style="transition-delay:0.12s" id="pricing-founding-card">
+        <div class="pricing-badge" id="pricing-founding-badge">🔥 Founding</div>
+        <div class="pricing-name" id="pricing-founding-name">Early Founder</div>
+        <div class="pricing-price" id="pricing-founding-price">$5<span>/mo</span></div>
+        <div class="pricing-period" id="pricing-founding-period">locked in forever · <span class="founding-spots-remaining" id="founding-spots-t1">…</span> spots left</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Unlimited generations</li>
@@ -892,10 +892,10 @@
           <li>Sync metadata</li>
           <li>Version history</li>
         </ul>
-        <a href="/app" class="btn btn-primary pricing-cta">Start Free Trial →</a>
+        <a href="/app#account" class="btn btn-primary pricing-cta" id="pricing-founding-cta">Lock In $5 Forever →</a>
       </div>
 
-      <!-- STUDIO -->
+      <!-- PRO (shown when founding is full) -->
       <div class="pricing-card fade-in" style="transition-delay:0.24s">
         <div class="pricing-name">Studio</div>
         <div class="pricing-price">$49<span>/mo</span></div>
@@ -913,7 +913,7 @@
       </div>
 
     </div>
-    <p class="pricing-note">Bring your own Anthropic API key for unlimited free use.</p>
+    <p class="pricing-note">Founding spots are limited — price locks in forever when you join.</p>
   </section>
 
   <!-- STATS -->
@@ -1034,6 +1034,49 @@
     }, { threshold: 0.12 });
 
     document.querySelectorAll('.feature-card, .fade-in').forEach(el => observer.observe(el));
+
+    // ── LIVE FOUNDING TIER COUNTER ──
+    (async function loadLiveFoundingCounter() {
+      try {
+        const res = await fetch('/api/founding');
+        if (!res.ok) return;
+        const data = await res.json();
+
+        // Update all elements with class founding-spots-remaining
+        document.querySelectorAll('.founding-spots-remaining').forEach(el => {
+          el.textContent = data.spots_left ?? '…';
+        });
+
+        // Update the featured pricing card dynamically
+        const badge    = document.getElementById('pricing-founding-badge');
+        const name     = document.getElementById('pricing-founding-name');
+        const price    = document.getElementById('pricing-founding-price');
+        const period   = document.getElementById('pricing-founding-period');
+        const cta      = document.getElementById('pricing-founding-cta');
+
+        if (data.tier === 1) {
+          if (badge)  badge.textContent  = '🔥 500 Spots Only';
+          if (name)   name.textContent   = 'Early Founder';
+          if (price)  price.innerHTML    = '$5<span>/mo</span>';
+          if (period) period.innerHTML   = 'locked in forever · <span class="founding-spots-remaining">' + (data.spots_left ?? '…') + '</span> spots left';
+          if (cta)  { cta.textContent  = 'Lock In $5 Forever →'; cta.href = '/app#account'; }
+        } else if (data.tier === 2) {
+          if (badge)  badge.textContent  = '⚡ Founding Member';
+          if (name)   name.textContent   = 'Founding Member';
+          if (price)  price.innerHTML    = '$10<span>/mo</span>';
+          if (period) period.innerHTML   = 'locked in forever · <span class="founding-spots-remaining">' + (data.spots_left ?? '…') + '</span> spots left';
+          if (cta)  { cta.textContent  = 'Lock In $10 Forever →'; cta.href = '/app#account'; }
+        } else {
+          // All founding spots full — show standard Pro
+          const card = document.getElementById('pricing-founding-card');
+          if (card) card.querySelector('.pricing-badge').textContent = 'Most Popular';
+          if (name)   name.textContent   = 'Pro';
+          if (price)  price.innerHTML    = '$19<span>/mo</span>';
+          if (period) period.textContent = 'billed monthly';
+          if (cta)  { cta.textContent  = 'Start Free Trial →'; cta.href = '/app'; }
+        }
+      } catch (e) { /* fail silently */ }
+    })();
   </script>
 </body>
 </html>

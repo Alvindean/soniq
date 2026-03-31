@@ -3,4 +3,16 @@ Disallow: /api/
 Disallow: /admin
 Disallow: /admin.html
 
-Sitemap: https://soniq.vercel.app/sitemap.xml
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+Sitemap: https://www.mysoniq.com/sitemap.xml
