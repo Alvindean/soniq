@@ -12,7 +12,7 @@
     "api/admin.js":          { "maxDuration": 15 },
     "api/rapstats.js":       { "maxDuration": 10 },
     "api/publish.js":        { "maxDuration": 15 },
-    "api/publish-list.js":   { "maxDuration": 10 },
+    "api/stripe.js":         { "maxDuration": 30 },
     "api/auth-verify.js":    { "maxDuration": 10 },
     "api/account-delete.js": { "maxDuration": 15 },
     "api/data-export.js":    { "maxDuration": 30 },
