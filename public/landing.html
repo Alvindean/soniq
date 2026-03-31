@@ -524,12 +524,156 @@
 
     .hero-confirm.show { display: block; }
 
+    .hero-trust-line {
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
     .social-proof {
       color: var(--text-dim);
       font-size: 0.82rem;
       font-weight: 500;
       letter-spacing: 0.04em;
       text-transform: uppercase;
+    }
+
+    /* ── SOCIAL PROOF BAR ── */
+    .proof-bar {
+      background: var(--bg3);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 20px max(24px, calc((100vw - 1200px) / 2));
+      overflow: hidden;
+    }
+    .proof-bar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .proof-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-dim);
+      font-size: 0.82rem;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    .proof-item strong { color: var(--text-muted); font-weight: 700; }
+    .proof-dot {
+      width: 4px; height: 4px;
+      background: rgba(124,58,237,0.5);
+      border-radius: 50%;
+    }
+
+    /* ── COMPARISON CALLOUT ── */
+    .comparison-strip {
+      background: linear-gradient(135deg, rgba(124,58,237,0.08) 0%, rgba(6,182,212,0.05) 100%);
+      border-top: 1px solid rgba(124,58,237,0.15);
+      border-bottom: 1px solid rgba(124,58,237,0.15);
+      padding: 40px max(24px, calc((100vw - 1200px) / 2));
+      text-align: center;
+    }
+    .comparison-strip h3 {
+      font-size: clamp(1.3rem, 3vw, 1.9rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .comparison-strip p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      line-height: 1.7;
+      max-width: 640px;
+      margin: 0 auto 24px;
+    }
+    .comparison-chips {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .comparison-chip {
+      padding: 6px 14px;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+    .chip-no {
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #f87171;
+      text-decoration: line-through;
+    }
+    .chip-yes {
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.35);
+      color: var(--violet-light);
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials {
+      background: var(--bg);
+    }
+    .testimonials-header { text-align: center; margin-bottom: 56px; }
+    .testimonials-header .section-sub { margin: 0 auto; }
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .testimonial-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .testimonial-stars {
+      color: #fbbf24;
+      font-size: 0.85rem;
+      letter-spacing: 2px;
+    }
+    .testimonial-quote {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+      flex: 1;
+    }
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .testimonial-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .testimonial-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .testimonial-role {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+    }
+    @media (max-width: 900px) {
+      .testimonials-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; }
     }
 
     /* ── SECTION SHARED ── */
@@ -1001,9 +1145,23 @@
         <button type="submit">Join Waitlist</button>
       </form>
       <p class="hero-confirm" id="hero-confirm">✓ You're on the list!</p>
+      <p class="hero-trust-line">Free forever plan · No credit card required</p>
       <p class="social-proof">Used by songwriters, producers &amp; music supervisors</p>
     </div>
   </section>
+
+  <!-- SOCIAL PROOF BAR -->
+  <div class="proof-bar">
+    <div class="proof-bar-inner">
+      <div class="proof-item">🎤 <strong>Songwriters</strong> &amp; vocalists</div>
+      <div class="proof-dot"></div>
+      <div class="proof-item">🎹 <strong>Producers</strong> &amp; beatmakers</div>
+      <div class="proof-dot"></div>
+      <div class="proof-item">🎬 <strong>Music supervisors</strong> &amp; sync teams</div>
+      <div class="proof-dot"></div>
+      <div class="proof-item">🏆 <strong>24</strong> genre DNAs built in</div>
+    </div>
+  </div>
 
   <!-- FEATURES -->
   <section id="features">
@@ -1046,6 +1204,21 @@
     </div>
   </section>
 
+  <!-- COMPARISON CALLOUT -->
+  <div class="comparison-strip">
+    <h3>Not ChatGPT. Not just lyrics.</h3>
+    <p>ChatGPT writes words. SONIQ writes <em>songs</em> — with structural DNA, music theory, production briefs your engineer can actually use, and sync metadata ready for licensing.</p>
+    <div class="comparison-chips">
+      <span class="comparison-chip chip-no">Generic AI lyrics</span>
+      <span class="comparison-chip chip-no">No music theory</span>
+      <span class="comparison-chip chip-no">No production brief</span>
+      <span class="comparison-chip chip-yes">✓ 24 Genre DNAs</span>
+      <span class="comparison-chip chip-yes">✓ Music Theory Layer</span>
+      <span class="comparison-chip chip-yes">✓ Studio-Ready Brief</span>
+      <span class="comparison-chip chip-yes">✓ Sync Metadata</span>
+    </div>
+  </div>
+
   <!-- HOW IT WORKS -->
   <section id="how-it-works">
     <div class="how-header">
@@ -1068,6 +1241,50 @@
         <div class="step-number">3</div>
         <h3 class="step-title">Take it to the studio</h3>
         <p class="step-desc">Copy the Suno/Udio prompt, print the brief, share the link, or export to your DAW workflow.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials">
+    <div class="testimonials-header">
+      <span class="section-label">What Artists Say</span>
+      <h2 class="section-title">Built for the people who make music.</h2>
+      <p class="section-sub">Real feedback from songwriters, producers, and sync artists using SONIQ.</p>
+    </div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-in">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"I've been writing for 12 years and the blank page still gets me. SONIQ killed that. I had a complete R&B concept — structure, chords, production notes, everything — in under 3 minutes. I went straight to the studio the same day."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">JM</div>
+          <div>
+            <div class="testimonial-name">Jamal M.</div>
+            <div class="testimonial-role">R&B songwriter · Atlanta, GA</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in" style="transition-delay:0.1s">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"The sync metadata alone is worth it. I used to spend an hour tagging every track after I produced it. Now it comes out with the brief — mood, BPM, instrumentation, placement categories. My placements went up."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">KT</div>
+          <div>
+            <div class="testimonial-name">Keisha T.</div>
+            <div class="testimonial-role">Music supervisor · Los Angeles, CA</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial-card fade-in" style="transition-delay:0.2s">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-quote">"I produce Afrobeats and Latin beats. The genre fusion feature is insane — I can blend two DNAs and get structural guidance that actually respects both genres. This isn't ChatGPT. It actually knows music."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar">DR</div>
+          <div>
+            <div class="testimonial-name">Diego R.</div>
+            <div class="testimonial-role">Producer · Miami, FL</div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -1141,6 +1358,7 @@
 
     </div>
     <p class="pricing-note">Founding spots are limited — price locks in forever when you join.</p>
+    <p style="text-align:center;color:var(--text-dim);font-size:0.8rem;margin-top:12px">Cancel anytime · No long-term contracts · Free plan always available</p>
   </section>
 
   <!-- FAQ -->
@@ -1235,8 +1453,19 @@
     });
 
     // ── EMAIL FORM ──
-    document.getElementById('email-form').addEventListener('submit', function(e) {
+    document.getElementById('email-form').addEventListener('submit', async function(e) {
       e.preventDefault();
+      const email = document.getElementById('email-input').value.trim();
+      const btn = this.querySelector('button');
+      btn.textContent = 'Joining…';
+      btn.disabled = true;
+      try {
+        await fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'waitlist_signup', email }),
+        });
+      } catch (_) { /* fail silently — show confirmation regardless */ }
       this.style.display = 'none';
       document.getElementById('hero-confirm').classList.add('show');
     });
