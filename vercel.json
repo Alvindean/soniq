@@ -16,8 +16,11 @@
     "api/auth-verify.js":    { "maxDuration": 10 },
     "api/account-delete.js": { "maxDuration": 15 },
     "api/data-export.js":    { "maxDuration": 30 },
-    "api/founding.js":       { "maxDuration": 10 },
-    "api/send-email.js":     { "maxDuration": 15 }
+    "api/founding.js":           { "maxDuration": 10 },
+    "api/send-email.js":         { "maxDuration": 15 },
+    "api/admin-session.js":      { "maxDuration": 10 },
+    "api/stripe-checkout.js":    { "maxDuration": 30 },
+    "api/stripe-webhook.js":     { "maxDuration": 30 }
   },
   "headers": [
     {

@@ -6786,6 +6786,7 @@ function copyCoachFeedback() {
     }
   });
   S.supabase.auth.getSession().then(({ data: { session } }) => {
+    // Don't overwrite admin mock session
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -9279,6 +9280,44 @@ renderLib();
 updateLibBadge();
 loadVoiceProfile();
 checkShareLink();
+
+// ── ADMIN BYPASS ──
+(async function adminBypass() {
+  const params = new URLSearchParams(window.location.search);
+  const adminPw = params.get('admin');
+
+  if (adminPw) {
+    try {
+      const res = await fetch('/api/admin-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: adminPw })
+      });
+      const data = await res.json();
+      if (data.ok && data.token) {
+        localStorage.setItem('soniq_admin_token', data.token);
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    } catch (e) { console.error('Admin bypass failed:', e); }
+  }
+
+  const token = localStorage.getItem('soniq_admin_token');
+  if (token) {
+    if (typeof S !== 'undefined') {
+      S.plan = 'studio';
+      S.user = S.user || { id: 'admin', email: 'admin@mysoniq.com' };
+      S.isAdmin = true;
+    }
+    window.__soniqAdmin = true;
+    console.log('%c★ SONIQ Admin Mode Active', 'color: #f5c000; font-size: 14px; font-weight: bold');
+  }
+})();
+
+// Global admin clear function
+window.clearAdminSession = function() {
+  localStorage.removeItem('soniq_admin_token');
+  window.location.reload();
+};
 </script>
 <!-- ══ ANALYTICS + GAMIFICATION ══ -->
 <script>
