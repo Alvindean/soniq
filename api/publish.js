@@ -107,11 +107,11 @@ module.exports = async function handler(req, res) {
     tier,
     soniq_share,
     writer_share,
-    // Publisher metadata — Nu Wav Media / Alvin Dean Warren
-    publisher_name: 'Nu Wav Media',
+    // Publisher metadata — Nu Wav Media LLC / Alvin Dean Warren
+    publisher_name: 'Nu Wav Media LLC',
     publisher_owner: 'Alvin Dean Warren',
     publisher_dba: 'Alvo',
-    copyright_notice: `© ${new Date().getFullYear()} ${writer_name} / Nu Wav Media (Alvin Dean Warren). All rights reserved.`,
+    copyright_notice: `© ${new Date().getFullYear()} ${writer_name} / Nu Wav Media LLC (Alvin Dean Warren). All rights reserved.`,
     genre: genre || null,
     topic: topic || null,
     song_id: song_id || null,
