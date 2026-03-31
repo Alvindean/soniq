@@ -2535,7 +2535,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <li class="upgrade-feature">Version history</li>
     </ul>
 
-    <div class="upgrade-urgency" id="upgrade-urgency">Founding spots are going fast — <span id="upgrade-urgency-claimed">…</span> of 500 claimed</div>
+    <div class="upgrade-urgency" id="upgrade-urgency">Founding spots are going fast — <span id="upgrade-urgency-claimed">…</span> <span id="upgrade-urgency-suffix">of 500 claimed</span></div>
 
     <div class="upgrade-actions">
       <a id="upgrade-cta-btn" href="/app#account" class="upgrade-cta-btn">Lock In <span id="upgrade-cta-price">$10</span> Forever →</a>
@@ -6804,6 +6804,7 @@ async function openUpgradeModal() {
     const ctaPrice       = document.getElementById('upgrade-cta-price');
     const urgency        = document.getElementById('upgrade-urgency');
     const urgencyClaimed = document.getElementById('upgrade-urgency-claimed');
+    const urgencySuffix  = document.getElementById('upgrade-urgency-suffix');
     if (data.tier === 1) {
       tierWrap.className   = 'upgrade-tier-wrap tier1';
       tierIcon.textContent = '🔥';
@@ -6815,6 +6816,7 @@ async function openUpgradeModal() {
       if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn tier1';
       if (ctaPrice) ctaPrice.textContent = '$5';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 - (data.spots_left ?? 500);
+      if (urgencySuffix) urgencySuffix.textContent = 'of 500 claimed';
       if (urgency) urgency.style.display = '';
     } else if (data.tier === 2) {
       tierWrap.className   = 'upgrade-tier-wrap';
@@ -6827,6 +6829,7 @@ async function openUpgradeModal() {
       if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
       if (ctaPrice) ctaPrice.textContent = '$10';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - (data.spots_left ?? 1500));
+      if (urgencySuffix) urgencySuffix.textContent = 'of 2000 founding spots claimed';
       if (urgency) urgency.style.display = '';
     } else {
       tierWrap.className   = 'upgrade-tier-wrap';
