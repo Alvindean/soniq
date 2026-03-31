@@ -24,6 +24,7 @@ function escHtml(str) {
 const ALLOWED_ORIGINS = [
   'https://www.mysoniq.com',
   'https://mysoniq.com',
+  'https://soniq.vercel.app',
   'https://project-47rl2-git-main-alvin-deans-projects.vercel.app',
 ];
 
