@@ -4,24 +4,55 @@
  * POST /api/generate
  */
 
-const rateLimitMap = new Map();
-const RATE_LIMIT = 10;
-const RATE_WINDOW = 60 * 60 * 1000; // 1 hour
+const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-function checkRateLimit(ip) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    // Delete stale entry, create fresh one
-    rateLimitMap.delete(ip);
-    const fresh = { count: 1, resetAt: now + RATE_WINDOW };
-    rateLimitMap.set(ip, fresh);
-    return { allowed: true, minutesLeft: Math.ceil(RATE_WINDOW / 60000), count: 1 };
-  }
-  entry.count++;
-  const remaining = Math.ceil((entry.resetAt - now) / 60000);
-  return { allowed: entry.count <= RATE_LIMIT, minutesLeft: remaining, count: entry.count };
+const { createClient } = require('@supabase/supabase-js');
+
+function getSupabaseClient(token) {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_ANON_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, {
+    global: { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+  });
 }
+
+async function redisGet(key) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/get/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const d = await r.json();
+    return d.result;
+  } catch (e) {
+    console.error('Redis GET error:', e.message);
+    return null;
+  }
+}
+
+async function redisIncrExpire(key, ttl) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
+  try {
+    await fetch(`${UPSTASH_URL}/pipeline`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${UPSTASH_TOKEN}` },
+      body: JSON.stringify([
+        ['INCR', key],
+        ['EXPIRE', key, ttl]
+      ])
+    });
+  } catch (e) {
+    console.error('Redis INCR/EXPIRE error:', e.message);
+  }
+}
+
+function getTodayDate() {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+const PLAN_LIMITS = { free: 3, pro: Infinity, studio: Infinity, founding: Infinity };
 
 async function callAnthropic(apiKey, messages, system, max_tokens) {
   const payload = {model:'claude-sonnet-4-20250514', max_tokens, messages};
@@ -84,9 +115,51 @@ module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({error:'Method not allowed'});
+
+  // ── Auth check ──────────────────────────────────────────────────
+  const token = (req.headers.authorization || '').replace('Bearer ', '').trim();
+  if (!token) {
+    return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
+  }
+
+  const supabase = getSupabaseClient(token);
+  if (!supabase) return res.status(503).json({ error: 'auth service unavailable' });
+
+  const { data: { user }, error: authErr } = await supabase.auth.getUser();
+  if (authErr || !user) {
+    return res.status(401).json({ error: 'auth_required', message: 'Sign in to generate songs' });
+  }
+
+  // ── Plan lookup + rate limiting ─────────────────────────────────
+  let plan = 'free';
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('plan')
+      .eq('id', user.id)
+      .single();
+    if (profile?.plan) plan = profile.plan;
+  } catch (e) {
+    console.error('Profile fetch error:', e.message);
+  }
+
+  const limit = PLAN_LIMITS[plan] ?? 3;
+  if (isFinite(limit)) {
+    const dateKey = getTodayDate();
+    const redisKey = `soniq:ratelimit:daily:${user.id}:${dateKey}`;
+    const current = parseInt(await redisGet(redisKey) || '0', 10);
+    if (current >= limit) {
+      return res.status(429).json({
+        error: 'limit_reached',
+        message: `You've used your ${limit} free songs today. Upgrade for unlimited generations.`,
+        limit,
+        plan
+      });
+    }
+  }
 
   let body;
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
@@ -96,7 +169,7 @@ module.exports = async function handler(req, res) {
   const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
 
   if (userKey) {
-    // User-supplied key: skip rate limit, use their key directly
+    // User-supplied key: use their key directly
     const { messages, system } = body;
     const max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
     if (!messages?.length) return res.status(400).json({error:'messages required'});
@@ -108,12 +181,6 @@ module.exports = async function handler(req, res) {
       return res.status(502).json({error: 'API key rejected — check it is valid at console.anthropic.com'});
     }
   }
-
-  const ip = req.headers['x-real-ip'] ||
-    (req.headers['x-forwarded-for'] || '').split(',').pop().trim() ||
-    req.socket?.remoteAddress || 'unknown';
-  const rl = checkRateLimit(ip);
-  if (!rl.allowed) return res.status(429).json({error: `Rate limit exceeded. Try again in ${rl.minutesLeft} minutes.`});
 
   const anthropicKey = process.env.ANTHROPIC_API_KEY;
   const openrouterKey = process.env.OPENROUTER_API_KEY;
@@ -158,6 +225,11 @@ module.exports = async function handler(req, res) {
   if (anthropicKey) {
     try {
       const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
+      // Increment rate-limit counter after successful generation
+      if (isFinite(limit)) {
+        const dateKey = getTodayDate();
+        redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
+      }
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
       console.error('Anthropic failed, trying fallback:', err.message);
@@ -168,6 +240,11 @@ module.exports = async function handler(req, res) {
   if (openrouterKey) {
     try {
       const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
+      // Increment rate-limit counter after successful generation
+      if (isFinite(limit)) {
+        const dateKey = getTodayDate();
+        redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
+      }
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
       if (err.message === 'CREDITS_LOW') {

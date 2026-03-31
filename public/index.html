@@ -1249,6 +1249,93 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   color: #a78bfa;
 }
 
+/* ══════════════════════════════════════
+   ONBOARDING
+══════════════════════════════════════ */
+.ob-backdrop{position:fixed;inset:0;z-index:8800;background:rgba(0,0,0,0.72);pointer-events:none;opacity:0;transition:opacity 0.3s ease;}
+.ob-backdrop.on{opacity:1;pointer-events:auto;}
+.ob-highlight{position:fixed;z-index:8900;border:2px solid var(--amber);border-radius:var(--r2);box-shadow:0 0 0 4px rgba(245,192,0,0.18),0 0 32px rgba(245,192,0,0.22);pointer-events:none;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);}
+.ob-tip{position:fixed;z-index:9000;background:var(--s2);border:1px solid var(--amberline);border-radius:var(--r3);padding:16px 18px 14px;max-width:300px;min-width:220px;box-shadow:0 8px 32px rgba(0,0,0,0.5);pointer-events:auto;animation:pgIn 0.25s ease;}
+.ob-tip-step{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.12em;color:var(--amber);margin-bottom:6px;}
+.ob-tip-body{font-size:13px;color:var(--tx1);line-height:1.55;font-weight:500;margin-bottom:14px;}
+.ob-tip-body strong{color:var(--amber);}
+.ob-tip-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.ob-dots{display:flex;gap:5px;}
+.ob-dot{width:7px;height:7px;border-radius:50%;background:var(--s5);border:1px solid var(--b3);transition:all 0.2s;}
+.ob-dot.on{background:var(--amber);border-color:var(--amber);}
+.ob-btn{padding:7px 18px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all 0.15s;}
+.ob-btn:hover{background:#ffc820;}
+.ob-skip{font-size:11px;color:var(--tx4);cursor:pointer;background:none;border:none;font-family:var(--font);transition:color 0.15s;padding:0;}
+.ob-skip:hover{color:var(--tx2);}
+/* Empty state */
+.empty-state{padding:40px 20px 32px;text-align:center;display:none;margin-bottom:20px;}
+.empty-state.show{display:block;animation:pgIn 0.3s ease;}
+.es-headline{font-size:28px;font-weight:700;letter-spacing:-0.6px;color:var(--tx1);line-height:1.2;margin-bottom:8px;}
+.es-headline span{color:var(--amber);}
+.es-sub{font-size:14px;color:var(--tx3);max-width:420px;margin:0 auto 28px;line-height:1.6;}
+.es-chips-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--tx3);margin-bottom:12px;}
+.es-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:620px;margin:0 auto;}
+.es-chip{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:11px 18px;font-size:13px;color:var(--tx2);cursor:pointer;transition:all 0.15s;text-align:left;line-height:1.45;font-weight:500;}
+.es-chip:hover{border-color:var(--amberline);background:var(--s3);color:var(--tx1);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,0.28);}
+@media(max-width:580px){.es-chips{flex-direction:column;align-items:stretch;}.es-chip{text-align:center;}}
+/* Progress indicator */
+.gen-progress{display:none;align-items:center;gap:8px;padding:6px 14px;background:var(--s3);border:1px solid var(--b2);border-radius:99px;font-size:12px;font-weight:600;color:var(--tx2);white-space:nowrap;}
+.gen-progress.show{display:inline-flex;}
+.gp-pips{display:flex;gap:4px;align-items:center;}
+.gp-pip{width:8px;height:8px;border-radius:50%;background:var(--s5);border:1px solid var(--b3);transition:all 0.3s ease;}
+.gp-pip.used{background:var(--amber);border-color:var(--amber);}
+.gp-pip.current{background:var(--amber);border-color:var(--amber);box-shadow:0 0 6px rgba(245,192,0,0.5);animation:pipPulse 1.2s ease-in-out infinite;}
+@keyframes pipPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.35);}}
+/* Post-gen nudge */
+.gen-nudge{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);z-index:9980;background:linear-gradient(135deg,#1a1408,var(--s3));border:1px solid var(--amberline);border-radius:var(--r4);padding:12px 20px 12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.55);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;max-width:480px;white-space:nowrap;}
+.gen-nudge.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
+.gn-icon{font-size:20px;flex-shrink:0;line-height:1;}
+.gn-text{font-size:13px;color:var(--tx1);font-weight:500;flex:1;}
+.gn-text strong{color:var(--amber);}
+.gn-link{font-size:12px;font-weight:700;color:var(--amber);text-decoration:none;white-space:nowrap;flex-shrink:0;background:var(--amberbg);border:1px solid var(--amberline);padding:4px 12px;border-radius:99px;transition:all 0.15s;}
+.gn-link:hover{background:var(--amber);color:#08080a;}
+.gn-close{background:none;border:none;color:var(--tx4);font-size:14px;cursor:pointer;padding:0 0 0 6px;line-height:1;flex-shrink:0;transition:color 0.15s;}
+.gn-close:hover{color:var(--tx1);}
+@media(max-width:600px){.gen-nudge{bottom:80px;max-width:calc(100vw - 32px);white-space:normal;}}
+
+/* ── UPGRADE MODAL ──────────────────────────── */
+#upgrade-modal{position:fixed;inset:0;z-index:960;background:rgba(0,0,0,.90);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box;overflow-y:auto}
+#upgrade-modal.open{display:flex;animation:pgIn 0.25s ease}
+.upgrade-card{background:linear-gradient(160deg,#0f0f1a 0%,#12101e 60%,#0d1020 100%);border:1px solid rgba(168,146,255,0.22);border-radius:22px;padding:0;width:100%;max-width:480px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.6),0 0 0 1px rgba(168,146,255,0.1),inset 0 1px 0 rgba(255,255,255,0.04);position:relative}
+.upgrade-glow{position:absolute;top:-80px;left:50%;transform:translateX(-50%);width:340px;height:200px;background:radial-gradient(ellipse,rgba(168,146,255,0.18) 0%,transparent 70%);pointer-events:none}
+.upgrade-top{padding:34px 32px 24px;text-align:center;position:relative}
+.upgrade-eyebrow{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:6px}
+.upgrade-eyebrow::before,.upgrade-eyebrow::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(168,146,255,0.3))}
+.upgrade-eyebrow::after{background:linear-gradient(90deg,rgba(168,146,255,0.3),transparent)}
+.upgrade-headline{font-size:26px;font-weight:800;color:var(--tx1);letter-spacing:-0.4px;line-height:1.15;margin-bottom:10px}
+.upgrade-sub{font-size:14px;color:var(--tx2);line-height:1.6;max-width:360px;margin:0 auto}
+.upgrade-tier-wrap{margin:24px 32px 0;border-radius:14px;overflow:hidden;border:1px solid rgba(168,146,255,0.3);background:rgba(168,146,255,0.05)}
+.upgrade-tier-wrap.tier1{border-color:rgba(251,146,60,0.4);background:rgba(251,146,60,0.05)}
+.upgrade-tier{padding:18px 22px;display:flex;align-items:center;gap:14px}
+.upgrade-tier-icon{font-size:26px;line-height:1;flex-shrink:0}
+.upgrade-tier-body{flex:1;min-width:0}
+.upgrade-tier-name{font-size:16px;font-weight:800;color:var(--tx1);letter-spacing:-.2px;margin-bottom:2px}
+.upgrade-tier-name .price-forever{font-size:13px;font-weight:700;color:var(--violet);margin-left:6px}
+.upgrade-tier-name.tier1 .price-forever{color:#fb923c}
+.upgrade-tier-spot{font-size:11px;font-weight:600;color:var(--tx3);margin-top:1px}
+.upgrade-tier-badge{font-size:9px;font-weight:700;padding:3px 9px;border-radius:99px;flex-shrink:0;letter-spacing:.05em;text-transform:uppercase;background:rgba(168,146,255,0.15);border:1px solid rgba(168,146,255,0.35);color:var(--violet)}
+.upgrade-tier-badge.tier1{background:rgba(251,146,60,0.15);border-color:rgba(251,146,60,0.35);color:#fb923c}
+.upgrade-features{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin:20px 32px 0;padding:0}
+.upgrade-feature{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--tx2);font-weight:500}
+.upgrade-feature::before{content:'✓';color:#3ee896;font-weight:700;font-size:11px;flex-shrink:0;width:14px}
+.upgrade-urgency{margin:20px 32px 0;background:rgba(245,192,0,0.07);border:1px solid rgba(245,192,0,0.18);border-radius:8px;padding:8px 14px;font-size:11px;color:var(--amber);font-weight:600;display:flex;align-items:center;gap:6px;justify-content:center}
+.upgrade-urgency::before{content:'⏳';font-size:13px}
+.upgrade-actions{padding:22px 32px 28px;display:flex;flex-direction:column;gap:10px}
+.upgrade-cta-btn{display:flex;align-items:center;justify-content:center;gap:10px;padding:15px 28px;border-radius:14px;border:none;background:linear-gradient(135deg,#7c3aed,#9d5af5);color:#fff;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:.01em;cursor:pointer;transition:all .2s;box-shadow:0 4px 24px rgba(124,58,237,0.38);text-decoration:none}
+.upgrade-cta-btn.tier1{background:linear-gradient(135deg,#ea580c,#f97316);box-shadow:0 4px 24px rgba(234,88,12,0.38)}
+.upgrade-cta-btn:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 8px 36px rgba(124,58,237,0.5)}
+.upgrade-cta-btn.tier1:hover{box-shadow:0 8px 36px rgba(234,88,12,0.5)}
+.upgrade-dismiss{background:none;border:none;color:var(--tx4);font-size:13px;font-weight:500;cursor:pointer;padding:4px;font-family:var(--font);transition:color .15s;text-align:center}
+.upgrade-dismiss:hover{color:var(--tx2)}
+/* Upgrade button in nav */
+#nav-upgrade-btn{font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid rgba(168,146,255,0.4);background:rgba(168,146,255,0.08);color:var(--violet);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font);letter-spacing:.03em}
+#nav-upgrade-btn:hover{background:rgba(168,146,255,0.16);border-color:var(--violet);color:#fff}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -1256,6 +1343,19 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <body>
 <div class="wrap">
 <div class="toast" id="toast"></div>
+
+<!-- ONBOARDING OVERLAY -->
+<div class="ob-backdrop" id="ob-backdrop" onclick="completeOnboarding()"></div>
+<div class="ob-highlight" id="ob-highlight" style="display:none"></div>
+<div class="ob-tip" id="ob-tip" style="display:none"></div>
+
+<!-- POST-GENERATION NUDGE -->
+<div class="gen-nudge" id="gen-nudge">
+  <span class="gn-icon">🔥</span>
+  <span class="gn-text" id="gn-text">Song <strong>1</strong> generated. <strong>2 left</strong> today.</span>
+  <a class="gn-link" href="#" onclick="event.preventDefault();openUpgradeModal();closeGenNudge()">Go Unlimited →</a>
+  <button class="gn-close" onclick="closeGenNudge()" title="Dismiss">✕</button>
+</div>
 
 <!-- API KEY BANNER -->
 <div id="key-banner">
@@ -1304,6 +1404,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
+      <button id="nav-upgrade-btn" onclick="openUpgradeModal()" style="display:none" title="Upgrade to Pro">✦ Upgrade</button>
       <button id="nav-auth-btn" onclick="openAuth()" class="btn btn-sm" style="font-size:11px;padding:4px 10px">Sign In</button>
       <button id="nav-signout-btn" onclick="authSignOut()" class="btn btn-sm" style="display:none;font-size:11px;padding:4px 10px;color:var(--tx3)">Sign Out</button>
     </div>
@@ -1318,6 +1419,18 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div id="album-track-banner" style="display:none;background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r2);padding:10px 16px;font-size:12px;font-weight:600;color:var(--amber);margin-bottom:12px;align-items:center;justify-content:space-between;gap:10px">
     <span id="album-track-banner-text"></span>
     <button onclick="S.albumTrack=null;document.getElementById('album-track-banner').style.display='none'" style="background:none;border:none;color:var(--amber);cursor:pointer;font-size:14px;line-height:1">✕</button>
+  </div>
+
+  <!-- EMPTY STATE (shown to new users with 0 songs) -->
+  <div class="empty-state" id="empty-state">
+    <div class="es-headline">Your <span>first hit</span> starts here.</div>
+    <div class="es-sub">Pick a concept below or write your own — a complete song with lyrics, production brief, theory and visuals in seconds.</div>
+    <div class="es-chips-label">Try one of these →</div>
+    <div class="es-chips">
+      <button class="es-chip" onclick="prefillConcept('A late night drive thinking about someone I left behind')">A late night drive thinking about someone I left behind</button>
+      <button class="es-chip" onclick="prefillConcept('Making it out and never looking back')">Making it out and never looking back</button>
+      <button class="es-chip" onclick="prefillConcept('Finding peace after years of chaos')">Finding peace after years of chaos</button>
+    </div>
   </div>
 
   <!-- STUDIO INPUT CARD -->
@@ -2376,6 +2489,48 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">ISRC: <code id="pub-confirm-isrc" style="color:var(--amber)"></code></div>
       <p style="font-size:11px;color:var(--tx3);margin-bottom:16px">Our team will register this with your PRO within 5 business days. You'll receive a confirmation email once it's live.</p>
       <button class="btn" onclick="closePublish()">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div id="upgrade-modal" onclick="if(event.target===this)closeUpgradeModal()">
+  <div class="upgrade-card">
+    <div class="upgrade-glow"></div>
+    <div class="upgrade-top">
+      <div class="upgrade-eyebrow">Unlock SONIQ Pro</div>
+      <div class="upgrade-headline">You've found your flow.</div>
+      <div class="upgrade-sub">3 songs isn't enough for a real session. Unlock unlimited.</div>
+    </div>
+
+    <!-- Tier display — populated dynamically by openUpgradeModal() -->
+    <div id="upgrade-tier-container" class="upgrade-tier-wrap">
+      <div class="upgrade-tier">
+        <div class="upgrade-tier-icon" id="upgrade-tier-icon">⚡</div>
+        <div class="upgrade-tier-body">
+          <div class="upgrade-tier-name" id="upgrade-tier-name">
+            Founding Member<span class="price-forever" id="upgrade-price-label">$10/mo forever</span>
+          </div>
+          <div class="upgrade-tier-spot" id="upgrade-tier-spot">Loading spots…</div>
+        </div>
+        <div class="upgrade-tier-badge" id="upgrade-tier-badge">Founding</div>
+      </div>
+    </div>
+
+    <ul class="upgrade-features" style="list-style:none;padding:0">
+      <li class="upgrade-feature">Unlimited generations</li>
+      <li class="upgrade-feature">Full production briefs</li>
+      <li class="upgrade-feature">Music theory layer</li>
+      <li class="upgrade-feature">Visual briefs</li>
+      <li class="upgrade-feature">Sync metadata</li>
+      <li class="upgrade-feature">Version history</li>
+    </ul>
+
+    <div class="upgrade-urgency" id="upgrade-urgency">Founding spots are going fast — <span id="upgrade-urgency-claimed">…</span> of 500 claimed</div>
+
+    <div class="upgrade-actions">
+      <a id="upgrade-cta-btn" href="/app#account" class="upgrade-cta-btn">Lock In <span id="upgrade-cta-price">$10</span> Forever →</a>
+      <button class="upgrade-dismiss" onclick="closeUpgradeModal()">Maybe later</button>
     </div>
   </div>
 </div>
@@ -3762,14 +3917,27 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal) {
 }
 
 async function callServerStream(action, params, onChunk, signal) {
+  const headers = {'Content-Type': 'application/json'};
+  if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
   const res = await fetch('/api/stream', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers,
     body: JSON.stringify({ action, params, userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined }),
     signal
   });
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
+    if (res.status === 401) {
+      openAuth('Create your free account to generate your song — 3 free songs every day');
+      const err = new Error(e.message || 'Sign in to generate songs');
+      err.code = 'auth_required';
+      throw err;
+    }
+    if (res.status === 429) {
+      const err = new Error(e.message || 'Daily limit reached — upgrade for unlimited songs');
+      err.code = 'limit_reached';
+      throw err;
+    }
     throw new Error(e.error || 'API error ' + res.status);
   }
   // Read Lucky meta from header if present
@@ -3806,9 +3974,11 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
 
   // On Vercel — use secure server-side proxy
   if (isVercel) {
+    const genHeaders = {'Content-Type': 'application/json'};
+    if (S.session?.access_token) genHeaders['Authorization'] = 'Bearer ' + S.session.access_token;
     const res = await fetch('/api/generate', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: genHeaders,
       body: JSON.stringify({
         messages: [{role:'user', content:prompt}],
         system: systemPrompt || undefined,
@@ -3816,6 +3986,18 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
       })
     });
     const ct = res.headers.get('content-type') || '';
+    if (res.status === 401) {
+      openAuth('Create your free account to generate your song — 3 free songs every day');
+      const err = new Error('Sign in to generate songs');
+      err.code = 'auth_required';
+      throw err;
+    }
+    if (res.status === 429) {
+      const e = await res.json().catch(()=>({}));
+      const err = new Error(e.message || 'Daily limit reached — upgrade for unlimited songs');
+      err.code = 'limit_reached';
+      throw err;
+    }
     if (!ct.includes('application/json')) {
       throw new Error('Proxy error ' + res.status + ' — check ANTHROPIC_API_KEY or OPENROUTER_API_KEY is set in Vercel Environment Variables, then Redeploy.');
     }
@@ -4323,14 +4505,20 @@ const LUCKY_VOCALS=['Male vocals','Female vocals','Duet M/F','Raspy / Gritty mal
 
 function pickRandom(arr){return arr[Math.floor(Math.random()*arr.length)];}
 
-function apiErrHtml(msg) {
+function apiErrHtml(msg, errCode) {
   const m = msg.toLowerCase();
+  const isAuthRequired = errCode === 'auth_required' || m.includes('sign in to generate');
+  const isLimitReached = errCode === 'limit_reached' || m.includes('limit_reached');
   const isCredits = m.includes('credit');
   const isKey = m.includes('api key') || m.includes('configured') || m.includes('rejected') || m.includes('authentication');
   const isRate = m.includes('rate limit') || m.includes('429');
   const isOverload = m.includes('overloaded') || m.includes('529');
   let hint = '';
-  if (isCredits) {
+  if (isAuthRequired) {
+    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account to generate your song — 3 free songs every day\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
+  } else if (isLimitReached) {
+    hint = '<br><br>You\'ve used your 3 free songs today. Upgrade to Pro or lock in a Founding tier price.<br><button class="btn btn-amber" onclick="showFoundingUpsell()" style="margin-top:8px;font-size:13px">View Founding Offer</button>';
+  } else if (isCredits) {
     hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
   } else if (isKey) {
     hint = '<br><br><strong>Fix:</strong> Vercel → your project → Settings → Environment Variables → add <code style="background:var(--s3);padding:1px 5px;border-radius:3px">ANTHROPIC_API_KEY</code> → Redeploy';
@@ -4423,6 +4611,11 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 }
 
 function feelLucky(){
+  if (!S.user) {
+    openAuth('Create your free account to generate your song — 3 free songs every day');
+    S._pendingGenerate = 'lucky';
+    return;
+  }
   const luckyBtn = document.getElementById('lucky-btn');
   if (luckyBtn?.disabled) return;
   btnLoad('lucky-btn', 'Spinning…');
@@ -4674,6 +4867,11 @@ function loadLuckyHistItem(i){
 const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
 
 async function generateSong(){
+  if (!S.user) {
+    openAuth('Create your free account to generate your song — 3 free songs every day');
+    S._pendingGenerate = 'song';
+    return;
+  }
   const genBtn = document.getElementById('gen-btn');
   if (genBtn?.disabled) return; // prevent double-fire
   btnLoad('gen-btn', 'Writing song…');
@@ -4932,8 +5130,16 @@ DIRECTOR NOTES:
     parseSongResult(raw,genreLabel,topic);
   }catch(e){
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
+    if(e.code==='auth_required'){btnDone('gen-btn');return;}
+    if(e.code==='limit_reached'){
+      document.getElementById('res-title').textContent='Daily Limit Reached';
+      document.getElementById('res-lyrics-text').innerHTML=apiErrHtml(e.message,'limit_reached');
+      btnDone('gen-btn');
+      showFoundingUpsell();
+      return;
+    }
     document.getElementById('res-title').textContent='Error';
-    document.getElementById('res-lyrics-text').innerHTML=apiErrHtml(e.message);
+    document.getElementById('res-lyrics-text').innerHTML=apiErrHtml(e.message, e.code);
     toast('⚠️ '+e.message, 4000);
   }
   btnDone('gen-btn');
@@ -5658,6 +5864,11 @@ function initBuilder(){
 }
 
 async function generateFromBuilder(){
+  if (!S.user) {
+    openAuth('Create your free account to generate your song — 3 free songs every day');
+    S._pendingGenerate = 'builder';
+    return;
+  }
   const prompt = document.getElementById('pb-preview')?.textContent||'';
   if(!prompt||prompt.includes('Select options')){toast('Build a prompt first — select at least a genre');return;}
   const topic = document.getElementById('pb-topic')?.value?.trim() || 'an evocative instrumental journey';
@@ -5809,6 +6020,11 @@ function showFusion(g1,g2){
 }
 
 async function generateFusion(){
+  if (!S.user) {
+    openAuth('Create your free account to generate your song — 3 free songs every day');
+    S._pendingGenerate = 'fusion';
+    return;
+  }
   const {g1,g2,fd}=S.currentFusion||{};
   if(!g1)return;
   const prompt=`Write a complete ${g1} × ${g2} genre fusion song.\n\n${fd?`Fusion style: ${fd.name}\nFormula: ${fd.formula}`:`Experimental fusion of ${g1} and ${g2}. Define what makes it work and write accordingly.`}\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics with all section tags]\n\nSONG PROMPT:\n[under 440 chars, core genre, instruments (4-5), BPM, tempo, vocal descriptor, counter-melody device, no artist names]\n\nFUSION EXPLANATION:\n[2-3 sentences on how the two genres combine and what makes it work]`;
@@ -6506,7 +6722,21 @@ function copyCoachFeedback() {
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
-    if (event === 'SIGNED_IN') { closeAuth(); loadFoundingStatus(); }
+    if (event === 'SIGNED_IN') {
+      closeAuth();
+      loadFoundingStatus();
+      // Resume any generation that was blocked by the auth gate
+      if (S._pendingGenerate) {
+        const pending = S._pendingGenerate;
+        S._pendingGenerate = null;
+        setTimeout(() => {
+          if (pending === 'song') generateSong();
+          else if (pending === 'builder') generateFromBuilder();
+          else if (pending === 'fusion') generateFusion();
+          else if (pending === 'lucky') feelLucky();
+        }, 300);
+      }
+    }
     if (event === 'PASSWORD_RECOVERY') {
       openPasswordResetModal();
     }
@@ -6599,6 +6829,45 @@ function openAuth(reason) {
   document.getElementById('auth-error').style.display = 'none';
   document.getElementById('auth-modal').style.display = 'block';
   loadFoundingStatus();
+}
+
+async function showFoundingUpsell() {
+  // Build or reuse a upsell modal
+  let modal = document.getElementById('founding-upsell-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'founding-upsell-modal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:960;overflow-y:auto;padding:16px;box-sizing:border-box';
+    modal.innerHTML = `<div class="card" style="max-width:480px;margin:80px auto;position:relative">
+      <button onclick="document.getElementById('founding-upsell-modal').style.display='none'" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:20px;cursor:pointer;line-height:1">×</button>
+      <div class="ctitle" style="margin-bottom:6px">You've hit your daily limit</div>
+      <div style="color:var(--tx2);font-size:13px;margin-bottom:20px">3 free songs used today. Lock in a founding rate before spots run out — these prices go up when we launch.</div>
+      <div id="fu-founding-info" style="margin-bottom:20px;padding:14px;border-radius:10px;background:var(--s2);border:1px solid var(--brd);font-size:13px;color:var(--tx2)">Loading offer…</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <a href="https://buy.stripe.com/soniq-founding" target="_blank" class="btn btn-amber" style="text-align:center;padding:12px;font-size:14px;font-weight:700;text-decoration:none">Lock In Founding Price →</a>
+        <button onclick="document.getElementById('founding-upsell-modal').style.display='none'" style="background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:4px">Maybe later</button>
+      </div>
+    </div>`;
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'block';
+  // Load live founding counter
+  try {
+    const res = await fetch('/api/founding');
+    if (res.ok) {
+      const data = await res.json();
+      const infoEl = document.getElementById('fu-founding-info');
+      if (infoEl) {
+        if (data.tier === 1) {
+          infoEl.innerHTML = '🔥 <strong style="color:#fb923c">Early Founder — $5/mo forever</strong><br><span style="font-size:12px">' + (data.spots_left ?? '...') + ' spots remaining at this price. After that: $10/mo tier.</span>';
+        } else if (data.tier === 2) {
+          infoEl.innerHTML = '⚡ <strong style="color:#a78bfa">Founding Member — $10/mo forever</strong><br><span style="font-size:12px">' + (data.spots_left ?? '...') + ' spots remaining at this price. After that: $19/mo standard.</span>';
+        } else {
+          infoEl.innerHTML = '🚀 <strong>Pro — $19/mo</strong><br><span style="font-size:12px">Unlimited songs every day. Cancel anytime.</span>';
+        }
+      }
+    }
+  } catch (e) {}
 }
 
 function closeAuth() {
