@@ -2580,16 +2580,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <!-- 3-tier plan cards -->
     <div class="upgrade-plans">
-      <div class="uplan" id="uplan-starter" onclick="startCheckoutPlan('starter')">
-        <div class="uplan-name">Starter</div>
-        <div class="uplan-price">$9<span>/mo</span></div>
+      <div class="uplan" id="uplan-starter" onclick="startCheckoutPlan('founding_t2')">
+        <div class="uplan-name">Entry</div>
+        <div class="uplan-price">$9.99<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>Unlimited songs</li>
+          <li>10 songs / month</li>
           <li>All 24 genres</li>
           <li>Visual Prompts</li>
           <li>Full production brief</li>
+          <li>75+ quality score</li>
           <li>Theory Analysis</li>
-          <li>Social Media captions</li>
         </ul>
         <div class="uplan-cta">Get Started →</div>
       </div>
@@ -2598,10 +2598,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="uplan-name">Pro</div>
         <div class="uplan-price">$19<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>Everything in Starter</li>
+          <li>20 songs / month</li>
+          <li>81+ quality score</li>
           <li>Album Planner</li>
           <li>Rap Lab</li>
-          <li>Version History</li>
           <li>Batch ×3 generate</li>
           <li>Sync metadata</li>
         </ul>
@@ -2611,9 +2611,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="uplan-name">Studio</div>
         <div class="uplan-price">$49<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>Everything in Pro</li>
+          <li>50 songs / month</li>
+          <li>85+ quality score</li>
+          <li>100% publishing yours</li>
           <li>PDF Export</li>
-          <li>Shareable briefs</li>
           <li>Artist Voice Profile</li>
           <li>Priority API</li>
         </ul>
@@ -9065,7 +9066,7 @@ function calcHookScore(prefix) {
 // Only studio / studio_annual plans can access Studio features.
 // ═══════════════════════════════════════════════════════
 const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
-const PAID_PLANS   = new Set(['starter','starter_annual','pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+const PAID_PLANS   = new Set(['pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
 // Genres available on free plan — premium genres require Starter+
 const FREE_GENRES  = new Set(['pop','hiphop','rnb','rock','country','edm']);
 
@@ -10027,7 +10028,7 @@ function _dbgErr(ctx,msg){
 const OB_KEY = 'soniq:onboarding:v1:complete';
 const OB_DAILY_KEY = 'soniq:daily:songs';
 const OB_DAILY_DATE_KEY = 'soniq:daily:date';
-const OB_FREE_LIMIT = 1;
+const OB_FREE_LIMIT = 3; // lifetime trial songs
 
 const OB_STEPS = [
   {
@@ -10166,8 +10167,8 @@ function updateProgressIndicator() {
   var count = getDailySongCount();
   prog.classList.add('show');
   label.textContent = count === 0
-    ? (OB_FREE_LIMIT + ' free songs today')
-    : ('Song ' + count + ' of ' + OB_FREE_LIMIT + ' today');
+    ? (OB_FREE_LIMIT + ' free songs to try')
+    : ('Song ' + count + ' of ' + OB_FREE_LIMIT + ' free');
   for (var i = 1; i <= OB_FREE_LIMIT; i++) {
     var pip = document.getElementById('gp-pip-' + i);
     if (!pip) continue;
@@ -10192,7 +10193,7 @@ function showGenNudge(songNum) {
   if (remaining > 0) {
     txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited from $9/mo.';
   } else {
-    txt.innerHTML = 'You’ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong> for today. Upgrade to keep creating.';
+    txt.innerHTML = ‘You\’ve used all <strong>’ + OB_FREE_LIMIT + ‘ free songs</strong>. Upgrade to keep creating.’;
   }
   el.classList.add('show');
   if (_nudgeTimer) clearTimeout(_nudgeTimer);
