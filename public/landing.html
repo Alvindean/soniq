@@ -1122,7 +1122,10 @@
     /* ── H1 GENRE FLIP ── */
     .h1-genre-flip {
       display: inline-block;
-      color: var(--violet-light);
+      background: linear-gradient(135deg, #d4af37, #f0e68c, #d4af37);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       position: relative;
       transition: opacity 0.25s ease, transform 0.25s ease;
     }
