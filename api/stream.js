@@ -335,8 +335,10 @@ module.exports = async function handler(req, res) {
   // Helper: increment rate limit after successful stream
   const recordUsage = () => {
     if (!req._adminBypass && isFinite(limit)) {
-      const dateKey = getTodayDate();
-      redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
+      const isMonthly = MONTHLY_LIMIT_PLANS.has(plan);
+      const periodKey = isMonthly ? getThisMonth() : getTodayDate();
+      const ttl       = isMonthly ? 32 * 24 * 3600 : 86400; // ~32 days or 1 day
+      redisIncrExpire(`soniq:ratelimit:${isMonthly ? 'monthly' : 'daily'}:${user.id}:${periodKey}`, ttl);
     }
   };
 
