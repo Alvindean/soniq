@@ -66,13 +66,13 @@ const PLAN_LIMITS = {
   starter_annual:      50,   // per month
   pro:                 100,  // per month
   pro_annual:          100,  // per month
-  studio:              500,  // per month
-  studio_annual:       500,  // per month
-  founding:            500,  // per month
-  founding_t1:         500,  // per month
-  founding_t1_annual:  500,  // per month
-  founding_t2:         500,  // per month
-  founding_t2_annual:  500,  // per month
+  studio:              200,  // per month
+  studio_annual:       200,  // per month
+  founding:            200,  // per month
+  founding_t1:         200,  // per month
+  founding_t1_annual:  200,  // per month
+  founding_t2:         200,  // per month
+  founding_t2_annual:  200,  // per month
 };
 
 // Plans that use monthly (not daily) counting

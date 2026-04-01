@@ -973,6 +973,49 @@
     }
     .spots-bar-label .spots-claimed { color: #a855f7; font-weight: 600; }
 
+    /* ── ENTERPRISE STRIP ── */
+    .enterprise-strip {
+      margin: 32px max(24px, calc((100vw - 1100px) / 2)) 0;
+      background: linear-gradient(135deg, #1a1030 0%, #0f172a 100%);
+      border: 1px solid #7c3aed44;
+      border-radius: 16px;
+      padding: 32px 40px;
+    }
+    .enterprise-strip-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 32px;
+      flex-wrap: wrap;
+    }
+    .enterprise-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #a855f7;
+      margin-bottom: 6px;
+    }
+    .enterprise-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+    .enterprise-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    .enterprise-cta {
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    @media (max-width: 600px) {
+      .enterprise-strip { padding: 24px 20px; }
+      .enterprise-cta { width: 100%; text-align: center; }
+    }
+
     /* ── STATS ── */
     .stats {
       background: var(--bg3);
@@ -1644,7 +1687,7 @@
         <div class="pricing-period">billed monthly</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>500 songs / month</li>
+          <li>200 songs / month</li>
           <li>Everything in Pro</li>
           <li>100% publishing — split waived</li>
           <li>PDF Export</li>
@@ -1656,6 +1699,19 @@
       </div>
 
     </div>
+
+    <!-- ENTERPRISE STRIP -->
+    <div class="enterprise-strip fade-in">
+      <div class="enterprise-strip-inner">
+        <div class="enterprise-strip-left">
+          <div class="enterprise-label">Enterprise</div>
+          <div class="enterprise-title">For labels, publishers, and agencies.</div>
+          <div class="enterprise-desc">Custom song volume · Negotiated publishing split · Team seats · API access · Dedicated account manager · White-label options</div>
+        </div>
+        <a href="mailto:info@mysoniq.com?subject=Enterprise%20Inquiry" class="btn btn-outline-violet enterprise-cta">Contact Us →</a>
+      </div>
+    </div>
+
     <p class="pricing-note" id="pricing-note-founding" style="display:none">🔥 Founding spots available — price locks in forever when you join.</p>
     <p style="text-align:center;color:var(--text-dim);font-size:0.8rem;margin-top:12px">Cancel anytime · No long-term contracts · Free plan always available</p>
   </section>
@@ -1836,9 +1892,9 @@
         { q: 'What is genre DNA?', a: 'Genre DNA is the set of structural rules that make a genre work — verse length, hook placement, BPM ranges, chord progressions, production conventions, and the outlier songs that broke the rules but still charted. SONIQ has this built in for 24 genres including Hip-Hop, R&B, Pop, Country, Electronic, Latin, Singer-Songwriter, and more.' },
         { q: 'Does SONIQ replace human songwriters?', a: 'No. SONIQ kills the blank page — it gives you the structural blueprint, the theory foundation, the production direction, and the sync metadata. The idea, the emotion, and the performance are still entirely yours. It\'s a tool for serious artists, not a replacement for them.' },
         { q: 'What does the publishing registration include?', a: 'Every song gets a copyright timestamp (SONIQ-ID). Pro and Founding members can register with BMI, ASCAP, or SESAC through Nu Wav Media LLC, receive an ISRC code, and enter a co-publishing agreement. Your writer\'s share is protected from song one.' },
-        { q: 'What are the paid plan options?', a: 'Starter is $9/mo — 50 songs/month, all 24 genres, Visual Prompts, Theory Analysis, and Social Media captions. Pro is $19/mo — 100 songs/month plus everything in Starter, Album Planner, Rap Lab, Version History, and batch generation. Studio is $49/mo — 500 songs/month, 100% publishing (split waived), PDF export, shareable briefs, and Artist Voice Profile.' },
+        { q: 'What are the paid plan options?', a: 'Starter is $9/mo — 50 songs/month, all 24 genres, Visual Prompts, Theory Analysis, and Social Media captions. Pro is $19/mo — 100 songs/month plus everything in Starter, Album Planner, Rap Lab, Version History, and batch generation. Studio is $49/mo — 200 songs/month, 100% publishing (split waived), PDF export, shareable briefs, and Artist Voice Profile. Enterprise is available for labels, publishers, and agencies — custom volume, negotiated publishing split, team seats, and API access. Contact info@mysoniq.com.' },
         { q: 'How does sync metadata work?', a: 'Music supervisors search catalogs by mood, BPM, instrumentation, and use case — not by listening to every song. SONIQ automatically generates mood tags, BPM range, instrumentation notes, and best-fit placement categories (TV drama, fitness, retail, trailer) with every song. Your catalog becomes searchable from day one.' },
-        { q: 'How many songs can I generate for free?', a: 'Free accounts generate 1 song per day across 6 core genres (Pop, Hip-Hop, R&B, Rock, Country, EDM). Starter gets 50 songs/month, Pro gets 100 songs/month, and Studio gets 500 songs/month — all with full genre DNA, music theory, and production brief included.' },
+        { q: 'How many songs can I generate for free?', a: 'Free accounts generate 1 song per day across 6 core genres (Pop, Hip-Hop, R&B, Rock, Country, EDM). Starter gets 50 songs/month, Pro gets 100 songs/month, Studio gets 200 songs/month — all with full genre DNA, music theory, and production brief included. Enterprise plans have custom volume.' },
       ];
 
       const list = document.getElementById('faq-list');
