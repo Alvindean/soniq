@@ -1119,6 +1119,18 @@
       100% { height: var(--h); opacity: 1; }
     }
 
+    /* ── H1 GENRE FLIP ── */
+    .h1-genre-flip {
+      display: inline-block;
+      color: var(--violet-light);
+      position: relative;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .h1-genre-flip.flipping {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+
     /* ── GENRE CYCLE ── */
     .hero-genre-cycle {
       display: inline-flex;
@@ -1335,7 +1347,7 @@
     <div class="hero-gradient"></div>
     <div class="hero-content">
       <div class="hero-badge">AI Songwriting Studio</div>
-      <h1>Your next hit, written in 30 seconds.</h1>
+      <h1>Write a Hit <span id="h1-genre" class="h1-genre-flip">Hip-Hop</span> in seconds.</h1>
       <p class="hero-sub">Genre DNA. Music theory. Production brief. Visual direction. Social media captions. Everything a real song needs — free to start.</p>
 
       <div class="hero-founding-pill" id="hero-founding-pill" style="display:none">
@@ -1885,20 +1897,23 @@
       } catch (e) { /* fail silently */ }
     })();
 
-    // ── GENRE CYCLE ──
+    // ── GENRE CYCLE (drives both "Now generating" pill + H1 flip) ──
     (function() {
-      const genres = ['Hip-Hop', 'R&B', 'Afrobeats', 'Pop', 'Country', 'Electronic', 'Latin', 'Drill', 'Singer-Songwriter', 'Trap Soul'];
-      const el = document.getElementById('genre-cycle-text');
-      if (!el) return;
+      const genres = ['Hip-Hop', 'R&B', 'Afrobeats', 'Pop', 'Country', 'EDM', 'Latin', 'Drill', 'Trap', 'Neo-Soul', 'Rock', 'K-Pop', 'Reggaeton', 'Gospel', 'Metal'];
+      const pill   = document.getElementById('genre-cycle-text');
+      const h1g    = document.getElementById('h1-genre');
+      if (!h1g) return;
       let idx = 0;
       setInterval(() => {
-        el.classList.add('fading');
+        // fade out
+        if (pill) pill.classList.add('fading');
+        if (h1g)  h1g.classList.add('flipping');
         setTimeout(() => {
           idx = (idx + 1) % genres.length;
-          el.textContent = genres[idx];
-          el.classList.remove('fading');
-        }, 300);
-      }, 2200);
+          if (pill) { pill.textContent = genres[idx]; pill.classList.remove('fading'); }
+          if (h1g)  { h1g.textContent  = genres[idx]; h1g.classList.remove('flipping'); }
+        }, 260);
+      }, 2400);
     })();
 
     // ── STATS COUNTER ──
