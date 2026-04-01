@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "soniq",
   "framework": null,
   "buildCommand": "",
   "outputDirectory": "public",
