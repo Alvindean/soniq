@@ -73,6 +73,9 @@ const PLAN_LIMITS = {
   founding:            50,   // legacy
 };
 
+// Emails that always get Studio plan + unlimited access (no admin token needed)
+const ADMIN_EMAILS = new Set(['thealvindean@gmail.com']);
+
 // Plans that use monthly counting (free uses lifetime)
 const MONTHLY_LIMIT_PLANS = new Set([
   'founding_t1','founding_t1_annual',
@@ -305,6 +308,11 @@ module.exports = async function handler(req, res) {
       if (profile?.plan) plan = profile.plan;
     } catch (e) {
       console.error('Profile fetch error:', e.message);
+    }
+    // Email whitelist — always studio, always bypasses rate limiting
+    if (ADMIN_EMAILS.has(user.email)) {
+      plan = 'studio';
+      req._adminBypass = true;
     }
   }
 

@@ -6890,10 +6890,17 @@ function copyCoachFeedback() {
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
+  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com']);
   S.supabase.auth.onAuthStateChange((event, session) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
+    // Email whitelist — grant full studio access automatically
+    if (S.user && _ADMIN_EMAILS.has(S.user.email)) {
+      window.__soniqAdmin = true;
+      S.plan = 'studio';
+      S.isAdmin = true;
+    }
     updateAuthUI();
     if (event === 'SIGNED_IN') {
       closeAuth();
@@ -6919,6 +6926,12 @@ function copyCoachFeedback() {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
+    // Email whitelist — grant full studio access automatically
+    if (S.user && _ADMIN_EMAILS.has(S.user.email)) {
+      window.__soniqAdmin = true;
+      S.plan = 'studio';
+      S.isAdmin = true;
+    }
     updateAuthUI();
     loadFoundingStatus();
   });

@@ -52,6 +52,9 @@ function getTodayDate() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
+// Emails that always get Studio plan + unlimited access
+const ADMIN_EMAILS = new Set(['thealvindean@gmail.com']);
+
 const PLAN_LIMITS = {
   free: 1,
   starter: Infinity, starter_annual: Infinity,
@@ -167,6 +170,11 @@ module.exports = async function handler(req, res) {
       if (profile?.plan) plan = profile.plan;
     } catch (e) {
       console.error('Profile fetch error:', e.message);
+    }
+    // Email whitelist — always studio, always bypasses rate limiting
+    if (ADMIN_EMAILS.has(user.email)) {
+      plan = 'studio';
+      isAdmin = true;
     }
   }
 
