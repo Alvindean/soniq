@@ -46,21 +46,28 @@
             "name": "Free",
             "price": "0",
             "priceCurrency": "USD",
-            "description": "3 songs per day, full genre DNA and music theory"
+            "description": "1 song per day, 6 core genres, lyrics and production brief"
           },
           {
             "@type": "Offer",
-            "name": "Early Founder",
-            "price": "5",
+            "name": "Starter",
+            "price": "9",
             "priceCurrency": "USD",
-            "description": "Unlimited generations, all features, locked forever — 500 spots only"
+            "description": "Unlimited songs, all 24 genres, Visual Prompts, Theory Analysis, Social Media captions"
           },
           {
             "@type": "Offer",
             "name": "Pro",
             "price": "19",
             "priceCurrency": "USD",
-            "description": "Unlimited generations, full production briefs, sync metadata, version history"
+            "description": "Everything in Starter plus Album Planner, Rap Lab, Version History, batch generation"
+          },
+          {
+            "@type": "Offer",
+            "name": "Studio",
+            "price": "49",
+            "priceCurrency": "USD",
+            "description": "Everything in Pro plus PDF export, shareable briefs, Artist Voice Profile, Priority API"
           }
         ],
         "featureList": [
@@ -827,7 +834,7 @@
 
     .pricing-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
       gap: 20px;
       align-items: stretch;
     }
@@ -1328,11 +1335,11 @@
     <div class="hero-gradient"></div>
     <div class="hero-content">
       <div class="hero-badge">AI Songwriting Studio</div>
-      <h1>Write songs that actually hit.</h1>
-      <p class="hero-sub">AI songwriting with the DNA of 24 genres, full music theory, production briefs, and visual direction — built for artists and the industry.</p>
+      <h1>Write a complete song — lyrics, chords, production brief and music video concept — in 30 seconds.</h1>
+      <p class="hero-sub">Genre DNA. Music theory. Production brief. Visual direction. Social media captions. Everything a real song needs — free to start.</p>
 
       <div class="hero-founding-pill" id="hero-founding-pill" style="display:none">
-        🔥 <strong id="hero-founding-text">Early Founder — $5/mo</strong> · <span id="hero-spots-left">…</span> spots left
+        🔥 <strong id="hero-founding-text">Early Founder — $5/mo</strong> · <span id="hero-spots-left">…</span>
       </div>
 
       <div class="hero-eq" aria-hidden="true">
@@ -1565,22 +1572,38 @@
         <div class="pricing-period">forever free</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>3 generations / day</li>
-          <li>All 24 genres</li>
-          <li>Full lyrics + production brief</li>
-          <li>Music theory + visual direction</li>
+          <li>1 song / day</li>
+          <li>6 core genres</li>
+          <li>Lyrics + production brief</li>
           <li>SONIQ-ID copyright timestamp</li>
         </ul>
-        <a href="/app" class="btn btn-outline-violet pricing-cta">Get Started →</a>
+        <a href="/app" class="btn btn-outline-violet pricing-cta">Start Free →</a>
       </div>
 
-      <!-- FOUNDING / PRO — shown dynamically -->
-      <div class="pricing-card featured fade-in" style="transition-delay:0.12s" id="pricing-founding-card">
-        <div class="pricing-badge" id="pricing-founding-badge">🔥 500 Spots Only</div>
-        <div class="pricing-name" id="pricing-founding-name">Early Founder</div>
-        <div class="pricing-price" id="pricing-founding-price">$5<span>/mo</span></div>
-        <div class="pricing-period" id="pricing-founding-period">locked in forever</div>
-        <div class="spots-bar-wrap" id="spots-bar-wrap">
+      <!-- STARTER -->
+      <div class="pricing-card fade-in" style="transition-delay:0.08s">
+        <div class="pricing-name">Starter</div>
+        <div class="pricing-price">$9<span>/mo</span></div>
+        <div class="pricing-period">billed monthly</div>
+        <div class="pricing-divider"></div>
+        <ul class="pricing-features">
+          <li>Unlimited songs</li>
+          <li>All 24 genres</li>
+          <li>Visual Prompts</li>
+          <li>Full production brief</li>
+          <li>Theory Analysis</li>
+          <li>Social Media captions</li>
+        </ul>
+        <a href="/app#account" class="btn btn-outline-violet pricing-cta">Get Starter →</a>
+      </div>
+
+      <!-- PRO — featured -->
+      <div class="pricing-card featured fade-in" style="transition-delay:0.16s" id="pricing-founding-card">
+        <div class="pricing-badge" id="pricing-founding-badge">Most Popular</div>
+        <div class="pricing-name" id="pricing-founding-name">Pro</div>
+        <div class="pricing-price" id="pricing-founding-price">$19<span>/mo</span></div>
+        <div class="pricing-period" id="pricing-founding-period">billed monthly</div>
+        <div class="spots-bar-wrap" id="spots-bar-wrap" style="display:none">
           <div class="spots-bar-track">
             <div class="spots-bar-fill" id="spots-bar-fill"></div>
           </div>
@@ -1591,17 +1614,17 @@
         </div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>Unlimited generations</li>
-          <li>Full production briefs</li>
-          <li>Music theory layer</li>
-          <li>Visual briefs</li>
+          <li>Everything in Starter</li>
+          <li>Album Planner</li>
+          <li>Rap Lab</li>
+          <li>Version History</li>
+          <li>Batch ×3 generate</li>
           <li>Sync metadata</li>
-          <li>Version history</li>
         </ul>
-        <a href="/app#account" class="btn btn-primary pricing-cta" id="pricing-founding-cta">Lock In $5 Forever →</a>
+        <a href="/app#account" class="btn btn-primary pricing-cta" id="pricing-founding-cta">Go Pro →</a>
       </div>
 
-      <!-- PRO (shown when founding is full) -->
+      <!-- STUDIO -->
       <div class="pricing-card fade-in" style="transition-delay:0.24s">
         <div class="pricing-name">Studio</div>
         <div class="pricing-price">$49<span>/mo</span></div>
@@ -1609,17 +1632,16 @@
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
           <li>Everything in Pro</li>
-          <li>Batch ×3 generation</li>
+          <li>PDF Export</li>
+          <li>Shareable briefs</li>
           <li>Artist Voice Profile</li>
           <li>Priority API</li>
-          <li>PDF export</li>
-          <li>Shareable brief links</li>
         </ul>
-        <a href="mailto:info@mysoniq.com" class="btn btn-ghost pricing-cta">Contact Us →</a>
+        <a href="/app#account" class="btn btn-ghost pricing-cta">Go Studio →</a>
       </div>
 
     </div>
-    <p class="pricing-note">Founding spots are limited — price locks in forever when you join.</p>
+    <p class="pricing-note" id="pricing-note-founding" style="display:none">🔥 Founding spots available — price locks in forever when you join.</p>
     <p style="text-align:center;color:var(--text-dim);font-size:0.8rem;margin-top:12px">Cancel anytime · No long-term contracts · Free plan always available</p>
   </section>
 
@@ -1799,9 +1821,9 @@
         { q: 'What is genre DNA?', a: 'Genre DNA is the set of structural rules that make a genre work — verse length, hook placement, BPM ranges, chord progressions, production conventions, and the outlier songs that broke the rules but still charted. SONIQ has this built in for 24 genres including Hip-Hop, R&B, Pop, Country, Electronic, Latin, Singer-Songwriter, and more.' },
         { q: 'Does SONIQ replace human songwriters?', a: 'No. SONIQ kills the blank page — it gives you the structural blueprint, the theory foundation, the production direction, and the sync metadata. The idea, the emotion, and the performance are still entirely yours. It\'s a tool for serious artists, not a replacement for them.' },
         { q: 'What does the publishing registration include?', a: 'Every song gets a copyright timestamp (SONIQ-ID). Pro and Founding members can register with BMI, ASCAP, or SESAC through Nu Wav Media LLC, receive an ISRC code, and enter a co-publishing agreement. Your writer\'s share is protected from song one.' },
-        { q: 'What is the Early Founder pricing?', a: 'The first 500 members lock in SONIQ Pro for $5/month forever. After those spots are claimed, the next 1,500 members lock in at $9.99/month. Standard price is $19/month. Founding pricing never changes once locked in.' },
+        { q: 'What are the paid plan options?', a: 'Starter is $9/mo — unlimited songs, all 24 genres, Visual Prompts, Theory Analysis, and Social Media captions. Pro is $19/mo — everything in Starter plus Album Planner, Rap Lab, Version History, and batch generation. Studio is $49/mo — everything in Pro plus PDF export, shareable briefs, and Artist Voice Profile. Founding member spots are available at a locked-in rate — check the pricing section.' },
         { q: 'How does sync metadata work?', a: 'Music supervisors search catalogs by mood, BPM, instrumentation, and use case — not by listening to every song. SONIQ automatically generates mood tags, BPM range, instrumentation notes, and best-fit placement categories (TV drama, fitness, retail, trailer) with every song. Your catalog becomes searchable from day one.' },
-        { q: 'How many songs can I generate for free?', a: 'Free accounts generate 3 songs per day with full genre DNA, music theory, and production brief. Pro and Founding members get unlimited generations.' },
+        { q: 'How many songs can I generate for free?', a: 'Free accounts generate 1 song per day across 6 core genres (Pop, Hip-Hop, R&B, Rock, Country, EDM) with lyrics and production brief included. Starter and above get unlimited generations across all 24 genres.' },
       ];
 
       const list = document.getElementById('faq-list');
@@ -1829,78 +1851,37 @@
         if (!res.ok) return;
         const data = await res.json();
 
-        const badge      = document.getElementById('pricing-founding-badge');
-        const name       = document.getElementById('pricing-founding-name');
-        const price      = document.getElementById('pricing-founding-price');
-        const period     = document.getElementById('pricing-founding-period');
-        const cta        = document.getElementById('pricing-founding-cta');
-        const barWrap    = document.getElementById('spots-bar-wrap');
-        const barFill    = document.getElementById('spots-bar-fill');
-        const claimedNum = document.getElementById('spots-claimed-num');
-        const totalLabel = document.getElementById('spots-total-label');
-
-        // Hero pill elements
         const heroPill      = document.getElementById('hero-founding-pill');
         const heroText      = document.getElementById('hero-founding-text');
         const heroSpotsLeft = document.getElementById('hero-spots-left');
-        const heroFoundCta  = document.getElementById('hero-founding-cta');
-        const heroSeeHow    = document.getElementById('hero-see-how');
+
+        const urgencyBanner    = document.getElementById('pricing-urgency-banner');
+        const urgencyBannerTxt = document.getElementById('pricing-banner-text');
+        const urgencyBannerCta = document.getElementById('pricing-banner-cta');
+        const foundingNote     = document.getElementById('pricing-note-founding');
 
         const currentTier = data.current_tier;
 
-        function updateBar(claimed, total) {
-          const pct = total > 0 ? Math.min(100, (claimed / total) * 100) : 0;
-          if (barFill)    barFill.style.width    = pct + '%';
-          if (claimedNum) claimedNum.textContent = claimed;
-          if (totalLabel) totalLabel.textContent = 'of ' + total;
-          if (barWrap)    barWrap.style.display  = 'block';
-        }
-
-        const urgencyBanner   = document.getElementById('pricing-urgency-banner');
-        const urgencyBannerTxt = document.getElementById('pricing-banner-text');
-        const urgencyBannerCta = document.getElementById('pricing-banner-cta');
-
         if (currentTier === 1) {
           const t1 = data.tier1;
-          if (badge)  badge.textContent  = '🔥 ' + t1.spots_left + ' Spots Left';
-          if (name)   name.textContent   = 'Early Founder';
-          if (price)  price.innerHTML    = '$5<span>/mo</span>';
-          if (period) period.textContent = 'price locked forever once you join';
-          if (cta)  { cta.textContent    = 'Lock In $5 Forever →'; cta.href = '/app#account'; }
-          updateBar(t1.spots_claimed, t1.spots_total);
-          // Hero pill
-          if (heroPill)      { heroPill.style.display = 'inline-flex'; }
-          if (heroText)      heroText.textContent = 'Early Founder — $5/mo';
-          if (heroSpotsLeft) heroSpotsLeft.textContent = t1.spots_left;
-          // Pricing urgency banner
+          if (heroPill)      heroPill.style.display = 'inline-flex';
+          if (heroText)      heroText.textContent   = 'Early Founder — $5/mo';
+          if (heroSpotsLeft) heroSpotsLeft.textContent = t1.spots_left + ' spots left';
           if (urgencyBanner)    urgencyBanner.classList.add('visible');
-          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t1.spots_left + ' Early Founder spots remaining';
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = '🔥 ' + t1.spots_left + ' Early Founder spots remaining — lock in $5/mo forever';
           if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $5/mo →'; urgencyBannerCta.href = '/app#account'; }
+          if (foundingNote) foundingNote.style.display = 'block';
         } else if (currentTier === 2) {
           const t2 = data.tier2;
-          if (badge)  badge.textContent  = '⭐ ' + t2.spots_left + ' Spots Left';
-          if (name)   name.textContent   = 'Founding Member';
-          if (price)  price.innerHTML    = '$9.99<span>/mo</span>';
-          if (period) period.textContent = 'price locked forever once you join';
-          if (cta)  { cta.textContent    = 'Lock In $9.99 Forever →'; cta.href = '/app#account'; }
-          updateBar(t2.spots_claimed, t2.spots_total);
-          // Hero pill
-          if (heroPill)      { heroPill.style.display = 'inline-flex'; }
-          if (heroText)      heroText.textContent = 'Founding Member — $9.99/mo';
-          if (heroSpotsLeft) heroSpotsLeft.textContent = t2.spots_left;
-          // Pricing urgency banner
+          if (heroPill)      heroPill.style.display = 'inline-flex';
+          if (heroText)      heroText.textContent   = 'Founding Member — $9.99/mo';
+          if (heroSpotsLeft) heroSpotsLeft.textContent = t2.spots_left + ' spots left';
           if (urgencyBanner)    urgencyBanner.classList.add('visible');
-          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t2.spots_left + ' Founding Member spots remaining';
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = '⭐ ' + t2.spots_left + ' Founding Member spots remaining — lock in $9.99/mo forever';
           if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $9.99/mo →'; urgencyBannerCta.href = '/app#account'; }
-        } else {
-          // All founding spots full — show standard Pro
-          if (badge)   badge.textContent  = 'Most Popular';
-          if (name)    name.textContent   = 'Pro';
-          if (price)   price.innerHTML    = '$19<span>/mo</span>';
-          if (period)  period.textContent = 'billed monthly';
-          if (cta)   { cta.textContent    = 'Start Free Trial →'; cta.href = '/app'; }
-          if (barWrap) barWrap.style.display = 'none';
+          if (foundingNote) foundingNote.style.display = 'block';
         }
+        // tier 3 (all full) — no banner, Pro card already shows $19/mo
       } catch (e) { /* fail silently */ }
     })();
 

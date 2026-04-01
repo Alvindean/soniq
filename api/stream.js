@@ -55,7 +55,20 @@ function getTodayDate() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
-const PLAN_LIMITS = { free: 3, pro: Infinity, studio: Infinity, founding: Infinity };
+const PLAN_LIMITS = {
+  free:                1,
+  starter:             Infinity,
+  starter_annual:      Infinity,
+  pro:                 Infinity,
+  pro_annual:          Infinity,
+  studio:              Infinity,
+  studio_annual:       Infinity,
+  founding:            Infinity,
+  founding_t1:         Infinity,
+  founding_t1_annual:  Infinity,
+  founding_t2:         Infinity,
+  founding_t2_annual:  Infinity,
+};
 
 async function streamAnthropic(apiKey, messages, system, max_tokens, res) {
   const payload = {model: 'claude-sonnet-4-20250514', max_tokens, stream: true, messages};
