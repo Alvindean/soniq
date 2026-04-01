@@ -2844,29 +2844,75 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <!-- CHORDS GENERATOR -->
   <div id="more-spane-chords" class="spane">
-    <div class="card">
-      <div class="ctitle">🎵 Chord Progression Generator</div>
-      <p style="font-size:13px;color:var(--tx3);margin-bottom:16px">Generate a chord progression for your current song based on its genre, key, and mood.</p>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
-        <select id="chords-key" style="flex:1;min-width:100px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px">
-          <option value="">Key (auto)</option>
-          <option>C Major</option><option>G Major</option><option>D Major</option><option>A Major</option>
-          <option>E Major</option><option>F Major</option><option>Bb Major</option><option>Eb Major</option>
-          <option>A Minor</option><option>E Minor</option><option>D Minor</option><option>B Minor</option>
-          <option>F# Minor</option><option>C Minor</option><option>G Minor</option>
-        </select>
-        <select id="chords-feel" style="flex:1;min-width:120px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px">
-          <option value="verse">Verse</option>
-          <option value="chorus">Chorus / Hook</option>
-          <option value="bridge">Bridge</option>
-          <option value="intro">Intro / Outro</option>
-          <option value="full">Full Song (all sections)</option>
-        </select>
-        <button class="btn btn-amber" onclick="generateChords()" id="chords-btn" style="white-space:nowrap">Generate Chords</button>
+    <!-- Sub-tabs -->
+    <div style="display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid var(--b2)">
+      <button id="chords-tab-gen" onclick="chordsTab('gen')" style="padding:8px 18px;background:none;border:none;border-bottom:2px solid var(--amber);color:var(--amber);font-weight:700;font-size:13px;cursor:pointer;font-family:var(--font)">🎵 Generate</button>
+      <button id="chords-tab-analyze" onclick="chordsTab('analyze')" style="padding:8px 18px;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx3);font-weight:600;font-size:13px;cursor:pointer;font-family:var(--font)">🔍 Analyze Lyrics</button>
+    </div>
+
+    <!-- GENERATE PANEL -->
+    <div id="chords-panel-gen">
+      <div class="card">
+        <div class="ctitle">🎵 Chord Progression Generator</div>
+        <p style="font-size:13px;color:var(--tx3);margin-bottom:16px">Generate a progression for your current song based on genre, key, and section.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+          <select id="chords-key" style="flex:1;min-width:100px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px">
+            <option value="">Key (auto)</option>
+            <option>C Major</option><option>G Major</option><option>D Major</option><option>A Major</option>
+            <option>E Major</option><option>F Major</option><option>Bb Major</option><option>Eb Major</option>
+            <option>A Minor</option><option>E Minor</option><option>D Minor</option><option>B Minor</option>
+            <option>F# Minor</option><option>C Minor</option><option>G Minor</option>
+          </select>
+          <select id="chords-feel" style="flex:1;min-width:120px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px">
+            <option value="verse">Verse</option>
+            <option value="chorus">Chorus / Hook</option>
+            <option value="bridge">Bridge</option>
+            <option value="intro">Intro / Outro</option>
+            <option value="full">Full Song (all sections)</option>
+          </select>
+          <button class="btn btn-amber" onclick="generateChords()" id="chords-btn" style="white-space:nowrap">Generate Chords</button>
+        </div>
+        <div id="chords-output" style="display:none">
+          <div id="chords-result" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;font-family:var(--mono);font-size:13px;line-height:1.9;color:var(--tx1);white-space:pre-wrap"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button class="btn" onclick="copyChords('chords-result')" style="font-size:12px">📋 Copy</button>
+            <button class="btn" onclick="printChords('chords-result','chords-print-title')" style="font-size:12px">🖨️ Print</button>
+          </div>
+        </div>
       </div>
-      <div id="chords-output" style="display:none">
-        <div id="chords-result" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;font-family:var(--mono);font-size:13px;line-height:1.9;color:var(--tx1);white-space:pre-wrap"></div>
-        <button class="btn" onclick="copyChords()" style="margin-top:10px;font-size:12px">📋 Copy</button>
+    </div>
+
+    <!-- ANALYZE LYRICS PANEL -->
+    <div id="chords-panel-analyze" style="display:none">
+      <div class="card">
+        <div class="ctitle">🔍 Lyric-to-Chord Analyzer</div>
+        <p style="font-size:13px;color:var(--tx3);margin-bottom:14px">Paste your own lyrics — get chord suggestions matched to the emotional arc, section structure, and syllable stress of your words.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <select id="analyze-genre" style="flex:1;min-width:120px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px">
+            <option value="">Genre (optional)</option>
+            <option>Pop</option><option>Hip-Hop / Rap</option><option>R&B / Soul</option><option>Rock</option>
+            <option>Country</option><option>EDM / Electronic</option><option>Folk / Indie</option>
+            <option>Latin</option><option>Gospel</option><option>Jazz</option><option>Neo-Soul</option>
+            <option>Singer-Songwriter</option><option>Metal</option><option>Afrobeats</option>
+          </select>
+          <select id="analyze-key" style="flex:1;min-width:100px;padding:8px 10px;border-radius:7px;border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px">
+            <option value="">Key (auto-detect)</option>
+            <option>C Major</option><option>G Major</option><option>D Major</option><option>A Major</option>
+            <option>E Major</option><option>F Major</option><option>Bb Major</option><option>Eb Major</option>
+            <option>A Minor</option><option>E Minor</option><option>D Minor</option><option>B Minor</option>
+            <option>F# Minor</option><option>C Minor</option><option>G Minor</option>
+          </select>
+        </div>
+        <textarea id="analyze-lyrics" placeholder="[Verse 1]&#10;Paste your lyrics here...&#10;&#10;[Chorus]&#10;Each section gets its own chord progression." style="width:100%;min-height:160px;padding:12px;border-radius:8px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:13px;font-family:var(--font);line-height:1.7;resize:vertical;box-sizing:border-box;margin-bottom:12px"></textarea>
+        <button class="btn btn-amber" onclick="analyzeLyricsChords()" id="analyze-btn" style="width:100%">🔍 Analyze My Lyrics</button>
+
+        <div id="analyze-output" style="display:none;margin-top:16px">
+          <div id="analyze-result" style="background:var(--s2);border:1px solid var(--b2);border-radius:10px;padding:16px;font-size:13px;line-height:1.9;color:var(--tx1);white-space:pre-wrap;font-family:var(--mono)"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+            <button class="btn" onclick="copyChords('analyze-result')" style="font-size:12px">📋 Copy</button>
+            <button class="btn" onclick="printChords('analyze-result','analyze-print-title')" style="font-size:12px">🖨️ Print</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -6260,57 +6306,154 @@ function updateAdminTabs() {
 }
 
 // ═══════════════════════════════════════════════════════
+// CHORDS — SUB-TAB SWITCHER
+// ═══════════════════════════════════════════════════════
+function chordsTab(tab) {
+  const isGen = tab === 'gen';
+  document.getElementById('chords-panel-gen').style.display     = isGen ? '' : 'none';
+  document.getElementById('chords-panel-analyze').style.display = isGen ? 'none' : '';
+  const tGen = document.getElementById('chords-tab-gen');
+  const tAna = document.getElementById('chords-tab-analyze');
+  tGen.style.borderBottomColor = isGen ? 'var(--amber)' : 'transparent';
+  tGen.style.color = isGen ? 'var(--amber)' : 'var(--tx3)';
+  tAna.style.borderBottomColor = isGen ? 'transparent' : 'var(--amber)';
+  tAna.style.color = isGen ? 'var(--tx3)' : 'var(--amber)';
+}
+
+// ═══════════════════════════════════════════════════════
 // CHORD PROGRESSION GENERATOR
 // ═══════════════════════════════════════════════════════
 async function generateChords() {
   const song = S.currentSong || S.luckyCurrentSong;
-  const keyEl = document.getElementById('chords-key');
-  const feelEl = document.getElementById('chords-feel');
   const btn = document.getElementById('chords-btn');
   const output = document.getElementById('chords-output');
   const result = document.getElementById('chords-result');
 
   const genre = song?.genre || S.selectedGenre || 'pop';
-  const key = keyEl?.value || 'auto';
-  const feel = feelEl?.value || 'full';
+  const key   = document.getElementById('chords-key')?.value || 'auto';
+  const feel  = document.getElementById('chords-feel')?.value || 'full';
   const topic = song?.topic || '';
 
-  btn.disabled = true;
-  btn.textContent = '⏳ Generating…';
+  btn.disabled = true; btn.textContent = '⏳ Generating…';
   output.style.display = 'none';
 
   const prompt = `You are a music theory expert. Generate a chord progression for a ${genre} song.
 
 Song context:
 - Genre: ${genre}
-- Key: ${key !== 'auto' ? key : 'choose the most fitting key for this genre and mood'}
+- Key: ${key !== 'auto' && key ? key : 'choose the most fitting key for this genre and mood'}
 - Section: ${feel}
 - Topic/Mood: ${topic || 'general'}
 
 Provide:
-1. The key and scale
-2. The chord progression with roman numeral analysis (e.g. I - V - vi - IV)
-3. The actual chord names (e.g. C - G - Am - F)
-4. Guitar/piano voicing tips (1-2 sentences)
-5. A variation or alternative progression
+1. KEY & SCALE — the key, scale mode, and why it fits
+2. CHORD PROGRESSION — roman numeral analysis (e.g. I – V – vi – IV)
+3. CHORD NAMES — actual chord names (e.g. C – G – Am – F)
+4. VOICING TIPS — 1-2 practical guitar/piano tips
+5. VARIATION — an alternative progression with different emotional color
+6. BPM RANGE — suggested tempo range for this genre/mood
 
-Keep it practical and immediately usable. Format clearly with section headers.`;
+Format with clear section headers. Keep it immediately usable.`;
 
   try {
-    const text = await callClaude(prompt, 'Music theory expert. Be concise and practical.', 1024);
+    const text = await callClaude(prompt, 'Music theory expert. Be concise and practical.', 1200);
     result.textContent = text;
     output.style.display = '';
   } catch(e) {
-    result.textContent = 'Could not generate chords. ' + (e.message || 'Try again.');
+    result.textContent = 'Could not generate. ' + (e.message || 'Try again.');
     output.style.display = '';
   }
-  btn.disabled = false;
-  btn.textContent = 'Generate Chords';
+  btn.disabled = false; btn.textContent = 'Generate Chords';
 }
 
-function copyChords() {
-  const text = document.getElementById('chords-result')?.textContent || '';
-  navigator.clipboard.writeText(text).then(() => toast('✓ Chords copied'));
+// ═══════════════════════════════════════════════════════
+// LYRIC-TO-CHORD ANALYZER
+// ═══════════════════════════════════════════════════════
+async function analyzeLyricsChords() {
+  const lyrics = document.getElementById('analyze-lyrics')?.value?.trim();
+  if (!lyrics) { toast('Paste your lyrics first'); return; }
+
+  const btn    = document.getElementById('analyze-btn');
+  const output = document.getElementById('analyze-output');
+  const result = document.getElementById('analyze-result');
+  const genre  = document.getElementById('analyze-genre')?.value || '';
+  const key    = document.getElementById('analyze-key')?.value || '';
+
+  btn.disabled = true; btn.textContent = '⏳ Analyzing…';
+  output.style.display = 'none';
+
+  const prompt = `You are a music theory expert analyzing lyrics to suggest matching chord progressions.
+
+LYRICS:
+${lyrics}
+
+CONTEXT:
+- Genre: ${genre || 'detect from lyrics'}
+- Key preference: ${key || 'auto-detect the best key'}
+
+Analyze these lyrics and provide:
+
+1. DETECTED MOOD & TONE — the emotional arc you're reading from the lyrics
+2. SUGGESTED KEY — recommended key and why it fits the lyrical mood
+3. SECTION-BY-SECTION CHORDS — for each section found (Verse, Chorus, Bridge etc.):
+   - Roman numeral analysis
+   - Actual chord names
+   - Why these chords match this lyric section emotionally
+4. OVERALL PROGRESSION MAP — a quick-reference chart of the full song structure
+5. VOICING TIPS — 2-3 practical tips for guitar or piano
+6. ALTERNATIVE APPROACH — a darker or brighter variation if they want a different feel
+
+Format clearly with section headers. Be specific about which lines suggest which harmonic choices.`;
+
+  try {
+    const text = await callClaude(prompt, 'Music theory expert analyzing lyrics. Be specific and practical.', 1800);
+    result.textContent = text;
+    output.style.display = '';
+  } catch(e) {
+    result.textContent = 'Could not analyze. ' + (e.message || 'Try again.');
+    output.style.display = '';
+  }
+  btn.disabled = false; btn.textContent = '🔍 Analyze My Lyrics';
+}
+
+// ═══════════════════════════════════════════════════════
+// CHORDS — COPY & PRINT
+// ═══════════════════════════════════════════════════════
+function copyChords(elId) {
+  const text = document.getElementById(elId || 'chords-result')?.textContent || '';
+  navigator.clipboard.writeText(text).then(() => toast('✓ Copied to clipboard'));
+}
+
+function printChords(elId) {
+  const text = document.getElementById(elId || 'chords-result')?.textContent || '';
+  const song = S.currentSong || S.luckyCurrentSong;
+  const songTitle = song?.title || 'SONIQ Chord Analysis';
+  const genre = song?.genre || S.selectedGenre || '';
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html><head>
+<title>${songTitle} — Chords</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Georgia', serif; max-width: 700px; margin: 40px auto; padding: 0 24px; color: #111; }
+  .header { border-bottom: 3px solid #111; padding-bottom: 16px; margin-bottom: 24px; }
+  .logo { font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #888; margin-bottom: 8px; }
+  h1 { font-size: 24px; font-weight: 800; line-height: 1.2; margin-bottom: 4px; }
+  .meta { font-size: 12px; color: #666; }
+  pre { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.9; white-space: pre-wrap; word-break: break-word; }
+  .footer { margin-top: 40px; padding-top: 12px; border-top: 1px solid #ccc; font-size: 11px; color: #999; display: flex; justify-content: space-between; }
+  @media print { body { margin: 20px; } }
+</style>
+</head><body>
+<div class="header">
+  <div class="logo">◈ SONIQ — Chord Analysis</div>
+  <h1>${escHtml(songTitle)}</h1>
+  <div class="meta">${genre ? escHtml(genre) + ' · ' : ''}Generated ${new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}</div>
+</div>
+<pre>${escHtml(text)}</pre>
+<div class="footer"><span>mysoniq.com</span><span>SONIQ AI Song Creation Studio</span></div>
+</body></html>`);
+  w.document.close();
+  setTimeout(() => { w.focus(); w.print(); }, 400);
 }
 
 // TITLE CREATOR
