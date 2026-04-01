@@ -1102,13 +1102,71 @@ function sanitizeInput(str, maxLen = 300) {
   return str.slice(0, maxLen).replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '').trim();
 }
 
+// ─── AGE GROUPS ────────────────────────────────────────────────────────────
+const AGE_GROUPS = {
+  'toddler': {
+    label: 'Toddlers (1–4)',
+    vocab: 'Extremely simple 1–2 syllable words only. Single-concept sentences. Colors, animals, body parts, family members.',
+    themes: 'Colors, animals, simple objects, family love, bedtime, bath time, peek-a-boo, clapping games.',
+    structure: 'Ultra-short sections (4–8 lines max). Heavy repetition — repeat the hook 4–6 times. Call-and-response encouraged.',
+    rules: 'No complex narrative. Pure sensory and physical experience. Motion cues (clap, stomp, spin) are essential. Melody range max 5 notes.',
+    genreMap: 'children',
+    sunoHint: 'children\'s song, ukulele, hand claps, xylophone, playful, major key, bright, 110 BPM, joyful, singalong'
+  },
+  'kids': {
+    label: 'Kids (5–8)',
+    vocab: 'Simple clear vocabulary, max 2–3 syllable words. Short sentences. Rhymes are fun, not forced.',
+    themes: 'School, friendship, animals, adventures, imagination, nature, kindness, family, being brave, small everyday discoveries.',
+    structure: 'Short verse-chorus. Chorus 3–4× minimum. Bridge optional. Total length 2–3 min.',
+    rules: 'Teach without preaching. Humor and wordplay welcome. Motion cues (clap, jump, spin). Avoid scary or adult themes.',
+    genreMap: 'children',
+    sunoHint: 'children\'s pop, upbeat, acoustic guitar, glockenspiel, hand claps, singalong, educational, joyful, 115 BPM'
+  },
+  'tween': {
+    label: 'Tweens (9–12)',
+    vocab: 'Age-appropriate modern vocabulary. Relatable school/social themes. Avoid adult sexuality or violence.',
+    themes: 'School, friends, fitting in, first crushes (innocent), sports, games, family, pets, growing up, being yourself.',
+    structure: 'Standard pop structure. V-PC-C × 2 with bridge. 2.5–3.5 min.',
+    rules: 'Emotionally relatable without being adult. Aspirational. Fun over edgy. No explicit content.',
+    genreMap: null,
+    sunoHint: 'kids pop, bright, energetic, modern production, fun, relatable, school-age themes'
+  },
+  'teen': {
+    label: 'Teens (13–17)',
+    vocab: 'Contemporary teen language, current slang (but not over-dated). Emotionally direct.',
+    themes: 'Identity, social pressure, first love, heartbreak (non-explicit), friendship loyalty, dreams, self-expression, social media, school stress.',
+    structure: 'Modern pop/hip-hop structure. Short punchy verses. Hooky chorus. May include pre-chorus.',
+    rules: 'Authentic emotional truth without explicit content. Self-empowerment themes resonate. Avoid condescension.',
+    genreMap: null,
+    sunoHint: null
+  },
+  'young-adult': {
+    label: 'Young Adults (18–24)',
+    vocab: 'No restrictions. Contemporary, culturally current.',
+    themes: 'Independence, career beginnings, new relationships, heartbreak, late nights, finding yourself, FOMO, ambition.',
+    structure: 'Any modern structure. Standard adult song conventions.',
+    rules: 'Adult themes acceptable. Authentic to the experience of early independence and self-discovery.',
+    genreMap: null,
+    sunoHint: null
+  },
+  'adult': {
+    label: 'Adults (25+)',
+    vocab: 'No restrictions. Mature, emotionally nuanced.',
+    themes: 'Long-term relationships, career, family, nostalgia, loss, legacy, identity, life\'s complexity.',
+    structure: 'Any structure. Can be more complex and emotionally layered.',
+    rules: 'Adult themes acceptable. Values depth and authenticity over novelty.',
+    genreMap: null,
+    sunoHint: null
+  }
+};
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
     structure = 'standard', era = 'modern', length = 'medium',
     quality = 'high', theoryLevel = 'standard', mode = 'auto',
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
-    blend = {}, bracketMode = 'suno'
+    blend = {}, bracketMode = 'suno', ageGroup = ''
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -1159,6 +1217,20 @@ ${chosenOutliers.length ? `- Include these harmonic outliers:\n${chosenOutliers.
   const albumNote = albumTrack
     ? `\n\nALBUM CONTEXT: This song is the "${albumTrack.type}" on the album "${albumTrack.album}". Its role: ${albumTrack.role}. The album's emotional arc: ${albumTrack.arc}. Write it so it fits cohesively within that album story.`
     : '';
+
+  // Age group note
+  let ageNote = '';
+  if (ageGroup && AGE_GROUPS[ageGroup]) {
+    const ag = AGE_GROUPS[ageGroup];
+    // If toddler/kids, override to children's rules regardless of genre selected
+    const isChildAudience = (ageGroup === 'toddler' || ageGroup === 'kids');
+    ageNote = `\n\nAGE TARGET — Writing for ${ag.label}:
+- Vocabulary: ${ag.vocab}
+- Themes: ${ag.themes}
+- Structure: ${ag.structure}
+- Rules: ${ag.rules}${isChildAudience ? `\n- Production style: ${ag.sunoHint}` : ''}
+IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be age-appropriate for ${ag.label}. Override any adult themes from the topic with age-appropriate equivalents.`;
+  }
 
   // Genre-specific notes
   let genreSpecificNote = '';
@@ -1211,7 +1283,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${genreSpecificNote}${hookNote}${voiceNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${voiceNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
