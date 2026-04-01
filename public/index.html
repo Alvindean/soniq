@@ -95,6 +95,10 @@ a{color:var(--amber);text-decoration:none}
 
 /* ── GENRE GRID ── */
 .genre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-bottom:24px}
+.gp-locked{opacity:.55;cursor:pointer}
+.gp-locked:hover{opacity:.8;border-color:var(--amber)!important}
+.gp-icon{position:relative;display:inline-block}
+.gp-lock{position:absolute;top:-4px;right:-8px;font-size:9px;line-height:1}
 .gp{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:13px 8px;text-align:center;cursor:pointer;transition:all 0.15s}
 .gp:hover{border-color:var(--b3);background:var(--s4)}
 .gp.on{border-color:var(--amberline);background:var(--amberbg);box-shadow:var(--glow-amber)}
@@ -970,6 +974,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .key-bright-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--violet),var(--amber));transition:width .4s}
 /* Theory Analysis */
 .theory-analysis{margin-top:16px;background:var(--s2);border:1px solid #3a3060;border-radius:var(--r2);overflow:hidden}
+.theory-lock-gate{display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;gap:6px}
+.tlg-icon{font-size:22px}
+.tlg-title{font-size:13px;font-weight:700;color:var(--tx1)}
+.tlg-sub{font-size:11px;color:var(--tx3);line-height:1.5}
+.tlg-btn{margin-top:8px;background:linear-gradient(135deg,#7c3aed,#5b21b6);color:#fff;border:none;border-radius:var(--r2);padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.tlg-btn:hover{opacity:.9}
 .theory-header{font-size:11px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;padding:10px 14px;background:#1a1030;border-bottom:1px solid #3a3060}
 .theory-row{display:flex;gap:10px;padding:7px 14px;border-bottom:1px solid var(--b1);align-items:baseline}
 .theory-row:last-child{border-bottom:none}
@@ -1347,6 +1357,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .upgrade-cta-btn:hover{opacity:.92;transform:translateY(-1px);box-shadow:0 8px 36px rgba(124,58,237,0.5)}
 .upgrade-cta-btn.tier1:hover{box-shadow:0 8px 36px rgba(234,88,12,0.5)}
 .upgrade-dismiss{background:none;border:none;color:var(--tx4);font-size:13px;font-weight:500;cursor:pointer;padding:4px;font-family:var(--font);transition:color .15s;text-align:center}
+.upgrade-founding-banner{margin:0 24px 16px;border-radius:10px;padding:11px 16px;background:rgba(251,146,60,0.07);border:1px solid rgba(251,146,60,0.3);display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:#fb923c}
+.ufb-icon{font-size:16px;flex-shrink:0}
+.ufb-badge{margin-left:auto;font-size:9px;font-weight:700;padding:2px 8px;border-radius:99px;background:rgba(251,146,60,0.18);border:1px solid rgba(251,146,60,0.35);flex-shrink:0}
+.ufb-spots{font-size:10px;color:var(--tx3);font-weight:500;width:100%;margin-top:2px}
+.upgrade-plans{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:0 20px 16px}
+.uplan{background:rgba(255,255,255,0.03);border:1px solid var(--b2);border-radius:12px;padding:14px 12px;cursor:pointer;transition:all .15s;position:relative}
+.uplan:hover{border-color:var(--violet);background:rgba(168,146,255,0.06)}
+.uplan-featured{border-color:rgba(168,146,255,0.45);background:rgba(168,146,255,0.07)}
+.uplan-featured:hover{border-color:var(--violet)}
+.uplan-badge{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#7c3aed,#9d5af5);color:#fff;font-size:9px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap}
+.uplan-name{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.uplan-price{font-size:22px;font-weight:800;color:var(--tx1);line-height:1;margin-bottom:10px}
+.uplan-price span{font-size:12px;font-weight:500;color:var(--tx3)}
+.uplan-features{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:4px}
+.uplan-features li{font-size:10px;color:var(--tx2);padding-left:12px;position:relative}
+.uplan-features li::before{content:'✓';position:absolute;left:0;color:#3ee896;font-size:9px;font-weight:700}
+.uplan-cta{margin-top:10px;font-size:11px;font-weight:700;color:var(--violet);text-align:center}
+.upgrade-card{max-width:560px!important}
 .upgrade-dismiss:hover{color:var(--tx2)}
 /* Upgrade button in nav */
 #nav-upgrade-btn{font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid rgba(168,146,255,0.4);background:rgba(168,146,255,0.08);color:var(--violet);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font);letter-spacing:.03em}
@@ -1881,10 +1909,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="gen-progress" id="gen-progress">
           <div class="gp-pips" id="gp-pips">
             <div class="gp-pip" id="gp-pip-1"></div>
-            <div class="gp-pip" id="gp-pip-2"></div>
-            <div class="gp-pip" id="gp-pip-3"></div>
           </div>
-          <span id="gp-label">Song 1 of 3 today</span>
+          <span id="gp-label">1 free song today</span>
         </div>
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
@@ -1973,8 +1999,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="otab-more-item" onclick="goOtabMore('res','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
           <div class="otab-more-item" onclick="goOtabMore('res','notes','💡 Notes')">💡 Notes</div>
           <div class="otab-more-item" onclick="goOtabMore('res','moodboard','🎨 Mood');loadMoodBoard('res')">🎨 Mood</div>
-          <div class="otab-more-item" onclick="goOtabMore('res','visual','🎬 Visual');loadVisualPrompts('res')">🎬 Visual</div>
-          <div class="otab-more-item" onclick="goOtabMore('res','sync','📋 Sync');renderSyncMeta('res')">📋 Sync</div>
+          <div class="otab-more-item" onclick="tryOpenVisual('res')">🎬 Visual</div>
+          <div class="otab-more-item" onclick="tryOpenSync('res')">📋 Sync</div>
         </div>
       </div>
     </div>
@@ -2152,8 +2178,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="otab-more-menu" id="lres-more-menu">
           <div class="otab-more-item" onclick="goOtabMore('lres','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
           <div class="otab-more-item" onclick="goOtabMore('lres','notes','💡 Director Notes')">💡 Director Notes</div>
-          <div class="otab-more-item" onclick="goOtabMore('lres','visual','🎬 Visual');loadVisualPrompts('lres')">🎬 Visual</div>
-          <div class="otab-more-item" onclick="goOtabMore('lres','sync','📋 Sync');renderSyncMeta('lres')">📋 Sync</div>
+          <div class="otab-more-item" onclick="tryOpenVisual('lres')">🎬 Visual</div>
+          <div class="otab-more-item" onclick="tryOpenSync('lres')">📋 Sync</div>
         </div>
       </div>
     </div>
@@ -2539,43 +2565,67 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div class="upgrade-card">
     <div class="upgrade-glow"></div>
     <div class="upgrade-top">
-      <div class="upgrade-eyebrow">Unlock SONIQ Pro</div>
+      <div class="upgrade-eyebrow">Unlock SONIQ</div>
       <div class="upgrade-headline">You've found your flow.</div>
-      <div class="upgrade-sub">3 songs isn't enough for a real session. Unlock unlimited.</div>
+      <div class="upgrade-sub" id="upgrade-sub-text">1 song a day isn't enough for a real session.</div>
     </div>
 
-    <!-- Tier display — populated dynamically by openUpgradeModal() -->
-    <div id="upgrade-tier-container" class="upgrade-tier-wrap">
-      <div class="upgrade-tier">
-        <div class="upgrade-tier-icon" id="upgrade-tier-icon">⚡</div>
-        <div class="upgrade-tier-body">
-          <div class="upgrade-tier-name" id="upgrade-tier-name">
-            Founding Member<span class="price-forever" id="upgrade-price-label">$9.99/mo forever</span>
-          </div>
-          <div class="upgrade-tier-spot" id="upgrade-tier-spot">Loading spots…</div>
-        </div>
-        <div class="upgrade-tier-badge" id="upgrade-tier-badge">Founding</div>
+    <!-- Founding tier banner — shown when spots available -->
+    <div id="upgrade-founding-banner" class="upgrade-founding-banner" style="display:none">
+      <span class="ufb-icon" id="upgrade-tier-icon">🔥</span>
+      <span id="upgrade-tier-name">Early Founder — $5/mo forever</span>
+      <span class="ufb-badge" id="upgrade-tier-badge">Founding</span>
+      <div class="ufb-spots" id="upgrade-tier-spot"></div>
+    </div>
+
+    <!-- 3-tier plan cards -->
+    <div class="upgrade-plans">
+      <div class="uplan" id="uplan-starter" onclick="startCheckoutPlan('starter')">
+        <div class="uplan-name">Starter</div>
+        <div class="uplan-price">$9<span>/mo</span></div>
+        <ul class="uplan-features">
+          <li>Unlimited songs</li>
+          <li>All 24 genres</li>
+          <li>Visual Prompts</li>
+          <li>Full production brief</li>
+          <li>Theory Analysis</li>
+          <li>Social Media captions</li>
+        </ul>
+        <div class="uplan-cta">Get Started →</div>
+      </div>
+      <div class="uplan uplan-featured" id="uplan-pro" onclick="startCheckoutPlan('pro')">
+        <div class="uplan-badge">Most Popular</div>
+        <div class="uplan-name">Pro</div>
+        <div class="uplan-price">$19<span>/mo</span></div>
+        <ul class="uplan-features">
+          <li>Everything in Starter</li>
+          <li>Album Planner</li>
+          <li>Rap Lab</li>
+          <li>Version History</li>
+          <li>Batch ×3 generate</li>
+          <li>Sync metadata</li>
+        </ul>
+        <div class="uplan-cta">Go Pro →</div>
+      </div>
+      <div class="uplan" id="uplan-studio" onclick="startCheckoutPlan('studio')">
+        <div class="uplan-name">Studio</div>
+        <div class="uplan-price">$49<span>/mo</span></div>
+        <ul class="uplan-features">
+          <li>Everything in Pro</li>
+          <li>PDF Export</li>
+          <li>Shareable briefs</li>
+          <li>Artist Voice Profile</li>
+          <li>Priority API</li>
+        </ul>
+        <div class="uplan-cta">Go Studio →</div>
       </div>
     </div>
 
-    <ul class="upgrade-features" style="list-style:none;padding:0">
-      <li class="upgrade-feature">Unlimited generations</li>
-      <li class="upgrade-feature">Full production briefs</li>
-      <li class="upgrade-feature">Music theory layer</li>
-      <li class="upgrade-feature">Visual briefs</li>
-      <li class="upgrade-feature">Sync metadata</li>
-      <li class="upgrade-feature">Version history</li>
-    </ul>
-
-    <div class="upgrade-urgency" id="upgrade-urgency">Founding spots are going fast — <span id="upgrade-urgency-claimed">…</span> <span id="upgrade-urgency-suffix">of 500 claimed</span></div>
+    <div class="upgrade-urgency" id="upgrade-urgency" style="display:none">Founding spots going fast — <span id="upgrade-urgency-claimed">…</span> <span id="upgrade-urgency-suffix">of 500 claimed</span></div>
 
     <div class="upgrade-actions">
-      <button id="upgrade-cta-btn" onclick="startCheckout()" class="upgrade-cta-btn">Lock In <span id="upgrade-cta-price">$9.99</span> Forever →</button>
-      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:6px">
-        <button onclick="startCheckout('annual')" style="font-size:12px;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline">Annual (save 30%) →</button>
-        <button onclick="startCheckout('studio')" style="font-size:12px;color:var(--tx3);background:none;border:none;cursor:pointer;text-decoration:underline">Studio $49/mo →</button>
-      </div>
       <button class="upgrade-dismiss" onclick="closeUpgradeModal()">Maybe later</button>
+      <div style="font-size:10px;color:var(--tx4);margin-top:6px;text-align:center">Cancel anytime · No contracts</div>
     </div>
   </div>
 </div>
@@ -3987,7 +4037,7 @@ async function callServerStream(action, params, onChunk, signal) {
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
     if (res.status === 401) {
-      openAuth('Create your free account to generate your song — 3 free songs every day');
+      openAuth('Create your free account to generate your song — 1 free song every day');
       const err = new Error(e.message || 'Sign in to generate songs');
       err.code = 'auth_required';
       throw err;
@@ -4048,7 +4098,7 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
     });
     const ct = res.headers.get('content-type') || '';
     if (res.status === 401) {
-      openAuth('Create your free account to generate your song — 3 free songs every day');
+      openAuth('Create your free account to generate your song — 1 free song every day');
       const err = new Error('Sign in to generate songs');
       err.code = 'auth_required';
       throw err;
@@ -4576,9 +4626,9 @@ function apiErrHtml(msg, errCode) {
   const isOverload = m.includes('overloaded') || m.includes('529');
   let hint = '';
   if (isAuthRequired) {
-    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account to generate your song — 3 free songs every day\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
+    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account to generate your song — 1 free song every day\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
   } else if (isLimitReached) {
-    hint = '<br><br>You\'ve used your 3 free songs today. Upgrade to unlock unlimited generations.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock Unlimited →</button>';
+    hint = '<br><br>You\'ve used your 1 free song today. Upgrade from $9/mo to unlock unlimited generations.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock Unlimited →</button>';
   } else if (isCredits) {
     hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
   } else if (isKey) {
@@ -4673,7 +4723,7 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 
 function feelLucky(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 3 free songs every day');
+    openAuth('Create your free account to generate your song — 1 free song every day');
     S._pendingGenerate = 'lucky';
     return;
   }
@@ -4937,7 +4987,7 @@ const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','roc
 
 async function generateSong(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 3 free songs every day');
+    openAuth('Create your free account to generate your song — 1 free song every day');
     S._pendingGenerate = 'song';
     return;
   }
@@ -5517,25 +5567,38 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
     </div>`;
   }).join('');
 
-  // Theory Analysis section
+  // Theory Analysis section — Starter+ only
   let theoryHtml = '';
   if (theoryRaw) {
-    const getTA = key => { const m = theoryRaw.match(new RegExp(key+':\\s*(.+)')); return m ? m[1].trim() : ''; };
-    const scale    = getTA('SCALE');
-    const keyFeel  = getTA('KEY FEEL');
-    const outliers = getTA('OUTLIER CHORDS');
-    const vl       = getTA('VOICE LEADING');
-    const tension  = getTA('TENSION RATING');
-    const archetype= getTA('PROGRESSION ARCHETYPE');
-    theoryHtml = `<div class="theory-analysis">
-      <div class="theory-header">🎼 Theory Analysis</div>
-      ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${escHtml(scale)}</span></div>` : ''}
-      ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${escHtml(keyFeel)}</span></div>` : ''}
-      ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${escHtml(outliers)}</span></div>` : ''}
-      ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${escHtml(vl)}</span></div>` : ''}
-      ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${escHtml(tension)}</span></div>` : ''}
-      ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${escHtml(archetype)}</span></div>` : ''}
-    </div>`;
+    const isPaidUser = window.__soniqAdmin || PAID_PLANS.has(S.plan);
+    if (!isPaidUser) {
+      theoryHtml = `<div class="theory-analysis theory-locked">
+        <div class="theory-header">🎼 Theory Analysis</div>
+        <div class="theory-lock-gate">
+          <div class="tlg-icon">🔒</div>
+          <div class="tlg-title">Full theory analysis unlocks with Starter</div>
+          <div class="tlg-sub">Scale · Key feel · Outlier chords · Voice leading · Tension rating · Archetype</div>
+          <button class="tlg-btn" onclick="openUpgradeModal()">Unlock from $9/mo →</button>
+        </div>
+      </div>`;
+    } else {
+      const getTA = key => { const m = theoryRaw.match(new RegExp(key+':\\s*(.+)')); return m ? m[1].trim() : ''; };
+      const scale    = getTA('SCALE');
+      const keyFeel  = getTA('KEY FEEL');
+      const outliers = getTA('OUTLIER CHORDS');
+      const vl       = getTA('VOICE LEADING');
+      const tension  = getTA('TENSION RATING');
+      const archetype= getTA('PROGRESSION ARCHETYPE');
+      theoryHtml = `<div class="theory-analysis">
+        <div class="theory-header">🎼 Theory Analysis</div>
+        ${scale    ? `<div class="theory-row"><span class="theory-key">Scale</span><span class="theory-val">${escHtml(scale)}</span></div>` : ''}
+        ${keyFeel  ? `<div class="theory-row theory-row-body"><span class="theory-key">Key Feel</span><span class="theory-val">${escHtml(keyFeel)}</span></div>` : ''}
+        ${outliers ? `<div class="theory-row"><span class="theory-key">Outlier Chords</span><span class="theory-val theory-outlier-val">${escHtml(outliers)}</span></div>` : ''}
+        ${vl       ? `<div class="theory-row theory-row-body"><span class="theory-key">Voice Leading</span><span class="theory-val">${escHtml(vl)}</span></div>` : ''}
+        ${tension  ? `<div class="theory-row"><span class="theory-key">Tension</span><span class="theory-val">${escHtml(tension)}</span></div>` : ''}
+        ${archetype? `<div class="theory-row"><span class="theory-key">Archetype</span><span class="theory-val">${escHtml(archetype)}</span></div>` : ''}
+      </div>`;
+    }
   }
 
   el.innerHTML = metaHtml + `<div class="chord-sections">${sectionHtml || '<div style="padding:16px;color:var(--tx3);font-size:13px">'+escHtml(chordsRaw)+'</div>'}</div>` + theoryHtml;
@@ -5936,7 +5999,7 @@ function initBuilder(){
 
 async function generateFromBuilder(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 3 free songs every day');
+    openAuth('Create your free account to generate your song — 1 free song every day');
     S._pendingGenerate = 'builder';
     return;
   }
@@ -6092,7 +6155,7 @@ function showFusion(g1,g2){
 
 async function generateFusion(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 3 free songs every day');
+    openAuth('Create your free account to generate your song — 1 free song every day');
     S._pendingGenerate = 'fusion';
     return;
   }
@@ -6443,16 +6506,28 @@ const GENRES_DEF = [
   {id:'tvmusical',label:'TV / Musical',icon:'🎬',new:true},
 ];
 
+function isGenreFree(gid) {
+  return window.__soniqAdmin || PAID_PLANS.has(S.plan) || FREE_GENRES.has(gid);
+}
+
 function initGenreGrid(){
   const grid = document.getElementById('genre-grid');
   if (!grid) return;
-  grid.innerHTML = GENRES_DEF.map(g => `
-    <div class="gp${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}" 
-         data-gid="${g.id}" 
-         onclick="onGenreChange('${g.id}')">
-      <div class="gp-icon">${g.icon}</div>
+  grid.innerHTML = GENRES_DEF.map(g => {
+    const locked = !isGenreFree(g.id);
+    return `<div class="gp${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
+         data-gid="${g.id}"
+         title="${locked?'Unlock all 24 genres with Starter — from $9/mo':''}"
+         onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
+      <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
+}
+
+function lockedGenreClick(gid) {
+  toast('🔒 ' + (GENRES_DEF.find(g=>g.id===gid)?.label||'This genre') + ' unlocks with Starter — from $9/mo');
+  openUpgradeModal();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6879,65 +6954,52 @@ async function openUpgradeModal() {
   if (!modal) return;
   modal.classList.add('open');
   document.body.style.overflow = 'hidden';
+  // Update sub-text based on context
+  const sub = document.getElementById('upgrade-sub-text');
+  if (sub) sub.textContent = S.user ? '1 song a day isn\'t enough for a real session.' : 'Sign in first, then pick your plan.';
+  // Show founding banner if spots available
   try {
     const res = await fetch('/api/founding');
     if (!res.ok) return;
     const data = await res.json();
-    const tierWrap       = document.getElementById('upgrade-tier-container');
-    const tierIcon       = document.getElementById('upgrade-tier-icon');
-    const tierName       = document.getElementById('upgrade-tier-name');
-    const tierSpot       = document.getElementById('upgrade-tier-spot');
-    const tierBadge      = document.getElementById('upgrade-tier-badge');
-    const ctaBtn         = document.getElementById('upgrade-cta-btn');
-    const ctaPrice       = document.getElementById('upgrade-cta-price');
+    const banner    = document.getElementById('upgrade-founding-banner');
+    const tierIcon  = document.getElementById('upgrade-tier-icon');
+    const tierName  = document.getElementById('upgrade-tier-name');
+    const tierSpot  = document.getElementById('upgrade-tier-spot');
+    const tierBadge = document.getElementById('upgrade-tier-badge');
     const urgency        = document.getElementById('upgrade-urgency');
     const urgencyClaimed = document.getElementById('upgrade-urgency-claimed');
     const urgencySuffix  = document.getElementById('upgrade-urgency-suffix');
-    const currentTier = data.current_tier;
-    const t1SpotsLeft = data.tier1?.spots_left ?? 500;
-    const t2SpotsLeft = data.tier2?.spots_left ?? 1500;
-    if (currentTier === 1) {
-      currentCheckoutPlan  = 'founding_t1';
-      tierWrap.className   = 'upgrade-tier-wrap tier1';
-      tierIcon.textContent = '🔥';
-      tierName.className   = 'upgrade-tier-name tier1';
-      tierName.innerHTML   = 'Early Founder<span class="price-forever" style="color:#fb923c">$5/mo forever</span>';
-      tierSpot.textContent = t1SpotsLeft + ' of 500 spots left';
-      tierBadge.className  = 'upgrade-tier-badge tier1';
-      tierBadge.textContent= 'Founding';
-      if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn tier1';
-      if (ctaPrice) ctaPrice.textContent = '$5';
+    const t1SpotsLeft = data.tier1?.spots_left ?? 0;
+    const t2SpotsLeft = data.tier2?.spots_left ?? 0;
+    if (data.current_tier === 1 && t1SpotsLeft > 0) {
+      if (banner) banner.style.display = 'flex';
+      if (tierIcon) tierIcon.textContent = '🔥';
+      if (tierName) tierName.textContent = 'Early Founder — $5/mo forever';
+      if (tierBadge) tierBadge.textContent = 'Founding';
+      if (tierSpot) tierSpot.textContent = t1SpotsLeft + ' of 500 spots left';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 - t1SpotsLeft;
       if (urgencySuffix) urgencySuffix.textContent = 'of 500 claimed';
       if (urgency) urgency.style.display = '';
-    } else if (currentTier === 2) {
-      currentCheckoutPlan  = 'founding_t2';
-      tierWrap.className   = 'upgrade-tier-wrap';
-      tierIcon.textContent = '⚡';
-      tierName.className   = 'upgrade-tier-name';
-      tierName.innerHTML   = 'Founding Member<span class="price-forever">$9.99/mo forever</span>';
-      tierSpot.textContent = t2SpotsLeft + ' of 1500 spots left';
-      tierBadge.className  = 'upgrade-tier-badge';
-      tierBadge.textContent= 'Founding';
-      if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
-      if (ctaPrice) ctaPrice.textContent = '$9.99';
+      currentCheckoutPlan = 'founding_t1';
+    } else if (data.current_tier === 2 && t2SpotsLeft > 0) {
+      if (banner) banner.style.display = 'flex';
+      if (tierIcon) tierIcon.textContent = '⚡';
+      if (tierName) tierName.textContent = 'Founding Member — $9.99/mo forever';
+      if (tierBadge) tierBadge.textContent = 'Founding';
+      if (tierSpot) tierSpot.textContent = t2SpotsLeft + ' of 1500 spots left';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - t2SpotsLeft);
       if (urgencySuffix) urgencySuffix.textContent = 'of 2000 founding spots claimed';
       if (urgency) urgency.style.display = '';
-    } else {
-      currentCheckoutPlan  = 'pro';
-      tierWrap.className   = 'upgrade-tier-wrap';
-      tierIcon.textContent = '✦';
-      tierName.className   = 'upgrade-tier-name';
-      tierName.innerHTML   = 'Pro<span class="price-forever">$19/mo</span>';
-      tierSpot.textContent = 'Unlimited generations, all features';
-      tierBadge.className  = 'upgrade-tier-badge';
-      tierBadge.textContent= 'Pro';
-      if (ctaBtn) ctaBtn.className = 'upgrade-cta-btn';
-      if (ctaPrice) ctaPrice.textContent = '$19';
-      if (urgency) urgency.style.display = 'none';
+      currentCheckoutPlan = 'founding_t2';
     }
   } catch (e) { /* silently fail — modal still shows */ }
+}
+
+function startCheckoutPlan(plan) {
+  if (!S.user) { closeUpgradeModal(); openAuth('Create your free account first, then upgrade'); return; }
+  currentCheckoutPlan = plan;
+  startCheckout();
 }
 
 function closeUpgradeModal() {
@@ -7800,6 +7862,28 @@ async function loadMoodBoard(prefix) {
 // ═══════════════════════════════════════════════════════
 // VISUAL BRIEF
 // ═══════════════════════════════════════════════════════
+function tryOpenVisual(prefix) {
+  if (!window.__soniqAdmin && !PAID_PLANS.has(S.plan)) {
+    if (!S.user) { openAuth('Sign in and upgrade to unlock Visual Prompts, Music Video concepts & Social Media captions'); return; }
+    toast('🎬 Visual Prompts unlock with Starter — artist visuals, music video concepts & social captions');
+    openUpgradeModal();
+    return;
+  }
+  goOtabMore(prefix, 'visual', '🎬 Visual');
+  loadVisualPrompts(prefix);
+}
+
+function tryOpenSync(prefix) {
+  if (!window.__soniqAdmin && !PAID_PLANS.has(S.plan)) {
+    if (!S.user) { openAuth('Sign in and upgrade to unlock Sync Metadata'); return; }
+    toast('📋 Sync Metadata unlocks with Starter — mood tags, BPM, placement categories for licensing');
+    openUpgradeModal();
+    return;
+  }
+  goOtabMore(prefix, 'sync', '📋 Sync');
+  renderSyncMeta(prefix);
+}
+
 async function loadVisualPrompts(prefix) {
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   const container = document.getElementById(prefix + '-visual-content');
@@ -8981,7 +9065,9 @@ function calcHookScore(prefix) {
 // Only studio / studio_annual plans can access Studio features.
 // ═══════════════════════════════════════════════════════
 const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
-const PAID_PLANS   = new Set(['pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+const PAID_PLANS   = new Set(['starter','starter_annual','pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+// Genres available on free plan — premium genres require Starter+
+const FREE_GENRES  = new Set(['pop','hiphop','rnb','rock','country','edm']);
 
 function requireStudio(featureName) {
   if (window.__soniqAdmin || STUDIO_PLANS.has(S.plan)) return true;
@@ -9941,7 +10027,7 @@ function _dbgErr(ctx,msg){
 const OB_KEY = 'soniq:onboarding:v1:complete';
 const OB_DAILY_KEY = 'soniq:daily:songs';
 const OB_DAILY_DATE_KEY = 'soniq:daily:date';
-const OB_FREE_LIMIT = 3;
+const OB_FREE_LIMIT = 1;
 
 const OB_STEPS = [
   {
@@ -10104,7 +10190,7 @@ function showGenNudge(songNum) {
   if (window.__soniqAdmin || isFounder || isPaid) return;
   var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
   if (remaining > 0) {
-    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited with Early Founder pricing.';
+    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited from $9/mo.';
   } else {
     txt.innerHTML = 'You’ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong> for today. Upgrade to keep creating.';
   }

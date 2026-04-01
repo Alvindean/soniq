@@ -53,7 +53,8 @@ function getTodayDate() {
 }
 
 const PLAN_LIMITS = {
-  free: 3,
+  free: 1,
+  starter: Infinity, starter_annual: Infinity,
   pro: Infinity, pro_annual: Infinity,
   studio: Infinity, studio_annual: Infinity,
   founding: Infinity,
