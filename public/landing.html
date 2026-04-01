@@ -53,14 +53,14 @@
             "name": "Starter",
             "price": "9",
             "priceCurrency": "USD",
-            "description": "50 songs/month, all 24 genres, Visual Prompts, Theory Analysis, Social Media captions"
+            "description": "10 songs/month, all 24 genres, Visual Prompts, Theory Analysis, Social Media captions"
           },
           {
             "@type": "Offer",
             "name": "Pro",
             "price": "19",
             "priceCurrency": "USD",
-            "description": "Everything in Starter plus Album Planner, Rap Lab, Version History, batch generation"
+            "description": "Everything in Entry plus Album Planner, Rap Lab, Version History, batch generation"
           },
           {
             "@type": "Offer",
@@ -971,6 +971,48 @@
     }
     .spots-bar-label .spots-claimed { color: #a855f7; font-weight: 600; }
 
+    /* ── SCORE GUARANTEE ── */
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .score-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      text-align: center;
+    }
+    .score-card-featured {
+      border-color: #7c3aed;
+      background: rgba(124,58,237,0.06);
+      box-shadow: 0 0 40px rgba(124,58,237,0.15);
+    }
+    .score-tier {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #a855f7;
+      margin-bottom: 12px;
+    }
+    .score-num {
+      font-size: 3rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a855f7, #7c3aed);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .score-none { background: none; -webkit-text-fill-color: var(--text-dim); color: var(--text-dim); }
+    .score-label { font-size: 0.85rem; font-weight: 600; color: #fff; margin-bottom: 8px; }
+    .score-desc { font-size: 0.78rem; color: var(--text-muted); line-height: 1.5; }
+    @media (max-width: 900px) { .score-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .score-grid { grid-template-columns: 1fr; } }
+
     /* ── ENTERPRISE STRIP ── */
     .enterprise-strip {
       margin-top: 20px;
@@ -1661,6 +1703,50 @@
     </div>
   </section>
 
+  <!-- SCORE GUARANTEE -->
+  <section id="score-guarantee" style="background:var(--bg2)">
+    <div style="text-align:center;margin-bottom:48px">
+      <span class="section-label">Quality Guarantee</span>
+      <h2 class="section-title">Every paid song scores or we rewrite it.</h2>
+      <p class="section-sub" style="max-width:560px;margin:0 auto">SONIQ scores every generation against a 100-point rubric — Genre DNA, lyric craft, song structure, and hook strength. If it doesn't hit your plan's minimum, the AI automatically rewrites it until it does.</p>
+    </div>
+    <div class="score-grid">
+      <div class="score-card">
+        <div class="score-tier">Free</div>
+        <div class="score-num score-none">—</div>
+        <div class="score-label">No guarantee</div>
+        <div class="score-desc">Raw generation. What comes out is what you get.</div>
+      </div>
+      <div class="score-card">
+        <div class="score-tier">Entry · $9.99</div>
+        <div class="score-num">75+</div>
+        <div class="score-label">Quality guaranteed</div>
+        <div class="score-desc">Every song scores 75 or higher — or it's automatically rewritten before you see it.</div>
+      </div>
+      <div class="score-card score-card-featured">
+        <div class="score-tier">Pro · $19</div>
+        <div class="score-num">81+</div>
+        <div class="score-label">Pro quality guaranteed</div>
+        <div class="score-desc">A score of 81+ means structurally solid, genre-authentic, and hook-ready for recording.</div>
+      </div>
+      <div class="score-card">
+        <div class="score-tier">Studio · $49</div>
+        <div class="score-num">85+</div>
+        <div class="score-label">Studio quality guaranteed</div>
+        <div class="score-desc">85+ is professional-grade. Pitchable to labels, licensable for sync, ready for the studio.</div>
+      </div>
+    </div>
+    <div style="margin-top:40px;background:var(--card-bg);border:1px solid var(--border);border-radius:16px;padding:28px 32px">
+      <p style="font-weight:700;color:#fff;margin-bottom:16px;font-size:1rem">The 100-Point SONIQ Rubric</p>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px">
+        <div><div style="color:#a855f7;font-weight:600;font-size:0.8rem;margin-bottom:4px">LYRIC CRAFT · 30pts</div><div style="color:var(--text-muted);font-size:0.8rem">Rhyme scheme, imagery specificity, line rhythm, vocabulary</div></div>
+        <div><div style="color:#a855f7;font-weight:600;font-size:0.8rem;margin-bottom:4px">STRUCTURE · 25pts</div><div style="color:var(--text-muted);font-size:0.8rem">Correct verse/hook/bridge format, section completeness</div></div>
+        <div><div style="color:#a855f7;font-weight:600;font-size:0.8rem;margin-bottom:4px">GENRE DNA · 25pts</div><div style="color:var(--text-muted);font-size:0.8rem">Authentic genre markers, style adherence, production language</div></div>
+        <div><div style="color:#a855f7;font-weight:600;font-size:0.8rem;margin-bottom:4px">HOOK STRENGTH · 20pts</div><div style="color:var(--text-muted);font-size:0.8rem">Memorability, emotional payoff, chorus impact</div></div>
+      </div>
+    </div>
+  </section>
+
   <!-- PRICING -->
   <section id="pricing">
     <div class="pricing-header">
@@ -1696,19 +1782,19 @@
 
       <!-- STARTER -->
       <div class="pricing-card fade-in" style="transition-delay:0.08s">
-        <div class="pricing-name">Starter</div>
-        <div class="pricing-price">$9<span>/mo</span></div>
+        <div class="pricing-name">Entry</div>
+        <div class="pricing-price">$9.99<span>/mo</span></div>
         <div class="pricing-period">billed monthly</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>50 songs / month</li>
+          <li>10 songs / month</li>
           <li>All 24 genres</li>
+          <li>⭐ 75+ quality score guarantee</li>
           <li>Visual Prompts</li>
           <li>Full production brief</li>
           <li>Theory Analysis</li>
-          <li>Social Media captions</li>
         </ul>
-        <a href="/app#account" class="btn btn-outline-violet pricing-cta">Get Starter →</a>
+        <a href="/app#account" class="btn btn-outline-violet pricing-cta">Get Started →</a>
       </div>
 
       <!-- PRO — featured -->
@@ -1728,11 +1814,11 @@
         </div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>100 songs / month</li>
-          <li>Everything in Starter</li>
+          <li>20 songs / month</li>
+          <li>⭐ 81+ quality score guarantee</li>
+          <li>Everything in Entry</li>
           <li>Album Planner</li>
           <li>Rap Lab</li>
-          <li>Version History</li>
           <li>Batch ×3 generate</li>
           <li>Sync metadata</li>
         </ul>
@@ -1746,7 +1832,8 @@
         <div class="pricing-period">billed monthly</div>
         <div class="pricing-divider"></div>
         <ul class="pricing-features">
-          <li>200 songs / month</li>
+          <li>50 songs / month</li>
+          <li>⭐ 85+ quality score guarantee</li>
           <li>Everything in Pro</li>
           <li>100% publishing — split waived</li>
           <li>PDF Export</li>
@@ -1768,7 +1855,7 @@
             <div class="enterprise-label">Enterprise</div>
             <div class="enterprise-title">For labels, publishers &amp; agencies</div>
             <div class="enterprise-pills">
-              <span class="enterprise-pill">Custom volume</span>
+              <span class="enterprise-pill">Unlimited songs</span>
               <span class="enterprise-pill">Team seats</span>
               <span class="enterprise-pill">API access</span>
               <span class="enterprise-pill">Negotiated publishing split</span>
@@ -1961,9 +2048,9 @@
         { q: 'What is genre DNA?', a: 'Genre DNA is the set of structural rules that make a genre work — verse length, hook placement, BPM ranges, chord progressions, production conventions, and the outlier songs that broke the rules but still charted. SONIQ has this built in for 24 genres including Hip-Hop, R&B, Pop, Country, Electronic, Latin, Singer-Songwriter, and more.' },
         { q: 'Does SONIQ replace human songwriters?', a: 'No. SONIQ kills the blank page — it gives you the structural blueprint, the theory foundation, the production direction, and the sync metadata. The idea, the emotion, and the performance are still entirely yours. It\'s a tool for serious artists, not a replacement for them.' },
         { q: 'What does the publishing registration include?', a: 'Every song gets a copyright timestamp (SONIQ-ID). Pro and Founding members can register with BMI, ASCAP, or SESAC through Nu Wav Media LLC, receive an ISRC code, and enter a co-publishing agreement. Your writer\'s share is protected from song one.' },
-        { q: 'What are the paid plan options?', a: 'Starter is $9/mo — 50 songs/month, all 24 genres, Visual Prompts, Theory Analysis, and Social Media captions. Pro is $19/mo — 100 songs/month plus everything in Starter, Album Planner, Rap Lab, Version History, and batch generation. Studio is $49/mo — 200 songs/month, 100% publishing (split waived), PDF export, shareable briefs, and Artist Voice Profile. Enterprise is available for labels, publishers, and agencies — custom volume, negotiated publishing split, team seats, and API access. Contact info@mysoniq.com.' },
+        { q: 'What are the paid plan options?', a: 'Entry is $9.99/mo — 10 songs/month, all 24 genres, Visual Prompts, Theory Analysis, and Social Media captions. Pro is $19/mo — 20 songs/month plus everything in Entry, Album Planner, Rap Lab, Version History, and batch generation. Studio is $49/mo — 50 songs/month, 100% publishing (split waived), PDF export, shareable briefs, and Artist Voice Profile. Enterprise is unlimited — for labels, publishers, and agencies who need serious volume. Contact info@mysoniq.com.' },
         { q: 'How does sync metadata work?', a: 'Music supervisors search catalogs by mood, BPM, instrumentation, and use case — not by listening to every song. SONIQ automatically generates mood tags, BPM range, instrumentation notes, and best-fit placement categories (TV drama, fitness, retail, trailer) with every song. Your catalog becomes searchable from day one.' },
-        { q: 'How many songs can I generate for free?', a: 'Free accounts generate 1 song per day across 6 core genres (Pop, Hip-Hop, R&B, Rock, Country, EDM). Starter gets 50 songs/month, Pro gets 100 songs/month, Studio gets 200 songs/month — all with full genre DNA, music theory, and production brief included. Enterprise plans have custom volume.' },
+        { q: 'How many songs can I generate for free?', a: 'Free accounts generate 3 free songs total to try across 6 core genres (Pop, Hip-Hop, R&B, Rock, Country, EDM). Entry gets 10/month, Pro gets 20/month, Studio gets 50/month — all with full Genre DNA, music theory, and production brief. Unlimited volume is Enterprise only.' },
       ];
 
       const list = document.getElementById('faq-list');

@@ -59,28 +59,112 @@ function getThisMonth() {
   return new Date().toISOString().slice(0, 7); // YYYY-MM
 }
 
-// Daily limit for free; monthly limits for paid tiers
+// free = 3 lifetime songs (trial); paid = monthly
 const PLAN_LIMITS = {
-  free:                1,    // per day
-  starter:             50,   // per month
-  starter_annual:      50,   // per month
-  pro:                 100,  // per month
-  pro_annual:          100,  // per month
-  studio:              200,  // per month
-  studio_annual:       200,  // per month
-  founding:            200,  // per month
-  founding_t1:         200,  // per month
-  founding_t1_annual:  200,  // per month
-  founding_t2:         200,  // per month
-  founding_t2_annual:  200,  // per month
+  free:                3,    // lifetime trial
+  founding_t1:         20,   // per month ($5 early founder)
+  founding_t1_annual:  20,
+  founding_t2:         10,   // per month ($9.99 entry)
+  founding_t2_annual:  10,
+  pro:                 20,   // per month ($19)
+  pro_annual:          20,
+  studio:              50,   // per month ($49)
+  studio_annual:       50,
+  founding:            50,   // legacy
 };
 
-// Plans that use monthly (not daily) counting
+// Plans that use monthly counting (free uses lifetime)
 const MONTHLY_LIMIT_PLANS = new Set([
-  'starter','starter_annual','pro','pro_annual',
-  'studio','studio_annual','founding','founding_t1',
-  'founding_t1_annual','founding_t2','founding_t2_annual'
+  'founding_t1','founding_t1_annual',
+  'founding_t2','founding_t2_annual',
+  'pro','pro_annual',
+  'studio','studio_annual','founding'
 ]);
+
+// Minimum quality score per plan (0 = no guarantee)
+const PLAN_MIN_SCORES = {
+  free:               0,
+  founding_t2:        75,  founding_t2_annual:  75,
+  founding_t1:        75,  founding_t1_annual:  75,
+  pro:                81,  pro_annual:          81,
+  studio:             85,  studio_annual:       85,
+  founding:           85,
+};
+
+const PLAN_MAX_RETRIES = {
+  founding_t2: 2, founding_t2_annual: 2,
+  founding_t1: 2, founding_t1_annual: 2,
+  pro: 2,         pro_annual: 2,
+  studio: 3,      studio_annual: 3,
+  founding: 3,
+};
+
+// Score a generated song using Claude Haiku (cheap, fast)
+async function scoreSong(text, genre, anthropicKey) {
+  if (!anthropicKey || !text) return 100;
+  try {
+    const prompt = `Score this ${genre || 'pop'} song 0-100 using these criteria:
+- Lyric Craft (0-30): rhyme scheme, imagery, line rhythm
+- Structure (0-25): correct verse/hook/bridge for genre
+- Genre DNA (0-25): authentic genre markers and style
+- Hook Strength (0-20): memorability and emotional payoff
+
+Song:
+${text.slice(0, 2500)}
+
+Reply ONLY with JSON: {"score":<0-100>}`;
+
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-version':'2023-06-01'},
+      body: JSON.stringify({model:'claude-haiku-4-5-20251001', max_tokens:60, messages:[{role:'user',content:prompt}]})
+    });
+    const d = await r.json();
+    const raw = d.content?.[0]?.text || '';
+    const m = raw.match(/\{[\s\S]*?\}/);
+    if (m) return JSON.parse(m[0]).score || 0;
+  } catch (e) { console.error('Score error:', e.message); }
+  return 100; // fail open
+}
+
+// Generate full text (buffered, not streamed) via Anthropic
+async function generateBuffered(anthropicKey, messages, system, max_tokens) {
+  const payload = {model:'claude-sonnet-4-20250514', max_tokens, stream:true, messages};
+  if (system) payload.system = system;
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
+    method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':anthropicKey,'anthropic-version':'2023-06-01'},
+    body: JSON.stringify(payload)
+  });
+  if (!r.ok) throw new Error('Anthropic ' + r.status);
+  const reader = r.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = '', result = '';
+  while (true) {
+    const {done, value} = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, {stream:true});
+    const lines = buf.split('\n'); buf = lines.pop();
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      try {
+        const ev = JSON.parse(line.slice(6));
+        if (ev.type === 'content_block_delta' && ev.delta?.type === 'text_delta') result += ev.delta.text;
+      } catch {}
+    }
+  }
+  return result;
+}
+
+// Stream pre-buffered text as SSE chunks
+function streamBuffered(text, score, res) {
+  const chunkSize = 40;
+  for (let i = 0; i < text.length; i += chunkSize) {
+    res.write(`data: ${JSON.stringify({text: text.slice(i, i + chunkSize)})}\n\n`);
+  }
+  res.write(`data: ${JSON.stringify({done: true, score})}\n\n`);
+  res.end();
+}
 
 async function streamAnthropic(apiKey, messages, system, max_tokens, res) {
   const payload = {model: 'claude-sonnet-4-20250514', max_tokens, stream: true, messages};
@@ -224,24 +308,25 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const limit = PLAN_LIMITS[plan] ?? 1;
+  const limit = PLAN_LIMITS[plan] ?? 3;
   if (!req._adminBypass && isFinite(limit)) {
-    const isMonthly = MONTHLY_LIMIT_PLANS.has(plan);
-    const periodKey = isMonthly ? getThisMonth() : getTodayDate();
-    const redisKey  = `soniq:ratelimit:${isMonthly ? 'monthly' : 'daily'}:${user.id}:${periodKey}`;
-    const current   = parseInt(await redisGet(redisKey) || '0', 10);
+    const isLifetime = plan === 'free';
+    const isMonthly  = MONTHLY_LIMIT_PLANS.has(plan);
+    const redisKey   = isLifetime
+      ? `soniq:ratelimit:lifetime:${user.id}`
+      : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+    const current = parseInt(await redisGet(redisKey) || '0', 10);
     if (current >= limit) {
-      const periodLabel = isMonthly ? 'this month' : 'today';
-      const upgradeHint = plan === 'free'
-        ? 'Upgrade to Starter for 50 songs/month.'
-        : plan === 'starter' || plan === 'starter_annual'
-          ? 'Upgrade to Pro for 100 songs/month.'
+      const upgradeHint = isLifetime
+        ? 'Your 3 free songs are used. Upgrade to keep creating.'
+        : plan === 'founding_t2' || plan === 'founding_t2_annual'
+          ? 'Upgrade to Pro for 20 songs/month.'
           : plan === 'pro' || plan === 'pro_annual'
-            ? 'Upgrade to Studio for 500 songs/month.'
-            : 'Contact support to increase your limit.';
+            ? 'Upgrade to Studio for 50 songs/month.'
+            : 'Contact info@mysoniq.com for Enterprise volume.';
       return res.status(429).json({
         error: 'limit_reached',
-        message: `You've used all ${limit} songs ${periodLabel}. ${upgradeHint}`,
+        message: upgradeHint,
         limit,
         plan
       });
@@ -332,15 +417,40 @@ module.exports = async function handler(req, res) {
 
   const errors = [];
 
-  // Helper: increment rate limit after successful stream
+  // Helper: increment rate limit after successful generation
   const recordUsage = () => {
     if (!req._adminBypass && isFinite(limit)) {
-      const isMonthly = MONTHLY_LIMIT_PLANS.has(plan);
-      const periodKey = isMonthly ? getThisMonth() : getTodayDate();
-      const ttl       = isMonthly ? 32 * 24 * 3600 : 86400; // ~32 days or 1 day
-      redisIncrExpire(`soniq:ratelimit:${isMonthly ? 'monthly' : 'daily'}:${user.id}:${periodKey}`, ttl);
+      const isLifetime = plan === 'free';
+      const redisKey   = isLifetime
+        ? `soniq:ratelimit:lifetime:${user.id}`
+        : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+      const ttl = isLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+      redisIncrExpire(redisKey, ttl);
     }
   };
+
+  const minScore   = PLAN_MIN_SCORES[plan] ?? 0;
+  const maxRetries = PLAN_MAX_RETRIES[plan] ?? 0;
+
+  // Paid plans with score guarantee: buffer, score, retry if needed
+  if (anthropicKey && minScore > 0) {
+    let bestText = '', bestScore = 0, attempts = 0;
+    const totalAttempts = maxRetries + 1;
+    try {
+      while (attempts < totalAttempts) {
+        attempts++;
+        const text = await generateBuffered(anthropicKey, messages, system, max_tokens);
+        const score = await scoreSong(text, body.genre, anthropicKey);
+        if (score > bestScore) { bestScore = score; bestText = text; }
+        if (score >= minScore) break;
+      }
+      recordUsage();
+      streamBuffered(bestText, bestScore, res);
+      return;
+    } catch (err) {
+      console.error('Buffered generation failed:', err.message);
+    }
+  }
 
   if (anthropicKey) {
     try {
