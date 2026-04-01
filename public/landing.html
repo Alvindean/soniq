@@ -827,14 +827,9 @@
     }
 
     /* ── PRICING ── */
-    #pricing {
-      background: var(--bg);
-      padding: 80px max(24px, calc((100vw - 1180px) / 2));
-    }
-
-    .pricing-header { text-align: center; margin-bottom: 60px; }
+    #pricing { background: var(--bg); }
+    .pricing-header { text-align: center; margin-bottom: 48px; }
     .pricing-header .section-sub { margin: 0 auto; }
-
     .pricing-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -978,7 +973,7 @@
 
     /* ── ENTERPRISE STRIP ── */
     .enterprise-strip {
-      margin: 20px 0 0;
+      margin-top: 20px;
       background: var(--card-bg);
       border: 1px solid #7c3aed55;
       border-radius: 20px;
@@ -1172,12 +1167,18 @@
     }
 
     /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+    }
     @media (max-width: 900px) {
       .feature-grid { grid-template-columns: repeat(2, 1fr); }
-      .pricing-grid { grid-template-columns: 1fr; max-width: 420px; margin: 0 auto; }
+      .pricing-grid { grid-template-columns: repeat(2, 1fr); }
       .steps { grid-template-columns: 1fr; gap: 40px; }
       .steps::before { display: none; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 580px) {
+      .pricing-grid { grid-template-columns: 1fr; max-width: 400px; margin: 0 auto; }
     }
 
     @media (max-width: 640px) {
