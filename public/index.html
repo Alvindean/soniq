@@ -1909,10 +1909,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="gen-progress" id="gen-progress">
           <div class="gp-pips" id="gp-pips">
             <div class="gp-pip" id="gp-pip-1"></div>
-            <div class="gp-pip" id="gp-pip-2"></div>
-            <div class="gp-pip" id="gp-pip-3"></div>
           </div>
-          <span id="gp-label">Song 1 of 3 today</span>
+          <span id="gp-label">1 free song today</span>
         </div>
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
@@ -2002,7 +2000,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="otab-more-item" onclick="goOtabMore('res','notes','💡 Notes')">💡 Notes</div>
           <div class="otab-more-item" onclick="goOtabMore('res','moodboard','🎨 Mood');loadMoodBoard('res')">🎨 Mood</div>
           <div class="otab-more-item" onclick="tryOpenVisual('res')">🎬 Visual</div>
-          <div class="otab-more-item" onclick="goOtabMore('res','sync','📋 Sync');renderSyncMeta('res')">📋 Sync</div>
+          <div class="otab-more-item" onclick="tryOpenSync('res')">📋 Sync</div>
         </div>
       </div>
     </div>
@@ -2181,7 +2179,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="otab-more-item" onclick="goOtabMore('lres','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
           <div class="otab-more-item" onclick="goOtabMore('lres','notes','💡 Director Notes')">💡 Director Notes</div>
           <div class="otab-more-item" onclick="tryOpenVisual('lres')">🎬 Visual</div>
-          <div class="otab-more-item" onclick="goOtabMore('lres','sync','📋 Sync');renderSyncMeta('lres')">📋 Sync</div>
+          <div class="otab-more-item" onclick="tryOpenSync('lres')">📋 Sync</div>
         </div>
       </div>
     </div>
@@ -4618,7 +4616,7 @@ function apiErrHtml(msg, errCode) {
   if (isAuthRequired) {
     hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account to generate your song — 1 free song every day\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
   } else if (isLimitReached) {
-    hint = '<br><br>You\'ve used your 3 free songs today. Upgrade to unlock unlimited generations.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock Unlimited →</button>';
+    hint = '<br><br>You\'ve used your 1 free song today. Upgrade from $9/mo to unlock unlimited generations.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock Unlimited →</button>';
   } else if (isCredits) {
     hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
   } else if (isKey) {
@@ -7862,6 +7860,17 @@ function tryOpenVisual(prefix) {
   loadVisualPrompts(prefix);
 }
 
+function tryOpenSync(prefix) {
+  if (!window.__soniqAdmin && !PAID_PLANS.has(S.plan)) {
+    if (!S.user) { openAuth('Sign in and upgrade to unlock Sync Metadata'); return; }
+    toast('📋 Sync Metadata unlocks with Starter — mood tags, BPM, placement categories for licensing');
+    openUpgradeModal();
+    return;
+  }
+  goOtabMore(prefix, 'sync', '📋 Sync');
+  renderSyncMeta(prefix);
+}
+
 async function loadVisualPrompts(prefix) {
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   const container = document.getElementById(prefix + '-visual-content');
@@ -10163,10 +10172,11 @@ function showGenNudge(songNum) {
   var txt = document.getElementById('gn-text');
   if (!el || !txt) return;
   var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
-  if (isFounder) return;
+  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
+  if (window.__soniqAdmin || isFounder || isPaid) return;
   var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
   if (remaining > 0) {
-    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited with Early Founder pricing.';
+    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited from $9/mo.';
   } else {
     txt.innerHTML = 'You’ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong> for today. Upgrade to keep creating.';
   }
