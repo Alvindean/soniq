@@ -897,6 +897,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .vb-chip.img{color:#a78bfa;border-color:#6d3fa040;background:#6d3fa018}
 .vb-chip.vid{color:#34d399;border-color:#34d39940;background:#34d39918}
 .vb-chip.art{color:var(--amber);border-color:var(--amberline);background:var(--amberbg)}
+.vb-chip.social{color:#f472b6;border-color:#f472b640;background:#f472b618}
 .vb-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);overflow:hidden;transition:border-color .15s}
 .vb-card:hover{border-color:var(--b3)}
 .vb-card-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px 8px;border-bottom:1px solid var(--b1)}
@@ -1475,6 +1476,19 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <label class="topic-label">Mood <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— pick 1–2 moods</span></label>
       <div class="mood-grid" id="mood-grid"></div>
       <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
+
+      <!-- AGE GROUP SELECTOR -->
+      <label class="topic-label" style="margin-top:4px">Audience Age <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— optional, shapes vocabulary &amp; themes</span></label>
+      <div class="quality-row" id="age-pills">
+        <span class="qpill on" onclick="setAgeGroup(this,'')" id="age-pill-any">Any Age</span>
+        <span class="qpill" onclick="setAgeGroup(this,'toddler')" id="age-pill-toddler">👶 1–4</span>
+        <span class="qpill" onclick="setAgeGroup(this,'kids')" id="age-pill-kids">🧒 5–8</span>
+        <span class="qpill" onclick="setAgeGroup(this,'tween')" id="age-pill-tween">🎒 9–12</span>
+        <span class="qpill" onclick="setAgeGroup(this,'teen')" id="age-pill-teen">🎧 13–17</span>
+        <span class="qpill" onclick="setAgeGroup(this,'young-adult')" id="age-pill-ya">🔥 18–24</span>
+        <span class="qpill" onclick="setAgeGroup(this,'adult')" id="age-pill-adult">🎵 25+</span>
+      </div>
+      <div id="age-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:8px;min-height:14px"></div>
 
       <!-- PARAMS ROW (Vocal + Structure only) -->
       <div class="params" style="grid-template-columns:1fr 1fr">
@@ -3877,6 +3891,7 @@ const S={selectedGenre:'pop',
   selectedMoods:['Emotional'],
   bracketMode:'suno',
   selectedEra:'modern',
+  selectedAgeGroup:'',
   albumLanes:['streaming'],
   albumData:null,
   currentVersions:[],
@@ -4968,7 +4983,8 @@ async function generateSong(){
       genre2: document.getElementById('g-genre2')?.value || '',
       style2: document.getElementById('g-style2')?.value || '',
       ratio: parseInt(document.getElementById('g-blend')?.value || 70)
-    }
+    },
+    ageGroup: S.selectedAgeGroup || ''
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
@@ -6457,6 +6473,29 @@ function setEra(el, val) {
   if (desc) desc.textContent = ERA_DESCS[val] || '';
 }
 
+const AGE_DESCS = {
+  '':            '',
+  'toddler':     'Ultra-simple words, animal sounds, repetition — motion cues like clap/stomp. Max 5-note melody range.',
+  'kids':        'Simple vocabulary, school & friendship themes, motion cues, singalong structure with humor.',
+  'tween':       'Relatable school/social themes, first crushes (innocent), being yourself. No adult content.',
+  'teen':        'Contemporary language, identity & first love, self-empowerment. Authentic without explicit content.',
+  'young-adult': 'No restrictions. Independence, new relationships, ambition, self-discovery.',
+  'adult':       'No restrictions. Emotionally nuanced — relationships, legacy, life\'s complexity.'
+};
+
+function setAgeGroup(el, val) {
+  document.querySelectorAll('#age-pills .qpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.selectedAgeGroup = val;
+  const desc = document.getElementById('age-desc');
+  if (desc) desc.textContent = AGE_DESCS[val] || '';
+  // For toddler/kids, suggest children's genre
+  if ((val === 'toddler' || val === 'kids') && S.selectedGenre !== 'children') {
+    const hint = document.getElementById('age-desc');
+    if (hint) hint.textContent = (AGE_DESCS[val] || '') + ' · Tip: try 🌈 Children\'s genre for best results';
+  }
+}
+
 // ═══════════════════════════════════════════════════════
 // SONG VARIANTS
 // ═══════════════════════════════════════════════════════
@@ -7777,14 +7816,14 @@ async function loadVisualPrompts(prefix) {
   </div>`;
 
   const lyricsSnippet = (song.lyrics || '').slice(0, 400);
-  const systemPrompt = `You are a creative director specializing in music video concepts and AI-generated visuals. Return ONLY the 3 sections asked for — no preamble, no extra commentary.`;
+  const systemPrompt = `You are a creative director specializing in music video concepts, AI-generated visuals, and social media marketing. Return ONLY the 4 sections asked for — no preamble, no extra commentary.`;
   const userPrompt = `Song: "${song.title}"
 Genre: ${song.genre || 'pop'}
 Style prompt: ${song.style || ''}
 Lyrics excerpt:
 ${lyricsSnippet}
 
-Generate 3 ready-to-paste visual prompts for this song. Use EXACTLY these headers:
+Generate 4 ready-to-paste prompts for this song. Use EXACTLY these headers:
 
 ARTIST_VISUAL:
 [One detailed paragraph. Physical description: gender presentation, age range, skin tone, hair, face features. Outfit: specific clothing, fabrics, accessories, era/aesthetic. Setting: where they are, background. Lighting: type, color, source direction. Camera angle. Mood keywords. End with: --ar 2:3 --style raw --q 2 (Midjourney params). Optimized for Midjourney v6 / Flux / Ideogram.]
@@ -7793,7 +7832,14 @@ MUSIC_VIDEO:
 [One detailed paragraph for a 15–45 second short-form vertical video (9:16). Opening shot. Artist/subject action and movement. Environment and set details. Camera movement (slow push in, tracking, handheld, etc.). Color grade (warm golden, desaturated cinematic, neon-drenched, etc.). Lighting mood. Emotional arc. Wardrobe moment. Closing shot. Optimized for Runway Gen-3, Pika 2.0, Kling, Dream Machine.]
 
 COVER_ART:
-[One detailed paragraph for single/album artwork. Visual metaphor representing the song theme. Color palette (3–4 specific colors). Composition style (centered subject, rule of thirds, abstract, etc.). Art style (photorealistic, painterly, graphic illustration, etc.). Atmosphere and mood. Texture details. NO text in image. Square format 1:1. Optimized for Midjourney v6 / Ideogram v2 / Adobe Firefly.]`;
+[One detailed paragraph for single/album artwork. Visual metaphor representing the song theme. Color palette (3–4 specific colors). Composition style (centered subject, rule of thirds, abstract, etc.). Art style (photorealistic, painterly, graphic illustration, etc.). Atmosphere and mood. Texture details. NO text in image. Square format 1:1. Optimized for Midjourney v6 / Ideogram v2 / Adobe Firefly.]
+
+SOCIAL_MEDIA:
+[Four ready-to-post social media captions for this song release. Each on its own line, labeled:
+INSTAGRAM: [150–220 character caption with emotion hook, song title, 8–10 relevant hashtags. Starts with a strong first line that stops the scroll.]
+TIKTOK: [120–160 character caption with trending hooks ("POV:", "This song hits different when...", "Tell me why this made me cry 😭"), song title, 5–7 hashtags. Ultra-casual tone.]
+TWITTER/X: [Under 280 chars. Punchy, opinionated, one strong take on the song theme. 2–3 hashtags max.]
+YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene, includes song title and artist, ends with a call to action. 150–250 characters.]]`;
 
   try {
     const raw = await callClaude(userPrompt, systemPrompt);
@@ -7805,6 +7851,7 @@ COVER_ART:
     const artistVisual = extractSection(raw, 'ARTIST_VISUAL');
     const musicVideo   = extractSection(raw, 'MUSIC_VIDEO');
     const coverArt     = extractSection(raw, 'COVER_ART');
+    const socialMedia  = extractSection(raw, 'SOCIAL_MEDIA');
 
     function makeCard(icon, name, sub, chipClass, chips, promptText, copyKey) {
       return `<div class="vb-card" id="${prefix}-vb-${copyKey}">
@@ -7832,12 +7879,13 @@ COVER_ART:
       ${makeCard('🎤','Artist Visual','How your artist looks — paste into any image AI','img',['Midjourney','Flux','Ideogram','Firefly'],artistVisual,'artist')}
       ${makeCard('🎬','Music Video','Short-form vertical video concept — 9:16, 15–45 sec','vid',['Runway Gen-3','Pika 2.0','Kling','Dream Machine'],musicVideo,'video')}
       ${makeCard('🖼','Cover Art','Single / album artwork — no text in image','art',['Midjourney v6','Ideogram v2','Firefly','Flux'],coverArt,'cover')}
+      ${makeCard('📱','Social Media','Ready-to-post captions for every platform','social',['Instagram','TikTok','Twitter/X','YouTube'],socialMedia,'social')}
     </div>`;
 
     container.innerHTML = html;
     container.dataset.loaded = '1';
     // cache on song object
-    if (song) song._visual = { artistVisual, musicVideo, coverArt };
+    if (song) song._visual = { artistVisual, musicVideo, coverArt, socialMedia };
     showEmptyTabState(prefix + '-visual-content', 'Visual prompts generated on first click');
   } catch(e) {
     container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:20px">Visual brief unavailable. Try again.</div>';
