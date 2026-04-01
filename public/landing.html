@@ -144,7 +144,7 @@
             "name": "What is the Early Founder pricing?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "The first 500 members can lock in SONIQ Pro for $5/month forever. After those spots are claimed, the next tier is $9.99/month. The standard price is $19/month. Founding pricing never changes once locked in."
+              "text": "The first 500 members can lock in SONIQ Pro for $5/month forever. After those spots are claimed, the next tier is $9.99/month. The standard price is $19/month. Founding pricing is available while spots last."
             }
           },
           {
@@ -1758,7 +1758,7 @@
     <!-- Founding urgency banner — shown by JS when spots available -->
     <div class="pricing-urgency-banner" id="pricing-urgency-banner">
       <div class="pricing-urgency-inner">
-        <strong id="pricing-banner-text">Early Founder spots are going fast — lock in $5/mo forever</strong>
+        <strong id="pricing-banner-text">Early Founder spots are going fast — lock in $5/mo</strong>
         <a href="/app#account" id="pricing-banner-cta">Lock In $5/mo →</a>
       </div>
     </div>
@@ -1868,7 +1868,7 @@
       </div>
     </div>
 
-    <p class="pricing-note" id="pricing-note-founding" style="display:none">🔥 Founding spots available — price locks in forever when you join.</p>
+    <p class="pricing-note" id="pricing-note-founding" style="display:none">🔥 Founding spots available — founding pricing available now.</p>
     <p style="text-align:center;color:var(--text-dim);font-size:0.8rem;margin-top:12px">Cancel anytime · No long-term contracts · Free plan always available</p>
   </section>
 
@@ -2095,7 +2095,7 @@
           if (heroText)      heroText.textContent   = 'Early Founder — $5/mo';
           if (heroSpotsLeft) heroSpotsLeft.textContent = t1.spots_left + ' spots left';
           if (urgencyBanner)    urgencyBanner.classList.add('visible');
-          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t1.spots_left + ' Early Founder spots remaining — lock in $5/mo forever';
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t1.spots_left + ' Early Founder spots remaining — lock in $5/mo';
           if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $5/mo →'; urgencyBannerCta.href = '/app#account'; }
           if (foundingNote) foundingNote.style.display = 'block';
         } else if (currentTier === 2) {
@@ -2104,7 +2104,7 @@
           if (heroText)      heroText.textContent   = 'Founding Member — $9.99/mo';
           if (heroSpotsLeft) heroSpotsLeft.textContent = t2.spots_left + ' spots left';
           if (urgencyBanner)    urgencyBanner.classList.add('visible');
-          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t2.spots_left + ' Founding Member spots remaining — lock in $9.99/mo forever';
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t2.spots_left + ' Founding Member spots remaining — lock in $9.99/mo';
           if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $9.99/mo →'; urgencyBannerCta.href = '/app#account'; }
           if (foundingNote) foundingNote.style.display = 'block';
         }

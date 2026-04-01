@@ -69,14 +69,14 @@ const PLAN_TO_PRICE = {
 };
 
 const PLAN_LABELS = {
-  founding_t1:        'Early Founder — $5/mo locked forever',
-  founding_t1_annual: 'Early Founder Annual — $42/yr locked forever',
-  founding_t2:        'Founding Member — $9.99/mo locked forever',
-  founding_t2_annual: 'Founding Member Annual — $84/yr locked forever',
+  founding_t1:        'Early Founder — $5/mo',
+  founding_t1_annual: 'Early Founder Annual — $42/yr',
+  founding_t2:        'Entry — $9.99/mo',
+  founding_t2_annual: 'Entry Annual — $84/yr',
   pro:                'Pro — $19/mo',
-  pro_annual:         'Pro Annual — $114/yr (50% off)',
+  pro_annual:         'Pro Annual — $114/yr',
   studio:             'Studio — $49/mo',
-  studio_annual:      'Studio Annual — $468/yr (20% off)',
+  studio_annual:      'Studio Annual — $468/yr',
 };
 
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
