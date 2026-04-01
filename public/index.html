@@ -7343,6 +7343,8 @@ async function submitPublish() {
   try {
     const headers = { 'Content-Type': 'application/json' };
     if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
+    const _adminTok = localStorage.getItem('soniq_admin_token');
+    if (window.__soniqAdmin && _adminTok) headers['X-Admin-Token'] = _adminTok;
     const resp = await fetch('/api/publish', {
       method: 'POST',
       headers,
