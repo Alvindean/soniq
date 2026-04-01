@@ -55,20 +55,32 @@ function getTodayDate() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
 
+function getThisMonth() {
+  return new Date().toISOString().slice(0, 7); // YYYY-MM
+}
+
+// Daily limit for free; monthly limits for paid tiers
 const PLAN_LIMITS = {
-  free:                1,
-  starter:             Infinity,
-  starter_annual:      Infinity,
-  pro:                 Infinity,
-  pro_annual:          Infinity,
-  studio:              Infinity,
-  studio_annual:       Infinity,
-  founding:            Infinity,
-  founding_t1:         Infinity,
-  founding_t1_annual:  Infinity,
-  founding_t2:         Infinity,
-  founding_t2_annual:  Infinity,
+  free:                1,    // per day
+  starter:             50,   // per month
+  starter_annual:      50,   // per month
+  pro:                 100,  // per month
+  pro_annual:          100,  // per month
+  studio:              200,  // per month
+  studio_annual:       200,  // per month
+  founding:            200,  // per month
+  founding_t1:         200,  // per month
+  founding_t1_annual:  200,  // per month
+  founding_t2:         200,  // per month
+  founding_t2_annual:  200,  // per month
 };
+
+// Plans that use monthly (not daily) counting
+const MONTHLY_LIMIT_PLANS = new Set([
+  'starter','starter_annual','pro','pro_annual',
+  'studio','studio_annual','founding','founding_t1',
+  'founding_t1_annual','founding_t2','founding_t2_annual'
+]);
 
 async function streamAnthropic(apiKey, messages, system, max_tokens, res) {
   const payload = {model: 'claude-sonnet-4-20250514', max_tokens, stream: true, messages};
@@ -212,15 +224,24 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const limit = PLAN_LIMITS[plan] ?? 3;
+  const limit = PLAN_LIMITS[plan] ?? 1;
   if (!req._adminBypass && isFinite(limit)) {
-    const dateKey = getTodayDate();
-    const redisKey = `soniq:ratelimit:daily:${user.id}:${dateKey}`;
-    const current = parseInt(await redisGet(redisKey) || '0', 10);
+    const isMonthly = MONTHLY_LIMIT_PLANS.has(plan);
+    const periodKey = isMonthly ? getThisMonth() : getTodayDate();
+    const redisKey  = `soniq:ratelimit:${isMonthly ? 'monthly' : 'daily'}:${user.id}:${periodKey}`;
+    const current   = parseInt(await redisGet(redisKey) || '0', 10);
     if (current >= limit) {
+      const periodLabel = isMonthly ? 'this month' : 'today';
+      const upgradeHint = plan === 'free'
+        ? 'Upgrade to Starter for 50 songs/month.'
+        : plan === 'starter' || plan === 'starter_annual'
+          ? 'Upgrade to Pro for 100 songs/month.'
+          : plan === 'pro' || plan === 'pro_annual'
+            ? 'Upgrade to Studio for 500 songs/month.'
+            : 'Contact support to increase your limit.';
       return res.status(429).json({
         error: 'limit_reached',
-        message: `You've used your ${limit} free songs today. Upgrade for unlimited generations.`,
+        message: `You've used all ${limit} songs ${periodLabel}. ${upgradeHint}`,
         limit,
         plan
       });
@@ -314,8 +335,10 @@ module.exports = async function handler(req, res) {
   // Helper: increment rate limit after successful stream
   const recordUsage = () => {
     if (!req._adminBypass && isFinite(limit)) {
-      const dateKey = getTodayDate();
-      redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
+      const isMonthly = MONTHLY_LIMIT_PLANS.has(plan);
+      const periodKey = isMonthly ? getThisMonth() : getTodayDate();
+      const ttl       = isMonthly ? 32 * 24 * 3600 : 86400; // ~32 days or 1 day
+      redisIncrExpire(`soniq:ratelimit:${isMonthly ? 'monthly' : 'daily'}:${user.id}:${periodKey}`, ttl);
     }
   };
 
