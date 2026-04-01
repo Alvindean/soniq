@@ -62,17 +62,17 @@ function getThisMonth() {
 // Daily limit for free; monthly limits for paid tiers
 const PLAN_LIMITS = {
   free:                1,    // per day
-  starter:             50,   // per month
-  starter_annual:      50,   // per month
-  pro:                 100,  // per month
-  pro_annual:          100,  // per month
-  studio:              200,  // per month
-  studio_annual:       200,  // per month
-  founding:            200,  // per month
-  founding_t1:         200,  // per month
-  founding_t1_annual:  200,  // per month
-  founding_t2:         200,  // per month
-  founding_t2_annual:  200,  // per month
+  starter:             15,   // per month
+  starter_annual:      15,   // per month
+  pro:                 40,   // per month
+  pro_annual:          40,   // per month
+  studio:              100,  // per month
+  studio_annual:       100,  // per month
+  founding:            100,  // per month
+  founding_t1:         100,  // per month
+  founding_t1_annual:  100,  // per month
+  founding_t2:         100,  // per month
+  founding_t2_annual:  100,  // per month
 };
 
 // Plans that use monthly (not daily) counting
@@ -233,12 +233,12 @@ module.exports = async function handler(req, res) {
     if (current >= limit) {
       const periodLabel = isMonthly ? 'this month' : 'today';
       const upgradeHint = plan === 'free'
-        ? 'Upgrade to Starter for 50 songs/month.'
+        ? 'Upgrade to Starter for 15 songs/month.'
         : plan === 'starter' || plan === 'starter_annual'
-          ? 'Upgrade to Pro for 100 songs/month.'
+          ? 'Upgrade to Pro for 40 songs/month.'
           : plan === 'pro' || plan === 'pro_annual'
-            ? 'Upgrade to Studio for 500 songs/month.'
-            : 'Contact support to increase your limit.';
+            ? 'Upgrade to Studio for 100 songs/month.'
+            : 'Contact us at info@mysoniq.com for Enterprise volume.';
       return res.status(429).json({
         error: 'limit_reached',
         message: `You've used all ${limit} songs ${periodLabel}. ${upgradeHint}`,
