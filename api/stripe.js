@@ -30,6 +30,7 @@
 
 const { createClient } = require('@supabase/supabase-js');
 
+// Lazy-init Stripe to avoid module-level errors when env var is missing at build time
 let _stripe = null;
 function getStripe() {
   if (!_stripe) {

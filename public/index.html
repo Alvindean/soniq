@@ -1426,7 +1426,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="hdr-icon">🎵</div>
     <div>
       <div class="hdr-title"><span>SON</span>IQ</div>
-      <div class="hdr-sub">AI Song Creation Studio · 18 Genres · AI Ready</div>
+      <div class="hdr-sub">AI Song Creation Studio · 24 Genres · AI Ready</div>
     </div>
   </div>
   <div class="hdr-tags">
@@ -3951,6 +3951,16 @@ const S={selectedGenre:'pop',
   luckyController: null, // AbortController for lucky generate
 };
 
+// ── ADMIN SESSION — synchronous check (must run before Supabase init) ──
+// Token is set on first visit with ?admin=PASSWORD and persisted in localStorage.
+// Subsequent page loads unlock instantly without any network call.
+if (localStorage.getItem('soniq_admin_token')) {
+  window.__soniqAdmin = true;
+  S.plan = 'studio';
+  S.isAdmin = true;
+  S.user = { id: 'admin', email: 'admin@mysoniq.com', app_metadata: {}, user_metadata: {} };
+}
+
 // ═══════════════════════════════════════════════════════
 // ANTHROPIC API CALL
 // ═══════════════════════════════════════════════════════
@@ -4075,6 +4085,8 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
   if (isVercel) {
     const genHeaders = {'Content-Type': 'application/json'};
     if (S.session?.access_token) genHeaders['Authorization'] = 'Bearer ' + S.session.access_token;
+    const _adminTok = localStorage.getItem('soniq_admin_token');
+    if (window.__soniqAdmin && _adminTok) genHeaders['X-Admin-Token'] = _adminTok;
     const res = await fetch('/api/generate', {
       method: 'POST',
       headers: genHeaders,
@@ -6878,6 +6890,7 @@ function copyCoachFeedback() {
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
   S.supabase.auth.onAuthStateChange((event, session) => {
+    if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -6902,7 +6915,7 @@ function copyCoachFeedback() {
     }
   });
   S.supabase.auth.getSession().then(({ data: { session } }) => {
-    // Don't overwrite admin mock session
+    if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
     updateAuthUI();
@@ -7265,7 +7278,7 @@ function generateISRC() {
 }
 
 function openPublish() {
-  if (!S.user) {
+  if (!S.user && !window.__soniqAdmin) {
     openAuth('Sign in to register your song for publishing');
     return;
   }
@@ -9057,7 +9070,7 @@ const PAID_PLANS   = new Set(['starter','starter_annual','pro','pro_annual','stu
 const FREE_GENRES  = new Set(['pop','hiphop','rnb','rock','country','edm']);
 
 function requireStudio(featureName) {
-  if (STUDIO_PLANS.has(S.plan)) return true;
+  if (window.__soniqAdmin || STUDIO_PLANS.has(S.plan)) return true;
   if (!S.user) { openAuth('Sign in to access ' + featureName); return false; }
   toast('⚡ ' + featureName + ' is a Studio feature — upgrade to Studio to unlock');
   openUpgradeModal();
@@ -9065,7 +9078,7 @@ function requireStudio(featureName) {
 }
 
 function requirePaid(featureName) {
-  if (PAID_PLANS.has(S.plan)) return true;
+  if (window.__soniqAdmin || PAID_PLANS.has(S.plan)) return true;
   if (!S.user) { openAuth('Sign in to access ' + featureName); return false; }
   toast('⬆️ ' + featureName + ' is available on paid plans — upgrade to unlock');
   openUpgradeModal();
@@ -10148,7 +10161,8 @@ function updateProgressIndicator() {
   var label = document.getElementById('gp-label');
   if (!prog || !label) return;
   var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
-  if (isFounder) { prog.classList.remove('show'); return; }
+  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
+  if (window.__soniqAdmin || isFounder || isPaid) { prog.classList.remove('show'); return; }
   var count = getDailySongCount();
   prog.classList.add('show');
   label.textContent = count === 0

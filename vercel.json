@@ -7,19 +7,11 @@
   "functions": {
     "api/stream.js":         { "maxDuration": 60 },
     "api/generate.js":       { "maxDuration": 60 },
-    "api/track.js":          { "maxDuration": 10 },
     "api/admin.js":          { "maxDuration": 15 },
-    "api/rapstats.js":       { "maxDuration": 10 },
     "api/publish.js":        { "maxDuration": 15 },
     "api/stripe.js":         { "maxDuration": 30 },
-    "api/auth-verify.js":    { "maxDuration": 10 },
-    "api/account-delete.js": { "maxDuration": 15 },
-    "api/data-export.js":    { "maxDuration": 30 },
-    "api/founding.js":           { "maxDuration": 10 },
-    "api/send-email.js":         { "maxDuration": 15 },
-    "api/admin-session.js":      { "maxDuration": 10 },
-    "api/stripe-checkout.js":    { "maxDuration": 30 },
-    "api/stripe-webhook.js":     { "maxDuration": 30 }
+    "api/founding.js":       { "maxDuration": 10 },
+    "api/admin-session.js":  { "maxDuration": 10 }
   },
   "headers": [
     {
