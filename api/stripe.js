@@ -28,12 +28,18 @@
  *   UPSTASH_REDIS_REST_TOKEN
  */
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.error('FATAL: STRIPE_SECRET_KEY is not set');
-}
-
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const { createClient } = require('@supabase/supabase-js');
+
+// Lazy-init Stripe to avoid module-level errors when env var is missing at build time
+let _stripe = null;
+function getStripe() {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) throw new Error('STRIPE_SECRET_KEY is not configured');
+    _stripe = require('stripe')(key);
+  }
+  return _stripe;
+}
 
 // Buffer the raw request body (needed when bodyParser: false)
 function getRawBody(req) {
@@ -219,7 +225,7 @@ async function handleCheckout(req, res) {
 
   let session;
   try {
-    session = await stripe.checkout.sessions.create({
+    session = await getStripe().checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
@@ -276,7 +282,7 @@ async function handleWebhook(req, res) {
   let event;
   try {
     // Default tolerance: 300s — do not override, protects against replay attacks.
-    event = stripe.webhooks.constructEvent(rawBody, sig, webhookSecret);
+    event = getStripe().webhooks.constructEvent(rawBody, sig, webhookSecret);
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).json({ error: `Webhook error: ${err.message}` });
