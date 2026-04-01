@@ -827,7 +827,10 @@
     }
 
     /* ── PRICING ── */
-    #pricing { background: var(--bg); }
+    #pricing {
+      background: var(--bg);
+      padding: 80px max(24px, calc((100vw - 1180px) / 2));
+    }
 
     .pricing-header { text-align: center; margin-bottom: 60px; }
     .pricing-header .section-sub { margin: 0 auto; }
@@ -1668,8 +1671,8 @@
     <!-- Founding urgency banner — shown by JS when spots available -->
     <div class="pricing-urgency-banner" id="pricing-urgency-banner">
       <div class="pricing-urgency-inner">
-        🔥 <strong id="pricing-banner-text">Early Founder spots are going fast</strong> — lock in $5/mo forever
-        <a href="/app#account" id="pricing-banner-cta">Lock In Now →</a>
+        <strong id="pricing-banner-text">Early Founder spots are going fast — lock in $5/mo forever</strong>
+        <a href="/app#account" id="pricing-banner-cta">Lock In $5/mo →</a>
       </div>
     </div>
 
@@ -2004,7 +2007,7 @@
           if (heroText)      heroText.textContent   = 'Early Founder — $5/mo';
           if (heroSpotsLeft) heroSpotsLeft.textContent = t1.spots_left + ' spots left';
           if (urgencyBanner)    urgencyBanner.classList.add('visible');
-          if (urgencyBannerTxt) urgencyBannerTxt.textContent = '🔥 ' + t1.spots_left + ' Early Founder spots remaining — lock in $5/mo forever';
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t1.spots_left + ' Early Founder spots remaining — lock in $5/mo forever';
           if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $5/mo →'; urgencyBannerCta.href = '/app#account'; }
           if (foundingNote) foundingNote.style.display = 'block';
         } else if (currentTier === 2) {
@@ -2013,7 +2016,7 @@
           if (heroText)      heroText.textContent   = 'Founding Member — $9.99/mo';
           if (heroSpotsLeft) heroSpotsLeft.textContent = t2.spots_left + ' spots left';
           if (urgencyBanner)    urgencyBanner.classList.add('visible');
-          if (urgencyBannerTxt) urgencyBannerTxt.textContent = '⭐ ' + t2.spots_left + ' Founding Member spots remaining — lock in $9.99/mo forever';
+          if (urgencyBannerTxt) urgencyBannerTxt.textContent = t2.spots_left + ' Founding Member spots remaining — lock in $9.99/mo forever';
           if (urgencyBannerCta) { urgencyBannerCta.textContent = 'Lock In $9.99/mo →'; urgencyBannerCta.href = '/app#account'; }
           if (foundingNote) foundingNote.style.display = 'block';
         }
