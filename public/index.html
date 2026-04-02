@@ -4903,8 +4903,9 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
     if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
   };
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2}, luckyStreamCb, luckySignal).then(r => r.text)
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure}, luckyStreamCb, luckySignal).then(r => r.text)
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal);
   luckyPromise.then(raw=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
@@ -5360,17 +5361,15 @@ function showCopyrightStrip(ns, title, ts) {
               + ' at ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
   strip.style.display = 'flex';
+  // Hidden claim text — still copied by copyCopyrightClaim(), not shown in UI
   strip.innerHTML = `
-    <div class="cp-seal">©</div>
-    <div class="cp-body">
-      <div class="cp-claim" id="${ns}-cp-claim">${escHtml(claim)}</div>
-      <div class="cp-meta">Created ${human} · Click claim to select all · Paste into descriptions, metadata, or copyright filings</div>
-    </div>
-    <div class="cp-actions">
-      <input class="cp-name-inp" id="${ns}-cp-name" value="${escHtml(name)}" placeholder="Your name / artist" title="Sets your copyright name"
+    <span style="font-size:11px;font-weight:700;color:var(--tx3);white-space:nowrap;padding-top:1px">© Claim</span>
+    <div class="cp-actions" style="flex:1;margin-left:10px">
+      <input class="cp-name-inp" id="${ns}-cp-name" value="${escHtml(name)}" placeholder="Your name / artist"
         oninput="updateCopyrightClaim('${ns}','${title}',${ts},this.value)">
       <button class="cp-copy-btn" id="${ns}-cp-btn" onclick="copyCopyrightClaim('${ns}')">Copy Claim</button>
-    </div>`;
+    </div>
+    <div id="${ns}-cp-claim" style="display:none">${escHtml(claim)}</div>`;
 }
 
 function updateCopyrightClaim(ns, title, ts, name) {
@@ -7017,7 +7016,7 @@ function copyCoachFeedback() {
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
-  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com']);
+  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com']);
   S.supabase.auth.onAuthStateChange((event, session) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
