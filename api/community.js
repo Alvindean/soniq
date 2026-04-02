@@ -218,21 +218,62 @@ module.exports = async function handler(req, res) {
     // ── action=leaderboard ─────────────────────────────────
     if (action === 'leaderboard') {
       try {
-        // Top 10 by XP; activity window (last 7 days) is enforced server-side
-        // via a join against community_posts if a `last_active_at` column is not
-        // present on profiles — we order by XP as the primary signal per spec.
-        const { data: users, error: lbErr } = await supabase
-          .from('profiles')
-          .select('display_name, artist_name, xp, level, plan, song_count')
-          .order('xp', { ascending: false })
-          .limit(10);
+        const weekAgo = new Date(Date.now() - 7 * 86400000).toISOString();
 
-        if (lbErr) {
-          console.error('Leaderboard query error:', lbErr.message);
-          return res.status(500).json({ error: 'leaderboard_query_failed', detail: lbErr.message });
+        // Weekly leaderboard: rank by posts + reactions gained this week
+        // Pull recent community posts (this week) and group by user_id
+        const { data: weeklyPosts } = await supabase
+          .from('community_posts')
+          .select('user_id, reaction_count')
+          .eq('is_published', true)
+          .gte('created_at', weekAgo);
+
+        // Aggregate weekly score per user: posts * 10 + reactions * 3
+        const weeklyScores = {};
+        (weeklyPosts || []).forEach(p => {
+          if (!p.user_id) return;
+          weeklyScores[p.user_id] = (weeklyScores[p.user_id] || 0) + 10 + (p.reaction_count || 0) * 3;
+        });
+
+        // Also count weekly reactions given
+        const { data: weeklyReacts } = await supabase
+          .from('community_reactions')
+          .select('user_id')
+          .gte('created_at', weekAgo);
+        (weeklyReacts || []).forEach(r => {
+          if (r.user_id) weeklyScores[r.user_id] = (weeklyScores[r.user_id] || 0) + 3;
+        });
+
+        // Get top user IDs by weekly score
+        const topIds = Object.entries(weeklyScores)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([id]) => id);
+
+        // Fallback: if no weekly activity, return all-time top XP
+        if (!topIds.length) {
+          const { data: users } = await supabase
+            .from('profiles')
+            .select('display_name, artist_name, xp, level, plan, song_count')
+            .order('xp', { ascending: false })
+            .limit(10);
+          return res.status(200).json({ users: users || [], mode: 'all_time' });
         }
 
-        return res.status(200).json({ users: users || [] });
+        // Fetch profiles for top weekly users
+        const { data: profiles, error: lbErr } = await supabase
+          .from('profiles')
+          .select('id, display_name, artist_name, xp, level, plan, song_count')
+          .in('id', topIds);
+
+        if (lbErr) return res.status(500).json({ error: 'leaderboard_query_failed' });
+
+        // Re-sort by weekly score and attach weekly_score
+        const sorted = (profiles || [])
+          .map(p => ({ ...p, weekly_score: weeklyScores[p.id] || 0 }))
+          .sort((a, b) => b.weekly_score - a.weekly_score);
+
+        return res.status(200).json({ users: sorted, mode: 'weekly' });
       } catch (e) {
         console.error('GET leaderboard error:', e.message);
         return res.status(500).json({ error: 'internal_error' });

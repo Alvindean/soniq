@@ -8687,6 +8687,10 @@ async function toggleReact(postId, reactionType, btn) {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed');
+    if (!isActive) {
+      awardXP('community_react');
+      checkAchievements('community_react');
+    }
     // Update all reaction buttons in this card
     if (card) {
       const counts = data.reaction_counts || {};
@@ -8711,19 +8715,24 @@ async function loadCommLeaderboard() {
     const res = await fetch('/api/community?action=leaderboard');
     const data = await res.json();
     const users = data.users || [];
-    if (!users.length) { el.innerHTML = '<div style="color:var(--tx4);font-size:11px">No data yet</div>'; return; }
+    const isWeekly = data.mode === 'weekly';
+    // Update leaderboard card title
+    const titleEl = el.previousElementSibling;
+    if (titleEl) titleEl.textContent = isWeekly ? '🏅 Top Writers This Week' : '🏅 Top Writers All Time';
+    if (!users.length) { el.innerHTML = '<div style="color:var(--tx4);font-size:11px;text-align:center;padding:12px">Be the first to share a song!</div>'; return; }
     el.innerHTML = users.slice(0, 10).map((u, i) => {
       const name = escHtml(u.display_name || u.artist_name || 'Anonymous');
       const lv = Math.min(u.level || 0, 5);
       const color = levelColors[lv];
-      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `<span style="font-size:11px;color:var(--tx4);font-weight:700">${i+1}</span>`;
+      const score = isWeekly ? `${u.weekly_score||0} pts this week` : `${u.xp||0} XP`;
       return `<div class="leader-row">
+        <div style="font-size:14px;width:20px;text-align:center;flex-shrink:0">${medal}</div>
         <div class="leader-avatar" style="background:${color}18;color:${color}">${(name[0]||'?').toUpperCase()}</div>
         <div style="flex:1;min-width:0">
           <div style="font-size:12px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
-          <div style="font-size:10px;color:var(--tx4)">${u.xp||0} XP · ${u.song_count||0} songs</div>
+          <div style="font-size:10px;color:var(--tx4)">${score} · ${u.song_count||0} songs</div>
         </div>
-        <div style="font-size:14px">${medal}</div>
       </div>`;
     }).join('');
   } catch(e) { el.innerHTML = '<div style="color:var(--tx4);font-size:11px">Leaderboard coming soon</div>'; }
@@ -8780,7 +8789,8 @@ async function submitShare() {
     closeShareModal();
     toast('✓ Shared to community!');
     navTo('community');
-    awardXP && awardXP('song_published');
+    awardXP('community_share');
+    checkAchievements('community_share');
   } catch(e) { toast('⚠️ ' + e.message, 3000); }
   btn.disabled = false; btn.textContent = '🌐 Share to Community';
 }
@@ -8823,6 +8833,8 @@ async function submitComment() {
     if (!res.ok) throw new Error('Failed');
     document.getElementById('comment-text').value = '';
     toast('✓ Comment posted');
+    awardXP('community_comment');
+    checkAchievements('community_comment');
     openCommentDrawer(_commCurrentPostId);
   } catch(e) { toast('⚠️ Could not post comment'); }
 }
@@ -10583,7 +10595,13 @@ const XP_VALUES = {
   song_liked: 5,
   variant_made: 15,
   song_published: 50,
-  achievement_unlocked: 25
+  achievement_unlocked: 25,
+  community_share: 20,
+  community_react: 3,
+  community_comment: 5,
+  reaction_received: 3,
+  comment_received: 5,
+  first_listener: 15
 };
 
 function getXPState() {
@@ -10634,16 +10652,21 @@ function getCurrentLevel() {
 
 // ─── ACHIEVEMENTS ─────────────────────────────────────────────
 const ACHIEVEMENTS = {
-  first_song:       { icon: '🎵', name: 'First Song',       desc: 'Generated your first song', xp: 25 },
-  genre_explorer:   { icon: '🗺️', name: 'Genre Explorer',   desc: 'Wrote in 5 different genres', xp: 50 },
-  lucky_7:          { icon: '🎲', name: 'Lucky 7',           desc: 'Used Feel Lucky 7 times', xp: 30 },
-  hit_maker:        { icon: '👑', name: 'Hit Maker',         desc: 'Liked 10 of your own songs', xp: 40 },
-  prolific:         { icon: '📝', name: 'Prolific',          desc: 'Generated 25 songs', xp: 75 },
-  publisher:        { icon: '📜', name: 'Published',         desc: 'Registered your first song', xp: 100 },
-  variant_king:     { icon: '🎛️', name: 'Variant King',      desc: 'Generated 5 song variants', xp: 50 },
-  coach_student:    { icon: '🎓', name: 'Coachable',         desc: 'Used the AI Feedback Coach', xp: 25 },
-  on_a_roll:        { icon: '🔥', name: 'On a Roll',         desc: '3-day generation streak', xp: 60 },
-  rap_god:          { icon: '🎤', name: 'Rap God',           desc: 'Generated 10 Hip-Hop songs', xp: 40 }
+  first_song:        { icon: '🎵', name: 'First Song',        desc: 'Generated your first song', xp: 25 },
+  genre_explorer:    { icon: '🗺️', name: 'Genre Explorer',    desc: 'Wrote in 5 different genres', xp: 50 },
+  lucky_7:           { icon: '🎲', name: 'Lucky 7',            desc: 'Used Feel Lucky 7 times', xp: 30 },
+  hit_maker:         { icon: '👑', name: 'Hit Maker',          desc: 'Liked 10 of your own songs', xp: 40 },
+  prolific:          { icon: '📝', name: 'Prolific',           desc: 'Generated 25 songs', xp: 75 },
+  publisher:         { icon: '📜', name: 'Published',          desc: 'Registered your first song', xp: 100 },
+  variant_king:      { icon: '🎛️', name: 'Variant King',       desc: 'Generated 5 song variants', xp: 50 },
+  coach_student:     { icon: '🎓', name: 'Coachable',          desc: 'Used the AI Feedback Coach', xp: 25 },
+  on_a_roll:         { icon: '🔥', name: 'On a Roll',          desc: '3-day generation streak', xp: 60 },
+  rap_god:           { icon: '🎤', name: 'Rap God',            desc: 'Generated 10 Hip-Hop songs', xp: 40 },
+  community_debut:   { icon: '🌐', name: 'Community Debut',    desc: 'Shared your first song to community', xp: 30 },
+  social_butterfly:  { icon: '🦋', name: 'Social Butterfly',   desc: 'Reacted to 20 community songs', xp: 40 },
+  crowd_pleaser:     { icon: '🙌', name: 'Crowd Pleaser',      desc: 'Received 10 reactions on a post', xp: 75 },
+  feedback_giver:    { icon: '💬', name: 'Feedback Giver',     desc: 'Left 10 community comments', xp: 45 },
+  co_sign_king:      { icon: '🎤', name: 'Co-Sign King',       desc: 'Received 5 Co-sign reactions', xp: 60 }
 };
 
 function getAchState() {
@@ -10740,6 +10763,37 @@ function checkAchievements(trigger, extra) {
   if (trigger === 'song_published') {
     awardXP('song_published');
     unlock('publisher');
+  }
+
+  if (trigger === 'community_share') {
+    st.comm_share_count = (st.comm_share_count || 0) + 1;
+    saveAchState(st);
+    unlock('community_debut');
+  }
+
+  if (trigger === 'community_react') {
+    st.comm_react_count = (st.comm_react_count || 0) + 1;
+    saveAchState(st);
+    if (st.comm_react_count >= 20) unlock('social_butterfly');
+  }
+
+  if (trigger === 'community_comment') {
+    st.comm_comment_count = (st.comm_comment_count || 0) + 1;
+    saveAchState(st);
+    if (st.comm_comment_count >= 10) unlock('feedback_giver');
+  }
+
+  // Triggered server-side via profile sync when reaction thresholds hit
+  if (trigger === 'reaction_received') {
+    st.reactions_received = (st.reactions_received || 0) + (extra?.count || 1);
+    saveAchState(st);
+    if (st.reactions_received >= 10) unlock('crowd_pleaser');
+  }
+
+  if (trigger === 'cosign_received') {
+    st.cosigns_received = (st.cosigns_received || 0) + 1;
+    saveAchState(st);
+    if (st.cosigns_received >= 5) unlock('co_sign_king');
   }
 }
 
