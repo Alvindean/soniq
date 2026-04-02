@@ -110,11 +110,14 @@ module.exports = async function handler(req, res) {
     // ── action=feed ────────────────────────────────────────
     if (action === 'feed') {
       try {
-        const sortRaw  = req.query.sort  || 'hot';
-        const sort     = VALID_SORT_MODES.has(sortRaw) ? sortRaw : 'hot';
-        const genre    = sanitize(req.query.genre || '', 50) || null;
-        const limit    = Math.min(Math.max(parseInt(req.query.limit)  || 20, 1), 50);
-        const offset   = Math.max(parseInt(req.query.offset) || 0, 0);
+        const sortRaw   = req.query.sort  || 'hot';
+        const sort      = VALID_SORT_MODES.has(sortRaw) ? sortRaw : 'hot';
+        const genre     = sanitize(req.query.genre || '', 50) || null;
+        const VALID_FEED_POST_TYPES = new Set(['song','thought','question','collab','tip','snippet']);
+        const postTypeRaw = sanitize(req.query.post_type || '', 20) || null;
+        const postType  = postTypeRaw && VALID_FEED_POST_TYPES.has(postTypeRaw) ? postTypeRaw : null;
+        const limit     = Math.min(Math.max(parseInt(req.query.limit)  || 20, 1), 50);
+        const offset    = Math.max(parseInt(req.query.offset) || 0, 0);
 
         const orderColumn =
           sort === 'hot' ? 'hot_score'      :
@@ -138,6 +141,12 @@ module.exports = async function handler(req, res) {
           .range(offset, offset + limit - 1);
 
         if (genre) query = query.eq('genre', genre);
+        // post_type filter: 'song' = song shares (null song_id excluded), others = forum posts by topic
+        if (postType === 'song') {
+          query = query.not('song_id', 'is', null);
+        } else if (postType) {
+          query = query.eq('topic', postType);
+        }
 
         const { data: posts, error: feedErr, count } = await query;
 
@@ -332,12 +341,13 @@ module.exports = async function handler(req, res) {
           return res.status(500).json({ error: 'share_failed', detail: insertErr.message });
         }
 
-        // Redis: track genre popularity in community feed
-        if (row.genre) {
-          await redisPipeline([
-            ['ZINCRBY', 'soniq:community:genres', '1', row.genre]
-          ]);
-        }
+        // Redis: track activity counters
+        const redisTrack = [
+          ['INCR', 'soniq:community:posts:total'],
+          ['INCR', 'soniq:community:posts:song'],
+        ];
+        if (row.genre) redisTrack.push(['ZINCRBY', 'soniq:community:genres', '1', row.genre]);
+        await redisPipeline(redisTrack);
 
         return res.status(200).json({ post_id: inserted.id });
       } catch (e) {
@@ -405,6 +415,9 @@ module.exports = async function handler(req, res) {
           if (reaction_counts[r.reaction_type] !== undefined) reaction_counts[r.reaction_type]++;
         });
 
+        // Redis: track total reactions
+        await redisPipeline([['INCR', 'soniq:community:reactions:total']]);
+
         return res.status(200).json({
           reaction_counts,
           user_reaction: reaction_type
@@ -458,6 +471,9 @@ module.exports = async function handler(req, res) {
             row_id:      pid
           }).catch(() => {});
         }
+
+        // Redis: track total comments
+        await redisPipeline([['INCR', 'soniq:community:comments:total']]);
 
         return res.status(200).json({ comment_id: inserted.id });
       } catch (e) {
@@ -535,11 +551,13 @@ module.exports = async function handler(req, res) {
           return res.status(500).json({ error: 'post_failed', detail: insertErr.message });
         }
 
-        if (row.genre) {
-          await redisPipeline([
-            ['ZINCRBY', 'soniq:community:genres', '1', row.genre]
-          ]);
-        }
+        // Redis: track activity counters
+        const redisTrackPost = [
+          ['INCR', 'soniq:community:posts:total'],
+          ['INCR', `soniq:community:posts:${postType}`],
+        ];
+        if (row.genre) redisTrackPost.push(['ZINCRBY', 'soniq:community:genres', '1', row.genre]);
+        await redisPipeline(redisTrackPost);
 
         return res.status(200).json({ post_id: inserted.id });
       } catch (e) {

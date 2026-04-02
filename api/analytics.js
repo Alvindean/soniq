@@ -220,6 +220,16 @@ module.exports = async function handler(req, res) {
       ['ZREVRANGE', 'soniq:genres:top',  '0', '19', 'WITHSCORES'],
       ['ZREVRANGE', 'soniq:topics:top',  '0', '19', 'WITHSCORES'],
       ['LRANGE',   'soniq:recent',       '0', '49'],
+      // Community activity counters
+      ['GET', 'soniq:community:posts:total'],
+      ['GET', 'soniq:community:posts:song'],
+      ['GET', 'soniq:community:posts:thought'],
+      ['GET', 'soniq:community:posts:question'],
+      ['GET', 'soniq:community:posts:collab'],
+      ['GET', 'soniq:community:posts:tip'],
+      ['GET', 'soniq:community:posts:snippet'],
+      ['GET', 'soniq:community:reactions:total'],
+      ['GET', 'soniq:community:comments:total'],
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
@@ -251,24 +261,43 @@ module.exports = async function handler(req, res) {
       ]);
 
     // Destructure Redis results
-    const FIXED = 5; // number of fixed commands before daily keys
     const [
       totalSongsRaw,
       totalPublishedRaw,
       topGenresRaw,
       topTopicsRaw,
       recentRaw,
+      commPostsTotalRaw,
+      commPostsSongRaw,
+      commPostsThoughtRaw,
+      commPostsQuestionRaw,
+      commPostsCollabRaw,
+      commPostsTipRaw,
+      commPostsSnippetRaw,
+      commReactionsTotalRaw,
+      commCommentsTotalRaw,
       ...dailyResults
     ] = redisResults;
 
     // Summary
-    const total_songs      = parseInt(totalSongsRaw)     || 0;
-    const total_published  = parseInt(totalPublishedRaw) || 0;
-    const total_users      = totalUsersResult.count       ?? 0;
-    const total_posts      = commPostsResult.count        ?? 0;
-    const total_reactions  = commReactionsResult.count    ?? 0;
+    const total_songs      = parseInt(totalSongsRaw)         || 0;
+    const total_published  = parseInt(totalPublishedRaw)     || 0;
+    const total_users      = totalUsersResult.count           ?? 0;
+    // Community counts: prefer Supabase exact counts; Redis used for breakdown by post type
+    const total_posts      = commPostsResult.count            ?? parseInt(commPostsTotalRaw) || 0;
+    const total_reactions  = commReactionsResult.count        ?? parseInt(commReactionsTotalRaw) || 0;
+    const total_comments   = parseInt(commCommentsTotalRaw)   || 0;
 
-    const summary = { total_users, total_songs, total_published, total_posts, total_reactions };
+    const posts_by_type = {
+      song:     parseInt(commPostsSongRaw)     || 0,
+      thought:  parseInt(commPostsThoughtRaw)  || 0,
+      question: parseInt(commPostsQuestionRaw) || 0,
+      collab:   parseInt(commPostsCollabRaw)   || 0,
+      tip:      parseInt(commPostsTipRaw)       || 0,
+      snippet:  parseInt(commPostsSnippetRaw)  || 0,
+    };
+
+    const summary = { total_users, total_songs, total_published, total_posts, total_reactions, total_comments };
 
     // Top genres / topics
     const top_genres = parseZSet(topGenresRaw);
@@ -331,6 +360,7 @@ module.exports = async function handler(req, res) {
       summary,
       users,
       songs_by_plan,
+      posts_by_type,
       top_genres,
       top_topics,
       daily_events,

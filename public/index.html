@@ -3428,22 +3428,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
-    <!-- Sort tabs + genre filter -->
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
-      <div style="display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--brd)">
-        <button class="comm-sort-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
-        <button class="comm-sort-btn" onclick="setCommSort('new',this)">✨ New</button>
-        <button class="comm-sort-btn" onclick="setCommSort('top',this)">👑 Top</button>
+    <!-- Sort tabs + filters -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div style="display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--brd)">
+          <button class="comm-sort-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
+          <button class="comm-sort-btn" onclick="setCommSort('new',this)">✨ New</button>
+          <button class="comm-sort-btn" onclick="setCommSort('top',this)">👑 Top</button>
+        </div>
+        <select id="comm-genre-filter" onchange="loadCommunityFeed()" style="padding:5px 8px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);font-size:11px">
+          <option value="">All Genres</option>
+          <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option>
+          <option value="rnb">R&amp;B</option><option value="rock">Rock</option>
+          <option value="country">Country</option><option value="edm">EDM</option>
+          <option value="jazz">Jazz</option><option value="soul">Soul</option>
+          <option value="gospel">Gospel</option><option value="latin">Latin</option>
+          <option value="afrobeats">Afrobeats</option><option value="kpop">K-Pop</option>
+        </select>
       </div>
-      <select id="comm-genre-filter" onchange="loadCommunityFeed()" style="padding:5px 8px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);font-size:11px">
-        <option value="">All Genres</option>
-        <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option>
-        <option value="rnb">R&amp;B</option><option value="rock">Rock</option>
-        <option value="country">Country</option><option value="edm">EDM</option>
-        <option value="jazz">Jazz</option><option value="soul">Soul</option>
-        <option value="gospel">Gospel</option><option value="latin">Latin</option>
-        <option value="afrobeats">Afrobeats</option><option value="kpop">K-Pop</option>
-      </select>
+      <!-- Post type filter -->
+      <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-type-filter">
+        <button class="post-type-btn on" onclick="setCommTypeFilter('',this)">All</button>
+        <button class="post-type-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
+        <button class="post-type-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
+        <button class="post-type-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
+        <button class="post-type-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
+        <button class="post-type-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
+        <button class="post-type-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
+      </div>
     </div>
 
     <!-- Feed -->
@@ -3597,6 +3609,15 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="card" style="margin-bottom:16px">
       <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">💬 Top Topics</div>
       <div id="adm-topics" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+
+    <!-- Community breakdown -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🌐 Community Posts by Type</div>
+      <div id="adm-comm-breakdown"></div>
+      <div style="display:flex;gap:16px;margin-top:10px;flex-wrap:wrap">
+        <div style="font-size:11px;color:var(--tx4)">Total Comments: <span id="adm-total-comments" style="color:var(--tx2);font-weight:700">—</span></div>
+      </div>
     </div>
 
     <!-- Users table -->
@@ -8604,6 +8625,7 @@ async function regenVisual(prefix) {
 // ═══════════════════════════════════════════════════════
 let _commSort = 'hot';
 let _commPostType = 'thought';
+let _commTypeFilter = '';
 let _commOffset = 0;
 let _commHasMore = false;
 let _commCurrentPostId = null;
@@ -8667,6 +8689,14 @@ async function submitPost() {
   btn.disabled = false; btn.textContent = 'Post';
 }
 
+function setCommTypeFilter(type, btn) {
+  _commTypeFilter = type;
+  document.querySelectorAll('#comm-type-filter .post-type-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  _commOffset = 0;
+  loadCommunityFeed();
+}
+
 function setCommSort(sort, btn) {
   _commSort = sort;
   document.querySelectorAll('.comm-sort-btn').forEach(b => b.classList.remove('on'));
@@ -8709,6 +8739,7 @@ async function loadCommunityFeed() {
     const headers = token ? { Authorization: 'Bearer ' + token } : {};
     const params = new URLSearchParams({ action: 'feed', sort: _commSort, limit: '20', offset: '0' });
     if (genre) params.set('genre', genre);
+    if (_commTypeFilter) params.set('post_type', _commTypeFilter);
     const res = await fetch('/api/community?' + params, { headers });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
@@ -11244,6 +11275,28 @@ function renderAdminDashboard(data) {
   document.getElementById('adm-today-songs').textContent = todayCount;
   document.getElementById('adm-total-posts').textContent = data.summary?.total_posts ?? '—';
   document.getElementById('adm-total-reactions').textContent = data.summary?.total_reactions ?? '—';
+  document.getElementById('adm-total-comments').textContent = data.summary?.total_comments ?? '—';
+
+  // Community posts by type breakdown
+  const commBreak = document.getElementById('adm-comm-breakdown');
+  const postsByType = data.posts_by_type || {};
+  const typeLabels = {song:'🎵 Songs',thought:'💬 Thoughts',question:'❓ Questions',collab:'🤝 Collabs',tip:'💡 Tips',snippet:'🎤 Snippets'};
+  const typeColors = {song:'#60a5fa',thought:'#a78bfa',question:'#34d399',collab:'#f97316',tip:'#fbbf24',snippet:'#f47292'};
+  const totalPosts = Object.values(postsByType).reduce((a,b)=>a+b,0) || 1;
+  if (commBreak) commBreak.innerHTML = Object.entries(typeLabels).map(([key, label]) => {
+    const cnt = postsByType[key] || 0;
+    const pct = Math.round(cnt / totalPosts * 100);
+    const color = typeColors[key] || '#94a3b8';
+    return `<div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
+        <span style="color:var(--tx2);font-weight:600">${label}</span>
+        <span style="color:var(--tx4)">${cnt} (${pct}%)</span>
+      </div>
+      <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:99px"></div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--tx4);font-size:11px">No data yet</div>';
 
   // Plan breakdown
   const planEl = document.getElementById('adm-plans');
