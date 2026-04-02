@@ -223,7 +223,7 @@ module.exports = async function handler(req, res) {
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
-    const [redisResults, profilesResult, songsByPlanResult, totalUsersResult] =
+    const [redisResults, profilesResult, songsByPlanResult, totalUsersResult, commPostsResult, commReactionsResult] =
       await Promise.all([
         redisPipeline(redisCommands),
         supabase
@@ -240,6 +240,13 @@ module.exports = async function handler(req, res) {
           }),
         supabase
           .from('profiles')
+          .select('id', { count: 'exact', head: true }),
+        supabase
+          .from('community_posts')
+          .select('id', { count: 'exact', head: true })
+          .eq('is_published', true),
+        supabase
+          .from('community_reactions')
           .select('id', { count: 'exact', head: true })
       ]);
 
@@ -255,11 +262,13 @@ module.exports = async function handler(req, res) {
     ] = redisResults;
 
     // Summary
-    const total_songs     = parseInt(totalSongsRaw)     || 0;
-    const total_published = parseInt(totalPublishedRaw) || 0;
-    const total_users     = totalUsersResult.count       ?? 0;
+    const total_songs      = parseInt(totalSongsRaw)     || 0;
+    const total_published  = parseInt(totalPublishedRaw) || 0;
+    const total_users      = totalUsersResult.count       ?? 0;
+    const total_posts      = commPostsResult.count        ?? 0;
+    const total_reactions  = commReactionsResult.count    ?? 0;
 
-    const summary = { total_users, total_songs, total_published };
+    const summary = { total_users, total_songs, total_published, total_posts, total_reactions };
 
     // Top genres / topics
     const top_genres = parseZSet(topGenresRaw);

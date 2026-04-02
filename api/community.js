@@ -498,6 +498,56 @@ module.exports = async function handler(req, res) {
       }
     }
 
+    // ── action=post (forum short-form post) ───────────────
+    if (action === 'post') {
+      try {
+        const VALID_POST_TYPES = new Set(['thought', 'question', 'collab', 'tip', 'snippet']);
+        const { post_type, text, genre } = body;
+
+        if (!text || !text.trim()) return res.status(400).json({ error: 'text_required' });
+        const postType = VALID_POST_TYPES.has(post_type) ? post_type : 'thought';
+        const content  = sanitize(text.trim(), 280);
+        const titleFromContent = content.slice(0, 60) + (content.length > 60 ? '…' : '');
+
+        const row = {
+          user_id:        user.id,
+          song_id:        null,
+          title:          titleFromContent,
+          genre:          sanitize(genre || '', 50) || null,
+          topic:          postType,      // topic field stores post_type for forum posts
+          note:           content,       // note field stores the full text body
+          lyrics_preview: '',
+          is_published:   true,
+          reaction_count: 0,
+          comment_count:  0,
+          hot_score:      0,
+          created_at:     new Date().toISOString()
+        };
+
+        const { data: inserted, error: insertErr } = await supabase
+          .from('community_posts')
+          .insert(row)
+          .select('id')
+          .single();
+
+        if (insertErr) {
+          console.error('Forum post insert error:', insertErr.message);
+          return res.status(500).json({ error: 'post_failed', detail: insertErr.message });
+        }
+
+        if (row.genre) {
+          await redisPipeline([
+            ['ZINCRBY', 'soniq:community:genres', '1', row.genre]
+          ]);
+        }
+
+        return res.status(200).json({ post_id: inserted.id });
+      } catch (e) {
+        console.error('POST forum post error:', e.message);
+        return res.status(500).json({ error: 'internal_error' });
+      }
+    }
+
     return res.status(400).json({ error: 'unknown_action', received: action });
   }
 };
