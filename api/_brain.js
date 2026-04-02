@@ -1160,6 +1160,114 @@ const AGE_GROUPS = {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// BRIDGE ARCHETYPES — Randomised per generation to prevent the same
+// 2-4 bar quiet/whisper bridge appearing by default every time.
+// Each archetype specifies structure, energy, delivery and lyric approach.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BRIDGE_ARCHETYPES = [
+  {
+    name: 'Confessional Drop',
+    energy: 'low → slow build',
+    bars: '4–6',
+    delivery: 'Almost spoken — conversational, not sung. No melody, just cadence. Like the artist stopped performing and started talking.',
+    lyric: 'One hard truth the song has been circling around but never said. Single sentence per line. No rhyme required — the honesty IS the structure.',
+    production: 'Pull everything back: just one instrument (piano, guitar, or sparse pad). Vocal dry with no reverb or delay. Space between lines.',
+    rule: 'BRIDGE MUST be the moment the mask comes off. Unpolished. Real. Then the final chorus returns with the full weight of what was just admitted.',
+  },
+  {
+    name: 'Escalation Climb',
+    energy: 'mid → peak intensity',
+    bars: '8',
+    delivery: 'Starts at verse energy, builds line by line to the most intense vocal moment in the song. The bridge IS the climax, not the chorus.',
+    lyric: 'Each line raises the stakes of the conflict or emotion. Last 2 lines hit hardest — these are the lines people screenshot. Stack imagery, not narrative.',
+    production: 'Drums build every 2 bars. Instrumentation layers in. Final 2 bars: full band, pushed vocal, reverb tail. Explode into final chorus.',
+    rule: 'BRIDGE MUST end louder and more urgent than it started. It earns the final chorus release.',
+  },
+  {
+    name: 'Left-Turn Narrative',
+    energy: 'different texture — sideways move',
+    bars: '6–8',
+    delivery: 'Different vocal register or approach than any other section. If verses were sung, bridge could be half-rapped or spoken. Change the instrument.',
+    lyric: 'New POV, new timeline, or new character. The bridge is a cut to a scene from the past, a letter, a conversation, or a future projection. Not a continuation — a reframe.',
+    production: 'Instrument swap or featured instrument solo takes the melodic lead. Drums might drop completely or switch to half-time. Unexpected key area.',
+    rule: 'BRIDGE MUST feel like a different song that makes you understand the original song better when it ends.',
+  },
+  {
+    name: 'Rhythmic Breakdown',
+    energy: 'high — groove-locked',
+    bars: '4–8',
+    delivery: 'Rhythmic, chant-like, almost percussive. Words land on the beat like kicks and snares. Call-and-response optional. Could be a single repeated phrase evolving.',
+    lyric: 'Short, punchy lines. 2-5 syllables each. Works on repetition and slight variation — same phrase with one word changed each time. The meaning shifts through the changes.',
+    production: 'Drums and bass only, or a single hypnotic instrument loop. Everything else stripped. Let the groove breathe and build tension through rhythm alone.',
+    rule: 'BRIDGE MUST be physically infectious — the listener\'s head should nod before their brain processes the words.',
+  },
+  {
+    name: 'Emotional Reversal',
+    energy: 'mirror opposite of the chorus',
+    bars: '4–6',
+    delivery: 'If chorus is soaring and anthemic, bridge is quiet and close. If chorus is dark, bridge finds a thread of hope. The contrast IS the point.',
+    lyric: 'Reframe the central metaphor of the song from the opposite direction. If the song is about loss, find what was gained. If it\'s about love, acknowledge the cost. Dual truth.',
+    production: 'Harmonic shift — bridge often borrows from the relative major/minor or lands on an unexpected chord that makes the return to chorus feel like resolution.',
+    rule: 'BRIDGE MUST make the final chorus sound like it means something different than it did the first time.',
+  },
+  {
+    name: 'Pre-Outro Vamp Build',
+    energy: 'medium → cascading',
+    bars: '6–8 with repeating tag',
+    delivery: 'Last 2 bars of the bridge repeat 2-3 times with slight melodic variation each time. The repetition creates tension that the final chorus releases.',
+    lyric: 'Write the bridge as a complete thought, then isolate the last line as the repeating tag. The tag should work both as a question and an answer depending on inflection.',
+    production: 'Background vocals enter on repeating tag. Layered harmonies build. Slight BPM push (feels faster without changing tempo) through drum pattern tightening.',
+    rule: 'BRIDGE MUST set up the final chorus as the only possible resolution to the tension it builds.',
+  },
+  {
+    name: 'Lyric Callback / Recontextualise',
+    energy: 'same energy as verse 1, but heavier',
+    bars: '4–6',
+    delivery: 'Callbacks land differently once context has built. Deliver familiar lines with new emotional weight — slower, or more fragile, or harder.',
+    lyric: 'Take an image or line from verse 1 and return to it — but now the circumstances have changed. Same words, entirely different meaning. The listener should feel the shift.',
+    production: 'Mirror the production of verse 1 but stripped down. The familiarity of the instrumentation makes the shifted meaning land harder.',
+    rule: 'BRIDGE MUST prove the song was planning this moment from the first bar. Callback creates inevitability.',
+  },
+  {
+    name: 'Spoken Interlude / Monologue',
+    energy: 'ambient — static tension',
+    bars: '4–8 (flexible)',
+    delivery: 'Not sung at all. Spoken directly. Could be a voicemail, a memory, an argument, an internal monologue. Raw voice, minimal or no music under it.',
+    lyric: 'Write as prose, not poetry. Irregular line lengths. Real speech rhythms — sentence fragments, self-corrections, trailing thoughts. The only rule: it must be true to the character.',
+    production: 'Music fades to near-silence or single sustained note/pad. Possible: ambient sound texture under the voice (rain, static, room tone). Returns with full force on final chorus.',
+    rule: 'BRIDGE MUST sound like it was captured, not composed. The listener should lean in.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OUTRO ARCHETYPES — Prevents the default "fade out over repeating chorus"
+// ═══════════════════════════════════════════════════════════════════════════
+
+const OUTRO_ARCHETYPES = [
+  { name: 'Cold Stop', rule: 'Song ends on a single word, note, or silence mid-phrase. Abrupt. The absence of resolution IS the ending. No fade — a hard cut that leaves the listener mid-breath.' },
+  { name: 'Spiral Vamp', rule: 'Outro takes the hook and slowly deconstructs it — strip instruments one by one, change one word in the hook each repeat, until only voice and one note remain. The song unravels deliberately.' },
+  { name: 'Callback Resolution', rule: 'Outro returns to the opening line or image from Verse 1, but now it lands completely differently. The song ends where it began — the journey changed the meaning. No new material.' },
+  { name: 'Crowd Takeover', rule: 'Final section hands the song to the audience — melody simplified to its most singable core, lyrics pared to 4-6 words max, energy rises instead of fading. Song ends at its loudest.' },
+  { name: 'Dialogue / Spoken Coda', rule: 'After the final chorus, a brief spoken moment (2-4 lines) that steps outside the song — a thought, a question, a confession. Music drops completely or holds one note under it.' },
+  { name: 'Harmonic Drift', rule: 'Outro lands on an unresolved chord or half-cadence and holds. Music fades slowly without resolving. The tension is intentional — the story is unresolved and the listener knows it.' },
+  { name: 'Counter-Melody Ascent', rule: 'Outro strips the lead vocal and lets the counter-melody (instrument or backing voice) carry the song to its end — it was there all along, now it leads. Main vocal drops to harmonies only.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VERSE 2 ESCALATION ARCHETYPES — Verse 2 must do more than repeat Verse 1
+// ═══════════════════════════════════════════════════════════════════════════
+
+const VERSE2_ARCHETYPES = [
+  { name: 'Consequence', rule: 'Verse 2 shows what happened AFTER Verse 1. Same character, later in time, changed circumstances. The hook now means something different because of what verse 2 revealed.' },
+  { name: 'The Other Side', rule: 'Verse 2 gives the opposing perspective — different character, contradicting version of events, or the same person arguing against themselves. Creates productive tension.' },
+  { name: 'Zoom Out', rule: 'Verse 1 was intimate and personal. Verse 2 zooms out — the personal story becomes universal. Connect the specific situation to something larger: culture, history, the human condition.' },
+  { name: 'Deeper Specific', rule: 'Verse 2 goes more specific, not more general. New proper nouns, new sensory details, new micro-moments. The theme is the same but the evidence is richer and more precise.' },
+  { name: 'Time Jump', rule: 'Verse 2 is set years earlier or later than Verse 1. The emotional context shifts completely. What the chorus meant before now has a completely different backstory.' },
+  { name: 'Antagonist Voice', rule: 'Verse 2 is written from the POV of whoever or whatever is on the other side of the conflict. Not sympathetic — just truthful. The listener has to hold both truths.' },
+];
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
@@ -1274,6 +1382,26 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
 
   const system = buildGenreAgentSystem(genre);
 
+  // Section archetypes — randomised every generation
+  // Bridge, Outro, and Verse 2 each get a different archetype roll
+  // so the song never defaults to the same structural pattern twice
+  const _ba = pickRandom(BRIDGE_ARCHETYPES);
+  const _oa = pickRandom(OUTRO_ARCHETYPES);
+  const _v2a = pickRandom(VERSE2_ARCHETYPES);
+
+  const bridgeNote = `\n\nBRIDGE ARCHITECTURE — "${_ba.name}":
+Energy arc: ${_ba.energy} · Bars: ${_ba.bars}
+Delivery: ${_ba.delivery}
+Lyric approach: ${_ba.lyric}
+Production: ${_ba.production}
+Rule: ${_ba.rule}`;
+
+  const outroNote = `\n\nOUTRO APPROACH — "${_oa.name}":
+${_oa.rule}`;
+
+  const verse2Note = `\n\nVERSE 2 STRATEGY — "${_v2a.name}":
+${_v2a.rule}`;
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -1292,8 +1420,7 @@ SONGWRITING RULES:
 - Every line must be specific — no vague emotions, no clichés
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
-- Bridge must offer a new emotional or narrative perspective — not a repeat
-- The last chorus must feel bigger than the first
+- The last chorus must feel bigger than the first${bridgeNote}${verse2Note}${outroNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
