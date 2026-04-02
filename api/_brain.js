@@ -1160,6 +1160,360 @@ const AGE_GROUPS = {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// BRIDGE ARCHETYPES — Randomised per generation to prevent the same
+// 2-4 bar quiet/whisper bridge appearing by default every time.
+// Each archetype specifies structure, energy, delivery and lyric approach.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const BRIDGE_ARCHETYPES = [
+  {
+    name: 'Confessional Drop',
+    energy: 'low → slow build',
+    bars: '4–6',
+    delivery: 'Almost spoken — conversational, not sung. No melody, just cadence. Like the artist stopped performing and started talking.',
+    lyric: 'One hard truth the song has been circling around but never said. Single sentence per line. No rhyme required — the honesty IS the structure.',
+    production: 'Pull everything back: just one instrument (piano, guitar, or sparse pad). Vocal dry with no reverb or delay. Space between lines.',
+    rule: 'BRIDGE MUST be the moment the mask comes off. Unpolished. Real. Then the final chorus returns with the full weight of what was just admitted.',
+  },
+  {
+    name: 'Escalation Climb',
+    energy: 'mid → peak intensity',
+    bars: '8',
+    delivery: 'Starts at verse energy, builds line by line to the most intense vocal moment in the song. The bridge IS the climax, not the chorus.',
+    lyric: 'Each line raises the stakes of the conflict or emotion. Last 2 lines hit hardest — these are the lines people screenshot. Stack imagery, not narrative.',
+    production: 'Drums build every 2 bars. Instrumentation layers in. Final 2 bars: full band, pushed vocal, reverb tail. Explode into final chorus.',
+    rule: 'BRIDGE MUST end louder and more urgent than it started. It earns the final chorus release.',
+  },
+  {
+    name: 'Left-Turn Narrative',
+    energy: 'different texture — sideways move',
+    bars: '6–8',
+    delivery: 'Different vocal register or approach than any other section. If verses were sung, bridge could be half-rapped or spoken. Change the instrument.',
+    lyric: 'New POV, new timeline, or new character. The bridge is a cut to a scene from the past, a letter, a conversation, or a future projection. Not a continuation — a reframe.',
+    production: 'Instrument swap or featured instrument solo takes the melodic lead. Drums might drop completely or switch to half-time. Unexpected key area.',
+    rule: 'BRIDGE MUST feel like a different song that makes you understand the original song better when it ends.',
+  },
+  {
+    name: 'Rhythmic Breakdown',
+    energy: 'high — groove-locked',
+    bars: '4–8',
+    delivery: 'Rhythmic, chant-like, almost percussive. Words land on the beat like kicks and snares. Call-and-response optional. Could be a single repeated phrase evolving.',
+    lyric: 'Short, punchy lines. 2-5 syllables each. Works on repetition and slight variation — same phrase with one word changed each time. The meaning shifts through the changes.',
+    production: 'Drums and bass only, or a single hypnotic instrument loop. Everything else stripped. Let the groove breathe and build tension through rhythm alone.',
+    rule: 'BRIDGE MUST be physically infectious — the listener\'s head should nod before their brain processes the words.',
+  },
+  {
+    name: 'Emotional Reversal',
+    energy: 'mirror opposite of the chorus',
+    bars: '4–6',
+    delivery: 'If chorus is soaring and anthemic, bridge is quiet and close. If chorus is dark, bridge finds a thread of hope. The contrast IS the point.',
+    lyric: 'Reframe the central metaphor of the song from the opposite direction. If the song is about loss, find what was gained. If it\'s about love, acknowledge the cost. Dual truth.',
+    production: 'Harmonic shift — bridge often borrows from the relative major/minor or lands on an unexpected chord that makes the return to chorus feel like resolution.',
+    rule: 'BRIDGE MUST make the final chorus sound like it means something different than it did the first time.',
+  },
+  {
+    name: 'Pre-Outro Vamp Build',
+    energy: 'medium → cascading',
+    bars: '6–8 with repeating tag',
+    delivery: 'Last 2 bars of the bridge repeat 2-3 times with slight melodic variation each time. The repetition creates tension that the final chorus releases.',
+    lyric: 'Write the bridge as a complete thought, then isolate the last line as the repeating tag. The tag should work both as a question and an answer depending on inflection.',
+    production: 'Background vocals enter on repeating tag. Layered harmonies build. Slight BPM push (feels faster without changing tempo) through drum pattern tightening.',
+    rule: 'BRIDGE MUST set up the final chorus as the only possible resolution to the tension it builds.',
+  },
+  {
+    name: 'Lyric Callback / Recontextualise',
+    energy: 'same energy as verse 1, but heavier',
+    bars: '4–6',
+    delivery: 'Callbacks land differently once context has built. Deliver familiar lines with new emotional weight — slower, or more fragile, or harder.',
+    lyric: 'Take an image or line from verse 1 and return to it — but now the circumstances have changed. Same words, entirely different meaning. The listener should feel the shift.',
+    production: 'Mirror the production of verse 1 but stripped down. The familiarity of the instrumentation makes the shifted meaning land harder.',
+    rule: 'BRIDGE MUST prove the song was planning this moment from the first bar. Callback creates inevitability.',
+  },
+  {
+    name: 'Spoken Interlude / Monologue',
+    energy: 'ambient — static tension',
+    bars: '4–8 (flexible)',
+    delivery: 'Not sung at all. Spoken directly. Could be a voicemail, a memory, an argument, an internal monologue. Raw voice, minimal or no music under it.',
+    lyric: 'Write as prose, not poetry. Irregular line lengths. Real speech rhythms — sentence fragments, self-corrections, trailing thoughts. The only rule: it must be true to the character.',
+    production: 'Music fades to near-silence or single sustained note/pad. Possible: ambient sound texture under the voice (rain, static, room tone). Returns with full force on final chorus.',
+    rule: 'BRIDGE MUST sound like it was captured, not composed. The listener should lean in.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// OUTRO ARCHETYPES — Prevents the default "fade out over repeating chorus"
+// ═══════════════════════════════════════════════════════════════════════════
+
+const OUTRO_ARCHETYPES = [
+  { name: 'Cold Stop', rule: 'Song ends on a single word, note, or silence mid-phrase. Abrupt. The absence of resolution IS the ending. No fade — a hard cut that leaves the listener mid-breath.' },
+  { name: 'Spiral Vamp', rule: 'Outro takes the hook and slowly deconstructs it — strip instruments one by one, change one word in the hook each repeat, until only voice and one note remain. The song unravels deliberately.' },
+  { name: 'Callback Resolution', rule: 'Outro returns to the opening line or image from Verse 1, but now it lands completely differently. The song ends where it began — the journey changed the meaning. No new material.' },
+  { name: 'Crowd Takeover', rule: 'Final section hands the song to the audience — melody simplified to its most singable core, lyrics pared to 4-6 words max, energy rises instead of fading. Song ends at its loudest.' },
+  { name: 'Dialogue / Spoken Coda', rule: 'After the final chorus, a brief spoken moment (2-4 lines) that steps outside the song — a thought, a question, a confession. Music drops completely or holds one note under it.' },
+  { name: 'Harmonic Drift', rule: 'Outro lands on an unresolved chord or half-cadence and holds. Music fades slowly without resolving. The tension is intentional — the story is unresolved and the listener knows it.' },
+  { name: 'Counter-Melody Ascent', rule: 'Outro strips the lead vocal and lets the counter-melody (instrument or backing voice) carry the song to its end — it was there all along, now it leads. Main vocal drops to harmonies only.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VERSE 2 ESCALATION ARCHETYPES — Verse 2 must do more than repeat Verse 1
+// ═══════════════════════════════════════════════════════════════════════════
+
+const VERSE2_ARCHETYPES = [
+  { name: 'Consequence', rule: 'Verse 2 shows what happened AFTER Verse 1. Same character, later in time, changed circumstances. The hook now means something different because of what verse 2 revealed.' },
+  { name: 'The Other Side', rule: 'Verse 2 gives the opposing perspective — different character, contradicting version of events, or the same person arguing against themselves. Creates productive tension.' },
+  { name: 'Zoom Out', rule: 'Verse 1 was intimate and personal. Verse 2 zooms out — the personal story becomes universal. Connect the specific situation to something larger: culture, history, the human condition.' },
+  { name: 'Deeper Specific', rule: 'Verse 2 goes more specific, not more general. New proper nouns, new sensory details, new micro-moments. The theme is the same but the evidence is richer and more precise.' },
+  { name: 'Time Jump', rule: 'Verse 2 is set years earlier or later than Verse 1. The emotional context shifts completely. What the chorus meant before now has a completely different backstory.' },
+  { name: 'Antagonist Voice', rule: 'Verse 2 is written from the POV of whoever or whatever is on the other side of the conflict. Not sympathetic — just truthful. The listener has to hold both truths.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GENRE SECTION DNA
+// Per-genre data for bridge harmony, weighted archetype preferences,
+// counter-melody role, real song references, outro + verse-2 tendencies.
+//
+// Selection logic (pickWeightedArchetype):
+//   70% chance → pick from genre's preferred list (weighted toward first)
+//   30% chance → pick from full pool (true surprise)
+// ═══════════════════════════════════════════════════════════════════════════
+
+const GENRE_SECTION_DNA = {
+  pop: {
+    bridge: {
+      harmonic: '♭VI → ♭VII → I (borrowed minor lift) or iv → ♭VII for tension. Often +2 semitone key change before final chorus — the "pop uplift." Adds 1-2 chords not heard in verse or chorus.',
+      counter: 'Strings or synth pad takes the melodic lead while the vocal strips back to its most vulnerable register.',
+      preferred_bridge: ['Emotional Reversal', 'Confessional Drop', 'Escalation Climb', 'Lyric Callback / Recontextualise'],
+      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Callback Resolution'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      examples: '"Someone Like You" (Adele) — bridge strips to voice + piano, deceptive cadence V→vi, most vulnerable moment. "Rolling in the Deep" — bridge builds over ♭VI→♭VII then modulates up. "Bad Guy" (Billie Eilish) — bridge near-silence then explosion back.',
+    },
+  },
+  hiphop: {
+    bridge: {
+      harmonic: 'Melodic bridge over i minor or ♭VII for emotional lift. Sung bridge: maj7 or 9 extensions contrast the harder verse chords. Rapped bridge: strip to kick+808 only, same loop. Beat switch = move to a completely new key/tempo area.',
+      counter: 'Producer melody or vocal sample carries the bridge — the MC steps back. The beat IS the bridge instrument.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Confessional Drop', 'Spoken Interlude / Monologue'],
+      preferred_outro: ['Cold Stop', 'Counter-Melody Ascent', 'Crowd Takeover'],
+      preferred_verse2: ['Antagonist Voice', 'Time Jump', 'Deeper Specific', 'Consequence'],
+      examples: '"All Falls Down" (Kanye) — sung emotional bridge over soft piano completely contrasts rapped verses. "HUMBLE." (Kendrick) — bridge strips to near-silence before final verse explosion. "DNA." (Kendrick) — bridge is a full beat switch into different key area.',
+    },
+  },
+  rnb: {
+    bridge: {
+      harmonic: 'Half-time feel: drums drop to half-time, harmony gets extended (maj9, min11). ♭VII → IV → I or sustained vamp on IV. Modulate up 2-3 semitones for the falsetto peak.',
+      counter: 'Background vocal harmonies thicken during the bridge — they become the texture, not the lead.',
+      preferred_bridge: ['Pre-Outro Vamp Build', 'Confessional Drop', 'Emotional Reversal', 'Escalation Climb'],
+      preferred_outro: ['Spiral Vamp', 'Crowd Takeover', 'Counter-Melody Ascent'],
+      preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      examples: '"Untitled (How Does It Feel)" (D\'Angelo) — bridge is pure vocal improv over minimal chord. "The Weekend" (SZA) — bridge modulates up + falsetto peak. "Crazy in Love" — bridge strips to bass + vocal, then explodes.',
+    },
+  },
+  neosoul: {
+    bridge: {
+      harmonic: 'Most harmonically adventurous section: mode mixture (Dorian ↔ Aeolian), borrowed ♭III or ♭VI chords. Half-time Dilla drag. Chord voicings add 9ths and 11ths not used elsewhere. Stays rhythmically behind the beat.',
+      counter: 'Rhodes or guitar plays a new melodic counter-line during the bridge — this is the moment the instrumental voice takes over.',
+      preferred_bridge: ['Spoken Interlude / Monologue', 'Pre-Outro Vamp Build', 'Lyric Callback / Recontextualise', 'Confessional Drop'],
+      preferred_outro: ['Spiral Vamp', 'Counter-Melody Ascent', 'Harmonic Drift'],
+      preferred_verse2: ['Deeper Specific', 'The Other Side', 'Consequence'],
+      examples: '"On & On" (Erykah Badu) — bridge is a spoken meditation over a single chord vamp. "Brown Skin" (India.Arie) — bridge deconstructs the groove to voice + guitar. Common "The Light" — bridge is the most vulnerable emotional turn.',
+    },
+  },
+  jazz: {
+    bridge: {
+      harmonic: 'AABA B-section: III7 → VI7 → II7 → V7 (cycle of 5ths into new key center). Tritone subs common: ♭II7 replaces V7. Modulates to a new tonal area and returns via ii-V-I. This is the harmonic adventure — not a rest, a journey.',
+      counter: 'The comping instrument (piano or guitar) breaks from accompaniment and plays a counter-melodic response during the bridge B-section.',
+      preferred_bridge: ['Left-Turn Narrative', 'Lyric Callback / Recontextualise', 'Emotional Reversal'],
+      preferred_outro: ['Harmonic Drift', 'Dialogue / Spoken Coda', 'Counter-Melody Ascent'],
+      preferred_verse2: ['The Other Side', 'Deeper Specific', 'Time Jump'],
+      examples: '"In a Sentimental Mood" — B-section modulates from Dm to F major and back via cycle of 5ths. "All the Things You Are" — bridge cycles through 4 key areas in 8 bars. "Autumn Leaves" — B-section lands on unexpected ♭VII before resolving home.',
+    },
+  },
+  blues: {
+    bridge: {
+      harmonic: 'Turnaround (bars 11-12 of the 12-bar): I → ♭VII → ♭VI → V7 (descending bass line) OR I → VI7 → ii7 → V7. Guitar solo IS the bridge. The turnaround creates tension that pulls into the next verse.',
+      counter: 'Guitar answers the vocal in the turnaround — this call-and-response IS blues structure. The guitar is the bridge instrument.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Lyric Callback / Recontextualise', 'Escalation Climb'],
+      preferred_outro: ['Counter-Melody Ascent', 'Harmonic Drift', 'Spiral Vamp'],
+      preferred_verse2: ['Deeper Specific', 'Antagonist Voice', 'Consequence'],
+      examples: '"The Thrill Is Gone" (B.B. King) — turnaround lands on VI7 minor creating maximum tension. "Hoochie Coochie Man" — stop-time bridge before the last verse. "Sweet Home Chicago" — turnaround accelerates the groove into final verse.',
+    },
+  },
+  gospel: {
+    bridge: {
+      harmonic: 'CLIMAX — modulate up a whole step (Nashville move: I → II major with iii-vi-ii-V7 approach). Vamp on IV chord. Choir enters or doubles in octaves. The harmonic lift IS the spiritual lift — the modulation is the message.',
+      counter: 'Choir sings counter-melody AGAINST the lead — lead goes up, choir goes down. Call-and-response intensifies during the vamp.',
+      preferred_bridge: ['Escalation Climb', 'Pre-Outro Vamp Build', 'Rhythmic Breakdown'],
+      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Pre-Outro Vamp Build'],
+      preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      examples: '"Oh Happy Day" — bridge modulates up and vamps endlessly, choir takeover. "I Never Loved a Man" (Aretha) — bridge is rhythmic percussion build that lifts the whole congregation. "Break Every Chain" — bridge is sustained single-chord vamp that builds for 2+ minutes.',
+    },
+  },
+  country: {
+    bridge: {
+      harmonic: '"The Turn" — stays on V7 for maximum unresolved tension, then releases to I for the final chorus. Or: moves to IV and stays, then V7 → I return. No key change. The harmony is simple — the emotional weight comes from the lyrics revealing something new.',
+      counter: 'Pedal steel or fiddle plays a counter-melody under the bridge vocal — the most emotional instrument in country leads here.',
+      preferred_bridge: ['Confessional Drop', 'Left-Turn Narrative', 'Lyric Callback / Recontextualise'],
+      preferred_outro: ['Callback Resolution', 'Cold Stop', 'Spiral Vamp'],
+      preferred_verse2: ['Time Jump', 'Antagonist Voice', 'Consequence'],
+      examples: '"The Dance" (Garth Brooks) — bridge reveals the philosophical turn that reframes the whole song. "Before He Cheats" — bridge is the most specific, most violent verse. "Whiskey Glasses" — bridge doubles down on the emotional denial.',
+    },
+  },
+  rock: {
+    bridge: {
+      harmonic: '♭VI → ♭VII → I power move (the "Stadium Rock" chord sequence). Or: drop to I minor for darkness before returning to major. Half-step key modulation for the final chorus. The bridge earns the final chorus explosion.',
+      counter: 'Second guitar plays a contrasting melodic line — clean against distortion, or a sustained note while the rhythm guitar drives.',
+      preferred_bridge: ['Escalation Climb', 'Rhythmic Breakdown', 'Confessional Drop'],
+      preferred_outro: ['Cold Stop', 'Counter-Melody Ascent', 'Crowd Takeover'],
+      preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      examples: '"Under the Bridge" (RHCP) — bridge key shift into unexpected harmonic area. "Everlong" (Foo Fighters) — quiet bridge then full-band explosion back. "Don\'t Look Back in Anger" (Oasis) — bridge strips to piano then rebuilds.',
+    },
+  },
+  altrock: {
+    bridge: {
+      harmonic: 'Quiet-LOUD: strip to clean guitar + whispered vocal, then full distortion wall. ♭VI chord adds unexpected darkness. Or: drone on one chord and let the dynamics do the work. The bridge IS the contrast.',
+      counter: 'Bass takes a counter-melodic role when guitars go quiet — then falls back into the root when full band returns.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Confessional Drop', 'Spoken Interlude / Monologue'],
+      preferred_outro: ['Cold Stop', 'Harmonic Drift', 'Counter-Melody Ascent'],
+      preferred_verse2: ['The Other Side', 'Consequence', 'Deeper Specific'],
+      examples: '"Smells Like Teen Spirit" — quiet bridge, then full-band explosion that redefined a decade. "Mr. Brightside" — no bridge, sustained tension instead. "Fake Plastic Trees" — bridge is the most sparse, most devastating.',
+    },
+  },
+  edm: {
+    bridge: {
+      harmonic: 'Pre-drop breakdown: strip ALL harmonic content except one sustained synth note or pad on I. The absence of harmony IS the tension. Then the drop restores full harmonic power — the resolution after 32 bars of suspended silence.',
+      counter: 'A single melodic motif — the hook reduced to its simplest form — plays alone during the breakdown before the drop.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Emotional Reversal', 'Pre-Outro Vamp Build'],
+      preferred_outro: ['Cold Stop', 'Crowd Takeover', 'Spiral Vamp'],
+      preferred_verse2: ['Zoom Out', 'Deeper Specific', 'Consequence'],
+      examples: '"Levels" (Avicii) — 32-bar breakdown to a single melody, then drop. "Ghosts \'n\' Stuff" (Deadmau5) — filter sweep from silence into full-power drop. "One More Time" (Daft Punk) — bridge strips the groove to a single repeating phrase.',
+    },
+  },
+  funk: {
+    bridge: {
+      harmonic: 'Funk break / synth or guitar solo: tight groove on I or vi with chromatic approach chords (♭III→II→I passing motion). The harmony barely moves — the RHYTHM changes. Bridge is a rhythmic contrast, not a harmonic journey.',
+      counter: 'Horn section (brass) plays the bridge counter-melody — the rhythm section locks tighter while brass takes the melodic lead.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Pre-Outro Vamp Build', 'Escalation Climb'],
+      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Counter-Melody Ascent'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      examples: '"Give Up the Funk" (Parliament) — bridge is pure call-and-response, horn section drives. "Super Freak" (Rick James) — bridge locks into a tighter syncopated figure. "September" (EW&F) — bridge is horn-section showcase over the same groove.',
+    },
+  },
+  soul: {
+    bridge: {
+      harmonic: 'Organ swell moment: ii7 → V7 → I with extra 7th extensions. Gospel turnaround (vi → ii → V7) adds depth. The bridge is the most emotionally saturated chord — add 9ths and 13ths here that weren\'t in the verse.',
+      counter: 'Background vocalists take over the response role — they stop being background and become equal voices in the bridge.',
+      preferred_bridge: ['Escalation Climb', 'Pre-Outro Vamp Build', 'Confessional Drop'],
+      preferred_outro: ['Spiral Vamp', 'Crowd Takeover', 'Counter-Melody Ascent'],
+      preferred_verse2: ['Consequence', 'Deeper Specific', 'Zoom Out'],
+      examples: '"Respect" (Aretha) — bridge is vocal ad-lib showcase, most technically demanding. "Ain\'t No Sunshine" — bridge single-phrase repetition that becomes a chant. "A Change Is Gonna Come" — bridge is the theological centre of the song.',
+    },
+  },
+  reggae: {
+    bridge: {
+      harmonic: 'Dub break: same chord (I or i → ♭VII alternation), but production transforms. Guitar drops out, bass locks with drums, heavy reverb/delay echoes the last phrase. The bridge is a texture change, not a harmonic one.',
+      counter: 'Melodica or flute carries the melodic line during the dub break — the rhythm instruments retreat and the melodic instrument leads.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Lyric Callback / Recontextualise'],
+      preferred_outro: ['Spiral Vamp', 'Harmonic Drift', 'Crowd Takeover'],
+      preferred_verse2: ['Deeper Specific', 'Zoom Out', 'Consequence'],
+      examples: '"No Woman No Cry" — bridge is dub echo vamp, bass and drums carry. "Many Rivers to Cross" — bridge is a piano-led confessional. "Rivers of Babylon" — bridge is a pure melodic counter-statement.',
+    },
+  },
+  afrobeats: {
+    bridge: {
+      harmonic: 'I → IV → V → IV loop with intensified percussion — no modulation, the groove IS the harmony. Bridge adds talking drum, shekere, and more vocal texture. The polyrhythm gets more complex, not simpler.',
+      counter: 'Highlife guitar plays a more elaborate ostinato during the bridge — the repeating pattern becomes the emotional carrier.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Pre-Outro Vamp Build'],
+      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Counter-Melody Ascent'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      examples: '"Essence" (Wizkid) — bridge is pure percussion build then release. "Last Last" (Burna Boy) — bridge strips to drums and bass, then rebuilds with layers. "Ye" (Burna Boy) — bridge is the most vulnerable vocal moment in the song.',
+    },
+  },
+  latin: {
+    bridge: {
+      harmonic: 'Clave continues through bridge but harmony shifts to relative major/minor. Montuno section: repeated 2-chord vamp (I–V or i–♭VII) where the clave and piano lock. Modulate up 2-3 semitones via chromatic bass approach: IV→V→I in new key.',
+      counter: 'Brass section (trumpets, trombones) takes the melodic counter during the bridge — the montuno piano answers them.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Pre-Outro Vamp Build', 'Escalation Climb'],
+      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Callback Resolution'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'The Other Side'],
+      examples: '"Vivir Mi Vida" (Marc Anthony) — bridge is pure salsa brass + clave break. "Bailando" — bridge adds timbales/congas complexity, rhythm IS the transition. "Bésame Mucho" — bridge returns to tonic via chromatic descent.',
+    },
+  },
+  kpop: {
+    bridge: {
+      harmonic: 'Rap break over relative minor or borrowed parallel-key chords. Key change UP +1 or +2 semitones before final chorus — this is the K-pop non-negotiable. The harmonic lift coincides with the emotional peak and choreography climax.',
+      counter: 'Synth or string post-bridge line plays a counter-melody that re-harmonises the hook in the new key, preparing the final chorus.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Escalation Climb'],
+      preferred_outro: ['Cold Stop', 'Crowd Takeover', 'Callback Resolution'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'The Other Side'],
+      examples: '"Dynamite" (BTS) — bridge is rap break then key change up before final chorus. "Pink Venom" (BLACKPINK) — bridge adds a contrasting melodic section. "Attention" (NewJeans) — bridge strips the K-pop formula, minimal and unexpected.',
+    },
+  },
+  ss: {
+    bridge: {
+      harmonic: 'Relative minor shift (I→vi) or unexpected deceptive cadence (V→vi instead of V→I). Often a capo change for tonal shift. The harmony is the simplest in the song — the lyric revelation carries all the weight.',
+      counter: 'Acoustic guitar fingerpicking pattern changes for the bridge — a new pattern becomes the emotional signal. Cello or second acoustic voice enters only here.',
+      preferred_bridge: ['Confessional Drop', 'Spoken Interlude / Monologue', 'Lyric Callback / Recontextualise'],
+      preferred_outro: ['Dialogue / Spoken Coda', 'Callback Resolution', 'Harmonic Drift'],
+      preferred_verse2: ['Deeper Specific', 'The Other Side', 'Time Jump'],
+      examples: '"Fast Car" (Tracy Chapman) — bridge is a lyrical revelation over the same harmonic loop. "The Night Will Always Win" (Manchester Orchestra) — bridge is a whispered confession. "The Blower\'s Daughter" — bridge strips to a single note held.',
+    },
+  },
+  punk: {
+    bridge: {
+      harmonic: 'I → I → I → I (pure power chord drive) or sudden IV→V→I crash. Bridge may drop to silence for 1 bar then explode back. The "anti-bridge" — no harmonic complexity, just maximum energy disruption.',
+      counter: 'There is no counter-melody. The bridge IS the disruption. Drums and bass lock harder as guitars stop.',
+      preferred_bridge: ['Escalation Climb', 'Rhythmic Breakdown', 'Spoken Interlude / Monologue'],
+      preferred_outro: ['Cold Stop', 'Crowd Takeover', 'Callback Resolution'],
+      preferred_verse2: ['Consequence', 'Antagonist Voice', 'Zoom Out'],
+      examples: '"God Save the Queen" (Sex Pistols) — bridge is the loudest, most hostile moment. "Basket Case" (Green Day) — bridge drops to clean guitar then explodes back. "I Wanna Be Sedated" — no bridge, one constant assault.',
+    },
+  },
+  tvmusical: {
+    bridge: {
+      harmonic: 'Dramatic modulation up 1-3 semitones for the climax — usually the "+3 semitone theatrical key change." Unexpected borrowed chords for emotional revelation. The bridge is where the CHARACTER changes — the harmony mirrors their internal shift.',
+      counter: 'Full orchestral counter-melody during the bridge — strings or brass plays a dramatic answer to the vocal.',
+      preferred_bridge: ['Escalation Climb', 'Left-Turn Narrative', 'Emotional Reversal'],
+      preferred_outro: ['Callback Resolution', 'Dialogue / Spoken Coda', 'Cold Stop'],
+      preferred_verse2: ['Consequence', 'The Other Side', 'Time Jump'],
+      examples: '"Defying Gravity" (Wicked) — bridge modulates up 3 semitones to the climax that changes the character. "Being Alive" (Company) — bridge is the emotional core of the entire show. "Seasons of Love" (RENT) — bridge adds new melodic counter-line over the whole cast.',
+    },
+  },
+  gospel: {
+    bridge: {
+      harmonic: 'CLIMAX — modulate up a whole step (Nashville move: I → II major with iii-vi-ii-V7 approach). Vamp on IV chord. Choir enters or doubles in octaves. The harmonic lift IS the spiritual lift — the modulation is the message.',
+      counter: 'Choir sings counter-melody AGAINST the lead — lead goes up, choir goes down. Call-and-response intensifies during the vamp.',
+      preferred_bridge: ['Escalation Climb', 'Pre-Outro Vamp Build', 'Rhythmic Breakdown'],
+      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Pre-Outro Vamp Build'],
+      preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      examples: '"Oh Happy Day" — bridge modulates up and vamps endlessly, choir takeover. "I Never Loved a Man" (Aretha) — bridge is rhythmic percussion build. "Break Every Chain" — bridge is sustained single-chord vamp that builds for 2+ minutes.',
+    },
+  },
+};
+
+// Weighted archetype picker:
+// 70% → one of the genre's preferred list (slight bias toward first = most canonical)
+// 30% → fully random from entire pool (surprise / rule-break)
+function pickWeightedArchetype(fullPool, preferredNames) {
+  if (!preferredNames || !preferredNames.length) return pickRandom(fullPool);
+  const usePref = Math.random() < 0.70;
+  if (usePref) {
+    // Weight toward earlier items: index 0 gets weight 4, index 1 → 3, etc.
+    const weights = preferredNames.map((_, i) => Math.max(4 - i, 1));
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    for (let i = 0; i < preferredNames.length; i++) {
+      r -= weights[i];
+      if (r <= 0) {
+        const found = fullPool.find(a => a.name === preferredNames[i]);
+        if (found) return found;
+      }
+    }
+    return pickRandom(fullPool.filter(a => preferredNames.includes(a.name)) || fullPool);
+  }
+  return pickRandom(fullPool);
+}
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
@@ -1274,6 +1628,31 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
 
   const system = buildGenreAgentSystem(genre);
 
+  // Section archetypes — genre-weighted + randomised every generation.
+  // Each uses the genre's preferred list 70% of the time (biased toward most
+  // canonical choice); 30% fully random for surprise / rule-breaking.
+  const _gsd = GENRE_SECTION_DNA[genre] || {};
+  const _ba  = pickWeightedArchetype(BRIDGE_ARCHETYPES,  _gsd.bridge?.preferred_bridge);
+  const _oa  = pickWeightedArchetype(OUTRO_ARCHETYPES,   _gsd.bridge?.preferred_outro);
+  const _v2a = pickWeightedArchetype(VERSE2_ARCHETYPES,  _gsd.bridge?.preferred_verse2);
+
+  const _harmonicLine  = _gsd.bridge?.harmonic  ? `\nHarmonic approach: ${_gsd.bridge.harmonic}`  : '';
+  const _counterLine   = _gsd.bridge?.counter   ? `\nCounter-melody role: ${_gsd.bridge.counter}` : '';
+  const _examplesLine  = _gsd.bridge?.examples  ? `\nReal-world models: ${_gsd.bridge.examples}`  : '';
+
+  const bridgeNote = `\n\nBRIDGE ARCHITECTURE — "${_ba.name}" [${genreLabel}]:${_harmonicLine}${_counterLine}
+Energy arc: ${_ba.energy} · Bars: ${_ba.bars}
+Delivery: ${_ba.delivery}
+Lyric approach: ${_ba.lyric}
+Production: ${_ba.production}
+Rule: ${_ba.rule}${_examplesLine}`;
+
+  const outroNote = `\n\nOUTRO APPROACH — "${_oa.name}":
+${_oa.rule}`;
+
+  const verse2Note = `\n\nVERSE 2 STRATEGY — "${_v2a.name}":
+${_v2a.rule}`;
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -1292,8 +1671,7 @@ SONGWRITING RULES:
 - Every line must be specific — no vague emotions, no clichés
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
-- Bridge must offer a new emotional or narrative perspective — not a repeat
-- The last chorus must feel bigger than the first
+- The last chorus must feel bigger than the first${bridgeNote}${verse2Note}${outroNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
@@ -1369,13 +1747,21 @@ function buildLuckyPrompt(params) {
   const keys = Object.keys(FUSION_DATA);
   const rawG1 = params && params.g1 ? sanitizeInput(params.g1, 50) : null;
   const rawG2 = params && params.g2 ? sanitizeInput(params.g2, 50) : null;
-  const key = (rawG1 && rawG2) ? rawG1 + '+' + rawG2 : pickRandom(keys);
+  // Try exact key first, then reverse order (handles either direction client may send)
+  let key = null;
+  if (rawG1 && rawG2) {
+    const fwd = rawG1 + '+' + rawG2;
+    const rev = rawG2 + '+' + rawG1;
+    key = FUSION_DATA[fwd] ? fwd : FUSION_DATA[rev] ? rev : fwd; // fwd fallback still uses those genres
+  }
+  if (!key) key = pickRandom(keys);
   const [g1, g2] = key.split('+');
   const fd = FUSION_DATA[key];
-  const topic = pickRandom(LUCKY_TOPICS);
-  const mood = pickRandom(LUCKY_MOODS);
-  const structure = pickRandom(LUCKY_STRUCTURES);
-  const vocal = pickRandom(LUCKY_VOCALS);
+  // Honour client-picked values so reveal UI matches generated song exactly
+  const topic     = (params && params.topic)     ? sanitizeInput(params.topic, 100)     : pickRandom(LUCKY_TOPICS);
+  const mood      = (params && params.mood)      ? sanitizeInput(params.mood, 100)      : pickRandom(LUCKY_MOODS);
+  const structure = (params && params.structure) ? sanitizeInput(params.structure, 50)  : pickRandom(LUCKY_STRUCTURES);
+  const vocal     = (params && params.vocal)     ? sanitizeInput(params.vocal, 100)     : pickRandom(LUCKY_VOCALS);
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
 
   // Outlier injection

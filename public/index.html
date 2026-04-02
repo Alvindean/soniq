@@ -1633,6 +1633,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','chain')">Chain</span>
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','mosaic')">Mosaic</span>
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','slant')">Slant</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','deferred')">Deferred ✦</span>
             </div>
           </div>
           <div class="rl-dim-row">
@@ -1717,6 +1718,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="bpill" onclick="setTheoryLevel(this,'avantgarde')">Avant-garde</span>
           </div>
           <div id="theory-level-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px">Diatonic, genre-typical progressions — the proven formulas that work</div>
+
+          <!-- RHYTHM DNA: SWING + SYLLABLES -->
+          <label class="bracket-label" style="margin-top:14px">🥁 Swing Feel <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how notes land in the groove</span></label>
+          <div class="bracket-pills" id="swing-pills">
+            <span class="bpill on" onclick="setSwing(this,'genre_default')">Auto (genre default)</span>
+            <span class="bpill" onclick="setSwing(this,'straight')">Straight — tight grid</span>
+            <span class="bpill" onclick="setSwing(this,'shuffle')">Shuffle — loose &amp; warm</span>
+            <span class="bpill" onclick="setSwing(this,'swing')">Heavy Swing — J Dilla drag</span>
+          </div>
+          <div id="swing-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px">Matched to genre automatically — affects both production and lyric rhythm</div>
+
+          <label class="bracket-label" style="margin-top:2px">✍ Syllable Density <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how many syllables per bar</span></label>
+          <div class="bracket-pills" id="syllable-pills">
+            <span class="bpill on" onclick="setSyllable(this,'auto')">Auto (from swing)</span>
+            <span class="bpill" onclick="setSyllable(this,'dense')">Dense — pack every beat</span>
+            <span class="bpill" onclick="setSyllable(this,'normal')">Normal — balanced</span>
+            <span class="bpill" onclick="setSyllable(this,'sparse')">Sparse — space is music</span>
+          </div>
+          <div id="syllable-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:14px;min-height:16px">Syllable count follows swing feel by default — override here for specific density</div>
+
+          <!-- SOUTHPAW / DEFERRED RHYME -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2)">
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx2)">Southpaw Rhyme Scheme</div>
+              <div style="font-size:11px;color:var(--tx3);margin-top:3px">Plant rhymes early, pay off late — deferred tension. Works in every genre.</div>
+            </div>
+            <button id="southpaw-btn" onclick="toggleSouthpaw()" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.15s;white-space:nowrap">Off</button>
+          </div>
 
           <!-- MODE SELECTOR -->
           <label class="bracket-label" style="margin-top:2px">🎵 Scale / Mode <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— overrides genre default</span></label>
@@ -2281,6 +2310,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="edstats">Lines: <span id="ed-total">0</span> &nbsp;·&nbsp; Avg syllables: <span id="ed-avg">0</span> &nbsp;·&nbsp; Over limit: <span id="ed-over" style="color:var(--red)">0</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">Copy Edited</button>
+        <button class="btn btn-sm" onclick="showPasteModal()" title="Paste lyrics from clipboard">📋 Paste</button>
         <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
         <button class="btn" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
       </div>
@@ -3942,6 +3972,9 @@ const S={selectedGenre:'pop',
   selectedMoods:['Emotional'],
   bracketMode:'suno',
   selectedEra:'modern',
+  swingLevel: 'genre_default',
+  syllableDensity: 'auto',
+  southpaw: false,
   selectedAgeGroup:'',
   albumLanes:['streaming'],
   albumData:null,
@@ -4276,6 +4309,13 @@ function goPg(id,el){
   if(id==='builder')initBuilder();
   if(id==='lucky')renderLuckyHistory();
   if(id==='profile')loadProfilePage();
+  if(id==='editor'){
+    // Auto-load last song if editor is empty
+    if(!S.editorLines?.length){
+      const src = S.currentSong?.lyrics ? S.currentSong : S.library?.[0];
+      if(src?.lyrics) loadLyricsIntoEditor(src.lyrics, src.title);
+    }
+  }
 }
 function goStab(ns,id,el){
   const pre=ns+'-spane-';
@@ -4871,8 +4911,9 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
     if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
   };
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2}, luckyStreamCb, luckySignal).then(r => r.text)
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure}, luckyStreamCb, luckySignal).then(r => r.text)
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal);
   luckyPromise.then(raw=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
@@ -4910,7 +4951,9 @@ function parseLuckyResult(raw,fusionName,meta){
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY',null);
+  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
+  const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
 
   const out=document.getElementById('lucky-out');
   out.style.display='block';
@@ -4929,7 +4972,7 @@ function parseLuckyResult(raw,fusionName,meta){
     if (!S.luckyVersions) S.luckyVersions = [];
     pushVersion('lres');
   }
-  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
+  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,visualPrompt,videoPrompt,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
   pushVersion('lres');
   renderVersionBar('lres');
   updateShareHash(S.luckyCurrentSong);
@@ -4947,6 +4990,7 @@ function parseLuckyResult(raw,fusionName,meta){
   const ldb = document.getElementById('lres-dislike-btn'); if(ldb) ldb.classList.remove('disliked');
   toast('🎲 "'+title+'" — lucky song generated!');
   out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  autoSaveSongToServer(S.luckyCurrentSong);
 }
 
 function openLuckyEditor(){
@@ -5035,7 +5079,10 @@ async function generateSong(){
       style2: document.getElementById('g-style2')?.value || '',
       ratio: parseInt(document.getElementById('g-blend')?.value || 70)
     },
-    ageGroup: S.selectedAgeGroup || ''
+    ageGroup: S.selectedAgeGroup || '',
+    swing: S.swingLevel || 'genre_default',
+    syllableDensity: S.syllableDensity || 'auto',
+    southpaw: S.southpaw || false
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
@@ -5322,17 +5369,15 @@ function showCopyrightStrip(ns, title, ts) {
               + ' at ' + d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
   strip.style.display = 'flex';
+  // Hidden claim text — still copied by copyCopyrightClaim(), not shown in UI
   strip.innerHTML = `
-    <div class="cp-seal">©</div>
-    <div class="cp-body">
-      <div class="cp-claim" id="${ns}-cp-claim">${escHtml(claim)}</div>
-      <div class="cp-meta">Created ${human} · Click claim to select all · Paste into descriptions, metadata, or copyright filings</div>
-    </div>
-    <div class="cp-actions">
-      <input class="cp-name-inp" id="${ns}-cp-name" value="${escHtml(name)}" placeholder="Your name / artist" title="Sets your copyright name"
+    <span style="font-size:11px;font-weight:700;color:var(--tx3);white-space:nowrap;padding-top:1px">© Claim</span>
+    <div class="cp-actions" style="flex:1;margin-left:10px">
+      <input class="cp-name-inp" id="${ns}-cp-name" value="${escHtml(name)}" placeholder="Your name / artist"
         oninput="updateCopyrightClaim('${ns}','${title}',${ts},this.value)">
       <button class="cp-copy-btn" id="${ns}-cp-btn" onclick="copyCopyrightClaim('${ns}')">Copy Claim</button>
-    </div>`;
+    </div>
+    <div id="${ns}-cp-claim" style="display:none">${escHtml(claim)}</div>`;
 }
 
 function updateCopyrightClaim(ns, title, ts, name) {
@@ -5369,7 +5414,9 @@ function parseSongResult(raw,genre,topic){
   const chords=parseSection(raw,'CHORD PROGRESSION','THEORY ANALYSIS');
   const theoryAnalysis=parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY',null);
+  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
+  const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;
@@ -5388,7 +5435,7 @@ function parseSongResult(raw,genre,topic){
     if (!S.currentVersions) S.currentVersions = [];
     pushVersion('res');
   }
-  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};
+  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,visualPrompt,videoPrompt,genre,topic,ts};
   // Push the new song as a version too
   pushVersion('res');
   renderVersionBar('res');
@@ -5422,6 +5469,8 @@ function parseSongResult(raw,genre,topic){
   trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
   onboardingPostGenerate();
+  // Auto-save to server (fire-and-forget — localStorage remains primary)
+  autoSaveSongToServer(S.currentSong);
 }
 
 // ─── ONBOARDING PROGRESS HELPERS (defined here so generateSong can always call them) ──
@@ -5797,9 +5846,14 @@ function updateSaveBtn(btnId, saved){
 }
 
 function openEditor(){
-  if(!S.currentSong?.lyrics){toast('Generate a song first');return;}
-  loadLyricsIntoEditor(S.currentSong.lyrics,S.currentSong.title);
+  if(S.currentSong?.lyrics){
+    loadLyricsIntoEditor(S.currentSong.lyrics,S.currentSong.title);
+  }
   navTo('editor');
+  // If still no content after trying to load, show paste modal so user can manually enter lyrics
+  if(!S.editorLines?.length){
+    setTimeout(()=>showPasteModal(),100);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6019,8 +6073,20 @@ async function regenLine(i){
   }catch(e){toast('⚠️ Regen failed: '+e.message,3000);}
   if(regBtn)regBtn.disabled=false;
 }
-function showPasteModal(){document.getElementById('paste-modal').style.display='block';}
-function loadPasted(){const raw=document.getElementById('paste-area').value;if(!raw.trim())return;loadLyricsIntoEditor(raw,'Pasted Song');}
+function showPasteModal(){
+  const modal=document.getElementById('paste-modal');
+  modal.style.display='block';
+  modal.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>document.getElementById('paste-area')?.focus(),150);
+}
+function loadPasted(){
+  const ta=document.getElementById('paste-area');
+  const raw=ta?.value||'';
+  if(!raw.trim()){toast('Paste some lyrics first');return;}
+  loadLyricsIntoEditor(raw,'Pasted Song');
+  ta.value='';
+  toast('✓ Lyrics loaded into editor');
+}
 function copyEdited(){const text=S.editorLines.map(l=>l.text).join('\n');safeCopy(text,'Edited lyrics copied');}
 function saveEdited(){
   const lyrics=S.editorLines.map(l=>l.text).join('\n');
@@ -6975,7 +7041,7 @@ function copyCoachFeedback() {
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
-  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com']);
+  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com']);
   S.supabase.auth.onAuthStateChange((event, session) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
@@ -7468,6 +7534,18 @@ async function submitPublish() {
     pubs.unshift({ title, isrc, tier, pro, ts: Date.now() });
     localStorage.setItem('soniq_published', JSON.stringify(pubs.slice(0, 50)));
     checkAchievements('song_published');
+    // Track publish event on server
+    if (S.session?.access_token) {
+      fetch('/api/track', {
+        method: 'POST',
+        headers: _trackHeaders(),
+        body: JSON.stringify({
+          action: 'publish',
+          songId: S.currentSong?._serverId || S.currentSong?.id || null,
+          tier, genre: S.currentSong?.genre || null, title
+        })
+      }).catch(() => {});
+    }
 
     // Show confirmation
     const card = document.querySelector('#pub-modal .card');
@@ -8059,10 +8137,25 @@ YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene
       </div>`;
     }
 
+    // Quick prompts from the brain (instant, no extra API call)
+    const quickSection = (song.visualPrompt || song.videoPrompt) ? `
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:8px">⚡ Quick Prompts — Ready to paste</div>
+        ${song.visualPrompt ? `<div style="margin-bottom:8px">
+          <div class="vp-label"><span>🖼 Cover Art / Image</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Midjourney · DALL-E · Firefly</span></div>
+          <div class="vp-prompt-box" id="${prefix}-quick-visual">${escHtml(song.visualPrompt)}<button class="vp-copy-btn" onclick="copyEl('${prefix}-quick-visual',this)">Copy</button></div>
+        </div>` : ''}
+        ${song.videoPrompt ? `<div style="margin-bottom:8px">
+          <div class="vp-label"><span>🎬 Music Video Concept</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Sora · Runway · Kling</span></div>
+          <div class="vp-prompt-box" id="${prefix}-quick-video">${escHtml(song.videoPrompt)}<button class="vp-copy-btn" onclick="copyEl('${prefix}-quick-video',this)">Copy</button></div>
+        </div>` : ''}
+      </div>` : '';
+
     const html = `<div class="visual-brief">
       <div class="vb-regen-row">
         <button class="vb-copy-btn" onclick="regenVisual('${prefix}')">↻ Regenerate</button>
       </div>
+      ${quickSection}
       ${makeCard('🎤','Artist Visual','How your artist looks — paste into any image AI','img',['Midjourney','Flux','Ideogram','Firefly'],artistVisual,'artist')}
       ${makeCard('🎬','Music Video','Short-form vertical video concept — 9:16, 15–45 sec','vid',['Runway Gen-3','Pika 2.0','Kling','Dream Machine'],musicVideo,'video')}
       ${makeCard('🖼','Cover Art','Single / album artwork — no text in image','art',['Midjourney v6','Ideogram v2','Firefly','Flux'],coverArt,'cover')}
@@ -8076,6 +8169,22 @@ YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene
     showEmptyTabState(prefix + '-visual-content', 'Visual prompts generated on first click');
   } catch(e) {
     container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:20px">Visual brief unavailable. Try again.</div>';
+  }
+}
+
+function copyEl(elId, btn) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  // Get text content, stripping the copy button text
+  const text = el.textContent.replace(/Copy$/, '').trim();
+  const afterCopy = () => {
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  };
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(afterCopy).catch(() => { fallbackCopy(text); afterCopy(); });
+  } else {
+    fallbackCopy(text); afterCopy();
   }
 }
 
@@ -8772,6 +8881,52 @@ function updateModeDesc() {
   }
 }
 
+const SWING_DESCS = {
+  genre_default: 'Matched to genre automatically — affects both production and lyric rhythm',
+  straight: 'Dead straight — every note on the grid. Surgical precision. 8–14 syllables/bar.',
+  shuffle: 'Slight shuffle — warm, breathing human feel. Lines lean without fully swinging. 6–9 syllables/bar.',
+  swing: 'Full triplet swing — J Dilla drag. Space IS the music. 3–6 syllables/bar.',
+};
+const SYLLABLE_DESCS = {
+  auto: 'Syllable count follows swing feel by default — override here for specific density',
+  dense: 'Pack it tight — 10–16 syllables/bar. Kendrick on "HUMBLE." energy. Every slot filled.',
+  normal: 'Standard phrasing — 6–10 syllables/bar. Balance density with space.',
+  sparse: 'Minimal — 3–6 syllables/bar. Frank Ocean territory. What you don\'t say matters as much.',
+};
+
+function setSwing(el, level) {
+  S.swingLevel = level;
+  document.querySelectorAll('#swing-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const d = document.getElementById('swing-desc');
+  if (d) d.textContent = SWING_DESCS[level] || '';
+}
+
+function setSyllable(el, density) {
+  S.syllableDensity = density;
+  document.querySelectorAll('#syllable-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const d = document.getElementById('syllable-desc');
+  if (d) d.textContent = SYLLABLE_DESCS[density] || '';
+}
+
+function toggleSouthpaw() {
+  S.southpaw = !S.southpaw;
+  const btn = document.getElementById('southpaw-btn');
+  if (!btn) return;
+  if (S.southpaw) {
+    btn.textContent = 'On ✦';
+    btn.style.background = 'var(--cyanbg)';
+    btn.style.borderColor = 'var(--cyanline)';
+    btn.style.color = 'var(--cyan)';
+  } else {
+    btn.textContent = 'Off';
+    btn.style.background = 'var(--s3)';
+    btn.style.borderColor = 'var(--b2)';
+    btn.style.color = 'var(--tx3)';
+  }
+}
+
 function setHookStyle(el, style) {
   S.hookStyle = style;
   document.querySelectorAll('#hook-style-pills .bpill').forEach(p => p.classList.remove('on'));
@@ -8985,6 +9140,55 @@ async function instantEdit() {
 }
 
 // ═══════════════════════════════════════════════════════
+// SERVER TRACKING HELPERS
+// ═══════════════════════════════════════════════════════
+
+function _trackHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (S.session?.access_token) h['Authorization'] = 'Bearer ' + S.session.access_token;
+  return h;
+}
+
+// Auto-save a song to the server (fire-and-forget — never blocks the UI)
+function autoSaveSongToServer(song, extraParams) {
+  if (!S.session?.access_token || !song) return;
+  const payload = {
+    action: 'save',
+    song: {
+      id:           song.id,
+      title:        song.title,
+      genre:        song.genre,
+      topic:        song.topic,
+      mood:         song.mood || '',
+      lyrics:       song.lyrics || '',
+      style:        song.style || '',
+      brief:        song.brief || '',
+      chords:       song.chords || '',
+      theoryAnalysis: song.theoryAnalysis || '',
+      notes:        song.notes || '',
+      countermelody: song.countermelody || '',
+      verdict:      song.verdict || '',
+      visualPrompt: song.visualPrompt || '',
+      videoPrompt:  song.videoPrompt || '',
+      score:        typeof song.score === 'number' ? song.score : null,
+      params: extraParams || {
+        genre:          song.genre,
+        swing:          S.swingLevel || 'genre_default',
+        syllableDensity: S.syllableDensity || 'auto',
+        southpaw:       S.southpaw || false,
+        era:            S.selectedEra || 'modern',
+        theoryLevel:    S.theoryLevel || 'standard',
+        plan:           S.plan || 'free',
+      }
+    }
+  };
+  fetch('/api/track', { method: 'POST', headers: _trackHeaders(), body: JSON.stringify(payload) })
+    .then(r => r.json())
+    .then(d => { if (d.ok) song._serverId = d.id; })
+    .catch(() => {}); // silent fail — localStorage is the primary store
+}
+
+// ═══════════════════════════════════════════════════════
 // FEATURE 1: LIKE / DISLIKE
 // ═══════════════════════════════════════════════════════
 function setLike(prefix, isLike) {
@@ -9007,6 +9211,14 @@ function setLike(prefix, isLike) {
   const evName = isLike ? 'song_liked' : 'song_disliked';
   trackEvent(evName, { genre: song?.genre, topic: song?.topic });
   if (isLike) checkAchievements('song_liked');
+  // Server-side like tracking (fire-and-forget)
+  if (S.session?.access_token && song.id && isLike) {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: _trackHeaders(),
+      body: JSON.stringify({ action: 'like', songId: song._serverId || song.id })
+    }).catch(() => {});
+  }
 }
 
 // ═══════════════════════════════════════════════════════
