@@ -3214,6 +3214,35 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <!-- PROFILE BODY -->
   <div style="max-width:680px;margin:0 auto;padding:20px">
 
+    <!-- QUICK ACTIONS -->
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+      <button class="btn" onclick="navTo('write')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">✍️</span>Write</button>
+      <button class="btn" onclick="navTo('library')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">📚</span>Library</button>
+      <button class="btn" onclick="navTo('editor')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">✏️</span>Editor</button>
+      <button class="btn" onclick="navTo('lucky')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">🎲</span>Lucky</button>
+    </div>
+
+    <!-- PLAN & USAGE -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1)">📊 Plan &amp; Usage</div>
+        <div id="profile-plan-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--amberbg);border:1px solid var(--amberline);color:var(--amber);text-transform:uppercase;letter-spacing:.06em">Free</div>
+      </div>
+      <div id="profile-usage-wrap">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:5px">
+          <span id="profile-usage-label">Songs used</span>
+          <span id="profile-usage-nums" style="font-weight:600;color:var(--tx2)">0 / 3</span>
+        </div>
+        <div style="height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:6px">
+          <div id="profile-usage-bar" style="height:100%;background:linear-gradient(90deg,var(--amber),var(--violet));border-radius:99px;width:0%;transition:width .6s ease"></div>
+        </div>
+        <div id="profile-usage-sub" style="font-size:10px;color:var(--tx4)"></div>
+      </div>
+      <div id="profile-upgrade-cta" style="display:none;margin-top:12px">
+        <button class="btn btn-amber" onclick="navTo('profile');document.getElementById('profile-edit-modal').style.display='none'" style="width:100%;font-size:13px;padding:9px">⚡ Upgrade Plan — Unlock More Songs</button>
+      </div>
+    </div>
+
     <!-- TOP GENRE + ANTHEM row -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div class="card" style="padding:14px">
@@ -3228,6 +3257,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
+    <!-- GENRE BREAKDOWN -->
+    <div class="card" style="margin-bottom:16px" id="profile-genre-breakdown-card" style="display:none">
+      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎸 Genre Breakdown</div>
+      <div id="profile-genre-breakdown"></div>
+    </div>
+
     <!-- ACHIEVEMENTS -->
     <div class="card" style="margin-bottom:16px">
       <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🏆 Achievements</div>
@@ -3235,11 +3270,31 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
 
     <!-- RECENT SONGS -->
-    <div class="card">
-      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎶 Recent Songs</div>
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎶 Recent Songs</div>
+        <button class="btn btn-sm" onclick="navTo('library')" style="font-size:10px">View All</button>
+      </div>
       <div id="profile-songs-list"></div>
       <div id="profile-no-songs" style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">No songs yet — go write one!</div>
     </div>
+
+    <!-- ACCOUNT -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">👤 Account</div>
+      <div id="profile-email-display" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd)">
+        <span style="font-size:18px">✉️</span>
+        <div>
+          <div id="profile-email-val" style="font-size:13px;color:var(--tx1);font-weight:600"></div>
+          <div id="profile-member-since" style="font-size:10px;color:var(--tx4)"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
+        <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -9982,6 +10037,11 @@ function checkAchievements(trigger, extra) {
 
   if (trigger === 'song_generated') {
     awardXP('song_generated');
+    // Track usage for profile meter
+    const _plan = S.plan || 'free';
+    const _isLifetime = _plan === 'free';
+    const _uKey = _isLifetime ? 'soniq_usage_lifetime' : `soniq_usage_${new Date().toISOString().slice(0,7)}`;
+    localStorage.setItem(_uKey, String((parseInt(localStorage.getItem(_uKey)||'0',10)+1)));
     // Update streak
     updateStreak();
     unlock('first_song');
@@ -10096,21 +10156,94 @@ function loadProfilePage() {
   document.getElementById('pstat-published').textContent = published.length;
   document.getElementById('pstat-streak').textContent = (ach.streak || 0) + '🔥';
 
+  // Plan & Usage
+  const PLAN_DISPLAY = {
+    free:'Free',pro:'Pro',pro_annual:'Pro',studio:'Studio',studio_annual:'Studio',
+    founding:'Founding',founding_t1:'Founding T1',founding_t1_annual:'Founding T1',
+    founding_t2:'Founding T2',founding_t2_annual:'Founding T2',
+    starter:'Starter',starter_annual:'Starter'
+  };
+  const CLIENT_PLAN_LIMITS = {
+    free:3,founding_t1:20,founding_t1_annual:20,founding_t2:10,founding_t2_annual:10,
+    pro:20,pro_annual:20,studio:50,studio_annual:50,founding:50,starter:10,starter_annual:10
+  };
+  const plan = S.plan || 'free';
+  const planLabel = PLAN_DISPLAY[plan] || plan.charAt(0).toUpperCase()+plan.slice(1);
+  const planLimit = CLIENT_PLAN_LIMITS[plan] ?? 3;
+  const isLifetime = plan === 'free';
+  const isUnlimited = planLimit === Infinity || !isFinite(planLimit);
+
+  // Track usage in localStorage
+  const thisMonth = new Date().toISOString().slice(0,7);
+  const usageKey = isLifetime ? 'soniq_usage_lifetime' : `soniq_usage_${thisMonth}`;
+  const usageCount = parseInt(localStorage.getItem(usageKey) || '0', 10);
+
+  const planBadge = document.getElementById('profile-plan-badge');
+  planBadge.textContent = planLabel;
+  const planColors = {free:'var(--tx3)',pro:'#60a5fa',studio:'var(--amber)',founding:'#a78bfa',founding_t1:'#a78bfa',founding_t2:'#34d399'};
+  const pc = planColors[plan] || planColors[plan.replace(/_annual/,'')] || 'var(--amber)';
+  planBadge.style.color = pc; planBadge.style.borderColor = pc+'60'; planBadge.style.background = pc+'18';
+
+  if (!isUnlimited) {
+    const usagePct = Math.min(100, Math.round(usageCount / planLimit * 100));
+    document.getElementById('profile-usage-bar').style.width = usagePct + '%';
+    document.getElementById('profile-usage-nums').textContent = `${usageCount} / ${planLimit}`;
+    document.getElementById('profile-usage-label').textContent = isLifetime ? 'Lifetime songs used' : `Songs this month (${thisMonth})`;
+    document.getElementById('profile-usage-sub').textContent = isLifetime
+      ? `${planLimit - usageCount} free song${planLimit - usageCount !== 1 ? 's' : ''} remaining`
+      : `${Math.max(0, planLimit - usageCount)} remaining · resets ${new Date(new Date().getFullYear(), new Date().getMonth()+1, 1).toLocaleDateString(undefined,{month:'short',day:'numeric'})}`;
+    if (plan === 'free' && usageCount >= planLimit) {
+      document.getElementById('profile-upgrade-cta').style.display = '';
+    }
+  } else {
+    document.getElementById('profile-usage-bar').style.width = '100%';
+    document.getElementById('profile-usage-nums').textContent = `${usageCount} generated`;
+    document.getElementById('profile-usage-label').textContent = 'Unlimited plan';
+    document.getElementById('profile-usage-sub').textContent = 'No monthly cap — create freely';
+  }
+
   // Top genre
   const genreMap = {};
   lib.forEach(s => { if (s.genre) genreMap[s.genre] = (genreMap[s.genre]||0)+1; });
-  const topGenre = Object.entries(genreMap).sort((a,b)=>b[1]-a[1])[0];
+  const genreEntries = Object.entries(genreMap).sort((a,b)=>b[1]-a[1]);
+  const topGenre = genreEntries[0];
   document.getElementById('profile-top-genre').textContent = topGenre ? topGenre[0].charAt(0).toUpperCase()+topGenre[0].slice(1) : '—';
   document.getElementById('profile-genre-count').textContent = topGenre ? topGenre[1] + ' songs' : '';
 
+  // Genre breakdown bars
+  const gbCard = document.getElementById('profile-genre-breakdown-card');
+  const gbEl = document.getElementById('profile-genre-breakdown');
+  if (genreEntries.length > 1) {
+    gbCard.style.display = '';
+    const maxCount = genreEntries[0][1];
+    const GENRE_COLORS = {pop:'#f472b6',hiphop:'#a78bfa',rnb:'#34d399',rock:'#f97316',country:'#fbbf24',edm:'#60a5fa',jazz:'#818cf8',soul:'#fb923c',gospel:'#4ade80',blues:'#38bdf8',funk:'#e879f9',reggae:'#86efac',afrobeats:'#fde68a',latin:'#fb7185',kpop:'#c084fc',punk:'#f87171',altrock:'#94a3b8',neosoul:'#6ee7b7',ss:'#fcd34d',folk:'#a3e635'};
+    gbEl.innerHTML = genreEntries.slice(0,8).map(([g, cnt]) => {
+      const color = GENRE_COLORS[g] || '#94a3b8';
+      const pct = Math.round(cnt / maxCount * 100);
+      const label = g.charAt(0).toUpperCase() + g.slice(1);
+      return `<div style="margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px">
+          <span style="color:var(--tx2);font-weight:600">${escHtml(label)}</span>
+          <span style="color:var(--tx4)">${cnt} song${cnt!==1?'s':''}</span>
+        </div>
+        <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:99px;transition:width .6s ease"></div>
+        </div>
+      </div>`;
+    }).join('');
+  } else {
+    gbCard.style.display = 'none';
+  }
+
   // Anthem (most liked or first)
-  const liked = lib.find(s => s.liked);
-  const anthem = liked || lib[0];
+  const likedSong = lib.find(s => s.liked);
+  const anthem = likedSong || lib[0];
   document.getElementById('profile-anthem-title').textContent = anthem ? anthem.title : '—';
   document.getElementById('profile-anthem-genre').textContent = anthem ? anthem.genre || '' : 'Write a song to set your anthem';
 
   // Achievements grid
   const grid = document.getElementById('profile-achievements-grid');
+  const unlockCount = Object.keys(ACHIEVEMENTS).filter(k => !!ach[k]).length;
   grid.innerHTML = Object.entries(ACHIEVEMENTS).map(([key, a]) => {
     const unlocked = !!ach[key];
     return `<div class="ach-badge ${unlocked?'unlocked':''}">
@@ -10119,7 +10252,7 @@ function loadProfilePage() {
       <div class="ach-b-desc">${escHtml(a.desc)}</div>
       ${unlocked ? `<div style="font-size:9px;color:var(--amber);margin-top:3px">+${a.xp} XP</div>` : ''}
     </div>`;
-  }).join('');
+  }).join('') + `<div style="grid-column:1/-1;font-size:10px;color:var(--tx4);text-align:right;margin-top:4px">${unlockCount} / ${Object.keys(ACHIEVEMENTS).length} unlocked</div>`;
 
   // Recent songs
   const songsEl = document.getElementById('profile-songs-list');
@@ -10129,8 +10262,8 @@ function loadProfilePage() {
     noSongs.style.display = '';
   } else {
     noSongs.style.display = 'none';
-    songsEl.innerHTML = lib.slice(0,10).map((s,i) => `
-      <div class="profile-song-row">
+    songsEl.innerHTML = lib.slice(0,8).map((s,i) => `
+      <div class="profile-song-row" onclick="loadFromLibIdx(${S.library.findIndex(l=>l.id===s.id)});navTo('write')" style="cursor:pointer">
         <div class="profile-song-num">${i+1}</div>
         <div class="profile-song-info">
           <div class="profile-song-title">${escHtml(s.title || 'Untitled')}</div>
@@ -10138,6 +10271,17 @@ function loadProfilePage() {
         </div>
         ${s.liked ? '<div class="profile-song-liked">♥</div>' : ''}
       </div>`).join('');
+  }
+
+  // Account section
+  const emailEl = document.getElementById('profile-email-val');
+  const sinceEl = document.getElementById('profile-member-since');
+  if (S.user?.email) {
+    emailEl.textContent = S.user.email;
+    const createdAt = S.user.created_at || S.user.user_metadata?.created_at;
+    sinceEl.textContent = createdAt ? 'Member since ' + new Date(createdAt).toLocaleDateString(undefined,{month:'long',year:'numeric'}) : 'SONIQ Member';
+  } else {
+    document.getElementById('profile-email-display').style.display = 'none';
   }
 }
 
