@@ -4942,7 +4942,9 @@ function parseLuckyResult(raw,fusionName,meta){
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY',null);
+  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
+  const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
 
   const out=document.getElementById('lucky-out');
   out.style.display='block';
@@ -4961,7 +4963,7 @@ function parseLuckyResult(raw,fusionName,meta){
     if (!S.luckyVersions) S.luckyVersions = [];
     pushVersion('lres');
   }
-  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
+  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,visualPrompt,videoPrompt,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
   pushVersion('lres');
   renderVersionBar('lres');
   updateShareHash(S.luckyCurrentSong);
@@ -4979,6 +4981,7 @@ function parseLuckyResult(raw,fusionName,meta){
   const ldb = document.getElementById('lres-dislike-btn'); if(ldb) ldb.classList.remove('disliked');
   toast('🎲 "'+title+'" — lucky song generated!');
   out.scrollIntoView({behavior:'smooth',block:'nearest'});
+  autoSaveSongToServer(S.luckyCurrentSong);
 }
 
 function openLuckyEditor(){
@@ -5404,7 +5407,9 @@ function parseSongResult(raw,genre,topic){
   const chords=parseSection(raw,'CHORD PROGRESSION','THEORY ANALYSIS');
   const theoryAnalysis=parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY',null);
+  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
+  const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;
@@ -5423,7 +5428,7 @@ function parseSongResult(raw,genre,topic){
     if (!S.currentVersions) S.currentVersions = [];
     pushVersion('res');
   }
-  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,genre,topic,ts};
+  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,visualPrompt,videoPrompt,genre,topic,ts};
   // Push the new song as a version too
   pushVersion('res');
   renderVersionBar('res');
@@ -5457,6 +5462,8 @@ function parseSongResult(raw,genre,topic){
   trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
   onboardingPostGenerate();
+  // Auto-save to server (fire-and-forget — localStorage remains primary)
+  autoSaveSongToServer(S.currentSong);
 }
 
 // ─── ONBOARDING PROGRESS HELPERS (defined here so generateSong can always call them) ──
@@ -7503,6 +7510,18 @@ async function submitPublish() {
     pubs.unshift({ title, isrc, tier, pro, ts: Date.now() });
     localStorage.setItem('soniq_published', JSON.stringify(pubs.slice(0, 50)));
     checkAchievements('song_published');
+    // Track publish event on server
+    if (S.session?.access_token) {
+      fetch('/api/track', {
+        method: 'POST',
+        headers: _trackHeaders(),
+        body: JSON.stringify({
+          action: 'publish',
+          songId: S.currentSong?._serverId || S.currentSong?.id || null,
+          tier, genre: S.currentSong?.genre || null, title
+        })
+      }).catch(() => {});
+    }
 
     // Show confirmation
     const card = document.querySelector('#pub-modal .card');
@@ -8094,10 +8113,25 @@ YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene
       </div>`;
     }
 
+    // Quick prompts from the brain (instant, no extra API call)
+    const quickSection = (song.visualPrompt || song.videoPrompt) ? `
+      <div style="margin-bottom:16px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:8px">⚡ Quick Prompts — Ready to paste</div>
+        ${song.visualPrompt ? `<div style="margin-bottom:8px">
+          <div class="vp-label"><span>🖼 Cover Art / Image</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Midjourney · DALL-E · Firefly</span></div>
+          <div class="vp-prompt-box" id="${prefix}-quick-visual">${escHtml(song.visualPrompt)}<button class="vp-copy-btn" onclick="copyEl('${prefix}-quick-visual',this)">Copy</button></div>
+        </div>` : ''}
+        ${song.videoPrompt ? `<div style="margin-bottom:8px">
+          <div class="vp-label"><span>🎬 Music Video Concept</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Sora · Runway · Kling</span></div>
+          <div class="vp-prompt-box" id="${prefix}-quick-video">${escHtml(song.videoPrompt)}<button class="vp-copy-btn" onclick="copyEl('${prefix}-quick-video',this)">Copy</button></div>
+        </div>` : ''}
+      </div>` : '';
+
     const html = `<div class="visual-brief">
       <div class="vb-regen-row">
         <button class="vb-copy-btn" onclick="regenVisual('${prefix}')">↻ Regenerate</button>
       </div>
+      ${quickSection}
       ${makeCard('🎤','Artist Visual','How your artist looks — paste into any image AI','img',['Midjourney','Flux','Ideogram','Firefly'],artistVisual,'artist')}
       ${makeCard('🎬','Music Video','Short-form vertical video concept — 9:16, 15–45 sec','vid',['Runway Gen-3','Pika 2.0','Kling','Dream Machine'],musicVideo,'video')}
       ${makeCard('🖼','Cover Art','Single / album artwork — no text in image','art',['Midjourney v6','Ideogram v2','Firefly','Flux'],coverArt,'cover')}
@@ -8111,6 +8145,22 @@ YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene
     showEmptyTabState(prefix + '-visual-content', 'Visual prompts generated on first click');
   } catch(e) {
     container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:20px">Visual brief unavailable. Try again.</div>';
+  }
+}
+
+function copyEl(elId, btn) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  // Get text content, stripping the copy button text
+  const text = el.textContent.replace(/Copy$/, '').trim();
+  const afterCopy = () => {
+    btn.textContent = '✓ Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  };
+  if (navigator?.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).then(afterCopy).catch(() => { fallbackCopy(text); afterCopy(); });
+  } else {
+    fallbackCopy(text); afterCopy();
   }
 }
 
@@ -9066,6 +9116,55 @@ async function instantEdit() {
 }
 
 // ═══════════════════════════════════════════════════════
+// SERVER TRACKING HELPERS
+// ═══════════════════════════════════════════════════════
+
+function _trackHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  if (S.session?.access_token) h['Authorization'] = 'Bearer ' + S.session.access_token;
+  return h;
+}
+
+// Auto-save a song to the server (fire-and-forget — never blocks the UI)
+function autoSaveSongToServer(song, extraParams) {
+  if (!S.session?.access_token || !song) return;
+  const payload = {
+    action: 'save',
+    song: {
+      id:           song.id,
+      title:        song.title,
+      genre:        song.genre,
+      topic:        song.topic,
+      mood:         song.mood || '',
+      lyrics:       song.lyrics || '',
+      style:        song.style || '',
+      brief:        song.brief || '',
+      chords:       song.chords || '',
+      theoryAnalysis: song.theoryAnalysis || '',
+      notes:        song.notes || '',
+      countermelody: song.countermelody || '',
+      verdict:      song.verdict || '',
+      visualPrompt: song.visualPrompt || '',
+      videoPrompt:  song.videoPrompt || '',
+      score:        typeof song.score === 'number' ? song.score : null,
+      params: extraParams || {
+        genre:          song.genre,
+        swing:          S.swingLevel || 'genre_default',
+        syllableDensity: S.syllableDensity || 'auto',
+        southpaw:       S.southpaw || false,
+        era:            S.selectedEra || 'modern',
+        theoryLevel:    S.theoryLevel || 'standard',
+        plan:           S.plan || 'free',
+      }
+    }
+  };
+  fetch('/api/track', { method: 'POST', headers: _trackHeaders(), body: JSON.stringify(payload) })
+    .then(r => r.json())
+    .then(d => { if (d.ok) song._serverId = d.id; })
+    .catch(() => {}); // silent fail — localStorage is the primary store
+}
+
+// ═══════════════════════════════════════════════════════
 // FEATURE 1: LIKE / DISLIKE
 // ═══════════════════════════════════════════════════════
 function setLike(prefix, isLike) {
@@ -9088,6 +9187,14 @@ function setLike(prefix, isLike) {
   const evName = isLike ? 'song_liked' : 'song_disliked';
   trackEvent(evName, { genre: song?.genre, topic: song?.topic });
   if (isLike) checkAchievements('song_liked');
+  // Server-side like tracking (fire-and-forget)
+  if (S.session?.access_token && song.id && isLike) {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: _trackHeaders(),
+      body: JSON.stringify({ action: 'like', songId: song._serverId || song.id })
+    }).catch(() => {});
+  }
 }
 
 // ═══════════════════════════════════════════════════════

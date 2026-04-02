@@ -23,7 +23,12 @@ const GENRE_BIBLE={
       {song:'"Lose Yourself" — Eminem',rule:'Rock guitar riff + power ballad structure, no traditional hip-hop drums or samples',result:'Won Oscar for Best Original Song — first rap song ever to receive it'},
       {song:'"HUMBLE." — Kendrick Lamar',rule:'Sparse production with minimal hook variation and zero ad-libs — stripped everything rap conventionally adds',result:'#1 hit that broke streaming records and defined minimalist prestige rap'},
       {song:'"Sicko Mode" — Travis Scott',rule:'Three completely different beat sections mid-song with no warning — breaks the single-groove golden rule',result:'#1 hit that became a cultural moment and turned the "beat switch" into an art form'},
-      {song:'"What We Do" — Freeway ft. Jay-Z',rule:'Rhymes deliberately scattered — plants a rhyme in bar 2, pays it off in bar 7; flows against the grid, clapping 1/3 instead of 2/4',result:'Instantly recognizable voice and flow that forced active listening — deferred rhyme tension became his signature'}
+      {song:'"What We Do" — Freeway ft. Jay-Z',rule:'Rhymes deliberately scattered — plants a rhyme in bar 2, pays it off in bar 7; flows against the grid, clapping 1/3 instead of 2/4',result:'Instantly recognizable voice and flow that forced active listening — deferred rhyme tension became his signature'},
+      {song:'"Feel So Good" — Mase',rule:'4–7 syllables/bar whisper delivery — broke every rule about dense hip-hop verses with aggressive energy',result:'#1 hit proving restraint and calm authority can land harder than aggression'},
+      {song:'"A Milli" — Lil Wayne',rule:'No hook, no chorus — just 4 minutes of metaphor chains over one repeating loop; broke the standard song structure',result:'Defined the "rapper\'s rapper" era and launched a decade of no-hook mixtape culture'},
+      {song:'"99 Problems" — Jay-Z',rule:'Rock guitar production and verse-heavy structure with no traditional rap hook — crossed genre lines completely',result:'Grammy-winning cultural landmark that proved hip-hop didn\'t need a melody to dominate'},
+      {song:'"Fragile" — Tech N9ne',rule:'Sung melodic hook over ultra-technical triplet verses — mixed emotional vulnerability with technical maximalism',result:'Broke into mainstream rock/pop crossover while keeping his underground technical credibility'},
+      {song:'"Tell Me When To Go" — E-40',rule:'Invented an entire vocabulary ("hyphy", "ghost ride") that mainstream culture didn\'t know — wrote for a culture that didn\'t exist yet at scale',result:'Launched the hyphy movement and proved that inventing your own language makes you impossible to copy'}
     ],
     vocables:{sounds:'(yeah) (uh) (let\'s go) (ayy)',when:'ad-lib on every 2nd bar, outro crowd chant',suno_tag:'[Outro - crowd chant]',borrowed_from:'gospel affirmation secularized',notes:'Parentheses syntax critical — Suno renders these as background voices'}
   },
@@ -1256,6 +1261,59 @@ APPLICATION IN ALL GENRES:
 - In jazz/neosoul: lyric phrasing mirrors the bebop concept of delayed resolution
 The goal: make the listener ACTIVE. They're tracking the rhyme thread. When it arrives late, the reward is bigger.`;
 
+// ═══════════════════════════════════════════════════════════════════════════
+// ARTIST FLOW DNA — Stylistic fingerprints of key artists
+// Referenced in Rap Lab and available as voice model inspiration.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ARTIST_FLOW_DNA = {
+  mase: {
+    name: 'Mase',
+    era: 'Late 90s Bad Boy / Harlem',
+    signature: 'Whisper-to-crowd delivery — laid-back, almost lazy cadence that makes every word land harder because it arrives so calm. Minimal syllables per bar but maximum double meaning. Luxury-coded braggadocio with religious undertone. Flow sits just BEHIND the beat — never pushes, never rushes.',
+    rhyme: 'Simple end rhymes, often monosyllabic. Power is in delivery and restraint, not complexity.',
+    syllables: '4–7 per bar. Deliberate space. The silence between words is part of the flow.',
+    lyric_rules: 'Keep it deceptively simple. Short declarative statements. One unexpected flex per 4 bars that recontextualizes everything before it. Luxury nouns. Understated confidence. Write like you don\'t need to prove anything.',
+    suno_tag: 'smooth rap, laid-back delivery, whisper flow, 90s Bad Boy',
+  },
+  lilwayne: {
+    name: 'Lil Wayne',
+    era: '2000s–2010s Cash Money / Young Money',
+    signature: 'Extended metaphor chains that run for 4-8 bars — every line is a new angle on the same metaphor. Punch-then-explain structure: hit with the punchline FIRST, then unpack it. Nasal delivery with melodic vowel stretches. Slant rhyme stacked 3-4 deep. Confident non sequiturs that still feel inevitable.',
+    rhyme: 'Multi-syllabic slant rhyme chains. Each bar\'s last word sets up the NEXT bar\'s rhyme scheme. Chain-links across the whole verse.',
+    syllables: '10–14 per bar. Dense but fluid — never sounds forced.',
+    lyric_rules: 'Open the verse with the punchline, then spend 8 bars proving it. Every metaphor has a B-side meaning. Use "I am" constructions. No throwaway lines — every bar lands. End the verse on an unexpected image that reframes everything.',
+    suno_tag: 'melodic rap, dense flow, metaphor chains, southern rap, 2000s',
+  },
+  jayz: {
+    name: 'Jay-Z',
+    era: 'Late 90s–present Roc-A-Fella / Roc Nation',
+    signature: 'Economic storytelling — 16 bars that feel like a short film. The brag that isn\'t a brag: wealth and power conveyed through specific detail (brand names, numbers, addresses) not adjectives. Internal rhyme tightly controlled. Conversational authority — sounds like he\'s talking to you, not performing at you. Every verse has a thesis, development, and payoff.',
+    rhyme: 'Complex internal rhyme interlocked with end rhyme. Internal rhymes hit every 3-4 syllables without feeling forced.',
+    syllables: '8–12 per bar. Varies within verse for emphasis — drops to 5-6 on the most important lines.',
+    lyric_rules: 'State the thesis in bar 1. Use specific proper nouns (places, brands, dollar figures). Build evidence across bars 2-12. Deliver the emotional payoff in bar 15-16. One line per verse that stands completely alone as a quotable. Write in past tense for narrative bars — you\'ve already lived this.',
+    suno_tag: 'boom bap, conversational delivery, luxury rap, East Coast, storytelling',
+  },
+  techn9ne: {
+    name: 'Tech N9ne',
+    era: '90s–present Strange Music / Kansas City',
+    signature: 'Triplet flow marathon — sustained technical precision at high BPM. Multi-syllabic rhyme schemes that run 6-8 syllables per rhyme cluster. Enunciation as performance: every consonant crisp even at maximum speed. Alternates between hyper-fast triplet verses and melodic sung hooks. Horror-influenced imagery with high vocabulary. Spiritual and struggle themes alongside lyrical flexing.',
+    rhyme: 'Multi-syllabic rhyme families (4-6 syllables rhyming simultaneously). Every bar in a verse rhymes with every other bar through complex cross-rhyme patterns.',
+    syllables: '14–20+ per bar in triplet sections. Chorus can drop to 6-8 for contrast.',
+    lyric_rules: 'Build rhyme families of 4-6 syllables and sustain them for the whole verse. Every syllable must be pronounceable at speed — avoid consonant clusters that clump. Alternate between hyper-verse and melodic hook for dynamic contrast. Use vocabulary that sounds technical but isn\'t obscure. Include one "show stopper" bar per 16 that even non-fans will remember.',
+    suno_tag: 'triplet flow, fast rap, technical rap, Midwest, high BPM',
+  },
+  e40: {
+    name: 'E-40',
+    era: '80s–present Bay Area / Vallejo',
+    signature: 'Invented slang as its own dialect — E-40 words that entered mainstream: "on fleek," "sipping," "fetti," "turf," "slap." Staccato chopped delivery: words land like percussion, no legato. Bay Area vernacular as an entire sonic texture — the vocabulary IS the genre marker. Storytelling through scene-setting specificity. Entrepreneurial brag (actual business moves, not just lifestyle). Vocal ad-libs as counterpoint.',
+    rhyme: 'Internal rhyme hits on offbeats. Slant rhyme preferred — the BAY sound over perfect rhyme.',
+    syllables: '8–12 per bar but chopped into 2-3 syllable staccato bursts with micro-pauses.',
+    lyric_rules: 'Use invented compound slang for at least 2 words per verse. Every 4 bars, a regional reference (Bay Area geography, culture). Staccato choppy delivery — write short word clusters separated by micro-pauses. Include a "business bar" (entrepreneurial flex) per verse. Outro should be a vamp of the most memorable slang phrase. Ad-libs in parentheses every 4 bars.',
+    suno_tag: 'Bay Area rap, hyphy, staccato delivery, West Coast, slap music',
+  },
+};
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
@@ -1477,7 +1535,13 @@ COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]`;
+SECTION MAP: [which sections and how it evolves]
+
+VISUAL PROMPT:
+[Cover art prompt for AI image generators (Midjourney, DALL-E, Firefly). Under 200 characters. Mood, color palette, key imagery, visual metaphor for the song. No text. No artist names.]
+
+VIDEO PROMPT:
+[Music video concept for AI video generators (Sora, Runway, Kling). Under 300 characters. Setting, lighting, key visual moments, camera moves, color grade, emotional arc. Cinematic and specific.]`;
 
   return { system, prompt };
 }
@@ -2144,4 +2208,4 @@ After the 9 dimensions, give:
 FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, ARTIST_FLOW_DNA };
