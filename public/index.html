@@ -5424,6 +5424,91 @@ function parseSongResult(raw,genre,topic){
   onboardingPostGenerate();
 }
 
+// ─── ONBOARDING PROGRESS HELPERS (defined here so generateSong can always call them) ──
+var OB_KEY           = 'soniq:onboarding:v1:complete';
+var OB_DAILY_KEY     = 'soniq:daily:songs';
+var OB_DAILY_DATE_KEY= 'soniq:daily:date';
+var OB_FREE_LIMIT    = 3;
+var _nudgeTimer      = null;
+
+function getDailySongCount() {
+  var today = new Date().toDateString();
+  var saved = localStorage.getItem(OB_DAILY_DATE_KEY);
+  if (saved !== today) {
+    localStorage.setItem(OB_DAILY_DATE_KEY, today);
+    localStorage.setItem(OB_DAILY_KEY, '0');
+    return 0;
+  }
+  return parseInt(localStorage.getItem(OB_DAILY_KEY) || '0', 10);
+}
+
+function incrementDailySongCount() {
+  var today = new Date().toDateString();
+  localStorage.setItem(OB_DAILY_DATE_KEY, today);
+  var next = getDailySongCount() + 1;
+  localStorage.setItem(OB_DAILY_KEY, String(next));
+  return next;
+}
+
+function updateEmptyState() {
+  var es = document.getElementById('empty-state');
+  if (!es) return;
+  if (getDailySongCount() === 0) { es.classList.add('show'); }
+  else { es.classList.remove('show'); }
+}
+
+function updateProgressIndicator() {
+  var prog = document.getElementById('gen-progress');
+  var label = document.getElementById('gp-label');
+  if (!prog || !label) return;
+  var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
+  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
+  if (window.__soniqAdmin || isFounder || isPaid) { prog.classList.remove('show'); return; }
+  var count = getDailySongCount();
+  prog.classList.add('show');
+  label.textContent = count === 0
+    ? (OB_FREE_LIMIT + ' free songs to try')
+    : ('Song ' + count + ' of ' + OB_FREE_LIMIT + ' free');
+  for (var i = 1; i <= OB_FREE_LIMIT; i++) {
+    var pip = document.getElementById('gp-pip-' + i);
+    if (!pip) continue;
+    pip.classList.remove('used', 'current');
+    if (i < count) pip.classList.add('used');
+    else if (i === count) pip.classList.add('current');
+  }
+}
+
+function showGenNudge(songNum) {
+  var el = document.getElementById('gen-nudge');
+  var txt = document.getElementById('gn-text');
+  if (!el || !txt) return;
+  var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
+  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
+  if (window.__soniqAdmin || isFounder || isPaid) return;
+  var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
+  if (remaining > 0) {
+    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> — or go unlimited from $9/mo.';
+  } else {
+    txt.innerHTML = 'You\'ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong>. Upgrade to keep creating.';
+  }
+  el.classList.add('show');
+  if (_nudgeTimer) clearTimeout(_nudgeTimer);
+  _nudgeTimer = setTimeout(closeGenNudge, 9000);
+}
+
+function closeGenNudge() {
+  var el = document.getElementById('gen-nudge');
+  if (el) el.classList.remove('show');
+  if (_nudgeTimer) { clearTimeout(_nudgeTimer); _nudgeTimer = null; }
+}
+
+function onboardingPostGenerate() {
+  var num = incrementDailySongCount();
+  updateProgressIndicator();
+  updateEmptyState();
+  showGenNudge(num);
+}
+
 // ─── BRIEF RENDERER ───────────────────────────────────────────
 function parseBriefSection(text, key) {
   const idx = text.indexOf(key + ':');
@@ -10039,11 +10124,9 @@ function _dbgErr(ctx,msg){
 // ══════════════════════════════════════════════════════════════
 //  ONBOARDING  (SONIQ v1)
 // ══════════════════════════════════════════════════════════════
-
-const OB_KEY = 'soniq:onboarding:v1:complete';
-const OB_DAILY_KEY = 'soniq:daily:songs';
-const OB_DAILY_DATE_KEY = 'soniq:daily:date';
-const OB_FREE_LIMIT = 3; // lifetime trial songs
+// Note: OB_KEY, OB_FREE_LIMIT, getDailySongCount, updateProgressIndicator,
+// showGenNudge, closeGenNudge, onboardingPostGenerate are defined earlier
+// in the main script block so generateSong() can always call them.
 
 const OB_STEPS = [
   {
@@ -10132,100 +10215,13 @@ function completeOnboarding() {
 // ── EMPTY STATE ───────────────────────────────────────────────
 
 function prefillConcept(text) {
-  var inp = document.getElementById('g-topic');
+  var inp = document.getElementById(‘g-topic’);
   if (inp) {
     inp.value = text;
     inp.focus();
-    inp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    inp.scrollIntoView({ behavior: ‘smooth’, block: ‘nearest’ });
   }
   updateEmptyState();
-}
-
-function updateEmptyState() {
-  var es = document.getElementById('empty-state');
-  if (!es) return;
-  if (getDailySongCount() === 0) {
-    es.classList.add('show');
-  } else {
-    es.classList.remove('show');
-  }
-}
-
-// ── DAILY PROGRESS ────────────────────────────────────────────
-
-function getDailySongCount() {
-  var today = new Date().toDateString();
-  var saved = localStorage.getItem(OB_DAILY_DATE_KEY);
-  if (saved !== today) {
-    localStorage.setItem(OB_DAILY_DATE_KEY, today);
-    localStorage.setItem(OB_DAILY_KEY, '0');
-    return 0;
-  }
-  return parseInt(localStorage.getItem(OB_DAILY_KEY) || '0', 10);
-}
-
-function incrementDailySongCount() {
-  var today = new Date().toDateString();
-  localStorage.setItem(OB_DAILY_DATE_KEY, today);
-  var next = getDailySongCount() + 1;
-  localStorage.setItem(OB_DAILY_KEY, String(next));
-  return next;
-}
-
-function updateProgressIndicator() {
-  var prog = document.getElementById('gen-progress');
-  var label = document.getElementById('gp-label');
-  if (!prog || !label) return;
-  var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
-  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
-  if (window.__soniqAdmin || isFounder || isPaid) { prog.classList.remove('show'); return; }
-  var count = getDailySongCount();
-  prog.classList.add('show');
-  label.textContent = count === 0
-    ? (OB_FREE_LIMIT + ' free songs to try')
-    : ('Song ' + count + ' of ' + OB_FREE_LIMIT + ' free');
-  for (var i = 1; i <= OB_FREE_LIMIT; i++) {
-    var pip = document.getElementById('gp-pip-' + i);
-    if (!pip) continue;
-    pip.classList.remove('used', 'current');
-    if (i < count) pip.classList.add('used');
-    else if (i === count) pip.classList.add('current');
-  }
-}
-
-// ── POST-GENERATION NUDGE ─────────────────────────────────────
-
-var _nudgeTimer = null;
-
-function showGenNudge(songNum) {
-  var el = document.getElementById('gen-nudge');
-  var txt = document.getElementById('gn-text');
-  if (!el || !txt) return;
-  var isFounder = typeof S !== 'undefined' && S.foundingStatus?.is_founder;
-  var isPaid = typeof S !== 'undefined' && PAID_PLANS && PAID_PLANS.has(S.plan);
-  if (window.__soniqAdmin || isFounder || isPaid) return;
-  var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
-  if (remaining > 0) {
-    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> today — or go unlimited from $9/mo.';
-  } else {
-    txt.innerHTML = ‘You\’ve used all <strong>’ + OB_FREE_LIMIT + ‘ free songs</strong>. Upgrade to keep creating.’;
-  }
-  el.classList.add('show');
-  if (_nudgeTimer) clearTimeout(_nudgeTimer);
-  _nudgeTimer = setTimeout(closeGenNudge, 9000);
-}
-
-function closeGenNudge() {
-  var el = document.getElementById('gen-nudge');
-  if (el) el.classList.remove('show');
-  if (_nudgeTimer) { clearTimeout(_nudgeTimer); _nudgeTimer = null; }
-}
-
-function onboardingPostGenerate() {
-  var num = incrementDailySongCount();
-  updateProgressIndicator();
-  updateEmptyState();
-  showGenNudge(num);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
