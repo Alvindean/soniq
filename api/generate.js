@@ -48,22 +48,31 @@ async function redisIncrExpire(key, ttl) {
   }
 }
 
-function getTodayDate() {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+function getThisMonth() {
+  return new Date().toISOString().slice(0, 7); // YYYY-MM
 }
 
 // Emails that always get Studio plan + unlimited access
 const ADMIN_EMAILS = new Set(['thealvindean@gmail.com']);
 
+// Must match stream.js exactly — generate.js is a fallback path for the same users
 const PLAN_LIMITS = {
-  free: 1,
-  starter: Infinity, starter_annual: Infinity,
-  pro: Infinity, pro_annual: Infinity,
-  studio: Infinity, studio_annual: Infinity,
-  founding: Infinity,
-  founding_t1: Infinity, founding_t1_annual: Infinity,
-  founding_t2: Infinity, founding_t2_annual: Infinity,
+  free:                3,   // lifetime trial
+  founding_t1:         20,  founding_t1_annual: 20,
+  founding_t2:         10,  founding_t2_annual: 10,
+  pro:                 20,  pro_annual:         20,
+  studio:              50,  studio_annual:      50,
+  founding:            50,
+  starter: 10, starter_annual: 10, // legacy
 };
+
+const MONTHLY_LIMIT_PLANS = new Set([
+  'founding_t1','founding_t1_annual',
+  'founding_t2','founding_t2_annual',
+  'pro','pro_annual',
+  'studio','studio_annual','founding',
+  'starter','starter_annual',
+]);
 
 async function callAnthropic(apiKey, messages, system, max_tokens) {
   const payload = {model:'claude-sonnet-4-20250514', max_tokens, messages};
@@ -180,16 +189,16 @@ module.exports = async function handler(req, res) {
 
   const limit = PLAN_LIMITS[plan] ?? 3;
   if (!isAdmin && isFinite(limit)) {
-    const dateKey = getTodayDate();
-    const redisKey = `soniq:ratelimit:daily:${user.id}:${dateKey}`;
+    const isLifetime = plan === 'free';
+    const redisKey = isLifetime
+      ? `soniq:ratelimit:lifetime:${user.id}`
+      : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
     const current = parseInt(await redisGet(redisKey) || '0', 10);
     if (current >= limit) {
-      return res.status(429).json({
-        error: 'limit_reached',
-        message: `You've used your ${limit} free songs today. Upgrade for unlimited generations.`,
-        limit,
-        plan
-      });
+      const upgradeHint = isLifetime
+        ? 'Your 3 free songs are used. Upgrade to keep creating.'
+        : 'Monthly limit reached. Upgrade for more songs.';
+      return res.status(429).json({ error: 'limit_reached', message: upgradeHint, limit, plan });
     }
   }
 
@@ -254,15 +263,22 @@ module.exports = async function handler(req, res) {
 
   const errors = [];
 
+  const recordUsage = () => {
+    if (!isAdmin && isFinite(limit)) {
+      const isLifetime = plan === 'free';
+      const redisKey = isLifetime
+        ? `soniq:ratelimit:lifetime:${user.id}`
+        : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+      const ttl = isLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+      redisIncrExpire(redisKey, ttl);
+    }
+  };
+
   // Try Anthropic first, then OpenRouter as fallback
   if (anthropicKey) {
     try {
       const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
-      // Increment rate-limit counter after successful generation
-      if (!isAdmin && isFinite(limit)) {
-        const dateKey = getTodayDate();
-        redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
-      }
+      recordUsage();
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
       console.error('Anthropic failed, trying fallback:', err.message);
@@ -273,11 +289,7 @@ module.exports = async function handler(req, res) {
   if (openrouterKey) {
     try {
       const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
-      // Increment rate-limit counter after successful generation
-      if (!isAdmin && isFinite(limit)) {
-        const dateKey = getTodayDate();
-        redisIncrExpire(`soniq:ratelimit:daily:${user.id}:${dateKey}`, 86400);
-      }
+      recordUsage();
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
       if (err.message === 'CREDITS_LOW') {
