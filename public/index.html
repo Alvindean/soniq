@@ -3240,7 +3240,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div id="profile-usage-sub" style="font-size:10px;color:var(--tx4)"></div>
       </div>
       <div id="profile-upgrade-cta" style="display:none;margin-top:12px">
-        <button class="btn btn-amber" onclick="navTo('profile');document.getElementById('profile-edit-modal').style.display='none'" style="width:100%;font-size:13px;padding:9px">⚡ Upgrade Plan — Unlock More Songs</button>
+        <button class="btn btn-amber" onclick="openUpgradeModal()" style="width:100%;font-size:13px;padding:9px">⚡ Upgrade Plan — Unlock More Songs</button>
       </div>
     </div>
 
@@ -10282,13 +10282,23 @@ function loadProfilePage() {
   const usageKey = isLifetime ? 'soniq_usage_lifetime' : `soniq_usage_${thisMonth}`;
   const usageCount = parseInt(localStorage.getItem(usageKey) || '0', 10);
 
+  // Plan badge — only use hex colors to avoid invalid "var(--x)60" CSS
   const planBadge = document.getElementById('profile-plan-badge');
   planBadge.textContent = planLabel;
-  const planColors = {free:'var(--tx3)',pro:'#60a5fa',studio:'var(--amber)',founding:'#a78bfa',founding_t1:'#a78bfa',founding_t2:'#34d399'};
-  const pc = planColors[plan] || planColors[plan.replace(/_annual/,'')] || 'var(--amber)';
-  planBadge.style.color = pc; planBadge.style.borderColor = pc+'60'; planBadge.style.background = pc+'18';
+  const PLAN_HEX = {free:'#94a3b8',pro:'#60a5fa',studio:'#fbbf24',founding:'#a78bfa',founding_t1:'#a78bfa',founding_t1_annual:'#a78bfa',founding_t2:'#34d399',founding_t2_annual:'#34d399',starter:'#60a5fa',starter_annual:'#60a5fa'};
+  const pc = PLAN_HEX[plan] || '#fbbf24';
+  planBadge.style.color = pc;
+  planBadge.style.borderColor = pc + '60';
+  planBadge.style.background  = pc + '18';
 
-  if (!isUnlimited) {
+  // Studio/founding admins are effectively unlimited — treat as such
+  const isUnlimited = !isFinite(planLimit) || ['studio','studio_annual','founding'].includes(plan) && CLIENT_PLAN_LIMITS[plan] >= 50 && S.isAdmin;
+  if (isUnlimited) {
+    document.getElementById('profile-usage-bar').style.width = '100%';
+    document.getElementById('profile-usage-nums').textContent = `${usageCount} generated`;
+    document.getElementById('profile-usage-label').textContent = 'Plan: ' + planLabel;
+    document.getElementById('profile-usage-sub').textContent = 'No monthly cap — create freely';
+  } else {
     const usagePct = Math.min(100, Math.round(usageCount / planLimit * 100));
     document.getElementById('profile-usage-bar').style.width = usagePct + '%';
     document.getElementById('profile-usage-nums').textContent = `${usageCount} / ${planLimit}`;
@@ -10299,11 +10309,6 @@ function loadProfilePage() {
     if (plan === 'free' && usageCount >= planLimit) {
       document.getElementById('profile-upgrade-cta').style.display = '';
     }
-  } else {
-    document.getElementById('profile-usage-bar').style.width = '100%';
-    document.getElementById('profile-usage-nums').textContent = `${usageCount} generated`;
-    document.getElementById('profile-usage-label').textContent = 'Unlimited plan';
-    document.getElementById('profile-usage-sub').textContent = 'No monthly cap — create freely';
   }
 
   // Top genre
