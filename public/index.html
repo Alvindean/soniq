@@ -6965,12 +6965,23 @@ let _coachTopic = '';
 let _coachFeedback = '';
 
 function openCoach(source) {
-  const song = source === 'editor' ? S.editorSong : (S.currentSong || S.editorSong);
-  if (!song) { toast('No song loaded — generate or load a song first'); return; }
+  let song, lyrics;
+  if (source === 'editor') {
+    // Always use live editor lines so edits are reflected
+    if (S.editorLines?.length) {
+      lyrics = S.editorLines.map(l => l.text).join('\n');
+    }
+    song = S.editorSong || S.currentSong;
+  } else {
+    song = S.currentSong || S.editorSong;
+    lyrics = song?.lyrics || song?.content || '';
+  }
 
-  _coachLyrics = song.lyrics || song.content || '';
-  _coachGenre = song.genre || '';
-  _coachTopic = song.topic || '';
+  if (!song && !lyrics) { toast('No song loaded — generate or paste lyrics first'); return; }
+
+  _coachLyrics = lyrics || song?.lyrics || song?.content || '';
+  _coachGenre = song?.genre || '';
+  _coachTopic = song?.topic || '';
 
   if (!_coachLyrics.trim()) { toast('No lyrics to analyze'); return; }
 
