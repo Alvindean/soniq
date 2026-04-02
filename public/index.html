@@ -783,6 +783,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .btn-dl{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r4);border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-dl:hover{background:var(--cyan);color:#050505}
 .save-bar-saved{font-size:11px;color:var(--green);font-weight:600;display:none;align-items:center;gap:4px}
+/* ── COMMUNITY ── */
+.comm-sort-btn{background:none;border:none;color:var(--tx3);font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.comm-sort-btn.on{background:var(--bg3);color:var(--tx1)}
+.comm-card{background:var(--bg1);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color .2s}
+.comm-card:hover{border-color:var(--amberline)}
+.comm-flair{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--tx4);margin-bottom:8px}
+.comm-flair .cf-badge{background:var(--bg3);border-radius:99px;padding:2px 7px;color:var(--tx3);font-weight:600}
+.comm-title{font-size:15px;font-weight:800;color:var(--tx1);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.comm-lyrics{font-size:12px;color:var(--tx3);line-height:1.6;margin-bottom:10px;font-style:italic;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.comm-audio{border-radius:8px;overflow:hidden;margin-bottom:10px;background:var(--bg2);border:1px solid var(--brd)}
+.comm-reactions{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.react-btn{background:var(--bg2);border:1px solid var(--brd);border-radius:99px;padding:4px 10px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px;color:var(--tx3);font-family:var(--font);transition:all .15s;font-weight:600}
+.react-btn:hover{border-color:var(--amberline);color:var(--tx2)}
+.react-btn.active{background:var(--amberbg);border-color:var(--amberline);color:var(--amber)}
+.react-btn.fire.active{background:#f9731620;border-color:#f9731660;color:#f97316}
+.react-btn.love.active{background:#f4729220;border-color:#f4729260;color:#f47292}
+.react-btn.cosign.active{background:#34d39920;border-color:#34d39960;color:#34d399}
+.react-btn.insight.active{background:#60a5fa20;border-color:#60a5fa60;color:#60a5fa}
+.react-btn.flip.active{background:#a78bfa20;border-color:#a78bfa60;color:#a78bfa}
+.comm-meta{font-size:10px;color:var(--tx4);display:flex;align-items:center;gap:10px;margin-top:8px}
+.leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
+.leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── CAMPAIGN MODE ── */
 .camp-hero{padding:28px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px}
 .camp-hero-label{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -1445,6 +1467,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
   <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+  <button class="nb" onclick="goPg('community',this)" id="nav-community-btn"><span class="ni">🌐</span>Community</button>
   <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
   <button class="nb" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none"><span class="ni">📊</span>Admin</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
@@ -1993,6 +2016,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
         <button class="btn" onclick="openCoach()" id="coach-btn" style="display:none" title="AI Feedback Coach — get expert notes on your lyrics">🎓 Coach</button>
         <button class="btn btn-green" onclick="openPublish()" id="publish-btn" style="display:none" title="Register this song for publishing royalties">📜 Publish</button>
+        <button class="btn" onclick="openAudioModal('res')" id="audio-btn" style="display:none" title="Add Suno/Udio/SoundCloud audio link">🎵 Audio</button>
+        <button class="btn btn-teal" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none" title="Share to SONIQ Community">🌐 Share</button>
       </div>
     </div>
 
@@ -2041,6 +2066,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="res-lyrics-text" class="lyrics-box"></div>
+      <!-- AUDIO EMBED -->
+      <div id="res-audio-embed" style="display:none;margin:12px 0;border-radius:8px;overflow:hidden;border:1px solid var(--brd)"></div>
       <!-- REVISION BAR -->
       <div class="revision-bar" id="res-revision-bar" style="display:none">
         <span class="revision-bar-label">Quick Revise:</span>
@@ -3322,6 +3349,128 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </div>
 
 <!-- ══════════════════════════════════
+     COMMUNITY PAGE
+══════════════════════════════════ -->
+<div id="pg-community" class="pg">
+  <div style="max-width:680px;margin:0 auto;padding:16px">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs from writers worldwide · React · Listen · Co-sign</div>
+      </div>
+      <button class="btn btn-amber" onclick="openShareModal()" id="comm-share-btn" style="display:none">🎵 Share a Song</button>
+    </div>
+
+    <!-- Weekly Challenge -->
+    <div id="comm-challenge-card" class="card" style="margin-bottom:14px;border:1px solid var(--amberline);background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);display:none">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="font-size:28px">🏆</div>
+        <div style="flex:1">
+          <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.08em">Weekly Challenge</div>
+          <div id="comm-challenge-title" style="font-size:14px;font-weight:700;color:var(--tx1);margin-top:1px"></div>
+          <div id="comm-challenge-sub" style="font-size:11px;color:var(--tx3);margin-top:2px"></div>
+        </div>
+        <button class="btn btn-sm btn-amber" onclick="openChallengeWriter()">Write Now</button>
+      </div>
+    </div>
+
+    <!-- Sort tabs + genre filter -->
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+      <div style="display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--brd)">
+        <button class="comm-sort-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
+        <button class="comm-sort-btn" onclick="setCommSort('new',this)">✨ New</button>
+        <button class="comm-sort-btn" onclick="setCommSort('top',this)">👑 Top</button>
+      </div>
+      <select id="comm-genre-filter" onchange="loadCommunityFeed()" style="padding:5px 8px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);font-size:11px">
+        <option value="">All Genres</option>
+        <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option>
+        <option value="rnb">R&amp;B</option><option value="rock">Rock</option>
+        <option value="country">Country</option><option value="edm">EDM</option>
+        <option value="jazz">Jazz</option><option value="soul">Soul</option>
+        <option value="gospel">Gospel</option><option value="latin">Latin</option>
+        <option value="afrobeats">Afrobeats</option><option value="kpop">K-Pop</option>
+      </select>
+    </div>
+
+    <!-- Feed -->
+    <div id="comm-feed"></div>
+    <div id="comm-loading" style="text-align:center;padding:32px;color:var(--tx4);font-size:13px;display:none">Loading…</div>
+    <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
+      <div style="font-size:36px;margin-bottom:8px">🎵</div>
+      <div style="font-size:14px;font-weight:600;color:var(--tx3);margin-bottom:4px">No songs yet</div>
+      <div style="font-size:12px">Be the first to share — generate a song and hit Share to Community</div>
+    </div>
+    <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
+
+    <!-- Leaderboard sidebar (below feed on mobile) -->
+    <div class="card" style="margin-top:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🏅 Top Writers This Week</div>
+      <div id="comm-leaderboard"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SHARE TO COMMUNITY MODAL -->
+<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:920;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeShareModal()">
+  <div class="card" style="max-width:520px;margin:40px auto;position:relative">
+    <button onclick="closeShareModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">🌐 Share to Community</div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Song</div>
+      <select id="share-song-picker" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box"></select>
+    </div>
+
+    <div style="margin-bottom:12px">
+      <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Note <span style="font-style:italic;text-transform:none">(optional · max 280 chars)</span></div>
+      <textarea id="share-note" maxlength="280" rows="2" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box;resize:none" placeholder="What's the story behind this song?"></textarea>
+    </div>
+
+    <div style="margin-bottom:16px">
+      <div style="font-size:11px;color:var(--tx3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em">Audio Link <span style="font-style:italic;text-transform:none">(optional — Suno, Udio, SoundCloud, YouTube)</span></div>
+      <input id="share-audio-url" type="url" oninput="previewAudioEmbed(this.value,'share-audio-preview')" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="https://suno.com/song/...">
+      <div id="share-audio-preview" style="margin-top:8px"></div>
+    </div>
+
+    <button class="btn btn-amber" onclick="submitShare()" style="width:100%;padding:10px;font-size:14px" id="share-submit-btn">🌐 Share to Community</button>
+  </div>
+</div>
+
+<!-- COMMENT DRAWER -->
+<div id="comment-drawer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:919;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeCommentDrawer()">
+  <div class="card" style="max-width:540px;margin:40px auto;position:relative">
+    <button onclick="closeCommentDrawer()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">💬 Comments</div>
+    <div id="comment-list" style="margin-bottom:14px;max-height:320px;overflow-y:auto"></div>
+    <div id="comment-input-wrap" style="display:none">
+      <textarea id="comment-text" rows="2" maxlength="500" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box;resize:none;margin-bottom:8px" placeholder="Add a comment…"></textarea>
+      <button class="btn btn-teal" onclick="submitComment()" style="width:100%">Post Comment</button>
+    </div>
+    <div id="comment-signin-prompt" style="display:none;text-align:center;padding:12px;font-size:12px;color:var(--tx3)">
+      <a href="#" onclick="openAuth();closeCommentDrawer()" style="color:var(--amber)">Sign in</a> to leave a comment
+    </div>
+  </div>
+</div>
+
+<!-- ADD AUDIO MODAL -->
+<div id="audio-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:921;overflow-y:auto;padding:16px;box-sizing:border-box" onclick="if(event.target===this)closeAudioModal()">
+  <div class="card" style="max-width:480px;margin:60px auto;position:relative">
+    <button onclick="closeAudioModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer">✕</button>
+    <div class="ctitle">🎵 Add Audio Link</div>
+    <p style="font-size:12px;color:var(--tx3);margin-bottom:14px">Paste your Suno, Udio, SoundCloud, YouTube, or Spotify link. We'll show an embedded player alongside your lyrics.</p>
+    <input id="audio-url-input" type="url" oninput="previewAudioEmbed(this.value,'audio-url-preview')" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box;margin-bottom:10px" placeholder="https://suno.com/song/...">
+    <div id="audio-url-preview" style="margin-bottom:12px"></div>
+    <div class="btn-row">
+      <button class="btn btn-amber" onclick="saveAudioLink()" style="flex:1">💾 Save Link</button>
+      <button class="btn" onclick="closeAudioModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
      ADMIN DASHBOARD PAGE
 ══════════════════════════════════ -->
 <div id="pg-admin" class="pg">
@@ -4463,6 +4612,7 @@ function goPg(id,el){
   if(id==='library')renderLib();
   if(id==='builder')initBuilder();
   if(id==='lucky')renderLuckyHistory();
+  if(id==='community')loadCommunityFeed();
   if(id==='profile')loadProfilePage();
   if(id==='admin'){if(S.isAdmin)loadAdminDashboard();else{toast('Admin access required');navTo('write');}}
   if(id==='editor'){
@@ -5611,6 +5761,10 @@ function parseSongResult(raw,genre,topic){
   if (coachBtn) coachBtn.style.display = '';
   const publishBtn = document.getElementById('publish-btn');
   if (publishBtn) publishBtn.style.display = '';
+  const audioBtn = document.getElementById('audio-btn');
+  if (audioBtn) audioBtn.style.display = '';
+  const commShareResBtn = document.getElementById('comm-share-res-btn');
+  if (commShareResBtn) commShareResBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
@@ -8380,6 +8534,396 @@ async function regenVisual(prefix) {
 }
 
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+// COMMUNITY FEED
+// ═══════════════════════════════════════════════════════
+let _commSort = 'hot';
+let _commOffset = 0;
+let _commHasMore = false;
+let _commCurrentPostId = null;
+let _audioModalTarget = null; // 'res' or song id
+
+const REACTIONS = [
+  {key:'fire',  emoji:'🔥', label:'Fire'},
+  {key:'love',  emoji:'❤️', label:'Love'},
+  {key:'cosign',emoji:'🎤', label:'Co-sign'},
+  {key:'insight',emoji:'💡',label:'Insight'},
+  {key:'flip',  emoji:'🔁', label:'Flip'},
+];
+
+function setCommSort(sort, btn) {
+  _commSort = sort;
+  document.querySelectorAll('.comm-sort-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  _commOffset = 0;
+  loadCommunityFeed();
+}
+
+async function loadCommunityFeed() {
+  _commOffset = 0;
+  const feed = document.getElementById('comm-feed');
+  const loading = document.getElementById('comm-loading');
+  const empty = document.getElementById('comm-empty');
+  const loadMore = document.getElementById('comm-load-more');
+  if (feed) feed.innerHTML = '';
+  if (loading) loading.style.display = '';
+  if (empty) empty.style.display = 'none';
+  if (loadMore) loadMore.style.display = 'none';
+
+  // Show share button only if logged in
+  const shareBtn = document.getElementById('comm-share-btn');
+  if (shareBtn) shareBtn.style.display = S.user ? '' : 'none';
+
+  const genre = document.getElementById('comm-genre-filter')?.value || '';
+  try {
+    const token = S.session?.access_token || '';
+    const headers = token ? { Authorization: 'Bearer ' + token } : {};
+    const params = new URLSearchParams({ action: 'feed', sort: _commSort, limit: '20', offset: '0' });
+    if (genre) params.set('genre', genre);
+    const res = await fetch('/api/community?' + params, { headers });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    if (loading) loading.style.display = 'none';
+    const posts = data.posts || [];
+    if (!posts.length) { if (empty) empty.style.display = ''; return; }
+    _commOffset = posts.length;
+    _commHasMore = data.has_more;
+    if (feed) feed.innerHTML = posts.map(renderCommCard).join('');
+    if (loadMore) loadMore.style.display = data.has_more ? '' : 'none';
+  } catch(e) {
+    if (loading) loading.style.display = 'none';
+    // Fallback: show demo cards if API not live yet
+    if (feed) feed.innerHTML = renderCommPlaceholder();
+  }
+  loadCommLeaderboard();
+}
+
+async function loadMoreComm() {
+  const genre = document.getElementById('comm-genre-filter')?.value || '';
+  const token = S.session?.access_token || '';
+  const headers = token ? { Authorization: 'Bearer ' + token } : {};
+  const params = new URLSearchParams({ action: 'feed', sort: _commSort, limit: '20', offset: String(_commOffset) });
+  if (genre) params.set('genre', genre);
+  try {
+    const res = await fetch('/api/community?' + params, { headers });
+    const data = await res.json();
+    const posts = data.posts || [];
+    _commOffset += posts.length;
+    _commHasMore = data.has_more;
+    const feed = document.getElementById('comm-feed');
+    if (feed) feed.insertAdjacentHTML('beforeend', posts.map(renderCommCard).join(''));
+    const lb = document.getElementById('comm-load-more');
+    if (lb) lb.style.display = data.has_more ? '' : 'none';
+  } catch(e) {}
+}
+
+function renderCommCard(post) {
+  const level = post.level || 0;
+  const levelNames = ['Rookie','Songwriter','Hit Maker','Producer','Platinum','Legend'];
+  const levelColors = ['#94a3b8','#34d399','#60a5fa','#a78bfa','#fbbf24','#f97316'];
+  const lname = levelNames[level] || 'Rookie';
+  const lcolor = levelColors[level] || '#94a3b8';
+  const name = escHtml(post.display_name || post.artist_name || 'Anonymous');
+  const genre = escHtml(post.genre || '');
+  const title = escHtml(post.title || 'Untitled');
+  const lyrics = escHtml((post.lyrics_preview || '').slice(0, 200));
+  const note = post.note ? `<div style="font-size:12px;color:var(--tx2);margin-bottom:8px;padding:8px 10px;background:var(--bg2);border-radius:6px;border-left:2px solid var(--amberline)">${escHtml(post.note)}</div>` : '';
+  const when = post.created_at ? timeAgo(new Date(post.created_at)) : '';
+  const reactions = post.reactions || {};
+  const userReaction = post.user_reaction || '';
+  const audioEmbed = post.audio_url ? buildAudioEmbed(post.audio_url, true) : '';
+
+  const reactionBtns = REACTIONS.map(r => {
+    const cnt = reactions[r.key] || 0;
+    const active = userReaction === r.key ? ` ${r.key} active` : '';
+    return `<button class="react-btn${active}" onclick="toggleReact('${escHtml(post.id)}','${r.key}',this)">${r.emoji} ${cnt > 0 ? cnt : ''}</button>`;
+  }).join('');
+
+  return `<div class="comm-card" id="cp-${escHtml(post.id)}">
+    <div class="comm-flair">
+      <span>${name}</span>
+      <span class="cf-badge" style="color:${lcolor};border-color:${lcolor}40;background:${lcolor}12">${lname}</span>
+      ${genre ? `<span class="cf-badge">${genre}</span>` : ''}
+      <span style="margin-left:auto">${when}</span>
+    </div>
+    <div class="comm-title">${title}</div>
+    ${note}
+    ${audioEmbed ? `<div class="comm-audio">${audioEmbed}</div>` : ''}
+    <div class="comm-lyrics">${lyrics}</div>
+    <div class="comm-reactions">
+      ${reactionBtns}
+      <button class="react-btn" onclick="openCommentDrawer('${escHtml(post.id)}')" style="margin-left:auto">💬 ${post.comment_count || 0}</button>
+    </div>
+  </div>`;
+}
+
+function renderCommPlaceholder() {
+  return `<div class="comm-card">
+    <div class="comm-flair"><span>Be the first!</span><span class="cf-badge">Songwriter</span><span class="cf-badge">Hip-Hop</span></div>
+    <div class="comm-title">Share your first song to the community</div>
+    <div class="comm-lyrics">Generate a song on the Write page, then hit 🌐 Share to post it here. The community feed will come alive as writers share their work.</div>
+    <div class="comm-reactions">${REACTIONS.map(r=>`<button class="react-btn">${r.emoji}</button>`).join('')}</div>
+  </div>`;
+}
+
+function timeAgo(date) {
+  const s = Math.floor((Date.now() - date) / 1000);
+  if (s < 60) return 'just now';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+}
+
+async function toggleReact(postId, reactionType, btn) {
+  if (!S.user) { toast('Sign in to react'); return; }
+  const card = document.getElementById('cp-' + postId);
+  const isActive = btn.classList.contains('active');
+  const token = S.session?.access_token || '';
+  try {
+    const res = await fetch('/api/community', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ action: isActive ? 'unreact' : 'react', post_id: postId, reaction_type: reactionType })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed');
+    // Update all reaction buttons in this card
+    if (card) {
+      const counts = data.reaction_counts || {};
+      const userRxn = data.user_reaction || '';
+      REACTIONS.forEach(r => {
+        const rbtn = card.querySelector(`.react-btn.${r.key}`) || [...card.querySelectorAll('.react-btn')].find(b => b.textContent.startsWith(r.emoji));
+        if (!rbtn) return;
+        const cnt = counts[r.key] || 0;
+        rbtn.textContent = r.emoji + (cnt > 0 ? ' ' + cnt : '');
+        rbtn.classList.toggle('active', userRxn === r.key);
+        rbtn.classList.toggle(r.key, true);
+      });
+    }
+  } catch(e) { toast('⚠️ ' + e.message); }
+}
+
+async function loadCommLeaderboard() {
+  const el = document.getElementById('comm-leaderboard');
+  if (!el) return;
+  const levelColors = ['#94a3b8','#34d399','#60a5fa','#a78bfa','#fbbf24','#f97316'];
+  try {
+    const res = await fetch('/api/community?action=leaderboard');
+    const data = await res.json();
+    const users = data.users || [];
+    if (!users.length) { el.innerHTML = '<div style="color:var(--tx4);font-size:11px">No data yet</div>'; return; }
+    el.innerHTML = users.slice(0, 10).map((u, i) => {
+      const name = escHtml(u.display_name || u.artist_name || 'Anonymous');
+      const lv = Math.min(u.level || 0, 5);
+      const color = levelColors[lv];
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i+1}.`;
+      return `<div class="leader-row">
+        <div class="leader-avatar" style="background:${color}18;color:${color}">${(name[0]||'?').toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
+          <div style="font-size:10px;color:var(--tx4)">${u.xp||0} XP · ${u.song_count||0} songs</div>
+        </div>
+        <div style="font-size:14px">${medal}</div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = '<div style="color:var(--tx4);font-size:11px">Leaderboard coming soon</div>'; }
+}
+
+// ── Share Modal ──────────────────────────────────────────
+function openShareModal(source) {
+  if (!S.user) { toast('Sign in to share'); openAuth(); return; }
+  const picker = document.getElementById('share-song-picker');
+  if (picker) {
+    const songs = source === 'res' && S.currentSong
+      ? [S.currentSong, ...S.library.filter(s => s.id !== S.currentSong?.id)]
+      : S.library;
+    picker.innerHTML = songs.map((s, i) =>
+      `<option value="${i}">${escHtml(s.title || 'Untitled')} — ${escHtml(s.genre || '')}</option>`
+    ).join('');
+    picker._songs = songs;
+  }
+  document.getElementById('share-note').value = '';
+  document.getElementById('share-audio-url').value = '';
+  document.getElementById('share-audio-preview').innerHTML = '';
+  document.getElementById('share-modal').style.display = '';
+}
+
+function closeShareModal() { document.getElementById('share-modal').style.display = 'none'; }
+
+async function submitShare() {
+  const picker = document.getElementById('share-song-picker');
+  const song = picker._songs?.[parseInt(picker.value) || 0] || S.currentSong;
+  if (!song) { toast('No song selected'); return; }
+  const note = document.getElementById('share-note').value.trim().slice(0, 280);
+  const audioUrl = document.getElementById('share-audio-url').value.trim();
+  const btn = document.getElementById('share-submit-btn');
+  btn.disabled = true; btn.textContent = 'Sharing…';
+  try {
+    const token = S.session?.access_token || '';
+    const res = await fetch('/api/community', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({
+        action: 'share',
+        song_id: song.id,
+        title: song.title || 'Untitled',
+        genre: song.genre || '',
+        topic: song.topic || '',
+        lyrics_preview: (song.lyrics || '').slice(0, 150),
+        style_prompt: song.style || '',
+        audio_url: audioUrl || null,
+        note: note || null
+      })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Share failed');
+    closeShareModal();
+    toast('✓ Shared to community!');
+    navTo('community');
+    awardXP && awardXP('song_published');
+  } catch(e) { toast('⚠️ ' + e.message, 3000); }
+  btn.disabled = false; btn.textContent = '🌐 Share to Community';
+}
+
+// ── Comment Drawer ───────────────────────────────────────
+async function openCommentDrawer(postId) {
+  _commCurrentPostId = postId;
+  const list = document.getElementById('comment-list');
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:12px">Loading…</div>';
+  document.getElementById('comment-input-wrap').style.display = S.user ? '' : 'none';
+  document.getElementById('comment-signin-prompt').style.display = S.user ? 'none' : '';
+  document.getElementById('comment-drawer').style.display = '';
+  try {
+    const token = S.session?.access_token || '';
+    const headers = token ? { Authorization: 'Bearer ' + token } : {};
+    const res = await fetch(`/api/community?action=post&id=${encodeURIComponent(postId)}`, { headers });
+    const data = await res.json();
+    const comments = data.comments || [];
+    list.innerHTML = comments.length
+      ? comments.map(c => `<div style="padding:8px 0;border-bottom:1px solid var(--bg2)">
+          <div style="font-size:11px;font-weight:700;color:var(--tx2)">${escHtml(c.display_name||'Anonymous')} <span style="color:var(--tx4);font-weight:400">${timeAgo(new Date(c.created_at))}</span></div>
+          <div style="font-size:12px;color:var(--tx2);margin-top:3px">${escHtml(c.text)}</div>
+        </div>`).join('')
+      : '<div style="text-align:center;padding:20px;color:var(--tx4);font-size:12px">No comments yet — be the first</div>';
+  } catch(e) { list.innerHTML = '<div style="color:var(--tx4);font-size:12px;padding:12px">Could not load comments</div>'; }
+}
+
+function closeCommentDrawer() { document.getElementById('comment-drawer').style.display = 'none'; }
+
+async function submitComment() {
+  const text = document.getElementById('comment-text').value.trim();
+  if (!text) return;
+  const token = S.session?.access_token || '';
+  try {
+    const res = await fetch('/api/community', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify({ action: 'comment', post_id: _commCurrentPostId, text: text.slice(0, 500) })
+    });
+    if (!res.ok) throw new Error('Failed');
+    document.getElementById('comment-text').value = '';
+    toast('✓ Comment posted');
+    openCommentDrawer(_commCurrentPostId);
+  } catch(e) { toast('⚠️ Could not post comment'); }
+}
+
+// ═══════════════════════════════════════════════════════
+// AUDIO EMBED SYSTEM
+// ═══════════════════════════════════════════════════════
+function detectAudioPlatform(url) {
+  if (!url) return null;
+  try { new URL(url); } catch { return null; }
+  if (/suno\.com\/song\//.test(url)) return 'suno';
+  if (/suno\.com\/embed\//.test(url)) return 'suno_embed';
+  if (/udio\.com/.test(url)) return 'udio';
+  if (/soundcloud\.com/.test(url)) return 'soundcloud';
+  if (/youtube\.com|youtu\.be/.test(url)) return 'youtube';
+  if (/spotify\.com/.test(url)) return 'spotify';
+  return 'link';
+}
+
+function buildAudioEmbed(url, compact) {
+  const platform = detectAudioPlatform(url);
+  if (!platform) return '';
+  const h = compact ? '80' : '166';
+  const style = `width:100%;border:none;border-radius:${compact?'0':'8px'}`;
+
+  if (platform === 'suno') {
+    const id = url.split('/song/')[1]?.split('?')[0];
+    if (!id) return buildLinkFallback(url, 'Suno');
+    return `<iframe src="https://suno.com/embed/${id}" style="${style}" height="${compact?'80':'152'}" allow="autoplay" loading="lazy"></iframe>`;
+  }
+  if (platform === 'suno_embed') {
+    return `<iframe src="${escHtml(url)}" style="${style}" height="${compact?'80':'152'}" allow="autoplay" loading="lazy"></iframe>`;
+  }
+  if (platform === 'udio') {
+    const id = url.split('/songs/')[1]?.split('?')[0] || url.split('udio.com/')[1]?.split('?')[0];
+    const embedUrl = id ? `https://www.udio.com/songs/${id}` : url;
+    return `<iframe src="${escHtml(embedUrl)}" style="${style}" height="${h}" allow="autoplay" loading="lazy"></iframe>`;
+  }
+  if (platform === 'soundcloud') {
+    const encoded = encodeURIComponent(url);
+    return `<iframe src="https://w.soundcloud.com/player/?url=${encoded}&color=%23fbbf24&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&visual=${compact?'false':'true'}" style="${style}" height="${h}" allow="autoplay" loading="lazy"></iframe>`;
+  }
+  if (platform === 'youtube') {
+    const m = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (!m) return buildLinkFallback(url, 'YouTube');
+    return `<iframe src="https://www.youtube.com/embed/${m[1]}" style="${style}" height="${compact?'80':'200'}" allow="autoplay;encrypted-media" allowfullscreen loading="lazy"></iframe>`;
+  }
+  if (platform === 'spotify') {
+    const m = url.match(/track\/([a-zA-Z0-9]+)/);
+    if (!m) return buildLinkFallback(url, 'Spotify');
+    return `<iframe src="https://open.spotify.com/embed/track/${m[1]}" style="${style}" height="${compact?'80':'152'}" allow="autoplay;clipboard-write;encrypted-media;fullscreen" loading="lazy"></iframe>`;
+  }
+  return buildLinkFallback(url, 'Audio');
+}
+
+function buildLinkFallback(url, label) {
+  return `<a href="${escHtml(url)}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:7px;color:var(--amber);font-size:12px;font-weight:600;text-decoration:none">🎵 Listen on ${escHtml(label)} ↗</a>`;
+}
+
+function previewAudioEmbed(url, containerId) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  if (!url.trim()) { el.innerHTML = ''; return; }
+  const platform = detectAudioPlatform(url);
+  if (!platform) { el.innerHTML = '<div style="font-size:11px;color:var(--red)">Invalid URL — paste a Suno, Udio, SoundCloud, YouTube, or Spotify link</div>'; return; }
+  el.innerHTML = `<div style="font-size:10px;color:var(--tx4);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em">Preview — ${platform}</div>` + buildAudioEmbed(url, false);
+}
+
+// ── Audio Modal (attach to library song) ────────────────
+function openAudioModal(source) {
+  _audioModalTarget = source;
+  const inp = document.getElementById('audio-url-input');
+  const preview = document.getElementById('audio-url-preview');
+  // Pre-fill if song already has audio
+  const existingUrl = S.currentSong?.audioUrl || '';
+  if (inp) { inp.value = existingUrl; previewAudioEmbed(existingUrl, 'audio-url-preview'); }
+  if (preview && !existingUrl) preview.innerHTML = '';
+  document.getElementById('audio-modal').style.display = '';
+}
+
+function closeAudioModal() { document.getElementById('audio-modal').style.display = 'none'; }
+
+function saveAudioLink() {
+  const url = document.getElementById('audio-url-input').value.trim();
+  if (url && !detectAudioPlatform(url)) { toast('Invalid URL'); return; }
+  if (S.currentSong) {
+    S.currentSong.audioUrl = url || null;
+    // Persist to library if saved there
+    const libIdx = S.library.findIndex(s => s.id === S.currentSong.id);
+    if (libIdx >= 0) { S.library[libIdx].audioUrl = url || null; persistLib(); }
+    // Show embed in result area
+    const embedWrap = document.getElementById('res-audio-embed');
+    if (embedWrap) {
+      embedWrap.innerHTML = url ? buildAudioEmbed(url, false) : '';
+      embedWrap.style.display = url ? '' : 'none';
+    }
+  }
+  closeAudioModal();
+  toast(url ? '✓ Audio link saved' : '✓ Audio link removed');
+}
+
 async function pasteCampBrief() {
   try {
     const text = await navigator.clipboard.readText();
