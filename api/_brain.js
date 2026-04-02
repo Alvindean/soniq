@@ -22,13 +22,7 @@ const GENRE_BIBLE={
     outliers:[
       {song:'"Lose Yourself" — Eminem',rule:'Rock guitar riff + power ballad structure, no traditional hip-hop drums or samples',result:'Won Oscar for Best Original Song — first rap song ever to receive it'},
       {song:'"HUMBLE." — Kendrick Lamar',rule:'Sparse production with minimal hook variation and zero ad-libs — stripped everything rap conventionally adds',result:'#1 hit that broke streaming records and defined minimalist prestige rap'},
-      {song:'"Sicko Mode" — Travis Scott',rule:'Three completely different beat sections mid-song with no warning — breaks the single-groove golden rule',result:'#1 hit that became a cultural moment and turned the "beat switch" into an art form'},
-      {song:'"What We Do" — Freeway ft. Jay-Z',rule:'Rhymes deliberately scattered — plants a rhyme in bar 2, pays it off in bar 7; flows against the grid, clapping 1/3 instead of 2/4',result:'Instantly recognizable voice and flow that forced active listening — deferred rhyme tension became his signature'},
-      {song:'"Feel So Good" — Mase',rule:'4–7 syllables/bar whisper delivery — broke every rule about dense hip-hop verses with aggressive energy',result:'#1 hit proving restraint and calm authority can land harder than aggression'},
-      {song:'"A Milli" — Lil Wayne',rule:'No hook, no chorus — just 4 minutes of metaphor chains over one repeating loop; broke the standard song structure',result:'Defined the "rapper\'s rapper" era and launched a decade of no-hook mixtape culture'},
-      {song:'"99 Problems" — Jay-Z',rule:'Rock guitar production and verse-heavy structure with no traditional rap hook — crossed genre lines completely',result:'Grammy-winning cultural landmark that proved hip-hop didn\'t need a melody to dominate'},
-      {song:'"Fragile" — Tech N9ne',rule:'Sung melodic hook over ultra-technical triplet verses — mixed emotional vulnerability with technical maximalism',result:'Broke into mainstream rock/pop crossover while keeping his underground technical credibility'},
-      {song:'"Tell Me When To Go" — E-40',rule:'Invented an entire vocabulary ("hyphy", "ghost ride") that mainstream culture didn\'t know — wrote for a culture that didn\'t exist yet at scale',result:'Launched the hyphy movement and proved that inventing your own language makes you impossible to copy'}
+      {song:'"Sicko Mode" — Travis Scott',rule:'Three completely different beat sections mid-song with no warning — breaks the single-groove golden rule',result:'#1 hit that became a cultural moment and turned the "beat switch" into an art form'}
     ],
     vocables:{sounds:'(yeah) (uh) (let\'s go) (ayy)',when:'ad-lib on every 2nd bar, outro crowd chant',suno_tag:'[Outro - crowd chant]',borrowed_from:'gospel affirmation secularized',notes:'Parentheses syntax critical — Suno renders these as background voices'}
   },
@@ -1167,152 +1161,112 @@ const AGE_GROUPS = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// SWING DNA — Per-genre default + 3 universal levels
-// Swing level controls the subdivision feel AND lyric writing rules.
+// BRIDGE ARCHETYPES — Randomised per generation to prevent the same
+// 2-4 bar quiet/whisper bridge appearing by default every time.
+// Each archetype specifies structure, energy, delivery and lyric approach.
 // ═══════════════════════════════════════════════════════════════════════════
 
-const SWING_GENRE_DEFAULTS = {
-  pop:       'straight',
-  hiphop:    'straight',   // trap = dead straight; boom bap = slight shuffle
-  rnb:       'shuffle',
-  neosoul:   'swing',      // J Dilla drag
-  jazz:      'swing',
-  blues:     'shuffle',
-  gospel:    'swing',
-  country:   'straight',
-  edm:       'straight',
-  rock:      'straight',
-  altrock:   'straight',
-  funk:      'shuffle',
-  afrobeats: 'straight',   // polyrhythm on straight grid
-  reggae:    'straight',   // one-drop = straight grid
-  reggaeton: 'straight',   // dembow = straight
-  latin:     'shuffle',    // clave carries a natural swing
-  kpop:      'straight',
-  punk:      'straight',
-  ss:        'straight',
-  soul:      'shuffle',
-  children:  'straight',
-  parody:    'straight',
-  comedy:    'straight',
-  tvmusical: 'straight',
-};
-
-const SWING_LEVELS = {
-  straight: {
-    label:   'Straight',
-    ratio:   '50/50',
-    feel:    'Dead straight — every note lands exactly on the grid. Machine precision.',
-    suno_tag:'quantized, tight grid, straight rhythm, on the beat',
-    production: 'All instruments quantized to grid. Kick on beat 1, snare on beat 3. Hi-hats perfectly even. Tight, locked, clinical.',
-    lyric_rules: 'Dense syllables — pack every beat. Lines are even and precise. Internal rhymes hit every 2-3 syllables. Consonants are sharp. 8-14 syllables per bar. Think Kendrick on "HUMBLE." — every syllable placed with surgical intent.',
-    syllable_range: '8–14 per bar',
+const BRIDGE_ARCHETYPES = [
+  {
+    name: 'Confessional Drop',
+    energy: 'low → slow build',
+    bars: '4–6',
+    delivery: 'Almost spoken — conversational, not sung. No melody, just cadence. Like the artist stopped performing and started talking.',
+    lyric: 'One hard truth the song has been circling around but never said. Single sentence per line. No rhyme required — the honesty IS the structure.',
+    production: 'Pull everything back: just one instrument (piano, guitar, or sparse pad). Vocal dry with no reverb or delay. Space between lines.',
+    rule: 'BRIDGE MUST be the moment the mask comes off. Unpolished. Real. Then the final chorus returns with the full weight of what was just admitted.',
   },
-  shuffle: {
-    label:   'Shuffle',
-    ratio:   '58/42',
-    feel:    'Slight shuffle — a loose, breathing human feel. The groove leans without fully swinging.',
-    suno_tag:'shuffle groove, slightly swung, loose feel, human timing',
-    production: 'Hi-hats swung at 58/42. Snare lands slightly behind beat 2 and 4. Bass note elongated on the downbeat. Gives warmth without full jazz swing.',
-    lyric_rules: 'Medium density — some lines breathe, some pack tight. Allow vowels to stretch on emotional words ("loooove", "staaay"). 6–9 syllables per bar. Mix lines that push against the beat with ones that lean back. Conversational rhythm — lines should sound like how people actually talk when they\'re not in a hurry.',
-    syllable_range: '6–9 per bar',
+  {
+    name: 'Escalation Climb',
+    energy: 'mid → peak intensity',
+    bars: '8',
+    delivery: 'Starts at verse energy, builds line by line to the most intense vocal moment in the song. The bridge IS the climax, not the chorus.',
+    lyric: 'Each line raises the stakes of the conflict or emotion. Last 2 lines hit hardest — these are the lines people screenshot. Stack imagery, not narrative.',
+    production: 'Drums build every 2 bars. Instrumentation layers in. Final 2 bars: full band, pushed vocal, reverb tail. Explode into final chorus.',
+    rule: 'BRIDGE MUST end louder and more urgent than it started. It earns the final chorus release.',
   },
-  swing: {
-    label:   'Heavy Swing',
-    ratio:   '67/33',
-    feel:    'Full triplet swing — notes arrive in groups of three. The groove breathes and drags. J Dilla territory.',
-    suno_tag:'heavy swing, triplet feel, J Dilla drag, behind the beat',
-    production: 'Full triplet subdivision. Hi-hats and snare swing at 67/33. Drums land slightly late (Dilla drag). Bass slides into pitch. The groove breathes — never fill every 16th note. Space IS the music.',
-    lyric_rules: 'Sparse and spacious — triplet phrasing with natural rests between clusters. Write in 3-syllable groups: "nev-er-mind / let it go / you al-read-y know." Choose words with open vowels (love, soul, gold, home, free, move). Maximum 5-6 words per bar. Silence between phrases carries equal weight to words. Lines should sound like relaxed speech — no rush, no force. Simple end rhymes only — no complex internal schemes.',
-    syllable_range: '3–6 per bar',
+  {
+    name: 'Left-Turn Narrative',
+    energy: 'different texture — sideways move',
+    bars: '6–8',
+    delivery: 'Different vocal register or approach than any other section. If verses were sung, bridge could be half-rapped or spoken. Change the instrument.',
+    lyric: 'New POV, new timeline, or new character. The bridge is a cut to a scene from the past, a letter, a conversation, or a future projection. Not a continuation — a reframe.',
+    production: 'Instrument swap or featured instrument solo takes the melodic lead. Drums might drop completely or switch to half-time. Unexpected key area.',
+    rule: 'BRIDGE MUST feel like a different song that makes you understand the original song better when it ends.',
   },
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SYLLABLE DENSITY — Explicit override (independent of swing)
-// When set, overrides swing level's syllable rules.
-// ═══════════════════════════════════════════════════════════════════════════
-
-const SYLLABLE_DENSITY_RULES = {
-  dense:  'SYLLABLE DENSITY — Dense: Pack syllables tightly. 10–16 syllables per bar. Internal rhymes every 2-3 syllables. Lines should feel rapid and full. This is Eminem, Twista, Kendrick — every slot filled.',
-  normal: 'SYLLABLE DENSITY — Normal: Standard phrasing for the genre. 6–10 syllables per bar. Balance density with space. Natural, conversational rhythm.',
-  sparse: 'SYLLABLE DENSITY — Sparse: Minimal words, maximum space. 3–6 syllables per bar. Choose each word as if it costs something. This is Frank Ocean, D\'Angelo — what you don\'t say matters as much as what you do.',
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// SOUTHPAW / DEFERRED RHYME — The Freeway Principle
-// Named for Philly rapper Freeway whose scattered, deferred rhyme schemes
-// and off-beat placement created instant recognizability.
-// Works across ALL genres — country, folk, gospel, pop, jazz, rap.
-// ═══════════════════════════════════════════════════════════════════════════
-
-const SOUTHPAW_NOTE = `
-SOUTHPAW RHYME SCHEME — Deferred/Scattered (The Freeway Principle):
-RULE: Do NOT resolve rhymes where expected. Plant a rhyme in line 2 — pay it off in line 5 or 6. The listener's ear holds an unresolved tension until the payoff arrives late.
-TECHNIQUE 1 — Deferred rhyme: Set up A in bar 1, B in bar 2, then A returns in bar 5 and B in bar 7. Cross-stitch rhymes across 4-6 bars instead of adjacent lines.
-TECHNIQUE 2 — Cross-bar phrasing: Lines can START slightly before or AFTER the bar line — they "sit against" the grid rather than landing on the beat. The phrase carries across the barline.
-TECHNIQUE 3 — Scattered internal rhymes: Not every bar needs to rhyme with the adjacent bar. Let a word in bar 3 echo a word from bar 1 that nobody expected.
-TECHNIQUE 4 — Unresolved tension: Leave ONE rhyme per verse deliberately unpaid. The ear waits for it. Sometimes the silence IS the payoff.
-APPLICATION IN ALL GENRES:
-- In rap: flow phrases across the barline, plant rhymes 3-4 bars early
-- In country/folk: conversational lines that rhyme irregularly, like speech
-- In gospel: unexpected rhyme arrival creates revelation effect — the "turn" lands late
-- In pop: hook can delay its rhyme by one full bar, creating a "lean-in" moment
-- In jazz/neosoul: lyric phrasing mirrors the bebop concept of delayed resolution
-The goal: make the listener ACTIVE. They're tracking the rhyme thread. When it arrives late, the reward is bigger.`;
+  {
+    name: 'Rhythmic Breakdown',
+    energy: 'high — groove-locked',
+    bars: '4–8',
+    delivery: 'Rhythmic, chant-like, almost percussive. Words land on the beat like kicks and snares. Call-and-response optional. Could be a single repeated phrase evolving.',
+    lyric: 'Short, punchy lines. 2-5 syllables each. Works on repetition and slight variation — same phrase with one word changed each time. The meaning shifts through the changes.',
+    production: 'Drums and bass only, or a single hypnotic instrument loop. Everything else stripped. Let the groove breathe and build tension through rhythm alone.',
+    rule: 'BRIDGE MUST be physically infectious — the listener\'s head should nod before their brain processes the words.',
+  },
+  {
+    name: 'Emotional Reversal',
+    energy: 'mirror opposite of the chorus',
+    bars: '4–6',
+    delivery: 'If chorus is soaring and anthemic, bridge is quiet and close. If chorus is dark, bridge finds a thread of hope. The contrast IS the point.',
+    lyric: 'Reframe the central metaphor of the song from the opposite direction. If the song is about loss, find what was gained. If it\'s about love, acknowledge the cost. Dual truth.',
+    production: 'Harmonic shift — bridge often borrows from the relative major/minor or lands on an unexpected chord that makes the return to chorus feel like resolution.',
+    rule: 'BRIDGE MUST make the final chorus sound like it means something different than it did the first time.',
+  },
+  {
+    name: 'Pre-Outro Vamp Build',
+    energy: 'medium → cascading',
+    bars: '6–8 with repeating tag',
+    delivery: 'Last 2 bars of the bridge repeat 2-3 times with slight melodic variation each time. The repetition creates tension that the final chorus releases.',
+    lyric: 'Write the bridge as a complete thought, then isolate the last line as the repeating tag. The tag should work both as a question and an answer depending on inflection.',
+    production: 'Background vocals enter on repeating tag. Layered harmonies build. Slight BPM push (feels faster without changing tempo) through drum pattern tightening.',
+    rule: 'BRIDGE MUST set up the final chorus as the only possible resolution to the tension it builds.',
+  },
+  {
+    name: 'Lyric Callback / Recontextualise',
+    energy: 'same energy as verse 1, but heavier',
+    bars: '4–6',
+    delivery: 'Callbacks land differently once context has built. Deliver familiar lines with new emotional weight — slower, or more fragile, or harder.',
+    lyric: 'Take an image or line from verse 1 and return to it — but now the circumstances have changed. Same words, entirely different meaning. The listener should feel the shift.',
+    production: 'Mirror the production of verse 1 but stripped down. The familiarity of the instrumentation makes the shifted meaning land harder.',
+    rule: 'BRIDGE MUST prove the song was planning this moment from the first bar. Callback creates inevitability.',
+  },
+  {
+    name: 'Spoken Interlude / Monologue',
+    energy: 'ambient — static tension',
+    bars: '4–8 (flexible)',
+    delivery: 'Not sung at all. Spoken directly. Could be a voicemail, a memory, an argument, an internal monologue. Raw voice, minimal or no music under it.',
+    lyric: 'Write as prose, not poetry. Irregular line lengths. Real speech rhythms — sentence fragments, self-corrections, trailing thoughts. The only rule: it must be true to the character.',
+    production: 'Music fades to near-silence or single sustained note/pad. Possible: ambient sound texture under the voice (rain, static, room tone). Returns with full force on final chorus.',
+    rule: 'BRIDGE MUST sound like it was captured, not composed. The listener should lean in.',
+  },
+];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// ARTIST FLOW DNA — Stylistic fingerprints of key artists
-// Referenced in Rap Lab and available as voice model inspiration.
+// OUTRO ARCHETYPES — Prevents the default "fade out over repeating chorus"
 // ═══════════════════════════════════════════════════════════════════════════
 
-const ARTIST_FLOW_DNA = {
-  mase: {
-    name: 'Mase',
-    era: 'Late 90s Bad Boy / Harlem',
-    signature: 'Whisper-to-crowd delivery — laid-back, almost lazy cadence that makes every word land harder because it arrives so calm. Minimal syllables per bar but maximum double meaning. Luxury-coded braggadocio with religious undertone. Flow sits just BEHIND the beat — never pushes, never rushes.',
-    rhyme: 'Simple end rhymes, often monosyllabic. Power is in delivery and restraint, not complexity.',
-    syllables: '4–7 per bar. Deliberate space. The silence between words is part of the flow.',
-    lyric_rules: 'Keep it deceptively simple. Short declarative statements. One unexpected flex per 4 bars that recontextualizes everything before it. Luxury nouns. Understated confidence. Write like you don\'t need to prove anything.',
-    suno_tag: 'smooth rap, laid-back delivery, whisper flow, 90s Bad Boy',
-  },
-  lilwayne: {
-    name: 'Lil Wayne',
-    era: '2000s–2010s Cash Money / Young Money',
-    signature: 'Extended metaphor chains that run for 4-8 bars — every line is a new angle on the same metaphor. Punch-then-explain structure: hit with the punchline FIRST, then unpack it. Nasal delivery with melodic vowel stretches. Slant rhyme stacked 3-4 deep. Confident non sequiturs that still feel inevitable.',
-    rhyme: 'Multi-syllabic slant rhyme chains. Each bar\'s last word sets up the NEXT bar\'s rhyme scheme. Chain-links across the whole verse.',
-    syllables: '10–14 per bar. Dense but fluid — never sounds forced.',
-    lyric_rules: 'Open the verse with the punchline, then spend 8 bars proving it. Every metaphor has a B-side meaning. Use "I am" constructions. No throwaway lines — every bar lands. End the verse on an unexpected image that reframes everything.',
-    suno_tag: 'melodic rap, dense flow, metaphor chains, southern rap, 2000s',
-  },
-  jayz: {
-    name: 'Jay-Z',
-    era: 'Late 90s–present Roc-A-Fella / Roc Nation',
-    signature: 'Economic storytelling — 16 bars that feel like a short film. The brag that isn\'t a brag: wealth and power conveyed through specific detail (brand names, numbers, addresses) not adjectives. Internal rhyme tightly controlled. Conversational authority — sounds like he\'s talking to you, not performing at you. Every verse has a thesis, development, and payoff.',
-    rhyme: 'Complex internal rhyme interlocked with end rhyme. Internal rhymes hit every 3-4 syllables without feeling forced.',
-    syllables: '8–12 per bar. Varies within verse for emphasis — drops to 5-6 on the most important lines.',
-    lyric_rules: 'State the thesis in bar 1. Use specific proper nouns (places, brands, dollar figures). Build evidence across bars 2-12. Deliver the emotional payoff in bar 15-16. One line per verse that stands completely alone as a quotable. Write in past tense for narrative bars — you\'ve already lived this.',
-    suno_tag: 'boom bap, conversational delivery, luxury rap, East Coast, storytelling',
-  },
-  techn9ne: {
-    name: 'Tech N9ne',
-    era: '90s–present Strange Music / Kansas City',
-    signature: 'Triplet flow marathon — sustained technical precision at high BPM. Multi-syllabic rhyme schemes that run 6-8 syllables per rhyme cluster. Enunciation as performance: every consonant crisp even at maximum speed. Alternates between hyper-fast triplet verses and melodic sung hooks. Horror-influenced imagery with high vocabulary. Spiritual and struggle themes alongside lyrical flexing.',
-    rhyme: 'Multi-syllabic rhyme families (4-6 syllables rhyming simultaneously). Every bar in a verse rhymes with every other bar through complex cross-rhyme patterns.',
-    syllables: '14–20+ per bar in triplet sections. Chorus can drop to 6-8 for contrast.',
-    lyric_rules: 'Build rhyme families of 4-6 syllables and sustain them for the whole verse. Every syllable must be pronounceable at speed — avoid consonant clusters that clump. Alternate between hyper-verse and melodic hook for dynamic contrast. Use vocabulary that sounds technical but isn\'t obscure. Include one "show stopper" bar per 16 that even non-fans will remember.',
-    suno_tag: 'triplet flow, fast rap, technical rap, Midwest, high BPM',
-  },
-  e40: {
-    name: 'E-40',
-    era: '80s–present Bay Area / Vallejo',
-    signature: 'Invented slang as its own dialect — E-40 words that entered mainstream: "on fleek," "sipping," "fetti," "turf," "slap." Staccato chopped delivery: words land like percussion, no legato. Bay Area vernacular as an entire sonic texture — the vocabulary IS the genre marker. Storytelling through scene-setting specificity. Entrepreneurial brag (actual business moves, not just lifestyle). Vocal ad-libs as counterpoint.',
-    rhyme: 'Internal rhyme hits on offbeats. Slant rhyme preferred — the BAY sound over perfect rhyme.',
-    syllables: '8–12 per bar but chopped into 2-3 syllable staccato bursts with micro-pauses.',
-    lyric_rules: 'Use invented compound slang for at least 2 words per verse. Every 4 bars, a regional reference (Bay Area geography, culture). Staccato choppy delivery — write short word clusters separated by micro-pauses. Include a "business bar" (entrepreneurial flex) per verse. Outro should be a vamp of the most memorable slang phrase. Ad-libs in parentheses every 4 bars.',
-    suno_tag: 'Bay Area rap, hyphy, staccato delivery, West Coast, slap music',
-  },
-};
+const OUTRO_ARCHETYPES = [
+  { name: 'Cold Stop', rule: 'Song ends on a single word, note, or silence mid-phrase. Abrupt. The absence of resolution IS the ending. No fade — a hard cut that leaves the listener mid-breath.' },
+  { name: 'Spiral Vamp', rule: 'Outro takes the hook and slowly deconstructs it — strip instruments one by one, change one word in the hook each repeat, until only voice and one note remain. The song unravels deliberately.' },
+  { name: 'Callback Resolution', rule: 'Outro returns to the opening line or image from Verse 1, but now it lands completely differently. The song ends where it began — the journey changed the meaning. No new material.' },
+  { name: 'Crowd Takeover', rule: 'Final section hands the song to the audience — melody simplified to its most singable core, lyrics pared to 4-6 words max, energy rises instead of fading. Song ends at its loudest.' },
+  { name: 'Dialogue / Spoken Coda', rule: 'After the final chorus, a brief spoken moment (2-4 lines) that steps outside the song — a thought, a question, a confession. Music drops completely or holds one note under it.' },
+  { name: 'Harmonic Drift', rule: 'Outro lands on an unresolved chord or half-cadence and holds. Music fades slowly without resolving. The tension is intentional — the story is unresolved and the listener knows it.' },
+  { name: 'Counter-Melody Ascent', rule: 'Outro strips the lead vocal and lets the counter-melody (instrument or backing voice) carry the song to its end — it was there all along, now it leads. Main vocal drops to harmonies only.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VERSE 2 ESCALATION ARCHETYPES — Verse 2 must do more than repeat Verse 1
+// ═══════════════════════════════════════════════════════════════════════════
+
+const VERSE2_ARCHETYPES = [
+  { name: 'Consequence', rule: 'Verse 2 shows what happened AFTER Verse 1. Same character, later in time, changed circumstances. The hook now means something different because of what verse 2 revealed.' },
+  { name: 'The Other Side', rule: 'Verse 2 gives the opposing perspective — different character, contradicting version of events, or the same person arguing against themselves. Creates productive tension.' },
+  { name: 'Zoom Out', rule: 'Verse 1 was intimate and personal. Verse 2 zooms out — the personal story becomes universal. Connect the specific situation to something larger: culture, history, the human condition.' },
+  { name: 'Deeper Specific', rule: 'Verse 2 goes more specific, not more general. New proper nouns, new sensory details, new micro-moments. The theme is the same but the evidence is richer and more precise.' },
+  { name: 'Time Jump', rule: 'Verse 2 is set years earlier or later than Verse 1. The emotional context shifts completely. What the chorus meant before now has a completely different backstory.' },
+  { name: 'Antagonist Voice', rule: 'Verse 2 is written from the POV of whoever or whatever is on the other side of the conflict. Not sympathetic — just truthful. The listener has to hold both truths.' },
+];
 
 function buildSongPrompt(params) {
   const {
@@ -1320,9 +1274,7 @@ function buildSongPrompt(params) {
     structure = 'standard', era = 'modern', length = 'medium',
     quality = 'high', theoryLevel = 'standard', mode = 'auto',
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
-    blend = {}, bracketMode = 'suno', ageGroup = '',
-    swing = 'genre_default', syllableDensity = 'auto',
-    southpaw = false
+    blend = {}, bracketMode = 'suno', ageGroup = ''
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -1398,25 +1350,6 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   else if (genre === 'children') genreSpecificNote = `\n\nCHILDREN'S RULES:\n- Singability above all: max 8 words in hook, melody under 1 octave.\n- Repetition is a feature — chorus 3-4x minimum.\n- Embed motion cues: clap, stomp, jump, spin.\n- Never condescend — write UP to imagination.`;
   else if (genre === 'tvmusical') genreSpecificNote = `\n\nTV/MUSICAL RULES:\n- Every song has a DRAMATIC FUNCTION.\n- Characters sing because dialogue is insufficient.\n- "I want" structure in verse 1/chorus 1.\n- Reprise principle: same melody, changed lyrics = devastating.`;
 
-  // Swing + syllable density
-  const resolvedSwing = (swing === 'genre_default' || !SWING_LEVELS[swing])
-    ? (SWING_GENRE_DEFAULTS[genre] || 'straight')
-    : swing;
-  const swingData = SWING_LEVELS[resolvedSwing];
-  const syllableRule = syllableDensity !== 'auto' && SYLLABLE_DENSITY_RULES[syllableDensity]
-    ? SYLLABLE_DENSITY_RULES[syllableDensity]
-    : swingData.lyric_rules;
-  const swingNote = `
-
-RHYTHM DNA — Swing: ${swingData.label} (${swingData.ratio} subdivision):
-Feel: ${swingData.feel}
-Production: ${swingData.production}
-Lyric writing: ${syllableRule}
-Suno/Udio tag to include in SONG PROMPT: "${swingData.suno_tag}"`;
-
-  // Southpaw / deferred rhyme
-  const southpawNote = southpaw ? SOUTHPAW_NOTE : '';
-
   // Hook style
   const resolvedHookStyle = (hookStyle && hookStyle !== 'auto') ? hookStyle : null;
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle] ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}` : '';
@@ -1449,6 +1382,26 @@ Suno/Udio tag to include in SONG PROMPT: "${swingData.suno_tag}"`;
 
   const system = buildGenreAgentSystem(genre);
 
+  // Section archetypes — randomised every generation
+  // Bridge, Outro, and Verse 2 each get a different archetype roll
+  // so the song never defaults to the same structural pattern twice
+  const _ba = pickRandom(BRIDGE_ARCHETYPES);
+  const _oa = pickRandom(OUTRO_ARCHETYPES);
+  const _v2a = pickRandom(VERSE2_ARCHETYPES);
+
+  const bridgeNote = `\n\nBRIDGE ARCHITECTURE — "${_ba.name}":
+Energy arc: ${_ba.energy} · Bars: ${_ba.bars}
+Delivery: ${_ba.delivery}
+Lyric approach: ${_ba.lyric}
+Production: ${_ba.production}
+Rule: ${_ba.rule}`;
+
+  const outroNote = `\n\nOUTRO APPROACH — "${_oa.name}":
+${_oa.rule}`;
+
+  const verse2Note = `\n\nVERSE 2 STRATEGY — "${_v2a.name}":
+${_v2a.rule}`;
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -1458,17 +1411,16 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${swingNote}${southpawNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${voiceNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${voiceNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
 - Chorus lines: maximum 10 syllables each for singability
-- Verse lines: target ${swingData.syllable_range} (set by rhythm DNA above), consistent within each verse
+- Verse lines: 8-13 syllables, consistent within each verse
 - Every line must be specific — no vague emotions, no clichés
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
-- Bridge must offer a new emotional or narrative perspective — not a repeat
-- The last chorus must feel bigger than the first
+- The last chorus must feel bigger than the first${bridgeNote}${verse2Note}${outroNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
@@ -1535,13 +1487,7 @@ COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]
-
-VISUAL PROMPT:
-[Cover art prompt for AI image generators (Midjourney, DALL-E, Firefly). Under 200 characters. Mood, color palette, key imagery, visual metaphor for the song. No text. No artist names.]
-
-VIDEO PROMPT:
-[Music video concept for AI video generators (Sora, Runway, Kling). Under 300 characters. Setting, lighting, key visual moments, camera moves, color grade, emotional arc. Cinematic and specific.]`;
+SECTION MAP: [which sections and how it evolves]`;
 
   return { system, prompt };
 }
@@ -1794,8 +1740,7 @@ const RHYME_NOTES = {
   'multi-syllabic': 'Multi-syllabic rhymes — multiple syllables rhyme simultaneously (e.g., "motivate" / "innovate"). Technical showcase.',
   'chain':          'Chain rhyming — each bar\'s last word or sound becomes the first sound of the next internal rhyme. Continuous forward pull.',
   'mosaic':         'Mosaic rhyme — complex interlocking rhyme scheme where multiple words throughout the verse form a web. Every word load-bearing.',
-  'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.',
-  'deferred':       'Deferred/Southpaw rhyme (The Freeway Principle) — plant a rhyme in bar 2, pay it off in bar 5-7. Scattered rhyme placement across the verse creates active listening tension. Lines can sit across the barline. DO NOT resolve rhymes where expected — make the listener track the thread. Named for Philly rapper Freeway.'
+  'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.'
 };
 const DENSITY_NOTES = {
   'sparse':      'Sparse delivery — few syllables per bar, heavy use of space and silence. Each word carries more weight.',
@@ -2208,4 +2153,4 @@ After the 9 dimensions, give:
 FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, ARTIST_FLOW_DNA };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
