@@ -1633,6 +1633,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','chain')">Chain</span>
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','mosaic')">Mosaic</span>
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','slant')">Slant</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','deferred')">Deferred ✦</span>
             </div>
           </div>
           <div class="rl-dim-row">
@@ -1717,6 +1718,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="bpill" onclick="setTheoryLevel(this,'avantgarde')">Avant-garde</span>
           </div>
           <div id="theory-level-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px">Diatonic, genre-typical progressions — the proven formulas that work</div>
+
+          <!-- RHYTHM DNA: SWING + SYLLABLES -->
+          <label class="bracket-label" style="margin-top:14px">🥁 Swing Feel <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how notes land in the groove</span></label>
+          <div class="bracket-pills" id="swing-pills">
+            <span class="bpill on" onclick="setSwing(this,'genre_default')">Auto (genre default)</span>
+            <span class="bpill" onclick="setSwing(this,'straight')">Straight — tight grid</span>
+            <span class="bpill" onclick="setSwing(this,'shuffle')">Shuffle — loose &amp; warm</span>
+            <span class="bpill" onclick="setSwing(this,'swing')">Heavy Swing — J Dilla drag</span>
+          </div>
+          <div id="swing-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px">Matched to genre automatically — affects both production and lyric rhythm</div>
+
+          <label class="bracket-label" style="margin-top:2px">✍ Syllable Density <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how many syllables per bar</span></label>
+          <div class="bracket-pills" id="syllable-pills">
+            <span class="bpill on" onclick="setSyllable(this,'auto')">Auto (from swing)</span>
+            <span class="bpill" onclick="setSyllable(this,'dense')">Dense — pack every beat</span>
+            <span class="bpill" onclick="setSyllable(this,'normal')">Normal — balanced</span>
+            <span class="bpill" onclick="setSyllable(this,'sparse')">Sparse — space is music</span>
+          </div>
+          <div id="syllable-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:14px;min-height:16px">Syllable count follows swing feel by default — override here for specific density</div>
+
+          <!-- SOUTHPAW / DEFERRED RHYME -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2)">
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx2)">Southpaw Rhyme Scheme</div>
+              <div style="font-size:11px;color:var(--tx3);margin-top:3px">Plant rhymes early, pay off late — deferred tension. Works in every genre.</div>
+            </div>
+            <button id="southpaw-btn" onclick="toggleSouthpaw()" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.15s;white-space:nowrap">Off</button>
+          </div>
 
           <!-- MODE SELECTOR -->
           <label class="bracket-label" style="margin-top:2px">🎵 Scale / Mode <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— overrides genre default</span></label>
@@ -3942,6 +3971,9 @@ const S={selectedGenre:'pop',
   selectedMoods:['Emotional'],
   bracketMode:'suno',
   selectedEra:'modern',
+  swingLevel: 'genre_default',
+  syllableDensity: 'auto',
+  southpaw: false,
   selectedAgeGroup:'',
   albumLanes:['streaming'],
   albumData:null,
@@ -5035,7 +5067,10 @@ async function generateSong(){
       style2: document.getElementById('g-style2')?.value || '',
       ratio: parseInt(document.getElementById('g-blend')?.value || 70)
     },
-    ageGroup: S.selectedAgeGroup || ''
+    ageGroup: S.selectedAgeGroup || '',
+    swing: S.swingLevel || 'genre_default',
+    syllableDensity: S.syllableDensity || 'auto',
+    southpaw: S.southpaw || false
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
@@ -8769,6 +8804,52 @@ function updateModeDesc() {
   } else {
     const m = MUSIC_THEORY_BIBLE.modes[modeId];
     el.textContent = m ? m.feel : '';
+  }
+}
+
+const SWING_DESCS = {
+  genre_default: 'Matched to genre automatically — affects both production and lyric rhythm',
+  straight: 'Dead straight — every note on the grid. Surgical precision. 8–14 syllables/bar.',
+  shuffle: 'Slight shuffle — warm, breathing human feel. Lines lean without fully swinging. 6–9 syllables/bar.',
+  swing: 'Full triplet swing — J Dilla drag. Space IS the music. 3–6 syllables/bar.',
+};
+const SYLLABLE_DESCS = {
+  auto: 'Syllable count follows swing feel by default — override here for specific density',
+  dense: 'Pack it tight — 10–16 syllables/bar. Kendrick on "HUMBLE." energy. Every slot filled.',
+  normal: 'Standard phrasing — 6–10 syllables/bar. Balance density with space.',
+  sparse: 'Minimal — 3–6 syllables/bar. Frank Ocean territory. What you don\'t say matters as much.',
+};
+
+function setSwing(el, level) {
+  S.swingLevel = level;
+  document.querySelectorAll('#swing-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const d = document.getElementById('swing-desc');
+  if (d) d.textContent = SWING_DESCS[level] || '';
+}
+
+function setSyllable(el, density) {
+  S.syllableDensity = density;
+  document.querySelectorAll('#syllable-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const d = document.getElementById('syllable-desc');
+  if (d) d.textContent = SYLLABLE_DESCS[density] || '';
+}
+
+function toggleSouthpaw() {
+  S.southpaw = !S.southpaw;
+  const btn = document.getElementById('southpaw-btn');
+  if (!btn) return;
+  if (S.southpaw) {
+    btn.textContent = 'On ✦';
+    btn.style.background = 'var(--cyanbg)';
+    btn.style.borderColor = 'var(--cyanline)';
+    btn.style.color = 'var(--cyan)';
+  } else {
+    btn.textContent = 'Off';
+    btn.style.background = 'var(--s3)';
+    btn.style.borderColor = 'var(--b2)';
+    btn.style.color = 'var(--tx3)';
   }
 }
 

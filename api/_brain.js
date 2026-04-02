@@ -22,7 +22,8 @@ const GENRE_BIBLE={
     outliers:[
       {song:'"Lose Yourself" — Eminem',rule:'Rock guitar riff + power ballad structure, no traditional hip-hop drums or samples',result:'Won Oscar for Best Original Song — first rap song ever to receive it'},
       {song:'"HUMBLE." — Kendrick Lamar',rule:'Sparse production with minimal hook variation and zero ad-libs — stripped everything rap conventionally adds',result:'#1 hit that broke streaming records and defined minimalist prestige rap'},
-      {song:'"Sicko Mode" — Travis Scott',rule:'Three completely different beat sections mid-song with no warning — breaks the single-groove golden rule',result:'#1 hit that became a cultural moment and turned the "beat switch" into an art form'}
+      {song:'"Sicko Mode" — Travis Scott',rule:'Three completely different beat sections mid-song with no warning — breaks the single-groove golden rule',result:'#1 hit that became a cultural moment and turned the "beat switch" into an art form'},
+      {song:'"What We Do" — Freeway ft. Jay-Z',rule:'Rhymes deliberately scattered — plants a rhyme in bar 2, pays it off in bar 7; flows against the grid, clapping 1/3 instead of 2/4',result:'Instantly recognizable voice and flow that forced active listening — deferred rhyme tension became his signature'}
     ],
     vocables:{sounds:'(yeah) (uh) (let\'s go) (ayy)',when:'ad-lib on every 2nd bar, outro crowd chant',suno_tag:'[Outro - crowd chant]',borrowed_from:'gospel affirmation secularized',notes:'Parentheses syntax critical — Suno renders these as background voices'}
   },
@@ -1160,13 +1161,110 @@ const AGE_GROUPS = {
   }
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SWING DNA — Per-genre default + 3 universal levels
+// Swing level controls the subdivision feel AND lyric writing rules.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SWING_GENRE_DEFAULTS = {
+  pop:       'straight',
+  hiphop:    'straight',   // trap = dead straight; boom bap = slight shuffle
+  rnb:       'shuffle',
+  neosoul:   'swing',      // J Dilla drag
+  jazz:      'swing',
+  blues:     'shuffle',
+  gospel:    'swing',
+  country:   'straight',
+  edm:       'straight',
+  rock:      'straight',
+  altrock:   'straight',
+  funk:      'shuffle',
+  afrobeats: 'straight',   // polyrhythm on straight grid
+  reggae:    'straight',   // one-drop = straight grid
+  reggaeton: 'straight',   // dembow = straight
+  latin:     'shuffle',    // clave carries a natural swing
+  kpop:      'straight',
+  punk:      'straight',
+  ss:        'straight',
+  soul:      'shuffle',
+  children:  'straight',
+  parody:    'straight',
+  comedy:    'straight',
+  tvmusical: 'straight',
+};
+
+const SWING_LEVELS = {
+  straight: {
+    label:   'Straight',
+    ratio:   '50/50',
+    feel:    'Dead straight — every note lands exactly on the grid. Machine precision.',
+    suno_tag:'quantized, tight grid, straight rhythm, on the beat',
+    production: 'All instruments quantized to grid. Kick on beat 1, snare on beat 3. Hi-hats perfectly even. Tight, locked, clinical.',
+    lyric_rules: 'Dense syllables — pack every beat. Lines are even and precise. Internal rhymes hit every 2-3 syllables. Consonants are sharp. 8-14 syllables per bar. Think Kendrick on "HUMBLE." — every syllable placed with surgical intent.',
+    syllable_range: '8–14 per bar',
+  },
+  shuffle: {
+    label:   'Shuffle',
+    ratio:   '58/42',
+    feel:    'Slight shuffle — a loose, breathing human feel. The groove leans without fully swinging.',
+    suno_tag:'shuffle groove, slightly swung, loose feel, human timing',
+    production: 'Hi-hats swung at 58/42. Snare lands slightly behind beat 2 and 4. Bass note elongated on the downbeat. Gives warmth without full jazz swing.',
+    lyric_rules: 'Medium density — some lines breathe, some pack tight. Allow vowels to stretch on emotional words ("loooove", "staaay"). 6–9 syllables per bar. Mix lines that push against the beat with ones that lean back. Conversational rhythm — lines should sound like how people actually talk when they\'re not in a hurry.',
+    syllable_range: '6–9 per bar',
+  },
+  swing: {
+    label:   'Heavy Swing',
+    ratio:   '67/33',
+    feel:    'Full triplet swing — notes arrive in groups of three. The groove breathes and drags. J Dilla territory.',
+    suno_tag:'heavy swing, triplet feel, J Dilla drag, behind the beat',
+    production: 'Full triplet subdivision. Hi-hats and snare swing at 67/33. Drums land slightly late (Dilla drag). Bass slides into pitch. The groove breathes — never fill every 16th note. Space IS the music.',
+    lyric_rules: 'Sparse and spacious — triplet phrasing with natural rests between clusters. Write in 3-syllable groups: "nev-er-mind / let it go / you al-read-y know." Choose words with open vowels (love, soul, gold, home, free, move). Maximum 5-6 words per bar. Silence between phrases carries equal weight to words. Lines should sound like relaxed speech — no rush, no force. Simple end rhymes only — no complex internal schemes.',
+    syllable_range: '3–6 per bar',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SYLLABLE DENSITY — Explicit override (independent of swing)
+// When set, overrides swing level's syllable rules.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SYLLABLE_DENSITY_RULES = {
+  dense:  'SYLLABLE DENSITY — Dense: Pack syllables tightly. 10–16 syllables per bar. Internal rhymes every 2-3 syllables. Lines should feel rapid and full. This is Eminem, Twista, Kendrick — every slot filled.',
+  normal: 'SYLLABLE DENSITY — Normal: Standard phrasing for the genre. 6–10 syllables per bar. Balance density with space. Natural, conversational rhythm.',
+  sparse: 'SYLLABLE DENSITY — Sparse: Minimal words, maximum space. 3–6 syllables per bar. Choose each word as if it costs something. This is Frank Ocean, D\'Angelo — what you don\'t say matters as much as what you do.',
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SOUTHPAW / DEFERRED RHYME — The Freeway Principle
+// Named for Philly rapper Freeway whose scattered, deferred rhyme schemes
+// and off-beat placement created instant recognizability.
+// Works across ALL genres — country, folk, gospel, pop, jazz, rap.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SOUTHPAW_NOTE = `
+SOUTHPAW RHYME SCHEME — Deferred/Scattered (The Freeway Principle):
+RULE: Do NOT resolve rhymes where expected. Plant a rhyme in line 2 — pay it off in line 5 or 6. The listener's ear holds an unresolved tension until the payoff arrives late.
+TECHNIQUE 1 — Deferred rhyme: Set up A in bar 1, B in bar 2, then A returns in bar 5 and B in bar 7. Cross-stitch rhymes across 4-6 bars instead of adjacent lines.
+TECHNIQUE 2 — Cross-bar phrasing: Lines can START slightly before or AFTER the bar line — they "sit against" the grid rather than landing on the beat. The phrase carries across the barline.
+TECHNIQUE 3 — Scattered internal rhymes: Not every bar needs to rhyme with the adjacent bar. Let a word in bar 3 echo a word from bar 1 that nobody expected.
+TECHNIQUE 4 — Unresolved tension: Leave ONE rhyme per verse deliberately unpaid. The ear waits for it. Sometimes the silence IS the payoff.
+APPLICATION IN ALL GENRES:
+- In rap: flow phrases across the barline, plant rhymes 3-4 bars early
+- In country/folk: conversational lines that rhyme irregularly, like speech
+- In gospel: unexpected rhyme arrival creates revelation effect — the "turn" lands late
+- In pop: hook can delay its rhyme by one full bar, creating a "lean-in" moment
+- In jazz/neosoul: lyric phrasing mirrors the bebop concept of delayed resolution
+The goal: make the listener ACTIVE. They're tracking the rhyme thread. When it arrives late, the reward is bigger.`;
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
     structure = 'standard', era = 'modern', length = 'medium',
     quality = 'high', theoryLevel = 'standard', mode = 'auto',
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
-    blend = {}, bracketMode = 'suno', ageGroup = ''
+    blend = {}, bracketMode = 'suno', ageGroup = '',
+    swing = 'genre_default', syllableDensity = 'auto',
+    southpaw = false
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -1242,6 +1340,25 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   else if (genre === 'children') genreSpecificNote = `\n\nCHILDREN'S RULES:\n- Singability above all: max 8 words in hook, melody under 1 octave.\n- Repetition is a feature — chorus 3-4x minimum.\n- Embed motion cues: clap, stomp, jump, spin.\n- Never condescend — write UP to imagination.`;
   else if (genre === 'tvmusical') genreSpecificNote = `\n\nTV/MUSICAL RULES:\n- Every song has a DRAMATIC FUNCTION.\n- Characters sing because dialogue is insufficient.\n- "I want" structure in verse 1/chorus 1.\n- Reprise principle: same melody, changed lyrics = devastating.`;
 
+  // Swing + syllable density
+  const resolvedSwing = (swing === 'genre_default' || !SWING_LEVELS[swing])
+    ? (SWING_GENRE_DEFAULTS[genre] || 'straight')
+    : swing;
+  const swingData = SWING_LEVELS[resolvedSwing];
+  const syllableRule = syllableDensity !== 'auto' && SYLLABLE_DENSITY_RULES[syllableDensity]
+    ? SYLLABLE_DENSITY_RULES[syllableDensity]
+    : swingData.lyric_rules;
+  const swingNote = `
+
+RHYTHM DNA — Swing: ${swingData.label} (${swingData.ratio} subdivision):
+Feel: ${swingData.feel}
+Production: ${swingData.production}
+Lyric writing: ${syllableRule}
+Suno/Udio tag to include in SONG PROMPT: "${swingData.suno_tag}"`;
+
+  // Southpaw / deferred rhyme
+  const southpawNote = southpaw ? SOUTHPAW_NOTE : '';
+
   // Hook style
   const resolvedHookStyle = (hookStyle && hookStyle !== 'auto') ? hookStyle : null;
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle] ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}` : '';
@@ -1283,12 +1400,12 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${voiceNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${swingNote}${southpawNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${voiceNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
 - Chorus lines: maximum 10 syllables each for singability
-- Verse lines: 8-13 syllables, consistent within each verse
+- Verse lines: target ${swingData.syllable_range} (set by rhythm DNA above), consistent within each verse
 - Every line must be specific — no vague emotions, no clichés
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
@@ -1613,7 +1730,8 @@ const RHYME_NOTES = {
   'multi-syllabic': 'Multi-syllabic rhymes — multiple syllables rhyme simultaneously (e.g., "motivate" / "innovate"). Technical showcase.',
   'chain':          'Chain rhyming — each bar\'s last word or sound becomes the first sound of the next internal rhyme. Continuous forward pull.',
   'mosaic':         'Mosaic rhyme — complex interlocking rhyme scheme where multiple words throughout the verse form a web. Every word load-bearing.',
-  'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.'
+  'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.',
+  'deferred':       'Deferred/Southpaw rhyme (The Freeway Principle) — plant a rhyme in bar 2, pay it off in bar 5-7. Scattered rhyme placement across the verse creates active listening tension. Lines can sit across the barline. DO NOT resolve rhymes where expected — make the listener track the thread. Named for Philly rapper Freeway.'
 };
 const DENSITY_NOTES = {
   'sparse':      'Sparse delivery — few syllables per bar, heavy use of space and silence. Each word carries more weight.',
