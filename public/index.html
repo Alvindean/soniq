@@ -6985,6 +6985,7 @@ function copyCoachFeedback() {
       window.__soniqAdmin = true;
       S.plan = 'studio';
       S.isAdmin = true;
+      if (typeof initGenreGrid === 'function') initGenreGrid();
     }
     updateAuthUI();
     if (event === 'SIGNED_IN') {
@@ -7016,6 +7017,7 @@ function copyCoachFeedback() {
       window.__soniqAdmin = true;
       S.plan = 'studio';
       S.isAdmin = true;
+      if (typeof initGenreGrid === 'function') initGenreGrid();
     }
     updateAuthUI();
     loadFoundingStatus();
