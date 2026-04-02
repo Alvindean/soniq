@@ -2310,6 +2310,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="edstats">Lines: <span id="ed-total">0</span> &nbsp;·&nbsp; Avg syllables: <span id="ed-avg">0</span> &nbsp;·&nbsp; Over limit: <span id="ed-over" style="color:var(--red)">0</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">Copy Edited</button>
+        <button class="btn btn-sm" onclick="showPasteModal()" title="Paste lyrics from clipboard">📋 Paste</button>
         <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
         <button class="btn" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
       </div>
@@ -4308,6 +4309,13 @@ function goPg(id,el){
   if(id==='builder')initBuilder();
   if(id==='lucky')renderLuckyHistory();
   if(id==='profile')loadProfilePage();
+  if(id==='editor'){
+    // Auto-load last song if editor is empty
+    if(!S.editorLines?.length){
+      const src = S.currentSong?.lyrics ? S.currentSong : S.library?.[0];
+      if(src?.lyrics) loadLyricsIntoEditor(src.lyrics, src.title);
+    }
+  }
 }
 function goStab(ns,id,el){
   const pre=ns+'-spane-';
@@ -5838,9 +5846,14 @@ function updateSaveBtn(btnId, saved){
 }
 
 function openEditor(){
-  if(!S.currentSong?.lyrics){toast('Generate a song first');return;}
-  loadLyricsIntoEditor(S.currentSong.lyrics,S.currentSong.title);
+  if(S.currentSong?.lyrics){
+    loadLyricsIntoEditor(S.currentSong.lyrics,S.currentSong.title);
+  }
   navTo('editor');
+  // If still no content after trying to load, show paste modal so user can manually enter lyrics
+  if(!S.editorLines?.length){
+    setTimeout(()=>showPasteModal(),100);
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -6060,8 +6073,20 @@ async function regenLine(i){
   }catch(e){toast('⚠️ Regen failed: '+e.message,3000);}
   if(regBtn)regBtn.disabled=false;
 }
-function showPasteModal(){document.getElementById('paste-modal').style.display='block';}
-function loadPasted(){const raw=document.getElementById('paste-area').value;if(!raw.trim())return;loadLyricsIntoEditor(raw,'Pasted Song');}
+function showPasteModal(){
+  const modal=document.getElementById('paste-modal');
+  modal.style.display='block';
+  modal.scrollIntoView({behavior:'smooth',block:'nearest'});
+  setTimeout(()=>document.getElementById('paste-area')?.focus(),150);
+}
+function loadPasted(){
+  const ta=document.getElementById('paste-area');
+  const raw=ta?.value||'';
+  if(!raw.trim()){toast('Paste some lyrics first');return;}
+  loadLyricsIntoEditor(raw,'Pasted Song');
+  ta.value='';
+  toast('✓ Lyrics loaded into editor');
+}
 function copyEdited(){const text=S.editorLines.map(l=>l.text).join('\n');safeCopy(text,'Edited lyrics copied');}
 function saveEdited(){
   const lyrics=S.editorLines.map(l=>l.text).join('\n');
