@@ -2949,7 +2949,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <div class="camp-form">
     <div class="camp-field">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label class="camp-label" style="margin:0">Campaign Theme / Artist Brief</label><button class="mic-btn" id="camp-brief-mic-btn" onclick="toggleMicFor('camp-brief-mic-btn','camp-brief','lines')" title="Dictate your campaign brief" style="font-size:15px;padding:3px 8px">🎤</button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label class="camp-label" style="margin:0">Campaign Theme / Artist Brief</label><div style="display:flex;gap:6px"><button class="btn btn-sm btn-amber" onclick="pasteCampBrief()" title="Paste from clipboard">📋 Paste</button><button class="mic-btn" id="camp-brief-mic-btn" onclick="toggleMicFor('camp-brief-mic-btn','camp-brief','lines')" title="Dictate your campaign brief" style="font-size:15px;padding:3px 8px">🎤</button></div></div>
       <textarea id="camp-brief" class="camp-textarea" placeholder="e.g. A breakup album about moving on and finding yourself again. Artist is a 25-year-old pop singer with a vulnerable, honest tone."></textarea>
     </div>
     <div class="camp-grid">
@@ -3017,7 +3017,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <div class="album-form">
     <div class="album-field">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label class="album-label" style="margin:0">Album Concept / Artist Brief</label><button class="mic-btn" id="alb-brief-mic-btn" onclick="toggleMicFor('alb-brief-mic-btn','alb-brief','lines')" title="Dictate your album concept" style="font-size:15px;padding:3px 8px">🎤</button></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label class="album-label" style="margin:0">Album Concept / Artist Brief</label><div style="display:flex;gap:6px"><button class="btn btn-sm btn-amber" onclick="pasteAlbBrief()" title="Paste from clipboard">📋 Paste</button><button class="mic-btn" id="alb-brief-mic-btn" onclick="toggleMicFor('alb-brief-mic-btn','alb-brief','lines')" title="Dictate your album concept" style="font-size:15px;padding:3px 8px">🎤</button></div></div>
       <textarea id="alb-brief" class="album-textarea" placeholder="e.g. A debut album about leaving your hometown and finding identity in a new city. Soulful pop with R&B influences. Female artist, 22, honest and cinematic lyric style."></textarea>
     </div>
     <div class="album-grid">
@@ -8221,6 +8221,32 @@ async function regenVisual(prefix) {
 }
 
 // ═══════════════════════════════════════════════════════
+async function pasteCampBrief() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) { toast('Clipboard is empty'); return; }
+    const ta = document.getElementById('camp-brief');
+    ta.value = text;
+    ta.focus();
+    toast('✓ Pasted into campaign brief');
+  } catch(e) {
+    toast('Paste failed — use Ctrl+V / Cmd+V directly in the field');
+  }
+}
+
+async function pasteAlbBrief() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) { toast('Clipboard is empty'); return; }
+    const ta = document.getElementById('alb-brief');
+    ta.value = text;
+    ta.focus();
+    toast('✓ Pasted into album brief');
+  } catch(e) {
+    toast('Paste failed — use Ctrl+V / Cmd+V directly in the field');
+  }
+}
+
 // CAMPAIGN MODE
 // ═══════════════════════════════════════════════════════
 async function generateCampaign() {
