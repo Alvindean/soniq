@@ -1446,6 +1446,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
   <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
+  <button class="nb" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none"><span class="ni">📊</span>Admin</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <a href="/" style="font-size:11px;color:var(--tx3);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--b1);white-space:nowrap" title="Back to mysoniq.com">◈ SONIQ</a>
       <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
@@ -3150,7 +3151,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <!-- ══════════════════════════════════
      PROFILE PAGE
 ══════════════════════════════════ -->
-<div id="pg-profile" class="pg" style="display:none;padding:0">
+<div id="pg-profile" class="pg" style="padding:0">
 
   <!-- PROFILE HEADER BANNER -->
   <div id="profile-banner" style="background:linear-gradient(135deg,#1a0a2e 0%,#0f0f1a 40%,#0a1a0f 100%);padding:32px 20px 0;position:relative;overflow:hidden">
@@ -3258,7 +3259,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
 
     <!-- GENRE BREAKDOWN -->
-    <div class="card" style="margin-bottom:16px" id="profile-genre-breakdown-card" style="display:none">
+    <div class="card" id="profile-genre-breakdown-card" style="margin-bottom:16px;display:none">
       <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎸 Genre Breakdown</div>
       <div id="profile-genre-breakdown"></div>
     </div>
@@ -3317,6 +3318,105 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <textarea id="pedit-bio" maxlength="120" rows="2" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box;resize:none" placeholder="Songwriter, beatmaker, storyteller..."></textarea>
     </div>
     <button class="btn btn-amber" onclick="saveProfileEdit()" style="width:100%;padding:10px;font-size:14px">Save Profile</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     ADMIN DASHBOARD PAGE
+══════════════════════════════════ -->
+<div id="pg-admin" class="pg">
+  <div style="max-width:900px;margin:0 auto;padding:20px">
+
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div>
+        <div style="font-size:20px;font-weight:800;color:var(--tx1)">📊 Master Analytics</div>
+        <div style="font-size:11px;color:var(--tx3);margin-top:2px">Admin-only · All user data · Real-time</div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-sm btn-teal" onclick="loadAdminDashboard()">🔄 Refresh</button>
+        <button class="btn btn-sm btn-amber" onclick="exportAdminCSV()">⬇ Export CSV</button>
+        <button class="btn btn-sm" onclick="exportAdminJSON()">⬇ Export JSON</button>
+      </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px">
+      <div class="card" style="padding:14px;text-align:center">
+        <div id="adm-total-users" style="font-size:28px;font-weight:900;color:var(--amber)">—</div>
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Total Users</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center">
+        <div id="adm-total-songs" style="font-size:28px;font-weight:900;color:#60a5fa">—</div>
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Songs Made</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center">
+        <div id="adm-total-published" style="font-size:28px;font-weight:900;color:#34d399">—</div>
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Published</div>
+      </div>
+      <div class="card" style="padding:14px;text-align:center">
+        <div id="adm-today-songs" style="font-size:28px;font-weight:900;color:#f97316">—</div>
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Today</div>
+      </div>
+    </div>
+
+    <!-- Plan breakdown + Top genres (2 col) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">📋 Plan Breakdown</div>
+        <div id="adm-plans"></div>
+      </div>
+      <div class="card">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🎸 Top Genres</div>
+        <div id="adm-genres"></div>
+      </div>
+    </div>
+
+    <!-- Daily activity (last 14 days) -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">📈 Daily Song Activity (last 14 days)</div>
+      <div id="adm-daily" style="display:flex;align-items:flex-end;gap:4px;height:60px"></div>
+      <div id="adm-daily-labels" style="display:flex;gap:4px;margin-top:4px;font-size:9px;color:var(--tx4)"></div>
+    </div>
+
+    <!-- Top topics -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">💬 Top Topics</div>
+      <div id="adm-topics" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+    </div>
+
+    <!-- Users table -->
+    <div class="card" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1)">👥 All Users</div>
+        <input id="adm-user-search" placeholder="Search email / name…" oninput="filterAdminUsers()" style="padding:5px 9px;border-radius:6px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:11px;width:180px">
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:11px" id="adm-users-table">
+          <thead>
+            <tr style="color:var(--tx3);text-transform:uppercase;font-size:9px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
+              <th style="padding:6px 8px;text-align:left">Email</th>
+              <th style="padding:6px 8px;text-align:left">Name</th>
+              <th style="padding:6px 8px;text-align:center">Plan</th>
+              <th style="padding:6px 8px;text-align:center">Songs</th>
+              <th style="padding:6px 8px;text-align:center">XP</th>
+              <th style="padding:6px 8px;text-align:center">Streak</th>
+              <th style="padding:6px 8px;text-align:left">Last Active</th>
+              <th style="padding:6px 8px;text-align:left">Joined</th>
+            </tr>
+          </thead>
+          <tbody id="adm-users-body"></tbody>
+        </table>
+      </div>
+      <div id="adm-no-users" style="text-align:center;padding:20px;color:var(--tx4);font-size:12px;display:none">No users found</div>
+    </div>
+
+    <!-- Recent activity -->
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🕐 Recent Activity</div>
+      <div id="adm-recent"></div>
+    </div>
+
   </div>
 </div>
 
@@ -4364,6 +4464,7 @@ function goPg(id,el){
   if(id==='builder')initBuilder();
   if(id==='lucky')renderLuckyHistory();
   if(id==='profile')loadProfilePage();
+  if(id==='admin'){if(S.isAdmin)loadAdminDashboard();else{toast('Admin access required');navTo('write');}}
   if(id==='editor'){
     // Auto-load last song if editor is empty
     if(!S.editorLines?.length){
@@ -7166,6 +7267,7 @@ function updateAuthUI() {
   const signOutBtn = document.getElementById('nav-signout-btn');
   const userInfo = document.getElementById('nav-user-info');
   const upgradeBtn = document.getElementById('nav-upgrade-btn');
+  const adminBtn = document.getElementById('nav-admin-btn');
   if (S.user) {
     if (authBtn) authBtn.style.display = 'none';
     if (signOutBtn) signOutBtn.style.display = '';
@@ -7173,11 +7275,13 @@ function updateAuthUI() {
     // Show upgrade button only for free users (not founders / pro)
     const isPaid = S.foundingStatus?.is_founder || S.foundingStatus?.is_pro;
     if (upgradeBtn) upgradeBtn.style.display = isPaid ? 'none' : '';
+    if (adminBtn) adminBtn.style.display = S.isAdmin ? '' : 'none';
   } else {
     if (authBtn) authBtn.style.display = '';
     if (signOutBtn) signOutBtn.style.display = 'none';
     if (userInfo) userInfo.style.display = 'none';
     if (upgradeBtn) upgradeBtn.style.display = 'none';
+    if (adminBtn) adminBtn.style.display = window.__soniqAdmin ? '' : 'none';
   }
 }
 
@@ -10283,6 +10387,10 @@ function loadProfilePage() {
   } else {
     document.getElementById('profile-email-display').style.display = 'none';
   }
+
+  // Sync stats to server in background (debounced — no UI impact)
+  clearTimeout(loadProfilePage._syncTimer);
+  loadProfilePage._syncTimer = setTimeout(syncProfileToServer, 2000);
 }
 
 function openProfileEdit() {
@@ -10304,16 +10412,219 @@ function saveProfileEdit() {
     bio:          document.getElementById('pedit-bio').value.trim().slice(0,120)
   };
   localStorage.setItem('soniq_profile', JSON.stringify(d));
-  // Sync to Supabase if logged in
-  if (S.supabase && S.user) {
-    S.supabase.from('profiles').update({
-      display_name: d.display_name,
-      artist_name:  d.artist_name
-    }).eq('id', S.user.id).then(() => {});
-  }
+  syncProfileToServer(d);
   closeProfileEdit();
   loadProfilePage();
   toast('✓ Profile saved');
+}
+
+function syncProfileToServer(profileOverride) {
+  if (!S.supabase || !S.user || S.user.id === 'admin') return;
+  const xpSt = getXPState();
+  const ach = getAchState();
+  const lib = JSON.parse(localStorage.getItem('soniq_library') || '[]');
+  const pd = profileOverride || JSON.parse(localStorage.getItem('soniq_profile') || '{}');
+  const genreMap = {};
+  lib.forEach(s => { if (s.genre) genreMap[s.genre] = (genreMap[s.genre]||0)+1; });
+  const payload = {
+    display_name: pd.display_name || '',
+    artist_name:  pd.artist_name  || '',
+    bio:          pd.bio          || '',
+    plan:         S.plan          || 'free',
+    xp:           xpSt.xp        || 0,
+    level:        getCurrentLevel(),
+    song_count:   ach.song_count  || 0,
+    liked_count:  ach.liked_count || 0,
+    streak:       ach.streak      || 0,
+    genres:       JSON.stringify(genreMap),
+    last_active:  new Date().toISOString()
+  };
+  S.supabase.from('profiles').update(payload).eq('id', S.user.id).then(() => {});
+}
+
+// ═══════════════════════════════════════════════════════
+// ADMIN DASHBOARD
+// ═══════════════════════════════════════════════════════
+let _adminData = null;
+let _adminUsersAll = [];
+
+async function loadAdminDashboard() {
+  if (!S.isAdmin && !window.__soniqAdmin) { toast('Admin access required'); return; }
+  const adminKey = localStorage.getItem('soniq_admin_token') || '';
+  const token = S.session?.access_token || '';
+
+  // Show loading state
+  ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = '…';
+  });
+
+  try {
+    const headers = { 'Content-Type': 'application/json' };
+    if (adminKey) headers['x-admin-key'] = adminKey;
+    if (token)    headers['Authorization'] = 'Bearer ' + token;
+
+    const res = await fetch('/api/analytics', { headers });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    _adminData = await res.json();
+    _adminUsersAll = _adminData.users || [];
+    renderAdminDashboard(_adminData);
+  } catch(e) {
+    toast('⚠️ Analytics load failed: ' + e.message, 4000);
+  }
+}
+
+function renderAdminDashboard(data) {
+  // Summary
+  const today = new Date().toISOString().slice(0,10);
+  const todayEvents = (data.daily_events || []).find(d => d.date === today);
+  const todayCount = todayEvents?.song_saved || todayEvents?.total || 0;
+
+  document.getElementById('adm-total-users').textContent = (data.summary?.total_users ?? (data.users?.length ?? '—'));
+  document.getElementById('adm-total-songs').textContent = data.summary?.total_songs ?? data.total_songs ?? '—';
+  document.getElementById('adm-total-published').textContent = data.summary?.total_published ?? '—';
+  document.getElementById('adm-today-songs').textContent = todayCount;
+
+  // Plan breakdown
+  const planEl = document.getElementById('adm-plans');
+  const users = data.users || [];
+  const planCounts = {};
+  users.forEach(u => { const p = u.plan||'free'; planCounts[p] = (planCounts[p]||0)+1; });
+  const planColors = {free:'#94a3b8',pro:'#60a5fa',studio:'#fbbf24',founding_t1:'#a78bfa',founding_t2:'#34d399',founding:'#f97316'};
+  const totalU = users.length || 1;
+  planEl.innerHTML = Object.entries(planCounts).sort((a,b)=>b[1]-a[1]).map(([plan,cnt]) => {
+    const pct = Math.round(cnt/totalU*100);
+    const color = planColors[plan] || planColors[plan.replace(/_annual/,'')] || '#94a3b8';
+    return `<div style="margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
+        <span style="color:var(--tx2);font-weight:600">${plan}</span>
+        <span style="color:var(--tx4)">${cnt} user${cnt!==1?'s':''} (${pct}%)</span>
+      </div>
+      <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:99px"></div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--tx4);font-size:11px">No data yet</div>';
+
+  // Top genres
+  const genreEl = document.getElementById('adm-genres');
+  const genres = data.top_genres || [];
+  const maxG = genres[0]?.count || 1;
+  const GCOLS = {pop:'#f472b6',hiphop:'#a78bfa',rnb:'#34d399',rock:'#f97316',country:'#fbbf24',edm:'#60a5fa',jazz:'#818cf8'};
+  genreEl.innerHTML = genres.slice(0,8).map(g => {
+    const pct = Math.round(g.count/maxG*100);
+    const color = GCOLS[g.name] || '#94a3b8';
+    return `<div style="margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:2px">
+        <span style="color:var(--tx2);font-weight:600">${g.name}</span>
+        <span style="color:var(--tx4)">${g.count}</span>
+      </div>
+      <div style="height:4px;background:var(--bg3);border-radius:99px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:${color};border-radius:99px"></div>
+      </div>
+    </div>`;
+  }).join('') || '<div style="color:var(--tx4);font-size:11px">No data yet</div>';
+
+  // Daily bar chart
+  const dailyEl = document.getElementById('adm-daily');
+  const labelEl = document.getElementById('adm-daily-labels');
+  const days = data.daily_events || [];
+  const maxDay = Math.max(...days.map(d => d.song_saved || d.total || 0), 1);
+  dailyEl.innerHTML = days.map(d => {
+    const cnt = d.song_saved || d.total || 0;
+    const h = Math.max(4, Math.round(cnt/maxDay*56));
+    return `<div title="${d.date}: ${cnt} songs" style="flex:1;height:${h}px;background:linear-gradient(180deg,var(--amber),var(--violet));border-radius:3px 3px 0 0;min-width:12px;cursor:default"></div>`;
+  }).join('');
+  labelEl.innerHTML = days.map(d => {
+    const dt = new Date(d.date+'T12:00:00');
+    return `<div style="flex:1;text-align:center;overflow:hidden">${dt.toLocaleDateString(undefined,{month:'numeric',day:'numeric'})}</div>`;
+  }).join('');
+
+  // Top topics
+  const topicsEl = document.getElementById('adm-topics');
+  const topics = data.top_topics || [];
+  topicsEl.innerHTML = topics.slice(0,20).map(t =>
+    `<span style="background:var(--bg2);border:1px solid var(--brd);border-radius:99px;padding:3px 10px;font-size:10px;color:var(--tx2)">${escHtml(t.name)} <span style="color:var(--tx4)">${t.count}</span></span>`
+  ).join('') || '<span style="color:var(--tx4);font-size:11px">No data yet</span>';
+
+  // Users table
+  renderAdminUsers(_adminUsersAll);
+
+  // Recent activity
+  const recentEl = document.getElementById('adm-recent');
+  const recent = data.recent || [];
+  recentEl.innerHTML = recent.slice(0,20).map(r => {
+    const when = r.ts ? new Date(r.ts).toLocaleString() : '';
+    return `<div style="display:flex;gap:10px;padding:5px 0;border-bottom:1px solid var(--bg2);font-size:11px">
+      <span style="color:var(--tx4);white-space:nowrap">${when}</span>
+      <span style="color:var(--amber);flex-shrink:0">${escHtml(r.type||'event')}</span>
+      <span style="color:var(--tx2)">${escHtml(r.genre||'')} ${r.topic?'· '+escHtml(r.topic):''}</span>
+    </div>`;
+  }).join('') || '<div style="color:var(--tx4);font-size:11px">No recent activity</div>';
+}
+
+function renderAdminUsers(users) {
+  const tbody = document.getElementById('adm-users-body');
+  const noEl  = document.getElementById('adm-no-users');
+  if (!users.length) { tbody.innerHTML=''; noEl.style.display=''; return; }
+  noEl.style.display='none';
+  const planColors = {free:'#94a3b8',pro:'#60a5fa',studio:'#fbbf24',founding_t1:'#a78bfa',founding_t2:'#34d399',founding:'#f97316'};
+  tbody.innerHTML = users.map(u => {
+    const plan = u.plan || 'free';
+    const pc = planColors[plan] || planColors[plan.replace(/_annual/,'')] || '#94a3b8';
+    const joined = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
+    const lastActive = u.last_active ? new Date(u.last_active).toLocaleDateString() : '—';
+    return `<tr style="border-bottom:1px solid var(--bg2)">
+      <td style="padding:6px 8px;color:var(--tx2)">${escHtml(u.email||'—')}</td>
+      <td style="padding:6px 8px;color:var(--tx3)">${escHtml(u.display_name||u.artist_name||'—')}</td>
+      <td style="padding:6px 8px;text-align:center"><span style="background:${pc}20;color:${pc};border:1px solid ${pc}60;border-radius:99px;padding:1px 7px;font-size:9px;font-weight:700;white-space:nowrap">${plan}</span></td>
+      <td style="padding:6px 8px;text-align:center;color:var(--tx2);font-weight:700">${u.song_count||0}</td>
+      <td style="padding:6px 8px;text-align:center;color:var(--tx3)">${u.xp||0}</td>
+      <td style="padding:6px 8px;text-align:center;color:var(--tx3)">${u.streak||0}${(u.streak||0)>2?'🔥':''}</td>
+      <td style="padding:6px 8px;color:var(--tx4)">${lastActive}</td>
+      <td style="padding:6px 8px;color:var(--tx4)">${joined}</td>
+    </tr>`;
+  }).join('');
+}
+
+function filterAdminUsers() {
+  const q = (document.getElementById('adm-user-search')?.value || '').toLowerCase();
+  const filtered = q ? _adminUsersAll.filter(u =>
+    (u.email||'').toLowerCase().includes(q) ||
+    (u.display_name||'').toLowerCase().includes(q) ||
+    (u.artist_name||'').toLowerCase().includes(q) ||
+    (u.plan||'').toLowerCase().includes(q)
+  ) : _adminUsersAll;
+  renderAdminUsers(filtered);
+}
+
+function exportAdminCSV() {
+  if (!S.isAdmin && !window.__soniqAdmin) return;
+  const adminKey = localStorage.getItem('soniq_admin_token') || '';
+  const token = S.session?.access_token || '';
+  const headers = {};
+  if (adminKey) headers['x-admin-key'] = adminKey;
+  if (token)    headers['Authorization'] = 'Bearer ' + token;
+  fetch('/api/analytics?format=csv', { headers })
+    .then(r => r.blob())
+    .then(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `soniq-users-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }).catch(() => toast('⚠️ Export failed'));
+}
+
+function exportAdminJSON() {
+  if (!_adminData) { toast('Load dashboard first'); return; }
+  const blob = new Blob([JSON.stringify(_adminData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `soniq-analytics-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 // Load counter when lucky page is viewed
