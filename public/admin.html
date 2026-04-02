@@ -158,14 +158,16 @@ async function loadData() {
     }
     if (!r.ok) {
       const d = await r.json().catch(() => ({}));
-      document.getElementById('content').innerHTML = `<div class="error-msg">${d.error || 'Failed to load analytics.'}</div>`;
+      const msg = String(d.error || 'Failed to load analytics.').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+      document.getElementById('content').innerHTML = `<div class="error-msg">${msg}</div>`;
       return;
     }
     const data = await r.json();
     render(data);
     document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
   } catch (e) {
-    document.getElementById('content').innerHTML = `<div class="error-msg">Network error: ${e.message}</div>`;
+    const msg = String(e.message || 'Unknown error').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+    document.getElementById('content').innerHTML = `<div class="error-msg">Network error: ${msg}</div>`;
   }
 }
 

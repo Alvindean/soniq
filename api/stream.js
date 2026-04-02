@@ -319,7 +319,6 @@ module.exports = async function handler(req, res) {
   const limit = PLAN_LIMITS[plan] ?? 3;
   if (!req._adminBypass && isFinite(limit)) {
     const isLifetime = plan === 'free';
-    const isMonthly  = MONTHLY_LIMIT_PLANS.has(plan);
     const redisKey   = isLifetime
       ? `soniq:ratelimit:lifetime:${user.id}`
       : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;

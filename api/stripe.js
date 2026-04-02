@@ -298,7 +298,8 @@ async function handleWebhook(req, res) {
 
       if (!userId || !plan) {
         console.error('Webhook: missing user_id or plan in session metadata', session.id);
-        break;
+        // Return 200 so Stripe doesn't retry — this is a data issue, not a server error
+        return res.status(200).json({ received: true, warning: 'missing metadata' });
       }
 
       // Founding counter: spot was already reserved (INCRed) at checkout creation time.
