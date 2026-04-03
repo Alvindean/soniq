@@ -3658,6 +3658,30 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </div><!-- /wrap -->
 
 <script>
+// ── Device ID (anonymous, persistent) ─────────────────
+function getDeviceId() {
+  let id = localStorage.getItem('soniq_device_id');
+  if (!id) {
+    id = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    localStorage.setItem('soniq_device_id', id);
+  }
+  return id;
+}
+
+// ── Event tracker (fire-and-forget) ───────────────────
+function trackEvent(event, meta) {
+  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  if (!isVercel) return; // skip in local dev
+  try {
+    fetch('/api/track', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ event, device_id: getDeviceId(), ...meta }),
+      keepalive: true
+    });
+  } catch(e) {}
+}
+
 // ═══════════════════════════════════════════════════════
 // DATA
 // ═══════════════════════════════════════════════════════
@@ -10724,29 +10748,7 @@ window.clearAdminSession = function() {
 </script>
 <!-- ══ ANALYTICS + GAMIFICATION ══ -->
 <script>
-// ── Device ID (anonymous, persistent) ─────────────────
-function getDeviceId() {
-  let id = localStorage.getItem('soniq_device_id');
-  if (!id) {
-    id = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
-    localStorage.setItem('soniq_device_id', id);
-  }
-  return id;
-}
 
-// ── Event tracker (fire-and-forget) ───────────────────
-function trackEvent(event, meta) {
-  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
-  if (!isVercel) return; // skip in local dev
-  try {
-    fetch('/api/track', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ event, device_id: getDeviceId(), ...meta }),
-      keepalive: true
-    });
-  } catch(e) {}
-}
 
 // ── Global counter ─────────────────────────────────────
 async function loadGlobalCounter() {
