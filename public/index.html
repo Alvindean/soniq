@@ -2538,6 +2538,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
         <input id="auth-signup-password" type="password" autocomplete="new-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
       </div>
+      <!-- Age verification -->
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:10px;cursor:pointer;line-height:1.5">
+        <input type="checkbox" id="auth-age-check" style="margin-top:2px;flex-shrink:0;accent-color:var(--amber)">
+        <span>I confirm I am at least <strong>13 years old</strong> (18+ required for publishing features)</span>
+      </label>
+      <!-- Terms + Privacy acceptance -->
+      <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:14px;cursor:pointer;line-height:1.5">
+        <input type="checkbox" id="auth-terms-check" style="margin-top:2px;flex-shrink:0;accent-color:var(--amber)">
+        <span>I agree to the <a href="/legal/terms.html" target="_blank" style="color:var(--amber)">Terms of Service</a> and <a href="/legal/privacy.html" target="_blank" style="color:var(--amber)">Privacy Policy</a></span>
+      </label>
       <div id="founding-offer" style="text-align:center;margin-top:8px;font-size:0.8rem;color:#fb923c;display:none">
         🔥 <strong>Early Founder</strong> — Early Founder rate — $5/mo · <span id="founding-spots">...</span> spots left
       </div>
@@ -2622,9 +2632,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="font-size:10px;color:var(--tx3);max-width:180px;text-align:right">International Standard Recording Code — your song's unique global ID</div>
     </div>
 
-    <!-- Agreement -->
-    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:16px;cursor:pointer">
-      <input type="checkbox" id="pub-agree" style="margin-top:2px;flex-shrink:0">
+    <!-- Age verification (required for publishing — 18+) -->
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:10px;cursor:pointer;line-height:1.5">
+      <input type="checkbox" id="pub-age-check" style="margin-top:2px;flex-shrink:0;accent-color:var(--amber)">
+      <span>I confirm I am <strong>18 years of age or older</strong> — required for publishing services per our <a href="/legal/terms.html" target="_blank" style="color:var(--amber)">Terms of Service</a></span>
+    </label>
+    <!-- Co-publishing agreement -->
+    <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:16px;cursor:pointer;line-height:1.5">
+      <input type="checkbox" id="pub-agree" style="margin-top:2px;flex-shrink:0;accent-color:var(--amber)">
       <span>I agree to the <a href="/legal/copublishing.html" target="_blank" style="color:var(--amber)">Co-Publishing Agreement (v1.0)</a> and authorize Nu Wav Media LLC to administer publishing per the selected tier. I confirm I am the sole/primary writer of this song.</span>
     </label>
 
@@ -3347,6 +3362,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="display:flex;gap:8px">
         <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
         <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
+      </div>
+    </div>
+
+    <!-- Legal footer -->
+    <div style="text-align:center;padding:24px 0 8px;border-top:1px solid var(--brd);margin-top:8px">
+      <div style="font-size:10px;color:var(--tx4);margin-bottom:8px">© 2026 Nu Wav Media LLC · SONIQ</div>
+      <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
+        <a href="/legal/terms.html" target="_blank" style="font-size:11px;color:var(--tx3);text-decoration:none">Terms of Service</a>
+        <a href="/legal/privacy.html" target="_blank" style="font-size:11px;color:var(--tx3);text-decoration:none">Privacy Policy</a>
+        <a href="/legal/copublishing.html" target="_blank" style="font-size:11px;color:var(--tx3);text-decoration:none">Co-Publishing Agreement</a>
+        <a href="mailto:legal@nuwavmedia.com" style="font-size:11px;color:var(--tx3);text-decoration:none">Legal Contact</a>
       </div>
     </div>
 
@@ -7824,24 +7850,52 @@ async function authSignIn() {
 
 async function authSignUp() {
   if (!S.supabase) { toast('Auth not configured yet'); return; }
-  const name = document.getElementById('auth-signup-name').value.trim();
-  const email = document.getElementById('auth-signup-email').value.trim();
+  const name     = document.getElementById('auth-signup-name').value.trim();
+  const email    = document.getElementById('auth-signup-email').value.trim();
   const password = document.getElementById('auth-signup-password').value;
+  const ageOk    = document.getElementById('auth-age-check')?.checked;
+  const termsOk  = document.getElementById('auth-terms-check')?.checked;
+
   if (!name || !email || !password) { showAuthError('All fields are required'); return; }
   if (password.length < 8) { showAuthError('Password must be at least 8 characters'); return; }
+  if (!ageOk)   { showAuthError('Please confirm you are at least 13 years old'); return; }
+  if (!termsOk) { showAuthError('Please agree to the Terms of Service and Privacy Policy'); return; }
+
   const btn = document.getElementById('auth-signup-btn');
   btn.disabled = true; btn.textContent = 'Creating account…';
-  const { error } = await S.supabase.auth.signUp({
+
+  const { data, error } = await S.supabase.auth.signUp({
     email, password,
-    options: { data: { full_name: name } }
+    options: {
+      data: {
+        full_name:      name,
+        terms_accepted: true,
+        terms_version:  'v1.0',
+        age_verified:   true
+      }
+    }
   });
+
   if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Create Account'; return; }
+
+  // Belt-and-suspenders: also update the profile row directly with consent data
+  // (the Supabase trigger captures it, but this handles race conditions)
+  if (data?.user?.id) {
+    S.supabase.from('profiles').update({
+      terms_accepted:    true,
+      terms_version:     'v1.0',
+      terms_accepted_at: new Date().toISOString(),
+      age_verified:      true
+    }).eq('id', data.user.id).then(() => {});
+  }
+
   // Fire welcome email (non-blocking)
   fetch('/api/send-email', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'welcome', email, name })
   }).catch(() => {});
+
   document.getElementById('auth-form-signup').style.display = 'none';
   const succ = document.getElementById('auth-success');
   succ.style.display = '';
@@ -7930,11 +7984,13 @@ async function submitPublish() {
   const title = (document.getElementById('pub-song-title').value || '').trim();
   const isrc = document.getElementById('pub-isrc-display').textContent;
   const tier = S.pubTier || 'admin';
+  const ageOk  = document.getElementById('pub-age-check')?.checked;
   const agreed = document.getElementById('pub-agree').checked;
 
   if (!writerName) { toast('Please enter your legal name'); return; }
   if (!pro) { toast('Please select your PRO affiliation'); return; }
-  if (!agreed) { toast('Please agree to the publishing terms'); return; }
+  if (!ageOk)   { toast('You must be 18 or older to register publishing'); return; }
+  if (!agreed)  { toast('Please agree to the Co-Publishing Agreement'); return; }
 
   const btn = document.getElementById('pub-submit-btn');
   btn.disabled = true;
@@ -11755,6 +11811,38 @@ window.addEventListener('error',e=>_dbgErr('JS',`${e.filename?.split('/').pop()}
 window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.message||String(e.reason)));
 setInterval(()=>{ if(DBG.on) dbgUpdateState(); },2000);
 document.addEventListener('DOMContentLoaded',initDebug);
+</script>
+<!-- ── COOKIE CONSENT BANNER ───────────────────────────────── -->
+<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--brd);padding:10px 20px;z-index:9999;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 12px rgba(0,0,0,.25)">
+  <span style="font-size:12px;color:var(--tx3);line-height:1.5">
+    🍪 We use session cookies only — no tracking, no third-party ads.
+    <a href="/legal/privacy.html" target="_blank" style="color:var(--amber);text-decoration:none">Privacy Policy</a>
+  </span>
+  <button onclick="acceptCookies()" style="background:var(--amber);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Got it</button>
+</div>
+
+<script>
+// ── Cookie consent ──────────────────────────────────────────
+function checkCookieBanner() {
+  if (!localStorage.getItem('soniq_cookie_consent')) {
+    const b = document.getElementById('cookie-banner');
+    if (b) b.style.display = 'flex';
+  }
+}
+function acceptCookies() {
+  localStorage.setItem('soniq_cookie_consent', '1');
+  const b = document.getElementById('cookie-banner');
+  if (b) b.style.display = 'none';
+  // Persist to profile if logged in
+  if (S.user && S.supabase) {
+    S.supabase.from('profiles').update({
+      cookie_consent:    true,
+      cookie_consent_at: new Date().toISOString()
+    }).eq('id', S.user.id).catch(() => {});
+  }
+}
+// Show after a brief delay so it doesn't flash on first paint
+setTimeout(checkCookieBanner, 1500);
 </script>
 </body>
 </html>
