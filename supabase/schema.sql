@@ -13,6 +13,14 @@ create table if not exists public.profiles (
   plan          text not null default 'free' check (plan in ('free','pro','studio')),
   songs_today   int not null default 0,
   songs_today_reset date,
+  -- Legal consent (E-SIGN Act compliant)
+  terms_accepted      boolean not null default false,
+  terms_version       text,               -- e.g. 'v1.0'
+  terms_accepted_at   timestamptz,        -- UTC timestamp of acceptance
+  terms_accepted_ip   text,               -- IP at time of acceptance
+  age_verified        boolean not null default false,  -- confirmed 13+ at signup
+  cookie_consent      boolean not null default true,   -- session cookies only
+  cookie_consent_at   timestamptz,
   created_at    timestamptz not null default now(),
   updated_at    timestamptz not null default now()
 );
@@ -128,11 +136,18 @@ create trigger profiles_updated_at before update on public.profiles
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$
 begin
-  insert into public.profiles (id, email, display_name)
+  insert into public.profiles (
+    id, email, display_name,
+    terms_accepted, terms_version, terms_accepted_at, age_verified
+  )
   values (
     new.id,
     new.email,
-    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1))
+    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email,'@',1)),
+    coalesce((new.raw_user_meta_data->>'terms_accepted')::boolean, false),
+    coalesce(new.raw_user_meta_data->>'terms_version', 'v1.0'),
+    case when (new.raw_user_meta_data->>'terms_accepted')::boolean = true then now() else null end,
+    coalesce((new.raw_user_meta_data->>'age_verified')::boolean, false)
   );
   return new;
 end;

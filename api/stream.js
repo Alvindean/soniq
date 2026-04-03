@@ -370,6 +370,19 @@ module.exports = async function handler(req, res) {
       let built;
       if (body.action === 'generate') {
         const p = body.params || {};
+
+        // Server-side genre gate — free plan restricted to 6 base genres
+        const FREE_GENRES_SET = new Set(['pop','hiphop','rnb','rock','country','edm']);
+        const PAID_PLANS_SET  = new Set(['pro','pro_annual','studio','studio_annual',
+          'founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual',
+          'starter','starter_annual']);
+        if (p.genre && !FREE_GENRES_SET.has(p.genre) && !PAID_PLANS_SET.has(plan) && !req._adminBypass) {
+          return res.status(403).json({
+            error: 'plan_required',
+            message: `${p.genre} genre unlocks with Starter — upgrade to access all 14 genres.`
+          });
+        }
+
         if (p.genre === 'hiphop' && p.rapLabActive) {
           built = brain.buildRapLabPrompt(p);
         } else {
@@ -389,10 +402,20 @@ module.exports = async function handler(req, res) {
       return res.status(500).json({ error: 'Prompt build error: ' + err.message });
     }
   } else {
-    // Legacy: client sends raw messages (for visual prompts, titles, etc.)
+    // Legacy path: visual prompts, theory analysis, sync metadata, AI titles, etc.
+    // These are paid features — gate by plan server-side, same as client does.
+    const PAID_PLANS_SET = new Set(['pro','pro_annual','studio','studio_annual',
+      'founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual',
+      'starter','starter_annual']);
+    if (!req._adminBypass && !PAID_PLANS_SET.has(plan)) {
+      return res.status(403).json({
+        error: 'plan_required',
+        message: 'This feature requires a paid plan. Upgrade to unlock.'
+      });
+    }
+    // Cap max_tokens — never let a client request blow through credit limits
     messages = body.messages;
     system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
-    // Cap max_tokens — never let a client request blow through credit limits
     max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
   }
 
