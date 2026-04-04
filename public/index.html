@@ -10145,15 +10145,35 @@ async function instantEdit() {
   btnLoad('ie-btn', '⚡ Editing…');
   const lyricsEl = document.getElementById('res-lyrics-text');
   lyricsEl.innerHTML = '<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Applying edit…</div></div>';
+  const song = S.currentSong;
+  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   try {
     let full = '';
-    await callClaudeStream(
-      `You are editing a ${S.currentSong.genre||'pop'} song. Apply this specific change: "${instruction}"\n\nCURRENT LYRICS:\n${S.currentSong.lyrics}\n\nRules:\n- Only change what the instruction asks for\n- Preserve all other sections exactly\n- Return the complete revised lyrics with [Section] tags\n- No commentary — only the lyrics`,
-      'You are a professional lyric editor. Apply only the requested change precisely.',
-      (chunk, text) => { full = text; });
+    const editParams = {
+      instruction,
+      lyrics:         song.lyrics,
+      genre:          song.genre        || 'pop',
+      title:          song.title        || '',
+      topic:          song.topic        || '',
+      mood:           song.mood         || '',
+      style:          song.style        || '',
+      brief:          song.brief        || '',
+      chords:         song.chords       || '',
+      theoryAnalysis: song.theoryAnalysis || '',
+      verdict:        song.verdict      || '',
+    };
+    if (isVercel) {
+      await callServerStream('edit', editParams, (chunk, text) => { full = text; });
+    } else {
+      await callClaudeStream(
+        `You are editing a ${song.genre||'pop'} song. Apply this specific change: "${instruction}"\n\nCURRENT LYRICS:\n${song.lyrics}\n\nReturn the complete revised lyrics with [Section] tags only.`,
+        'You are a professional lyric editor. Apply only the requested change precisely.',
+        (chunk, text) => { full = text; });
+    }
     const newLyrics = full.trim();
     S.currentSong.lyrics = newLyrics;
     lyricsEl.innerHTML = escHtml(newLyrics).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+    calcHookScore('res');
     toast('⚡ Edit applied!');
     inp.value = '';
     document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
@@ -10533,13 +10553,31 @@ async function revise(prefix, instruction) {
   }
 
   const lyricsEl = document.getElementById(prefix + '-lyrics-text');
+  const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   try {
     let full = '';
-    await callClaudeStream(
-      `Revise this song with one specific instruction: ${instruction}. Keep the same structure and title. Improve only what the instruction asks. Return ONLY the revised LYRICS section in the same bracket-tag format.\n\nTitle: ${song.title||''}\nGenre: ${song.genre||'pop'}\nStyle: ${song.style||''}\n\nCurrent Lyrics:\n${song.lyrics}`,
-      'You are a professional lyric editor. Apply only the specific instruction. Return ONLY the complete lyrics with [Section] tags, no commentary.',
-      (chunk, text) => { full = text; }
-    );
+    const editParams = {
+      instruction,
+      lyrics:         song.lyrics,
+      genre:          song.genre         || 'pop',
+      title:          song.title         || '',
+      topic:          song.topic         || '',
+      mood:           song.mood          || '',
+      style:          song.style         || '',
+      brief:          song.brief         || '',
+      chords:         song.chords        || '',
+      theoryAnalysis: song.theoryAnalysis || '',
+      verdict:        song.verdict       || '',
+    };
+    if (isVercel) {
+      await callServerStream('edit', editParams, (chunk, text) => { full = text; });
+    } else {
+      await callClaudeStream(
+        `Revise this ${song.genre||'pop'} song: ${instruction}.\n\nTitle: ${song.title||''}\nGenre: ${song.genre||'pop'}\n\nCurrent Lyrics:\n${song.lyrics}\n\nReturn ONLY the complete revised lyrics with [Section] tags.`,
+        'You are a professional lyric editor. Apply only the specific instruction. Return ONLY the complete lyrics with [Section] tags, no commentary.',
+        (chunk, text) => { full = text; }
+      );
+    }
     const newLyrics = full.trim();
     if (prefix === 'res') S.currentSong.lyrics = newLyrics;
     else S.luckyCurrentSong.lyrics = newLyrics;
