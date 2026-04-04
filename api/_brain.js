@@ -1269,6 +1269,147 @@ const VERSE2_ARCHETYPES = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
+// Each archetype defines HOW to build anticipation differently
+// ═══════════════════════════════════════════════════════════════════════════
+
+const PRE_CHORUS_ARCHETYPES = [
+  {
+    name: 'Tension Ramp',
+    energy: 'low → high (linear climb)',
+    bars: '2–4',
+    delivery: 'Start at verse energy. Each line slightly louder, slightly more urgent. The final line lands on the most unresolved note of the song — V7 or ♭VII held open. The listener leans forward.',
+    lyric: 'Short lines, rising specificity. Each line narrows the focus until the last line is so precise and so loaded that the chorus is the only possible response. No resolution — the pre-chorus is a question.',
+    production: 'Drums tighten (ride → hi-hat → open hi-hat). A synth swell or string swell begins at bar 2 and peaks at the last pre-chorus beat. Bass locks with the kick.',
+    rule: 'PRE-CHORUS MUST end on maximum unresolved tension. The chorus is not a release — it is an inevitability. The listener should feel pulled forward, not surprised.',
+  },
+  {
+    name: 'Question Drop',
+    energy: 'building → hanging open',
+    bars: '2–4',
+    delivery: 'The entire pre-chorus builds toward a single question — spoken, sung, or left hanging. Delivery rises through the section. The final line rises in pitch (question inflection). Then silence. Then chorus answers.',
+    lyric: 'Set up the central unresolved tension of the song as a question. The most specific version of the conflict. Not rhetorical — genuinely unanswered. The chorus IS the answer, whether lyrically explicit or emotional.',
+    production: 'Everything pulls back on the final question. One held chord. The silence before the chorus is as loud as the chorus itself. Often: kick drops out on the final question bar.',
+    rule: 'PRE-CHORUS MUST make the chorus feel like the answer to a real question. If the chorus does not resolve the pre-chorus question emotionally, rewrite one of them.',
+  },
+  {
+    name: 'Lyric Elevator',
+    energy: 'mid → peak (step-by-step)',
+    bars: '4',
+    delivery: 'Four lines, each more emotionally loaded than the last. Line 1 = observation. Line 2 = feeling. Line 3 = realization. Line 4 = the most exposed line — almost too honest to sing. Then the chorus.',
+    lyric: 'Four-rung ladder of emotional escalation. Each line reveals one more layer. By line 4, the emotional core of the song is completely exposed — the chorus is the response to that exposure. Specificity increases every line.',
+    production: 'Instrumentation adds one element per rung: guitar → bass → drums → strings. By line 4, the full band is in except the final element that drops on the chorus.',
+    rule: 'PRE-CHORUS MUST feel like a controlled emotional unraveling. By the last line the listener knows the most important thing about the character — even if the character hasn\'t said it explicitly yet.',
+  },
+  {
+    name: 'Harmonic Pivot',
+    energy: 'tense — unexpected sidestep',
+    bars: '2–4',
+    delivery: 'Melodic line that moves to a chord or tonal center not heard anywhere else in the song. The harmonic surprise is the tension. Delivery can be restrained — the harmony does the emotional work.',
+    lyric: 'The lyric at the moment of the harmonic pivot should match the unexpected turn — the most unusual image in the song, or the most honest admission. The harmony and lyric arrive together as a single surprising move.',
+    production: 'The "pivot chord" — ♭VI, iv, or borrowed parallel-key chord — appears here and only here. It makes the V7→I resolution into the chorus feel like coming home from somewhere unexpected.',
+    rule: 'PRE-CHORUS MUST contain at least one harmonic element not heard in the verse or chorus. This chord is the emotional fingerprint of the song — the moment the listener\'s ear shifts from expectation to discovery.',
+  },
+  {
+    name: 'Velocity Surge',
+    energy: 'same energy as verse → rhythmic acceleration',
+    bars: '2–4',
+    delivery: 'Lyric density doubles. More syllables per bar. Faster, tighter delivery — as if the thought is outrunning the singer\'s ability to contain it. Triplet feel or double-time approach. The rush IS the emotion.',
+    lyric: 'Pack maximum information into minimum space. Short rhymes, internal rhymes, chain-rhyme. The pre-chorus says more per bar than anything else in the song. The urgency is in the compression of language, not the volume.',
+    production: 'The rhythm section plays in the pockets — slightly ahead of the beat, pushing forward. Hi-hats open. Bass moves faster. The tempo hasn\'t changed but it FEELS like it has.',
+    rule: 'PRE-CHORUS MUST create the sensation that the song is accelerating into the chorus. The listener\'s pulse should quicken from the rhythmic compression alone, before the chorus arrives.',
+  },
+  {
+    name: 'Whisper to Roar',
+    energy: 'near-silent → full force (extreme arc)',
+    bars: '4',
+    delivery: 'Start at the absolute quietest dynamic in the song — whispered, barely audible. Build through the pre-chorus to the biggest single moment before the chorus. The dynamic arc IS the pre-chorus. The contrast makes the chorus explode.',
+    lyric: 'Begin with the most private thought in the song — something barely spoken. By the last pre-chorus line, that private thought has become a statement. Same emotional truth, different volume.',
+    production: 'Bar 1: voice alone or with single instrument at low volume. Bar 2: add one element. Bar 3: add percussion. Bar 4: full band minus one element that drops on the chorus. The swell must be earned — no cheating by faking it.',
+    rule: 'PRE-CHORUS MUST establish the quietest point in the entire song (bar 1) before the song explodes. The contrast multiplies the chorus impact. Do not skip the quiet — it is doing half the work.',
+  },
+  {
+    name: 'Call-Setup',
+    energy: 'groove-locked — anticipatory',
+    bars: '2–4',
+    delivery: 'The pre-chorus is a call waiting for a response. Vocals land on the downbeats, leaving space on the upbeats for an imagined answer. The phrasing is open-ended. The chorus is the response that fills the silence.',
+    lyric: 'Write the pre-chorus as a declaration waiting for confirmation, or a plea waiting for permission. Short lines with deliberate spaces between them. The unsaid words in the gaps are as important as the spoken ones.',
+    production: 'Rhythm guitar or synth plays the "response" part in the gaps — answers the vocal phrases instrumentally. This creates the call-and-response dynamic before the chorus gives the full vocal answer.',
+    rule: 'PRE-CHORUS MUST feel like the first half of a conversation. The chorus completes the conversation. If the chorus could exist without the pre-chorus setup, the pre-chorus isn\'t specific enough.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// POST-CHORUS ARCHETYPES — What happens after the chorus hits
+// The "power part" — where the hook lands and breathes
+// ═══════════════════════════════════════════════════════════════════════════
+
+const POST_CHORUS_ARCHETYPES = [
+  {
+    name: 'Breath and Reset',
+    energy: 'drops sharply → groove settles',
+    bars: '2–4',
+    delivery: 'After the chorus explosion, pull almost everything back. Just kick, bass, and maybe a single guitar or synth. Give the listener a second to process what they just heard. Then the verse rebuilds from this stripped foundation.',
+    lyric: 'No lyric — or a single ad-lib phrase (one word, one breath, one syllable). The space IS the post-chorus. The silence after a peak is as intentional as the peak itself.',
+    production: 'Drop to percussion + bass only, or vocal ad-lib over minimal instrumentation. 2-4 bars. The contrast with the chorus makes the next verse feel deliberate and focused. Drum fill into the verse.',
+    rule: 'POST-CHORUS MUST create a real dynamic drop — not a pretend one. The listener should feel the pressure release. This makes the second verse land with new context instead of feeling like repetition.',
+  },
+  {
+    name: 'Hook Echo',
+    energy: 'same as chorus but instrumental',
+    bars: '2–4',
+    delivery: 'The chorus lyric ends but its melody continues — played by an instrument (guitar lead, synth, sax, strings) without words. The melody hangs in the air. The listener is mentally singing the words that aren\'t there.',
+    lyric: 'No lyric, or a single hummed or "la la la" repetition of the hook melody. The instrument carries the emotional memory of the chorus lyric without needing words. The listener completes it themselves.',
+    production: 'Lead guitar, piano, synth, or melodica plays the exact hook melody at chorus volume, then fades or transitions into the next section. Often harmonized (3rd or 5th) for richness.',
+    rule: 'POST-CHORUS MUST be the hook melody without words — proving the melody is powerful enough to carry meaning alone. If the listener doesn\'t hum along during this section, the hook needs more work.',
+  },
+  {
+    name: 'Ad-Lib Showcase',
+    energy: 'same groove — vocal peak',
+    bars: '2–4',
+    delivery: 'Vocalist improvises over the same chord loop as the chorus. Runs, riffs, scatting, emotional sighs, falsetto peaks. The production stays but the vocalist reveals everything they held back in the composed chorus. This is the moment of raw expression.',
+    lyric: 'Ad-lib phrases: fragments, emotional exclamations, repeated single syllables. Write them in parentheses: (yeah), (oh lord), (come on). Suggest 2-3 specific ad-lib moments — these are as composed as the lyrics, even if they sound spontaneous.',
+    production: 'Background vocals join for harmonies. The main chord loop of the chorus continues unchanged. Just add space and permission for the lead vocal to breathe and explore.',
+    rule: 'POST-CHORUS MUST feel like the vocalist just exhaled everything they had been holding back. It is the most emotionally honest moment in the song because it appears unscripted — even when it is carefully composed.',
+  },
+  {
+    name: 'Punchy Counter-Statement',
+    energy: 'sharp — single knockout hit',
+    bars: '1–2',
+    delivery: 'One devastating line or phrase — the comment on everything the chorus just said. Often the most quotable line in the entire song. Delivered with maximum clarity and minimum production behind it. Then the track continues.',
+    lyric: 'One line. The post-hook line that makes people rewind. It subverts, confirms, or deepens what the chorus just declared. The chorus makes the statement — the post-hook is the coda that makes it unforgettable. Often a contrast: if the chorus is big, the post-hook is quiet.',
+    production: 'Everything drops out except one element for the 1-2 bar line. Then full band resumes. The emptiness makes the single line hit twice as hard. Like a spotlight on one phrase.',
+    rule: 'POST-CHORUS MUST land the single most quotable phrase in the song. If the chorus is the argument, the post-hook is the closing line that wins it. If you can\'t identify this line, the section isn\'t specific enough.',
+  },
+  {
+    name: 'Drop Groove',
+    energy: 'no harmony — pure rhythm',
+    bars: '2–4',
+    delivery: 'All chord instruments drop out. Bass + drums only (or percussion only). The groove is exposed — just the rhythm, no harmony hiding it. Then the next section re-enters over this stripped rhythmic foundation.',
+    lyric: 'No lyric — or a rhythmic chant (2-3 syllables, percussion-like). The groove is the content. The listener\'s body takes over from their brain. This is the most physical moment in the song.',
+    production: 'Hard cut from full chorus to bass + drums only. No guitar, no synth, no keys. Just the pocket. After 2-4 bars, the instrumentation re-enters. Works in every genre: EDM drop, funk breakdown, trap bass drop, reggae riddim strip.',
+    rule: 'POST-CHORUS MUST strip all harmony for at least 2 full bars. The rawness of the exposed rhythm makes everything that follows it feel more powerful. The groove is the hook.',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HOOK STRUCTURE NOTES — Structural hook archetypes (separate from delivery)
+// These define HOW the hook is shaped, not how it is delivered
+// ═══════════════════════════════════════════════════════════════════════════
+
+const HOOK_STRUCTURE_NOTES = {
+  'auto': '',
+  'Ladder Hook':     'HOOK STRUCTURE — Ladder: Hook builds line by line toward the payoff. Each line is one rung higher emotionally. The final line is the thesis — the most memorable phrase in the song. Setup → escalation → landing. The listener climbs with you. Tennessee Whiskey model: each verse/chorus line escalates the central simile.',
+  'Mantra Hook':     'HOOK STRUCTURE — Mantra: The entire hook is ONE sentence, repeated 3-6 times with slight melodic variation each time. Power through repetition — not complexity. The meaning deepens with each repeat. The hook is also the title. "HUMBLE." / "Never broke again" / "Thank U, Next" — single devastating phrase.',
+  'Question+Answer': 'HOOK STRUCTURE — Question + Answer: Hook divided into two equal halves. First half: a question or incomplete thought. Second half: the answer or completion. The listener is pulled through the gap between them. Creates internal tension and resolution inside the hook itself. The chorus contains a complete micro-argument.',
+  'A/B Double':      'HOOK STRUCTURE — A/B Double: Two distinct melodic phrases back to back. Hook A (4 bars, establishes central image, usually sung) → Hook B (4 bars, escalates or reframes it, often different cadence/energy). Together more powerful than either alone. Creates two earworms in one. Travis Scott / OutKast model.',
+  'Anti-Hook':       'HOOK STRUCTURE — Anti-Hook: Deliberately refuses the expected melodic or dynamic peak. Chorus lands quiet or mid-energy when the production promises an explosion. The absence IS the hook — the gap where the peak was supposed to be is more memorable than the peak would have been. Kendrick Lamar / Radiohead tradition. Creep drops quiet exactly when it should go loud.',
+  'Chant Hook':      'HOOK STRUCTURE — Chant: 2-5 words, rhythmically locked to the beat, crowd-participatory from first listen. Not primarily melodic — rhythmic. The words are a percussion instrument. The hook is what every person in the crowd chants back before they know the lyrics. "Hey Ya!" / "Jump Around" / "Seven Nation Army" riff model.',
+  'Narrative Hook':  'HOOK STRUCTURE — Narrative Micro-Story: The hook tells a complete mini-story in 8 bars — setup, complication, resolution. The verse provides context; the chorus delivers a complete emotional journey every time it repeats. Not a statement but an event. The listener re-experiences something each time the chorus returns.',
+  'Confession Hook': 'HOOK STRUCTURE — Direct Address Confession: Hook speaks directly to one specific person or breaks the fourth wall to speak to the listener. "You" or implied direct address. Breaks theatrical distance. The listener feels personally implicated — called out or called to. The most intimate hook structure: one person to one person, even in a stadium.',
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // GENRE SECTION DNA
 // Per-genre data for bridge harmony, weighted archetype preferences,
 // counter-melody role, real song references, outro + verse-2 tendencies.
@@ -1286,6 +1427,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Emotional Reversal', 'Confessional Drop', 'Escalation Climb', 'Lyric Callback / Recontextualise'],
       preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Callback Resolution'],
       preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      preferred_prechorus: ['Tension Ramp', 'Lyric Elevator', 'Whisper to Roar', 'Question Drop'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Hook Echo', 'Breath and Reset'],
       examples: '"Someone Like You" (Adele) — bridge strips to voice + piano, deceptive cadence V→vi, most vulnerable moment. "Rolling in the Deep" — bridge builds over ♭VI→♭VII then modulates up. "Bad Guy" (Billie Eilish) — bridge near-silence then explosion back.',
     },
   },
@@ -1296,6 +1439,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Confessional Drop', 'Spoken Interlude / Monologue'],
       preferred_outro: ['Cold Stop', 'Counter-Melody Ascent', 'Crowd Takeover'],
       preferred_verse2: ['Antagonist Voice', 'Time Jump', 'Deeper Specific', 'Consequence'],
+      preferred_prechorus: ['Velocity Surge', 'Tension Ramp', 'Call-Setup'],
+      preferred_postchorus: ['Drop Groove', 'Punchy Counter-Statement', 'Ad-Lib Showcase'],
       examples: '"All Falls Down" (Kanye) — sung emotional bridge over soft piano completely contrasts rapped verses. "HUMBLE." (Kendrick) — bridge strips to near-silence before final verse explosion. "DNA." (Kendrick) — bridge is a full beat switch into different key area.',
     },
   },
@@ -1306,6 +1451,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Pre-Outro Vamp Build', 'Confessional Drop', 'Emotional Reversal', 'Escalation Climb'],
       preferred_outro: ['Spiral Vamp', 'Crowd Takeover', 'Counter-Melody Ascent'],
       preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      preferred_prechorus: ['Lyric Elevator', 'Harmonic Pivot', 'Whisper to Roar'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Hook Echo', 'Punchy Counter-Statement'],
       examples: '"Untitled (How Does It Feel)" (D\'Angelo) — bridge is pure vocal improv over minimal chord. "The Weekend" (SZA) — bridge modulates up + falsetto peak. "Crazy in Love" — bridge strips to bass + vocal, then explodes.',
     },
   },
@@ -1316,6 +1463,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Spoken Interlude / Monologue', 'Pre-Outro Vamp Build', 'Lyric Callback / Recontextualise', 'Confessional Drop'],
       preferred_outro: ['Spiral Vamp', 'Counter-Melody Ascent', 'Harmonic Drift'],
       preferred_verse2: ['Deeper Specific', 'The Other Side', 'Consequence'],
+      preferred_prechorus: ['Harmonic Pivot', 'Lyric Elevator', 'Whisper to Roar'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Hook Echo', 'Drop Groove'],
       examples: '"On & On" (Erykah Badu) — bridge is a spoken meditation over a single chord vamp. "Brown Skin" (India.Arie) — bridge deconstructs the groove to voice + guitar. Common "The Light" — bridge is the most vulnerable emotional turn.',
     },
   },
@@ -1326,6 +1475,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Left-Turn Narrative', 'Lyric Callback / Recontextualise', 'Emotional Reversal'],
       preferred_outro: ['Harmonic Drift', 'Dialogue / Spoken Coda', 'Counter-Melody Ascent'],
       preferred_verse2: ['The Other Side', 'Deeper Specific', 'Time Jump'],
+      preferred_prechorus: ['Harmonic Pivot', 'Question Drop', 'Tension Ramp'],
+      preferred_postchorus: ['Hook Echo', 'Ad-Lib Showcase', 'Breath and Reset'],
       examples: '"In a Sentimental Mood" — B-section modulates from Dm to F major and back via cycle of 5ths. "All the Things You Are" — bridge cycles through 4 key areas in 8 bars. "Autumn Leaves" — B-section lands on unexpected ♭VII before resolving home.',
     },
   },
@@ -1336,6 +1487,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Lyric Callback / Recontextualise', 'Escalation Climb'],
       preferred_outro: ['Counter-Melody Ascent', 'Harmonic Drift', 'Spiral Vamp'],
       preferred_verse2: ['Deeper Specific', 'Antagonist Voice', 'Consequence'],
+      preferred_prechorus: ['Call-Setup', 'Tension Ramp', 'Lyric Elevator'],
+      preferred_postchorus: ['Drop Groove', 'Hook Echo', 'Punchy Counter-Statement'],
       examples: '"The Thrill Is Gone" (B.B. King) — turnaround lands on VI7 minor creating maximum tension. "Hoochie Coochie Man" — stop-time bridge before the last verse. "Sweet Home Chicago" — turnaround accelerates the groove into final verse.',
     },
   },
@@ -1346,6 +1499,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Escalation Climb', 'Pre-Outro Vamp Build', 'Rhythmic Breakdown'],
       preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Pre-Outro Vamp Build'],
       preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      preferred_prechorus: ['Lyric Elevator', 'Whisper to Roar', 'Call-Setup'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Breath and Reset', 'Drop Groove'],
       examples: '"Oh Happy Day" — bridge modulates up and vamps endlessly, choir takeover. "I Never Loved a Man" (Aretha) — bridge is rhythmic percussion build that lifts the whole congregation. "Break Every Chain" — bridge is sustained single-chord vamp that builds for 2+ minutes.',
     },
   },
@@ -1356,6 +1511,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Confessional Drop', 'Left-Turn Narrative', 'Lyric Callback / Recontextualise'],
       preferred_outro: ['Callback Resolution', 'Cold Stop', 'Spiral Vamp'],
       preferred_verse2: ['Time Jump', 'Antagonist Voice', 'Consequence'],
+      preferred_prechorus: ['Lyric Elevator', 'Tension Ramp', 'Question Drop'],
+      preferred_postchorus: ['Hook Echo', 'Breath and Reset', 'Punchy Counter-Statement'],
       examples: '"The Dance" (Garth Brooks) — bridge reveals the philosophical turn that reframes the whole song. "Before He Cheats" — bridge is the most specific, most violent verse. "Whiskey Glasses" — bridge doubles down on the emotional denial.',
     },
   },
@@ -1366,6 +1523,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Escalation Climb', 'Rhythmic Breakdown', 'Confessional Drop'],
       preferred_outro: ['Cold Stop', 'Counter-Melody Ascent', 'Crowd Takeover'],
       preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
+      preferred_prechorus: ['Tension Ramp', 'Velocity Surge', 'Whisper to Roar'],
+      preferred_postchorus: ['Drop Groove', 'Hook Echo', 'Breath and Reset'],
       examples: '"Under the Bridge" (RHCP) — bridge key shift into unexpected harmonic area. "Everlong" (Foo Fighters) — quiet bridge then full-band explosion back. "Don\'t Look Back in Anger" (Oasis) — bridge strips to piano then rebuilds.',
     },
   },
@@ -1376,6 +1535,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Confessional Drop', 'Spoken Interlude / Monologue'],
       preferred_outro: ['Cold Stop', 'Harmonic Drift', 'Counter-Melody Ascent'],
       preferred_verse2: ['The Other Side', 'Consequence', 'Deeper Specific'],
+      preferred_prechorus: ['Whisper to Roar', 'Tension Ramp', 'Question Drop'],
+      preferred_postchorus: ['Drop Groove', 'Punchy Counter-Statement', 'Breath and Reset'],
       examples: '"Smells Like Teen Spirit" — quiet bridge, then full-band explosion that redefined a decade. "Mr. Brightside" — no bridge, sustained tension instead. "Fake Plastic Trees" — bridge is the most sparse, most devastating.',
     },
   },
@@ -1386,6 +1547,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Emotional Reversal', 'Pre-Outro Vamp Build'],
       preferred_outro: ['Cold Stop', 'Crowd Takeover', 'Spiral Vamp'],
       preferred_verse2: ['Zoom Out', 'Deeper Specific', 'Consequence'],
+      preferred_prechorus: ['Velocity Surge', 'Tension Ramp', 'Harmonic Pivot'],
+      preferred_postchorus: ['Drop Groove', 'Hook Echo', 'Breath and Reset'],
       examples: '"Levels" (Avicii) — 32-bar breakdown to a single melody, then drop. "Ghosts \'n\' Stuff" (Deadmau5) — filter sweep from silence into full-power drop. "One More Time" (Daft Punk) — bridge strips the groove to a single repeating phrase.',
     },
   },
@@ -1396,6 +1559,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Pre-Outro Vamp Build', 'Escalation Climb'],
       preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Counter-Melody Ascent'],
       preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      preferred_prechorus: ['Velocity Surge', 'Call-Setup', 'Tension Ramp'],
+      preferred_postchorus: ['Drop Groove', 'Ad-Lib Showcase', 'Punchy Counter-Statement'],
       examples: '"Give Up the Funk" (Parliament) — bridge is pure call-and-response, horn section drives. "Super Freak" (Rick James) — bridge locks into a tighter syncopated figure. "September" (EW&F) — bridge is horn-section showcase over the same groove.',
     },
   },
@@ -1406,6 +1571,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Escalation Climb', 'Pre-Outro Vamp Build', 'Confessional Drop'],
       preferred_outro: ['Spiral Vamp', 'Crowd Takeover', 'Counter-Melody Ascent'],
       preferred_verse2: ['Consequence', 'Deeper Specific', 'Zoom Out'],
+      preferred_prechorus: ['Lyric Elevator', 'Whisper to Roar', 'Call-Setup'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Hook Echo', 'Punchy Counter-Statement'],
       examples: '"Respect" (Aretha) — bridge is vocal ad-lib showcase, most technically demanding. "Ain\'t No Sunshine" — bridge single-phrase repetition that becomes a chant. "A Change Is Gonna Come" — bridge is the theological centre of the song.',
     },
   },
@@ -1416,6 +1583,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Lyric Callback / Recontextualise'],
       preferred_outro: ['Spiral Vamp', 'Harmonic Drift', 'Crowd Takeover'],
       preferred_verse2: ['Deeper Specific', 'Zoom Out', 'Consequence'],
+      preferred_prechorus: ['Call-Setup', 'Tension Ramp', 'Question Drop'],
+      preferred_postchorus: ['Drop Groove', 'Breath and Reset', 'Hook Echo'],
       examples: '"No Woman No Cry" — bridge is dub echo vamp, bass and drums carry. "Many Rivers to Cross" — bridge is a piano-led confessional. "Rivers of Babylon" — bridge is a pure melodic counter-statement.',
     },
   },
@@ -1426,6 +1595,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Pre-Outro Vamp Build'],
       preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Counter-Melody Ascent'],
       preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      preferred_prechorus: ['Velocity Surge', 'Call-Setup', 'Tension Ramp'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Drop Groove', 'Breath and Reset'],
       examples: '"Essence" (Wizkid) — bridge is pure percussion build then release. "Last Last" (Burna Boy) — bridge strips to drums and bass, then rebuilds with layers. "Ye" (Burna Boy) — bridge is the most vulnerable vocal moment in the song.',
     },
   },
@@ -1436,6 +1607,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Pre-Outro Vamp Build', 'Escalation Climb'],
       preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Callback Resolution'],
       preferred_verse2: ['Deeper Specific', 'Consequence', 'The Other Side'],
+      preferred_prechorus: ['Velocity Surge', 'Tension Ramp', 'Call-Setup'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Drop Groove', 'Punchy Counter-Statement'],
       examples: '"Vivir Mi Vida" (Marc Anthony) — bridge is pure salsa brass + clave break. "Bailando" — bridge adds timbales/congas complexity, rhythm IS the transition. "Bésame Mucho" — bridge returns to tonic via chromatic descent.',
     },
   },
@@ -1446,6 +1619,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Escalation Climb'],
       preferred_outro: ['Cold Stop', 'Crowd Takeover', 'Callback Resolution'],
       preferred_verse2: ['Deeper Specific', 'Consequence', 'The Other Side'],
+      preferred_prechorus: ['Tension Ramp', 'Velocity Surge', 'Harmonic Pivot'],
+      preferred_postchorus: ['Hook Echo', 'Ad-Lib Showcase', 'Punchy Counter-Statement'],
       examples: '"Dynamite" (BTS) — bridge is rap break then key change up before final chorus. "Pink Venom" (BLACKPINK) — bridge adds a contrasting melodic section. "Attention" (NewJeans) — bridge strips the K-pop formula, minimal and unexpected.',
     },
   },
@@ -1456,6 +1631,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Confessional Drop', 'Spoken Interlude / Monologue', 'Lyric Callback / Recontextualise'],
       preferred_outro: ['Dialogue / Spoken Coda', 'Callback Resolution', 'Harmonic Drift'],
       preferred_verse2: ['Deeper Specific', 'The Other Side', 'Time Jump'],
+      preferred_prechorus: ['Question Drop', 'Lyric Elevator', 'Whisper to Roar'],
+      preferred_postchorus: ['Breath and Reset', 'Hook Echo', 'Punchy Counter-Statement'],
       examples: '"Fast Car" (Tracy Chapman) — bridge is a lyrical revelation over the same harmonic loop. "The Night Will Always Win" (Manchester Orchestra) — bridge is a whispered confession. "The Blower\'s Daughter" — bridge strips to a single note held.',
     },
   },
@@ -1466,6 +1643,8 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Escalation Climb', 'Rhythmic Breakdown', 'Spoken Interlude / Monologue'],
       preferred_outro: ['Cold Stop', 'Crowd Takeover', 'Callback Resolution'],
       preferred_verse2: ['Consequence', 'Antagonist Voice', 'Zoom Out'],
+      preferred_prechorus: ['Velocity Surge', 'Tension Ramp', 'Call-Setup'],
+      preferred_postchorus: ['Drop Groove', 'Punchy Counter-Statement', 'Breath and Reset'],
       examples: '"God Save the Queen" (Sex Pistols) — bridge is the loudest, most hostile moment. "Basket Case" (Green Day) — bridge drops to clean guitar then explodes back. "I Wanna Be Sedated" — no bridge, one constant assault.',
     },
   },
@@ -1476,17 +1655,9 @@ const GENRE_SECTION_DNA = {
       preferred_bridge: ['Escalation Climb', 'Left-Turn Narrative', 'Emotional Reversal'],
       preferred_outro: ['Callback Resolution', 'Dialogue / Spoken Coda', 'Cold Stop'],
       preferred_verse2: ['Consequence', 'The Other Side', 'Time Jump'],
+      preferred_prechorus: ['Lyric Elevator', 'Whisper to Roar', 'Harmonic Pivot'],
+      preferred_postchorus: ['Ad-Lib Showcase', 'Hook Echo', 'Punchy Counter-Statement'],
       examples: '"Defying Gravity" (Wicked) — bridge modulates up 3 semitones to the climax that changes the character. "Being Alive" (Company) — bridge is the emotional core of the entire show. "Seasons of Love" (RENT) — bridge adds new melodic counter-line over the whole cast.',
-    },
-  },
-  gospel: {
-    bridge: {
-      harmonic: 'CLIMAX — modulate up a whole step (Nashville move: I → II major with iii-vi-ii-V7 approach). Vamp on IV chord. Choir enters or doubles in octaves. The harmonic lift IS the spiritual lift — the modulation is the message.',
-      counter: 'Choir sings counter-melody AGAINST the lead — lead goes up, choir goes down. Call-and-response intensifies during the vamp.',
-      preferred_bridge: ['Escalation Climb', 'Pre-Outro Vamp Build', 'Rhythmic Breakdown'],
-      preferred_outro: ['Crowd Takeover', 'Spiral Vamp', 'Pre-Outro Vamp Build'],
-      preferred_verse2: ['Consequence', 'Zoom Out', 'Deeper Specific'],
-      examples: '"Oh Happy Day" — bridge modulates up and vamps endlessly, choir takeover. "I Never Loved a Man" (Aretha) — bridge is rhythmic percussion build. "Break Every Chain" — bridge is sustained single-chord vamp that builds for 2+ minutes.',
     },
   },
 };
@@ -1632,9 +1803,16 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   // Each uses the genre's preferred list 70% of the time (biased toward most
   // canonical choice); 30% fully random for surprise / rule-breaking.
   const _gsd = GENRE_SECTION_DNA[genre] || {};
-  const _ba  = pickWeightedArchetype(BRIDGE_ARCHETYPES,  _gsd.bridge?.preferred_bridge);
-  const _oa  = pickWeightedArchetype(OUTRO_ARCHETYPES,   _gsd.bridge?.preferred_outro);
-  const _v2a = pickWeightedArchetype(VERSE2_ARCHETYPES,  _gsd.bridge?.preferred_verse2);
+  const _ba  = pickWeightedArchetype(BRIDGE_ARCHETYPES,     _gsd.bridge?.preferred_bridge);
+  const _oa  = pickWeightedArchetype(OUTRO_ARCHETYPES,      _gsd.bridge?.preferred_outro);
+  const _v2a = pickWeightedArchetype(VERSE2_ARCHETYPES,     _gsd.bridge?.preferred_verse2);
+  const _pca = pickWeightedArchetype(PRE_CHORUS_ARCHETYPES, _gsd.bridge?.preferred_prechorus);
+  const _poa = pickWeightedArchetype(POST_CHORUS_ARCHETYPES,_gsd.bridge?.preferred_postchorus);
+
+  // Hook structural variation (separate from delivery style — picked randomly)
+  const _hookStructKeys = Object.keys(HOOK_STRUCTURE_NOTES).filter(k => k !== 'auto');
+  const _hookStructKey  = _hookStructKeys[Math.floor(Math.random() * _hookStructKeys.length)];
+  const _hookStructNote = HOOK_STRUCTURE_NOTES[_hookStructKey] || '';
 
   const _harmonicLine  = _gsd.bridge?.harmonic  ? `\nHarmonic approach: ${_gsd.bridge.harmonic}`  : '';
   const _counterLine   = _gsd.bridge?.counter   ? `\nCounter-melody role: ${_gsd.bridge.counter}` : '';
@@ -1653,6 +1831,22 @@ ${_oa.rule}`;
   const verse2Note = `\n\nVERSE 2 STRATEGY — "${_v2a.name}":
 ${_v2a.rule}`;
 
+  const preChorusNote = `\n\nPRE-CHORUS ARCHITECTURE — "${_pca.name}" [${genreLabel}]:
+Energy arc: ${_pca.energy} · Bars: ${_pca.bars}
+Delivery: ${_pca.delivery}
+Lyric approach: ${_pca.lyric}
+Production: ${_pca.production}
+Rule: ${_pca.rule}`;
+
+  const postChorusNote = `\n\nPOST-CHORUS / POWER PART — "${_poa.name}" [${genreLabel}]:
+Energy arc: ${_poa.energy} · Bars: ${_poa.bars}
+Delivery: ${_poa.delivery}
+Lyric approach: ${_poa.lyric}
+Production: ${_poa.production}
+Rule: ${_poa.rule}`;
+
+  const hookStructNote = _hookStructNote ? `\n\n${_hookStructNote}` : '';
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -1662,7 +1856,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${voiceNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -1671,7 +1865,7 @@ SONGWRITING RULES:
 - Every line must be specific — no vague emotions, no clichés
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
-- The last chorus must feel bigger than the first${bridgeNote}${verse2Note}${outroNote}
+- The last chorus must feel bigger than the first${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
@@ -2483,4 +2677,109 @@ ${p.lyrics}`;
   return { prompt, system };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
+// ═══════════════════════════════════════════════════════════════════════════
+// PROMPT INTELLIGENCE — Analyzes a generated song + score and returns
+// specific, actionable suggestions to improve the NEXT generation.
+// Baked into the server — returns structured advice the client can display.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function buildPromptIntelligence(params) {
+  const {
+    genre = 'pop',
+    topic = '',
+    mood = '',
+    hookScore = 0,
+    scoreBreakdown = {},
+    title = '',
+    verdict = '',
+    structure = 'standard',
+    lyrics = '',
+  } = params || {};
+
+  const genreLabel = GENRE_LABELS[genre] || genre;
+  const gb = GENRE_BIBLE[genre] || GENRE_BIBLE.pop || {};
+  const outliers = (gb.outliers || []);
+
+  // Score dimension analysis
+  const { lyricCraft = 0, structure: structScore = 0, genreDNA = 0, hookStrength = 0 } = scoreBreakdown;
+  const weakest = [
+    { dim: 'Lyric Craft', score: lyricCraft, max: 30 },
+    { dim: 'Structure', score: structScore, max: 25 },
+    { dim: 'Genre DNA', score: genreDNA, max: 25 },
+    { dim: 'Hook Strength', score: hookStrength, max: 20 },
+  ].sort((a, b) => (a.score / a.max) - (b.score / b.max));
+
+  const suggestions = [];
+
+  // --- LYRIC CRAFT suggestions ---
+  if (lyricCraft < 22) {
+    const lyricTips = [
+      `Make the ${genreLabel} verse more specific — add a proper noun, a street address, a brand name, a clock time. Specificity creates universality.`,
+      `Replace the weakest line in the chorus with an extended simile: "as [adjective] as [unexpected noun]" — the more surprising the comparison, the harder it lands.`,
+      `Try writing verse 2 from the opposite point of view — the antagonist's perspective reveals what verse 1 couldn't say about the situation.`,
+      `Use a callback structure: plant one specific image in verse 1, pay it off in the bridge with the same words but opposite meaning.`,
+    ];
+    suggestions.push({ type: 'lyric', priority: 1, tip: lyricTips[Math.floor(Math.random() * lyricTips.length)] });
+  }
+
+  // --- HOOK STRENGTH suggestions ---
+  if (hookStrength < 16) {
+    const hookStructKeys = Object.keys(HOOK_STRUCTURE_NOTES).filter(k => k !== 'auto');
+    const randomHookStruct = hookStructKeys[Math.floor(Math.random() * hookStructKeys.length)];
+    suggestions.push({
+      type: 'hook',
+      priority: hookStrength < 12 ? 1 : 2,
+      tip: `Your hook needs more structural punch. Try the "${randomHookStruct}" approach: ${HOOK_STRUCTURE_NOTES[randomHookStruct]}`,
+    });
+  }
+
+  // --- STRUCTURE suggestions ---
+  if (structScore < 18) {
+    const gsd = GENRE_SECTION_DNA[genre] || {};
+    const preRef = (gsd.bridge?.preferred_prechorus || [])[0];
+    const postRef = (gsd.bridge?.preferred_postchorus || [])[0];
+    const structTips = [
+      preRef && `Add a [Pre-Chorus] section using the "${preRef}" technique to build maximum tension before the hook drops.`,
+      postRef && `Add a [Post-Chorus] "power part" using the "${postRef}" technique — this is where listeners replay the song.`,
+      `Try the "${(gsd.bridge?.preferred_bridge || ['Confessional Drop'])[0]}" bridge archetype — it's the most resonant structural choice for ${genreLabel}.`,
+      `Your verse 2 should use the "${(gsd.bridge?.preferred_verse2 || ['Deeper Specific'])[0]}" escalation strategy to avoid feeling like a copy of verse 1.`,
+    ].filter(Boolean);
+    if (structTips.length) suggestions.push({ type: 'structure', priority: structScore < 15 ? 1 : 2, tip: structTips[Math.floor(Math.random() * structTips.length)] });
+  }
+
+  // --- GENRE DNA suggestions ---
+  if (genreDNA < 18) {
+    const genreKeys = gb.keys || [];
+    const randomKey = genreKeys[Math.floor(Math.random() * genreKeys.length)];
+    const outlierRef = outliers.length ? outliers[Math.floor(Math.random() * outliers.length)] : null;
+    const dnaTips = [
+      randomKey && `Apply this ${genreLabel} DNA rule: "${randomKey}"`,
+      outlierRef && `Study how "${outlierRef.song}" broke the ${genreLabel} rule (${outlierRef.rule}) and got the result: ${outlierRef.result}. Consider a deliberate rule-break in your next version.`,
+      `Your production prompt needs stronger ${genreLabel} genre signals. Add the genre-specific instruments, BPM range, and production texture that Suno needs to place this correctly.`,
+    ].filter(Boolean);
+    if (dnaTips.length) suggestions.push({ type: 'genre', priority: genreDNA < 15 ? 1 : 3, tip: dnaTips[Math.floor(Math.random() * dnaTips.length)] });
+  }
+
+  // --- TOPIC/MOOD suggestions based on score level ---
+  if (hookScore < 70) {
+    const topicSuggestions = [
+      topic && `Narrow the topic further. Instead of "${topic}", try the most specific 5-minute moment within that experience — the phone call, the exact thing that was said, the last thing you saw before it changed.`,
+      `Add a specific constraint to force creativity: write the song from inside a car, or set it at 3:47am, or limit the chorus to a single repeated metaphor.`,
+      mood && `Push the mood to its extremes — if the mood is "${mood}", find the version that tips into its opposite in the bridge. Emotional complexity outperforms single-mood songs.`,
+    ].filter(Boolean);
+    if (topicSuggestions.length) suggestions.push({ type: 'topic', priority: 3, tip: topicSuggestions[Math.floor(Math.random() * topicSuggestions.length)] });
+  }
+
+  // Sort by priority, return top 3
+  suggestions.sort((a, b) => a.priority - b.priority);
+  const top3 = suggestions.slice(0, 3);
+
+  return {
+    score: hookScore,
+    weakestDimension: weakest[0]?.dim || null,
+    suggestions: top3.map(s => ({ type: s.type, tip: s.tip })),
+    genreLabel,
+  };
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };

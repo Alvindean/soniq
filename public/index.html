@@ -928,6 +928,18 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .score-item-val{font-size:12px;font-weight:700;font-family:var(--mono)}
 .score-item-note{font-size:11px;color:var(--tx3);line-height:1.4;margin-top:3px}
 .score-loading{color:var(--tx3);font-size:12px;display:flex;align-items:center;gap:8px;padding:8px 0}
+/* ── PROMPT INTELLIGENCE ── */
+.prompt-intel{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:16px 18px;margin-bottom:14px;display:none}
+.prompt-intel.visible{display:block}
+.prompt-intel-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.prompt-intel-title{font-size:12px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em}
+.prompt-intel-badge{font-size:10px;font-weight:700;background:var(--violet-bg,#2a1e3d);color:var(--violet,#a78bfa);border-radius:99px;padding:3px 10px;letter-spacing:.04em}
+.prompt-intel-list{display:flex;flex-direction:column;gap:8px}
+.prompt-intel-item{background:var(--s3);border-radius:var(--r2);padding:10px 13px;display:flex;gap:10px;align-items:flex-start}
+.prompt-intel-icon{font-size:16px;flex-shrink:0;margin-top:1px}
+.prompt-intel-tip{font-size:12px;color:var(--tx1);line-height:1.6}
+.prompt-intel-apply{font-size:11px;font-weight:600;color:var(--cyan);cursor:pointer;margin-top:5px;display:inline-block;text-decoration:underline;opacity:.8}
+.prompt-intel-apply:hover{opacity:1}
 /* ── SONIC MOOD BOARD ── */
 .moodboard{padding:16px 18px}
 .moodboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
@@ -2069,6 +2081,15 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="score-grid" id="res-score-grid"></div>
     </div>
 
+    <!-- PROMPT INTELLIGENCE -->
+    <div class="prompt-intel" id="res-prompt-intel">
+      <div class="prompt-intel-hdr">
+        <span class="prompt-intel-title">🧠 Next Song Suggestions</span>
+        <span class="prompt-intel-badge">AI Prompt Coach</span>
+      </div>
+      <div class="prompt-intel-list" id="res-prompt-intel-list"></div>
+    </div>
+
     <div class="otabs">
       <div class="otab on" id="res-tab-lyrics" onclick="goOtab('res','lyrics',this)">📝 Lyrics</div>
       <div class="otab" id="res-tab-brief" onclick="goOtab('res','brief',this)">🎛 Brief</div>
@@ -2252,6 +2273,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="score-overall"><span class="score-overall-num" id="lres-score-num">—</span><span class="score-overall-lbl">hook<br>score</span></div>
       </div>
       <div class="score-grid" id="lres-score-grid"></div>
+    </div>
+    <!-- PROMPT INTELLIGENCE (Lucky) -->
+    <div class="prompt-intel" id="lres-prompt-intel">
+      <div class="prompt-intel-hdr">
+        <span class="prompt-intel-title">🧠 Next Song Suggestions</span>
+        <span class="prompt-intel-badge">AI Prompt Coach</span>
+      </div>
+      <div class="prompt-intel-list" id="lres-prompt-intel-list"></div>
     </div>
     <div class="otabs">
       <div class="otab" onclick="goOtab('lres','brief',this)">🎛 Brief</div>
@@ -5427,6 +5456,7 @@ function parseLuckyResult(raw,fusionName,meta){
   const lrevBar = document.getElementById('lres-revision-bar');
   if (lrevBar) lrevBar.style.display = 'flex';
   calcHookScore('lres');
+  setTimeout(() => loadPromptIntelligence('lres'), 400);
   S.luckyHistory.unshift({...S.luckyCurrentSong});
   if(S.luckyHistory.length>20)S.luckyHistory=S.luckyHistory.slice(0,20);
   renderLuckyHistory();
@@ -5909,6 +5939,7 @@ function parseSongResult(raw,genre,topic){
   if (revBar) revBar.style.display = 'flex';
   // Hook score (replaces API score dashboard for this)
   calcHookScore('res');
+  setTimeout(() => loadPromptIntelligence('res'), 400);
   generateScoreDashboard('res', lyrics, genre);
   document.getElementById('instant-edit-card').classList.add('visible');
   // Reset like/dislike buttons
@@ -10414,6 +10445,71 @@ function calcHookScore(prefix) {
     <div class="score-item-val" style="color:${colors[i]}">${it.score}/10</div>
     <div class="score-item-note">${it.note}</div>
   </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// FEATURE 4: PROMPT INTELLIGENCE — Smart next-song suggestions
+// Calls /api/stream?action=suggest with current song data
+// Displays top 3 tips in the prompt intelligence card
+// ═══════════════════════════════════════════════════════
+async function loadPromptIntelligence(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song || !song.lyrics) return;
+
+  const card = document.getElementById(prefix + '-prompt-intel');
+  const list = document.getElementById(prefix + '-prompt-intel-list');
+  if (!card || !list) return;
+
+  // Build params from current song state
+  const genre = song.genre || S.selectedGenre || 'pop';
+  const topic = song.topic || (prefix === 'res' ? document.getElementById('topic')?.value : '') || '';
+  const mood  = song.mood  || (prefix === 'res' ? document.getElementById('mood')?.value  : '') || '';
+
+  // Extract rough hook score from DOM (already computed by calcHookScore)
+  const numEl = document.getElementById(prefix + '-score-num');
+  const hookScore = numEl ? parseFloat(numEl.textContent) * 10 : 0; // convert 0-10 → 0-100
+
+  list.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:8px 0">Analyzing your song…</div>';
+  card.classList.add('visible');
+
+  try {
+    const resp = await fetch('/api/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'suggest',
+        params: { genre, topic, mood, hookScore, title: song.title || '', verdict: song.verdict || '', lyrics: (song.lyrics || '').slice(0, 400) }
+      })
+    });
+    if (!resp.ok) throw new Error('suggest failed');
+    const data = await resp.json();
+
+    if (!data.suggestions || !data.suggestions.length) {
+      card.classList.remove('visible');
+      return;
+    }
+
+    const typeIcon = { lyric: '✍️', hook: '🎣', structure: '🏗', genre: '🎵', topic: '💡' };
+    const typeLabel = { lyric: 'Lyric Craft', hook: 'Hook Strength', structure: 'Song Structure', genre: 'Genre DNA', topic: 'Topic Depth' };
+
+    list.innerHTML = data.suggestions.map((s, i) => {
+      const icon = typeIcon[s.type] || '💡';
+      const label = typeLabel[s.type] || 'Tip';
+      // Truncate long tips for display — show full on expand
+      const shortTip = s.tip.length > 180 ? s.tip.slice(0, 180) + '…' : s.tip;
+      const fullTip  = s.tip;
+      return `<div class="prompt-intel-item">
+        <span class="prompt-intel-icon">${icon}</span>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${label}</div>
+          <div class="prompt-intel-tip" id="pi-tip-${prefix}-${i}">${shortTip}</div>
+          ${s.tip.length > 180 ? `<span class="prompt-intel-apply" onclick="document.getElementById('pi-tip-${prefix}-${i}').textContent='${fullTip.replace(/'/g,"\\'")}';this.style.display='none'">Read more</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    card.classList.remove('visible');
+  }
 }
 
 // ═══════════════════════════════════════════════════════
