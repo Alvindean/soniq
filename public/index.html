@@ -940,6 +940,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .prompt-intel-tip{font-size:12px;color:var(--tx1);line-height:1.6}
 .prompt-intel-apply{font-size:11px;font-weight:600;color:var(--cyan);cursor:pointer;margin-top:5px;display:inline-block;text-decoration:underline;opacity:.8}
 .prompt-intel-apply:hover{opacity:1}
+/* ── HOOK ISOLATION CARD ── */
+.hook-iso-card{background:linear-gradient(135deg,var(--s2) 0%,rgba(167,139,250,.08) 100%);border:1px solid rgba(167,139,250,.25);border-radius:var(--r3);padding:16px 18px;margin-bottom:14px}
+.hook-iso-label{font-size:10px;font-weight:700;color:var(--violet,#a78bfa);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.hook-iso-body{font-size:14px;color:var(--tx1);line-height:1.8;white-space:pre-wrap;font-style:italic;border-left:3px solid var(--violet,#a78bfa);padding-left:14px}
 /* ── SONIC MOOD BOARD ── */
 .moodboard{padding:16px 18px}
 .moodboard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:14px}
@@ -1810,6 +1814,50 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <button id="southpaw-btn" onclick="toggleSouthpaw()" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.15s;white-space:nowrap">Off</button>
           </div>
 
+          <!-- SYLLABLE HARD CAP -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2)">
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx2)">Syllable Hard Cap</div>
+              <div style="font-size:11px;color:var(--tx3);margin-top:3px">Max syllables per line — enforced on every section. 0 = no cap (genre default).</div>
+            </div>
+            <input type="number" id="syllable-cap-input" min="0" max="30" value="0" style="width:60px;padding:5px 8px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;font-weight:700;text-align:center" oninput="setSyllableCap(this.value)">
+          </div>
+
+          <!-- PLATFORM SELECTOR -->
+          <label class="bracket-label" style="margin-top:2px">🎛 Target Platform <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— optimizes output format for your AI music tool</span></label>
+          <div class="bracket-pills" id="platform-pills">
+            <span class="bpill on" onclick="setPlatform(this,'suno')">Suno</span>
+            <span class="bpill" onclick="setPlatform(this,'udio')">Udio</span>
+            <span class="bpill" onclick="setPlatform(this,'stable')">Stable Audio</span>
+          </div>
+          <div id="platform-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:14px;min-height:16px">Output optimized for Suno — bracket tags, under-200-char prompts</div>
+
+          <!-- EMOTIONAL ARC -->
+          <label class="bracket-label" style="margin-top:2px">🌊 Emotional Arc <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— shapes the emotional journey of the whole song</span></label>
+          <select id="emotional-arc-select" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:var(--r2);color:#e0e0f0;font-size:12px;padding:7px 10px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;margin-bottom:4px" onchange="setEmotionalArc(this.value)">
+            <option value="none">None — let the topic guide the arc</option>
+            <option value="devastation-acceptance">Devastation → Acceptance (grief, letting go)</option>
+            <option value="joy-nostalgia-gratitude">Joy → Nostalgia → Gratitude (memory, love)</option>
+            <option value="anger-clarity-resolve">Anger → Clarity → Resolve (empowerment)</option>
+            <option value="longing-action-arrival">Longing → Action → Arrival (ambition, faith)</option>
+            <option value="innocence-loss-wisdom">Innocence → Loss → Wisdom (coming of age)</option>
+            <option value="isolation-connection-belonging">Isolation → Connection → Belonging (identity)</option>
+          </select>
+          <div id="emotional-arc-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:14px;min-height:16px">No emotional arc override — the song follows the topic's natural emotional direction</div>
+
+          <!-- DUAL PERSPECTIVE -->
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2)">
+            <div style="flex:1">
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx2)">Dual Perspective (Verse 2)</div>
+              <div style="font-size:11px;color:var(--tx3);margin-top:3px">Verse 2 written from the antagonist or opposing POV — creates dramatic tension.</div>
+            </div>
+            <button id="dual-persp-btn" onclick="toggleDualPerspective()" style="font-size:11px;font-weight:700;padding:5px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.15s;white-space:nowrap">Off</button>
+          </div>
+
+          <!-- SEED LINE -->
+          <label class="bracket-label" style="margin-top:2px">✍ Seed Line <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— your key line; the entire song will orbit it</span></label>
+          <input type="text" id="seed-line-input" placeholder='e.g. "I still sleep on your side of the bed"' maxlength="120" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:var(--r2);color:#e0e0f0;font-size:12px;padding:8px 10px;outline:none;box-sizing:border-box;margin-bottom:14px" oninput="S.seedLine=this.value.trim()">
+
           <!-- MODE SELECTOR -->
           <label class="bracket-label" style="margin-top:2px">🎵 Scale / Mode <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— overrides genre default</span></label>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:4px">
@@ -2090,6 +2138,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="prompt-intel-list" id="res-prompt-intel-list"></div>
     </div>
 
+    <!-- HOOK ISOLATION -->
+    <div class="hook-iso-card" id="res-hook-iso" style="display:none">
+      <div class="hook-iso-label">🎣 Hook Isolation — Chorus in Focus</div>
+      <div class="hook-iso-body" id="res-hook-iso-text"></div>
+    </div>
+
     <div class="otabs">
       <div class="otab on" id="res-tab-lyrics" onclick="goOtab('res','lyrics',this)">📝 Lyrics</div>
       <div class="otab" id="res-tab-brief" onclick="goOtab('res','brief',this)">🎛 Brief</div>
@@ -2281,6 +2335,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="prompt-intel-badge">AI Prompt Coach</span>
       </div>
       <div class="prompt-intel-list" id="lres-prompt-intel-list"></div>
+    </div>
+    <!-- HOOK ISOLATION (Lucky) -->
+    <div class="hook-iso-card" id="lres-hook-iso" style="display:none">
+      <div class="hook-iso-label">🎣 Hook Isolation — Chorus in Focus</div>
+      <div class="hook-iso-body" id="lres-hook-iso-text"></div>
     </div>
     <div class="otabs">
       <div class="otab" onclick="goOtab('lres','brief',this)">🎛 Brief</div>
@@ -4452,6 +4511,13 @@ const S={selectedGenre:'pop',
   luckyLockedGenres:[],
   genController: null,   // AbortController for main generate
   luckyController: null, // AbortController for lucky generate
+  // New quality features
+  emotionalArc: 'none',
+  syllableCap: 0,
+  platform: 'suno',
+  dualPerspective: false,
+  seedLine: '',
+  recentOpenings: [],    // Track last 3 verse-1 opening lines for pattern avoidance
 };
 
 // ── ADMIN SESSION — synchronous check (must run before Supabase init) ──
@@ -5418,7 +5484,8 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
 
 function parseLuckyResult(raw,fusionName,meta){
   const title=parseSection(raw,'TITLE','VERDICT')||fusionName+' Song';
-  const verdict=parseSection(raw,'VERDICT','LYRICS');
+  const verdict=parseSection(raw,'VERDICT','HOOK ISOLATION')||parseSection(raw,'VERDICT','LYRICS');
+  const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
   const lyrics=parseSection(raw,'LYRICS','SONG PROMPT');
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
@@ -5434,6 +5501,17 @@ function parseLuckyResult(raw,fusionName,meta){
   out.classList.add('visible');
   document.getElementById('lres-title').textContent=title;
   document.getElementById('lres-verdict').textContent=verdict;
+  // Hook isolation display (Lucky)
+  const lhookIsoEl = document.getElementById('lres-hook-iso');
+  const lhookIsoText = document.getElementById('lres-hook-iso-text');
+  if (lhookIsoEl && lhookIsoText) {
+    const lhookTxt = hookIsolation || (() => {
+      const cm = (lyrics||'').match(/\[Chorus\]([\s\S]*?)(?=\[|$)/i);
+      return cm ? cm[1].trim() : '';
+    })();
+    if (lhookTxt) { lhookIsoText.textContent = lhookTxt; lhookIsoEl.style.display = ''; }
+    else lhookIsoEl.style.display = 'none';
+  }
   document.getElementById('lres-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
@@ -5557,7 +5635,13 @@ async function generateSong(){
     ageGroup: S.selectedAgeGroup || '',
     swing: S.swingLevel || 'genre_default',
     syllableDensity: S.syllableDensity || 'auto',
-    southpaw: S.southpaw || false
+    southpaw: S.southpaw || false,
+    emotionalArc: S.emotionalArc || 'none',
+    syllableCap: S.syllableCap || 0,
+    platform: S.platform || 'suno',
+    dualPerspective: S.dualPerspective || false,
+    seedLine: S.seedLine || '',
+    avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : []
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
@@ -5880,7 +5964,8 @@ function copyCopyrightClaim(ns) {
 
 function parseSongResult(raw,genre,topic){
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
-  const verdict=parseSection(raw,'VERDICT','LYRICS');
+  const verdict=parseSection(raw,'VERDICT','HOOK ISOLATION')||parseSection(raw,'VERDICT','LYRICS');
+  const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
   const lyrics=parseSection(raw,'LYRICS','SONG PROMPT');
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
@@ -5895,6 +5980,17 @@ function parseSongResult(raw,genre,topic){
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;
+  // Hook isolation display
+  const hookIsoEl = document.getElementById('res-hook-iso');
+  const hookIsoText = document.getElementById('res-hook-iso-text');
+  if (hookIsoEl && hookIsoText) {
+    const hookTxt = hookIsolation || (() => {
+      const cm = (lyrics||'').match(/\[Chorus\]([\s\S]*?)(?=\[|$)/i);
+      return cm ? cm[1].trim() : '';
+    })();
+    if (hookTxt) { hookIsoText.textContent = hookTxt; hookIsoEl.style.display = ''; }
+    else hookIsoEl.style.display = 'none';
+  }
   document.getElementById('res-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
@@ -5911,6 +6007,16 @@ function parseSongResult(raw,genre,topic){
     pushVersion('res');
   }
   S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,visualPrompt,videoPrompt,genre,topic,ts};
+  // Track opening lines for pattern avoidance — keep last 3
+  if (lyrics) {
+    const verse1Match = lyrics.match(/\[Verse\s*1?\]([\s\S]*?)(?=\[|$)/i);
+    const verse1Lines = verse1Match ? verse1Match[1].trim().split('\n').map(l=>l.trim()).filter(Boolean) : [];
+    if (verse1Lines[0]) {
+      if (!S.recentOpenings) S.recentOpenings = [];
+      S.recentOpenings.unshift(verse1Lines[0]);
+      if (S.recentOpenings.length > 3) S.recentOpenings = S.recentOpenings.slice(0, 3);
+    }
+  }
   // Push the new song as a version too
   pushVersion('res');
   renderVersionBar('res');
@@ -9963,6 +10069,58 @@ function setSyllable(el, density) {
   if (d) d.textContent = SYLLABLE_DESCS[density] || '';
 }
 
+const PLATFORM_DESCS = {
+  suno:   'Output optimized for Suno — bracket tags, under-200-char prompts',
+  udio:   'Output optimized for Udio — emotional descriptors in brackets, richer genre descriptions',
+  stable: 'Output optimized for Stable Audio — dense style description, no bracket tags needed',
+};
+
+const EMOTIONAL_ARC_DESCS = {
+  none:                     'No emotional arc override — the song follows the topic\'s natural emotional direction',
+  'devastation-acceptance': 'Devastation → Acceptance: raw grief in V1, bargaining in chorus, turning point in bridge, acceptance in final chorus',
+  'joy-nostalgia-gratitude':'Joy → Nostalgia → Gratitude: joyful memory → time passing → gratitude for having had it',
+  'anger-clarity-resolve':  'Anger → Clarity → Resolve: raw grievance → understanding → war cry in final chorus',
+  'longing-action-arrival': 'Longing → Action → Arrival: wanting → deciding → journey → earned arrival',
+  'innocence-loss-wisdom':  'Innocence → Loss → Wisdom: coming-of-age in 3 minutes — belief → collision → hard truth',
+  'isolation-connection-belonging': 'Isolation → Connection → Belonging: alone → risk of connection → walls come down',
+};
+
+function setSyllableCap(val) {
+  const n = parseInt(val) || 0;
+  S.syllableCap = n > 0 ? n : 0;
+}
+
+function setPlatform(el, platform) {
+  S.platform = platform;
+  document.querySelectorAll('#platform-pills .bpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  const d = document.getElementById('platform-desc');
+  if (d) d.textContent = PLATFORM_DESCS[platform] || '';
+}
+
+function setEmotionalArc(val) {
+  S.emotionalArc = val;
+  const d = document.getElementById('emotional-arc-desc');
+  if (d) d.textContent = EMOTIONAL_ARC_DESCS[val] || '';
+}
+
+function toggleDualPerspective() {
+  S.dualPerspective = !S.dualPerspective;
+  const btn = document.getElementById('dual-persp-btn');
+  if (!btn) return;
+  if (S.dualPerspective) {
+    btn.textContent = 'On ✦';
+    btn.style.background = 'var(--amberbg,#2a1e0a)';
+    btn.style.borderColor = 'var(--amberline,#7a5c20)';
+    btn.style.color = 'var(--amber,#f59e0b)';
+  } else {
+    btn.textContent = 'Off';
+    btn.style.background = 'var(--s3)';
+    btn.style.borderColor = 'var(--b2)';
+    btn.style.color = 'var(--tx3)';
+  }
+}
+
 function toggleSouthpaw() {
   S.southpaw = !S.southpaw;
   const btn = document.getElementById('southpaw-btn');
@@ -10427,7 +10585,29 @@ function calcHookScore(prefix) {
   const hasQ = /\?|maybe|somehow|never know|still|wonder|if only/i.test(lastLine);
   const zeigScore = hasQ ? 10 : 6;
 
-  const overall = Math.round((sylScore + repScore + singScore + zeigScore) / 4 * 10) / 10;
+  // 5. Genre purity — checks for genre-specific bracket tags in lyrics
+  const genreTags = {
+    pop:['Build','Drop','Key Change','Pre-Chorus'],
+    hiphop:['Trap Hi-Hat','808 Bass','Ad-lib','Double Time','Triplet Flow','Beat Switch'],
+    rnb:['Falsetto','Ad-lib','Harmony','Vamp'],
+    neosoul:['Ad-lib','Vamp','Groove'],
+    country:['Steel Guitar','Banjo','Fiddle','Twang'],
+    gospel:['Choir','Vamp','Praise Break','Call and Response'],
+    blues:['Guitar Solo','Turnaround','Shuffle','12-bar'],
+    altrock:['Distortion','Feedback','Build','Quiet'],
+    edm:['Drop','Build','Synth Lead','Breakdown'],
+    jazz:['Improv','Scat','Swing','Head'],
+    kpop:['Pre-Chorus','Post-Chorus','Rap Break','Key Change'],
+    reggae:['Dub Break','One-Drop','Offbeat'],
+    latin:['Montuno','Clave','Horn Break'],
+    punk:['Shout','Oi','Fast','Breakdown'],
+  };
+  const genreTagSet = genreTags[song.genre] || [];
+  const fullLyrics  = (song.lyrics || '').toLowerCase();
+  const genreMatches = genreTagSet.filter(t => fullLyrics.includes(t.toLowerCase())).length;
+  const purityScore = genreTagSet.length === 0 ? 8 : Math.min(10, Math.round((genreMatches / Math.min(genreTagSet.length, 3)) * 10));
+
+  const overall = Math.round((sylScore + repScore + singScore + zeigScore + purityScore) / 5 * 10) / 10;
 
   dash.classList.add('visible');
   if (numEl) numEl.textContent = overall.toFixed(1);
@@ -10436,9 +10616,10 @@ function calcHookScore(prefix) {
     {label:'Syllable Count', score:sylScore, note: `Avg ${avgSyl.toFixed(1)} syl/line`},
     {label:'Repetition', score:repScore, note:`${repeated} repeated words`},
     {label:'Singability', score:singScore, note:`Avg word: ${avgWordLen.toFixed(1)} chars`},
-    {label:'Zeigarnik', score:zeigScore, note:hasQ?'Ends open/unresolved':'Fully resolved ending'}
+    {label:'Zeigarnik', score:zeigScore, note:hasQ?'Ends open/unresolved':'Fully resolved ending'},
+    {label:'Genre Purity', score:purityScore, note:`${genreMatches}/${Math.min(genreTagSet.length,3)} genre tags found`}
   ];
-  const colors = ['var(--amber)','var(--cyan)','var(--green)','var(--violet)'];
+  const colors = ['var(--amber)','var(--cyan)','var(--green)','var(--violet)','var(--pink,#ec4899)'];
   grid.innerHTML = items.map((it,i)=>`<div class="score-item">
     <div class="score-item-label">${it.label}</div>
     <div class="score-bar-wrap"><div class="score-bar" style="width:${it.score*10}%;background:${colors[i]}"></div></div>
