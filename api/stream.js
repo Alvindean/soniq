@@ -364,6 +364,21 @@ module.exports = async function handler(req, res) {
       res.status(400).end('Unknown variant: ' + body.variant);
       return;
     }
+  } else if (body.action === 'edit') {
+    // ── Smart lyric editor — full GENRE_BIBLE + song context ──
+    try {
+      const brain = require('./_brain');
+      const p = body.params || {};
+      if (!p.lyrics)      { res.status(400).json({ error: 'lyrics required' }); return; }
+      if (!p.instruction) { res.status(400).json({ error: 'instruction required' }); return; }
+      const built = brain.buildEditPrompt(p);
+      messages   = [{ role: 'user', content: built.prompt }];
+      system     = built.system;
+      max_tokens = 2048;
+    } catch (err) {
+      console.error('Edit prompt build failed:', err.message);
+      return res.status(500).json({ error: 'Edit prompt error: ' + err.message });
+    }
   } else if (body.action === 'generate' || body.action === 'lucky') {
     try {
       const brain = require('./_brain');

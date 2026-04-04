@@ -2412,4 +2412,75 @@ After the 9 dimensions, give:
 FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
+// ── Editor Prompt Builder ─────────────────────────────────────────────────────
+// Builds a context-rich edit prompt using GENRE_BIBLE DNA + full song metadata.
+// Called by stream.js action='edit' — gives the editor access to the full bible.
+function buildEditPrompt(p) {
+  const genre  = p.genre  || 'pop';
+  const gb     = GENRE_BIBLE[genre] || GENRE_BIBLE.pop || {};
+  const mtb    = MUSIC_THEORY_BIBLE || {};
+
+  // Genre-specific scales
+  const scales = (mtb.genreScales || {})[genre] || [];
+
+  // Genre-relevant progressions
+  const allProgs = mtb.progressions || {};
+  const genreProgs = Object.entries(allProgs)
+    .filter(([, v]) => (v.genres || []).includes(genre))
+    .map(([name, v]) => `${name}: ${v.prog} — ${v.feel}`)
+    .join('\n  ');
+
+  // Genre keys / rules
+  const genreKeys = (gb.keys || []).map(k => `• ${k}`).join('\n');
+
+  // Outliers — songs that broke the rules in this genre
+  const outliers = (gb.outliers || [])
+    .map(o => `• ${o.song}: ${o.rule} → ${o.result}`)
+    .join('\n');
+
+  // Song context block
+  const ctx = [
+    p.title          && `Title: "${p.title}"`,
+    `Genre: ${genre}`,
+    p.topic          && `Topic: ${p.topic}`,
+    p.mood           && `Mood: ${p.mood}`,
+    p.style          && `Production Style: ${p.style}`,
+    p.brief          && `Song Brief: ${p.brief}`,
+    p.chords         && `Chord Progression: ${p.chords}`,
+    p.theoryAnalysis && `Theory Notes: ${p.theoryAnalysis}`,
+    p.verdict        && `Current Quality Assessment: ${p.verdict}`,
+  ].filter(Boolean).join('\n');
+
+  const system = `You are SONIQ's master lyric editor — a world-class songwriter, music producer, and A&R consultant.
+
+═══ GENRE DNA: ${genre.toUpperCase()} ═══
+${gb.dna || ''}
+
+STRUCTURE GUIDE:
+${gb.structure || ''}
+
+GENRE RULES:
+${genreKeys}
+
+SCALES FOR THIS GENRE: ${scales.join(', ')}
+
+CHORD PROGRESSIONS THAT WORK:
+  ${genreProgs || 'Standard I-IV-V-I'}
+
+NORM-BREAKERS (songs that broke the rules and won):
+${outliers || 'None documented'}
+
+YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the song's voice, theme, and emotional arc. Return ONLY the complete revised lyrics with [Section] tags — no commentary, no explanation.`;
+
+  const prompt = `SONG CONTEXT:
+${ctx}
+
+EDIT INSTRUCTION: "${p.instruction}"
+
+CURRENT LYRICS:
+${p.lyrics}`;
+
+  return { prompt, system };
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
