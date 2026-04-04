@@ -377,6 +377,18 @@ module.exports = async function handler(req, res) {
       res.status(400).end('Unknown variant: ' + body.variant);
       return;
     }
+  } else if (body.action === 'suggest') {
+    // ── Prompt intelligence — analyze song + score, return suggestions (sync, no streaming) ──
+    try {
+      const brain = require('./_brain');
+      const p = body.params || {};
+      const result = brain.buildPromptIntelligence(p);
+      res.setHeader('Content-Type', 'application/json');
+      return res.status(200).json(result);
+    } catch (err) {
+      console.error('Prompt intelligence error:', err.message);
+      return res.status(500).json({ error: 'Suggest error: ' + err.message });
+    }
   } else if (body.action === 'edit') {
     // ── Smart lyric editor — full GENRE_BIBLE + song context ──
     try {
