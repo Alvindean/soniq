@@ -5597,10 +5597,10 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure}, luckyStreamCb, luckySignal).then(r => r.text)
-    : callClaudeStream(prompt, system, luckyStreamCb, luckySignal);
-  luckyPromise.then(raw=>{
-    parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd});
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData }))
+    : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null }));
+  luckyPromise.then(({text: raw, prodData: luckyProdData})=>{
+    parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd},luckyProdData);
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
     trackEvent('feel_lucky_used', { genre: g1, genre2: g2, fusion_key: key, topic });
@@ -5626,7 +5626,7 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
   }); // end spinLuckyWheel
 }
 
-function parseLuckyResult(raw,fusionName,meta){
+function parseLuckyResult(raw,fusionName,meta,prodData){
   const title=parseSection(raw,'TITLE','VERDICT')||fusionName+' Song';
   const verdict=parseSection(raw,'VERDICT','HOOK ISOLATION')||parseSection(raw,'VERDICT','LYRICS');
   const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
@@ -5636,13 +5636,14 @@ function parseLuckyResult(raw,fusionName,meta){
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY','FX CHAIN');
-  const fxChain=parseSection(raw,'FX CHAIN','PLUGIN TOOLKIT');
-  const pluginToolkit=parseSection(raw,'PLUGIN TOOLKIT','MIX BLUEPRINT');
-  const mixBlueprint=parseSection(raw,'MIX BLUEPRINT','MASTERING TARGET');
-  const masteringTarget=parseSection(raw,'MASTERING TARGET','VISUAL PROMPT');
+  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
   const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
   const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
+  // Production data from server constants (not AI-generated)
+  const fxChain=prodData?.fxChain||'';
+  const pluginToolkit=prodData?.pluginToolkit||'';
+  const mixBlueprint=prodData?.mixBlueprint||'';
+  const masteringTarget=prodData?.masteringTarget||'';
 
   const out=document.getElementById('lucky-out');
   out.style.display='block';
@@ -5992,17 +5993,18 @@ DIRECTOR NOTES:
       const el=document.getElementById('stream-display');
       if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
     };
-    let raw;
+    let raw, genProdData;
     if (isVercel) {
       // Server-side prompt building — IP stays hidden
       const result = await callServerStream('generate', songParams, streamCb, genSignal);
       raw = result.text;
+      genProdData = result.meta?.prodData;
     } else {
       // Local dev fallback — client builds prompt
       raw = await callClaudeStream(prompt, system, streamCb, genSignal);
     }
     S.genController = null;
-    parseSongResult(raw,genreLabel,topic);
+    parseSongResult(raw, genreLabel, topic, genProdData);
   }catch(e){
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
     if(e.code==='auth_required'){btnDone('gen-btn');return;}
@@ -6110,7 +6112,7 @@ function copyCopyrightClaim(ns) {
   }
 }
 
-function parseSongResult(raw,genre,topic){
+function parseSongResult(raw,genre,topic,prodData){
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
   const verdict=parseSection(raw,'VERDICT','HOOK ISOLATION')||parseSection(raw,'VERDICT','LYRICS');
   const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
@@ -6122,13 +6124,14 @@ function parseSongResult(raw,genre,topic){
   const chords=parseSection(raw,'CHORD PROGRESSION','THEORY ANALYSIS');
   const theoryAnalysis=parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY','FX CHAIN');
-  const fxChain=parseSection(raw,'FX CHAIN','PLUGIN TOOLKIT');
-  const pluginToolkit=parseSection(raw,'PLUGIN TOOLKIT','MIX BLUEPRINT');
-  const mixBlueprint=parseSection(raw,'MIX BLUEPRINT','MASTERING TARGET');
-  const masteringTarget=parseSection(raw,'MASTERING TARGET','VISUAL PROMPT');
+  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
   const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
   const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
+  // Production data from server constants (not AI-generated — no hallucination, no extra tokens)
+  const fxChain=prodData?.fxChain||'';
+  const pluginToolkit=prodData?.pluginToolkit||'';
+  const mixBlueprint=prodData?.mixBlueprint||'';
+  const masteringTarget=prodData?.masteringTarget||'';
 
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-verdict').textContent=verdict;

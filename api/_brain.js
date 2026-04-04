@@ -2142,7 +2142,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${productionContextNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -2232,33 +2232,7 @@ COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]
-
-FX CHAIN:
-REVERB: [type, decay time, which elements]
-DELAY: [type, timing, which elements]
-COMPRESSION: [approach for drums, vocal, bus]
-EQ: [3 most important moves for this genre]
-SIDECHAIN: [what ducks what, and how much]
-SIGNATURE EFFECT: [the one FX move that defines this genre's sound]
-
-PLUGIN TOOLKIT:
-FREE: [3 specific free plugins with their role]
-PAID: [3 specific paid plugins with their role]
-DAW TIP: [one workflow tip for achieving the genre's core sound without expensive tools]
-
-MIX BLUEPRINT:
-STEREO FIELD: [what goes wide, what stays mono, why]
-LEVEL HIERARCHY: [which 3 elements sit highest in the mix and at what relative levels]
-BUS STRUCTURE: [recommended bus setup — drums bus, vocal bus, instrument bus, master bus approach]
-SPECIAL TECHNIQUE: [one mixing technique specific to this genre/song that makes it land]
-
-MASTERING TARGET:
-LUFS: [target integrated loudness for streaming]
-DYNAMIC RANGE: [target DR value]
-BRIGHTNESS: [high-frequency treatment]
-STEREO WIDTH: [target correlation / width approach]
-NOTES: [2 mastering notes specific to this genre and song feel]`;
+SECTION MAP: [which sections and how it evolves]`;
 
   return { system, prompt };
 }
@@ -2317,7 +2291,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckyProductionNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -2379,33 +2353,7 @@ COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]
-
-FX CHAIN:
-REVERB: [type, decay time, which elements]
-DELAY: [type, timing, which elements]
-COMPRESSION: [approach for drums, vocal, bus]
-EQ: [3 most important moves for this fusion genre]
-SIDECHAIN: [what ducks what, and how much]
-SIGNATURE EFFECT: [the one FX move that defines this fusion sound]
-
-PLUGIN TOOLKIT:
-FREE: [3 specific free plugins with their role]
-PAID: [3 specific paid plugins with their role]
-DAW TIP: [one workflow tip for achieving this fusion's core sound]
-
-MIX BLUEPRINT:
-STEREO FIELD: [what goes wide, what stays mono, why]
-LEVEL HIERARCHY: [which 3 elements sit highest in the mix]
-BUS STRUCTURE: [recommended bus setup for this fusion style]
-SPECIAL TECHNIQUE: [one mixing technique specific to this fusion that makes it land]
-
-MASTERING TARGET:
-LUFS: [target integrated loudness for streaming]
-DYNAMIC RANGE: [target DR value]
-BRIGHTNESS: [high-frequency treatment]
-STEREO WIDTH: [target correlation / width approach]
-NOTES: [2 mastering notes specific to this fusion genre blend]`;
+SECTION MAP: [which sections and how it evolves]`;
 
   return {
     system,
@@ -2682,33 +2630,7 @@ DIRECTOR NOTES:
 2. [Mixing note for this specific style]
 3. [Vocal direction note]
 4. [Suno/AI platform specific tip]
-5. [What makes this combination of dimensions unique]
-
-FX CHAIN:
-REVERB: [type, decay time, which elements]
-DELAY: [type, timing, which elements]
-COMPRESSION: [approach for drums, vocal, bus]
-EQ: [3 most important moves for this rap style]
-SIDECHAIN: [what ducks what, and how much]
-SIGNATURE EFFECT: [the one FX move that defines this rap style's sound]
-
-PLUGIN TOOLKIT:
-FREE: [3 specific free plugins with their role]
-PAID: [3 specific paid plugins with their role]
-DAW TIP: [one workflow tip for achieving this style's core sound]
-
-MIX BLUEPRINT:
-STEREO FIELD: [what goes wide, what stays mono, why]
-LEVEL HIERARCHY: [which 3 elements sit highest in the mix]
-BUS STRUCTURE: [recommended bus setup for this style]
-SPECIAL TECHNIQUE: [one mixing technique specific to this style]
-
-MASTERING TARGET:
-LUFS: [target integrated loudness for streaming]
-DYNAMIC RANGE: [target DR value]
-BRIGHTNESS: [high-frequency treatment]
-STEREO WIDTH: [target correlation / width approach]
-NOTES: [2 mastering notes specific to this rap style]`;
+5. [What makes this combination of dimensions unique]`;
 
   return { system, prompt };
 }
@@ -3195,4 +3117,38 @@ function buildPromptIntelligence(params) {
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES };
+function buildProductionData(genre) {
+  const fx  = GENRE_FX_PROFILES[genre]  || {};
+  const pl  = GENRE_PLUGIN_CHAINS[genre] || {};
+  const mst = MASTERING_TARGETS[genre]  || {};
+  return {
+    fxChain: Object.keys(fx).length ? [
+      fx.reverb        ? `REVERB: ${fx.reverb}`             : '',
+      fx.delay         ? `DELAY: ${fx.delay}`               : '',
+      fx.compression   ? `COMPRESSION: ${fx.compression}`   : '',
+      fx.eq            ? `EQ: ${fx.eq}`                     : '',
+      fx.sidechain     ? `SIDECHAIN: ${fx.sidechain}`       : '',
+      fx.width         ? `SIGNATURE EFFECT: ${fx.width}`    : '',
+    ].filter(Boolean).join('\n') : '',
+    pluginToolkit: (pl.free || pl.paid) ? [
+      pl.free ? `FREE: ${pl.free.join(', ')}` : '',
+      pl.paid ? `PAID: ${pl.paid.join(', ')}` : '',
+      `DAW TIP: Use the free alternatives first — master your signal chain before adding paid color.`,
+    ].filter(Boolean).join('\n') : '',
+    mixBlueprint: fx.width ? [
+      `STEREO FIELD: ${fx.width}`,
+      fx.sidechain ? `LEVEL HIERARCHY: Kick and bass centered and dominant; ${fx.sidechain}` : '',
+      `BUS STRUCTURE: Drums bus → Vocal bus → Instrument bus → Master bus with gentle glue compression`,
+      `SPECIAL TECHNIQUE: ${fx.compression || 'Standard VCA bus glue at 2-4 dB GR'}`,
+    ].filter(Boolean).join('\n') : '',
+    masteringTarget: mst.lufs ? [
+      `LUFS: ${mst.lufs}`,
+      `DYNAMIC RANGE: ${mst.dynamicRange || 'DR 8-10'}`,
+      `BRIGHTNESS: ${mst.brightness || 'Natural'}`,
+      `STEREO WIDTH: ${mst.stereoWidth || 'Moderate'}`,
+      `NOTES: ${mst.notes || ''}`,
+    ].filter(Boolean).join('\n') : '',
+  };
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData };
