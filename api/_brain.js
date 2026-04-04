@@ -1538,6 +1538,94 @@ const GENRE_SYLLABLE_BUDGETS = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PRODUCTION KNOWLEDGE BASE
+// Per-genre FX profiles, plugin chains, mastering targets, and production
+// archetypes used to generate the PRODUCTION BRIEF output section.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const GENRE_FX_PROFILES = {
+  pop:       { reverb: 'Medium hall (1.5–2.2s) on vocals, short room (0.4s) on snare', delay: '1/8 note ping-pong on vocal tails, 1/4 dotted on guitar', compression: 'VCA bus glue (2–4 dB GR), optical on lead vocal', eq: 'Air shelf +2 dB @ 16 kHz, low-cut @ 80 Hz on all but kick+bass', width: 'Stereo widener on synth pads, mono centre for kick/bass/lead vocal', sidechain: 'Kick ducking bass 4–6 dB, subtle pump on pads' },
+  hiphop:    { reverb: 'Dark plate (0.8–1.2s) on snare, short room on 808 tail, large verb on adlibs', delay: 'Triplet 1/8 slap on vocal doubles, subtle 1/4 on main vocal', compression: 'Hard limiting on 808 (Waves SSL), parallel NY compression on drums', eq: 'Heavy sub boost 50–80 Hz on 808, scooped mids on snare, air on vocal', width: 'Wide sample layer, mono 808 and kick', sidechain: 'Aggressive kick→808 sidechain for pump' },
+  rnb:       { reverb: 'Lush chamber (2–3s) on vocals, spring on keys', delay: '1/4 dotted on vocal harmonies, analog tape slap on lead', compression: 'Vintage LA-2A on lead vocal, bus glue on mix', eq: 'Low-mid warmth 200–400 Hz on voice, rolled-off highs for analog warmth', width: 'Stereo choir spread, mono bass and kick', sidechain: 'Light kick→bass pump (2–3 dB)' },
+  rock:      { reverb: 'Large ambience (2–4s) on snare, room mic blend on kit', delay: '1/4 ping-pong on guitar lead, slapback on vocals', compression: 'FET 1176 on snare/overheads, bus chain (SSL → limiting)', eq: 'HPF @ 100 Hz on guitars, presence boost 3–5 kHz on leads, air on overheads', width: 'Hard pan guitars L/R, mono kick/snare/bass', sidechain: 'Minimal — let the room breathe' },
+  country:   { reverb: 'Bright hall on vocals (1.8s), spring reverb on guitar/pedal steel', delay: 'Tape echo (1/4 + 3/8) on guitar fills, slap on lead vocal', compression: 'Optical on vocal, VCA on bus', eq: 'Warmth at 200 Hz on acoustic, sparkle at 8 kHz, cut mud at 300 Hz', width: 'Banjo/fiddle wide, steel guitar center-right', sidechain: 'Very light kick ducking' },
+  edm:       { reverb: 'Gated hall on snare, long pad verb (3–6s) on synths', delay: '1/8 ping-pong on arps, 1/4 dotted on leads, reverse reverb pre-hit', compression: 'Sidechain pumping (4/4 kick→pads 8–12 dB), peak limiting on master', eq: 'Deep bass scoop at 200–400 Hz, aggressive high-pass on pads, air at 14 kHz', width: 'Max stereo on synths/pads, mono kick/bass', sidechain: 'Heavy 4/4 sidechain pump is the signature effect' },
+  altrock:   { reverb: 'Grungy plate on snare, room ambience on kit', delay: 'Feedback-rich 1/4 delay on guitar, modulated delay on solos', compression: 'Hard FET on drums, fuzz/saturation on guitar bus', eq: 'Mid-forward 800 Hz–2 kHz crunch, rolled highs for grit', width: 'Guitars wide, fuzz guitar center', sidechain: 'Occasional pump for effect only' },
+  metal:     { reverb: 'Short room on snare (0.3s) for tightness, gated plate', delay: 'Very short slap (40ms) on rhythm guitars, lead 1/8 dotted', compression: 'Fast attack FET on kick/snare, parallel for punch, hard bus limiting', eq: 'Deep mid scoop on rhythm guitar (500 Hz), boost 3–4 kHz for presence, heavy HPF', width: 'Rhythm guitars hard-panned L/R (double-tracked)', sidechain: 'Kick→bass moderate pump' },
+  punk:      { reverb: 'Minimal — tight room only (0.2s)', delay: 'Slapback only on lead vocal', compression: 'Fast, raw 1176 — let it clip slightly for attitude', eq: 'Bright, mid-forward, almost no sub — cut below 80 Hz on everything', width: 'Slightly narrow — live room feel', sidechain: 'None — let it be raw' },
+  folk:      { reverb: 'Small room (0.6–1s) or live hall (2s) on acoustic/vocal', delay: 'Tape echo on guitar fingerpicking, room echo on vocals', compression: 'Gentle optical on vocal (2–3 dB), minimal bus compression', eq: 'Natural — boost 200 Hz warmth, cut 400 Hz mud, slight air at 10 kHz', width: 'Centered vocal, slight width on strumming', sidechain: 'None' },
+  jazz:      { reverb: 'Plate (1.5–2.5s) on brass/sax, room on piano', delay: 'Analog tape delay on trumpet/vocal', compression: 'Gentle RMS limiter — preserve dynamics', eq: 'Warm and full 200–400 Hz, bright at 8–10 kHz on piano', width: 'Traditional stereo mix — wide ensemble', sidechain: 'None' },
+  blues:     { reverb: 'Spring reverb on guitar amp, room on vocal', delay: 'Tape slap on guitar and vocal', compression: 'Tube-style optical on vocal, light bus glue', eq: 'Gritty low-mid push 300–500 Hz on guitar, warmth on vocal', width: 'Mono-ish guitar, slight spread on rhythm section', sidechain: 'None' },
+  latin:     { reverb: 'Bright hall (2s) on percussion, plate on vocal', delay: '1/8 dotted on guitar fills', compression: 'Optical on vocal, bus glue — keep it punchy', eq: 'Bright attack on percussion 6–8 kHz, warmth on guitar body', width: 'Percussion wide, bass and clave center', sidechain: 'Light kick→bass' },
+  reggaeton: { reverb: 'Dark chamber (1s) on dembow, plate on vocal', delay: '1/4 on vocal doubles, triplet on hooks', compression: 'Hard bus compression for loudness, sidechain pump', eq: 'Heavy sub 50–80 Hz on 808/bass, air on vocal', width: 'Wide synths, mono bass and kick', sidechain: 'Moderate dembow→synth pump' },
+  reggae:    { reverb: 'Large spring reverb on guitar (3s), plate on snare', delay: '1/4 dotted echoes everywhere — this is core to the sound', compression: 'Gentle optical on vocal, low bus compression for dynamics', eq: 'Bass-forward 80–120 Hz, scooped mids on guitar, warm on vocal', width: 'Rhythm guitar wide, roots bass center', sidechain: 'Light kick→bass' },
+  afrobeats: { reverb: 'Short verb on snare, airy plate on vocal', delay: '1/8 ping-pong on synth/guitar, 1/4 dotted on vocal', compression: 'Heavy bus limiting for loudness and density', eq: 'Sub boost 50–80 Hz, mid-cut 400 Hz, air at 12 kHz on vocal', width: 'Max stereo on bells/guitar, mono kick/bass', sidechain: 'Kick→synth moderate pump' },
+  kpop:      { reverb: 'Polished chamber (1.5s) on vocal, bright hall on synth', delay: '1/8 ping-pong on synth stabs, reverb tail delay on vocal', compression: 'Tight VCA on drums, optical on vocal, master limiting for loudness', eq: 'Air shelf at 14 kHz, cut 200–300 Hz mud, presence 4–5 kHz on vocal', width: 'Very wide synths and pads, mono kick/bass', sidechain: 'Kick→synth moderate pump' },
+  neosoul:   { reverb: 'Warm plate on vocal (2s), room on live drums', delay: 'Analog echo on guitar/keys, subtle on vocal', compression: 'LA-2A optical on vocal, parallel compression on drums', eq: 'Warm 200–400 Hz on keys and vocal, air at 10 kHz', width: 'Live band stereo spread', sidechain: 'Very light' },
+  gospel:    { reverb: 'Large hall (3–5s) on choir and lead vocal', delay: 'Long feedback echo on vocal runs', compression: 'Gentle optical on lead, dynamic choir mix', eq: 'Full and rich 100–400 Hz, presence on lead vocal 3–5 kHz', width: 'Wide choir, center lead vocal', sidechain: 'None' },
+  ss:        { reverb: 'Small room or hall depending on feel (0.8–2.5s)', delay: 'Tape slap on vocal and guitar', compression: 'Gentle 2–3 dB on vocal, minimal bus', eq: 'Natural — subtle warmth and air only', width: 'Slightly narrow for intimacy', sidechain: 'None' },
+};
+
+const GENRE_PLUGIN_CHAINS = {
+  pop:       { free: ['TDR Nova (EQ)', 'Valhalla Supermassive (reverb)', 'TAL-Reverb-4', 'OTT (multiband comp)'], paid: ['FabFilter Pro-Q 3', 'Waves SSL E-Channel', 'UAD 1176 LN', 'Soundtoys EchoBoy', 'Valhalla Room'] },
+  hiphop:    { free: ['Izotope Ozone Imager (width)', 'Valhalla Supermassive', 'OTT', 'Camel Crusher'], paid: ['Waves SSL G-Bus', 'FabFilter Pro-L 2', 'Slate VCC', 'Soundtoys Devil-Loc', 'UAD Neve 1073'] },
+  rnb:       { free: ['Analog Obsession LALA (optical)', 'Valhalla Supermassive', 'TAL-Chorus-LX'], paid: ['UAD LA-2A', 'FabFilter Pro-Q 3', 'Waves J37 Tape', 'Soundtoys Radiator', 'iZotope Nectar'] },
+  rock:      { free: ['GVST GClip (saturation)', 'Valhalla Supermassive', 'TDR Nova'], paid: ['UAD 1176 AE', 'Waves SSL G-Bus', 'FabFilter Saturn 2', 'Soundtoys Decapitator', 'Empirical Labs Distressor'] },
+  country:   { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'CHOW Tape'], paid: ['UAD Ocean Way Studios', 'Waves H-Delay', 'Soundtoys EchoBoy', 'FabFilter Pro-Q 3'] },
+  edm:       { free: ['Valhalla Supermassive', 'OTT', 'LFO Tool (sidechain)'], paid: ['FabFilter Pro-Q 3', 'Xfer LFO Tool', 'Waves SSL G-Bus', 'FabFilter Pro-L 2', 'iZotope Insight 2'] },
+  altrock:   { free: ['GVST GClip', 'Valhalla Supermassive', 'TDR Nova'], paid: ['UAD Marshall Plexi', 'FabFilter Saturn 2', 'Soundtoys Decapitator', 'Waves SSL 4000'] },
+  metal:     { free: ['GVST GClip', 'TDR Nova', 'Limiter No6'], paid: ['FabFilter Pro-Q 3', 'Waves SSL G-Bus', 'UAD Neve 1073', 'FabFilter Pro-L 2', 'Soundtoys Decapitator'] },
+  punk:      { free: ['GVST GClip', 'TDR Nova', 'Valhalla Supermassive (minimal use)'], paid: ['Waves SSL Channel', 'UAD 1176 LN', 'FabFilter Pro-L 2'] },
+  folk:      { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Studer A800', 'Soundtoys EchoBoy', 'Waves Renaissance Compressor'] },
+  jazz:      { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Fairchild 670', 'Waves Kramer Master Tape', 'Soundtoys EchoBoy'] },
+  blues:     { free: ['CHOW Tape', 'GVST GClip', 'Valhalla Supermassive'], paid: ['UAD Ampex ATR-102', 'Waves J37 Tape', 'Soundtoys Radiator'] },
+  latin:     { free: ['Valhalla Supermassive', 'TDR Nova', 'OTT'], paid: ['UAD Neve 1073', 'Waves CLA-76', 'Soundtoys EchoBoy', 'FabFilter Pro-Q 3'] },
+  reggaeton: { free: ['OTT', 'Valhalla Supermassive', 'LFO Tool'], paid: ['FabFilter Pro-L 2', 'Waves SSL G-Bus', 'Xfer LFO Tool'] },
+  reggae:    { free: ['Valhalla Supermassive (heavy)', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Roland RE-201 Space Echo', 'Soundtoys EchoBoy', 'Waves H-Delay'] },
+  afrobeats: { free: ['OTT', 'Valhalla Supermassive', 'TDR Nova'], paid: ['FabFilter Pro-L 2', 'Waves SSL G-Bus', 'iZotope Ozone 10'] },
+  kpop:      { free: ['OTT', 'Valhalla Supermassive', 'TDR Nova'], paid: ['FabFilter Pro-Q 3', 'Waves SSL G-Bus', 'FabFilter Pro-L 2', 'iZotope Nectar 3'] },
+  neosoul:   { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD LA-2A', 'Waves J37 Tape', 'Soundtoys EchoBoy', 'FabFilter Pro-Q 3'] },
+  gospel:    { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'TDR Nova'], paid: ['UAD Ocean Way Studios', 'Waves SSL G-Bus', 'FabFilter Pro-Q 3'] },
+  ss:        { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Studer A800', 'Waves Renaissance Compressor', 'Soundtoys EchoBoy'] },
+};
+
+const MASTERING_TARGETS = {
+  pop:       { lufs: '-14 LUFS (streaming)', dynamicRange: 'DR 7–9', brightness: 'Bright (8–14 kHz shelf +1.5 dB)', stereoWidth: 'Wide (>0.85)', notes: 'Max loudness within streaming normalization. Punchy, clean, competitive.' },
+  hiphop:    { lufs: '-9 to -12 LUFS', dynamicRange: 'DR 5–7', brightness: 'Warm-bright (air at 12 kHz)', stereoWidth: 'Moderate-wide', notes: '808 sub must translate on laptop speakers — check mono. Heavy limiting expected.' },
+  rnb:       { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 8–10', brightness: 'Warm (subtle air only)', stereoWidth: 'Moderate', notes: 'Preserve vocal dynamics. Warmth and intimacy over loudness.' },
+  rock:      { lufs: '-11 to -13 LUFS', dynamicRange: 'DR 8–11', brightness: 'Bright with mid presence', stereoWidth: 'Wide guitars', notes: 'Energy and punch. Allow more dynamics than pop.' },
+  country:   { lufs: '-13 to -14 LUFS', dynamicRange: 'DR 9–11', brightness: 'Bright and clear', stereoWidth: 'Natural', notes: 'Preserve acoustic guitar transients. Warm but clear.' },
+  edm:       { lufs: '-7 to -9 LUFS (club)', dynamicRange: 'DR 4–6', brightness: 'Air heavy (14 kHz +2 dB)', stereoWidth: 'Maximum', notes: 'Loudest genre. Club systems expect extreme loudness. Check mono compatibility.' },
+  altrock:   { lufs: '-11 to -13 LUFS', dynamicRange: 'DR 8–10', brightness: 'Mid-forward', stereoWidth: 'Wide', notes: 'Grit and energy. Allow some clipping for character.' },
+  metal:     { lufs: '-9 to -11 LUFS', dynamicRange: 'DR 6–8', brightness: 'Bright high-mid (4–6 kHz)', stereoWidth: 'Wide (guitars)', notes: 'Tight and crushing. Kick and guitar must cut without muddiness.' },
+  punk:      { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 7–9', brightness: 'Mid-bright', stereoWidth: 'Narrow-moderate', notes: 'Raw energy over polish. Slight edge/distortion acceptable.' },
+  folk:      { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 11–14', brightness: 'Natural', stereoWidth: 'Moderate', notes: 'Most dynamic genre. Preserve performance nuance. No heavy limiting.' },
+  jazz:      { lufs: '-16 to -18 LUFS', dynamicRange: 'DR 12–16', brightness: 'Warm-natural', stereoWidth: 'Wide ensemble', notes: 'Preserve full dynamic range. No brickwall limiting.' },
+  blues:     { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 10–13', brightness: 'Warm', stereoWidth: 'Moderate', notes: 'Analog warmth. Tape saturation before limiting.' },
+  latin:     { lufs: '-13 to -14 LUFS', dynamicRange: 'DR 8–10', brightness: 'Bright and punchy', stereoWidth: 'Wide percussion', notes: 'Percussive transients must punch through. Bright and energetic.' },
+  reggaeton: { lufs: '-9 to -11 LUFS', dynamicRange: 'DR 5–7', brightness: 'Bright (vocal clarity)', stereoWidth: 'Wide', notes: 'Loud and punchy. Dembow kick+snare must drive through everything.' },
+  reggae:    { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 9–12', brightness: 'Warm-dark', stereoWidth: 'Moderate', notes: 'Preserve bass weight. Echo tails need headroom.' },
+  afrobeats: { lufs: '-10 to -12 LUFS', dynamicRange: 'DR 6–8', brightness: 'Bright and airy', stereoWidth: 'Wide', notes: 'Competitive loudness. Percussion and vocal must pop.' },
+  kpop:      { lufs: '-8 to -10 LUFS', dynamicRange: 'DR 5–7', brightness: 'Very bright (K-pop signature)', stereoWidth: 'Maximum', notes: 'Extremely loud and polished. Every element must sparkle.' },
+  neosoul:   { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 9–12', brightness: 'Warm with air', stereoWidth: 'Moderate', notes: 'Groove and warmth. Preserve dynamics and musical feel.' },
+  gospel:    { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 9–12', brightness: 'Full and rich', stereoWidth: 'Wide choir', notes: 'Room to breathe. Choir dynamics and lead vocal must coexist.' },
+  ss:        { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 11–14', brightness: 'Natural', stereoWidth: 'Intimate', notes: 'Preserve performance vulnerability. No over-compression.' },
+};
+
+const PRODUCTION_ARCHETYPES = {
+  'trap-808':        { label: 'Trap / 808', genres: ['hiphop','reggaeton'], kit: 'TR-808 or Plug-In snare, hard 808 bass, hi-hat rolls (1/16–1/32)', tempo: '130–145 BPM', signature: 'Sliding 808 glide, snare choke, hi-hat velocity variation, dark minor keys' },
+  'live-band':       { label: 'Live Band', genres: ['rock','country','blues','folk','jazz','neosoul','gospel'], kit: 'Acoustic kit, bass guitar, real instruments', tempo: '70–140 BPM', signature: 'Room bleed, human timing fluctuation, chord stabs, real amp tone' },
+  'orchestral-pop':  { label: 'Orchestral Pop', genres: ['pop','rnb','ss'], kit: 'Strings, piano, light drums, orchestral hits', tempo: '70–100 BPM', signature: 'String swells into chorus, piano counter-melody, dynamic orchestra builds' },
+  'bedroom-pop':     { label: 'Bedroom Pop', genres: ['pop','folk','ss','altrock'], kit: 'Lo-fi samples, MIDI keys, soft drums, field recordings', tempo: '75–110 BPM', signature: 'Cassette warmth, intimate reverb, imperfect vocal takes kept, soft clipping' },
+  'electronic-atm':  { label: 'Electronic / Atmospheric', genres: ['edm','kpop','afrobeats','altrock'], kit: 'Synthesizers, drum machine, arpeggiators, granular pads', tempo: '110–145 BPM', signature: 'Sidechain pumping, filter sweeps, epic drop, evolving pad textures' },
+  'acoustic-roots':  { label: 'Acoustic / Roots', genres: ['folk','country','blues','reggae'], kit: 'Acoustic guitar, upright bass, brushed drums, harmonica', tempo: '65–110 BPM', signature: 'Natural reverb, tape warmth, chord voicing on acoustic, no samples' },
+  'club-dance':      { label: 'Club / Dance', genres: ['edm','latin','reggaeton','afrobeats','kpop'], kit: 'Kick-dominant, synth bass, stabs, high percussion', tempo: '120–135 BPM', signature: 'Four-on-the-floor kick, percussive groove, breakdown/drop structure' },
+  'gospel-choir':    { label: 'Gospel / Choir', genres: ['gospel','rnb','neosoul'], kit: 'Hammond organ, choir, live piano, gospel drums', tempo: '70–100 BPM', signature: 'Call-and-response, organ swells, choir harmonics, building intensity' },
+  'punk-garage':     { label: 'Punk / Garage', genres: ['punk','metal','rock'], kit: 'Distorted guitar, raw drums, bass overdrive', tempo: '140–200 BPM', signature: 'Raw recording, minimal production, energy over perfection' },
+  'latin-urban':     { label: 'Latin Urban', genres: ['latin','reggaeton'], kit: 'Dembow rhythm, brass, synth bass, clave percussion', tempo: '95–105 BPM', signature: 'Clave pattern, brass hits, rhythmic syncopation, urban production meets live instruments' },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // GENRE SECTION DNA
 // Per-genre data for bridge harmony, weighted archetype preferences,
 // counter-melody role, real song references, outro + verse-2 tendencies.
@@ -2014,6 +2102,16 @@ Rule: ${_poa.rule}`;
   const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
   const syllableNote = `\n\nSYLLABLE BUDGET:\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
 
+  // ── Production brief data ───────────────────────────────────────────────
+  const _fxProfile  = GENRE_FX_PROFILES[genre]  || {};
+  const _plugins    = GENRE_PLUGIN_CHAINS[genre] || {};
+  const _mastering  = MASTERING_TARGETS[genre]   || {};
+  const productionContextNote = (_fxProfile.reverb || _mastering.lufs) ? `\n\nPRODUCTION REFERENCE DATA (use this to populate the PRODUCTION BRIEF sections below):
+FX: Reverb — ${_fxProfile.reverb||'medium hall'}; Delay — ${_fxProfile.delay||'1/4 note'}; Compression — ${_fxProfile.compression||'standard VCA'}; EQ — ${_fxProfile.eq||'high-pass + air shelf'}; Sidechain — ${_fxProfile.sidechain||'light kick ducking'}
+PLUGINS (free): ${(_plugins.free||[]).slice(0,3).join(', ')}
+PLUGINS (paid): ${(_plugins.paid||[]).slice(0,3).join(', ')}
+MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–10'} · ${_mastering.brightness||'natural'} · ${_mastering.notes||''}` : '';
+
   // ── Dual perspective (antagonist POV in Verse 2) ────────────────────────
   const dualPerspNote = dualPerspective
     ? `\n\nDUAL PERSPECTIVE RULE: Verse 2 MUST be written from the antagonist's or opposite perspective. If Verse 1 is the protagonist's longing, Verse 2 is the other person's detachment. If Verse 1 is anger, Verse 2 is the accused person's justification. This creates dramatic tension and forces the listener to hold two truths simultaneously.`
@@ -2044,7 +2142,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${productionContextNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -2134,7 +2232,33 @@ COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]`;
+SECTION MAP: [which sections and how it evolves]
+
+FX CHAIN:
+REVERB: [type, decay time, which elements]
+DELAY: [type, timing, which elements]
+COMPRESSION: [approach for drums, vocal, bus]
+EQ: [3 most important moves for this genre]
+SIDECHAIN: [what ducks what, and how much]
+SIGNATURE EFFECT: [the one FX move that defines this genre's sound]
+
+PLUGIN TOOLKIT:
+FREE: [3 specific free plugins with their role]
+PAID: [3 specific paid plugins with their role]
+DAW TIP: [one workflow tip for achieving the genre's core sound without expensive tools]
+
+MIX BLUEPRINT:
+STEREO FIELD: [what goes wide, what stays mono, why]
+LEVEL HIERARCHY: [which 3 elements sit highest in the mix and at what relative levels]
+BUS STRUCTURE: [recommended bus setup — drums bus, vocal bus, instrument bus, master bus approach]
+SPECIAL TECHNIQUE: [one mixing technique specific to this genre/song that makes it land]
+
+MASTERING TARGET:
+LUFS: [target integrated loudness for streaming]
+DYNAMIC RANGE: [target DR value]
+BRIGHTNESS: [high-frequency treatment]
+STEREO WIDTH: [target correlation / width approach]
+NOTES: [2 mastering notes specific to this genre and song feel]`;
 
   return { system, prompt };
 }
@@ -2176,6 +2300,16 @@ function buildLuckyPrompt(params) {
       )
     : 'You are an expert songwriter, neuroscientist of music, and AI music production specialist. Write complete, emotionally authentic, production-ready songs. Respond with the exact format requested. No extra commentary.';
 
+  // ── Production brief data for Lucky (primary genre) ────────────────────
+  const _fxPL  = GENRE_FX_PROFILES[g1]  || GENRE_FX_PROFILES[g2]  || {};
+  const _plPL  = GENRE_PLUGIN_CHAINS[g1] || GENRE_PLUGIN_CHAINS[g2] || {};
+  const _mstPL = MASTERING_TARGETS[g1]  || MASTERING_TARGETS[g2]  || {};
+  const luckyProductionNote = (_fxPL.reverb || _mstPL.lufs) ? `\n\nPRODUCTION REFERENCE DATA (use to populate PRODUCTION BRIEF sections):
+FX: Reverb — ${_fxPL.reverb||'medium hall'}; Delay — ${_fxPL.delay||'1/4 note'}; Compression — ${_fxPL.compression||'standard VCA'}; EQ — ${_fxPL.eq||'high-pass + air shelf'}; Sidechain — ${_fxPL.sidechain||'light kick ducking'}
+PLUGINS (free): ${(_plPL.free||[]).slice(0,3).join(', ')}
+PLUGINS (paid): ${(_plPL.paid||[]).slice(0,3).join(', ')}
+MASTERING: ${_mstPL.lufs||'-14 LUFS'} · ${_mstPL.dynamicRange||'DR 8–10'} · ${_mstPL.brightness||'natural'} · ${_mstPL.notes||''}` : '';
+
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
 
 Fusion style: ${fd?.name || g1 + ' × ' + g2}
@@ -2183,7 +2317,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckyProductionNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -2245,7 +2379,33 @@ COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]`;
+SECTION MAP: [which sections and how it evolves]
+
+FX CHAIN:
+REVERB: [type, decay time, which elements]
+DELAY: [type, timing, which elements]
+COMPRESSION: [approach for drums, vocal, bus]
+EQ: [3 most important moves for this fusion genre]
+SIDECHAIN: [what ducks what, and how much]
+SIGNATURE EFFECT: [the one FX move that defines this fusion sound]
+
+PLUGIN TOOLKIT:
+FREE: [3 specific free plugins with their role]
+PAID: [3 specific paid plugins with their role]
+DAW TIP: [one workflow tip for achieving this fusion's core sound]
+
+MIX BLUEPRINT:
+STEREO FIELD: [what goes wide, what stays mono, why]
+LEVEL HIERARCHY: [which 3 elements sit highest in the mix]
+BUS STRUCTURE: [recommended bus setup for this fusion style]
+SPECIAL TECHNIQUE: [one mixing technique specific to this fusion that makes it land]
+
+MASTERING TARGET:
+LUFS: [target integrated loudness for streaming]
+DYNAMIC RANGE: [target DR value]
+BRIGHTNESS: [high-frequency treatment]
+STEREO WIDTH: [target correlation / width approach]
+NOTES: [2 mastering notes specific to this fusion genre blend]`;
 
   return {
     system,
@@ -2522,7 +2682,33 @@ DIRECTOR NOTES:
 2. [Mixing note for this specific style]
 3. [Vocal direction note]
 4. [Suno/AI platform specific tip]
-5. [What makes this combination of dimensions unique]`;
+5. [What makes this combination of dimensions unique]
+
+FX CHAIN:
+REVERB: [type, decay time, which elements]
+DELAY: [type, timing, which elements]
+COMPRESSION: [approach for drums, vocal, bus]
+EQ: [3 most important moves for this rap style]
+SIDECHAIN: [what ducks what, and how much]
+SIGNATURE EFFECT: [the one FX move that defines this rap style's sound]
+
+PLUGIN TOOLKIT:
+FREE: [3 specific free plugins with their role]
+PAID: [3 specific paid plugins with their role]
+DAW TIP: [one workflow tip for achieving this style's core sound]
+
+MIX BLUEPRINT:
+STEREO FIELD: [what goes wide, what stays mono, why]
+LEVEL HIERARCHY: [which 3 elements sit highest in the mix]
+BUS STRUCTURE: [recommended bus setup for this style]
+SPECIAL TECHNIQUE: [one mixing technique specific to this style]
+
+MASTERING TARGET:
+LUFS: [target integrated loudness for streaming]
+DYNAMIC RANGE: [target DR value]
+BRIGHTNESS: [high-frequency treatment]
+STEREO WIDTH: [target correlation / width approach]
+NOTES: [2 mastering notes specific to this rap style]`;
 
   return { system, prompt };
 }
@@ -2777,8 +2963,13 @@ function buildFeedbackPrompt(lyrics, genre, topic) {
   const genreKeys = genreData.keys ? genreData.keys.join('\n- ') : 'None';
   const genreStructure = genreData.structure || 'Standard song structure.';
   const genreVocables = genreData.vocables ? `Vocable signature: ${genreData.vocables.sounds} — ${genreData.vocables.notes}` : '';
+  const genreLabel = GENRE_LABELS[genre] || genre;
 
-  return `You are Soniq's AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant who has worked across every genre. You give honest, specific, actionable feedback. You do not flatter. You identify what is working, what is not, and exactly how to fix it.
+  const system = 'You are Soniq\'s AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant. Give honest, specific, actionable feedback. Name actual lines. Be direct. Do not flatter. A songwriter must be able to act on every note.';
+
+  const prompt = `You are analyzing ${genreLabel} song lyrics${topic ? ` about "${topic}"` : ''}. Use your full knowledge of this genre's rules to give expert feedback.
+
+You are Soniq's AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant who has worked across every genre. You give honest, specific, actionable feedback. You do not flatter. You identify what is working, what is not, and exactly how to fix it.
 
 GENRE: ${genre || 'unknown'}
 TOPIC/CONCEPT: ${topic || 'not specified'}
@@ -2809,6 +3000,8 @@ After the 9 dimensions, give:
 - GENRE VERDICT: Does this song belong in ${genre || 'its genre'}? What one production note would make it land harder?
 
 FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
+
+  return { prompt, system };
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
@@ -3002,4 +3195,4 @@ function buildPromptIntelligence(params) {
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES };

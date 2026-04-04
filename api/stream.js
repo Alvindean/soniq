@@ -413,6 +413,20 @@ module.exports = async function handler(req, res) {
       console.error('Prompt intelligence error:', err.message);
       return res.status(500).json({ error: 'Suggest error: ' + err.message });
     }
+  } else if (body.action === 'feedback') {
+    // ── AI Feedback Coach — full GENRE_BIBLE + 9-dimension analysis, streamed ──
+    try {
+      const brain = require('./_brain');
+      const p = body.params || {};
+      if (!p.lyrics) { res.status(400).json({ error: 'lyrics required' }); return; }
+      const built = brain.buildFeedbackPrompt(p.lyrics, p.genre, p.topic);
+      messages   = [{ role: 'user', content: built.prompt }];
+      system     = built.system;
+      max_tokens = 2048;
+    } catch (err) {
+      console.error('Feedback prompt build failed:', err.message);
+      return res.status(500).json({ error: 'Feedback prompt error: ' + err.message });
+    }
   } else if (body.action === 'edit') {
     // ── Smart lyric editor — full GENRE_BIBLE + song context ──
     try {

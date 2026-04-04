@@ -372,13 +372,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .gz-badge{background:var(--amber);color:#000;border-radius:99px;font-size:9px;font-weight:700;padding:1px 6px;min-width:18px;text-align:center}
 .gz-arrow{font-size:9px;color:var(--tx4);transition:transform 0.2s;line-height:1}
 .gz-arrow.open{transform:rotate(180deg)}
-.genre-zone-panel{width:100%;max-width:500px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;animation:pgIn 0.2s ease;overflow:hidden;transition:max-height 0.2s ease}
+.genre-zone-panel{width:100%;max-width:520px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:20px;animation:pgIn 0.2s ease;overflow:hidden}
+#gz-pills-container{max-height:300px;overflow-y:auto;padding-right:2px;scrollbar-width:thin}
 .gz-hint{font-size:10px;color:var(--tx4);margin-bottom:10px;text-align:center}
 .gz-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px}
 .gz-pill{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx3);font-size:11px;font-weight:600;padding:5px 13px;cursor:pointer;transition:all 0.15s;user-select:none}
 .gz-pill:hover{border-color:var(--amberline);color:var(--tx1)}
 .gz-pill.on{background:rgba(245,184,0,0.12);border-color:var(--amber);color:var(--amber)}
-.gz-footer{display:flex;justify-content:center;gap:10px}
+.gz-group{margin-bottom:10px}
+.gz-group-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx4);margin-bottom:5px;padding-left:2px}
+.gz-pair-count{font-size:10px;text-align:center;padding:4px 0;min-height:16px;transition:color 0.2s}
+.gz-footer{display:flex;justify-content:center;gap:10px;margin-top:6px}
 .gz-clear{background:transparent;border:none;color:var(--tx4);font-size:10px;cursor:pointer;padding:2px 8px;font-family:var(--font);transition:color 0.15s;border-radius:var(--r1)}
 .gz-clear:hover{color:var(--red);background:var(--redbg)}
 .gz-all{background:transparent;border:1px solid var(--b2);color:var(--tx3);font-size:10px;cursor:pointer;padding:2px 8px;font-family:var(--font);transition:all 0.15s;border-radius:var(--r1)}
@@ -753,6 +757,44 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 }
 .brief-tip:last-child{border-bottom:none}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
+/* ── FX CHAIN ── */
+.brief-fx-section{background:linear-gradient(135deg,#0a1a2a,#0e1e2e);border-color:#1e4a6e}
+.brief-fx-section .brief-section-label{color:#38bdf8}
+.brief-fx-grid{display:flex;flex-direction:column;gap:6px}
+.brief-fx-row{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid #1e2a3a}
+.brief-fx-row:last-child{border-bottom:none}
+.brief-fx-key{font-size:11px;font-weight:700;color:#38bdf8;min-width:130px;flex-shrink:0;text-transform:uppercase;letter-spacing:.04em}
+.brief-fx-val{font-size:12px;color:var(--tx2);line-height:1.6}
+/* ── PLUGIN TOOLKIT ── */
+.brief-plugin-section{background:linear-gradient(135deg,#0a1f0a,#0d1f0d);border-color:#1a4a1a}
+.brief-plugin-section .brief-section-label{color:#4ade80}
+.brief-plugin-row{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid #1a2a1a}
+.brief-plugin-row:last-child{border-bottom:none}
+.brief-plugin-tag{font-size:9px;font-weight:800;padding:2px 7px;border-radius:99px;flex-shrink:0;letter-spacing:.06em;margin-top:2px}
+.brief-plugin-free{background:#14532d;color:#4ade80;border:1px solid #166534}
+.brief-plugin-paid{background:#1a1a4a;color:#818cf8;border:1px solid #312e81}
+.brief-plugin-tip{background:#451a03;color:#fb923c;border:1px solid #7c2d12}
+.brief-plugin-body{font-size:12px;color:var(--tx2);line-height:1.6}
+/* ── MIX BLUEPRINT ── */
+.brief-mix-section{background:linear-gradient(135deg,#1a0a2a,#1e0d2e);border-color:#4a1a6e}
+.brief-mix-section .brief-section-label{color:#c084fc}
+.brief-mix-row{padding:6px 0;border-bottom:1px solid #2a1a3a}
+.brief-mix-row:last-child{border-bottom:none}
+.brief-mix-key{font-size:10px;font-weight:700;color:#c084fc;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.brief-mix-val{font-size:12px;color:var(--tx2);line-height:1.6}
+/* ── MASTERING TARGET ── */
+.brief-master-section{background:linear-gradient(135deg,#1a1000,#1e1400);border-color:#6a4a00}
+.brief-master-section .brief-section-label{color:#fbbf24}
+.master-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.master-chip{border-radius:var(--r2);padding:8px 12px;border:1px solid;min-width:100px;flex:1}
+.master-chip-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;opacity:.7;margin-bottom:3px}
+.master-chip-val{font-size:12px;font-weight:600;line-height:1.4}
+.master-chip-amber{background:#1c1400;border-color:#92400e}.master-chip-amber .master-chip-label,.master-chip-amber .master-chip-val{color:#fbbf24}
+.master-chip-green{background:#0a1f0a;border-color:#166534}.master-chip-green .master-chip-label,.master-chip-green .master-chip-val{color:#4ade80}
+.master-chip-blue{background:#0a1020;border-color:#1e4a6e}.master-chip-blue .master-chip-label,.master-chip-blue .master-chip-val{color:#38bdf8}
+.master-chip-violet{background:#1a0a2a;border-color:#4a1a6e}.master-chip-violet .master-chip-label,.master-chip-violet .master-chip-val{color:#c084fc}
+.master-notes{font-size:12px;color:var(--tx2);line-height:1.6;padding-top:4px;border-top:1px solid #3a2a00}
 
 /* ── API KEY BANNER ── */
 #key-banner{background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r3);padding:20px;margin-bottom:20px;display:none}
@@ -2260,10 +2302,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <!-- Genre Zone panel -->
     <div id="genre-zone-panel" class="genre-zone-panel" style="display:none">
-      <div class="gz-hint">Pin genres to limit the fusion pool — leave empty for full random</div>
-      <div class="gz-pills" id="gz-pills-container"></div>
+      <div class="gz-hint">Pin genres to shape the fusion pool — leave empty for full random · <strong>select 4+ for best coverage</strong></div>
+      <div id="gz-pills-container"></div>
+      <div class="gz-pair-count" id="gz-pair-count"></div>
       <div class="gz-footer">
-        <button class="gz-all" onclick="selectAllGenres()">All</button>
+        <button class="gz-all" onclick="selectAllGenres()">All 24</button>
         <button class="gz-clear" onclick="clearGenreZone()">Clear</button>
       </div>
     </div>
@@ -5220,11 +5263,79 @@ function apiErrHtml(msg, errCode) {
 }
 
 // ── Genre Zone helpers ──
+const GZ_CATEGORIES = [
+  { label: 'Core',       keys: ['pop','rock','rnb','hiphop','country','folk'] },
+  { label: 'Electronic', keys: ['edm','altrock','punk','metal','kpop'] },
+  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae'] },
+  { label: 'Soulful',    keys: ['jazz','blues','neosoul','gospel','ss'] },
+  { label: 'Special',    keys: ['parody','comedy','children','tvmusical'] },
+];
+
+// All 24 genres with display labels (superset of the old 18)
+const ALL_GENRE_LABELS = {
+  pop:'Pop', hiphop:'Rap / Hip-Hop', rnb:'R&B / Soul', rock:'Rock',
+  country:'Country', edm:'EDM / Electronic', latin:'Latin', reggaeton:'Reggaeton',
+  folk:'Folk', metal:'Metal', jazz:'Jazz', ss:'Singer-Songwriter',
+  altrock:'Alt-Rock', reggae:'Reggae', afrobeats:'Afrobeats', blues:'Blues',
+  punk:'Punk', kpop:'K-Pop', neosoul:'Neo-Soul', gospel:'Gospel',
+  parody:'Parody', comedy:'Comedy', children:"Children's", tvmusical:'TV / Musical',
+};
+
+// Translation to FUSION_DATA key parts (capitalized display names)
+const GZ_FMAP = {
+  pop:'Pop', hiphop:'Hip-Hop', rnb:'R&B', rock:'Rock', country:'Country',
+  edm:'EDM', latin:'Latin', reggaeton:'Reggaeton', folk:'Folk', metal:'Metal',
+  jazz:'Jazz', ss:'Singer-Songwriter', altrock:'Alt-Rock', reggae:'Reggae',
+  afrobeats:'Afrobeats', blues:'Blues', punk:'Punk', kpop:'K-Pop',
+  neosoul:'Neo-Soul', gospel:'Gospel',
+  // parody/comedy/children/tvmusical have no fusion pairs — handled as single-anchor mode
+};
+
+function countFusionPairsForLocked(locked) {
+  if (!locked.length) return Object.keys(FUSION_DATA).length;
+  const parts = locked.map(k => GZ_FMAP[k]).filter(Boolean);
+  if (parts.length === 0) return 0;
+  return Object.keys(FUSION_DATA).filter(key => {
+    const [a, b] = key.split('+');
+    return parts.includes(a) && parts.includes(b);
+  }).length;
+}
+
 function renderGenreZonePills(){
   const container=document.getElementById('gz-pills-container');
   if(!container)return;
-  container.innerHTML=Object.entries(GENRE_LABELS).map(([k,v])=>`<span class="gz-pill${S.luckyLockedGenres.includes(k)?' on':''}" onclick="toggleLuckyGenre('${k}')">${v}</span>`).join('');
+  container.innerHTML = GZ_CATEGORIES.map(cat => {
+    const pills = cat.keys.map(k => {
+      const label = ALL_GENRE_LABELS[k] || k;
+      const on = S.luckyLockedGenres.includes(k) ? ' on' : '';
+      return `<span class="gz-pill${on}" onclick="toggleLuckyGenre('${k}')">${label}</span>`;
+    }).join('');
+    return `<div class="gz-group"><div class="gz-group-label">${cat.label}</div><div class="gz-pills">${pills}</div></div>`;
+  }).join('');
 }
+
+function updateGenreZonePairCount(){
+  const el = document.getElementById('gz-pair-count');
+  if (!el) return;
+  const n = S.luckyLockedGenres.length;
+  if (n === 0) { el.textContent = ''; el.style.color = ''; return; }
+  const pairs = countFusionPairsForLocked(S.luckyLockedGenres);
+  const hasNoFusion = S.luckyLockedGenres.every(k => !GZ_FMAP[k]);
+  if (hasNoFusion && n === 1) {
+    el.textContent = '✦ Single-genre mode — no fusion needed';
+    el.style.color = 'var(--amber)';
+  } else if (pairs === 0 && n < 4) {
+    el.textContent = `⚠️ 0 fusion pairs — select 4+ genres for coverage (try selecting ${4 - n} more)`;
+    el.style.color = 'var(--red,#f87171)';
+  } else if (pairs < 5) {
+    el.textContent = `⚠️ Only ${pairs} fusion pair${pairs===1?'':'s'} — select 4+ genres for best variety`;
+    el.style.color = 'var(--amber)';
+  } else {
+    el.textContent = `✓ ${pairs} fusion pairs available`;
+    el.style.color = 'var(--green)';
+  }
+}
+
 function toggleGenreZone(){
   const panel=document.getElementById('genre-zone-panel');
   const btn=document.getElementById('gz-toggle-btn');
@@ -5233,7 +5344,7 @@ function toggleGenreZone(){
   panel.style.display=isOpen?'none':'block';
   arrow.classList.toggle('open',!isOpen);
   btn.classList.toggle('active',!isOpen);
-  if(!isOpen)renderGenreZonePills();
+  if(!isOpen){ renderGenreZonePills(); updateGenreZonePairCount(); }
 }
 function toggleLuckyGenre(k){
   const idx=S.luckyLockedGenres.indexOf(k);
@@ -5241,23 +5352,33 @@ function toggleLuckyGenre(k){
   else S.luckyLockedGenres.splice(idx,1);
   renderGenreZonePills();
   updateGenreZoneBadge();
+  updateGenreZonePairCount();
 }
 function clearGenreZone(){
   S.luckyLockedGenres=[];
   renderGenreZonePills();
   updateGenreZoneBadge();
-  toast('🎲 Genre filter cleared — all genres active');
+  updateGenreZonePairCount();
+  toast('🎲 Genre filter cleared — all 24 genres active');
 }
 function selectAllGenres(){
-  S.luckyLockedGenres=Object.keys(GENRE_LABELS);
+  S.luckyLockedGenres=Object.keys(ALL_GENRE_LABELS);
   renderGenreZonePills();
   updateGenreZoneBadge();
+  updateGenreZonePairCount();
 }
 function updateGenreZoneBadge(){
   const badge=document.getElementById('gz-badge');
   const btn=document.getElementById('gz-toggle-btn');
   const n=S.luckyLockedGenres.length;
-  if(badge){badge.style.display='inline';badge.textContent=n?n:'All';}
+  if(badge){
+    badge.style.display='inline';
+    // ⚠ prefix when too few genres for good coverage (1-3 fusionable picks)
+    const fusionableCount = S.luckyLockedGenres.filter(k=>GZ_FMAP[k]).length;
+    const warn = n > 0 && fusionableCount < 4;
+    badge.textContent = warn ? '⚠ '+n : (n || 'All');
+    badge.style.color = warn ? 'var(--amber)' : '';
+  }
   if(btn)btn.classList.toggle('active',n>0);
 }
 
@@ -5315,14 +5436,37 @@ function feelLucky(){
   // Filter fusion keys by locked genres
   const locked=S.luckyLockedGenres||[];
   const allKeys=Object.keys(FUSION_DATA);
-  // Map GENRE_LABELS short codes → FUSION_DATA key part names
-  const FMAP={pop:'Pop',hiphop:'Hip-Hop',rnb:'R&B',rock:'Rock',country:'Country',edm:'EDM',latin:'Latin',reggaeton:'Reggaeton',folk:'Folk',metal:'Metal',jazz:'Jazz',ss:'Singer-Songwriter',altrock:'Alt-Rock',reggae:'Reggae',afrobeats:'Afrobeats',blues:'Blues',punk:'Punk',kpop:'K-Pop'};
-  const lockedParts=locked.map(k=>FMAP[k]).filter(Boolean);
-  const filtered=lockedParts.length
-    ?allKeys.filter(k=>{const[a,b]=k.split('+');return lockedParts.includes(a)||lockedParts.includes(b);})
-    :allKeys;
-  if (locked.length > 0 && filtered.length === 0) {
-    toast('⚠️ No matching fusions for selected genres — using all');
+  const lockedParts=locked.map(k=>GZ_FMAP[k]).filter(Boolean);
+
+  // Special genres with no FUSION_DATA pairs (parody/comedy/children/tvmusical)
+  // When one of these is locked AND it's the only pick, use the regular generate flow instead
+  const specialOnly = locked.length === 1 && !GZ_FMAP[locked[0]];
+
+  let filtered;
+  if (lockedParts.length === 0) {
+    // No fusionable genres locked → use all (includes case of special-only)
+    filtered = allKeys;
+  } else if (lockedParts.length === 1) {
+    // ANCHOR MODE: 1 fusionable genre → find its best-quality fusion partner
+    const anchor = lockedParts[0];
+    const anchorKeys = allKeys.filter(k => { const[a,b]=k.split('+'); return a===anchor||b===anchor; });
+    // Sort by overall quality score, pick top 8 for variety
+    anchorKeys.sort((ka,kb) => ((FUSION_DATA[kb]?.q?.overall||0)-(FUSION_DATA[ka]?.q?.overall||0)));
+    filtered = anchorKeys.slice(0, 8).length ? anchorKeys.slice(0, 8) : allKeys;
+    toast(`🎯 Anchor mode: pairing ${ALL_GENRE_LABELS[locked[0]]||locked[0]} with its best fusion partners`);
+  } else {
+    // AND filter: both genres in the fusion pair must be from selected pool
+    filtered = allKeys.filter(k => { const[a,b]=k.split('+'); return lockedParts.includes(a)&&lockedParts.includes(b); });
+    if (filtered.length === 0) {
+      // Fallback to OR filter with warning
+      filtered = allKeys.filter(k => { const[a,b]=k.split('+'); return lockedParts.includes(a)||lockedParts.includes(b); });
+      if (filtered.length === 0) {
+        toast('⚠️ No fusion pairs for selected genres — using full pool. Select 4+ genres for coverage.');
+        filtered = allKeys;
+      } else {
+        toast(`⚠️ Only ${filtered.length} partial-match pairs — select 4+ genres for full coverage`);
+      }
+    }
   }
   const keys=filtered.length?filtered:allKeys;
   // Pick random fusion pair from FUSION_DATA keys
@@ -5492,7 +5636,11 @@ function parseLuckyResult(raw,fusionName,meta){
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
   const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const countermelody=parseSection(raw,'COUNTERMELODY','FX CHAIN');
+  const fxChain=parseSection(raw,'FX CHAIN','PLUGIN TOOLKIT');
+  const pluginToolkit=parseSection(raw,'PLUGIN TOOLKIT','MIX BLUEPRINT');
+  const mixBlueprint=parseSection(raw,'MIX BLUEPRINT','MASTERING TARGET');
+  const masteringTarget=parseSection(raw,'MASTERING TARGET','VISUAL PROMPT');
   const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
   const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
 
@@ -5516,7 +5664,7 @@ function parseLuckyResult(raw,fusionName,meta){
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
-  renderBrief('lres', songPrompt, briefRaw);
+  renderBrief('lres', songPrompt, briefRaw, { fxChain, pluginToolkit, mixBlueprint, masteringTarget });
 
   const lts = Date.now();
   // Version history for lres
@@ -5524,7 +5672,7 @@ function parseLuckyResult(raw,fusionName,meta){
     if (!S.luckyVersions) S.luckyVersions = [];
     pushVersion('lres');
   }
-  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,visualPrompt,videoPrompt,genre:fusionName,topic:meta.topic,mood:meta.mood,vocal:meta.vocal,ts:lts,id:lts};
+  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,fxChain,pluginToolkit,mixBlueprint,masteringTarget,visualPrompt,videoPrompt,genre:fusionName,topic:meta.topic,mood:meta.mood,vocal:meta.vocal,ts:lts,id:lts};
   pushVersion('lres');
   renderVersionBar('lres');
   updateShareHash(S.luckyCurrentSong);
@@ -5581,7 +5729,7 @@ function loadLuckyHistItem(i){
   toast('✓ Loaded: '+(song.title||'Lucky Song'));
 }
 
-const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop'};
+const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop','neosoul':'Neo-Soul','gospel':'Gospel','parody':'Parody','comedy':'Comedy','children':"Children's",'tvmusical':'TV / Musical'};
 
 async function generateSong(){
   if (!S.user && !window.__soniqAdmin) {
@@ -5974,7 +6122,11 @@ function parseSongResult(raw,genre,topic){
   const chords=parseSection(raw,'CHORD PROGRESSION','THEORY ANALYSIS');
   const theoryAnalysis=parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
-  const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const countermelody=parseSection(raw,'COUNTERMELODY','FX CHAIN');
+  const fxChain=parseSection(raw,'FX CHAIN','PLUGIN TOOLKIT');
+  const pluginToolkit=parseSection(raw,'PLUGIN TOOLKIT','MIX BLUEPRINT');
+  const mixBlueprint=parseSection(raw,'MIX BLUEPRINT','MASTERING TARGET');
+  const masteringTarget=parseSection(raw,'MASTERING TARGET','VISUAL PROMPT');
   const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
   const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
 
@@ -5998,7 +6150,7 @@ function parseSongResult(raw,genre,topic){
   renderChords('res', chords, theoryAnalysis);
 
   // Render Production Brief
-  renderBrief('res', songPrompt, briefRaw);
+  renderBrief('res', songPrompt, briefRaw, { fxChain, pluginToolkit, mixBlueprint, masteringTarget });
 
   const ts = Date.now();
   // Version history — push old song before replacing, never wipe on genre/topic change
@@ -6006,7 +6158,7 @@ function parseSongResult(raw,genre,topic){
     if (!S.currentVersions) S.currentVersions = [];
     pushVersion('res');
   }
-  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,visualPrompt,videoPrompt,genre,topic,ts};
+  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,fxChain,pluginToolkit,mixBlueprint,masteringTarget,visualPrompt,videoPrompt,genre,topic,ts};
   // Track opening lines for pattern avoidance — keep last 3
   if (lyrics) {
     const verse1Match = lyrics.match(/\[Verse\s*1?\]([\s\S]*?)(?=\[|$)/i);
@@ -6154,14 +6306,25 @@ function parseBriefSection(text, key) {
   return text.slice(start, end).trim();
 }
 
-function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
+function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const el = document.getElementById(prefix + '-brief-content');
   if (!el) return;
-  // countermelody from song object if not passed directly
-  if (!countermelodyRaw) {
-    const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
-    countermelodyRaw = song?.countermelody || '';
+  // extras can be an object {fxChain, pluginToolkit, mixBlueprint, masteringTarget}
+  // or a legacy string (countermelody raw). Fetch from song object if not provided.
+  let fxChain = '', pluginToolkit = '', mixBlueprint = '', masteringTarget = '', countermelodyRaw = '';
+  if (extras && typeof extras === 'object') {
+    fxChain        = extras.fxChain        || '';
+    pluginToolkit  = extras.pluginToolkit  || '';
+    mixBlueprint   = extras.mixBlueprint   || '';
+    masteringTarget= extras.masteringTarget|| '';
   }
+  // Always pull countermelody from song store
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  countermelodyRaw = song?.countermelody || '';
+  if (!fxChain)         fxChain         = song?.fxChain         || '';
+  if (!pluginToolkit)   pluginToolkit   = song?.pluginToolkit   || '';
+  if (!mixBlueprint)    mixBlueprint    = song?.mixBlueprint    || '';
+  if (!masteringTarget) masteringTarget = song?.masteringTarget || '';
 
   const raw = briefRaw || '';
   const corePrompt    = parseBriefSection(raw, 'CORE PROMPT') || songPrompt || '';
@@ -6173,6 +6336,74 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
 
   const cpBtn = (id, label='Copy') =>
     `<button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${id}').textContent)">${label}</button>`;
+
+  // Helper: parse key:value lines from a section block
+  const parseKV = (block) => {
+    const kv = {};
+    (block||'').split('\n').forEach(line => {
+      const m = line.match(/^([A-Z][A-Z &]+):\s*(.+)/);
+      if (m) kv[m[1].trim()] = m[2].trim();
+    });
+    return kv;
+  };
+
+  // FX CHAIN render
+  const fxHtml = fxChain ? (() => {
+    const kv = parseKV(fxChain);
+    const rows = ['REVERB','DELAY','COMPRESSION','EQ','SIDECHAIN','SIGNATURE EFFECT'];
+    const icons = { REVERB:'🌊', DELAY:'⏱', COMPRESSION:'🔧', EQ:'📊', SIDECHAIN:'⚡', 'SIGNATURE EFFECT':'✨' };
+    return `<div class="brief-section brief-fx-section">
+      <div class="brief-section-label">🎛 FX Chain</div>
+      <div class="brief-fx-grid">${rows.filter(k=>kv[k]).map(k=>`
+        <div class="brief-fx-row">
+          <span class="brief-fx-key">${icons[k]||''} ${k.charAt(0)+k.slice(1).toLowerCase()}</span>
+          <span class="brief-fx-val">${escHtml(kv[k])}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  })() : '';
+
+  // PLUGIN TOOLKIT render
+  const pluginHtml = pluginToolkit ? (() => {
+    const kv = parseKV(pluginToolkit);
+    return `<div class="brief-section brief-plugin-section">
+      <div class="brief-section-label">🔌 Plugin Toolkit</div>
+      ${kv['FREE'] ? `<div class="brief-plugin-row"><span class="brief-plugin-tag brief-plugin-free">FREE</span><span class="brief-plugin-body">${escHtml(kv['FREE'])}</span></div>` : ''}
+      ${kv['PAID'] ? `<div class="brief-plugin-row"><span class="brief-plugin-tag brief-plugin-paid">PAID</span><span class="brief-plugin-body">${escHtml(kv['PAID'])}</span></div>` : ''}
+      ${kv['DAW TIP'] ? `<div class="brief-plugin-row"><span class="brief-plugin-tag brief-plugin-tip">TIP</span><span class="brief-plugin-body">${escHtml(kv['DAW TIP'])}</span></div>` : ''}
+    </div>`;
+  })() : '';
+
+  // MIX BLUEPRINT render
+  const mixHtml = mixBlueprint ? (() => {
+    const kv = parseKV(mixBlueprint);
+    const rows = ['STEREO FIELD','LEVEL HIERARCHY','BUS STRUCTURE','SPECIAL TECHNIQUE'];
+    const icons = { 'STEREO FIELD':'↔️', 'LEVEL HIERARCHY':'📶', 'BUS STRUCTURE':'🗂', 'SPECIAL TECHNIQUE':'🎯' };
+    return `<div class="brief-section brief-mix-section">
+      <div class="brief-section-label">🎚 Mix Blueprint</div>
+      ${rows.filter(k=>kv[k]).map(k=>`
+        <div class="brief-mix-row">
+          <div class="brief-mix-key">${icons[k]||''} ${k.split(' ').map(w=>w.charAt(0)+w.slice(1).toLowerCase()).join(' ')}</div>
+          <div class="brief-mix-val">${escHtml(kv[k])}</div>
+        </div>`).join('')}
+    </div>`;
+  })() : '';
+
+  // MASTERING TARGET render
+  const masterHtml = masteringTarget ? (() => {
+    const kv = parseKV(masteringTarget);
+    const chips = [
+      kv['LUFS'] ? `<div class="master-chip master-chip-amber"><div class="master-chip-label">LUFS</div><div class="master-chip-val">${escHtml(kv['LUFS'])}</div></div>` : '',
+      kv['DYNAMIC RANGE'] ? `<div class="master-chip master-chip-green"><div class="master-chip-label">Dynamic Range</div><div class="master-chip-val">${escHtml(kv['DYNAMIC RANGE'])}</div></div>` : '',
+      kv['BRIGHTNESS'] ? `<div class="master-chip master-chip-blue"><div class="master-chip-label">Brightness</div><div class="master-chip-val">${escHtml(kv['BRIGHTNESS'])}</div></div>` : '',
+      kv['STEREO WIDTH'] ? `<div class="master-chip master-chip-violet"><div class="master-chip-label">Stereo Width</div><div class="master-chip-val">${escHtml(kv['STEREO WIDTH'])}</div></div>` : '',
+    ].filter(Boolean).join('');
+    return `<div class="brief-section brief-master-section">
+      <div class="brief-section-label">💿 Mastering Target</div>
+      <div class="master-chips">${chips}</div>
+      ${kv['NOTES'] ? `<div class="master-notes">${escHtml(kv['NOTES'])}</div>` : ''}
+    </div>`;
+  })() : '';
 
   el.innerHTML = `
     <!-- MAIN PROMPT — hero section -->
@@ -6231,6 +6462,11 @@ function renderBrief(prefix, songPrompt, briefRaw, countermelodyRaw) {
         </div>` : ''}
       </div>`;
     })() : ''}
+
+    ${fxHtml}
+    ${pluginHtml}
+    ${mixHtml}
+    ${masterHtml}
 
     ${!corePrompt&&!raw ? `<div style="padding:40px;text-align:center;color:var(--tx3);font-size:13px">Generate a song to see the Production Brief</div>` : ''}
   `;
@@ -6606,7 +6842,7 @@ function renderEditor(){
     const cls=sylCls(syl,chorus);
     const escaped=line.text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     html+=`<div class="lline" id="ll${i}">
-      <input class="ll-input" type="text" value="${escaped}" oninput="updLine(${i},this.value)" data-chorus="${chorus}"/>
+      <input class="ll-input" type="text" value="${escaped}" oninput="updLine(${i},this.value)" onblur="commitLine(${i},this.value)" data-chorus="${chorus}" data-orig="${escaped}"/>
       <span class="ll-syl ${cls}" id="syl${i}">${syl>0?syl:'—'}</span>
       <button class="ll-regen" id="reg${i}" onclick="regenLine(${i})" title="Regenerate this line">🔄</button>
     </div>`;
@@ -6624,6 +6860,27 @@ function updLine(i,v){
   const el=document.getElementById('syl'+i);
   if(el){el.textContent=syl>0?syl:'—';el.className='ll-syl '+cls;}
   updEdStats();
+}
+function commitLine(i,v){
+  // Propagate change to all other lines that had the same original text
+  const inp=document.querySelector(`#ll${i} .ll-input`);
+  const origText=inp?.dataset?.orig||'';
+  // Only propagate if the line actually changed
+  if(!origText||v===origText)return;
+  let updated=0;
+  S.editorLines.forEach((line,j)=>{
+    if(j===i||line.isTag||line.isEmpty)return;
+    if(line.text===origText){
+      line.text=v;
+      const other=document.querySelector(`#ll${j} .ll-input`);
+      if(other){other.value=v;other.dataset.orig=v;}
+      updLine(j,v);
+      updated++;
+    }
+  });
+  // Update orig on the edited input too
+  if(inp)inp.dataset.orig=v;
+  if(updated>0)toast(`🔄 Updated ${updated} matching line${updated>1?'s':''}`);
 }
 function updEdStats(){
   const lines=S.editorLines.filter(l=>!l.isTag&&!l.isEmpty&&l.text.trim());
@@ -7593,32 +7850,24 @@ async function runCoach() {
   document.getElementById('coach-idle').style.display = 'none';
   document.getElementById('coach-loading').style.display = 'block';
   document.getElementById('coach-results').style.display = 'none';
+  const outputEl = document.getElementById('coach-output');
+  outputEl.textContent = '';
+  let fullText = '';
 
   try {
-    const resp = await fetch('/api/generate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: [{
-          role: 'user',
-          content: `You are Soniq's AI Feedback Coach — a world-class music producer, songwriter, and A&R consultant. Analyze these ${_coachGenre || ''} lyrics${_coachTopic ? ' about "' + _coachTopic + '"' : ''} across these 9 dimensions. For each give: a star rating (⭐-⭐⭐⭐⭐⭐), one sentence on what works, one specific fix if under 4 stars.\n\n**DIMENSIONS:** Hook Strength · Emotional Arc · Specificity · Rhyme & Flow · Structure · Genre Authenticity · Opening Line · Bridge/Turn · Suno Readiness\n\nAfter all 9: give STRONGEST MOMENT, WEAKEST MOMENT, ONE PRIORITY FIX, and GENRE VERDICT.\n\nLYRICS:\n${_coachLyrics}`
-        }],
-        max_tokens: 2048
-      })
-    });
-
-    if (!resp.ok) throw new Error(`API error ${resp.status}`);
-    const data = await resp.json();
-    const text = Array.isArray(data.content)
-      ? data.content.map(c => c.text || '').join('')
-      : (data.content || data.text || '');
-
-    if (!text.trim()) throw new Error('Empty response');
-
-    _coachFeedback = text;
-    document.getElementById('coach-output').textContent = text;
-    document.getElementById('coach-loading').style.display = 'none';
-    document.getElementById('coach-results').style.display = 'block';
+    await callServerStream('feedback',
+      { lyrics: _coachLyrics, genre: _coachGenre, topic: _coachTopic },
+      (chunk, text) => {
+        fullText = text;
+        outputEl.textContent = text;
+        if (text.trim()) {
+          document.getElementById('coach-loading').style.display = 'none';
+          document.getElementById('coach-results').style.display = 'block';
+        }
+      }
+    );
+    _coachFeedback = fullText;
+    if (!fullText.trim()) throw new Error('Empty response');
   } catch(e) {
     document.getElementById('coach-loading').style.display = 'none';
     document.getElementById('coach-idle').style.display = 'block';
