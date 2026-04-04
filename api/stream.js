@@ -472,9 +472,11 @@ module.exports = async function handler(req, res) {
       messages = [{role: 'user', content: built.prompt}];
       system = built.system;
       max_tokens = 4096;
-      if (built.meta) {
-        res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(built.meta)).toString('base64'));
-      }
+      // Attach production data + lucky meta to response header (read by client parsers)
+      const metaGenre = (body.params?.genre) || (built.meta?.g1) || 'pop';
+      const prodData = brain.buildProductionData(metaGenre);
+      const metaObj = { ...(built.meta || {}), prodData };
+      res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(metaObj)).toString('base64'));
     } catch (err) {
       console.error('Brain prompt build failed:', err.message);
       return res.status(500).json({ error: 'Prompt build error: ' + err.message });
