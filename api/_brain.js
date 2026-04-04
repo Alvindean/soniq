@@ -1410,6 +1410,134 @@ const HOOK_STRUCTURE_NOTES = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// RHYME SCHEMES — injected randomly per generation
+// ═══════════════════════════════════════════════════════════════════════════
+
+const RHYME_SCHEMES = {
+  'AABB': 'Couplet rhyme (AABB): lines 1+2 rhyme, lines 3+4 rhyme. Creates momentum and satisfaction — folk, country, and pop default. Feels conversational and propulsive.',
+  'ABAB': 'Alternating rhyme (ABAB): lines 1+3 rhyme, lines 2+4 rhyme. Creates tension and pull — listener is always waiting for the resolution. Classic ballad and anthem structure.',
+  'ABCB': 'Ballad form (ABCB): only lines 2 and 4 rhyme. Feels natural, almost spoken — like someone telling you something true. Less forced than full rhyme, harder to write well.',
+  'AABA': 'Anchor rhyme (AABA): three lines rhyme, one breaks free. The free line (line 3) is always the most emotionally revealing line — it carries the weight because it stands apart.',
+  'Internal': 'Internal rhyme density: words within the same line rhyme with each other, not just end-words. Creates rapid momentum and flow density — hip-hop and slam poetry technique. Use at least 2 internal rhymes per 4-line unit.',
+  'Slant':   'Slant rhyme scheme: near-rhymes, assonance, and consonance instead of perfect rhymes. Creates organic, non-sing-songy feel — indie, alt-country, literary SS. Examples: "moon/room", "fire/liar", "time/mine".',
+  'Chain':   'Chain rhyme: the final word of each line rhymes with a word in the MIDDLE of the next line, creating a cascading effect. Pulls the listener forward relentlessly. Advanced technique — Eminem and Hamilton model.',
+};
+
+const GENRE_RHYME_PREF = {
+  pop:       ['AABB', 'ABAB', 'ABCB'],
+  hiphop:    ['Internal', 'Chain', 'AABB'],
+  rnb:       ['ABCB', 'ABAB', 'Slant'],
+  neosoul:   ['Slant', 'ABCB', 'Internal'],
+  country:   ['AABB', 'ABCB', 'ABAB'],
+  ss:        ['Slant', 'ABCB', 'AABA'],
+  jazz:      ['AABA', 'Slant', 'ABCB'],
+  gospel:    ['AABB', 'ABAB', 'Internal'],
+  altrock:   ['Slant', 'ABCB', 'ABAB'],
+  blues:     ['AABB', 'ABCB', 'Slant'],
+  edm:       ['AABB', 'ABAB', 'Internal'],
+  kpop:      ['ABAB', 'AABB', 'Internal'],
+  punk:      ['AABB', 'Internal', 'ABAB'],
+  reggae:    ['AABB', 'ABCB', 'Slant'],
+  latin:     ['ABAB', 'AABB', 'ABCB'],
+  reggaeton: ['AABB', 'Internal', 'Chain'],
+  afrobeats: ['AABB', 'ABCB', 'Internal'],
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ERA VOCABULARY — era-specific anchor words/phrases injected per generation
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ERA_VOCABULARY = {
+  classic: {
+    label: 'Classic (pre-1980)',
+    anchors: ['switchboard','eight-track','dime store','Western Union','operator','party line','drive-in','nickel jukebox','AM radio','vinyl single','five and dime','telegram'],
+    forbidden: ['scroll','swipe','stream','DM','download','playlist','algorithm','viral'],
+  },
+  vintage: {
+    label: 'Vintage (1980–1999)',
+    anchors: ['answering machine','mixtape','pay phone','cassette','pager','beeper','VCR','boom box','fax machine','dial-up','MTV','cellular'],
+    forbidden: ['stream','DM','TikTok','Instagram','algorithm','playlist','Spotify'],
+  },
+  modern: {
+    label: 'Modern (2000–2015)',
+    anchors: ['ringtone','MySpace','text me','download','iPod','YouTube','BlackBerry','going viral','Facebook','tweet','selfie','Wi-Fi'],
+    forbidden: ['TikTok','Reels','algorithm','For You Page','story post','NFT'],
+  },
+  contemporary: {
+    label: 'Contemporary (2016–2022)',
+    anchors: ['stories','scroll','playlist','stream','Spotify','DM slide','gram','dropped','viral','fire emoji','ghost','left on read'],
+    forbidden: ['eight-track','cassette','pager','telegram','party line'],
+  },
+  current: {
+    label: 'Current (2023–Now)',
+    anchors: ['algorithm','For You Page','AI-generated','hyperpop','ambient','lo-fi','parasocial','main character','rent-free','brain rot','delulu','understood the assignment'],
+    forbidden: ['eight-track','cassette','pager','telegram','MySpace','BlackBerry'],
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EMOTIONAL ARCS — user-selectable journey templates
+// ═══════════════════════════════════════════════════════════════════════════
+
+const EMOTIONAL_ARCS = {
+  'none': null,
+  'devastation-acceptance': {
+    name: 'Devastation → Acceptance',
+    arc: 'Verse 1: raw devastation — the wound is fresh. Chorus 1: denial or bargaining. Verse 2: deeper reckoning — understanding the why. Bridge: turning point — not fixed but not broken. Final Chorus: acceptance — same words, different meaning. The listener should feel relief, not joy.',
+    genre_fit: ['ss','rnb','country','neosoul','altrock','blues'],
+  },
+  'joy-nostalgia-gratitude': {
+    name: 'Joy → Nostalgia → Gratitude',
+    arc: 'Verse 1: a joyful memory in present tense — re-living it. Chorus: the pure feeling before context. Verse 2: realizing that time has passed, the moment is gone. Bridge: the bittersweet recognition that it was perfect. Final Chorus: gratitude for having had it — joy becomes thanksgiving.',
+    genre_fit: ['pop','country','ss','rnb','gospel'],
+  },
+  'anger-clarity-resolve': {
+    name: 'Anger → Clarity → Resolve',
+    arc: 'Verse 1: the grievance — specific, present tense, raw. Chorus: the explosion of anger. Verse 2: pulling back — understanding who you actually are and what you want. Bridge: the moment anger transforms into vision. Final Chorus: same words, now a war cry instead of a wound cry.',
+    genre_fit: ['hiphop','punk','altrock','blues','rock'],
+  },
+  'longing-action-arrival': {
+    name: 'Longing → Action → Arrival',
+    arc: 'Verse 1: longing — specific about what is missing or wanted. Pre-chorus: the decision forming. Chorus: the declaration of intent — not arrival yet, but commitment. Verse 2: the journey — obstacles, doubts. Bridge: the darkest moment before arrival. Final Chorus: arrival — same words, earned.',
+    genre_fit: ['pop','country','gospel','kpop','edm'],
+  },
+  'innocence-loss-wisdom': {
+    name: 'Innocence → Loss → Wisdom',
+    arc: 'Verse 1: innocence — the world as it was believed to be. Chorus: the collision with reality. Verse 2: aftermath — what is lost. Bridge: the question of what to do with the loss. Final Chorus/Outro: wisdom — not restored innocence but something better. The song is a coming-of-age in 3 minutes.',
+    genre_fit: ['ss','altrock','country','rnb','neosoul'],
+  },
+  'isolation-connection-belonging': {
+    name: 'Isolation → Connection → Belonging',
+    arc: 'Verse 1: alone — specific about the isolation, not generic. Chorus: the reaching out or discovery of another. Verse 2: the risk of connection — vulnerability. Bridge: the moment the walls come down. Final Chorus: belonging — the chorus lands the same but the isolation has been replaced.',
+    genre_fit: ['pop','kpop','edm','gospel','rnb'],
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GENRE SYLLABLE BUDGETS — default syllable constraints per section
+// ═══════════════════════════════════════════════════════════════════════════
+
+const GENRE_SYLLABLE_BUDGETS = {
+  pop:       { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
+  hiphop:    { verse: '12–20', chorus: '8–12', bridge: '10–16', prechorus: '8–12' },
+  rnb:       { verse: '8–13', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
+  neosoul:   { verse: '8–14', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
+  country:   { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–8' },
+  ss:        { verse: '7–14', chorus: '5–10', bridge: '5–10', prechorus: '5–9' },
+  jazz:      { verse: '6–12', chorus: '5–9',  bridge: '5–9',  prechorus: '5–8' },
+  gospel:    { verse: '8–13', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
+  altrock:   { verse: '8–13', chorus: '5–9',  bridge: '5–9',  prechorus: '5–8' },
+  blues:     { verse: '8–14', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
+  edm:       { verse: '6–10', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
+  kpop:      { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
+  punk:      { verse: '8–14', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
+  reggae:    { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '5–8' },
+  latin:     { verse: '8–13', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
+  reggaeton: { verse: '8–14', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
+  afrobeats: { verse: '6–12', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // GENRE SECTION DNA
 // Per-genre data for bridge harmony, weighted archetype preferences,
 // counter-melody role, real song references, outro + verse-2 tendencies.
@@ -1691,7 +1819,9 @@ function buildSongPrompt(params) {
     structure = 'standard', era = 'modern', length = 'medium',
     quality = 'high', theoryLevel = 'standard', mode = 'auto',
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
-    blend = {}, bracketMode = 'suno', ageGroup = ''
+    blend = {}, bracketMode = 'suno', ageGroup = '',
+    emotionalArc = 'none', seedLine = '', syllableCap = 0,
+    platform = 'suno', avoidPatterns = [], dualPerspective = false
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -1847,6 +1977,64 @@ Rule: ${_poa.rule}`;
 
   const hookStructNote = _hookStructNote ? `\n\n${_hookStructNote}` : '';
 
+  // ── Rhyme scheme injection ──────────────────────────────────────────────
+  const _rhymePref = GENRE_RHYME_PREF[genre] || ['AABB','ABAB','Slant'];
+  const _rhemeKey  = Math.random() < 0.7
+    ? _rhymePref[Math.floor(Math.random() * _rhymePref.length)]
+    : Object.keys(RHYME_SCHEMES)[Math.floor(Math.random() * Object.keys(RHYME_SCHEMES).length)];
+  const rhymeNote  = `\n\nRHYME SCHEME: ${_rhemeKey}\n${RHYME_SCHEMES[_rhemeKey] || ''}`;
+
+  // ── Era vocabulary injection ────────────────────────────────────────────
+  const _eraVoc = ERA_VOCABULARY[era];
+  const eraVocNote = _eraVoc
+    ? `\n\nERA ANCHORS (${_eraVoc.label}): Weave 2-3 of these into the lyrics to lock the song in its era: ${_eraVoc.anchors.slice(0,8).join(', ')}. Forbidden anachronisms: ${_eraVoc.forbidden.slice(0,5).join(', ')}.`
+    : '';
+
+  // ── Key psychology injection ────────────────────────────────────────────
+  const _keyPsych = MUSIC_THEORY_BIBLE.keyPsychology;
+  const _keyPool  = Object.keys(_keyPsych);
+  const _chosenKey = _keyPool[Math.floor(Math.random() * _keyPool.length)];
+  const _kp = _keyPsych[_chosenKey];
+  const keyPsychNote = `\n\nSUGGESTED KEY PSYCHOLOGY: ${_chosenKey} — ${_kp.feel} Tension: ${_kp.tension}, Brightness: ${_kp.bright}/10. Use this key's emotional character to shape the production brief.`;
+
+  // ── Emotional arc injection ─────────────────────────────────────────────
+  const _arcData = EMOTIONAL_ARCS[emotionalArc];
+  const emotionalArcNote = _arcData
+    ? `\n\nEMOTIONAL ARC — "${_arcData.name}":\n${_arcData.arc}`
+    : '';
+
+  // ── Seed line injection ─────────────────────────────────────────────────
+  const _cleanSeed = seedLine ? sanitizeInput(seedLine, 120) : '';
+  const seedLineNote = _cleanSeed
+    ? `\n\nSEED LINE (build the entire song around this line): "${_cleanSeed}" — This is the anchor. Every chorus, every verse must orbit this line. It should appear verbatim in the chorus and be the emotional thesis of the song.`
+    : '';
+
+  // ── Syllable budget ─────────────────────────────────────────────────────
+  const _sylBudget  = GENRE_SYLLABLE_BUDGETS[genre] || { verse:'8–13', chorus:'6–10', bridge:'6–10', prechorus:'6–9' };
+  const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
+  const syllableNote = `\n\nSYLLABLE BUDGET:\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
+
+  // ── Dual perspective (antagonist POV in Verse 2) ────────────────────────
+  const dualPerspNote = dualPerspective
+    ? `\n\nDUAL PERSPECTIVE RULE: Verse 2 MUST be written from the antagonist's or opposite perspective. If Verse 1 is the protagonist's longing, Verse 2 is the other person's detachment. If Verse 1 is anger, Verse 2 is the accused person's justification. This creates dramatic tension and forces the listener to hold two truths simultaneously.`
+    : '';
+
+  // ── Pattern avoidance ───────────────────────────────────────────────────
+  const avoidNote = avoidPatterns && avoidPatterns.length > 0
+    ? `\n\nPATTERN AVOIDANCE: These opening lines were used recently — do NOT start any verse with similar phrasing or imagery: ${avoidPatterns.map(p => `"${p}"`).join(', ')}. Find a completely fresh entry point.`
+    : '';
+
+  // ── Platform-specific instructions ─────────────────────────────────────
+  const platformNotes = {
+    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 200 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
+    udio:   'PLATFORM: Udio — Section tags work differently: Udio responds well to emotional descriptors in brackets, e.g. [Verse - melancholic], [Chorus - anthemic]. Keep SONG PROMPT under 300 characters. Udio prefers genre descriptors over instrument lists.',
+    stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
+  };
+  const platformNote = platformNotes[platform] || platformNotes.suno;
+
+  // ── Specificity self-check instruction ─────────────────────────────────
+  const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -1856,17 +2044,22 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
+- FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
 - Hook must arrive within 30 seconds
 - Chorus lines: maximum 10 syllables each for singability
 - Verse lines: 8-13 syllables, consistent within each verse
 - Every line must be specific — no vague emotions, no clichés
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
-- The last chorus must feel bigger than the first${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}
+- The last chorus must feel bigger than the first
+- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
+- ${platformNote}
+
+HOOK SELF-CHECK: After writing the chorus, verify: (1) Is the title or central phrase present? (2) Could a stranger hum this after one listen? (3) Does it say something specific, not generic? If any answer is no — rewrite the chorus before proceeding.
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
 
@@ -1874,15 +2067,24 @@ TITLE: [song title]
 
 VERDICT: [one sentence on why this song will connect with listeners]
 
+HOOK ISOLATION:
+[Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
+
 LYRICS:
 [Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
 
 SONG PROMPT:
-[The AI music platform style prompt. Under 440 characters. Include: core genre, sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]
+Genre: [core genre + sub-genre]
+Instruments: [4-5 key instruments, comma-separated]
+BPM: [range, e.g. 95-100]
+Vocal: [vocal descriptor]
+Texture: [production texture in 5-8 words]
+Counter-melody: [counter-melody device]
+Full prompt: [assemble all of the above into one ready-to-paste string under 440 characters — NO artist names]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
-[Exact copy of the SONG PROMPT above — ready to paste]
+[Exact copy of the Full prompt line above — ready to paste]
 
 TEMPO & KEY:
 [BPM range · Suggested key · Time signature · Feel]
@@ -1897,7 +2099,7 @@ SONIC REFERENCES:
 [3 production reference points — no artist names, describe the sonic feel]
 
 PLATFORM TIPS:
-[3 specific actionable tips for AI music platforms]
+[3 specific actionable tips for ${platform === 'udio' ? 'Udio' : platform === 'stable' ? 'Stable Audio' : 'Suno'}]
 
 STRUCTURE MAP:
 [Each section: bar count · energy level 1-10 · emotional job]
@@ -1995,6 +2197,9 @@ Respond with EXACTLY this format:
 TITLE: [song title]
 
 VERDICT: [one sentence on why this song will connect]
+
+HOOK ISOLATION:
+[Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
 
 LYRICS:
 [Write the complete song lyrics. EVERY SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE.]
@@ -2797,4 +3002,4 @@ function buildPromptIntelligence(params) {
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS };

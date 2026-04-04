@@ -102,6 +102,30 @@ const PLAN_MAX_RETRIES = {
   founding: 3,
 };
 
+// Lightweight hook score without AI — checks for chorus presence, hook isolation, syllable density
+// Used for free plan to do 1 retry when the hook is clearly absent or weak
+function serverHookScore(text) {
+  if (!text) return 0;
+  const lower = text.toLowerCase();
+  let score = 0;
+  // Has a chorus section
+  if (/\[chorus\]/i.test(text)) score += 30;
+  // Hook isolation section present (new format)
+  if (/hook isolation:/i.test(text)) score += 20;
+  // Title is present
+  if (/^title:/im.test(text)) score += 10;
+  // Song has at least 3 sections
+  const sections = (text.match(/\[[\w\s]+\]/g) || []).length;
+  if (sections >= 3) score += 15;
+  if (sections >= 5) score += 10;
+  // Lyrics have sufficient length (not truncated)
+  const lyricMatch = text.match(/LYRICS:\s*([\s\S]*?)(?=SONG PROMPT:|$)/i);
+  const lyricLen = lyricMatch ? lyricMatch[1].trim().length : 0;
+  if (lyricLen > 300) score += 10;
+  if (lyricLen > 600) score += 5;
+  return Math.min(score, 100);
+}
+
 // Score a generated song using Claude Haiku (cheap, fast)
 async function scoreSong(text, genre, anthropicKey) {
   if (!anthropicKey || !text) return 100;
@@ -519,6 +543,30 @@ module.exports = async function handler(req, res) {
       return;
     } catch (err) {
       console.error('Buffered generation failed:', err.message);
+    }
+  }
+
+  // Free plan: 1 structural retry if hook is clearly missing (uses no AI — pure regex check)
+  if (anthropicKey && plan === 'free') {
+    try {
+      const firstAttempt = await generateBuffered(anthropicKey, messages, system, max_tokens);
+      const hookQuality  = serverHookScore(firstAttempt);
+      if (hookQuality >= 60) {
+        recordUsage();
+        streamBuffered(firstAttempt, hookQuality, res);
+        return;
+      }
+      // Hook is weak — try once more, keep the better result
+      const secondAttempt = await generateBuffered(anthropicKey, messages, system, max_tokens);
+      const hookQuality2  = serverHookScore(secondAttempt);
+      const best = hookQuality2 > hookQuality ? secondAttempt : firstAttempt;
+      const bestQ = Math.max(hookQuality, hookQuality2);
+      recordUsage();
+      streamBuffered(best, bestQ, res);
+      return;
+    } catch (err) {
+      console.error('Free plan buffered generation failed:', err.message);
+      // Fall through to standard streaming
     }
   }
 
