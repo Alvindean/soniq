@@ -190,7 +190,7 @@ async function orFetch(apiKey, orMsgs, max_tokens) {
     headers: {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer ' + apiKey,
-      'HTTP-Referer': 'https://soniq.vercel.app',
+      'HTTP-Referer': 'https://www.mysoniq.com',
       'X-Title': 'SONIQ'
     },
     body: JSON.stringify({model: 'anthropic/claude-sonnet-4-5', max_tokens, stream: true, messages: orMsgs})
@@ -229,23 +229,36 @@ async function pipeSSE(r, res, extractText) {
   // Cancel upstream reader if client disconnects
   res.on('close', () => { cancelled = true; reader.cancel().catch(() => {}); });
 
-  while (true) {
-    if (cancelled) break;
-    const {done, value} = await reader.read();
-    if (done) break;
-    buf += decoder.decode(value, {stream: true});
-    const lines = buf.split('\n');
-    buf = lines.pop();
-    for (const line of lines) {
-      if (!line.startsWith('data: ')) continue;
-      const raw = line.slice(6).trim();
-      if (raw === '[DONE]') continue;
-      try {
-        const ev = JSON.parse(raw);
-        const text = extractText(ev);
-        if (text) res.write(`data: ${JSON.stringify({text})}\n\n`);
-      } catch {}
+  try {
+    while (true) {
+      if (cancelled) break;
+      const {done, value} = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, {stream: true});
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') continue;
+        try {
+          const ev = JSON.parse(raw);
+          // Surface mid-stream provider errors (OpenRouter sends these inline)
+          if (ev.error) {
+            const msg = ev.error?.message || JSON.stringify(ev.error);
+            throw new Error('Stream error: ' + msg.slice(0, 200));
+          }
+          const text = extractText(ev);
+          if (text) res.write(`data: ${JSON.stringify({text})}\n\n`);
+        } catch (parseErr) {
+          if (parseErr.message.startsWith('Stream error:')) throw parseErr;
+          // Malformed JSON chunk — skip silently
+        }
+      }
     }
+  } catch (err) {
+    // Re-throw everything except client-disconnect cancellations
+    if (!cancelled) throw err;
   }
 }
 
@@ -524,6 +537,12 @@ module.exports = async function handler(req, res) {
     } catch (err) {
       if (err.message === 'CREDITS_LOW') {
         res.write(`data: ${JSON.stringify({error: 'OpenRouter credit balance too low — add credits at openrouter.ai/settings/credits.'})}\n\n`);
+        return res.end();
+      }
+      // Connection terminated mid-stream — transient, safe to retry
+      const isTerminated = err.message === 'terminated' || err.message.includes('terminated');
+      if (isTerminated) {
+        res.write(`data: ${JSON.stringify({error: 'Connection dropped mid-stream — please try again.'})}\n\n`);
         return res.end();
       }
       console.error('OpenRouter stream failed:', err.message);
