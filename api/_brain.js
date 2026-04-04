@@ -2701,7 +2701,22 @@ function buildPromptIntelligence(params) {
   const outliers = (gb.outliers || []);
 
   // Score dimension analysis
-  const { lyricCraft = 0, structure: structScore = 0, genreDNA = 0, hookStrength = 0 } = scoreBreakdown;
+  // If no breakdown sent (client sends only hookScore), derive approximate dims
+  // so suggestions are calibrated to quality rather than always firing all four.
+  const hasDims = scoreBreakdown && (scoreBreakdown.lyricCraft || scoreBreakdown.hookStrength || scoreBreakdown.genreDNA || scoreBreakdown.structure);
+  let lyricCraft, structScore, genreDNA, hookStrength;
+  if (hasDims) {
+    ({ lyricCraft = 0, structure: structScore = 0, genreDNA = 0, hookStrength = 0 } = scoreBreakdown);
+  } else {
+    // Derive from overall hookScore (0-100 scale) with slight per-dimension jitter
+    // so different tip types are suggested on different generations
+    const base = Math.max(0, Math.min(100, hookScore));
+    const jitter = () => (Math.random() - 0.5) * 20; // ±10 points of noise
+    lyricCraft   = Math.round((base + jitter()) * 0.30); // max 30
+    structScore  = Math.round((base + jitter()) * 0.25); // max 25
+    genreDNA     = Math.round((base + jitter()) * 0.25); // max 25
+    hookStrength = Math.round((base + jitter()) * 0.20); // max 20
+  }
   const weakest = [
     { dim: 'Lyric Craft', score: lyricCraft, max: 30 },
     { dim: 'Structure', score: structScore, max: 25 },
