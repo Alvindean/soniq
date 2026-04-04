@@ -5446,7 +5446,7 @@ function parseLuckyResult(raw,fusionName,meta){
     if (!S.luckyVersions) S.luckyVersions = [];
     pushVersion('lres');
   }
-  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,visualPrompt,videoPrompt,genre:fusionName,topic:meta.topic,ts:lts,id:lts};
+  S.luckyCurrentSong={title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,notes,countermelody,visualPrompt,videoPrompt,genre:fusionName,topic:meta.topic,mood:meta.mood,vocal:meta.vocal,ts:lts,id:lts};
   pushVersion('lres');
   renderVersionBar('lres');
   updateShareHash(S.luckyCurrentSong);
