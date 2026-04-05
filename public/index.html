@@ -155,8 +155,8 @@ a{color:var(--amber);text-decoration:none}
 .write-output-panel{min-width:0}
 
 @media(min-width:901px){
-  /* 2-panel grid layout: 380px controls (left/sticky) + 1fr output (right) */
-  #pg-write.on{display:grid;grid-template-columns:380px 1fr;gap:var(--sp-lg,20px);align-items:start}
+  /* 2-panel grid layout: 420px controls (left/sticky) + 1fr output (right) */
+  #pg-write.on{display:grid;grid-template-columns:420px 1fr;gap:var(--sp-lg,20px);align-items:start}
   #pg-write.on .studio{display:none}
   #pg-write.on #writer-social{display:none}
   /* Sticky left panel with scrolling */
@@ -164,8 +164,8 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on #writer-output-controls::-webkit-scrollbar{width:3px}
   #pg-write.on #writer-output-controls::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
   /* Compact grids for narrower 380px panel */
-  #pg-write.on #writer-output-controls .genre-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
-  #pg-write.on #writer-output-controls .mood-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+  #pg-write.on #writer-output-controls .genre-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  #pg-write.on #writer-output-controls .mood-grid{grid-template-columns:repeat(3,1fr);gap:6px}
   /* Scaled inputs for 380px panel */
   #pg-write.on #writer-output-controls .topic-input{font-size:15px;padding:12px 14px;min-height:64px;width:100%}
   #pg-write.on #writer-output-controls .gen-btn{width:100%;justify-content:center;font-size:15px;padding:14px 20px}
@@ -194,15 +194,15 @@ a{color:var(--amber);text-decoration:none}
   .nav{margin:0 -28px 28px;border-radius:0;border-left:none;border-right:none;padding-left:28px;padding-right:28px}
 }
 
-/* ── AD RAILS (left + right, only at ≥1500px) ── */
+/* ── AD RAILS (right only at ≥1500px — left rail disabled, sidebar uses that space) ── */
 .ad-rail{display:none;position:fixed;top:0;bottom:0;width:168px;flex-direction:column;align-items:center;padding:80px 8px 24px;gap:var(--gap-lg);z-index:50;background:var(--s1);border-color:var(--b1)}
-.ad-rail-left{left:0;border-right:1px solid var(--b1)}
+.ad-rail-left{display:none!important}
 .ad-rail-right{right:0;border-left:1px solid var(--b1)}
 .ad-rail-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:4px;text-align:center}
 .ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
 @media(min-width:1500px){
-  .ad-rail{display:flex}
-  .wrap{margin-left:192px;margin-right:192px;max-width:none;padding-left:28px;padding-right:28px}
+  .ad-rail-right{display:flex}
+  .wrap{margin-right:192px;max-width:none;padding-right:28px}
 }
 
 /* ── GENRE GRID EXPAND ── */
@@ -1756,6 +1756,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .result-card.visible{animation:none}
   .chord-row{animation:none}
 }
+/* ── STEPPED WIZARD ── */
+.step-container{display:flex;flex-direction:column;gap:var(--sp-sm,8px);padding:12px 0;border-bottom:1px solid var(--b1);transition:all .25s ease}
+.step-container:first-child{padding-top:0}
+.step-header{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:4px 0}
+.step-header:hover .step-title{color:var(--tx1)}
+.step-num{font-size:9px;font-weight:800;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:3px 8px;flex-shrink:0;transition:all .2s}
+.step-num.active{color:var(--cyan);border-color:var(--cyan);background:rgba(0,180,216,.08)}
+.step-num.done{color:#4ade80;border-color:#4ade80;background:rgba(74,222,128,.08)}
+.step-title{flex:1;font-size:13px;font-weight:600;color:var(--tx2);transition:color .15s}
+.step-indicator{font-size:10px;color:var(--tx4);transition:transform .2s}
+.step-container.collapsed .step-indicator{transform:rotate(-90deg)}
+.step-content{display:flex;flex-direction:column;gap:var(--sp-sm,8px);overflow:hidden;transition:max-height .3s ease,opacity .2s ease;max-height:800px;opacity:1}
+.step-container.collapsed .step-content{max-height:0;opacity:0;pointer-events:none}
+.step-summary{display:none;flex-wrap:wrap;gap:6px;padding:4px 0}
+.step-container.collapsed .step-summary{display:flex}
+.step-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);font-size:11px;font-weight:600;color:var(--tx2);cursor:pointer;transition:all .15s}
+.step-pill:hover{background:var(--s4);border-color:var(--b3)}
+.step-pill.genre-pill{border-color:var(--genre-accent,var(--cyan));color:var(--genre-accent,var(--cyan));background:var(--genre-bg,rgba(0,180,216,.08))}
+.step-pill.mood-pill-summary{border-color:var(--amber);color:var(--amber);background:rgba(245,184,0,.08)}
+.step-pill .pill-icon{font-size:13px}
+/* Generate always sticky at bottom of wizard */
+#pg-write.on #gen-action-main{margin-top:auto;padding-top:12px}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
@@ -1897,31 +1919,58 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <!-- OUTPUT COLUMN SECONDARY CONTROLS (Topic, Age, Vocal, Structure, Adv, Blend, Length, Generate) -->
   <div id="writer-output-controls">
 
-      <!-- GENRE GRID -->
-      <label class="topic-label">Genre</label>
-      <div class="genre-grid" id="genre-grid"></div>
-
-      <!-- MOOD GRID -->
-      <label class="topic-label">Mood <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— pick 1–2 moods</span></label>
-      <div class="mood-grid" id="mood-grid"></div>
-      <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
-
-      <!-- BIG TOPIC INPUT -->
-      <label class="topic-label" for="g-topic">What is your song about?</label>
-      <textarea id="g-topic" class="topic-input" rows="2"
-        placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
-        onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}"></textarea>
-      <!-- TOOL ROW: Mic | Enhance | Score badge -->
-      <div class="topic-tool-row">
-        <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤 Mic</button>
-        <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept">✦ Enhance</button>
-        <div class="topic-score-badge" id="topic-score-badge" title="Hook score after generation">
-          <span class="tsb-label">Score</span>
-          <span class="tsb-num" id="topic-score-num">—</span>
+      <!-- ══ STEP 1: TOPIC (always visible) ══ -->
+      <div class="step-container step-1" id="step-1" data-step="1">
+        <div class="step-header" onclick="toggleStep(1)">
+          <span class="step-num active" id="step-1-num">1</span>
+          <span class="step-title">What is your song about?</span>
+          <span class="step-indicator" id="step-1-ind">▼</span>
         </div>
+        <div class="step-content">
+          <textarea id="g-topic" class="topic-input" rows="3"
+            placeholder="e.g. feeling free after a breakup, a city that never loved you back..."
+            oninput="onTopicInput()"
+            onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}"></textarea>
+          <div class="topic-tool-row">
+            <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤 Mic</button>
+            <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept">✦ Enhance</button>
+            <div class="topic-score-badge" id="topic-score-badge" title="Hook score after generation">
+              <span class="tsb-label">Score</span>
+              <span class="tsb-num" id="topic-score-num">—</span>
+            </div>
+          </div>
+        </div>
+        <div class="step-summary" id="step-1-summary"></div>
       </div>
 
-      <!-- GENERATE (above the fold) -->
+      <!-- ══ STEP 2: GENRE (appears when topic has content) ══ -->
+      <div class="step-container step-2" id="step-2" data-step="2" style="display:none">
+        <div class="step-header" onclick="toggleStep(2)">
+          <span class="step-num" id="step-2-num">2</span>
+          <span class="step-title">Pick a genre</span>
+          <span class="step-indicator" id="step-2-ind">▼</span>
+        </div>
+        <div class="step-content">
+          <div class="genre-grid" id="genre-grid"></div>
+        </div>
+        <div class="step-summary" id="step-2-summary"></div>
+      </div>
+
+      <!-- ══ STEP 3: MOOD (appears when genre selected) ══ -->
+      <div class="step-container step-3" id="step-3" data-step="3" style="display:none">
+        <div class="step-header" onclick="toggleStep(3)">
+          <span class="step-num" id="step-3-num">3</span>
+          <span class="step-title">Set the mood</span>
+          <span class="step-indicator" id="step-3-ind">▼</span>
+        </div>
+        <div class="step-content">
+          <div class="mood-grid" id="mood-grid"></div>
+          <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
+        </div>
+        <div class="step-summary" id="step-3-summary"></div>
+      </div>
+
+      <!-- ══ GENERATE (always visible) ══ -->
       <div class="gen-action" id="gen-action-main">
         <button class="gen-btn" id="gen-btn" onclick="generateSong()">
           <span class="gen-btn-icon">🎵</span>
@@ -5609,6 +5658,13 @@ function onGenreChange(g){
     if (btn && btn.getAttribute('aria-expanded') !== 'true') toggleGenreExpand();
   }
   applyGenreColor(g);
+  // ── Wizard: show Step 3, update summary pills ──
+  if(typeof updateStepVisibility==='function') updateStepVisibility();
+  if(typeof expandStep==='function') expandStep(3);
+  // Genre summary pill
+  const gDef = GENRES_DEF.find(x=>x.id===g);
+  const sum2 = document.getElementById('step-2-summary');
+  if(sum2 && gDef) sum2.innerHTML = '<span class="step-pill genre-pill" onclick="expandStep(2)"><span class="pill-icon">'+gDef.icon+'</span> '+gDef.label+'</span>';
   const styles=SUBSTYLES[g];
   const row=document.getElementById('substyle-row');
   const lbl=document.getElementById('substyle-label');
@@ -8583,8 +8639,71 @@ function copyCoachFeedback() {
   toast('Feedback copied to clipboard');
 }
 
+// ═══════════════════════════════════════════════════════════════
+// STEPPED WIZARD LOGIC
+// ═══════════════════════════════════════════════════════════════
+function onTopicInput(){
+  updateStepVisibility();
+  // Update step 1 summary pill
+  const text = (document.getElementById('g-topic').value||'').trim();
+  const sum = document.getElementById('step-1-summary');
+  if(sum) sum.innerHTML = text.length > 0
+    ? '<span class="step-pill" onclick="expandStep(1)">'+escHtml(text.substring(0,30))+(text.length>30?'...':'')+'</span>'
+    : '';
+}
+
+function updateStepVisibility(){
+  const topic = (document.getElementById('g-topic').value||'').trim();
+  const step2 = document.getElementById('step-2');
+  const step3 = document.getElementById('step-3');
+  // Step 2: show when topic has 3+ chars
+  if(step2){
+    const show2 = topic.length >= 3;
+    step2.style.display = show2 ? '' : 'none';
+    const n2 = document.getElementById('step-2-num');
+    if(n2) n2.className = 'step-num' + (show2 ? ' active' : '');
+  }
+  // Step 3: show when genre is selected
+  const hasGenre = S.selectedGenre && document.querySelector('#genre-grid .gp.on');
+  if(step3){
+    const show3 = !!hasGenre;
+    step3.style.display = show3 ? '' : 'none';
+    const n3 = document.getElementById('step-3-num');
+    if(n3) n3.className = 'step-num' + (show3 ? ' active' : '');
+  }
+  // Mark step 2 as done if genre selected
+  const n2 = document.getElementById('step-2-num');
+  if(n2 && hasGenre) n2.className = 'step-num done';
+}
+
+function toggleStep(n){
+  const el = document.getElementById('step-'+n);
+  if(!el) return;
+  el.classList.toggle('collapsed');
+  const ind = document.getElementById('step-'+n+'-ind');
+  if(ind) ind.textContent = el.classList.contains('collapsed') ? '▶' : '▼';
+}
+
+function collapseStep(n){
+  const el = document.getElementById('step-'+n);
+  if(el && !el.classList.contains('collapsed')){
+    el.classList.add('collapsed');
+    const ind = document.getElementById('step-'+n+'-ind');
+    if(ind) ind.textContent = '▶';
+  }
+}
+
+function expandStep(n){
+  const el = document.getElementById('step-'+n);
+  if(el && el.classList.contains('collapsed')){
+    el.classList.remove('collapsed');
+    const ind = document.getElementById('step-'+n+'-ind');
+    if(ind) ind.textContent = '▼';
+  }
+}
+
 // ─── SUPABASE AUTH ─────────────────────────────────────────────
-(function initSupabase() {
+function _initSupabase() {
   const url = 'https://gotrwbhkavkqmxtnxkkj.supabase.co';
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
@@ -8641,7 +8760,15 @@ function copyCoachFeedback() {
     openPasswordResetModal();
     history.replaceState(null, '', '/');
   }
-})();
+}
+// Supabase CDN loads with defer — call init when ready
+if (window.supabase) _initSupabase();
+else document.addEventListener('DOMContentLoaded', function(){
+  if (window.supabase) _initSupabase();
+  else { console.warn('[SONIQ] Supabase library not loaded — retrying in 500ms');
+    setTimeout(function(){ if(window.supabase) _initSupabase(); else console.error('[SONIQ] Supabase failed to load'); }, 500);
+  }
+});
 
 function updateAuthUI() {
   const authBtn = document.getElementById('nav-auth-btn');
@@ -10561,6 +10688,17 @@ function toggleMood(id,el){
     applyMoodColor(el, id);
   }
   updateMoodHint();
+  // ── Wizard: update mood summary pill ──
+  const sum3 = document.getElementById('step-3-summary');
+  if(sum3){
+    const pills = S.selectedMoods.map(mid=>{
+      const m = MOODS_DEF.find(x=>x.id===mid);
+      return m ? '<span class="step-pill mood-pill-summary" onclick="expandStep(3)"><span class="pill-icon">'+m.icon+'</span> '+m.id+'</span>' : '';
+    }).join('');
+    sum3.innerHTML = pills;
+  }
+  const n3 = document.getElementById('step-3-num');
+  if(n3 && S.selectedMoods.length > 0) n3.className = 'step-num done';
 }
 function updateMoodHint(){
   const hint=document.getElementById('mood-hint');
@@ -12410,7 +12548,7 @@ function loadProfilePage() {
   const planLabel = PLAN_DISPLAY[plan] || plan.charAt(0).toUpperCase()+plan.slice(1);
   const planLimit = CLIENT_PLAN_LIMITS[plan] ?? 3;
   const isLifetime = plan === 'free';
-  const isUnlimited = planLimit === Infinity || !isFinite(planLimit);
+  let isUnlimited = planLimit === Infinity || !isFinite(planLimit);
 
   // Track usage in localStorage
   const thisMonth = new Date().toISOString().slice(0,7);
@@ -12427,7 +12565,7 @@ function loadProfilePage() {
   planBadge.style.background  = pc + '18';
 
   // Studio/founding admins are effectively unlimited — treat as such
-  const isUnlimited = !isFinite(planLimit) || ['studio','studio_annual','founding'].includes(plan) && CLIENT_PLAN_LIMITS[plan] >= 50 && S.isAdmin;
+  isUnlimited = !isFinite(planLimit) || ['studio','studio_annual','founding'].includes(plan) && CLIENT_PLAN_LIMITS[plan] >= 50 && S.isAdmin;
   if (isUnlimited) {
     document.getElementById('profile-usage-bar').style.width = '100%';
     document.getElementById('profile-usage-nums').textContent = `${usageCount} generated`;
@@ -13225,11 +13363,11 @@ function completeOnboarding() {
 // ── EMPTY STATE ───────────────────────────────────────────────
 
 function prefillConcept(text) {
-  var inp = document.getElementById(‘g-topic’);
+  var inp = document.getElementById('g-topic');
   if (inp) {
     inp.value = text;
     inp.focus();
-    inp.scrollIntoView({ behavior: ‘smooth’, block: ‘nearest’ });
+    inp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   updateEmptyState();
 }
