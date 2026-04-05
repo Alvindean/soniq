@@ -11492,6 +11492,15 @@ function calcHookScore(prefix) {
   dash.classList.add('visible');
   if (numEl) numEl.textContent = overall.toFixed(1);
 
+  // Update the topic-area score badge
+  if (prefix === 'res') {
+    const badge = document.getElementById('topic-score-num');
+    if (badge) {
+      badge.textContent = overall.toFixed(1);
+      badge.className = 'tsb-num ' + (overall >= 7.5 ? 'good' : overall >= 5 ? 'ok' : 'low');
+    }
+  }
+
   const items = [
     {label:'Syllable Count', score:sylScore, note: `Avg ${avgSyl.toFixed(1)} syl/line`},
     {label:'Repetition', score:repScore, note:`${repeated} repeated words`},
