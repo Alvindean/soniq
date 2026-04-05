@@ -206,6 +206,12 @@ a{color:var(--amber);text-decoration:none}
 /* ── NAV ── */
 .nav{display:flex;gap:3px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:5px;margin-bottom:28px;overflow-x:auto}
 .nav::-webkit-scrollbar{display:none}
+/* Nav scroll fade — shows gradient on right edge when nav overflows */
+.nav-scroll-wrap{position:relative;margin-bottom:28px}
+.nav-scroll-wrap .nav{margin-bottom:0}
+.nav-scroll-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(to left,var(--s2) 0%,transparent 100%);pointer-events:none;border-radius:0 var(--r3) var(--r3) 0;transition:opacity .2s;z-index:1}
+.nav-scroll-wrap.at-end::after{opacity:0}
+@media(min-width:901px){.nav-scroll-wrap::after{display:none}}
 .nb{flex:1;min-width:88px;padding:12px 10px;border-radius:var(--r2);border:none;background:transparent;color:var(--tx3);font-size:12px;font-weight:600;letter-spacing:0.03em;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
 .nb:hover{background:var(--s3);color:var(--tx1)}
 .nb.on{background:var(--s4);color:var(--tx1);box-shadow:0 1px 0 0 var(--b3) inset}
@@ -7111,6 +7117,7 @@ function persistLib(){
   }
   updateLibBadge();
   if (typeof refreshInspirationBoard === 'function') refreshInspirationBoard();
+  if (typeof refreshCommunityFeed === 'function') refreshCommunityFeed();
 }
 
 function updateLibBadge(){
@@ -12721,8 +12728,27 @@ function refreshInspirationBoard() {
   }).join('');
 }
 
+function refreshCommunityFeed() {
+  const feed = document.getElementById('ws-community-feed');
+  if (!feed) return;
+  const songs = (S.library || []).slice(0, 3);
+  if (songs.length === 0) {
+    feed.innerHTML = '<div style="padding:12px 0;text-align:center;color:var(--tx4)">No songs yet — generate your first!</div>';
+    return;
+  }
+  feed.innerHTML = songs.map((song, i, arr) => {
+    const genre = song.genre ? song.genre.charAt(0).toUpperCase() + song.genre.slice(1) : 'Unknown';
+    const icon = {'pop':'🎤','hiphop':'🎤','rnb':'🎶','rock':'🎸','country':'🤠','edm':'⚡','jazz':'🎷','soul':'🔥','gospel':'✝️','blues':'🎵','funk':'🎹','reggae':'🌿','afrobeats':'🥁','latin':'💃','kpop':'✨','punk':'⚡','altrock':'🎸','neosoul':'🎹','ss':'🎵','folk':'🪕','metal':'🤘','reggaeton':'🔥','children':'👶','comedy':'😄'}[song.genre] || '🎵';
+    const border = i < arr.length - 1 ? 'border-bottom:1px solid var(--b1);' : '';
+    return `<div style="padding:8px 0;${border}cursor:pointer" onclick="opLoadRecent(${i})">
+      <div style="font-weight:600;color:var(--tx2)">${icon} "${song.title || 'Untitled'}"</div>
+      <div style="color:var(--tx4);font-size:10px">${genre}${song.mood ? ' · ' + song.mood : ''}</div>
+    </div>`;
+  }).join('');
+}
+
 // Refresh board on load so recent songs populate immediately
-document.addEventListener('DOMContentLoaded', refreshInspirationBoard);
+document.addEventListener('DOMContentLoaded', () => { refreshInspirationBoard(); refreshCommunityFeed(); });
 </script>
 
 <!-- ══ IMPORT LYRICS OVERLAY ══ -->
