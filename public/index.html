@@ -13019,11 +13019,14 @@ function opPickGenre(genre) {
 }
 
 function opUsePrompt(text) {
-  const topicInput = document.getElementById('topic');
+  const topicInput = document.getElementById('g-topic');
   if (!topicInput) return;
   topicInput.value = text;
   topicInput.dispatchEvent(new Event('input'));
   topicInput.focus();
+  // Trigger wizard step progression
+  if(typeof expandStep==='function') expandStep(1);
+  if(typeof onTopicInput==='function') onTopicInput();
   topicInput.scrollIntoView({behavior:'smooth',block:'nearest'});
   // Mark active prompt
   document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
@@ -13386,6 +13389,9 @@ function prefillConcept(text) {
   if (inp) {
     inp.value = text;
     inp.focus();
+    // Trigger wizard step progression
+    if(typeof expandStep==='function') expandStep(1);
+    if(typeof onTopicInput==='function') onTopicInput();
     inp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
   updateEmptyState();
