@@ -7289,7 +7289,7 @@ function renderBiblePills(){
 }
 function showBible(id,label){
   const b=GENRE_BIBLE[id];
-  if(!b){document.getElementById('bible-content').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--tx2)">Use the <strong>Analyzer</strong> for an AI-powered deep dive into ${label} songs. Genre Bible covers the 6 newest genres.</p></div>`;return;}
+  if(!b){document.getElementById('bible-content').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--tx2)">Use the <strong>Analyzer</strong> tab for an AI-powered deep dive into ${label} songs.</p></div>`;return;}
   document.getElementById('bible-content').innerHTML=`<div class="card bible"><div style="font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-0.4px">${escHtml(label)}</div><h4>Genre DNA</h4><p>${escHtml(b.dna)}</p><h4>Structure Approach</h4><p>${escHtml(b.structure)}</p><h4>Suno Production Tips</h4><p>${escHtml(b.suno)}</p><h4>Key Songwriting Rules</h4><ul>${b.keys.map(k=>`<li>${escHtml(k)}</li>`).join('')}</ul><h4>Artists to Study</h4><p class="artists">${escHtml(b.artists)}</p></div>`;
 }
 
