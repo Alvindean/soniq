@@ -47,7 +47,7 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT ── */
-.wrap{max-width:1440px;margin:0 auto;padding:0 28px 120px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px 120px}
 
 /* ── WRITER 3-PANEL LAYOUT ── */
 .writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:20px;align-items:start;margin-top:0}
@@ -85,20 +85,45 @@ a{color:var(--amber);text-decoration:none}
 #pg-write .writer-controls .gen-action{flex-direction:column;gap:8px}
 #pg-write .writer-controls .gen-action .btn{width:100%;justify-content:center}
 
-/* Output placeholder */
-#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:40px 24px;text-align:center;margin-bottom:16px}
+/* Output placeholder / Inspiration board */
+#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px 24px 28px;margin-bottom:16px;display:block}
 #output-placeholder.hide{display:none}
-#output-placeholder .op-icon{font-size:48px;margin-bottom:14px;opacity:.35}
-#output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:500}
-#output-placeholder .op-sub{font-size:12px;color:var(--tx4);margin-top:6px;line-height:1.5}
-@media(max-width:600px){#output-placeholder{padding:20px 14px}}
-#output-placeholder .op-txt{font-size:14px}
+#output-placeholder .op-hero{display:flex;flex-direction:column;align-items:center;padding:20px 0 18px;border-bottom:1px solid var(--b2);margin-bottom:20px}
+#output-placeholder .op-icon{font-size:40px;margin-bottom:10px;opacity:.4}
+#output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:600}
+#output-placeholder .op-sub{font-size:12px;color:var(--tx4);margin-top:4px;line-height:1.5;text-align:center}
+/* Quick-start genre chips */
+#output-placeholder .op-section{margin-bottom:18px}
+#output-placeholder .op-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tx4);margin-bottom:8px}
+#output-placeholder .op-chips{display:flex;flex-wrap:wrap;gap:6px}
+#output-placeholder .op-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:var(--s3);font-size:12px;color:var(--tx2);cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
+#output-placeholder .op-chip:hover{background:var(--acc);border-color:var(--acc);color:#000}
+/* Writing prompts */
+#output-placeholder .op-prompts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#output-placeholder .op-prompt{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
+#output-placeholder .op-prompt:hover{border-color:var(--acc);background:var(--s4)}
+#output-placeholder .op-prompt.active{border-color:var(--acc);background:var(--s4);box-shadow:0 0 0 2px rgba(245,192,0,0.15)}
+#output-placeholder .op-prompt-emoji{font-size:18px;margin-bottom:4px}
+#output-placeholder .op-prompt-text{font-size:11px;color:var(--tx3);line-height:1.4}
+/* Recent songs */
+#output-placeholder .op-recents{display:flex;flex-direction:column;gap:6px}
+#output-placeholder .op-recent-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--s3);border-radius:var(--r2);border:1px solid var(--b2);cursor:pointer;transition:border-color .15s}
+#output-placeholder .op-recent-item:hover{border-color:var(--acc)}
+#output-placeholder .op-recent-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);flex-shrink:0}
+#output-placeholder .op-recent-title{font-size:12px;font-weight:600;color:var(--tx1);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#output-placeholder .op-recent-meta{font-size:10px;color:var(--tx4);white-space:nowrap}
+@media(max-width:600px){
+  #output-placeholder{padding:16px}
+  #output-placeholder .op-prompts{grid-template-columns:1fr}
+}
 #output-placeholder .op-sub{font-size:11px}
 
 /* ── PG-WRITE 3-PANEL ── */
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
 @media(min-width:901px){
-  #pg-write.on{display:grid;grid-template-columns:1fr 360px 220px;grid-template-rows:auto;column-gap:20px;align-items:start}
+  #pg-write.on{display:grid;grid-template-columns:1fr 360px 220px;grid-template-rows:auto;column-gap:16px;align-items:start}
+  #pg-write.on .writer-output,
+  #pg-write.on > :first-child{min-width:0}
   #pg-write.on #album-track-banner{grid-column:1/-1}
   #pg-write.on .empty-state{grid-column:1;grid-row:2}
   #pg-write.on #output-placeholder{grid-column:1;grid-row:3}
@@ -111,21 +136,28 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on #gen-out{grid-column:1;grid-row:6}
   #pg-write.on .key-banner{grid-column:1;grid-row:7}
   #pg-write.on .save-bar{grid-column:1;grid-row:8}
-  #pg-write.on .studio .studio-body{padding:20px 18px}
-  #pg-write.on .studio .topic-label{font-size:11px}
+  #pg-write.on .studio .studio-body{padding:18px 16px}
+  #pg-write.on .studio .studio-top{padding:14px 16px}
+  #pg-write.on .studio .studio-hint{display:none}/* hide subtitle in narrow panel */
+  #pg-write.on .studio .topic-label{font-size:11px;margin-bottom:8px}
   /* Full-width topic input in controls panel — stack buttons below */
-  #pg-write.on .studio .enhance-row{flex-direction:column;gap:6px;margin-bottom:16px}
-  #pg-write.on .studio .topic-input{font-size:15px;padding:12px 14px;margin-bottom:0;width:100%;min-height:72px;resize:none}
-  #pg-write.on .studio .enhance-row-btns{display:flex;gap:6px}
+  #pg-write.on .studio .enhance-row{flex-direction:column;gap:6px;margin-bottom:14px}
+  #pg-write.on .studio .topic-input{font-size:15px;padding:12px 14px;margin-bottom:0;width:100%;min-height:64px}
+  #pg-write.on .studio .enhance-row-btns{display:flex;gap:6px;width:100%}
   #pg-write.on .studio .mic-btn{width:42px;flex-shrink:0}
   #pg-write.on .studio .enhance-btn{flex:1;padding:9px 12px;text-align:center}
+  /* Force exactly 3 genre columns — auto-fill unreliable with scrollbar */
+  #pg-write.on .studio .genre-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  #pg-write.on .studio .gp{padding:10px 4px}
+  #pg-write.on .studio .gp-icon{font-size:18px;margin-bottom:4px}
+  #pg-write.on .studio .gp-name{font-size:10px}
   #pg-write.on .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
   #pg-write.on .gen-action{flex-direction:column;gap:8px}
   #pg-write.on .gen-action .btn{width:100%;justify-content:center}
   #pg-write.on .gen-action .btn-import{width:100%;justify-content:center}
 }
 @media(min-width:901px) and (max-width:1200px){
-  #pg-write.on{grid-template-columns:1fr 360px}
+  #pg-write.on{grid-template-columns:1fr 360px;column-gap:16px}
   #pg-write.on #writer-social{display:none}
   #pg-write.on .studio{grid-column:2;grid-row:2/12}
   #pg-write.on #gen-out{grid-column:1;grid-row:6}
@@ -148,9 +180,38 @@ a{color:var(--amber);text-decoration:none}
 .htag-teal{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
 .htag-v{background:var(--violetbg);color:var(--violet);border-color:var(--violetline)}
 
+/* Full-width header/nav background on large screens */
+@media(min-width:1440px){
+  .hdr{margin:0 -28px;padding-left:28px;padding-right:28px}
+  .nav{margin:0 -28px 28px;border-radius:0;border-left:none;border-right:none;padding-left:28px;padding-right:28px}
+}
+
+/* ── AD RAILS (left + right, only at ≥1500px) ── */
+.ad-rail{display:none;position:fixed;top:0;bottom:0;width:168px;flex-direction:column;align-items:center;padding:80px 8px 24px;gap:16px;z-index:50;background:var(--s1);border-color:var(--b1)}
+.ad-rail-left{left:0;border-right:1px solid var(--b1)}
+.ad-rail-right{right:0;border-left:1px solid var(--b1)}
+.ad-rail-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:4px;text-align:center}
+.ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
+@media(min-width:1500px){
+  .ad-rail{display:flex}
+  .wrap{margin-left:192px;margin-right:192px;max-width:none;padding-left:28px;padding-right:28px}
+}
+
+/* ── GENRE GRID EXPAND ── */
+.gp-overflow{display:none!important}
+.gp-overflow.revealed{display:block!important}
+.genre-expand-btn{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:4px;padding:8px 0;cursor:pointer;font-size:11px;font-weight:600;color:var(--tx3);border:none;border-top:1px solid var(--b1);border-radius:0;transition:color .15s;background:none;width:100%;margin-top:6px;letter-spacing:.02em}
+.genre-expand-btn:hover{color:var(--acc)}
+
 /* ── NAV ── */
 .nav{display:flex;gap:3px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:5px;margin-bottom:28px;overflow-x:auto}
 .nav::-webkit-scrollbar{display:none}
+/* Nav scroll fade — shows gradient on right edge when nav overflows */
+.nav-scroll-wrap{position:relative;margin-bottom:28px}
+.nav-scroll-wrap .nav{margin-bottom:0}
+.nav-scroll-wrap::after{content:'';position:absolute;right:0;top:0;bottom:0;width:48px;background:linear-gradient(to left,var(--s2) 0%,transparent 100%);pointer-events:none;border-radius:0 var(--r3) var(--r3) 0;transition:opacity .2s;z-index:1}
+.nav-scroll-wrap.at-end::after{opacity:0}
+@media(min-width:901px){.nav-scroll-wrap::after{display:none}}
 .nb{flex:1;min-width:88px;padding:12px 10px;border-radius:var(--r2);border:none;background:transparent;color:var(--tx3);font-size:12px;font-weight:600;letter-spacing:0.03em;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;white-space:nowrap}
 .nb:hover{background:var(--s3);color:var(--tx1)}
 .nb.on{background:var(--s4);color:var(--tx1);box-shadow:0 1px 0 0 var(--b3) inset}
@@ -655,6 +716,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .genre-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}
   .params{grid-template-columns:1fr 1fr}
 }
+/* On mobile, show all genres (no collapse needed) */
+@media(max-width:900px){
+  .gp-overflow{display:flex}
+  .genre-expand-btn{display:none}
+}
 @media(max-width:580px){
   .spill,.qpill,.lane-pill,.mood-pill,.lpill{min-height:36px;padding:8px 12px;display:inline-flex;align-items:center;}
   .nb{min-height:48px;padding:8px 6px;}
@@ -662,7 +728,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 /* ── CONCEPT ENHANCE ── */
 .enhance-row{display:flex;gap:8px;align-items:stretch;margin-bottom:20px}
-.enhance-row-btns{display:contents}/* flat in base layout so buttons stay inline */
+.enhance-row-btns{display:flex;gap:8px;align-items:stretch}/* always flex — works in both row and column layouts */
 .enhance-row .topic-input{margin-bottom:0;flex:1}
 .enhance-btn{flex-shrink:0;padding:0 20px;border-radius:var(--r2);border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:.02em}
 .enhance-btn:hover:not(:disabled){background:var(--violet);color:#fff;transform:translateY(-1px)}
@@ -981,7 +1047,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── COMMUNITY 3-COLUMN LAYOUT ── */
-.comm-layout{display:grid;grid-template-columns:200px 1fr 220px;gap:20px;align-items:start;max-width:1200px;margin:0 auto;padding:16px 20px}
+.comm-layout{display:grid;grid-template-columns:200px 1fr 220px;gap:20px;align-items:start;max-width:none;margin:0;padding:16px 0}
 .comm-sidebar{position:sticky;top:16px}
 .comm-main{min-width:0}
 .comm-right{position:sticky;top:16px}
@@ -1004,9 +1070,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .comm-sidebar,.comm-right{display:none}
 }
 /* ── PROFILE FULL-WIDTH DASHBOARD ── */
-.profile-dashboard{max-width:1200px;margin:0 auto;padding:16px}
+.profile-dashboard{max-width:none;margin:0;padding:16px 0}
 @media(min-width:901px){
-  .profile-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;padding:20px 24px}
+  .profile-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;padding:20px 0}
   .profile-dashboard > div:first-child{grid-column:1/-1}
   .profile-dashboard > div:last-child{grid-column:1/-1}
 }
@@ -1653,6 +1719,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
 </head>
 <body>
+
+<!-- LEFT AD RAIL -->
+<aside class="ad-rail ad-rail-left" aria-label="Advertisement">
+  <div class="ad-rail-label">Advertisement</div>
+  <div class="ad-rail-slot" data-ad-rail="true">
+    <span style="color:var(--tx4);font-size:10px;text-align:center;padding:8px">Ad</span>
+  </div>
+</aside>
+
+<!-- RIGHT AD RAIL -->
+<aside class="ad-rail ad-rail-right" aria-label="Advertisement">
+  <div class="ad-rail-label">Advertisement</div>
+  <div class="ad-rail-slot" data-ad-rail="true">
+    <span style="color:var(--tx4);font-size:10px;text-align:center;padding:8px">Ad</span>
+  </div>
+</aside>
+
 <div class="wrap">
 <div class="toast" id="toast"></div>
 
@@ -1704,17 +1787,18 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </div>
 
 <!-- NAV -->
-<nav class="nav">
+<div class="nav-scroll-wrap" id="nav-scroll-wrap">
+<nav class="nav" id="main-nav">
   <button class="nb on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
   <button class="nb nb-lucky" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Feel Lucky</button>
   <button class="nb" onclick="goPg('library',this)"><span class="ni">📚</span>Library<span id="nav-lib-count" class="nav-badge" style="display:none"></span></button>
-  <button class="nb" onclick="goPg('editor',this)"><span class="ni">✏️</span>Editor</button>
   <button class="nb" onclick="goPg('builder',this)"><span class="ni">🎛️</span>Builder</button>
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
-  <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+  <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('community',this)" id="nav-community-btn"><span class="ni">🌐</span>Community</button>
   <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
+  <button class="nb" onclick="goPg('editor',this)"><span class="ni">✏️</span>Editor</button>
   <button class="nb" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none"><span class="ni">📊</span>Admin</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <a href="/" style="font-size:11px;color:var(--tx3);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--b1);white-space:nowrap" title="Back to mysoniq.com">◈ SONIQ</a>
@@ -1724,6 +1808,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <button id="nav-signout-btn" onclick="authSignOut()" class="btn btn-sm" style="display:none;font-size:11px;padding:4px 10px;color:var(--tx3)">Sign Out</button>
     </div>
 </nav>
+</div>
 
 <!-- ══════════════════════════════════
      WRITE PAGE
@@ -2305,20 +2390,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <!-- Community Snippets -->
     <div class="social-card" id="ws-community-card">
       <div class="social-card-title">🌐 Community</div>
-      <div id="ws-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6">
-        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
-          <div style="font-weight:600;color:var(--tx2)">🎵 "Midnight in Lagos"</div>
-          <div style="color:var(--tx4);font-size:10px">Afrobeats · by @kwame_beats</div>
-        </div>
-        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
-          <div style="font-weight:600;color:var(--tx2)">🎸 "Last Train Home"</div>
-          <div style="color:var(--tx4);font-size:10px">Folk · by @sierra_writes</div>
-        </div>
-        <div style="padding:8px 0">
-          <div style="font-weight:600;color:var(--tx2)">✨ "Neon Daydream"</div>
-          <div style="color:var(--tx4);font-size:10px">EDM · by @synth_soul</div>
-        </div>
-      </div>
+      <div id="ws-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6"></div>
       <button class="btn btn-sm" onclick="navTo('community')" style="width:100%;justify-content:center;font-size:11px;margin-top:10px">See All →</button>
     </div>
 
@@ -2351,11 +2423,68 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="hist-items" id="hist-items"></div>
   </div>
 
-  <!-- OUTPUT PLACEHOLDER (shown before first generation) -->
+  <!-- OUTPUT PLACEHOLDER / INSPIRATION BOARD (shown before first generation) -->
   <div id="output-placeholder">
-    <div class="op-icon">🎵</div>
-    <div class="op-txt">Your song will appear here</div>
-    <div class="op-sub">Choose a genre, describe your concept, and hit Generate ↗</div>
+
+    <!-- Hero -->
+    <div class="op-hero">
+      <div class="op-icon">🎵</div>
+      <div class="op-txt">Your song will appear here</div>
+      <div class="op-sub">Fill in your concept on the right and hit Generate</div>
+    </div>
+
+    <!-- Quick-start genres -->
+    <div class="op-section">
+      <div class="op-label">Quick-start by genre</div>
+      <div class="op-chips" id="op-genre-chips">
+        <button class="op-chip" onclick="opPickGenre('pop')">🎤 Pop</button>
+        <button class="op-chip" onclick="opPickGenre('hiphop')">🎤 Hip-Hop</button>
+        <button class="op-chip" onclick="opPickGenre('rnb')">🎶 R&amp;B</button>
+        <button class="op-chip" onclick="opPickGenre('rock')">🎸 Rock</button>
+        <button class="op-chip" onclick="opPickGenre('country')">🤠 Country</button>
+        <button class="op-chip" onclick="opPickGenre('edm')">⚡ EDM</button>
+        <button class="op-chip" onclick="opPickGenre('jazz')">🎷 Jazz</button>
+        <button class="op-chip" onclick="opPickGenre('soul')">🔥 Soul</button>
+      </div>
+    </div>
+
+    <!-- Writing prompts -->
+    <div class="op-section">
+      <div class="op-label">Need inspiration? Try a prompt</div>
+      <div class="op-prompts">
+        <div class="op-prompt" onclick="opUsePrompt('A late-night drive with someone you miss')">
+          <div class="op-prompt-emoji">🌙</div>
+          <div class="op-prompt-text">A late-night drive with someone you miss</div>
+        </div>
+        <div class="op-prompt" onclick="opUsePrompt('Rising from a tough time, finding strength again')">
+          <div class="op-prompt-emoji">💪</div>
+          <div class="op-prompt-text">Rising from a tough time, finding strength again</div>
+        </div>
+        <div class="op-prompt" onclick="opUsePrompt('The moment you realized it was over')">
+          <div class="op-prompt-emoji">💔</div>
+          <div class="op-prompt-text">The moment you realized it was over</div>
+        </div>
+        <div class="op-prompt" onclick="opUsePrompt('Summer romance that only lasted one week')">
+          <div class="op-prompt-emoji">☀️</div>
+          <div class="op-prompt-text">Summer romance that only lasted one week</div>
+        </div>
+        <div class="op-prompt" onclick="opUsePrompt('Gratitude anthem for the people who stayed')">
+          <div class="op-prompt-emoji">🙏</div>
+          <div class="op-prompt-text">Gratitude anthem for the people who stayed</div>
+        </div>
+        <div class="op-prompt" onclick="opUsePrompt('City lights, big dreams, first night in a new city')">
+          <div class="op-prompt-emoji">🌆</div>
+          <div class="op-prompt-text">City lights, big dreams, first night in a new city</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent songs from library -->
+    <div class="op-section" id="op-recents-section" style="display:none">
+      <div class="op-label">Continue where you left off</div>
+      <div class="op-recents" id="op-recents-list"></div>
+    </div>
+
   </div>
 
   <!-- RESULT OUTPUT -->
@@ -3585,7 +3714,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 
   <!-- AD SLOT — Album Engine page footer -->
-  <div style="max-width:900px;margin:24px auto 0;padding:0 20px">
+  <div style="max-width:1000px;margin:24px auto 0;padding:0 20px">
     <div style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 20px;text-align:center">
       <div style="font-size:10px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Sponsored</div>
       <!-- Google AdSense: add data-ad-client + data-ad-slot when approved -->
@@ -5189,10 +5318,12 @@ function goPg(id,el){
     const banner = document.getElementById('album-track-banner');
     if (banner) banner.style.display = 'none';
   }
+  const target = document.getElementById('pg-'+id);
+  if (!target) { console.warn('[SONIQ] goPg: page not found: pg-'+id); return; }
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('pg-'+id).classList.add('on');
-  el.classList.add('on');
+  target.classList.add('on');
+  if(el) el.classList.add('on');
   if(id==='more'){renderFormula();renderBiblePills();loadSongs();}
   if(id==='library')renderLib();
   if(id==='builder')initBuilder();
@@ -5323,6 +5454,12 @@ function onGenreChange(g){
     el.classList.toggle('on', el.dataset.gid===g);
   });
   S.selectedGenre=g;
+  // auto-expand genre grid if selected genre is in the overflow section
+  const selectedEl = document.querySelector(`#genre-grid .gp[data-gid="${g}"]`);
+  if (selectedEl && selectedEl.classList.contains('gp-overflow') && !selectedEl.classList.contains('revealed')) {
+    const btn = document.getElementById('genre-expand-btn');
+    if (btn && btn.getAttribute('aria-expanded') !== 'true') toggleGenreExpand();
+  }
   applyGenreColor(g);
   const styles=SUBSTYLES[g];
   const row=document.getElementById('substyle-row');
@@ -6981,6 +7118,8 @@ function persistLib(){
     }
   }
   updateLibBadge();
+  if (typeof refreshInspirationBoard === 'function') refreshInspirationBoard();
+  if (typeof refreshCommunityFeed === 'function') refreshCommunityFeed();
 }
 
 function updateLibBadge(){
@@ -7161,9 +7300,20 @@ function loadLyricsIntoEditor(lyrics,title){
   document.getElementById('paste-modal').style.display='none';
 }
 function navTo(pageId){
-  // Find the nav button that navigates to this page and click it programmatically
-  const btn=Array.from(document.querySelectorAll('.nb')).find(b=>b.getAttribute('onclick')===`goPg('${pageId}',this)`);
-  if(btn)goPg(pageId,btn);
+  const btn=Array.from(document.querySelectorAll('.nb')).find(b=>{
+    const oc=b.getAttribute('onclick')||'';
+    return oc.includes(`'${pageId}'`) || oc.includes(`"${pageId}"`);
+  });
+  if(btn) goPg(pageId,btn);
+  else {
+    // Fallback: call goPg directly if button not found
+    const target=document.getElementById('pg-'+pageId);
+    if(target){
+      document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+      document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+      target.classList.add('on');
+    }
+  }
 }
 
 function renderEditor(){
@@ -7858,16 +8008,36 @@ function isGenreFree(gid) {
 function initGenreGrid(){
   const grid = document.getElementById('genre-grid');
   if (!grid) return;
-  grid.innerHTML = GENRES_DEF.map(g => {
+  const VISIBLE = 8;
+  const total = GENRES_DEF.length;
+  grid.innerHTML = GENRES_DEF.map((g, i) => {
     const locked = !isGenreFree(g.id);
-    return `<div class="gp${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
+    const overflow = i >= VISIBLE ? ' gp-overflow' : '';
+    return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
          title="${locked?'Unlock all 24 genres with Starter — from $9/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
     </div>`;
-  }).join('');
+  }).join('') +
+  `<button class="genre-expand-btn" id="genre-expand-btn" onclick="toggleGenreExpand()" aria-expanded="false">
+    <span id="genre-expand-label">Show all ${total} genres ▾</span>
+  </button>`;
+}
+
+function toggleGenreExpand(){
+  const btn = document.getElementById('genre-expand-btn');
+  const label = document.getElementById('genre-expand-label');
+  if (!btn) return;
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  document.querySelectorAll('#genre-grid .gp-overflow').forEach(el => {
+    el.classList.toggle('revealed', !expanded);
+  });
+  btn.setAttribute('aria-expanded', String(!expanded));
+  label.textContent = expanded
+    ? `Show all ${GENRES_DEF.length} genres ▾`
+    : 'Show less ▴';
 }
 
 function lockedGenreClick(gid) {
@@ -12500,6 +12670,87 @@ if (_origGoPg) {
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('pg-lucky')?.classList.contains('on')) loadGlobalCounter();
 });
+
+// ═══════════════════════════════════════════════════════
+// INSPIRATION BOARD — quick-start helpers for empty output
+// ═══════════════════════════════════════════════════════
+function opPickGenre(genre) {
+  // Select genre in the controls panel and scroll to topic input
+  onGenreChange(genre);
+  const topicInput = document.getElementById('topic');
+  if (topicInput) topicInput.focus();
+}
+
+function opUsePrompt(text) {
+  const topicInput = document.getElementById('topic');
+  if (!topicInput) return;
+  topicInput.value = text;
+  topicInput.dispatchEvent(new Event('input'));
+  topicInput.focus();
+  topicInput.scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Mark active prompt
+  document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
+  event.currentTarget?.classList.add('active');
+  // Clear active state when user manually edits the field
+  const clearActive = () => {
+    document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
+    topicInput.removeEventListener('input', clearActive);
+  };
+  topicInput.addEventListener('input', clearActive, {once:true});
+}
+
+function opLoadRecent(idx) {
+  const song = S.library?.[idx];
+  if (!song) return;
+  loadSongIntoOutput(song);
+  toast('✓ Loaded: ' + (song.title || 'Untitled'));
+}
+
+function refreshInspirationBoard() {
+  // Defer if GENRE_COLORS isn't defined yet
+  if (typeof GENRE_COLORS === 'undefined') {
+    setTimeout(refreshInspirationBoard, 100);
+    return;
+  }
+  const section = document.getElementById('op-recents-section');
+  const list = document.getElementById('op-recents-list');
+  if (!section || !list) return;
+  const recent = (S.library || []).slice(0, 3);
+  if (recent.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  list.innerHTML = recent.map((song, i) => {
+    const genre = (song.genre || '').toLowerCase();
+    const color = GENRE_COLORS[genre] || '#f5c000';
+    const meta = [song.genre, song.mood].filter(Boolean).join(' · ');
+    return `<div class="op-recent-item" onclick="opLoadRecent(${i})">
+      <div class="op-recent-dot" style="background:${color}"></div>
+      <div class="op-recent-title">${song.title || 'Untitled'}</div>
+      <div class="op-recent-meta">${meta}</div>
+    </div>`;
+  }).join('');
+}
+
+function refreshCommunityFeed() {
+  const feed = document.getElementById('ws-community-feed');
+  if (!feed) return;
+  const songs = (S.library || []).slice(0, 3);
+  if (songs.length === 0) {
+    feed.innerHTML = '<div style="padding:12px 0;text-align:center;color:var(--tx4)">No songs yet — generate your first!</div>';
+    return;
+  }
+  feed.innerHTML = songs.map((song, i, arr) => {
+    const genre = song.genre ? song.genre.charAt(0).toUpperCase() + song.genre.slice(1) : 'Unknown';
+    const icon = {'pop':'🎤','hiphop':'🎤','rnb':'🎶','rock':'🎸','country':'🤠','edm':'⚡','jazz':'🎷','soul':'🔥','gospel':'✝️','blues':'🎵','funk':'🎹','reggae':'🌿','afrobeats':'🥁','latin':'💃','kpop':'✨','punk':'⚡','altrock':'🎸','neosoul':'🎹','ss':'🎵','folk':'🪕','metal':'🤘','reggaeton':'🔥','children':'👶','comedy':'😄'}[song.genre] || '🎵';
+    const border = i < arr.length - 1 ? 'border-bottom:1px solid var(--b1);' : '';
+    return `<div style="padding:8px 0;${border}cursor:pointer" onclick="opLoadRecent(${i})">
+      <div style="font-weight:600;color:var(--tx2)">${icon} "${song.title || 'Untitled'}"</div>
+      <div style="color:var(--tx4);font-size:10px">${genre}${song.mood ? ' · ' + song.mood : ''}</div>
+    </div>`;
+  }).join('');
+}
+
+// Refresh board on load so recent songs populate immediately
+document.addEventListener('DOMContentLoaded', () => { refreshInspirationBoard(); refreshCommunityFeed(); });
 </script>
 
 <!-- ══ IMPORT LYRICS OVERLAY ══ -->
@@ -12807,6 +13058,19 @@ window.addEventListener('error',e=>_dbgErr('JS',`${e.filename?.split('/').pop()}
 window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.message||String(e.reason)));
 setInterval(()=>{ if(DBG.on) dbgUpdateState(); },2000);
 document.addEventListener('DOMContentLoaded',initDebug);
+
+// Nav scroll fade indicator
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('main-nav');
+  const wrap = document.getElementById('nav-scroll-wrap');
+  if (!nav || !wrap) return;
+  const update = () => {
+    const atEnd = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 4;
+    wrap.classList.toggle('at-end', atEnd);
+  };
+  nav.addEventListener('scroll', update, {passive:true});
+  update();
+});
 </script>
 <!-- GDPR Cookie Consent -->
 <div id="cookie-banner" role="dialog" aria-label="Cookie consent">
@@ -12827,8 +13091,31 @@ function setCookieConsent(accepted) {
   localStorage.setItem('cookie_consent_ts', Date.now());
   document.getElementById('cookie-banner').classList.remove('show');
   if (accepted) {
-    // TODO: Initialize Google AdSense here when ready
-    // window.adsbygoogle = window.adsbygoogle || [];
+    // Lazy-init AdSense ad rails — only push when rails are visible (≥1500px)
+    (function initAdRails() {
+      function pushAd(slot) {
+        const ins = document.createElement('ins');
+        ins.className = 'adsbygoogle';
+        ins.style.cssText = 'display:block;width:152px;min-height:300px';
+        ins.dataset.adFormat = 'auto';
+        ins.dataset.fullWidthResponsive = 'false';
+        slot.innerHTML = '';
+        slot.appendChild(ins);
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch(e) { /* AdSense not loaded */ }
+      }
+      const mq = window.matchMedia('(min-width: 1500px)');
+      let pushed = false;
+      function onMqChange(e) {
+        if (e.matches && !pushed) {
+          pushed = true;
+          document.querySelectorAll('[data-ad-rail]').forEach(pushAd);
+        }
+      }
+      mq.addEventListener('change', onMqChange);
+      onMqChange(mq); // check immediately on load
+    })();
   }
 }
 
