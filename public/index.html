@@ -224,6 +224,7 @@ a{color:var(--amber);text-decoration:none}
 .blend-acc.open{border-color:var(--cyanline)}
 .blend-trigger{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;gap:8px}
 .blend-trigger:hover .blend-trigger-label{color:var(--tx2)}
+.blend-trigger:focus{outline:2px solid var(--cyan);outline-offset:2px;border-radius:var(--r1)}
 .blend-trigger-l{display:flex;align-items:center;gap:8px}
 .blend-trigger-dot{width:6px;height:6px;border-radius:50%;background:var(--tx4);transition:all 0.2s;flex-shrink:0}
 .blend-acc.open .blend-trigger-dot{background:var(--cyan)}
@@ -436,6 +437,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .lucky-headline .hl-1{color:var(--amber)}
 .lucky-sub{font-size:14px;color:var(--tx3);text-align:center;max-width:420px;line-height:1.6;margin-bottom:32px}
 .lucky-orb{font-size:52px;margin-bottom:24px;cursor:pointer;user-select:none;animation:orbFloat 4s ease-in-out infinite;filter:drop-shadow(0 0 16px rgba(245,184,0,0.3))}
+.lucky-orb:hover{transform:scale(1.04);opacity:.9}
 @keyframes orbFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
 .lucky-orb.spinning{animation:orbSpin 0.7s linear infinite}
 @keyframes orbSpin{from{transform:rotate(0deg) scale(1.05)}to{transform:rotate(360deg) scale(1.05)}}
@@ -640,7 +642,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
   .wrap{padding:0 16px 100px}
-  .nb{min-width:64px;font-size:10px;padding:10px 4px}
+  .nb{min-width:64px;font-size:11px;padding:10px 4px}
   .lucky-headline{font-size:28px}
   .result-song-title{font-size:20px}
   .hdr-sub{display:none}
@@ -932,7 +934,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
   .nav{overflow-x:auto;-webkit-overflow-scrolling:touch;gap:2px}
-  .nb{min-width:64px;font-size:10px;padding:8px 4px}
+  .nb{min-width:64px;font-size:11px;padding:8px 4px}
   .adm-2col{grid-template-columns:1fr!important}
   .adm-user-table thead{display:none}
   .adm-user-table tbody tr{display:grid;grid-template-columns:1fr 1fr;padding:8px;border-bottom:1px solid var(--bg2);gap:4px}
