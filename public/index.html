@@ -249,7 +249,19 @@ a{color:var(--amber);text-decoration:none}
 .mb-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:none;background:transparent;color:var(--tx4);font-size:9px;font-weight:600;cursor:pointer;border-radius:var(--r1)}
 .mb-btn.on{color:var(--amber)}
 .mb-btn .ni{font-size:18px;line-height:1}
-@media(max-width:900px){.sidebar-nav{display:none}.mobile-bottom-nav{display:flex}.wrap{margin-left:0!important}}
+@media(max-width:900px){
+  .sidebar-nav{display:none}
+  .mobile-bottom-nav{display:flex}
+  .wrap{margin-left:0!important}
+  /* On mobile, when output has content, show it above controls */
+  #pg-write.on{display:flex;flex-direction:column}
+  #pg-write.on .write-output-panel{order:-1}
+  #pg-write.on #writer-social{order:2}
+  #pg-write.on #writer-output-controls{order:1}
+  /* Compact mood grid on mobile */
+  .mood-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
+  .genre-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
+}
 @media(min-width:901px){.wrap{margin-left:64px}}
 
 /* ── PAGES ── */
@@ -1970,31 +1982,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="step-summary" id="step-3-summary"></div>
       </div>
 
-      <!-- ══ GENERATE (always visible) ══ -->
-      <div class="gen-action" id="gen-action-main">
-        <button class="gen-btn" id="gen-btn" onclick="generateSong()">
-          <span class="gen-btn-icon">🎵</span>
-          Generate Complete Song
-        </button>
-        <div id="platinum-toggle-wrap" style="display:none;align-items:center;gap:8px;margin-top:8px">
-          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none">
-            <div class="plat-switch" id="plat-switch" onclick="togglePlatinum()" title="Top 5% hit references + cross-genre technique injected into prompt">
-              <div class="plat-knob" id="plat-knob"></div>
-            </div>
-            <span style="font-size:12px;font-weight:700;color:var(--amber);letter-spacing:0.5px">✦ PLATINUM MODE</span>
-            <span style="font-size:11px;color:var(--tx3)">Top 5% references</span>
-          </label>
-        </div>
-        <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
-        <div class="gen-progress" id="gen-progress">
-          <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div></div>
-          <span id="gp-label">1 free song today</span>
-        </div>
-      </div>
-
-      <!-- MORE OPTIONS TOGGLE -->
+      <!-- ══ ADVANCED SETTINGS (before Generate for better workflow) ══ -->
       <button class="more-opts-btn" id="more-opts-btn" onclick="toggleMoreOpts()" aria-expanded="false">
-        <span id="more-opts-label">▾ More options</span>
+        <span id="more-opts-label">▾ Advanced Settings</span>
       </button>
 
       <!-- MORE OPTIONS PANEL (Age, Vocal, Structure, Adv, Blend, Length) -->
@@ -2466,6 +2456,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 
       </div><!-- /#more-opts-panel -->
+
+      <!-- ══ GENERATE (always at bottom of wizard) ══ -->
+      <div class="gen-action" id="gen-action-main">
+        <button class="gen-btn" id="gen-btn" onclick="generateSong()">
+          <span class="gen-btn-icon">🎵</span>
+          Generate Complete Song
+        </button>
+        <div id="platinum-toggle-wrap" style="display:none;align-items:center;gap:8px;margin-top:8px">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none">
+            <div class="plat-switch" id="plat-switch" onclick="togglePlatinum()" title="Top 5% hit references + cross-genre technique injected into prompt">
+              <div class="plat-knob" id="plat-knob"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--amber);letter-spacing:0.5px">✦ PLATINUM MODE</span>
+            <span style="font-size:11px;color:var(--tx3)">Top 5% references</span>
+          </label>
+        </div>
+        <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
+        <div class="gen-progress" id="gen-progress">
+          <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div></div>
+          <span id="gp-label">1 free song today</span>
+        </div>
+      </div>
 
   </div><!-- /#writer-output-controls -->
 
@@ -6419,6 +6431,13 @@ async function generateSong(){
   const genBtn = document.getElementById('gen-btn');
   if (genBtn?.disabled) return; // prevent double-fire
   btnLoad('gen-btn', 'Writing song…');
+  // ── Wizard: collapse all steps so output is visible ──
+  if(typeof collapseStep==='function'){collapseStep(1);collapseStep(2);collapseStep(3);}
+  // Scroll to output panel on mobile
+  setTimeout(function(){
+    var out=document.querySelector('.write-output-panel');
+    if(out && window.innerWidth<901) out.scrollIntoView({behavior:'smooth',block:'start'});
+  },400);
   const genre=S.selectedGenre||'pop';
   const genreLabel=GENRE_LABELS[genre]||genre;
   const topic=document.getElementById('g-topic').value.trim();
