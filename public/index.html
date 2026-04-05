@@ -47,7 +47,7 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT ── */
-.wrap{max-width:1440px;margin:0 auto;padding:0 28px 120px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px 120px}
 
 /* ── WRITER 3-PANEL LAYOUT ── */
 .writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:20px;align-items:start;margin-top:0}
@@ -86,7 +86,7 @@ a{color:var(--amber);text-decoration:none}
 #pg-write .writer-controls .gen-action .btn{width:100%;justify-content:center}
 
 /* Output placeholder */
-#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:40px 24px;text-align:center;margin-bottom:16px}
+#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:48px 32px;text-align:center;margin-bottom:16px;min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center}
 #output-placeholder.hide{display:none}
 #output-placeholder .op-icon{font-size:48px;margin-bottom:14px;opacity:.35}
 #output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:500}
@@ -98,7 +98,9 @@ a{color:var(--amber);text-decoration:none}
 /* ── PG-WRITE 3-PANEL ── */
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
 @media(min-width:901px){
-  #pg-write.on{display:grid;grid-template-columns:1fr 360px 220px;grid-template-rows:auto;column-gap:20px;align-items:start}
+  #pg-write.on{display:grid;grid-template-columns:1fr 360px 220px;grid-template-rows:auto;column-gap:16px;align-items:start}
+  #pg-write.on .writer-output,
+  #pg-write.on > :first-child{min-width:0}
   #pg-write.on #album-track-banner{grid-column:1/-1}
   #pg-write.on .empty-state{grid-column:1;grid-row:2}
   #pg-write.on #output-placeholder{grid-column:1;grid-row:3}
@@ -132,7 +134,7 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .gen-action .btn-import{width:100%;justify-content:center}
 }
 @media(min-width:901px) and (max-width:1200px){
-  #pg-write.on{grid-template-columns:1fr 360px}
+  #pg-write.on{grid-template-columns:1fr 360px;column-gap:16px}
   #pg-write.on #writer-social{display:none}
   #pg-write.on .studio{grid-column:2;grid-row:2/12}
   #pg-write.on #gen-out{grid-column:1;grid-row:6}
@@ -994,7 +996,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── COMMUNITY 3-COLUMN LAYOUT ── */
-.comm-layout{display:grid;grid-template-columns:200px 1fr 220px;gap:20px;align-items:start;max-width:1200px;margin:0 auto;padding:16px 20px}
+.comm-layout{display:grid;grid-template-columns:200px 1fr 220px;gap:20px;align-items:start;max-width:none;margin:0;padding:16px 0}
 .comm-sidebar{position:sticky;top:16px}
 .comm-main{min-width:0}
 .comm-right{position:sticky;top:16px}
@@ -1017,9 +1019,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .comm-sidebar,.comm-right{display:none}
 }
 /* ── PROFILE FULL-WIDTH DASHBOARD ── */
-.profile-dashboard{max-width:1200px;margin:0 auto;padding:16px}
+.profile-dashboard{max-width:none;margin:0;padding:16px 0}
 @media(min-width:901px){
-  .profile-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;padding:20px 24px}
+  .profile-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;padding:20px 0}
   .profile-dashboard > div:first-child{grid-column:1/-1}
   .profile-dashboard > div:last-child{grid-column:1/-1}
 }
@@ -3598,7 +3600,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 
   <!-- AD SLOT — Album Engine page footer -->
-  <div style="max-width:900px;margin:24px auto 0;padding:0 20px">
+  <div style="max-width:1000px;margin:24px auto 0;padding:0 20px">
     <div style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 20px;text-align:center">
       <div style="font-size:10px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Sponsored</div>
       <!-- Google AdSense: add data-ad-client + data-ad-slot when approved -->
