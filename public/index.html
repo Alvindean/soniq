@@ -107,9 +107,14 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on #gen-out{grid-column:1;grid-row:6}
   #pg-write.on .key-banner{grid-column:1;grid-row:7}
   #pg-write.on .save-bar{grid-column:1;grid-row:8}
-  #pg-write.on .studio .topic-input{font-size:15px;padding:13px 14px}
-  #pg-write.on .studio .topic-label{font-size:10px}
   #pg-write.on .studio .studio-body{padding:20px 18px}
+  #pg-write.on .studio .topic-label{font-size:10px}
+  /* Full-width topic input in controls panel — stack buttons below */
+  #pg-write.on .studio .enhance-row{flex-direction:column;gap:6px;margin-bottom:16px}
+  #pg-write.on .studio .topic-input{font-size:15px;padding:12px 14px;margin-bottom:0;width:100%;min-height:72px;resize:none}
+  #pg-write.on .studio .enhance-row-btns{display:flex;gap:6px}
+  #pg-write.on .studio .mic-btn{width:42px;flex-shrink:0}
+  #pg-write.on .studio .enhance-btn{flex:1;padding:9px 12px;text-align:center}
   #pg-write.on .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
   #pg-write.on .gen-action{flex-direction:column;gap:8px}
   #pg-write.on .gen-action .btn{width:100%;justify-content:center}
@@ -641,6 +646,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 /* ── CONCEPT ENHANCE ── */
 .enhance-row{display:flex;gap:8px;align-items:stretch;margin-bottom:20px}
+.enhance-row-btns{display:contents}/* flat in base layout so buttons stay inline */
 .enhance-row .topic-input{margin-bottom:0;flex:1}
 .enhance-btn{flex-shrink:0;padding:0 20px;border-radius:var(--r2);border:1px solid var(--violetline);background:var(--violetbg);color:var(--violet);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;letter-spacing:.02em}
 .enhance-btn:hover:not(:disabled){background:var(--violet);color:#fff;transform:translateY(-1px)}
@@ -1727,8 +1733,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <input type="text" id="g-topic" class="topic-input"
           placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
           onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}" />
-        <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤</button>
-        <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept into a sharper, more emotionally precise version">✦ Enhance</button>
+        <div class="enhance-row-btns">
+          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤</button>
+          <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept into a sharper, more emotionally precise version">✦ Enhance</button>
+        </div>
       </div>
 
       <!-- GENRE GRID -->
