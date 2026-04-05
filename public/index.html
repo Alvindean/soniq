@@ -742,11 +742,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .genre-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}
   .params{grid-template-columns:1fr 1fr}
 }
-/* On mobile, show all genres (no collapse needed) */
-@media(max-width:900px){
-  .gp-overflow{display:flex}
-  .genre-expand-btn{display:none}
-}
+/* On mobile, expand button stays visible — same collapse behaviour as desktop */
 @media(max-width:580px){
   .spill,.qpill,.lane-pill,.mood-pill,.lpill{min-height:36px;padding:8px 12px;display:inline-flex;align-items:center;}
   .nb{min-height:48px;padding:8px 6px;}
