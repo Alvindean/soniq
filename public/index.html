@@ -3735,104 +3735,114 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
      COMMUNITY PAGE
 ══════════════════════════════════ -->
 <div id="pg-community" class="pg">
-  <div style="max-width:680px;margin:0 auto;padding:16px">
+  <div class="comm-layout">
 
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips — from writers worldwide</div>
+    <!-- LEFT: FILTERS SIDEBAR -->
+    <div class="comm-sidebar">
+      <!-- Sort -->
+      <div class="comm-filter-section">
+        <div class="comm-filter-title">Sort By</div>
+        <button class="comm-filter-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
+        <button class="comm-filter-btn" onclick="setCommSort('new',this)">✨ New</button>
+        <button class="comm-filter-btn" onclick="setCommSort('top',this)">👑 Top</button>
+      </div>
+      <!-- Genre Filter -->
+      <div class="comm-filter-section">
+        <div class="comm-filter-title">Genre</div>
+        <select id="comm-genre-filter" class="comm-filter-select" onchange="loadCommunityFeed()">
+          <option value="">All Genres</option>
+          <option value="pop">Pop</option>
+          <option value="hiphop">Hip-Hop</option>
+          <option value="rnb">R&amp;B</option>
+          <option value="rock">Rock</option>
+          <option value="country">Country</option>
+          <option value="edm">EDM</option>
+          <option value="jazz">Jazz</option>
+          <option value="soul">Soul</option>
+          <option value="gospel">Gospel</option>
+          <option value="latin">Latin</option>
+          <option value="afrobeats">Afrobeats</option>
+          <option value="kpop">K-Pop</option>
+        </select>
+      </div>
+      <!-- Post Type Filter -->
+      <div class="comm-filter-section">
+        <div class="comm-filter-title">Post Type</div>
+        <div id="comm-type-filter">
+          <button class="comm-filter-btn on" onclick="setCommTypeFilter('',this)">All Posts</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
+        </div>
+      </div>
+      <!-- Challenge card in sidebar -->
+      <div id="comm-challenge-card" class="comm-filter-section" style="border-color:var(--amberline);background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);display:none">
+        <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🏆 Weekly Challenge</div>
+        <div id="comm-challenge-title" style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:4px"></div>
+        <div id="comm-challenge-sub" style="font-size:10px;color:var(--tx3);margin-bottom:10px"></div>
+        <button class="btn btn-sm btn-amber" onclick="openChallengeWriter()" style="width:100%;justify-content:center;font-size:11px">Write Now</button>
       </div>
     </div>
 
-    <!-- Compose Box (Twitter-style, always visible when logged in) -->
-    <div class="comm-compose" id="comm-compose-wrap">
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <div id="comm-compose-avatar" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">?</div>
-        <div style="flex:1">
-          <textarea id="comm-compose-text" maxlength="280" rows="2" placeholder="Share a thought, tip, lyric snippet, or collab request…" style="width:100%;background:none;border:none;resize:none;color:var(--tx1);font-size:13px;font-family:var(--font);outline:none;line-height:1.5;box-sizing:border-box" oninput="updateComposeCount()"></textarea>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:6px">
-            <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-post-types">
-              <button class="post-type-btn on" onclick="setPostType('thought',this)">💬 Thought</button>
-              <button class="post-type-btn" onclick="setPostType('question',this)">❓ Question</button>
-              <button class="post-type-btn" onclick="setPostType('collab',this)">🤝 Collab</button>
-              <button class="post-type-btn" onclick="setPostType('tip',this)">💡 Tip</button>
-              <button class="post-type-btn" onclick="setPostType('snippet',this)">🎤 Snippet</button>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span id="comm-compose-count" style="font-size:11px;color:var(--tx4)">280</span>
-              <button class="btn btn-sm btn-amber" onclick="submitPost()" id="comm-post-btn">Post</button>
+    <!-- CENTER: MAIN FEED -->
+    <div class="comm-main">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips — from writers worldwide</div>
+        </div>
+      </div>
+      <!-- Compose Box -->
+      <div class="comm-compose" id="comm-compose-wrap">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div id="comm-compose-avatar" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">?</div>
+          <div style="flex:1">
+            <textarea id="comm-compose-text" maxlength="280" rows="2" placeholder="Share a thought, tip, lyric snippet, or collab request…" style="width:100%;background:none;border:none;resize:none;color:var(--tx1);font-size:13px;font-family:var(--font);outline:none;line-height:1.5;box-sizing:border-box" oninput="updateComposeCount()"></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:6px">
+              <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-post-types">
+                <button class="post-type-btn on" onclick="setPostType('thought',this)">💬 Thought</button>
+                <button class="post-type-btn" onclick="setPostType('question',this)">❓ Question</button>
+                <button class="post-type-btn" onclick="setPostType('collab',this)">🤝 Collab</button>
+                <button class="post-type-btn" onclick="setPostType('tip',this)">💡 Tip</button>
+                <button class="post-type-btn" onclick="setPostType('snippet',this)">🎤 Snippet</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span id="comm-compose-count" style="font-size:11px;color:var(--tx4)">280</span>
+                <button class="btn btn-sm btn-amber" onclick="submitPost()" id="comm-post-btn">Post</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div id="comm-compose-signin" style="display:none;text-align:center;padding:8px;font-size:12px;color:var(--tx3)">
-        <a href="#" onclick="openAuth()" style="color:var(--amber);font-weight:600">Sign in</a> to post, share songs, and react
-      </div>
-    </div>
-
-    <!-- Weekly Challenge -->
-    <div id="comm-challenge-card" class="card" style="margin-bottom:14px;border:1px solid var(--amberline);background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);display:none">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="font-size:28px">🏆</div>
-        <div style="flex:1">
-          <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.08em">Weekly Challenge</div>
-          <div id="comm-challenge-title" style="font-size:14px;font-weight:700;color:var(--tx1);margin-top:1px"></div>
-          <div id="comm-challenge-sub" style="font-size:11px;color:var(--tx3);margin-top:2px"></div>
+        <div id="comm-compose-signin" style="display:none;text-align:center;padding:8px;font-size:12px;color:var(--tx3)">
+          <a href="#" onclick="openAuth()" style="color:var(--amber);font-weight:600">Sign in</a> to post, share songs, and react
         </div>
-        <button class="btn btn-sm btn-amber" onclick="openChallengeWriter()">Write Now</button>
       </div>
+      <!-- Feed -->
+      <div id="comm-feed"></div>
+      <div id="comm-loading" style="display:none">
+        <div class="comm-skeleton" style="height:110px"></div>
+        <div class="comm-skeleton" style="height:130px"></div>
+        <div class="comm-skeleton" style="height:100px"></div>
+      </div>
+      <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
+        <div style="font-size:36px;margin-bottom:8px">🎵</div>
+        <div style="font-size:14px;font-weight:600;color:var(--tx3);margin-bottom:4px">No posts yet</div>
+        <div style="font-size:12px;margin-bottom:14px">Be the first — share a song or post a thought above</div>
+        <div id="comm-empty-auth"></div>
+      </div>
+      <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
     </div>
 
-    <!-- Sort tabs + filters -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <div style="display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--brd)">
-          <button class="comm-sort-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
-          <button class="comm-sort-btn" onclick="setCommSort('new',this)">✨ New</button>
-          <button class="comm-sort-btn" onclick="setCommSort('top',this)">👑 Top</button>
-        </div>
-        <select id="comm-genre-filter" onchange="loadCommunityFeed()" style="padding:5px 8px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);font-size:11px">
-          <option value="">All Genres</option>
-          <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option>
-          <option value="rnb">R&amp;B</option><option value="rock">Rock</option>
-          <option value="country">Country</option><option value="edm">EDM</option>
-          <option value="jazz">Jazz</option><option value="soul">Soul</option>
-          <option value="gospel">Gospel</option><option value="latin">Latin</option>
-          <option value="afrobeats">Afrobeats</option><option value="kpop">K-Pop</option>
-        </select>
+    <!-- RIGHT: LEADERBOARD -->
+    <div class="comm-right">
+      <div class="card" style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🏅 Top Writers This Week</div>
+        <div id="comm-leaderboard"></div>
       </div>
-      <!-- Post type filter -->
-      <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-type-filter">
-        <button class="post-type-btn on" onclick="setCommTypeFilter('',this)">All</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
-      </div>
-    </div>
-
-    <!-- Feed -->
-    <div id="comm-feed"></div>
-    <div id="comm-loading" style="display:none">
-      <div class="comm-skeleton" style="height:110px"></div>
-      <div class="comm-skeleton" style="height:130px"></div>
-      <div class="comm-skeleton" style="height:100px"></div>
-    </div>
-    <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
-      <div style="font-size:36px;margin-bottom:8px">🎵</div>
-      <div style="font-size:14px;font-weight:600;color:var(--tx3);margin-bottom:4px">No posts yet</div>
-      <div style="font-size:12px;margin-bottom:14px">Be the first — share a song or post a thought above</div>
-      <div id="comm-empty-auth"></div>
-    </div>
-    <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
-
-    <!-- Leaderboard sidebar (below feed on mobile) -->
-    <div class="card" style="margin-top:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🏅 Top Writers This Week</div>
-      <div id="comm-leaderboard"></div>
     </div>
 
   </div>
@@ -9476,7 +9486,7 @@ async function submitPost() {
 
 function setCommTypeFilter(type, btn) {
   _commTypeFilter = type;
-  document.querySelectorAll('#comm-type-filter .post-type-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('#comm-type-filter .comm-filter-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   _commOffset = 0;
   loadCommunityFeed();
@@ -9484,7 +9494,7 @@ function setCommTypeFilter(type, btn) {
 
 function setCommSort(sort, btn) {
   _commSort = sort;
-  document.querySelectorAll('.comm-sort-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.comm-sidebar .comm-filter-btn[onclick^="setCommSort"]').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   _commOffset = 0;
   loadCommunityFeed();
