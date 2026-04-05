@@ -11,7 +11,8 @@
     "api/publish.js":        { "maxDuration": 15 },
     "api/stripe.js":         { "maxDuration": 30 },
     "api/founding.js":       { "maxDuration": 10 },
-    "api/admin-session.js":  { "maxDuration": 10 }
+    "api/admin-session.js":  { "maxDuration": 10 },
+    "api/aff.js":            { "maxDuration": 10 }
   },
   "headers": [
     {
@@ -20,7 +21,7 @@
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io https://gotrwbhkavkqmxtnxkkj.supabase.co https://*.supabase.co https://api.resend.com; img-src 'self' data: blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://adservice.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io https://gotrwbhkavkqmxtnxkkj.supabase.co https://*.supabase.co https://api.resend.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.google.com; img-src 'self' data: blob: https://pagead2.googlesyndication.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
       ]

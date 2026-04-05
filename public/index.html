@@ -37,6 +37,7 @@
   --glow-amber:0 0 0 1px var(--amberline),0 4px 24px rgba(245,192,0,0.14);
   --glow-cyan:0 0 0 1px var(--cyanline),0 4px 18px rgba(0,220,192,0.12);
   --r:var(--r2);
+  --genre-accent:#f5c000;--genre-bg:rgba(245,192,0,0.08);
 }
 html,body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 ::-webkit-scrollbar{width:3px;height:3px}
@@ -46,7 +47,74 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT ── */
-.wrap{max-width:1020px;margin:0 auto;padding:0 28px 120px}
+.wrap{max-width:1440px;margin:0 auto;padding:0 28px 120px}
+
+/* ── WRITER 3-PANEL LAYOUT ── */
+.writer-layout{display:grid;grid-template-columns:1fr 300px 220px;gap:20px;align-items:start;margin-top:0}
+.writer-output{min-width:0}
+.writer-controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.writer-controls::-webkit-scrollbar{width:3px}
+.writer-controls::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+.writer-social{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+
+/* Responsive: collapse social at 1200px */
+@media(max-width:1200px){
+  .writer-layout{grid-template-columns:1fr 300px}
+  .writer-social{display:none}
+}
+/* Responsive: collapse to single column at 900px */
+@media(max-width:900px){
+  .writer-layout{display:block}
+  .writer-controls{position:static;max-height:none;overflow:visible}
+  .wrap{padding:0 16px 100px}
+}
+
+/* Social panel cards */
+.social-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:16px;margin-bottom:12px}
+.social-card-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* Writer controls title */
+.controls-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;padding:10px 0 8px;display:none}
+
+/* studio in writer controls — no extra bottom margin needed */
+#pg-write .writer-controls .studio{margin-bottom:12px}
+
+/* Gen button full-width in controls panel */
+#pg-write .writer-controls .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px;border-radius:var(--r3)}
+#pg-write .writer-controls .gen-action{flex-direction:column;gap:8px}
+#pg-write .writer-controls .gen-action .btn{width:100%;justify-content:center}
+
+/* Output placeholder */
+#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:40px 24px;text-align:center;margin-bottom:16px}
+#output-placeholder.hide{display:none}
+#output-placeholder .op-icon{font-size:48px;margin-bottom:14px;opacity:.35}
+#output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:500}
+#output-placeholder .op-sub{font-size:12px;color:var(--tx4);margin-top:6px;line-height:1.5}
+
+/* ── PG-WRITE 3-PANEL ── */
+@media(min-width:901px){
+  #pg-write{display:grid;grid-template-columns:1fr 300px 220px;grid-template-rows:auto;column-gap:20px;align-items:start}
+  #album-track-banner{grid-column:1/-1}
+  #pg-write .empty-state{grid-column:1;grid-row:2}
+  #output-placeholder{grid-column:1;grid-row:3}
+  #pg-write .studio{grid-column:2;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;margin-bottom:0;scrollbar-width:thin}
+  #pg-write .studio::-webkit-scrollbar{width:3px}
+  #pg-write .studio::-webkit-scrollbar-thumb{background:var(--s5)}
+  #writer-social{grid-column:3;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+  #pg-write .synopsis-card{grid-column:1;grid-row:4}
+  #pg-write .hist-bar{grid-column:1;grid-row:5}
+  #pg-write #gen-out{grid-column:1;grid-row:6}
+  #pg-write .key-banner{grid-column:1;grid-row:7}
+  #pg-write .save-bar{grid-column:1;grid-row:8}
+  #pg-write .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
+  #pg-write .gen-action{flex-direction:column;gap:8px}
+  #pg-write .gen-action .btn{width:100%;justify-content:center}
+  #pg-write .gen-action .btn-import{width:100%;justify-content:center}
+}
+@media(min-width:901px) and (max-width:1200px){
+  #pg-write{grid-template-columns:1fr 300px}
+  #writer-social{display:none}
+}
 
 /* ── HEADER ── */
 .hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 20px;border-bottom:1px solid var(--b1);margin-bottom:28px;flex-wrap:wrap}
@@ -77,12 +145,12 @@ a{color:var(--amber);text-decoration:none}
 }
 
 /* ── PAGES ── */
-.pg{display:none}
+.pg{display:none;will-change:opacity,transform}
 .pg.on{display:block;animation:pgIn 0.2s ease}
 @keyframes pgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── STUDIO — write page main card ── */
-.studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:20px}
+.studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:20px;transition:border-color 0.3s}
 .studio-top{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:10px}
 .studio-label{font-size:12px;font-weight:600;color:var(--tx2);letter-spacing:0.04em;text-transform:uppercase}
 .studio-body{padding:28px 24px}
@@ -101,10 +169,10 @@ a{color:var(--amber);text-decoration:none}
 .gp-lock{position:absolute;top:-4px;right:-8px;font-size:9px;line-height:1}
 .gp{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:13px 8px;text-align:center;cursor:pointer;transition:all 0.15s}
 .gp:hover{border-color:var(--b3);background:var(--s4)}
-.gp.on{border-color:var(--amberline);background:var(--amberbg);box-shadow:var(--glow-amber)}
+.gp.on{border-color:var(--genre-accent);background:var(--genre-bg);box-shadow:0 0 0 1px var(--genre-accent),0 4px 24px rgba(0,0,0,0.14)}
+.gp.on .gp-name{color:var(--genre-accent)}
 .gp-icon{font-size:22px;line-height:1;margin-bottom:6px}
 .gp-name{font-size:11px;font-weight:600;color:var(--tx1);letter-spacing:0.02em;line-height:1.2}
-.gp.on .gp-name{color:var(--amber)}
 .gp.new-g .gp-name::after{content:' ✦';font-size:8px;color:var(--cyan);vertical-align:super}
 
 /* ── PARAM ROW ── */
@@ -211,7 +279,7 @@ a{color:var(--amber);text-decoration:none}
 
 /* ── RESULT ── */
 .result-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
-.result-card.visible{display:block;animation:pgIn 0.25s ease}
+.result-card.visible{display:block;animation:pgIn 0.25s ease;border-top:3px solid var(--genre-accent);transition:border-color 0.3s}
 .result-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 20px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:12px}
 .result-song-title{font-size:26px;font-weight:700;color:var(--tx1);letter-spacing:-0.5px;line-height:1.2}
 .result-song-verdict{font-size:13px;color:var(--tx3);margin-top:6px;font-style:italic;line-height:1.5}
@@ -230,8 +298,10 @@ a{color:var(--amber);text-decoration:none}
 .otab-more-item{padding:9px 16px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer;white-space:nowrap;transition:background .1s}
 .otab-more-item:hover{background:var(--s4);color:var(--tx1)}
 .otab-more-item.on{color:var(--amber)}
-.opane{display:none;padding:22px 24px}
-.opane.on{display:block}
+.opane{display:none;padding:22px 24px;animation:none}
+.opane.on{display:block;animation:tabIn .15s ease}
+.otab-pane-enter{animation:tabIn .2s ease both}
+@keyframes tabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .opane-hint{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:10px}
 .lyrics-box{font-family:var(--mono);font-size:13.5px;line-height:2.3;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:22px}
 .lyrics-box .tag{color:var(--amber);font-weight:700}
@@ -241,7 +311,7 @@ a{color:var(--amber);text-decoration:none}
 /* ── CRAFTING ANIMATION ── */
 .crafting{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 20px}
 .craft-waveform{display:flex;align-items:center;gap:4px;height:32px}
-.craft-bar{width:3px;border-radius:2px;background:var(--amber);animation:craftwave 1.4s ease-in-out infinite}
+.craft-bar{width:3px;border-radius:2px;background:var(--amber);animation:craftwave 1.4s ease-in-out infinite;will-change:transform}
 .craft-bar:nth-child(1){height:12px;animation-delay:0s}
 .craft-bar:nth-child(2){height:20px;animation-delay:0.1s}
 .craft-bar:nth-child(3){height:28px;animation-delay:0.2s}
@@ -677,10 +747,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .mood-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:5px;margin-bottom:20px}
 .mood-pill{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:7px 8px;text-align:center;cursor:pointer;transition:all .15s;user-select:none}
 .mood-pill:hover{border-color:var(--b3);background:var(--s4)}
-.mood-pill.on{border-color:var(--amberline);background:var(--amberbg)}
+.mood-pill.on{border-color:var(--mood-accent,var(--amberline));background:var(--mood-bg,var(--amberbg))}
 .mood-pill-icon{font-size:16px;line-height:1;margin-bottom:3px}
 .mood-pill-name{font-size:10px;font-weight:700;color:var(--tx2);letter-spacing:.02em}
-.mood-pill.on .mood-pill-name{color:var(--amber)}
+.mood-pill.on .mood-pill-name{color:var(--mood-accent,var(--amber))}
 .mood-hint{font-size:10px;color:var(--tx3);font-style:italic;margin-bottom:14px;line-height:1.5;min-height:16px}
 @media(max-width:440px){.mood-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}}
 
@@ -718,6 +788,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 }
 .brief-prompt-charcount{
   font-size:10px;margin-top:5px;text-align:right;font-family:var(--mono);font-weight:700;
+}
+.lyrics-charcount{
+  font-size:10px;margin-top:4px;text-align:right;font-family:var(--mono);font-weight:700;
+  padding:0 2px;min-height:14px;
 }
 .brief-copy-btn{
   font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;
@@ -879,6 +953,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-meta{font-size:10px;color:var(--tx4);display:flex;align-items:center;gap:10px;margin-top:8px}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+/* ── COMMUNITY 3-COLUMN LAYOUT ── */
+.comm-layout{display:grid;grid-template-columns:200px 1fr 220px;gap:20px;align-items:start;max-width:1200px;margin:0 auto;padding:16px 20px}
+.comm-sidebar{position:sticky;top:16px}
+.comm-main{min-width:0}
+.comm-right{position:sticky;top:16px}
+.comm-filter-section{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px;margin-bottom:12px}
+.comm-filter-title{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.comm-filter-btn{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:var(--r1);border:none;background:transparent;color:var(--tx2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.comm-filter-btn:hover{background:var(--s3);color:var(--tx1)}
+.comm-filter-btn.on{background:var(--amberbg);color:var(--amber);font-weight:700}
+.comm-filter-select{width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r1);color:var(--tx2);font-size:12px;padding:7px 10px;outline:none;margin-bottom:8px;-webkit-appearance:none;appearance:none}
+@media(max-width:1100px){
+  .comm-layout{grid-template-columns:180px 1fr}
+  .comm-right{display:none}
+}
+@media(max-width:900px){
+  .comm-layout{grid-template-columns:1fr;padding:12px 14px}
+  .comm-sidebar,.comm-right{position:static}
+  .comm-right{display:none}
+}
+/* ── PROFILE FULL-WIDTH DASHBOARD ── */
+.profile-dashboard{max-width:1200px;margin:0 auto;padding:20px 24px}
+@media(min-width:901px){
+  .profile-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+  .profile-dashboard > div:first-child{grid-column:1/-1}
+  .profile-dashboard > div:last-child{grid-column:1/-1}
+}
+@media(max-width:900px){.profile-dashboard{padding:16px}}
 /* ── CAMPAIGN MODE ── */
 .camp-hero{padding:28px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px}
 .camp-hero-label{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -1068,15 +1170,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .chords-output{padding:4px 0}
 .chord-meta{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
 .chord-meta-pill{display:flex;flex-direction:column;align-items:center;padding:10px 18px;background:var(--s3);border:1px solid var(--amberline);border-radius:var(--r2);min-width:72px}
-.chord-meta-label{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
+.chord-meta-label{font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:3px}
 .chord-meta-val{font-size:18px;font-weight:700;color:var(--tx1);font-family:var(--mono);letter-spacing:-.02em}
-.chord-sections{display:flex;flex-direction:column;gap:8px}
-.chord-row{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 16px;display:flex;gap:14px;align-items:flex-start;transition:border-color .15s}
+.chord-sections{display:flex;flex-direction:column;gap:10px}
+.chord-cards{gap:10px!important}
+.chord-row{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 20px;display:flex;gap:14px;align-items:flex-start;transition:border-color .15s;animation:chordRowIn .35s ease both}
 .chord-row:hover{border-color:var(--b3)}
-.chord-row-name{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;min-width:70px;flex-shrink:0;padding-top:2px}
+@keyframes chordRowIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.chord-row:nth-child(1){animation-delay:.05s}
+.chord-row:nth-child(2){animation-delay:.1s}
+.chord-row:nth-child(3){animation-delay:.15s}
+.chord-row:nth-child(4){animation-delay:.2s}
+.chord-row:nth-child(5){animation-delay:.25s}
+.chord-row:nth-child(6){animation-delay:.3s}
+.chord-row-name{font-size:13px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;min-width:70px;flex-shrink:0;padding-top:2px}
 .chord-row-body{flex:1;min-width:0}
-.chord-numerals{font-size:15px;font-weight:700;color:var(--tx1);font-family:var(--mono);margin-bottom:4px;line-height:1.3;word-break:break-all}
-.chord-feel{font-size:11px;color:var(--tx3);line-height:1.5}
+.chord-numerals{font-size:20px;font-weight:700;color:var(--tx1);font-family:var(--mono);margin-bottom:4px;line-height:1.3;word-break:break-all}
+.chord-feel{font-size:13px;color:var(--tx3);line-height:1.5}
 .chord-row-outlier{border-color:var(--amberline);background:linear-gradient(90deg,#1f1a0a,var(--s3))}
 .outlier-badge{font-size:9px;font-weight:700;color:var(--amber);background:var(--amberbg);border:1px solid var(--amberline);border-radius:99px;padding:1px 5px;vertical-align:middle;margin-left:4px;text-transform:uppercase;letter-spacing:.05em}
 .key-psych-pill{border-color:var(--cyanline)!important}
@@ -1096,7 +1206,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .theory-row{display:flex;gap:10px;padding:7px 14px;border-bottom:1px solid var(--b1);align-items:baseline}
 .theory-row:last-child{border-bottom:none}
 .theory-row-body{align-items:flex-start}
-.theory-key{font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em;min-width:100px;flex-shrink:0;padding-top:1px}
+.theory-key{font-size:12px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.06em;min-width:100px;flex-shrink:0;padding-top:1px}
 .theory-val{font-size:12px;color:var(--tx2);line-height:1.6;flex:1}
 .theory-outlier-val{color:var(--amber)}
 
@@ -1128,6 +1238,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .wrap{padding:0 12px 100px}
   .studio-body{padding:16px 14px}
   .otab{font-size:9px;padding:7px 5px}
+}
+/* Mobile font floors */
+@media(max-width:480px){
+  .nb{font-size:11px!important;min-width:72px;padding:10px 6px}
+  .otab{font-size:11px!important}
+  .topic-input{font-size:16px!important}
+  .gen-btn{font-size:14px!important;padding:14px 20px!important}
 }
 
 @media print{
@@ -1494,7 +1611,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -2115,6 +2232,64 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
+  <!-- SOCIAL PANEL -->
+  <div id="writer-social">
+    <!-- Profile Mini-Card -->
+    <div class="social-card">
+      <div class="social-card-title">👤 Your Profile</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div id="ws-avatar" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0">?</div>
+        <div>
+          <div id="ws-name" style="font-size:13px;font-weight:700;color:var(--tx1)">Artist</div>
+          <div id="ws-plan" style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Free Plan</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;text-align:center;margin-bottom:10px">
+        <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:7px 4px">
+          <div id="ws-songs" style="font-size:16px;font-weight:800;color:var(--tx1)">0</div>
+          <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">Songs</div>
+        </div>
+        <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:7px 4px">
+          <div id="ws-streak" style="font-size:16px;font-weight:800;color:#f97316">0🔥</div>
+          <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">Streak</div>
+        </div>
+        <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:7px 4px">
+          <div id="ws-xp" style="font-size:16px;font-weight:800;color:var(--violet)">0</div>
+          <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">XP</div>
+        </div>
+      </div>
+      <button class="btn btn-amber btn-sm" onclick="navTo('profile')" style="width:100%;justify-content:center;font-size:11px">View Profile →</button>
+    </div>
+
+    <!-- Community Snippets -->
+    <div class="social-card" id="ws-community-card">
+      <div class="social-card-title">🌐 Community</div>
+      <div id="ws-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6">
+        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
+          <div style="font-weight:600;color:var(--tx2)">🎵 "Midnight in Lagos"</div>
+          <div style="color:var(--tx4);font-size:10px">Afrobeats · by @kwame_beats</div>
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
+          <div style="font-weight:600;color:var(--tx2)">🎸 "Last Train Home"</div>
+          <div style="color:var(--tx4);font-size:10px">Folk · by @sierra_writes</div>
+        </div>
+        <div style="padding:8px 0">
+          <div style="font-weight:600;color:var(--tx2)">✨ "Neon Daydream"</div>
+          <div style="color:var(--tx4);font-size:10px">EDM · by @synth_soul</div>
+        </div>
+      </div>
+      <button class="btn btn-sm" onclick="navTo('community')" style="width:100%;justify-content:center;font-size:11px;margin-top:10px">See All →</button>
+    </div>
+
+    <!-- Weekly Challenge -->
+    <div class="social-card">
+      <div class="social-card-title">⚡ Weekly Challenge</div>
+      <div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:4px">Write a song about a city at 3am</div>
+      <div style="font-size:10px;color:var(--tx4);margin-bottom:10px">47 entries · 3 days left</div>
+      <button class="btn btn-sm" style="width:100%;justify-content:center;font-size:11px;border-color:var(--amberline);color:var(--amber)" onclick="prefillConcept('a city at 3am')">Try It →</button>
+    </div>
+  </div>
+
   <!-- SYNOPSIS PREVIEW CARD -->
   <div class="synopsis-card" id="synopsis-card">
     <div class="synopsis-hdr">
@@ -2133,6 +2308,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div class="hist-bar" id="hist-bar">
     <span class="hist-label">History</span>
     <div class="hist-items" id="hist-items"></div>
+  </div>
+
+  <!-- OUTPUT PLACEHOLDER (shown before first generation) -->
+  <div id="output-placeholder">
+    <div class="op-icon">🎵</div>
+    <div class="op-txt">Your song will appear here</div>
+    <div class="op-sub">Choose a genre, describe your concept, and hit Generate ↗</div>
   </div>
 
   <!-- RESULT OUTPUT -->
@@ -2225,6 +2407,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="res-lyrics-text" class="lyrics-box"></div>
+      <div class="lyrics-charcount" id="res-lyrics-charcount"></div>
       <!-- AUDIO EMBED -->
       <div id="res-audio-embed" style="display:none;margin:12px 0;border-radius:8px;overflow:hidden;border:1px solid var(--brd)"></div>
       <!-- REVISION BAR -->
@@ -2419,6 +2602,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="lres-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="lres-lyrics-text" class="lyrics-box"></div>
+      <div class="lyrics-charcount" id="lres-lyrics-charcount"></div>
       <!-- REVISION BAR -->
       <div class="revision-bar" id="lres-revision-bar" style="display:none">
         <span class="revision-bar-label">Quick Revise:</span>
@@ -3428,7 +3612,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 
   <!-- PROFILE BODY -->
-  <div style="max-width:680px;margin:0 auto;padding:20px">
+  <div class="profile-dashboard">
 
     <!-- QUICK ACTIONS -->
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
@@ -3551,104 +3735,114 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
      COMMUNITY PAGE
 ══════════════════════════════════ -->
 <div id="pg-community" class="pg">
-  <div style="max-width:680px;margin:0 auto;padding:16px">
+  <div class="comm-layout">
 
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-      <div>
-        <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
-        <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips — from writers worldwide</div>
+    <!-- LEFT: FILTERS SIDEBAR -->
+    <div class="comm-sidebar">
+      <!-- Sort -->
+      <div class="comm-filter-section">
+        <div class="comm-filter-title">Sort By</div>
+        <button class="comm-filter-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
+        <button class="comm-filter-btn" onclick="setCommSort('new',this)">✨ New</button>
+        <button class="comm-filter-btn" onclick="setCommSort('top',this)">👑 Top</button>
+      </div>
+      <!-- Genre Filter -->
+      <div class="comm-filter-section">
+        <div class="comm-filter-title">Genre</div>
+        <select id="comm-genre-filter" class="comm-filter-select" onchange="loadCommunityFeed()">
+          <option value="">All Genres</option>
+          <option value="pop">Pop</option>
+          <option value="hiphop">Hip-Hop</option>
+          <option value="rnb">R&amp;B</option>
+          <option value="rock">Rock</option>
+          <option value="country">Country</option>
+          <option value="edm">EDM</option>
+          <option value="jazz">Jazz</option>
+          <option value="soul">Soul</option>
+          <option value="gospel">Gospel</option>
+          <option value="latin">Latin</option>
+          <option value="afrobeats">Afrobeats</option>
+          <option value="kpop">K-Pop</option>
+        </select>
+      </div>
+      <!-- Post Type Filter -->
+      <div class="comm-filter-section">
+        <div class="comm-filter-title">Post Type</div>
+        <div id="comm-type-filter">
+          <button class="comm-filter-btn on" onclick="setCommTypeFilter('',this)">All Posts</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
+          <button class="comm-filter-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
+        </div>
+      </div>
+      <!-- Challenge card in sidebar -->
+      <div id="comm-challenge-card" class="comm-filter-section" style="border-color:var(--amberline);background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);display:none">
+        <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🏆 Weekly Challenge</div>
+        <div id="comm-challenge-title" style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:4px"></div>
+        <div id="comm-challenge-sub" style="font-size:10px;color:var(--tx3);margin-bottom:10px"></div>
+        <button class="btn btn-sm btn-amber" onclick="openChallengeWriter()" style="width:100%;justify-content:center;font-size:11px">Write Now</button>
       </div>
     </div>
 
-    <!-- Compose Box (Twitter-style, always visible when logged in) -->
-    <div class="comm-compose" id="comm-compose-wrap">
-      <div style="display:flex;gap:10px;align-items:flex-start">
-        <div id="comm-compose-avatar" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">?</div>
-        <div style="flex:1">
-          <textarea id="comm-compose-text" maxlength="280" rows="2" placeholder="Share a thought, tip, lyric snippet, or collab request…" style="width:100%;background:none;border:none;resize:none;color:var(--tx1);font-size:13px;font-family:var(--font);outline:none;line-height:1.5;box-sizing:border-box" oninput="updateComposeCount()"></textarea>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:6px">
-            <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-post-types">
-              <button class="post-type-btn on" onclick="setPostType('thought',this)">💬 Thought</button>
-              <button class="post-type-btn" onclick="setPostType('question',this)">❓ Question</button>
-              <button class="post-type-btn" onclick="setPostType('collab',this)">🤝 Collab</button>
-              <button class="post-type-btn" onclick="setPostType('tip',this)">💡 Tip</button>
-              <button class="post-type-btn" onclick="setPostType('snippet',this)">🎤 Snippet</button>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span id="comm-compose-count" style="font-size:11px;color:var(--tx4)">280</span>
-              <button class="btn btn-sm btn-amber" onclick="submitPost()" id="comm-post-btn">Post</button>
+    <!-- CENTER: MAIN FEED -->
+    <div class="comm-main">
+      <!-- Header -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips — from writers worldwide</div>
+        </div>
+      </div>
+      <!-- Compose Box -->
+      <div class="comm-compose" id="comm-compose-wrap">
+        <div style="display:flex;gap:10px;align-items:flex-start">
+          <div id="comm-compose-avatar" style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0">?</div>
+          <div style="flex:1">
+            <textarea id="comm-compose-text" maxlength="280" rows="2" placeholder="Share a thought, tip, lyric snippet, or collab request…" style="width:100%;background:none;border:none;resize:none;color:var(--tx1);font-size:13px;font-family:var(--font);outline:none;line-height:1.5;box-sizing:border-box" oninput="updateComposeCount()"></textarea>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px;flex-wrap:wrap;gap:6px">
+              <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-post-types">
+                <button class="post-type-btn on" onclick="setPostType('thought',this)">💬 Thought</button>
+                <button class="post-type-btn" onclick="setPostType('question',this)">❓ Question</button>
+                <button class="post-type-btn" onclick="setPostType('collab',this)">🤝 Collab</button>
+                <button class="post-type-btn" onclick="setPostType('tip',this)">💡 Tip</button>
+                <button class="post-type-btn" onclick="setPostType('snippet',this)">🎤 Snippet</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span id="comm-compose-count" style="font-size:11px;color:var(--tx4)">280</span>
+                <button class="btn btn-sm btn-amber" onclick="submitPost()" id="comm-post-btn">Post</button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      <div id="comm-compose-signin" style="display:none;text-align:center;padding:8px;font-size:12px;color:var(--tx3)">
-        <a href="#" onclick="openAuth()" style="color:var(--amber);font-weight:600">Sign in</a> to post, share songs, and react
-      </div>
-    </div>
-
-    <!-- Weekly Challenge -->
-    <div id="comm-challenge-card" class="card" style="margin-bottom:14px;border:1px solid var(--amberline);background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);display:none">
-      <div style="display:flex;align-items:center;gap:10px">
-        <div style="font-size:28px">🏆</div>
-        <div style="flex:1">
-          <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.08em">Weekly Challenge</div>
-          <div id="comm-challenge-title" style="font-size:14px;font-weight:700;color:var(--tx1);margin-top:1px"></div>
-          <div id="comm-challenge-sub" style="font-size:11px;color:var(--tx3);margin-top:2px"></div>
+        <div id="comm-compose-signin" style="display:none;text-align:center;padding:8px;font-size:12px;color:var(--tx3)">
+          <a href="#" onclick="openAuth()" style="color:var(--amber);font-weight:600">Sign in</a> to post, share songs, and react
         </div>
-        <button class="btn btn-sm btn-amber" onclick="openChallengeWriter()">Write Now</button>
       </div>
+      <!-- Feed -->
+      <div id="comm-feed"></div>
+      <div id="comm-loading" style="display:none">
+        <div class="comm-skeleton" style="height:110px"></div>
+        <div class="comm-skeleton" style="height:130px"></div>
+        <div class="comm-skeleton" style="height:100px"></div>
+      </div>
+      <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
+        <div style="font-size:36px;margin-bottom:8px">🎵</div>
+        <div style="font-size:14px;font-weight:600;color:var(--tx3);margin-bottom:4px">No posts yet</div>
+        <div style="font-size:12px;margin-bottom:14px">Be the first — share a song or post a thought above</div>
+        <div id="comm-empty-auth"></div>
+      </div>
+      <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
     </div>
 
-    <!-- Sort tabs + filters -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <div style="display:flex;background:var(--bg2);border-radius:8px;padding:3px;gap:2px;border:1px solid var(--brd)">
-          <button class="comm-sort-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
-          <button class="comm-sort-btn" onclick="setCommSort('new',this)">✨ New</button>
-          <button class="comm-sort-btn" onclick="setCommSort('top',this)">👑 Top</button>
-        </div>
-        <select id="comm-genre-filter" onchange="loadCommunityFeed()" style="padding:5px 8px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx2);font-size:11px">
-          <option value="">All Genres</option>
-          <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option>
-          <option value="rnb">R&amp;B</option><option value="rock">Rock</option>
-          <option value="country">Country</option><option value="edm">EDM</option>
-          <option value="jazz">Jazz</option><option value="soul">Soul</option>
-          <option value="gospel">Gospel</option><option value="latin">Latin</option>
-          <option value="afrobeats">Afrobeats</option><option value="kpop">K-Pop</option>
-        </select>
+    <!-- RIGHT: LEADERBOARD -->
+    <div class="comm-right">
+      <div class="card" style="margin-bottom:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🏅 Top Writers This Week</div>
+        <div id="comm-leaderboard"></div>
       </div>
-      <!-- Post type filter -->
-      <div style="display:flex;gap:5px;flex-wrap:wrap" id="comm-type-filter">
-        <button class="post-type-btn on" onclick="setCommTypeFilter('',this)">All</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
-        <button class="post-type-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
-      </div>
-    </div>
-
-    <!-- Feed -->
-    <div id="comm-feed"></div>
-    <div id="comm-loading" style="display:none">
-      <div class="comm-skeleton" style="height:110px"></div>
-      <div class="comm-skeleton" style="height:130px"></div>
-      <div class="comm-skeleton" style="height:100px"></div>
-    </div>
-    <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
-      <div style="font-size:36px;margin-bottom:8px">🎵</div>
-      <div style="font-size:14px;font-weight:600;color:var(--tx3);margin-bottom:4px">No posts yet</div>
-      <div style="font-size:12px;margin-bottom:14px">Be the first — share a song or post a thought above</div>
-      <div id="comm-empty-auth"></div>
-    </div>
-    <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
-
-    <!-- Leaderboard sidebar (below feed on mobile) -->
-    <div class="card" style="margin-top:16px">
-      <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🏅 Top Writers This Week</div>
-      <div id="comm-leaderboard"></div>
     </div>
 
   </div>
@@ -4541,6 +4735,57 @@ function safeParseLib() {
 let _soniqKey;
 
 // ═══════════════════════════════════════════════════════
+// COLOR SCIENCE — GENRE + MOOD
+// ═══════════════════════════════════════════════════════
+const GENRE_COLORS = {
+  pop:       '#f472b6',  // pink — playful, mainstream
+  hiphop:    '#a78bfa',  // purple — culture, swagger
+  rnb:       '#34d399',  // emerald — smooth, soulful
+  rock:      '#fb923c',  // orange — energy, attitude
+  country:   '#f5c000',  // amber — warmth, roots (same as --amber brand)
+  edm:       '#60a5fa',  // blue — electronic, euphoric
+  jazz:      '#818cf8',  // indigo — sophistication
+  soul:      '#fb923c',  // warm orange — deep feeling
+  gospel:    '#4ade80',  // green — life, spirit
+  blues:     '#38bdf8',  // sky blue — melancholy, depth
+  funk:      '#e879f9',  // fuchsia — groove, bounce
+  reggae:    '#86efac',  // light green — Caribbean, chill
+  afrobeats: '#fde68a',  // warm yellow — joy, Africa
+  latin:     '#f87171',  // coral — passion, heat
+  kpop:      '#c084fc',  // light purple — polished, trendy
+  punk:      '#dc2626',  // red — rebellion, raw
+  altrock:   '#94a3b8',  // slate — indie, alternative
+  neosoul:   '#6ee7b7',  // teal — modern soul
+  ss:        '#fcd34d',  // yellow — acoustic, personal (Singer-Songwriter)
+  folk:      '#a3e635',  // lime — earthy, organic
+  metal:     '#e11d48',  // rose red — heavy, intense
+  reggaeton: '#f97316',  // orange — urban, heat
+  children:  '#ff6b6b',  // salmon — playful, innocent
+  comedy:    '#fb923c',  // orange — fun, upbeat
+};
+
+const MOOD_COLORS = {
+  Euphoric:      '#60a5fa',
+  Melancholic:   '#818cf8',
+  Hopeful:       '#4ade80',
+  Defiant:       '#f97316',
+  Nostalgic:     '#fcd34d',
+  Dark:          '#7c3aed',
+  Rebellious:    '#dc2626',
+  Romantic:      '#f472b6',
+  Peaceful:      '#34d399',
+  Angry:         '#ef4444',
+  Playful:       '#e879f9',
+  Longing:       '#38bdf8',
+  Transcendent:  '#a78bfa',
+  Devastated:    '#94a3b8',
+  Tender:        '#fb923c',
+  Triumphant:    '#f5c000',
+  Bittersweet:   '#6ee7b7',
+  Emotional:     '#c084fc',
+};
+
+// ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
@@ -5011,6 +5256,16 @@ function sylCls(n,chorus){if(n<=0)return'syl-ok';if(n>=14)return'syl-over';if(ch
 // ═══════════════════════════════════════════════════════
 // GENERATE SONG
 // ═══════════════════════════════════════════════════════
+function applyGenreColor(genre) {
+  const color = GENRE_COLORS[genre] || '#f5c000';
+  const alpha = color.replace('#', '');
+  const r = parseInt(alpha.substring(0,2), 16);
+  const g = parseInt(alpha.substring(2,4), 16);
+  const b = parseInt(alpha.substring(4,6), 16);
+  document.documentElement.style.setProperty('--genre-accent', color);
+  document.documentElement.style.setProperty('--genre-bg', `rgba(${r},${g},${b},0.08)`);
+}
+
 function onGenreChange(g){
   if(!g)g=S.selectedGenre||'pop';
   // update genre grid selection
@@ -5018,6 +5273,7 @@ function onGenreChange(g){
     el.classList.toggle('on', el.dataset.gid===g);
   });
   S.selectedGenre=g;
+  applyGenreColor(g);
   const styles=SUBSTYLES[g];
   const row=document.getElementById('substyle-row');
   const lbl=document.getElementById('substyle-label');
@@ -5677,7 +5933,9 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
     if (lhookTxt) { lhookIsoText.textContent = lhookTxt; lhookIsoEl.style.display = ''; }
     else lhookIsoEl.style.display = 'none';
   }
-  document.getElementById('lres-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  const _lClean=stripLyricsDashes(lyrics||raw);
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(_lClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('lres', _lClean);
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -5737,7 +5995,9 @@ function loadLuckyHistItem(i){
   const out=document.getElementById('lucky-out');out.style.display='block';out.classList.add('visible');
   document.getElementById('lres-title').textContent=song.title||'Untitled';
   document.getElementById('lres-verdict').textContent=song.verdict||'';
-  document.getElementById('lres-lyrics-text').innerHTML=escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  const _llClean=stripLyricsDashes(song.lyrics||'');
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(_llClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('lres', _llClean);
   renderBrief('lres', song.style||'', song.brief||'');
   document.getElementById('lres-structure-text').textContent=song.structure||'';
   document.getElementById('lres-dopamine-text').textContent=song.dopamine||'';
@@ -5983,6 +6243,7 @@ DIRECTOR NOTES:
 
   const out=document.getElementById('gen-out');
   out.classList.add('visible');
+  document.getElementById('output-placeholder')?.classList.add('hide');
   document.getElementById('loaded-banner').style.display='none';
   document.getElementById('res-title').textContent='Crafting your song…';
   document.getElementById('res-verdict').textContent='';
@@ -6163,7 +6424,9 @@ function parseSongResult(raw,genre,topic,prodData){
     if (hookTxt) { hookIsoText.textContent = hookTxt; hookIsoEl.style.display = ''; }
     else hookIsoEl.style.display = 'none';
   }
-  document.getElementById('res-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  const _rClean=stripLyricsDashes(lyrics||raw);
+  document.getElementById('res-lyrics-text').innerHTML=escHtml(_rClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', _rClean);
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -6326,6 +6589,20 @@ function parseBriefSection(text, key) {
   return text.slice(start, end).trim();
 }
 
+function stripLyricsDashes(text) {
+  if (!text) return text;
+  // Remove em dashes at end of line, replace mid-line em dashes with comma
+  return text.replace(/—\s*$/gm, '').replace(/\s*—\s*/g, ', ');
+}
+function updateLyricsCount(prefix, rawText) {
+  const cc = document.getElementById(prefix + '-lyrics-charcount');
+  if (!cc) return;
+  const len = (rawText || '').length;
+  if (!len) { cc.textContent = ''; return; }
+  cc.textContent = len.toLocaleString() + ' / 5,000 characters (Suno lyrics limit)';
+  cc.style.color = len > 5000 ? 'var(--red)' : len > 4000 ? 'var(--amber)' : 'var(--green)';
+}
+
 function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const el = document.getElementById(prefix + '-brief-content');
   if (!el) return;
@@ -6434,7 +6711,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
         ${cpBtn('brief-core-prompt', 'Copy Prompt')}
       </div>
       <div class="brief-prompt-box" id="brief-core-prompt">${escHtml(corePrompt)}</div>
-      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/440 characters</div>
+      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/200 characters (Suno style field)</div>
     </div>
 
     <div class="brief-grid">
@@ -6495,7 +6772,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const cc = el.querySelector('#brief-charcount');
   if (cc) {
     const len = corePrompt.length;
-    cc.style.color = len > 440 ? 'var(--red)' : len > 380 ? 'var(--amber)' : 'var(--green)';
+    cc.style.color = len > 200 ? 'var(--red)' : len > 160 ? 'var(--amber)' : 'var(--green)';
   }
 }
 
@@ -6774,10 +7051,13 @@ function loadSongIntoOutput(song){
   S.currentSong = song;
   const out = document.getElementById('gen-out');
   out.classList.add('visible');
+  document.getElementById('output-placeholder')?.classList.add('hide');
   document.getElementById('loaded-banner').style.display = 'flex';
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
-  document.getElementById('res-lyrics-text').innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  const _rlClean=stripLyricsDashes(song.lyrics||'');
+  document.getElementById('res-lyrics-text').innerHTML = escHtml(_rlClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', _rlClean);
   renderBrief('res', song.style||'', song.brief||'');
   document.getElementById('res-structure-text').textContent = song.structure || '';
   document.getElementById('res-dopamine-text').textContent = song.dopamine || '';
@@ -7289,7 +7569,7 @@ function renderBiblePills(){
 }
 function showBible(id,label){
   const b=GENRE_BIBLE[id];
-  if(!b){document.getElementById('bible-content').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--tx2)">Use the <strong>Analyzer</strong> for an AI-powered deep dive into ${label} songs. Genre Bible covers the 6 newest genres.</p></div>`;return;}
+  if(!b){document.getElementById('bible-content').innerHTML=`<div class="card"><p style="font-size:13px;color:var(--tx2)">Use the <strong>Analyzer</strong> tab for an AI-powered deep dive into ${label} songs.</p></div>`;return;}
   document.getElementById('bible-content').innerHTML=`<div class="card bible"><div style="font-size:18px;font-weight:800;margin-bottom:12px;letter-spacing:-0.4px">${escHtml(label)}</div><h4>Genre DNA</h4><p>${escHtml(b.dna)}</p><h4>Structure Approach</h4><p>${escHtml(b.structure)}</p><h4>Suno Production Tips</h4><p>${escHtml(b.suno)}</p><h4>Key Songwriting Rules</h4><ul>${b.keys.map(k=>`<li>${escHtml(k)}</li>`).join('')}</ul><h4>Artists to Study</h4><p class="artists">${escHtml(b.artists)}</p></div>`;
 }
 
@@ -8005,6 +8285,8 @@ function updateAuthUI() {
     if (upgradeBtn) upgradeBtn.style.display = 'none';
     if (adminBtn) adminBtn.style.display = window.__soniqAdmin ? '' : 'none';
   }
+  // Update writer sidebar with current user data
+  if (typeof updateWriterSidebar === 'function') updateWriterSidebar();
 }
 
 // ─── UPGRADE MODAL ─────────────────────────────────────────────
@@ -9204,7 +9486,7 @@ async function submitPost() {
 
 function setCommTypeFilter(type, btn) {
   _commTypeFilter = type;
-  document.querySelectorAll('#comm-type-filter .post-type-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('#comm-type-filter .comm-filter-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   _commOffset = 0;
   loadCommunityFeed();
@@ -9212,7 +9494,7 @@ function setCommTypeFilter(type, btn) {
 
 function setCommSort(sort, btn) {
   _commSort = sort;
-  document.querySelectorAll('.comm-sort-btn').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.comm-sidebar .comm-filter-btn[onclick^="setCommSort"]').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   _commOffset = 0;
   loadCommunityFeed();
@@ -9867,7 +10149,21 @@ function initMoodGrid(){
       <div class="mood-pill-icon">${m.icon}</div>
       <div class="mood-pill-name">${m.id}</div>
     </div>`).join('');
+  // Apply mood colors to already-selected pills
+  grid.querySelectorAll('.mood-pill.on').forEach(el=>{
+    const id=el.dataset.mid;
+    if(id) applyMoodColor(el, id);
+  });
   updateMoodHint();
+}
+function applyMoodColor(el, id) {
+  const color = MOOD_COLORS[id] || '#f5c000';
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substring(0,2), 16);
+  const g = parseInt(hex.substring(2,4), 16);
+  const b = parseInt(hex.substring(4,6), 16);
+  el.style.setProperty('--mood-accent', color);
+  el.style.setProperty('--mood-bg', `rgba(${r},${g},${b},0.08)`);
 }
 function toggleMood(id,el){
   const idx=S.selectedMoods.indexOf(id);
@@ -9875,12 +10171,15 @@ function toggleMood(id,el){
     if(S.selectedMoods.length===1)return; // keep at least one
     S.selectedMoods.splice(idx,1);
     el.classList.remove('on');
+    el.style.removeProperty('--mood-accent');
+    el.style.removeProperty('--mood-bg');
   }else{
     if(S.selectedMoods.length>=2){
       toast('Max 2 moods — deselect one first'); return;
     }
     S.selectedMoods.push(id);
     el.classList.add('on');
+    applyMoodColor(el, id);
   }
   updateMoodHint();
 }
@@ -11263,7 +11562,7 @@ function checkShareLink() {
     if (!song || !song.lyrics) return;
     S.currentSong = song;
     const out = document.getElementById('gen-out');
-    if (out) { out.classList.add('visible'); }
+    if (out) { out.classList.add('visible'); document.getElementById('output-placeholder')?.classList.add('hide'); }
     const titleEl = document.getElementById('res-title');
     if (titleEl) titleEl.textContent = song.title || 'Shared Song';
     const verdictEl = document.getElementById('res-verdict');
@@ -11773,7 +12072,6 @@ function loadProfilePage() {
   if (genreEntries.length > 1) {
     gbCard.style.display = '';
     const maxCount = genreEntries[0][1];
-    const GENRE_COLORS = {pop:'#f472b6',hiphop:'#a78bfa',rnb:'#34d399',rock:'#f97316',country:'#fbbf24',edm:'#60a5fa',jazz:'#818cf8',soul:'#fb923c',gospel:'#4ade80',blues:'#38bdf8',funk:'#e879f9',reggae:'#86efac',afrobeats:'#fde68a',latin:'#fb7185',kpop:'#c084fc',punk:'#f87171',altrock:'#94a3b8',neosoul:'#6ee7b7',ss:'#fcd34d',folk:'#a3e635'};
     gbEl.innerHTML = genreEntries.slice(0,8).map(([g, cnt]) => {
       const color = GENRE_COLORS[g] || '#94a3b8';
       const pct = Math.round(cnt / maxCount * 100);
@@ -11844,6 +12142,42 @@ function loadProfilePage() {
   // Sync stats to server in background (debounced — no UI impact)
   clearTimeout(loadProfilePage._syncTimer);
   loadProfilePage._syncTimer = setTimeout(syncProfileToServer, 2000);
+}
+
+function updateWriterSidebar() {
+  try {
+    const lib = S.library || [];
+    const ach = getAchState ? getAchState() : {};
+    const xpSt = getXPState ? getXPState() : {};
+
+    const songEl = document.getElementById('ws-songs');
+    if (songEl) songEl.textContent = lib.length;
+
+    const streakEl = document.getElementById('ws-streak');
+    if (streakEl) streakEl.textContent = (ach.streak || 0) + '🔥';
+
+    const xpEl = document.getElementById('ws-xp');
+    if (xpEl) xpEl.textContent = xpSt.xp || 0;
+
+    const profileData = JSON.parse(localStorage.getItem('soniq_profile') || '{}');
+    const name = profileData.display_name || S.user?.email?.split('@')[0] || 'Artist';
+
+    const nameEl = document.getElementById('ws-name');
+    if (nameEl) nameEl.textContent = name;
+
+    const avatar = document.getElementById('ws-avatar');
+    if (avatar) avatar.textContent = (name[0] || '?').toUpperCase();
+
+    const planBadge = document.getElementById('ws-plan');
+    if (planBadge) {
+      const plan = S.plan || 'free';
+      planBadge.textContent = plan === 'studio' || plan === 'studio_annual' ? 'Studio Plan'
+        : plan === 'starter' || plan === 'starter_annual' ? 'Starter Plan'
+        : plan === 'pro' || plan === 'pro_annual' ? 'Pro Plan'
+        : plan.startsWith('founding') ? 'Founding Plan'
+        : 'Free Plan';
+    }
+  } catch(e) { /* non-critical sidebar update */ }
 }
 
 function openProfileEdit() {
@@ -12191,6 +12525,13 @@ document.addEventListener('DOMContentLoaded', () => {
 .dbg-err{padding:7px;background:var(--s3);border-left:3px solid var(--red);border-radius:3px;margin-bottom:5px;font-size:11px}
 #coach-output strong { color: var(--amber); }
 #coach-output { font-family: var(--font); }
+/* ── GDPR COOKIE CONSENT ── */
+#cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--s2);border-top:1px solid var(--b3);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--tx2);transform:translateY(100%);transition:transform 0.3s ease;box-shadow:0 -4px 24px rgba(0,0,0,0.4)}
+#cookie-banner.show{transform:translateY(0)}
+#cookie-banner a{color:var(--amber);text-decoration:underline}
+.cookie-btns{display:flex;gap:8px;flex-shrink:0}
+.cookie-accept{padding:8px 18px;border-radius:var(--r2);border:none;background:var(--amber);color:#08080a;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.cookie-decline{padding:8px 14px;border-radius:var(--r2);border:1px solid var(--b3);background:transparent;color:var(--tx3);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
 </style>
 
 <script>
@@ -12417,37 +12758,43 @@ window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.mess
 setInterval(()=>{ if(DBG.on) dbgUpdateState(); },2000);
 document.addEventListener('DOMContentLoaded',initDebug);
 </script>
-<!-- ── COOKIE CONSENT BANNER ───────────────────────────────── -->
-<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--brd);padding:10px 20px;z-index:9999;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 12px rgba(0,0,0,.25)">
-  <span style="font-size:12px;color:var(--tx3);line-height:1.5">
-    🍪 We use session cookies only — no tracking, no third-party ads.
-    <a href="/legal/privacy.html" target="_blank" style="color:var(--amber);text-decoration:none">Privacy Policy</a>
-  </span>
-  <button onclick="acceptCookies()" style="background:var(--amber);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Got it</button>
+<!-- GDPR Cookie Consent -->
+<div id="cookie-banner" role="dialog" aria-label="Cookie consent">
+  <div style="flex:1;min-width:200px">
+    🍪 We use cookies to improve your experience and serve relevant ads.
+    <a href="/legal/privacy.html">Privacy Policy</a>
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-decline" onclick="setCookieConsent(false)">Decline</button>
+    <button class="cookie-accept" onclick="setCookieConsent(true)">Accept</button>
+  </div>
 </div>
 
 <script>
-// ── Cookie consent ──────────────────────────────────────────
-function checkCookieBanner() {
-  if (!localStorage.getItem('soniq_cookie_consent')) {
-    const b = document.getElementById('cookie-banner');
-    if (b) b.style.display = 'flex';
+// ── GDPR COOKIE CONSENT ──
+function setCookieConsent(accepted) {
+  localStorage.setItem('cookie_consent', accepted ? 'accepted' : 'declined');
+  localStorage.setItem('cookie_consent_ts', Date.now());
+  document.getElementById('cookie-banner').classList.remove('show');
+  if (accepted) {
+    // TODO: Initialize Google AdSense here when ready
+    // window.adsbygoogle = window.adsbygoogle || [];
   }
 }
-function acceptCookies() {
-  localStorage.setItem('soniq_cookie_consent', '1');
-  const b = document.getElementById('cookie-banner');
-  if (b) b.style.display = 'none';
-  // Persist to profile if logged in
-  if (S.user && S.supabase) {
-    S.supabase.from('profiles').update({
-      cookie_consent:    true,
-      cookie_consent_at: new Date().toISOString()
-    }).eq('id', S.user.id).catch(() => {});
+
+function initCookieConsent() {
+  const consent = localStorage.getItem('cookie_consent');
+  const ts = parseInt(localStorage.getItem('cookie_consent_ts') || '0');
+  const SIX_MONTHS = 1000 * 60 * 60 * 24 * 180;
+  // Show if no consent or consent older than 6 months
+  if (!consent || (Date.now() - ts > SIX_MONTHS)) {
+    setTimeout(() => {
+      document.getElementById('cookie-banner')?.classList.add('show');
+    }, 2000);
   }
 }
-// Show after a brief delay so it doesn't flash on first paint
-setTimeout(checkCookieBanner, 1500);
+
+initCookieConsent();
 </script>
 </body>
 </html>

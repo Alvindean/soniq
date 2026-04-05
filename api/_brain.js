@@ -204,7 +204,10 @@ const GENRE_BIBLE={
   rnb:{dna:'Rhythm and blues: groove, vocal runs, romance and desire, emotional vulnerability, live instrumentation or sampled soul.',structure:'Verse → Hook → Verse → Hook → Bridge → Final Hook. Hook-centric. Verse sets emotional scene. Hook is the declaration. Bridge is the turn or breakdown.',suno:'"R&B, smooth production, vocal runs, electric piano, 90 BPM" for classic. "Contemporary R&B, 808 bass, trap hi-hats, 75 BPM" for modern.',keys:['Ad-libs and runs are a second vocal melody — write them','Groove must feel inevitable — bass and drums locked','Bridge is the emotional vulnerability peak','Specificity in lyrics: name the street, the hour, the feeling precisely'],artists:'Beyoncé · Usher · Alicia Keys · Frank Ocean · SZA · The Weeknd · Daniel Caesar · Giveon · Jhené Aiko',counter:{device:'Keyboard riff / ad-lib vocal counter-voice',does:'R&B\'s counter-melody lives in two places: the keyboard fills that respond between vocal phrases (a riff answering the lead), and the ad-lib vocal layer that creates an organic second melody running alongside the primary line. Together they create the layered warmth that defines R&B production.',howto:'keyboard fill counter-melody, ad-lib vocal counter-voice, electric piano response phrase',map:'Verse: keyboard fills between phrases / Hook: ad-lib vocal creates counter / Bridge: keyboard counter-line peaks / Outro: ad-lib voice overtakes as lead improvises'},outliers:[{song:'"Crazy in Love" — Beyoncé',rule:'Sampled brass stab creating frenetic aggressive energy instead of smooth groove — the opposite of R&B\'s DNA',result:'Defined 2000s R&B and launched Beyoncé\'s solo era, proved aggression and R&B elegance could fuse'},{song:'"No Scrubs" — TLC',rule:'Rejection and refusal anthem in a genre built on romance, desire, and longing',result:'One of the best-selling singles of 1999, changed what R&B women were allowed to say about men'},{song:'"Redbone" — Childish Gambino',rule:'95 BPM slowed to a crawl — so deliberately slow that radio programmers said it was unplayable',result:'#1 on R&B charts, became a cultural touchstone and spawned an entirely new wave of slow-burn R&B production'}],vocables:{sounds:'ooh, ah, yeah, baby, mmm',when:'everywhere — post-chorus, ad-libs throughout, bridge build, outro runs',suno_tag:'[Ad-lib vocal runs]',borrowed_from:'gospel, soul — direct lineage',notes:'R&B has the highest vocable density of any genre — ad-libs are expected throughout, not just at key moments'}},
   edm:{dna:'Drop-driven structure, electronic production, 4-on-the-floor kick, tension/release arc, euphoric peak moments, anonymous subject.',structure:'Intro (build) → Drop → Break → Drop 2 (bigger) → Outro. The build IS the tension. The drop IS the payoff. Everything serves the drop.',suno:'"EDM, synth lead, 4-on-the-floor kick, 128 BPM, festival drop" for festival. "Deep house, bass-driven, warm, 120 BPM" for underground.',keys:['The drop must be worth the build — if the buildup is epic the drop must be devastating','Vocals are usually hooks — minimal lyrics, maximum repetition','Breakdown creates anticipation — strip everything except a single element','Specify BPM — it is the genre\'s most fundamental parameter'],artists:'Calvin Harris · Martin Garrix · Avicii · Deadmau5 · Daft Punk · Skrillex · Disclosure · Flume',counter:{device:'Drop counter-melody synth / bass synth vs. lead',does:'The drop counter-melody is a secondary synth line that plays simultaneously with the main lead synth during the drop — two melodic voices creating counterpoint at peak energy. Below them, the bass synth plays a third counter-melodic line. The arpeggiated lead in the breakdown provides pre-drop counter-melody, building tension.',howto:'drop counter-melody synth, bass synth counter-line, arpeggio build counter',map:'Build: arpeggiated synth creates anticipatory counter-melody / Drop: two synths in counterpoint / Breakdown: stripped to single counter-melody line / Drop 2: both counter-melodies return louder'},outliers:[{song:'"Levels" — Avicii',rule:'Sampled Etta James gospel vocal ("Something\'s Got a Hold on Me") over an electronic rave drop — grandma\'s church music in the club',result:'Became the anthem of a generation, proved emotional vocal authenticity over a drop hits harder than any synth hook'},{song:'"Get Lucky" — Daft Punk ft. Pharrell',rule:'70s disco funk with live instruments only — no synthesizers in the drop in an era of pure digital production',result:'Fastest-selling UK single in history at release, proved live organic groove beats programmed perfection in EDM context'},{song:'"Titanium" — David Guetta ft. Sia',rule:'Lyrical emotional depth and ballad structure in a genre that avoids narrative and favors anonymous subject matter',result:'Multi-platinum global hit that crossover EDM onto pop radio permanently — emotion won over atmosphere'}],vocables:{sounds:'oh, hey, woo, yeah (often sampled/pitched)',when:'drop build, post-drop release, outro loop',suno_tag:'[Drop vocal chant]',borrowed_from:'house music, rave culture, gospel samples',notes:'EDM vocables are often pitched/processed — the human voice as instrument texture rather than singalong trigger'}},
   country:{dna:'Storytelling over everything, authentic emotion, rural/small-town imagery, guitar as emotional anchor, hook grounded in relatable universal truth.',structure:'Verse (story) → Chorus (universal truth) → Verse 2 (story deepens) → Chorus → Bridge (turn/reveal) → Final Chorus. Second verse MUST deepen the story emotionally.',suno:'"country, acoustic guitar, pedal steel, fiddle, 100 BPM, warm" for classic. "country pop, electric guitar, modern production, 120 BPM" for Nashville pop.',keys:['Second verse must be the emotional payoff — not a repeat of verse 1','Chorus is universal truth extracted from specific verse story','Pedal steel and fiddle are genre signals — specify them','Bridge is the revelation — what the narrator finally understands'],artists:'Dolly Parton · Garth Brooks · Johnny Cash · Kacey Musgraves · Chris Stapleton · Zach Bryan · Luke Combs · Carrie Underwood',counter:{device:'Pedal steel answer-line / fiddle counter-melody',does:'Country\'s definitive counter-melody is the pedal steel guitar — it plays an answering melodic phrase between vocal lines that aches with emotional resonance. In bluegrass, the fiddle plays a counter-melody against the vocal simultaneously. Both voices — vocal and pedal steel — are in constant melodic conversation.',howto:'pedal steel guitar answer fills, fiddle counter-melody, steel guitar response line',map:'Verse: pedal steel answers after each vocal phrase / Chorus: steel or fiddle counter-line under the hook / Bridge: pedal steel takes melodic lead while vocal drops / Outro: steel guitar leads the fade'},outliers:[{song:'"Old Town Road" — Lil Nas X',rule:'Trap 808 beat plus banjo — Billboard controversially removed it from country charts for insufficient genre purity',result:'Longest #1 run in Billboard Hot 100 history at the time — the banjo was country enough for 19 weeks'},{song:'"Before He Cheats" — Carrie Underwood',rule:'Violent revenge fantasy with property destruction — aggressive content far outside mainstream country\'s "accept and endure" tradition',result:'Multiple Grammy winner that became an anthem, proved country women were allowed to be dangerous'},{song:'"Islands in the Stream" — Dolly Parton & Kenny Rogers',rule:'Disco-influenced production with a synthesizer groove in country — absolutely wrong for the genre',result:'#1 country AND pop crossover simultaneously, proved great songwriting (Barry Gibb) transcends production rules'}],vocables:{sounds:'la-la-la, hey, yee-haw, na-na',when:'barn-dance chorus, outro group singalong',suno_tag:'[Group singalong]',borrowed_from:'folk, Appalachian oral tradition',notes:'Country vocables signal community — they invite the audience into the song as participants not observers'}},
-  jazz:{dna:'Improvisation over harmony, chord substitution, rhythmic sophistication, the conversation between instruments, space as music.',structure:'Head (melody) → Solos → Head out. Blues form (12-bar) or AABA (32-bar standard). The arrangement is a vehicle for improvisation.',suno:'"jazz, piano trio, upright bass, brushed drums, 120 BPM swing" for classic. "jazz fusion, electric piano, 100 BPM" for fusion.',keys:['The melody (head) is the launching pad — state it cleanly, then destroy it in the solo','Walking bass is always a counter-melody','Chord substitution creates harmonic surprise — ii-V-I can be approached from anywhere','Silence is the most important note in jazz'],artists:'Miles Davis · John Coltrane · Bill Evans · Thelonious Monk · Charlie Parker · Herbie Hancock · Esperanza Spalding · Kamasi Washington',counter:{device:'Walking bass (primary counter) / piano comping / horn counterpoint',does:'Jazz has the richest counter-melody tradition: the walking bass is ALWAYS a counter-melody — it creates an independent melodic line of its own against the soloist. Piano comping creates harmonic counter-commentary. In ensemble sections, horns play genuine counterpoint — multiple independent melodic lines simultaneously, each complete on its own.',howto:'walking bass counter-melody, piano comp counter-voice, horn counterpoint lines',map:'Throughout: walking bass provides constant counter / Head: piano comps creates harmonic counter / Solos: bass and comping in three-voice counterpoint / Ensemble: full horn counterpoint'},outliers:[{song:'"Take Five" — Dave Brubeck Quartet',rule:'5/4 time signature — commercially unthinkable, programmers said listeners couldn\'t feel an odd meter',result:'First jazz instrumental to sell over 1 million copies, proved listeners feel groove not math'},{song:'"Round Midnight" — Thelonious Monk',rule:'Extremely dissonant angular melody that sounded "wrong" to bebop musicians trained in smooth lines',result:'Most recorded jazz standard written by a living composer — the wrongness WAS the emotional truth'},{song:'"A Love Supreme" — John Coltrane',rule:'Four-part spiritual suite with no traditional song structure, no hooks, no commercial concessions',result:'Best-selling jazz album of all time — proved jazz listeners wanted transcendence more than entertainment'}],vocables:{sounds:'scat syllables: doo-wah, bop, skee-dat, ba-da',when:'improvised solo sections, outro scat fade',suno_tag:'[Scat vocal]',borrowed_from:'African American vocal improvisation tradition',notes:'Jazz vocables (scat) are melodically sophisticated — they mimic instrument lines, not crowd participation'}}
+  jazz:{dna:'Improvisation over harmony, chord substitution, rhythmic sophistication, the conversation between instruments, space as music.',structure:'Head (melody) → Solos → Head out. Blues form (12-bar) or AABA (32-bar standard). The arrangement is a vehicle for improvisation.',suno:'"jazz, piano trio, upright bass, brushed drums, 120 BPM swing" for classic. "jazz fusion, electric piano, 100 BPM" for fusion.',keys:['The melody (head) is the launching pad — state it cleanly, then destroy it in the solo','Walking bass is always a counter-melody','Chord substitution creates harmonic surprise — ii-V-I can be approached from anywhere','Silence is the most important note in jazz'],artists:'Miles Davis · John Coltrane · Bill Evans · Thelonious Monk · Charlie Parker · Herbie Hancock · Esperanza Spalding · Kamasi Washington',counter:{device:'Walking bass (primary counter) / piano comping / horn counterpoint',does:'Jazz has the richest counter-melody tradition: the walking bass is ALWAYS a counter-melody — it creates an independent melodic line of its own against the soloist. Piano comping creates harmonic counter-commentary. In ensemble sections, horns play genuine counterpoint — multiple independent melodic lines simultaneously, each complete on its own.',howto:'walking bass counter-melody, piano comp counter-voice, horn counterpoint lines',map:'Throughout: walking bass provides constant counter / Head: piano comps creates harmonic counter / Solos: bass and comping in three-voice counterpoint / Ensemble: full horn counterpoint'},outliers:[{song:'"Take Five" — Dave Brubeck Quartet',rule:'5/4 time signature — commercially unthinkable, programmers said listeners couldn\'t feel an odd meter',result:'First jazz instrumental to sell over 1 million copies, proved listeners feel groove not math'},{song:'"Round Midnight" — Thelonious Monk',rule:'Extremely dissonant angular melody that sounded "wrong" to bebop musicians trained in smooth lines',result:'Most recorded jazz standard written by a living composer — the wrongness WAS the emotional truth'},{song:'"A Love Supreme" — John Coltrane',rule:'Four-part spiritual suite with no traditional song structure, no hooks, no commercial concessions',result:'Best-selling jazz album of all time — proved jazz listeners wanted transcendence more than entertainment'}],vocables:{sounds:'scat syllables: doo-wah, bop, skee-dat, ba-da',when:'improvised solo sections, outro scat fade',suno_tag:'[Scat vocal]',borrowed_from:'African American vocal improvisation tradition',notes:'Jazz vocables (scat) are melodically sophisticated — they mimic instrument lines, not crowd participation'}},
+  rock:{dna:'Power chords, backbeat (snare on 2&4), guitar-bass-drums locked groove, riff as identity, distortion as emotion, verse-chorus-bridge with guitar solo as emotional peak. Dynamic contrast: quiet verse earning the explosive chorus.',structure:'Intro riff → Verse → Pre-Chorus → Chorus → Verse 2 → Pre-Chorus → Chorus → Guitar Solo / Bridge → Final Chorus → Outro. Intro riff often returns as outro.',suno:'"classic rock, electric guitar, power chords, driven drums, bass, 110 BPM, arena rock" for stadium. "hard rock, heavy riff, distorted guitar, 120 BPM" for modern. "indie rock, jangly guitars, clean tone, driving beat, 105 BPM" for indie. Always specify clean vs distorted guitar.',keys:['The riff IS the song\'s identity — memorable enough to hum, everything else serves it','Dynamic contrast is mandatory: verse must be quieter than chorus — the explosion must feel earned','Guitar solo is the emotional peak, not a technical showcase — it says what lyrics cannot','Chorus must feel like a collective event: written to be shouted by a crowd, not just sung solo','Rock lyrics: concrete images over abstraction. "Sleeping in a Chevy" not "feeling lost". Specificity creates anthems','Backbeat feel must be locked — drums and bass in the same pocket or the song loses its power'],artists:'Led Zeppelin · AC/DC · The Rolling Stones · Queen · Bruce Springsteen · Foo Fighters · Tom Petty · Aerosmith · Guns N\' Roses · Fleetwood Mac · The Eagles · Heart',counter:{device:'Second guitar harmony / keyboard layer / bass counter-line',does:'Rock\'s counter-melody lives in the second guitar track — a harmony guitar a third or fifth above the lead creates the twin-guitar wall of sound (Thin Lizzy, Iron Maiden). The bass frequently breaks from the root to play a counter-melodic line in the verse. A keyboard or organ adds harmonic counter-weight beneath the guitars.',howto:'harmony guitar counter-line, bass counter-melody, keyboard layer under guitars',map:'Verse: bass plays melodic counter beneath clean guitar / Chorus: second guitar harmony creates wall of sound / Bridge/Solo: bass and rhythm guitar create counter-rhythm / Outro: twin guitar harmonies lead the fade'},outliers:[{song:'"Bohemian Rhapsody" — Queen',rule:'6 minutes, opera section mid-song, no repeating chorus — radio refused to play it',result:'Held UK record for best-selling single, most recognizable song ever — commitment to vision beats every commercial formula'},{song:'"Smells Like Teen Spirit" — Nirvana',rule:'Deliberately lo-fi, muddy production against the polished hair-metal standard; Cobain said he was trying to rip off the Pixies',result:'Killed the dominant genre overnight — the anti-production became the definitive production'},{song:'"Mr. Brightside" — The Killers',rule:'No dynamic contrast — same relentless driving energy throughout with no quiet verse',result:'Never left UK charts for 16 consecutive years — sustained tension can replace the tension-release cycle entirely'}],vocables:{sounds:'woah, yeah, hey, come on',when:'pre-chorus lift, post-chorus crowd release, outro collective shout',suno_tag:'[Crowd shout]',borrowed_from:'blues shouting, gospel release',notes:'Rock vocables must be earned — quiet verse first, then the release. A "woah" with no contrast is decoration; with earned contrast, it is transcendence'}},
+  folk:{dna:'Voice and acoustic instrument as total truth. Narrative storytelling, first-person perspective, protest tradition, community and oral history. Folk trusts the listener — the story IS the production. Every word must justify its existence.',structure:'Most flexible genre. Verse-only (no chorus) is valid. VCVCBC works. Through-composed follows the story arc. Never impose a template on a narrative — let the story determine the structure.',suno:'"folk, acoustic guitar, fingerpicked, warm, narrative, close-mic vocals, 90 BPM" for classic. "folk rock, acoustic + electric guitar, driving rhythm, 105 BPM" for electrified. "indie folk, atmospheric, layered acoustics, 80 BPM" for modern. Specify: brushed drums or no drums for authenticity. Always include "fingerpicked" for storytelling feel.',keys:['Every line must justify its existence — folk has zero tolerance for filler. If a line isn\'t the best possible line, cut it','Specificity creates universality: a house number, a dog\'s name, a particular street. Concrete details make stories universal','Verse 2 rule: deepen the emotional stakes. Do not repeat verse 1 imagery — move the story forward','Silence between phrases is deliberate — guitar rests carry as much weight as the notes','Protest folk: the argument must live in the specific story of one person, not stated as abstraction','Guitar tuning is a character: open G, DADGAD, open D create distinct emotional textures — specify in prompt'],artists:'Bob Dylan · Joni Mitchell · Neil Young · Simon & Garfunkel · Woody Guthrie · Pete Seeger · Joan Baez · Gillian Welch · Iron & Wine · Fleet Foxes · Sufjan Stevens · Phoebe Bridgers',counter:{device:'Second acoustic guitar / fiddle / cello counter-line',does:'Folk\'s counter-melody is the instrument filling the phrase gaps — the fingerpicked guitar pattern weaves its own melodic thread around the vocal line. On duet recordings, the second acoustic plays a complementary fingerpicking counter-line. Fiddle or cello can take the counter-melodic role in bridge sections.',howto:'fingerpicking counter-melody, fiddle counter-line, second acoustic guitar fills',map:'Throughout: guitar fills phrase gaps with melodic counter / Chorus: second voice or instrument joins / Bridge: counter-melody becomes prominent as vocal strips back / Outro: guitar fingerpicking counter leads the fade'},outliers:[{song:'"Fast Car" — Tracy Chapman',rule:'One repeating guitar loop with almost no chord changes for 4:59 — broke the variation mandate',result:'Grammy winner, UK #1 thirty years later when covered — a single hypnotic groove can hold emotional truth forever'},{song:'"Blowin\' in the Wind" — Bob Dylan',rule:'No answers given — the entire song asks questions without resolution, violating narrative resolution convention',result:'Defining protest anthem of the 20th century — ambiguity lands harder than statements'},{song:'"The Sound of Silence" — Simon & Garfunkel',rule:'Columbia secretly added electric guitar and drums to the original acoustic recording — purists were furious',result:'Became their breakthrough single — the "wrong" production decision became the definitive version'}],vocables:{sounds:'mmm, la-la-la, oh, hey',when:'bridge hum before final verse, quiet outro fade only',suno_tag:'[Hummed outro]',borrowed_from:'Appalachian tradition, Celtic folk',notes:'Folk vocables must feel involuntary — like the singer is moved to hum rather than performing. One moment per song maximum. Intimacy over crowd energy'}},
+  metal:{dna:'Distorted guitars (down-tuned, palm-muted), aggressive percussion (double bass kick, blast beats), power and technical virtuosity, verse-chorus with mandatory breakdown, guitar solo as centerpiece. Extreme dynamics: the quiet is genuinely quiet, the loud is devastating.',structure:'Intro riff (identity statement) → Verse → Pre-Chorus → Chorus → Verse 2 → Pre-Chorus → Chorus → Breakdown (tempo shift, half-time or stop-start) → Guitar Solo → Bridge → Final Chorus → Outro. Breakdown and guitar solo are non-negotiable.',suno:'"heavy metal, distorted guitar, double bass drums, palm muting, power chords, 140 BPM" for classic. "thrash metal, fast riff, aggressive, 180 BPM" for thrash. "doom metal, slow, dark, heavy, 60 BPM" for doom. "melodic metal, harmonic guitar leads, clean chorus vocals, 130 BPM" for melodic. Always specify BPM and subgenre — metal sub-genres are sonically distinct.',keys:['The riff must be the most memorable thing — write the riff description first, every element serves it','Breakdown is mandatory: a tempo shift or rhythmic stop-start creates the headbanging moment — the crowd loses their mind here','Guitar solo must be the emotional climax, not a technical warm-up — the best metal solos say what the lyrics cannot','Dynamics: quiet sections must be genuinely quiet — contrast makes the heavy sections hit harder','Metal lyrics: mythology, psychology, existential conflict. Vague evil sounds dated; specific dread sounds timeless','Double bass drum pattern must be specified — it is the genre\'s rhythmic engine, everything rides on top of it'],artists:'Black Sabbath · Metallica · Iron Maiden · Pantera · Tool · Slayer · Ozzy Osbourne · Megadeth · Judas Priest · Lamb of God · System of a Down · Mastodon · Gojira',counter:{device:'Harmony guitar (twin lead) / galloping bass / riff counter-voice',does:'Metal\'s definitive counter-melody is the twin harmony guitar — two guitars playing harmonized lead lines a third or fifth apart (Iron Maiden perfected this). The bass plays a galloping rhythmic counter-line against the guitar riff. In progressive metal, a second voice plays a genuine melodic counter against the main riff.',howto:'twin harmony guitar leads, galloping bass counter-line, second guitar harmony riff',map:'Verse: bass gallops counter to guitar riff / Chorus: second guitar harmony creates wall of sound / Solo: guitar solo is primary melody, rhythm guitar provides counter-riff / Bridge: twin guitar harmonies in full counterpoint'},outliers:[{song:'"Master of Puppets" — Metallica',rule:'8.5 minutes with a complete mid-song tempo shift to a clean guitar ballad section — unexpected vulnerability in thrash metal',result:'Consistently rated the greatest metal song ever — proved complexity and emotional range coexist with brutality'},{song:'"War Pigs" — Black Sabbath',rule:'Anti-war political theme in a genre audiences expected to be about fantasy and escapism',result:'Became an anti-war anthem, proved heavy music could carry serious political weight'},{song:'"Chop Suey!" — System of a Down',rule:'No repeating chorus, shifting time signatures, vocals that alternate whisper and scream — broke every structural rule',result:'Their commercial breakthrough — chaos organized around a strong riff is more powerful than verse-chorus conformity'}],vocables:{sounds:'yeah, go, ahhh, hey',when:'breakdown entrance, chorus aggression peak, outro collective — sparingly',suno_tag:'[Metal shout]',borrowed_from:'hard rock shouting, blues intensity',notes:'Metal vocables must be used with restraint — impact over frequency. One well-placed "YEAH!" at a riff peak hits harder than scattered vocables throughout'}}
 };
 
 // ═══════════════════════════════════════════════════════
@@ -1622,6 +1625,246 @@ const MASTERING_TARGETS = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// AD-LIB BIBLE + VOCAL STACK PROFILES
+// Ad-lib guide for all 24 genres: signature sounds, placement, density, Suno
+// parentheses syntax. Vocal stack profiles: how many layers per section.
+// Injected into song prompts via buildAdlibNote() and buildVocalStackNote().
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ADLIB_BIBLE = {
+  pop: {
+    sounds: ['na-na-na', 'woah', 'hey', 'ooh', 'yeah'],
+    placement: 'post-chorus (mandatory), outro singalong, pre-chorus lift (hey!)',
+    density: 'medium',
+    example: '(na-na-na) (woah-woah) after the main hook; (yeah) on peaks',
+    outro: 'na-na-na singalong vamp',
+  },
+  hiphop: {
+    sounds: ['yeah', 'uh', 'ayy', "let's go", 'woo'],
+    placement: 'every 2nd bar inline, bar-end punctuation, outro crowd chant',
+    density: 'high',
+    example: '"I run this (yeah) city (uh)" — inline on every 2nd bar',
+    outro: '(yeah, yeah, yeah!) crowd chant builds and repeats',
+  },
+  rnb: {
+    sounds: ['ooh', 'ah', 'yeah', 'baby', 'mmm'],
+    placement: 'post-chorus runs, bridge build, end of phrases, outro vamp',
+    density: 'high',
+    example: '"You know I love you (ooh) forever (mmm)"; bridge: (ooh-ah-yeah!) vocal run',
+    outro: 'melismatic vocal run vamp — (ooh-ooh-ah-yeah!) escalating',
+  },
+  rock: {
+    sounds: ['woah', 'hey', 'yeah', 'woo', 'come on'],
+    placement: 'pre-chorus lift, post-chorus crowd release, outro collective',
+    density: 'medium',
+    example: '"Don\'t you cry (hey!) There\'s a heaven (yeah!)"',
+    outro: '(yeah! yeah! yeah!) collective shout, fades',
+  },
+  country: {
+    sounds: ['yeah', 'mmm', 'woah', 'hey', 'la-la-la'],
+    placement: 'verse story turns, final chorus group singalong, outro',
+    density: 'low-medium',
+    example: '"She walked out (yeah) door slammin\' (mm-mm)"',
+    outro: '(la-la-la) (woah-oh) group barn-dance singalong',
+  },
+  edm: {
+    sounds: ['oh-oh-oh', 'hey', 'yeah', 'woo'],
+    placement: 'pre-drop cue, drop entrance, post-drop groove, outro loop',
+    density: 'medium — processed/pitched',
+    example: '"[Build] (oh!) (yeah!) [Drop] (oh-oh-oh!) looped"',
+    outro: 'looped (oh-oh-oh) processed texture fades',
+  },
+  latin: {
+    sounds: ['ay', 'aye', 'oye', 'eh', 'olé', 'dale'],
+    placement: 'salsa montuno vamp, cumbia chorus response, outro coro fade',
+    density: 'high — bilingual call-and-response',
+    example: '"Te quiero (ay!) con toda mi alma (aye!)"',
+    outro: '(ay ay ay!) (dale, dale!) over montuno piano, 8–16 bars',
+  },
+  reggaeton: {
+    sounds: ['aye', 'eh', 'yo', 'dale', 'mira'],
+    placement: 'dembow accent beat, perreo section, outro vamp',
+    density: 'medium — rhythm-aligned',
+    example: '"Muévelo (aye) dale (eh)" — on dembow syncopation',
+    outro: '(dale, dale, dale!) over dembow groove, fades',
+  },
+  folk: {
+    sounds: ['mmm', 'oh', 'la-la-la'],
+    placement: 'bridge hum before final chorus, quiet outro only',
+    density: 'minimal — one moment max per song',
+    example: '"[Bridge] (mmm, oh...) [Final Chorus] (la-la-la)"',
+    outro: 'hummed melody (mmm) fades to silence',
+  },
+  metal: {
+    sounds: ['yeah', 'go', 'ahhh', 'hey'],
+    placement: 'breakdown entrance, chorus aggression peak, outro collective',
+    density: 'low — impact over frequency',
+    example: '"Master of puppets! (YEAH! YEAH!)" — at riff peaks',
+    outro: '(yeah! yeah! yeah!) or feedback noise — abrupt end',
+  },
+  jazz: {
+    sounds: ['doo-wah', 'bop', 'skee-dat', 'ba-da', 'shoo-bee'],
+    placement: 'solo section scat, outro improvisation, responsorial moments',
+    density: 'high — during solos only',
+    example: '"[Solo] (bop-ba-doo-wah, skee-dat-da-ba!)"',
+    outro: 'scat improvisation fades: (doo-wah... skee-dat... ba-da-bop...)',
+  },
+  ss: {
+    sounds: ['mmm', 'oh', 'la-la'],
+    placement: 'bridge confessional only, whispered outro',
+    density: 'minimal — 1–2 moments per song',
+    example: '"[Bridge] (whispered: I\'m sorry...) (oh...)"',
+    outro: 'whispered (mmm) or sighed (oh) fades to silence',
+  },
+  altrock: {
+    sounds: ['woah', 'oh-oh', 'yeah', 'woo'],
+    placement: 'pre-chorus earned tension, post-chorus self-aware release',
+    density: 'low-medium — must feel earned not manufactured',
+    example: '"Can you feel it? (woah...) [Post-chorus] (oh-oh-oh, yeah!)"',
+    outro: '(woah-woah-woah...) fading with feedback',
+  },
+  reggae: {
+    sounds: ['yeah', 'jah', 'one love', 'irie', 'bless'],
+    placement: 'call-and-response chorus, outro vamp (MANDATORY 8–16 bars)',
+    density: 'medium — spiritual affirmations',
+    example: '"Living in Babylon (yeah!) But I\'m rising (jah!)"',
+    outro: '(one love!) (yeah, jah!) 8–16 bar vamp — NEVER skip the outro vamp',
+  },
+  afrobeats: {
+    sounds: ['eh', 'aye', 'ehn', 'oh-oh', 'ye'],
+    placement: 'hook repeat, between call-and-response lines, outro fade',
+    density: 'medium — rhythmic accent not emotional',
+    example: '"Body move (eh!) soul on fire (aye!)" — on percussion accents',
+    outro: '(aye, aye, aye!) (eh, eh!) accenting percussion grid, fades',
+  },
+  blues: {
+    sounds: ['oh', 'lord', 'mmm', 'well'],
+    placement: 'between AAB lines as guitar-answering voice, turnaround marker',
+    density: 'low-medium — fills the guitar conversation gaps',
+    example: '"I\'ve been waiting so long (oh!) [guitar answers] (Lord have mercy!)"',
+    outro: '(boom... boom... boom...) hypnotic slow burn vamp',
+  },
+  punk: {
+    sounds: ['hey', 'oi', 'yeah', 'go'],
+    placement: 'chorus shout only, outro collective gang chant',
+    density: 'low — intentional anti-production. Gang vocals not individual',
+    example: '"[Chorus - shout] (HEY! OI! YEAH!)" — everyone shouts together',
+    outro: '(oi! oi! oi!) abrupt end — NO fade',
+  },
+  kpop: {
+    sounds: ['ooh', 'ah', 'yeah', 'na-na'],
+    placement: 'post-chorus (ALWAYS), outro sweetener, before key change countdown',
+    density: 'high — precision-engineered at exact bar positions',
+    example: '"[Post-Chorus] (ooh-ah, na-na-na)" — timed to choreography counts',
+    outro: '(yeah! ooh! ah!) (na-na-na, woah!) ad-lib driven singalong',
+  },
+  neosoul: {
+    sounds: ['ooh', 'ah', 'mmm', 'baby', 'yeah'],
+    placement: 'throughout chorus, bridge emotional build, outro melisma vamp',
+    density: 'high — parallel emotional text alongside main vocal',
+    example: '"Come to me (ah, yeah) be with me (ooh, ooh)"; bridge: (ooh-ooh-ah!) run',
+    outro: '(ooh-ooh-ooh!) escalating melismatic run vamps and fades',
+  },
+  gospel: {
+    sounds: ['hallelujah', 'oh Lord', 'amen', 'yes Lord', 'glory'],
+    placement: 'call-and-response THROUGHOUT, bridge vamp climax, outro vamp sacred',
+    density: 'maximum — ad-libs ARE the structure',
+    example: '"He lifted me up! [Response: (hallelujah!) (amen!)]"',
+    outro: '(hallelujah!) (yes Lord!) (glory!) EXTENDED vamp — NEVER cut short',
+  },
+  parody: {
+    sounds: ['(matching original genre ad-libs)', '(what?!)', '(seriously)', '(really?)'],
+    placement: 'mirror original song placement exactly — subvert content only',
+    density: 'match source genre density',
+    example: '"I put ketchup on my steak (what?!)" — sincere delivery + absurd content',
+    outro: 'callback to absurd premise with sincere ad-lib delivery',
+  },
+  comedy: {
+    sounds: ['(right?)', '(I mean)', '(yeah)', '(...pause)'],
+    placement: 'AFTER the punchline lands — never before. Timing is the joke.',
+    density: 'sparse — only where it amplifies comedy',
+    example: '"My dog judged me (I mean, he\'s right)"',
+    outro: 'final comedic payoff with sincere ad-lib',
+  },
+  children: {
+    sounds: ['la-la-la', 'na-na-na', 'do-do-do', 'yay', 'woohoo'],
+    placement: 'every chorus repeat (kids join by the 2nd time), outro singalong',
+    density: 'high — maximum simplicity, 1–2 syllables only',
+    example: '"Baby shark (do-do-do-do!) every day (yay!)"',
+    outro: '(do-do-do-do!) (la-la-la-la!) full group singalong fades',
+  },
+  tvmusical: {
+    sounds: ['la-la-la', 'da-da-da', 'hmm', '(character leitmotif)'],
+    placement: 'TV theme: 3-sec identity hook; musical: I-want song emotional eruption',
+    density: 'varies — TV theme: instant; musical: sparingly but powerfully',
+    example: 'Theme: "(Da-da-da!) [show name]"; Musical: "(Yes!) I want it! (I want it!)"',
+    outro: 'character leitmotif returns; theme is instantly singable on exit',
+  },
+};
+
+// Vocal stacking per genre: how many layers in each section
+// doubling = 2 takes (presence) | tripling = 3 takes (choir threshold) | stacked = 4-8 (gospel/transcendence)
+const VOCAL_STACK_PROFILES = {
+  pop:       { verse: 'single or subtle double', chorus: 'double-tracked lead', finalChorus: 'triple-tracked + harmony layer', method: 'ADT doubling on choruses, stacked harmony in final' },
+  hiphop:    { verse: 'single (confident)', chorus: 'double for presence', finalChorus: 'triple + layered ad-libs', method: 'Minimal doubling in verse; ad-lib layers create depth not stacking' },
+  rnb:       { verse: 'single + breathy double', chorus: 'doubled + harmony', finalChorus: '4–6 layer vocal stack', method: 'Build from intimate (verse) to transcendent (final chorus)' },
+  rock:      { verse: 'single or double', chorus: 'double-tracked', finalChorus: 'triple + gang vocal layer', method: 'Gang vocals on final chorus for communal energy' },
+  country:   { verse: 'single', chorus: 'double', finalChorus: 'double + group vocal', method: 'Group harmony on final chorus; barn-dance communal feel' },
+  edm:       { verse: 'heavily processed single', chorus: 'doubled + reverb', finalChorus: 'stacked + pitch-shifted layers', method: 'Processing over raw layers; wide stereo spread on drop' },
+  latin:     { verse: 'single lead', chorus: 'double + backing harmonies', finalChorus: 'double + call-response layer', method: 'Call-and-response adds natural second voice throughout' },
+  reggaeton: { verse: 'single', chorus: 'double', finalChorus: 'double + ad-lib layer', method: 'Minimal stacking; groove > vocal complexity' },
+  folk:      { verse: 'single (raw)', chorus: 'subtle double (barely audible)', finalChorus: 'gentle double', method: 'Resist stacking; imperfection is authenticity' },
+  metal:     { verse: 'single (aggressive)', chorus: 'double + screamed layer', finalChorus: 'triple + all-band shout', method: 'Contrast clean verse single vs stacked chorus power' },
+  jazz:      { verse: 'single', chorus: 'single (space is sacred)', finalChorus: 'single + scat countermelody', method: 'Never stack — jazz values space and single voice' },
+  ss:        { verse: 'single (intimate)', chorus: 'single or subtle double', finalChorus: 'gentle double', method: 'Preserve vulnerability; no obvious stacking' },
+  altrock:   { verse: 'single', chorus: 'double', finalChorus: 'triple (earned)', method: 'The triple stacking must feel discovered, not engineered' },
+  reggae:    { verse: 'single', chorus: 'double + backing singers', finalChorus: 'double + backing vamp stack', method: 'Backing vocalists add the communal layer naturally' },
+  afrobeats: { verse: 'single', chorus: 'double + rhythmic ad-libs', finalChorus: 'double + call-response layer', method: 'Ad-libs and call-response do the stacking work' },
+  blues:     { verse: 'single (raw)', chorus: 'single (guitar answers)', finalChorus: 'single + voice breaks', method: 'Never stack; the guitar IS the second voice' },
+  punk:      { verse: 'single', chorus: 'gang vocal stack (all members)', finalChorus: 'full gang shout', method: 'Stacking erases individual identity — that\'s the point' },
+  kpop:      { verse: 'double', chorus: 'triple + harmony', finalChorus: '4-layer precision stack', method: 'Engineered precision; each layer placed at exact beat divisions' },
+  neosoul:   { verse: 'single + whisper double', chorus: 'double + runs', finalChorus: '4–6 layer + melismatic runs', method: 'Builds from intimate (verse) to spiritual (final chorus)' },
+  gospel:    { verse: 'single lead', chorus: 'double + choir response', finalChorus: '6–8 layer choir stack', method: 'Maximum stacking signals maximum spiritual intensity' },
+  parody:    { verse: 'match source genre', chorus: 'match source genre', finalChorus: 'match source genre', method: 'Mimic source genre stacking exactly; content creates the comedy not production' },
+  comedy:    { verse: 'single (sincere)', chorus: 'single (commitment)', finalChorus: 'single (straight-faced)', method: 'Sincere production makes the joke land harder' },
+  children:  { verse: 'single (warm)', chorus: 'double (big and friendly)', finalChorus: 'group stack (everyone joins)', method: 'Final chorus group sound models communal participation for children' },
+  tvmusical: { verse: 'single (character voice)', chorus: 'character + harmony', finalChorus: 'company stack (cast joins)', method: 'Stack builds as more characters join; climax is everyone together' },
+};
+
+// Maps FUSION_DATA capitalized/hyphenated genre tokens → ADLIB_BIBLE keys
+const _FUSION_KEY_MAP = {
+  'Afrobeats': 'afrobeats', 'Alt-Rock': 'altrock', 'Blues': 'blues',
+  'Country': 'country', 'EDM': 'edm', 'Folk': 'folk', 'Gospel': 'gospel',
+  'Hip-Hop': 'hiphop', 'Jazz': 'jazz', 'K-Pop': 'kpop', 'Latin': 'latin',
+  'Neo-Soul': 'neosoul', 'Pop': 'pop', 'Punk': 'punk', 'R&B': 'rnb',
+  'Reggae': 'reggae', 'Reggaeton': 'reggaeton', 'Rock': 'rock',
+  'Singer-Songwriter': 'ss', 'Soul': 'neosoul'
+};
+function _normalizeGenreKey(genre) {
+  return _FUSION_KEY_MAP[genre] || genre;
+}
+
+function buildAdlibNote(genre) {
+  const a = ADLIB_BIBLE[_normalizeGenreKey(genre)];
+  if (!a) return '';
+  const sounds = a.sounds.slice(0, 4).map(s => `(${s})`).join(' ');
+  return `\n\nAD-LIBS (Suno parentheses syntax — use throughout):
+Sounds: ${sounds} — ${a.placement}
+Density: ${a.density}
+Example: ${a.example}
+Outro: ${a.outro}
+Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line = spotlight moment.`;
+}
+
+function buildVocalStackNote(genre) {
+  const v = VOCAL_STACK_PROFILES[_normalizeGenreKey(genre)];
+  if (!v) return '';
+  return `\n\nVOCAL STACKING (DIRECTOR NOTE):
+Verse: ${v.verse} | Chorus: ${v.chorus} | Final Chorus: ${v.finalChorus}
+Method: ${v.method}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PLATINUM MODE — TOP 5% HIT REFERENCES
 // Per-genre: top defining tracks + the single technique that separates top 5%
 // from average. Used by buildTopTierNote() to inject a tight reference block
@@ -2381,6 +2624,8 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
+  const adlibNote = buildAdlibNote(genre);
+  const vocalStackNote = buildVocalStackNote(genre);
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
@@ -2402,7 +2647,9 @@ SONGWRITING RULES:
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
-- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}
+- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
+- LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -2475,13 +2722,29 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]
+5. [tip 5]${vocalStackNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]`;
+SECTION MAP: [which sections and how it evolves]
+
+VISUAL PROMPT:
+COVER ART: [Single AI image prompt — dominant mood, color palette, visual metaphor for the song. Under 200 chars. No faces, no text in image.]
+STYLE: [art direction: photography / oil painting / digital illustration / cinematic still + key visual texture]
+PALETTE: [3-4 dominant colors and their emotional role]
+MOOD WORDS: [3 adjectives that describe the visual atmosphere]
+
+VIDEO PROMPT:
+CONCEPT: [One-sentence visual concept for the music video — setting, character arc, or abstract visual theme]
+MOVEMENT: [How the camera moves: handheld · dolly push · aerial · static locked · whip pan]
+ANGLES: [Key shot sequence: wide establishing → medium waist → close-up details → specific money shot]
+COLOR GRADE: [Grade/LUT style: warm golden hour · cold blue steel · bleach bypass · neon-saturated · desaturated grit]
+SCENES:
+1. Verse: [location + action + camera behavior]
+2. Chorus: [what happens visually at the emotional peak — the defining image]
+3. Bridge/Outro: [contrast scene or final visual statement]`;
 
   return { system, prompt };
 }
@@ -2507,6 +2770,8 @@ function buildLuckyPrompt(params) {
   const vocal     = (params && params.vocal)     ? sanitizeInput(params.vocal, 100)     : pickRandom(LUCKY_VOCALS);
   const platinum  = !!(params && params.platinum);
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
+  const adlibNote = buildAdlibNote(g1);
+  const vocalStackNote = buildVocalStackNote(g1);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -2548,7 +2813,9 @@ SONGWRITING RULES:
 - Specific imagery only — no clichés · Zeigarnik effect in chorus
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
-- Every section MUST start with its bracket tag on its own line.${platinum ? buildTopTierNote(g1, g2) : ''}
+- Every section MUST start with its bracket tag on its own line.
+- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags. Complete song, within the limit.
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
 
 Respond with EXACTLY this format:
 
@@ -2597,13 +2864,29 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]
+5. [tip 5]${vocalStackNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
 WHAT IT DOES: [one sentence]
 HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]`;
+SECTION MAP: [which sections and how it evolves]
+
+VISUAL PROMPT:
+COVER ART: [Single AI image prompt — dominant mood, color palette, visual metaphor for the song. Under 200 chars. No faces, no text in image.]
+STYLE: [art direction: photography / oil painting / digital illustration / cinematic still + key visual texture]
+PALETTE: [3-4 dominant colors and their emotional role]
+MOOD WORDS: [3 adjectives that describe the visual atmosphere]
+
+VIDEO PROMPT:
+CONCEPT: [One-sentence visual concept for the music video — setting, character arc, or abstract visual theme]
+MOVEMENT: [How the camera moves: handheld · dolly push · aerial · static locked · whip pan]
+ANGLES: [Key shot sequence: wide establishing → medium waist → close-up details → specific money shot]
+COLOR GRADE: [Grade/LUT style: warm golden hour · cold blue steel · bleach bypass · neon-saturated · desaturated grit]
+SCENES:
+1. Verse: [location + action + camera behavior]
+2. Chorus: [what happens visually at the emotional peak — the defining image]
+3. Bridge/Outro: [contrast scene or final visual statement]`;
 
   return {
     system,
@@ -2841,6 +3124,8 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
+- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags.
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildAdlibNote('hiphop')}
 
 Respond with EXACTLY this format:
 
@@ -2872,7 +3157,7 @@ DIRECTOR NOTES:
 2. [Mixing note for this specific style]
 3. [Vocal direction note]
 4. [Suno/AI platform specific tip]
-5. [What makes this combination of dimensions unique]`;
+5. [What makes this combination of dimensions unique]${buildVocalStackNote('hiphop')}`;
 
   return { system, prompt };
 }
@@ -3393,4 +3678,4 @@ function buildProductionData(genre) {
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote };
