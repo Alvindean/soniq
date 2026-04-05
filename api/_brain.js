@@ -1622,6 +1622,233 @@ const MASTERING_TARGETS = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// AD-LIB BIBLE + VOCAL STACK PROFILES
+// Ad-lib guide for all 24 genres: signature sounds, placement, density, Suno
+// parentheses syntax. Vocal stack profiles: how many layers per section.
+// Injected into song prompts via buildAdlibNote() and buildVocalStackNote().
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ADLIB_BIBLE = {
+  pop: {
+    sounds: ['na-na-na', 'woah', 'hey', 'ooh', 'yeah'],
+    placement: 'post-chorus (mandatory), outro singalong, pre-chorus lift (hey!)',
+    density: 'medium',
+    example: '(na-na-na) (woah-woah) after the main hook; (yeah) on peaks',
+    outro: 'na-na-na singalong vamp',
+  },
+  hiphop: {
+    sounds: ['yeah', 'uh', 'ayy', "let's go", 'woo'],
+    placement: 'every 2nd bar inline, bar-end punctuation, outro crowd chant',
+    density: 'high',
+    example: '"I run this (yeah) city (uh)" — inline on every 2nd bar',
+    outro: '(yeah, yeah, yeah!) crowd chant builds and repeats',
+  },
+  rnb: {
+    sounds: ['ooh', 'ah', 'yeah', 'baby', 'mmm'],
+    placement: 'post-chorus runs, bridge build, end of phrases, outro vamp',
+    density: 'high',
+    example: '"You know I love you (ooh) forever (mmm)"; bridge: (ooh-ah-yeah!) vocal run',
+    outro: 'melismatic vocal run vamp — (ooh-ooh-ah-yeah!) escalating',
+  },
+  rock: {
+    sounds: ['woah', 'hey', 'yeah', 'woo', 'come on'],
+    placement: 'pre-chorus lift, post-chorus crowd release, outro collective',
+    density: 'medium',
+    example: '"Don\'t you cry (hey!) There\'s a heaven (yeah!)"',
+    outro: '(yeah! yeah! yeah!) collective shout, fades',
+  },
+  country: {
+    sounds: ['yeah', 'mmm', 'woah', 'hey', 'la-la-la'],
+    placement: 'verse story turns, final chorus group singalong, outro',
+    density: 'low-medium',
+    example: '"She walked out (yeah) door slammin\' (mm-mm)"',
+    outro: '(la-la-la) (woah-oh) group barn-dance singalong',
+  },
+  edm: {
+    sounds: ['oh-oh-oh', 'hey', 'yeah', 'woo'],
+    placement: 'pre-drop cue, drop entrance, post-drop groove, outro loop',
+    density: 'medium — processed/pitched',
+    example: '"[Build] (oh!) (yeah!) [Drop] (oh-oh-oh!) looped"',
+    outro: 'looped (oh-oh-oh) processed texture fades',
+  },
+  latin: {
+    sounds: ['ay', 'aye', 'oye', 'eh', 'olé', 'dale'],
+    placement: 'salsa montuno vamp, cumbia chorus response, outro coro fade',
+    density: 'high — bilingual call-and-response',
+    example: '"Te quiero (ay!) con toda mi alma (aye!)"',
+    outro: '(ay ay ay!) (dale, dale!) over montuno piano, 8–16 bars',
+  },
+  reggaeton: {
+    sounds: ['aye', 'eh', 'yo', 'dale', 'mira'],
+    placement: 'dembow accent beat, perreo section, outro vamp',
+    density: 'medium — rhythm-aligned',
+    example: '"Muévelo (aye) dale (eh)" — on dembow syncopation',
+    outro: '(dale, dale, dale!) over dembow groove, fades',
+  },
+  folk: {
+    sounds: ['mmm', 'oh', 'la-la-la'],
+    placement: 'bridge hum before final chorus, quiet outro only',
+    density: 'minimal — one moment max per song',
+    example: '"[Bridge] (mmm, oh...) [Final Chorus] (la-la-la)"',
+    outro: 'hummed melody (mmm) fades to silence',
+  },
+  metal: {
+    sounds: ['yeah', 'go', 'ahhh', 'hey'],
+    placement: 'breakdown entrance, chorus aggression peak, outro collective',
+    density: 'low — impact over frequency',
+    example: '"Master of puppets! (YEAH! YEAH!)" — at riff peaks',
+    outro: '(yeah! yeah! yeah!) or feedback noise — abrupt end',
+  },
+  jazz: {
+    sounds: ['doo-wah', 'bop', 'skee-dat', 'ba-da', 'shoo-bee'],
+    placement: 'solo section scat, outro improvisation, responsorial moments',
+    density: 'high — during solos only',
+    example: '"[Solo] (bop-ba-doo-wah, skee-dat-da-ba!)"',
+    outro: 'scat improvisation fades: (doo-wah... skee-dat... ba-da-bop...)',
+  },
+  ss: {
+    sounds: ['mmm', 'oh', 'la-la'],
+    placement: 'bridge confessional only, whispered outro',
+    density: 'minimal — 1–2 moments per song',
+    example: '"[Bridge] (whispered: I\'m sorry...) (oh...)"',
+    outro: 'whispered (mmm) or sighed (oh) fades to silence',
+  },
+  altrock: {
+    sounds: ['woah', 'oh-oh', 'yeah', 'woo'],
+    placement: 'pre-chorus earned tension, post-chorus self-aware release',
+    density: 'low-medium — must feel earned not manufactured',
+    example: '"Can you feel it? (woah...) [Post-chorus] (oh-oh-oh, yeah!)"',
+    outro: '(woah-woah-woah...) fading with feedback',
+  },
+  reggae: {
+    sounds: ['yeah', 'jah', 'one love', 'irie', 'bless'],
+    placement: 'call-and-response chorus, outro vamp (MANDATORY 8–16 bars)',
+    density: 'medium — spiritual affirmations',
+    example: '"Living in Babylon (yeah!) But I\'m rising (jah!)"',
+    outro: '(one love!) (yeah, jah!) 8–16 bar vamp — NEVER skip the outro vamp',
+  },
+  afrobeats: {
+    sounds: ['eh', 'aye', 'ehn', 'oh-oh', 'ye'],
+    placement: 'hook repeat, between call-and-response lines, outro fade',
+    density: 'medium — rhythmic accent not emotional',
+    example: '"Body move (eh!) soul on fire (aye!)" — on percussion accents',
+    outro: '(aye, aye, aye!) (eh, eh!) accenting percussion grid, fades',
+  },
+  blues: {
+    sounds: ['oh', 'lord', 'mmm', 'well'],
+    placement: 'between AAB lines as guitar-answering voice, turnaround marker',
+    density: 'low-medium — fills the guitar conversation gaps',
+    example: '"I\'ve been waiting so long (oh!) [guitar answers] (Lord have mercy!)"',
+    outro: '(boom... boom... boom...) hypnotic slow burn vamp',
+  },
+  punk: {
+    sounds: ['hey', 'oi', 'yeah', 'go'],
+    placement: 'chorus shout only, outro collective gang chant',
+    density: 'low — intentional anti-production. Gang vocals not individual',
+    example: '"[Chorus - shout] (HEY! OI! YEAH!)" — everyone shouts together',
+    outro: '(oi! oi! oi!) abrupt end — NO fade',
+  },
+  kpop: {
+    sounds: ['ooh', 'ah', 'yeah', 'na-na'],
+    placement: 'post-chorus (ALWAYS), outro sweetener, before key change countdown',
+    density: 'high — precision-engineered at exact bar positions',
+    example: '"[Post-Chorus] (ooh-ah, na-na-na)" — timed to choreography counts',
+    outro: '(yeah! ooh! ah!) (na-na-na, woah!) ad-lib driven singalong',
+  },
+  neosoul: {
+    sounds: ['ooh', 'ah', 'mmm', 'baby', 'yeah'],
+    placement: 'throughout chorus, bridge emotional build, outro melisma vamp',
+    density: 'high — parallel emotional text alongside main vocal',
+    example: '"Come to me (ah, yeah) be with me (ooh, ooh)"; bridge: (ooh-ooh-ah!) run',
+    outro: '(ooh-ooh-ooh!) escalating melismatic run vamps and fades',
+  },
+  gospel: {
+    sounds: ['hallelujah', 'oh Lord', 'amen', 'yes Lord', 'glory'],
+    placement: 'call-and-response THROUGHOUT, bridge vamp climax, outro vamp sacred',
+    density: 'maximum — ad-libs ARE the structure',
+    example: '"He lifted me up! [Response: (hallelujah!) (amen!)]"',
+    outro: '(hallelujah!) (yes Lord!) (glory!) EXTENDED vamp — NEVER cut short',
+  },
+  parody: {
+    sounds: ['(matching original genre ad-libs)', '(what?!)', '(seriously)', '(really?)'],
+    placement: 'mirror original song placement exactly — subvert content only',
+    density: 'match source genre density',
+    example: '"I put ketchup on my steak (what?!)" — sincere delivery + absurd content',
+    outro: 'callback to absurd premise with sincere ad-lib delivery',
+  },
+  comedy: {
+    sounds: ['(right?)', '(I mean)', '(yeah)', '(...pause)'],
+    placement: 'AFTER the punchline lands — never before. Timing is the joke.',
+    density: 'sparse — only where it amplifies comedy',
+    example: '"My dog judged me (I mean, he\'s right)"',
+    outro: 'final comedic payoff with sincere ad-lib',
+  },
+  children: {
+    sounds: ['la-la-la', 'na-na-na', 'do-do-do', 'yay', 'woohoo'],
+    placement: 'every chorus repeat (kids join by the 2nd time), outro singalong',
+    density: 'high — maximum simplicity, 1–2 syllables only',
+    example: '"Baby shark (do-do-do-do!) every day (yay!)"',
+    outro: '(do-do-do-do!) (la-la-la-la!) full group singalong fades',
+  },
+  tvmusical: {
+    sounds: ['la-la-la', 'da-da-da', 'hmm', '(character leitmotif)'],
+    placement: 'TV theme: 3-sec identity hook; musical: I-want song emotional eruption',
+    density: 'varies — TV theme: instant; musical: sparingly but powerfully',
+    example: 'Theme: "(Da-da-da!) [show name]"; Musical: "(Yes!) I want it! (I want it!)"',
+    outro: 'character leitmotif returns; theme is instantly singable on exit',
+  },
+};
+
+// Vocal stacking per genre: how many layers in each section
+// doubling = 2 takes (presence) | tripling = 3 takes (choir threshold) | stacked = 4-8 (gospel/transcendence)
+const VOCAL_STACK_PROFILES = {
+  pop:       { verse: 'single or subtle double', chorus: 'double-tracked lead', finalChorus: 'triple-tracked + harmony layer', method: 'ADT doubling on choruses, stacked harmony in final' },
+  hiphop:    { verse: 'single (confident)', chorus: 'double for presence', finalChorus: 'triple + layered ad-libs', method: 'Minimal doubling in verse; ad-lib layers create depth not stacking' },
+  rnb:       { verse: 'single + breathy double', chorus: 'doubled + harmony', finalChorus: '4–6 layer vocal stack', method: 'Build from intimate (verse) to transcendent (final chorus)' },
+  rock:      { verse: 'single or double', chorus: 'double-tracked', finalChorus: 'triple + gang vocal layer', method: 'Gang vocals on final chorus for communal energy' },
+  country:   { verse: 'single', chorus: 'double', finalChorus: 'double + group vocal', method: 'Group harmony on final chorus; barn-dance communal feel' },
+  edm:       { verse: 'heavily processed single', chorus: 'doubled + reverb', finalChorus: 'stacked + pitch-shifted layers', method: 'Processing over raw layers; wide stereo spread on drop' },
+  latin:     { verse: 'single lead', chorus: 'double + backing harmonies', finalChorus: 'double + call-response layer', method: 'Call-and-response adds natural second voice throughout' },
+  reggaeton: { verse: 'single', chorus: 'double', finalChorus: 'double + ad-lib layer', method: 'Minimal stacking; groove > vocal complexity' },
+  folk:      { verse: 'single (raw)', chorus: 'subtle double (barely audible)', finalChorus: 'gentle double', method: 'Resist stacking; imperfection is authenticity' },
+  metal:     { verse: 'single (aggressive)', chorus: 'double + screamed layer', finalChorus: 'triple + all-band shout', method: 'Contrast clean verse single vs stacked chorus power' },
+  jazz:      { verse: 'single', chorus: 'single (space is sacred)', finalChorus: 'single + scat countermelody', method: 'Never stack — jazz values space and single voice' },
+  ss:        { verse: 'single (intimate)', chorus: 'single or subtle double', finalChorus: 'gentle double', method: 'Preserve vulnerability; no obvious stacking' },
+  altrock:   { verse: 'single', chorus: 'double', finalChorus: 'triple (earned)', method: 'The triple stacking must feel discovered, not engineered' },
+  reggae:    { verse: 'single', chorus: 'double + backing singers', finalChorus: 'double + backing vamp stack', method: 'Backing vocalists add the communal layer naturally' },
+  afrobeats: { verse: 'single', chorus: 'double + rhythmic ad-libs', finalChorus: 'double + call-response layer', method: 'Ad-libs and call-response do the stacking work' },
+  blues:     { verse: 'single (raw)', chorus: 'single (guitar answers)', finalChorus: 'single + voice breaks', method: 'Never stack; the guitar IS the second voice' },
+  punk:      { verse: 'single', chorus: 'gang vocal stack (all members)', finalChorus: 'full gang shout', method: 'Stacking erases individual identity — that\'s the point' },
+  kpop:      { verse: 'double', chorus: 'triple + harmony', finalChorus: '4-layer precision stack', method: 'Engineered precision; each layer placed at exact beat divisions' },
+  neosoul:   { verse: 'single + whisper double', chorus: 'double + runs', finalChorus: '4–6 layer + melismatic runs', method: 'Builds from intimate (verse) to spiritual (final chorus)' },
+  gospel:    { verse: 'single lead', chorus: 'double + choir response', finalChorus: '6–8 layer choir stack', method: 'Maximum stacking signals maximum spiritual intensity' },
+  parody:    { verse: 'match source genre', chorus: 'match source genre', finalChorus: 'match source genre', method: 'Mimic source genre stacking exactly; content creates the comedy not production' },
+  comedy:    { verse: 'single (sincere)', chorus: 'single (commitment)', finalChorus: 'single (straight-faced)', method: 'Sincere production makes the joke land harder' },
+  children:  { verse: 'single (warm)', chorus: 'double (big and friendly)', finalChorus: 'group stack (everyone joins)', method: 'Final chorus group sound models communal participation for children' },
+  tvmusical: { verse: 'single (character voice)', chorus: 'character + harmony', finalChorus: 'company stack (cast joins)', method: 'Stack builds as more characters join; climax is everyone together' },
+};
+
+function buildAdlibNote(genre) {
+  const a = ADLIB_BIBLE[genre];
+  if (!a) return '';
+  const sounds = a.sounds.slice(0, 4).map(s => `(${s})`).join(' ');
+  return `\n\nAD-LIBS (Suno parentheses syntax — use throughout):
+Sounds: ${sounds} — ${a.placement}
+Density: ${a.density}
+Example: ${a.example}
+Outro: ${a.outro}
+Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line = spotlight moment.`;
+}
+
+function buildVocalStackNote(genre) {
+  const v = VOCAL_STACK_PROFILES[genre];
+  if (!v) return '';
+  return `\n\nVOCAL STACKING (DIRECTOR NOTE):
+Verse: ${v.verse} | Chorus: ${v.chorus} | Final Chorus: ${v.finalChorus}
+Method: ${v.method}`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PLATINUM MODE — TOP 5% HIT REFERENCES
 // Per-genre: top defining tracks + the single technique that separates top 5%
 // from average. Used by buildTopTierNote() to inject a tight reference block
@@ -2381,6 +2608,8 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
+  const adlibNote = buildAdlibNote(genre);
+  const vocalStackNote = buildVocalStackNote(genre);
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
@@ -2402,7 +2631,7 @@ SONGWRITING RULES:
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
-- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}
+- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -2475,7 +2704,7 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]
+5. [tip 5]${vocalStackNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
@@ -2507,6 +2736,8 @@ function buildLuckyPrompt(params) {
   const vocal     = (params && params.vocal)     ? sanitizeInput(params.vocal, 100)     : pickRandom(LUCKY_VOCALS);
   const platinum  = !!(params && params.platinum);
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
+  const adlibNote = buildAdlibNote(g1);
+  const vocalStackNote = buildVocalStackNote(g1);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -2548,7 +2779,7 @@ SONGWRITING RULES:
 - Specific imagery only — no clichés · Zeigarnik effect in chorus
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
-- Every section MUST start with its bracket tag on its own line.${platinum ? buildTopTierNote(g1, g2) : ''}
+- Every section MUST start with its bracket tag on its own line.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
 
 Respond with EXACTLY this format:
 
@@ -2597,7 +2828,7 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]
+5. [tip 5]${vocalStackNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
@@ -2840,7 +3071,7 @@ SONGWRITING RULES:
 - Internal rhyme schemes preferred over simple end rhymes (unless 'end-only' specified)
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
-- Last chorus must feel bigger than the first
+- Last chorus must feel bigger than the first${buildAdlibNote('hiphop')}
 
 Respond with EXACTLY this format:
 
@@ -2872,7 +3103,7 @@ DIRECTOR NOTES:
 2. [Mixing note for this specific style]
 3. [Vocal direction note]
 4. [Suno/AI platform specific tip]
-5. [What makes this combination of dimensions unique]`;
+5. [What makes this combination of dimensions unique]${buildVocalStackNote('hiphop')}`;
 
   return { system, prompt };
 }
@@ -3393,4 +3624,4 @@ function buildProductionData(genre) {
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote };
