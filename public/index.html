@@ -185,6 +185,24 @@ a{color:var(--amber);text-decoration:none}
   .nav{margin:0 -28px 28px;border-radius:0;border-left:none;border-right:none;padding-left:28px;padding-right:28px}
 }
 
+/* ── AD RAILS (left + right, only at ≥1500px) ── */
+.ad-rail{display:none;position:fixed;top:0;bottom:0;width:168px;flex-direction:column;align-items:center;padding:80px 8px 24px;gap:16px;z-index:50;background:var(--s1);border-color:var(--b1)}
+.ad-rail-left{left:0;border-right:1px solid var(--b1)}
+.ad-rail-right{right:0;border-left:1px solid var(--b1)}
+.ad-rail-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:4px;text-align:center}
+.ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
+@media(min-width:1500px){
+  .ad-rail{display:flex}
+  .wrap{padding-left:calc(168px + 24px);padding-right:calc(168px + 24px)}
+  .nav,.hdr{margin-left:calc(-168px - 24px + 28px);margin-right:calc(-168px - 24px + 28px);padding-left:calc(168px + 24px);padding-right:calc(168px + 24px)}
+}
+
+/* ── GENRE GRID EXPAND ── */
+.gp-overflow{display:none!important}
+.gp-overflow.revealed{display:block!important}
+.genre-expand-btn{grid-column:1/-1;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 0;cursor:pointer;font-size:11px;font-weight:600;color:var(--tx4);border:1px dashed var(--b2);border-radius:var(--r2);transition:all .15s;background:none;width:100%;margin-top:2px}
+.genre-expand-btn:hover{color:var(--tx2);border-color:var(--b3);background:var(--s3)}
+
 /* ── NAV ── */
 .nav{display:flex;gap:3px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:5px;margin-bottom:28px;overflow-x:auto}
 .nav::-webkit-scrollbar{display:none}
@@ -691,6 +709,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 @media(max-width:440px){
   .genre-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}
   .params{grid-template-columns:1fr 1fr}
+}
+/* On mobile, show all genres (no collapse needed) */
+@media(max-width:900px){
+  .gp-overflow{display:flex}
+  .genre-expand-btn{display:none}
 }
 @media(max-width:580px){
   .spill,.qpill,.lane-pill,.mood-pill,.lpill{min-height:36px;padding:8px 12px;display:inline-flex;align-items:center;}
@@ -1690,6 +1713,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
 </head>
 <body>
+
+<!-- LEFT AD RAIL -->
+<aside class="ad-rail ad-rail-left" aria-label="Advertisement">
+  <div class="ad-rail-label">Advertisement</div>
+  <div class="ad-rail-slot">
+    <ins class="adsbygoogle" style="display:block;width:152px;min-height:300px" data-ad-format="auto" data-full-width-responsive="false"></ins>
+  </div>
+</aside>
+
+<!-- RIGHT AD RAIL -->
+<aside class="ad-rail ad-rail-right" aria-label="Advertisement">
+  <div class="ad-rail-label">Advertisement</div>
+  <div class="ad-rail-slot">
+    <ins class="adsbygoogle" style="display:block;width:152px;min-height:300px" data-ad-format="auto" data-full-width-responsive="false"></ins>
+  </div>
+</aside>
+
 <div class="wrap">
 <div class="toast" id="toast"></div>
 
@@ -5419,6 +5459,12 @@ function onGenreChange(g){
     el.classList.toggle('on', el.dataset.gid===g);
   });
   S.selectedGenre=g;
+  // auto-expand genre grid if selected genre is in the overflow section
+  const selectedEl = document.querySelector(`#genre-grid .gp[data-gid="${g}"]`);
+  if (selectedEl && selectedEl.classList.contains('gp-overflow') && !selectedEl.classList.contains('revealed')) {
+    const btn = document.getElementById('genre-expand-btn');
+    if (btn && btn.getAttribute('aria-expanded') !== 'true') toggleGenreExpand();
+  }
   applyGenreColor(g);
   const styles=SUBSTYLES[g];
   const row=document.getElementById('substyle-row');
@@ -7966,16 +8012,36 @@ function isGenreFree(gid) {
 function initGenreGrid(){
   const grid = document.getElementById('genre-grid');
   if (!grid) return;
-  grid.innerHTML = GENRES_DEF.map(g => {
+  const VISIBLE = 8;
+  const total = GENRES_DEF.length;
+  grid.innerHTML = GENRES_DEF.map((g, i) => {
     const locked = !isGenreFree(g.id);
-    return `<div class="gp${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
+    const overflow = i >= VISIBLE ? ' gp-overflow' : '';
+    return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
          title="${locked?'Unlock all 24 genres with Starter — from $9/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
     </div>`;
-  }).join('');
+  }).join('') +
+  `<button class="genre-expand-btn" id="genre-expand-btn" onclick="toggleGenreExpand()" aria-expanded="false">
+    <span id="genre-expand-label">Show all ${total} genres ▾</span>
+  </button>`;
+}
+
+function toggleGenreExpand(){
+  const btn = document.getElementById('genre-expand-btn');
+  const label = document.getElementById('genre-expand-label');
+  if (!btn) return;
+  const expanded = btn.getAttribute('aria-expanded') === 'true';
+  document.querySelectorAll('#genre-grid .gp-overflow').forEach(el => {
+    el.classList.toggle('revealed', !expanded);
+  });
+  btn.setAttribute('aria-expanded', String(!expanded));
+  label.textContent = expanded
+    ? `Show all ${GENRES_DEF.length} genres ▾`
+    : 'Show less ▴';
 }
 
 function lockedGenreClick(gid) {
