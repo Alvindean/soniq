@@ -1828,8 +1828,21 @@ const VOCAL_STACK_PROFILES = {
   tvmusical: { verse: 'single (character voice)', chorus: 'character + harmony', finalChorus: 'company stack (cast joins)', method: 'Stack builds as more characters join; climax is everyone together' },
 };
 
+// Maps FUSION_DATA capitalized/hyphenated genre tokens → ADLIB_BIBLE keys
+const _FUSION_KEY_MAP = {
+  'Afrobeats': 'afrobeats', 'Alt-Rock': 'altrock', 'Blues': 'blues',
+  'Country': 'country', 'EDM': 'edm', 'Folk': 'folk', 'Gospel': 'gospel',
+  'Hip-Hop': 'hiphop', 'Jazz': 'jazz', 'K-Pop': 'kpop', 'Latin': 'latin',
+  'Neo-Soul': 'neosoul', 'Pop': 'pop', 'Punk': 'punk', 'R&B': 'rnb',
+  'Reggae': 'reggae', 'Reggaeton': 'reggaeton', 'Rock': 'rock',
+  'Singer-Songwriter': 'ss', 'Soul': 'neosoul'
+};
+function _normalizeGenreKey(genre) {
+  return _FUSION_KEY_MAP[genre] || genre;
+}
+
 function buildAdlibNote(genre) {
-  const a = ADLIB_BIBLE[genre];
+  const a = ADLIB_BIBLE[_normalizeGenreKey(genre)];
   if (!a) return '';
   const sounds = a.sounds.slice(0, 4).map(s => `(${s})`).join(' ');
   return `\n\nAD-LIBS (Suno parentheses syntax — use throughout):
@@ -1841,7 +1854,7 @@ Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line
 }
 
 function buildVocalStackNote(genre) {
-  const v = VOCAL_STACK_PROFILES[genre];
+  const v = VOCAL_STACK_PROFILES[_normalizeGenreKey(genre)];
   if (!v) return '';
   return `\n\nVOCAL STACKING (DIRECTOR NOTE):
 Verse: ${v.verse} | Chorus: ${v.chorus} | Final Chorus: ${v.finalChorus}
