@@ -37,6 +37,7 @@
   --glow-amber:0 0 0 1px var(--amberline),0 4px 24px rgba(245,192,0,0.14);
   --glow-cyan:0 0 0 1px var(--cyanline),0 4px 18px rgba(0,220,192,0.12);
   --r:var(--r2);
+  --genre-accent:#f5c000;--genre-bg:rgba(245,192,0,0.08);
 }
 html,body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 ::-webkit-scrollbar{width:3px;height:3px}
@@ -82,7 +83,7 @@ a{color:var(--amber);text-decoration:none}
 @keyframes pgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── STUDIO — write page main card ── */
-.studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:20px}
+.studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:20px;transition:border-color 0.3s}
 .studio-top{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:10px}
 .studio-label{font-size:12px;font-weight:600;color:var(--tx2);letter-spacing:0.04em;text-transform:uppercase}
 .studio-body{padding:28px 24px}
@@ -101,10 +102,10 @@ a{color:var(--amber);text-decoration:none}
 .gp-lock{position:absolute;top:-4px;right:-8px;font-size:9px;line-height:1}
 .gp{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:13px 8px;text-align:center;cursor:pointer;transition:all 0.15s}
 .gp:hover{border-color:var(--b3);background:var(--s4)}
-.gp.on{border-color:var(--amberline);background:var(--amberbg);box-shadow:var(--glow-amber)}
+.gp.on{border-color:var(--genre-accent);background:var(--genre-bg);box-shadow:0 0 0 1px var(--genre-accent),0 4px 24px rgba(0,0,0,0.14)}
+.gp.on .gp-name{color:var(--genre-accent)}
 .gp-icon{font-size:22px;line-height:1;margin-bottom:6px}
 .gp-name{font-size:11px;font-weight:600;color:var(--tx1);letter-spacing:0.02em;line-height:1.2}
-.gp.on .gp-name{color:var(--amber)}
 .gp.new-g .gp-name::after{content:' ✦';font-size:8px;color:var(--cyan);vertical-align:super}
 
 /* ── PARAM ROW ── */
@@ -211,7 +212,7 @@ a{color:var(--amber);text-decoration:none}
 
 /* ── RESULT ── */
 .result-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
-.result-card.visible{display:block;animation:pgIn 0.25s ease}
+.result-card.visible{display:block;animation:pgIn 0.25s ease;border-top:3px solid var(--genre-accent);transition:border-color 0.3s}
 .result-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 20px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:12px}
 .result-song-title{font-size:26px;font-weight:700;color:var(--tx1);letter-spacing:-0.5px;line-height:1.2}
 .result-song-verdict{font-size:13px;color:var(--tx3);margin-top:6px;font-style:italic;line-height:1.5}
@@ -677,10 +678,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .mood-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:5px;margin-bottom:20px}
 .mood-pill{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:7px 8px;text-align:center;cursor:pointer;transition:all .15s;user-select:none}
 .mood-pill:hover{border-color:var(--b3);background:var(--s4)}
-.mood-pill.on{border-color:var(--amberline);background:var(--amberbg)}
+.mood-pill.on{border-color:var(--mood-accent,var(--amberline));background:var(--mood-bg,var(--amberbg))}
 .mood-pill-icon{font-size:16px;line-height:1;margin-bottom:3px}
 .mood-pill-name{font-size:10px;font-weight:700;color:var(--tx2);letter-spacing:.02em}
-.mood-pill.on .mood-pill-name{color:var(--amber)}
+.mood-pill.on .mood-pill-name{color:var(--mood-accent,var(--amber))}
 .mood-hint{font-size:10px;color:var(--tx3);font-style:italic;margin-bottom:14px;line-height:1.5;min-height:16px}
 @media(max-width:440px){.mood-grid{grid-template-columns:repeat(auto-fill,minmax(76px,1fr))}}
 
@@ -4547,6 +4548,57 @@ function safeParseLib() {
 let _soniqKey;
 
 // ═══════════════════════════════════════════════════════
+// COLOR SCIENCE — GENRE + MOOD
+// ═══════════════════════════════════════════════════════
+const GENRE_COLORS = {
+  pop:       '#f472b6',  // pink — playful, mainstream
+  hiphop:    '#a78bfa',  // purple — culture, swagger
+  rnb:       '#34d399',  // emerald — smooth, soulful
+  rock:      '#fb923c',  // orange — energy, attitude
+  country:   '#f5c000',  // amber — warmth, roots (same as --amber brand)
+  edm:       '#60a5fa',  // blue — electronic, euphoric
+  jazz:      '#818cf8',  // indigo — sophistication
+  soul:      '#fb923c',  // warm orange — deep feeling
+  gospel:    '#4ade80',  // green — life, spirit
+  blues:     '#38bdf8',  // sky blue — melancholy, depth
+  funk:      '#e879f9',  // fuchsia — groove, bounce
+  reggae:    '#86efac',  // light green — Caribbean, chill
+  afrobeats: '#fde68a',  // warm yellow — joy, Africa
+  latin:     '#f87171',  // coral — passion, heat
+  kpop:      '#c084fc',  // light purple — polished, trendy
+  punk:      '#dc2626',  // red — rebellion, raw
+  altrock:   '#94a3b8',  // slate — indie, alternative
+  neosoul:   '#6ee7b7',  // teal — modern soul
+  ss:        '#fcd34d',  // yellow — acoustic, personal (Singer-Songwriter)
+  folk:      '#a3e635',  // lime — earthy, organic
+  metal:     '#e11d48',  // rose red — heavy, intense
+  reggaeton: '#f97316',  // orange — urban, heat
+  children:  '#ff6b6b',  // salmon — playful, innocent
+  comedy:    '#fb923c',  // orange — fun, upbeat
+};
+
+const MOOD_COLORS = {
+  Euphoric:      '#60a5fa',
+  Melancholic:   '#818cf8',
+  Hopeful:       '#4ade80',
+  Defiant:       '#f97316',
+  Nostalgic:     '#fcd34d',
+  Dark:          '#7c3aed',
+  Rebellious:    '#dc2626',
+  Romantic:      '#f472b6',
+  Peaceful:      '#34d399',
+  Angry:         '#ef4444',
+  Playful:       '#e879f9',
+  Longing:       '#38bdf8',
+  Transcendent:  '#a78bfa',
+  Devastated:    '#94a3b8',
+  Tender:        '#fb923c',
+  Triumphant:    '#f5c000',
+  Bittersweet:   '#6ee7b7',
+  Emotional:     '#c084fc',
+};
+
+// ═══════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
@@ -5017,6 +5069,16 @@ function sylCls(n,chorus){if(n<=0)return'syl-ok';if(n>=14)return'syl-over';if(ch
 // ═══════════════════════════════════════════════════════
 // GENERATE SONG
 // ═══════════════════════════════════════════════════════
+function applyGenreColor(genre) {
+  const color = GENRE_COLORS[genre] || '#f5c000';
+  const alpha = color.replace('#', '');
+  const r = parseInt(alpha.substring(0,2), 16);
+  const g = parseInt(alpha.substring(2,4), 16);
+  const b = parseInt(alpha.substring(4,6), 16);
+  document.documentElement.style.setProperty('--genre-accent', color);
+  document.documentElement.style.setProperty('--genre-bg', `rgba(${r},${g},${b},0.08)`);
+}
+
 function onGenreChange(g){
   if(!g)g=S.selectedGenre||'pop';
   // update genre grid selection
@@ -5024,6 +5086,7 @@ function onGenreChange(g){
     el.classList.toggle('on', el.dataset.gid===g);
   });
   S.selectedGenre=g;
+  applyGenreColor(g);
   const styles=SUBSTYLES[g];
   const row=document.getElementById('substyle-row');
   const lbl=document.getElementById('substyle-label');
@@ -9895,7 +9958,21 @@ function initMoodGrid(){
       <div class="mood-pill-icon">${m.icon}</div>
       <div class="mood-pill-name">${m.id}</div>
     </div>`).join('');
+  // Apply mood colors to already-selected pills
+  grid.querySelectorAll('.mood-pill.on').forEach(el=>{
+    const id=el.dataset.mid;
+    if(id) applyMoodColor(el, id);
+  });
   updateMoodHint();
+}
+function applyMoodColor(el, id) {
+  const color = MOOD_COLORS[id] || '#f5c000';
+  const hex = color.replace('#', '');
+  const r = parseInt(hex.substring(0,2), 16);
+  const g = parseInt(hex.substring(2,4), 16);
+  const b = parseInt(hex.substring(4,6), 16);
+  el.style.setProperty('--mood-accent', color);
+  el.style.setProperty('--mood-bg', `rgba(${r},${g},${b},0.08)`);
 }
 function toggleMood(id,el){
   const idx=S.selectedMoods.indexOf(id);
@@ -9903,12 +9980,15 @@ function toggleMood(id,el){
     if(S.selectedMoods.length===1)return; // keep at least one
     S.selectedMoods.splice(idx,1);
     el.classList.remove('on');
+    el.style.removeProperty('--mood-accent');
+    el.style.removeProperty('--mood-bg');
   }else{
     if(S.selectedMoods.length>=2){
       toast('Max 2 moods — deselect one first'); return;
     }
     S.selectedMoods.push(id);
     el.classList.add('on');
+    applyMoodColor(el, id);
   }
   updateMoodHint();
 }
@@ -11801,7 +11881,6 @@ function loadProfilePage() {
   if (genreEntries.length > 1) {
     gbCard.style.display = '';
     const maxCount = genreEntries[0][1];
-    const GENRE_COLORS = {pop:'#f472b6',hiphop:'#a78bfa',rnb:'#34d399',rock:'#f97316',country:'#fbbf24',edm:'#60a5fa',jazz:'#818cf8',soul:'#fb923c',gospel:'#4ade80',blues:'#38bdf8',funk:'#e879f9',reggae:'#86efac',afrobeats:'#fde68a',latin:'#fb7185',kpop:'#c084fc',punk:'#f87171',altrock:'#94a3b8',neosoul:'#6ee7b7',ss:'#fcd34d',folk:'#a3e635'};
     gbEl.innerHTML = genreEntries.slice(0,8).map(([g, cnt]) => {
       const color = GENRE_COLORS[g] || '#94a3b8';
       const pct = Math.round(cnt / maxCount * 100);
@@ -12219,6 +12298,13 @@ document.addEventListener('DOMContentLoaded', () => {
 .dbg-err{padding:7px;background:var(--s3);border-left:3px solid var(--red);border-radius:3px;margin-bottom:5px;font-size:11px}
 #coach-output strong { color: var(--amber); }
 #coach-output { font-family: var(--font); }
+/* ── GDPR COOKIE CONSENT ── */
+#cookie-banner{position:fixed;bottom:0;left:0;right:0;z-index:9999;background:var(--s2);border-top:1px solid var(--b3);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--tx2);transform:translateY(100%);transition:transform 0.3s ease;box-shadow:0 -4px 24px rgba(0,0,0,0.4)}
+#cookie-banner.show{transform:translateY(0)}
+#cookie-banner a{color:var(--amber);text-decoration:underline}
+.cookie-btns{display:flex;gap:8px;flex-shrink:0}
+.cookie-accept{padding:8px 18px;border-radius:var(--r2);border:none;background:var(--amber);color:#08080a;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+.cookie-decline{padding:8px 14px;border-radius:var(--r2);border:1px solid var(--b3);background:transparent;color:var(--tx3);font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
 </style>
 
 <script>
@@ -12445,37 +12531,43 @@ window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.mess
 setInterval(()=>{ if(DBG.on) dbgUpdateState(); },2000);
 document.addEventListener('DOMContentLoaded',initDebug);
 </script>
-<!-- ── COOKIE CONSENT BANNER ───────────────────────────────── -->
-<div id="cookie-banner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg1);border-top:1px solid var(--brd);padding:10px 20px;z-index:9999;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 12px rgba(0,0,0,.25)">
-  <span style="font-size:12px;color:var(--tx3);line-height:1.5">
-    🍪 We use session cookies only — no tracking, no third-party ads.
-    <a href="/legal/privacy.html" target="_blank" style="color:var(--amber);text-decoration:none">Privacy Policy</a>
-  </span>
-  <button onclick="acceptCookies()" style="background:var(--amber);color:#000;border:none;border-radius:6px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Got it</button>
+<!-- GDPR Cookie Consent -->
+<div id="cookie-banner" role="dialog" aria-label="Cookie consent">
+  <div style="flex:1;min-width:200px">
+    🍪 We use cookies to improve your experience and serve relevant ads.
+    <a href="/legal/privacy.html">Privacy Policy</a>
+  </div>
+  <div class="cookie-btns">
+    <button class="cookie-decline" onclick="setCookieConsent(false)">Decline</button>
+    <button class="cookie-accept" onclick="setCookieConsent(true)">Accept</button>
+  </div>
 </div>
 
 <script>
-// ── Cookie consent ──────────────────────────────────────────
-function checkCookieBanner() {
-  if (!localStorage.getItem('soniq_cookie_consent')) {
-    const b = document.getElementById('cookie-banner');
-    if (b) b.style.display = 'flex';
+// ── GDPR COOKIE CONSENT ──
+function setCookieConsent(accepted) {
+  localStorage.setItem('cookie_consent', accepted ? 'accepted' : 'declined');
+  localStorage.setItem('cookie_consent_ts', Date.now());
+  document.getElementById('cookie-banner').classList.remove('show');
+  if (accepted) {
+    // TODO: Initialize Google AdSense here when ready
+    // window.adsbygoogle = window.adsbygoogle || [];
   }
 }
-function acceptCookies() {
-  localStorage.setItem('soniq_cookie_consent', '1');
-  const b = document.getElementById('cookie-banner');
-  if (b) b.style.display = 'none';
-  // Persist to profile if logged in
-  if (S.user && S.supabase) {
-    S.supabase.from('profiles').update({
-      cookie_consent:    true,
-      cookie_consent_at: new Date().toISOString()
-    }).eq('id', S.user.id).catch(() => {});
+
+function initCookieConsent() {
+  const consent = localStorage.getItem('cookie_consent');
+  const ts = parseInt(localStorage.getItem('cookie_consent_ts') || '0');
+  const SIX_MONTHS = 1000 * 60 * 60 * 24 * 180;
+  // Show if no consent or consent older than 6 months
+  if (!consent || (Date.now() - ts > SIX_MONTHS)) {
+    setTimeout(() => {
+      document.getElementById('cookie-banner')?.classList.add('show');
+    }, 2000);
   }
 }
-// Show after a brief delay so it doesn't flash on first paint
-setTimeout(checkCookieBanner, 1500);
+
+initCookieConsent();
 </script>
 </body>
 </html>
