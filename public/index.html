@@ -102,6 +102,7 @@ a{color:var(--amber);text-decoration:none}
 #output-placeholder .op-prompts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 #output-placeholder .op-prompt{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
 #output-placeholder .op-prompt:hover{border-color:var(--acc);background:var(--s4)}
+#output-placeholder .op-prompt.active{border-color:var(--acc);background:var(--s4);box-shadow:0 0 0 2px rgba(245,192,0,0.15)}
 #output-placeholder .op-prompt-emoji{font-size:18px;margin-bottom:4px}
 #output-placeholder .op-prompt-text{font-size:11px;color:var(--tx3);line-height:1.4}
 /* Recent songs */
@@ -12686,11 +12687,20 @@ function opPickGenre(genre) {
 
 function opUsePrompt(text) {
   const topicInput = document.getElementById('topic');
-  if (topicInput) {
-    topicInput.value = text;
-    topicInput.dispatchEvent(new Event('input'));
-    topicInput.focus();
-  }
+  if (!topicInput) return;
+  topicInput.value = text;
+  topicInput.dispatchEvent(new Event('input'));
+  topicInput.focus();
+  topicInput.scrollIntoView({behavior:'smooth',block:'nearest'});
+  // Mark active prompt
+  document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
+  event.currentTarget?.classList.add('active');
+  // Clear active state when user manually edits the field
+  const clearActive = () => {
+    document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
+    topicInput.removeEventListener('input', clearActive);
+  };
+  topicInput.addEventListener('input', clearActive, {once:true});
 }
 
 function opLoadRecent(idx) {
