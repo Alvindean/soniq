@@ -1517,24 +1517,33 @@ const EMOTIONAL_ARCS = {
 // GENRE SYLLABLE BUDGETS — default syllable constraints per section
 // ═══════════════════════════════════════════════════════════════════════════
 
+// hook = the single most repeated phrase (title line / refrain). Tighter than chorus.
 const GENRE_SYLLABLE_BUDGETS = {
-  pop:       { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  hiphop:    { verse: '12–20', chorus: '8–12', bridge: '10–16', prechorus: '8–12' },
-  rnb:       { verse: '8–13', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  neosoul:   { verse: '8–14', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
-  country:   { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–8' },
-  ss:        { verse: '7–14', chorus: '5–10', bridge: '5–10', prechorus: '5–9' },
-  jazz:      { verse: '6–12', chorus: '5–9',  bridge: '5–9',  prechorus: '5–8' },
-  gospel:    { verse: '8–13', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
-  altrock:   { verse: '8–13', chorus: '5–9',  bridge: '5–9',  prechorus: '5–8' },
-  blues:     { verse: '8–14', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
-  edm:       { verse: '6–10', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
-  kpop:      { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  punk:      { verse: '8–14', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
-  reggae:    { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '5–8' },
-  latin:     { verse: '8–13', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  reggaeton: { verse: '8–14', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  afrobeats: { verse: '6–12', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
+  pop:       { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  hiphop:    { verse: '12–20', chorus: '8–12', hook: '5–9', bridge: '10–16', prechorus: '8–12' },
+  rnb:       { verse: '8–13', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  neosoul:   { verse: '8–14', chorus: '6–10', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
+  country:   { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–8' },
+  ss:        { verse: '7–14', chorus: '5–10', hook: '3–7',  bridge: '5–10', prechorus: '5–9' },
+  jazz:      { verse: '6–12', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  gospel:    { verse: '8–13', chorus: '6–10', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
+  altrock:   { verse: '8–13', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  blues:     { verse: '8–14', chorus: '6–10', hook: '4–7',  bridge: '6–12', prechorus: '6–9' },
+  edm:       { verse: '6–10', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  kpop:      { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  punk:      { verse: '8–14', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  reggae:    { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '5–8' },
+  latin:     { verse: '8–13', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  reggaeton: { verse: '8–14', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  afrobeats: { verse: '6–12', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  rock:      { verse: '8–13', chorus: '5–10', hook: '3–7',  bridge: '5–9',  prechorus: '5–8' },
+  folk:      { verse: '7–13', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  metal:     { verse: '8–16', chorus: '4–9',  hook: '3–6',  bridge: '4–8',  prechorus: '4–8' },
+  reggae:    { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '5–8' },
+  parody:    { verse: '8–14', chorus: '6–10', hook: '4–8',  bridge: '6–10', prechorus: '6–9' },
+  comedy:    { verse: '6–14', chorus: '4–10', hook: '3–8',  bridge: '4–10', prechorus: '4–9' },
+  children:  { verse: '4–8',  chorus: '3–6',  hook: '2–5',  bridge: '3–6',  prechorus: '3–5' },
+  tvmusical: { verse: '8–14', chorus: '6–11', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -2098,9 +2107,9 @@ Rule: ${_poa.rule}`;
     : '';
 
   // ── Syllable budget ─────────────────────────────────────────────────────
-  const _sylBudget  = GENRE_SYLLABLE_BUDGETS[genre] || { verse:'8–13', chorus:'6–10', bridge:'6–10', prechorus:'6–9' };
+  const _sylBudget  = GENRE_SYLLABLE_BUDGETS[genre] || { verse:'8–13', chorus:'6–10', hook:'4–7', bridge:'6–10', prechorus:'6–9' };
   const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
-  const syllableNote = `\n\nSYLLABLE BUDGET:\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
+  const syllableNote = `\n\nSYLLABLE BUDGET:\n- Hook (title/refrain line): ${_sylBudget.hook || '4–7'} syllables — keep it singable and memorable\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
 
   // ── Production brief data ───────────────────────────────────────────────
   const _fxProfile  = GENRE_FX_PROFILES[genre]  || {};
@@ -2581,14 +2590,6 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • PERSONA: ${dims.persona} — ${PERSONA_NOTES[dims.persona]}
 ${hookNote ? '\n' + hookNote : ''}
 
-LYRIC INTELLIGENCE REQUIREMENTS:
-Every verse must include a LYRIC INTELLIGENCE note in [brackets after the last bar] with:
-- FLOW: the specific flow pattern used (name the cadence)
-- RHYME MAP: diagram the rhyme scheme (A/B/C notation + note any internal rhymes)
-- PHONETICS: flag any words Suno may mispronounce + the correct syllable emphasis
-- DENSITY: syllables per bar (avg)
-- STANDOUT LINE: the single most powerful line and why it works
-
 BRACKET REQUIREMENTS:
 ${bracketInstructionServer('hiphop', 'full', null)}
 
@@ -2607,7 +2608,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect]
 
 LYRICS:
-[Complete song lyrics. EVERY SECTION starts with its bracket tag. Include LYRIC INTELLIGENCE note after each verse/hook section.]
+[Complete song lyrics only. EVERY SECTION starts with its bracket tag. Clean lyrics — no annotations, no notes, no commentary embedded in the lyrics.]
 
 SONG PROMPT:
 [Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
@@ -2620,7 +2621,7 @@ TEMPO & KEY:
 [BPM · Key · Time sig · Feel]
 
 FLOW BREAKDOWN:
-[Bar-by-bar flow pattern guide for the main verse — tell the producer exactly where accents land]
+[3-5 lines: bar-by-bar flow pattern guide for the main verse. Where accents land, syllable density, rhythmic signature.]
 
 RAP LAB SETTINGS USED:
 Style: ${style.label} | Flow: ${dims.flow} | Rhyme: ${dims.rhymeArch} | Density: ${dims.density} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
