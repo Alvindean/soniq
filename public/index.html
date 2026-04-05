@@ -1787,7 +1787,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </div>
 
 <!-- NAV -->
-<nav class="nav">
+<div class="nav-scroll-wrap" id="nav-scroll-wrap">
+<nav class="nav" id="main-nav">
   <button class="nb on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
   <button class="nb nb-lucky" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Feel Lucky</button>
   <button class="nb" onclick="goPg('library',this)"><span class="ni">📚</span>Library<span id="nav-lib-count" class="nav-badge" style="display:none"></span></button>
@@ -1807,6 +1808,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <button id="nav-signout-btn" onclick="authSignOut()" class="btn btn-sm" style="display:none;font-size:11px;padding:4px 10px;color:var(--tx3)">Sign Out</button>
     </div>
 </nav>
+</div>
 
 <!-- ══════════════════════════════════
      WRITE PAGE
@@ -13056,6 +13058,19 @@ window.addEventListener('error',e=>_dbgErr('JS',`${e.filename?.split('/').pop()}
 window.addEventListener('unhandledrejection',e=>_dbgErr('Promise',e.reason?.message||String(e.reason)));
 setInterval(()=>{ if(DBG.on) dbgUpdateState(); },2000);
 document.addEventListener('DOMContentLoaded',initDebug);
+
+// Nav scroll fade indicator
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('main-nav');
+  const wrap = document.getElementById('nav-scroll-wrap');
+  if (!nav || !wrap) return;
+  const update = () => {
+    const atEnd = nav.scrollLeft + nav.clientWidth >= nav.scrollWidth - 4;
+    wrap.classList.toggle('at-end', atEnd);
+  };
+  nav.addEventListener('scroll', update, {passive:true});
+  update();
+});
 </script>
 <!-- GDPR Cookie Consent -->
 <div id="cookie-banner" role="dialog" aria-label="Cookie consent">
