@@ -461,13 +461,23 @@ module.exports = async function handler(req, res) {
           });
         }
 
+        // Gate platinum to admin + top-tier plans only
+        const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+        if (p.platinum && !req._adminBypass && !PLATINUM_PLANS.has(plan)) {
+          p.platinum = false;
+        }
+
         if (p.genre === 'hiphop' && p.rapLabActive) {
           built = brain.buildRapLabPrompt(p);
         } else {
           built = brain.buildSongPrompt(p);
         }
       } else {
-        built = brain.buildLuckyPrompt(body.params || {});
+        const lp = body.params || {};
+        // Gate platinum for lucky too
+        const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+        if (lp.platinum && !req._adminBypass && !PLATINUM_PLANS.has(plan)) lp.platinum = false;
+        built = brain.buildLuckyPrompt(lp);
       }
       messages = [{role: 'user', content: built.prompt}];
       system = built.system;

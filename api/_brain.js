@@ -1517,24 +1517,33 @@ const EMOTIONAL_ARCS = {
 // GENRE SYLLABLE BUDGETS — default syllable constraints per section
 // ═══════════════════════════════════════════════════════════════════════════
 
+// hook = the single most repeated phrase (title line / refrain). Tighter than chorus.
 const GENRE_SYLLABLE_BUDGETS = {
-  pop:       { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  hiphop:    { verse: '12–20', chorus: '8–12', bridge: '10–16', prechorus: '8–12' },
-  rnb:       { verse: '8–13', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  neosoul:   { verse: '8–14', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
-  country:   { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–8' },
-  ss:        { verse: '7–14', chorus: '5–10', bridge: '5–10', prechorus: '5–9' },
-  jazz:      { verse: '6–12', chorus: '5–9',  bridge: '5–9',  prechorus: '5–8' },
-  gospel:    { verse: '8–13', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
-  altrock:   { verse: '8–13', chorus: '5–9',  bridge: '5–9',  prechorus: '5–8' },
-  blues:     { verse: '8–14', chorus: '6–10', bridge: '6–12', prechorus: '6–9' },
-  edm:       { verse: '6–10', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
-  kpop:      { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  punk:      { verse: '8–14', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
-  reggae:    { verse: '8–12', chorus: '6–10', bridge: '6–10', prechorus: '5–8' },
-  latin:     { verse: '8–13', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  reggaeton: { verse: '8–14', chorus: '6–10', bridge: '6–10', prechorus: '6–9' },
-  afrobeats: { verse: '6–12', chorus: '4–8',  bridge: '4–8',  prechorus: '4–7' },
+  pop:       { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  hiphop:    { verse: '12–20', chorus: '8–12', hook: '5–9', bridge: '10–16', prechorus: '8–12' },
+  rnb:       { verse: '8–13', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  neosoul:   { verse: '8–14', chorus: '6–10', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
+  country:   { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–8' },
+  ss:        { verse: '7–14', chorus: '5–10', hook: '3–7',  bridge: '5–10', prechorus: '5–9' },
+  jazz:      { verse: '6–12', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  gospel:    { verse: '8–13', chorus: '6–10', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
+  altrock:   { verse: '8–13', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  blues:     { verse: '8–14', chorus: '6–10', hook: '4–7',  bridge: '6–12', prechorus: '6–9' },
+  edm:       { verse: '6–10', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  kpop:      { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  punk:      { verse: '8–14', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  reggae:    { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '5–8' },
+  latin:     { verse: '8–13', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  reggaeton: { verse: '8–14', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '6–9' },
+  afrobeats: { verse: '6–12', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  rock:      { verse: '8–13', chorus: '5–10', hook: '3–7',  bridge: '5–9',  prechorus: '5–8' },
+  folk:      { verse: '7–13', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  metal:     { verse: '8–16', chorus: '4–9',  hook: '3–6',  bridge: '4–8',  prechorus: '4–8' },
+  reggae:    { verse: '8–12', chorus: '6–10', hook: '4–7',  bridge: '6–10', prechorus: '5–8' },
+  parody:    { verse: '8–14', chorus: '6–10', hook: '4–8',  bridge: '6–10', prechorus: '6–9' },
+  comedy:    { verse: '6–14', chorus: '4–10', hook: '3–8',  bridge: '4–10', prechorus: '4–9' },
+  children:  { verse: '4–8',  chorus: '3–6',  hook: '2–5',  bridge: '3–6',  prechorus: '3–5' },
+  tvmusical: { verse: '8–14', chorus: '6–11', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1611,6 +1620,244 @@ const MASTERING_TARGETS = {
   gospel:    { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 9–12', brightness: 'Full and rich', stereoWidth: 'Wide choir', notes: 'Room to breathe. Choir dynamics and lead vocal must coexist.' },
   ss:        { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 11–14', brightness: 'Natural', stereoWidth: 'Intimate', notes: 'Preserve performance vulnerability. No over-compression.' },
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PLATINUM MODE — TOP 5% HIT REFERENCES
+// Per-genre: top defining tracks + the single technique that separates top 5%
+// from average. Used by buildTopTierNote() to inject a tight reference block
+// into prompts when platinum:true. Cross-training borrows the best technique
+// from a complementary genre to elevate the output further.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const GENRE_HIT_REFERENCES = {
+  pop: {
+    hits: [
+      { title: 'Anti-Hero', artist: 'Taylor Swift', technique: 'Self-aware narrator owns the flaw completely — disarming honesty lands harder than any defense' },
+      { title: 'Blinding Lights', artist: 'The Weeknd', technique: 'Nostalgic production + modern vulnerability — sonic past carries emotional present' },
+      { title: 'As It Was', artist: 'Harry Styles', technique: 'Verse emotional restraint explodes at chorus — hold back until the exact right moment' },
+    ],
+    defining: 'Hook singable after one listen. Verse builds tension; chorus releases it completely. Specificity over abstraction.',
+    crossFrom: 'country', crossTechnique: 'Concrete sensory detail — name the object, the place, the moment. "Cheap perfume" beats "her memory" every time.',
+  },
+  hiphop: {
+    hits: [
+      { title: 'HUMBLE.', artist: 'Kendrick Lamar', technique: 'Minimalist beat forces lyrical density to carry everything — no melodic crutch, pure word craft' },
+      { title: 'God\'s Plan', artist: 'Drake', technique: 'Hook repetition as hypnosis — say it simply, say it again, mean it more each time' },
+      { title: 'DNA.', artist: 'Kendrick Lamar', technique: 'Aggressive self-assertion as armor — identity as defiance, every bar a thesis statement' },
+    ],
+    defining: 'Every bar earns its place. Internal rhymes > end rhymes. The hook is a mantra. Flow variation signals emotional shift.',
+    crossFrom: 'blues', crossTechnique: 'AAB problem-state structure — state the problem, deepen it, then resolve (or refuse to).',
+  },
+  rnb: {
+    hits: [
+      { title: 'Kill Bill', artist: 'SZA', technique: 'Casual delivery of extreme emotion creates unsettling intimacy — mundane framing amplifies the feeling' },
+      { title: 'Leave The Door Open', artist: 'Silk Sonic', technique: 'Vintage production as sincerity signal — classic arrangement says "this emotion is timeless"' },
+      { title: 'Best Part', artist: 'Daniel Caesar', technique: 'Harmonic simplicity amplifies vocal vulnerability — fewer chords, more feeling' },
+    ],
+    defining: 'Groove is the emotional argument. Melody and rhythm must feel inevitable. Vulnerability is the superpower.',
+    crossFrom: 'neosoul', crossTechnique: 'Jazz chord extensions (maj7, 9ths) under the hook — harmony does emotional work the lyric doesn\'t have to.',
+  },
+  rock: {
+    hits: [
+      { title: 'Mr. Brightside', artist: 'The Killers', technique: 'No intro — drop straight into the emotional state. Opening riff IS the hook.' },
+      { title: 'Seven Nation Army', artist: 'The White Stripes', technique: '5-note bass riff becomes global anthem — rhythm carries the identity before words do' },
+      { title: 'Fix You', artist: 'Coldplay', technique: 'Quiet verse to anthemic chorus — dynamic contrast makes the release feel earned and overwhelming' },
+    ],
+    defining: 'Riff supremacy. Dynamic contrast between verse and chorus. Chorus must feel like a physical release.',
+    crossFrom: 'blues', crossTechnique: 'Pentatonic riff as emotional vocabulary — the bend, the slide, the note held just past comfortable.',
+  },
+  country: {
+    hits: [
+      { title: 'Before He Cheats', artist: 'Carrie Underwood', technique: 'Specific destructive detail — "Louisville Slugger to both headlights" > "I was so angry"' },
+      { title: 'Fast Car', artist: 'Tracy Chapman', technique: 'Accumulating concrete detail builds an entire life — the car, the job, the plan, the hope' },
+      { title: 'Jolene', artist: 'Dolly Parton', technique: 'Direct address to antagonist — intimacy and vulnerability through second-person pleading' },
+    ],
+    defining: 'Specificity is everything. Name the town, the truck, the bar, the feeling. Chorus is the emotional verdict on the verse\'s story.',
+    crossFrom: 'folk', crossTechnique: 'Confessional first-person truth — no metaphor barrier between singer and emotion. The lyric IS the diary entry.',
+  },
+  edm: {
+    hits: [
+      { title: 'Levels', artist: 'Avicii', technique: 'The drop IS the hook — melody lives in the synth. Build tension until the release is physical.' },
+      { title: 'Wake Me Up', artist: 'Avicii', technique: 'Live instruments under electronic production — human warmth amplifies synthetic power' },
+      { title: 'Titanium', artist: 'David Guetta ft. Sia', technique: 'Human voice as emotional anchor in a synthetic world — the contrast makes both land harder' },
+    ],
+    defining: 'The drop is the payoff. Every element before it is tension. Melody simple enough to feel in a crowd. Groove > complexity.',
+    crossFrom: 'pop', crossTechnique: 'Singable hook with emotional specificity — not just a vibe, an actual feeling with words.',
+  },
+  latin: {
+    hits: [
+      { title: 'Despacito', artist: 'Luis Fonsi ft. Daddy Yankee', technique: 'Rhythmic hook lands before the melody registers — groove creates double impact' },
+      { title: 'La Bamba', artist: 'Ritchie Valens', technique: 'Call-and-response hook builds communal energy — crowd becomes part of the performance' },
+      { title: 'Malamente', artist: 'Rosalía', technique: 'Genre authenticity as emotional texture — flamenco DNA inside modern production creates depth pastiche cannot' },
+    ],
+    defining: 'Rhythm is the primary language. Clave pattern locks the groove. Melody responds to rhythm, not the other way around.',
+    crossFrom: 'afrobeats', crossTechnique: 'Polyrhythmic percussion layers — stack rhythms that each work alone but create something larger together.',
+  },
+  reggaeton: {
+    hits: [
+      { title: 'Gasolina', artist: 'Daddy Yankee', technique: 'Dembow as identity — the rhythm IS the genre signature, hook rides it rather than fighting it' },
+      { title: 'Con Calma', artist: 'Daddy Yankee & Snow', technique: 'Sample as cultural memory — familiar rhythm triggers nostalgia while new hook feels immediate' },
+      { title: 'Hawái', artist: 'Maluma', technique: 'Romantic vulnerability over hard beat — soft words on a hard rhythm amplifies both' },
+    ],
+    defining: 'Dembow rhythm is non-negotiable. Hook simplicity is a feature. Repetition is hypnosis.',
+    crossFrom: 'hiphop', crossTechnique: 'Lyrical density in verses — pack bars with internal rhyme while letting the hook breathe.',
+  },
+  folk: {
+    hits: [
+      { title: 'The Sound of Silence', artist: 'Simon & Garfunkel', technique: 'Sparse arrangement forces lyric to carry everything — no production safety net' },
+      { title: 'Skinny Love', artist: 'Bon Iver', technique: 'Emotional ambiguity in concrete images — listener\'s experience fills the meaning' },
+      { title: 'Fast Car', artist: 'Tracy Chapman', technique: 'Accumulating specific detail builds an entire emotional world — every object is a feeling' },
+    ],
+    defining: 'The lyric IS the song. Sparse arrangement. First-person confession. Nature imagery as emotional mirror.',
+    crossFrom: 'ss', crossTechnique: 'Confessional directness — the singer is not performing, they are telling the truth.',
+  },
+  metal: {
+    hits: [
+      { title: 'Master of Puppets', artist: 'Metallica', technique: 'Opening riff contains the entire emotional argument of the song' },
+      { title: 'Paranoid', artist: 'Black Sabbath', technique: 'Tempo as aggression — speed and distortion carry emotion before the first lyric' },
+      { title: 'Duality', artist: 'Slipknot', technique: 'Quiet verse / crushing chorus — contrast amplifies both vulnerability and power' },
+    ],
+    defining: 'Riff supremacy. Dynamics between vulnerability (verse) and power (chorus). Virtuosity must serve emotion, not replace it.',
+    crossFrom: 'punk', crossTechnique: 'Urgency over polish — raw energy and directness. The feeling should feel dangerous, not rehearsed.',
+  },
+  jazz: {
+    hits: [
+      { title: 'Take Five', artist: 'Dave Brubeck', technique: 'Odd time signature as identity — the "wrong" rhythm becomes the most natural thing after 4 bars' },
+      { title: 'So What', artist: 'Miles Davis', technique: 'Space as expression — silence has emotional weight equal to sound' },
+      { title: 'Autumn Leaves', artist: 'Standard / Chet Baker', technique: 'Chord substitution creates surprise and longing — the "wrong" note is the most right' },
+    ],
+    defining: 'Space between notes is the emotion. Harmonic sophistication as vocabulary. What you leave out is the art.',
+    crossFrom: 'blues', crossTechnique: 'Blues scale as emotional anchor — underneath harmonic complexity, the pentatonic root keeps the listener feeling.',
+  },
+  ss: {
+    hits: [
+      { title: 'Hallelujah', artist: 'Leonard Cohen', technique: 'Sacred language applied to secular pain — collision of registers creates transcendence' },
+      { title: 'Gravity', artist: 'John Mayer', technique: 'Chord progression carries more emotion than the lyric — harmony does the heavy lifting' },
+      { title: 'The Story', artist: 'Brandi Carlile', technique: 'Quiet confessional explodes — restraint earns the release' },
+    ],
+    defining: 'Confessional directness. Chord progression as emotional arc. Every word earned. Bridge reframes everything before it.',
+    crossFrom: 'folk', crossTechnique: 'Natural imagery as emotional parallel — weather, seasons, water. Let the external mirror the internal without saying so.',
+  },
+  altrock: {
+    hits: [
+      { title: 'Creep', artist: 'Radiohead', technique: 'Specific weakness becomes universal anthem — everyone secretly feels the outsider feeling' },
+      { title: 'Yellow', artist: 'Coldplay', technique: 'Abstracted emotion in concrete image — "I drew a line for you" is specific, visual, and completely open' },
+      { title: 'Mr. Brightside', artist: 'The Killers', technique: 'No intro — drop straight into the emotional state, trust the listener to catch up' },
+    ],
+    defining: 'Emotional honesty over polish. Quiet-loud dynamic as the central move. Chorus is where the held-back thing finally comes out.',
+    crossFrom: 'rock', crossTechnique: 'Riff as emotional identity — the guitar hook tells you the feeling before any lyrics do.',
+  },
+  reggae: {
+    hits: [
+      { title: 'No Woman No Cry', artist: 'Bob Marley', technique: 'Anthemic simplicity — the hook is so simple it becomes a prayer through repetition' },
+      { title: 'Redemption Song', artist: 'Bob Marley', technique: 'Message over groove — when the lyric matters enough, strip the production to nothing' },
+      { title: 'Rivers of Babylon', artist: 'The Melodians', technique: 'Ancient words in new emotional context — the depth of source material resonates even without recognition' },
+    ],
+    defining: 'Offbeat skank creates space. Message-driven lyric. Repetition as ritual. Hook should feel like a community chant.',
+    crossFrom: 'folk', crossTechnique: 'Protest through simplicity — the most powerful political statements are the most direct.',
+  },
+  afrobeats: {
+    hits: [
+      { title: 'Essence', artist: 'Wizkid ft. Tems', technique: 'Groove as intimacy — the beat is seductive before a word is sung; melody floats over it like conversation' },
+      { title: 'Ye', artist: 'Burna Boy', technique: 'Cultural specificity as universal appeal — deeply specific references translate globally because emotion is universal' },
+      { title: 'Calm Down', artist: 'Rema', technique: 'Percussive vocal rhythm — voice becomes part of the rhythm section, syllables land like hi-hat hits' },
+    ],
+    defining: 'Percussion is the primary language. Vocal melody as counterpoint to groove. Cultural authenticity. Joy as resistance.',
+    crossFrom: 'rnb', crossTechnique: 'Melodic vulnerability in the hook — underneath groove confidence, the emotional reveal of needing someone.',
+  },
+  blues: {
+    hits: [
+      { title: 'The Thrill Is Gone', artist: 'B.B. King', technique: 'AAB lyric structure — state the pain, deepen it, then the guitar answers what words cannot say' },
+      { title: 'Pride and Joy', artist: 'Stevie Ray Vaughan', technique: 'Riff as emotional argument — guitar lick tells you the feeling before the lyric confirms it' },
+      { title: 'Cross Road Blues', artist: 'Robert Johnson', technique: 'Mythic imagery in physical detail — the crossroads is both real and symbolic simultaneously' },
+    ],
+    defining: 'AAB lyric structure. Guitar answers what voice cannot. Suffering as craft. Emotional truth over lyrical complexity.',
+    crossFrom: 'gospel', crossTechnique: 'Spiritual intensity in secular pain — let emotional intensity reach toward transcendence even in heartbreak.',
+  },
+  punk: {
+    hits: [
+      { title: 'London Calling', artist: 'The Clash', technique: 'Apocalyptic imagery as political urgency — the stakes are everything, delivery is immediate' },
+      { title: 'Basket Case', artist: 'Green Day', technique: 'Self-diagnosis as anthem — confessing the anxiety makes everyone else feel less alone' },
+      { title: 'Blitzkrieg Bop', artist: 'Ramones', technique: 'Maximum impact in minimum time — 2 minutes, 4 chords, one feeling. Nothing wasted.' },
+    ],
+    defining: 'Urgency over polish. Direct message. Short, fast, loud. Say the thing — no metaphor shield.',
+    crossFrom: 'folk', crossTechnique: 'Protest directness — folk\'s plainspoken truth delivered at punk speed and volume.',
+  },
+  kpop: {
+    hits: [
+      { title: 'Dynamite', artist: 'BTS', technique: 'English hook on Korean song — global accessibility sits on top of cultural identity, not instead of it' },
+      { title: 'Kill This Love', artist: 'BLACKPINK', technique: 'Pre-chorus is the real payoff — the drop hits harder because the build was perfectly constructed' },
+      { title: 'Feel Special', artist: 'TWICE', technique: 'Direct emotional address at maximum vulnerability — "you make me feel special" is the whole thesis' },
+    ],
+    defining: 'Pre-chorus tension architecture. Hook accessibility over lyrical complexity. Production must sparkle.',
+    crossFrom: 'edm', crossTechnique: 'Drop architecture — the silence before the drop is part of the drop. Build then release everything at once.',
+  },
+  neosoul: {
+    hits: [
+      { title: 'On & On', artist: 'Erykah Badu', technique: 'Jazz harmony under R&B groove — chord extensions do emotional work the lyric only hints at' },
+      { title: 'Bag Lady', artist: 'Erykah Badu', technique: 'Single metaphor sustained through the entire song — one image carries all the meaning' },
+      { title: 'Best Part', artist: 'Daniel Caesar ft. H.E.R.', technique: 'Harmonic space amplifies vocal — fewer chords creates room for the voice to breathe and mean everything' },
+    ],
+    defining: 'Jazz harmony meets R&B groove. The song breathes. Confessional lyric under musical sophistication. Space is as important as sound.',
+    crossFrom: 'jazz', crossTechnique: 'Unexpected chord substitution at emotional peak — the "wrong" chord that is most right creates surprise and longing.',
+  },
+  gospel: {
+    hits: [
+      { title: 'Total Praise', artist: 'Richard Smallwood', technique: 'Choir crescendo as spiritual escalation — sound of community believing amplifies individual conviction' },
+      { title: 'Goodness of God', artist: 'CeCe Winans', technique: 'Testimony structure — verse is the before, chorus is the after; the contrast IS the emotional argument' },
+      { title: 'I Can Only Imagine', artist: 'MercyMe', technique: 'Wonder as lyric strategy — asking the question creates more emotion than asserting the answer' },
+    ],
+    defining: 'Community call-and-response. Testimony structure. Vocal crescendo as spiritual argument. Repetition as conviction.',
+    crossFrom: 'rnb', crossTechnique: 'Contemporary arrangement under spiritual message — modern groove makes the message land in the present moment.',
+  },
+  parody: {
+    hits: [
+      { title: 'Word Crimes', artist: 'Weird Al Yankovic', technique: 'Maintain original song structure exactly — subvert only the subject matter, let collision create the comedy' },
+      { title: 'White & Nerdy', artist: 'Weird Al Yankovic', technique: 'Specific cultural references > generic jokes — exact detail is always funnier than vague category' },
+      { title: 'Amish Paradise', artist: 'Weird Al Yankovic', technique: 'Commit to the premise completely — play it straight, never wink. The bit lands harder when you believe it.' },
+    ],
+    defining: 'Preserve original song structure. Subvert only the subject. Specificity is the punchline. Full commitment to the premise.',
+    crossFrom: 'tvmusical', crossTechnique: 'Theatrical commitment — play it completely straight, never wink. The joke lands harder when the performer believes it.',
+  },
+  comedy: {
+    hits: [
+      { title: 'That Funny Feeling', artist: 'Bo Burnham', technique: 'Specificity is the punchline — exact cultural reference creates recognition that lands like a gut punch' },
+      { title: 'Hiphopopotamus vs. Rhymenoceros', artist: 'Flight of the Conchords', technique: 'Earnestness as comedy — the gap between sincerity and absurdity IS the joke' },
+      { title: 'I\'m On A Boat', artist: 'The Lonely Island', technique: 'Full commitment to a ridiculous premise — comedy is in how seriously everyone takes it' },
+    ],
+    defining: 'The unexpected word in the expected slot is the entire joke. Specific > general always. Commit to the premise completely.',
+    crossFrom: 'pop', crossTechnique: 'Genuine hook — the song must also work musically; the comedy needs contrast to land against.',
+  },
+  children: {
+    hits: [
+      { title: 'You\'ve Got a Friend in Me', artist: 'Randy Newman', technique: 'Adult emotion in simple language — warmth is real and unsentimental. Kids feel sincerity.' },
+      { title: 'Let It Go', artist: 'Idina Menzel / Frozen', technique: 'Empowerment arc in 3 minutes — verse establishes constraint, chorus breaks it, bridge commits to freedom' },
+      { title: 'The Bare Necessities', artist: 'Phil Harris / Jungle Book', technique: 'Rhythm as invitation — groove makes a child want to move before they understand the words' },
+    ],
+    defining: 'Simple vocabulary, genuine emotion. Hook invites movement. Clear narrative arc with resolution. Never condescending.',
+    crossFrom: 'folk', crossTechnique: 'Repetition as ritual — the hook must be instantly joinable so the child learns it by singing along.',
+  },
+  tvmusical: {
+    hits: [
+      { title: 'My Shot (Hamilton)', artist: 'Lin-Manuel Miranda', technique: 'Form matches character — rap form carries a founding father\'s ambition and urgency simultaneously' },
+      { title: 'Defying Gravity (Wicked)', artist: 'Idina Menzel', technique: 'Song replaces dialogue — this moment can ONLY be sung; music carries what words alone cannot' },
+      { title: 'On My Own (Les Misérables)', artist: 'Schönberg / Boublil', technique: 'Unreliable narrator in song — the gap between what she sings and what is true IS the tragedy' },
+    ],
+    defining: 'Song replaces what dialogue cannot express. Character is revealed, not described. Rhyme scheme IS personality. Lyric must advance the story.',
+    crossFrom: 'pop', crossTechnique: 'Hook accessibility — the tune must outlive the show. Singable leaving the venue.',
+  },
+};
+
+function buildTopTierNote(genre, crossGenre) {
+  const ref = GENRE_HIT_REFERENCES[genre];
+  if (!ref) return '';
+  const picks = ref.hits.slice(0, 2);
+  const refLines = picks.map(h => `  • "${h.title}" (${h.artist}): ${h.technique}`).join('\n');
+  const xKey    = crossGenre || ref.crossFrom;
+  const xLabel  = GENRE_LABELS[xKey] || xKey;
+  const xNote   = ref.crossTechnique ? `\nCROSS-TRAIN from ${xLabel}: ${ref.crossTechnique}` : '';
+  return `\n\nPLATINUM MODE — TOP 5% TARGET:\nWrite at the level of the best ${GENRE_LABELS[genre] || genre} songs ever made.\nReference:\n${refLines}\nDEFINING TECHNIQUE: ${ref.defining}${xNote}\nEvery line must justify its existence. The hook must be undeniable.`;
+}
 
 const PRODUCTION_ARCHETYPES = {
   'trap-808':        { label: 'Trap / 808', genres: ['hiphop','reggaeton'], kit: 'TR-808 or Plug-In snare, hard 808 bass, hi-hat rolls (1/16–1/32)', tempo: '130–145 BPM', signature: 'Sliding 808 glide, snare choke, hi-hat velocity variation, dark minor keys' },
@@ -1909,7 +2156,7 @@ function buildSongPrompt(params) {
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
-    platform = 'suno', avoidPatterns = [], dualPerspective = false
+    platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -2098,9 +2345,9 @@ Rule: ${_poa.rule}`;
     : '';
 
   // ── Syllable budget ─────────────────────────────────────────────────────
-  const _sylBudget  = GENRE_SYLLABLE_BUDGETS[genre] || { verse:'8–13', chorus:'6–10', bridge:'6–10', prechorus:'6–9' };
+  const _sylBudget  = GENRE_SYLLABLE_BUDGETS[genre] || { verse:'8–13', chorus:'6–10', hook:'4–7', bridge:'6–10', prechorus:'6–9' };
   const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
-  const syllableNote = `\n\nSYLLABLE BUDGET:\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
+  const syllableNote = `\n\nSYLLABLE BUDGET:\n- Hook (title/refrain line): ${_sylBudget.hook || '4–7'} syllables — keep it singable and memorable\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
 
   // ── Production brief data ───────────────────────────────────────────────
   const _fxProfile  = GENRE_FX_PROFILES[genre]  || {};
@@ -2133,6 +2380,8 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   // ── Specificity self-check instruction ─────────────────────────────────
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
 
+  const platinumNote = platinum ? buildTopTierNote(genre) : '';
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -2153,7 +2402,7 @@ SONGWRITING RULES:
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
-- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}
+- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -2256,6 +2505,7 @@ function buildLuckyPrompt(params) {
   const mood      = (params && params.mood)      ? sanitizeInput(params.mood, 100)      : pickRandom(LUCKY_MOODS);
   const structure = (params && params.structure) ? sanitizeInput(params.structure, 50)  : pickRandom(LUCKY_STRUCTURES);
   const vocal     = (params && params.vocal)     ? sanitizeInput(params.vocal, 100)     : pickRandom(LUCKY_VOCALS);
+  const platinum  = !!(params && params.platinum);
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
 
   // Outlier injection
@@ -2298,7 +2548,7 @@ SONGWRITING RULES:
 - Specific imagery only — no clichés · Zeigarnik effect in chorus
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
-- Every section MUST start with its bracket tag on its own line.
+- Every section MUST start with its bracket tag on its own line.${platinum ? buildTopTierNote(g1, g2) : ''}
 
 Respond with EXACTLY this format:
 
@@ -2581,14 +2831,6 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • PERSONA: ${dims.persona} — ${PERSONA_NOTES[dims.persona]}
 ${hookNote ? '\n' + hookNote : ''}
 
-LYRIC INTELLIGENCE REQUIREMENTS:
-Every verse must include a LYRIC INTELLIGENCE note in [brackets after the last bar] with:
-- FLOW: the specific flow pattern used (name the cadence)
-- RHYME MAP: diagram the rhyme scheme (A/B/C notation + note any internal rhymes)
-- PHONETICS: flag any words Suno may mispronounce + the correct syllable emphasis
-- DENSITY: syllables per bar (avg)
-- STANDOUT LINE: the single most powerful line and why it works
-
 BRACKET REQUIREMENTS:
 ${bracketInstructionServer('hiphop', 'full', null)}
 
@@ -2607,7 +2849,7 @@ TITLE: [song title]
 VERDICT: [one sentence on why this song will connect]
 
 LYRICS:
-[Complete song lyrics. EVERY SECTION starts with its bracket tag. Include LYRIC INTELLIGENCE note after each verse/hook section.]
+[Complete song lyrics only. EVERY SECTION starts with its bracket tag. Clean lyrics — no annotations, no notes, no commentary embedded in the lyrics.]
 
 SONG PROMPT:
 [Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
@@ -2620,7 +2862,7 @@ TEMPO & KEY:
 [BPM · Key · Time sig · Feel]
 
 FLOW BREAKDOWN:
-[Bar-by-bar flow pattern guide for the main verse — tell the producer exactly where accents land]
+[3-5 lines: bar-by-bar flow pattern guide for the main verse. Where accents land, syllable density, rhythmic signature.]
 
 RAP LAB SETTINGS USED:
 Style: ${style.label} | Flow: ${dims.flow} | Rhyme: ${dims.rhymeArch} | Density: ${dims.density} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
@@ -3151,4 +3393,4 @@ function buildProductionData(genre) {
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote };
