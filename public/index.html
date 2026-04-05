@@ -136,10 +136,8 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on{display:grid;grid-template-columns:360px 1fr 220px;grid-template-rows:auto;column-gap:16px;align-items:start}
   #pg-write.on > *{min-width:0}
   #pg-write.on #album-track-banner{grid-column:1/-1;grid-row:1}
-  /* Controls panel — col 1, sticky */
-  #pg-write.on .studio{grid-column:1;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;margin-bottom:0;scrollbar-width:thin}
-  #pg-write.on .studio::-webkit-scrollbar{width:3px}
-  #pg-write.on .studio::-webkit-scrollbar-thumb{background:var(--s5)}
+  /* Controls panel — col 1, sticky at top, no internal scroll */
+  #pg-write.on .studio{grid-column:1;grid-row:2/10;position:sticky;top:16px;overflow:visible;margin-bottom:0}
   /* Output column — col 2 (secondary controls + output expand together) */
   #pg-write.on #writer-output-controls{grid-column:2;grid-row:2}
   #pg-write.on .empty-state{grid-column:2;grid-row:3}
@@ -191,7 +189,7 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .save-bar{grid-column:2;grid-row:9}
 }
 @media(min-width:901px) and (max-height:700px){
-  #pg-write.on .studio{top:4px;max-height:calc(100vh - 8px)}
+  #pg-write.on .studio{top:4px}
   #pg-write.on #writer-social{top:4px;max-height:calc(100vh - 8px)}
 }
 
@@ -8059,7 +8057,7 @@ function isGenreFree(gid) {
 function initGenreGrid(){
   const grid = document.getElementById('genre-grid');
   if (!grid) return;
-  const VISIBLE = 8;
+  const VISIBLE = 6; /* 2 clean rows of 3 — no orphaned tiles */
   const total = GENRES_DEF.length;
   grid.innerHTML = GENRES_DEF.map((g, i) => {
     const locked = !isGenreFree(g.id);
