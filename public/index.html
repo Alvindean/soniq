@@ -2563,27 +2563,27 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="op-section">
       <div class="op-label">Need inspiration? Try a prompt</div>
       <div class="op-prompts">
-        <div class="op-prompt" onclick="opUsePrompt('A late-night drive with someone you miss')">
+        <div class="op-prompt" onclick="opUsePrompt('A late-night drive with someone you miss',this)">
           <div class="op-prompt-emoji">🌙</div>
           <div class="op-prompt-text">A late-night drive with someone you miss</div>
         </div>
-        <div class="op-prompt" onclick="opUsePrompt('Rising from a tough time, finding strength again')">
+        <div class="op-prompt" onclick="opUsePrompt('Rising from a tough time, finding strength again',this)">
           <div class="op-prompt-emoji">💪</div>
           <div class="op-prompt-text">Rising from a tough time, finding strength again</div>
         </div>
-        <div class="op-prompt" onclick="opUsePrompt('The moment you realized it was over')">
+        <div class="op-prompt" onclick="opUsePrompt('The moment you realized it was over',this)">
           <div class="op-prompt-emoji">💔</div>
           <div class="op-prompt-text">The moment you realized it was over</div>
         </div>
-        <div class="op-prompt" onclick="opUsePrompt('Summer romance that only lasted one week')">
+        <div class="op-prompt" onclick="opUsePrompt('Summer romance that only lasted one week',this)">
           <div class="op-prompt-emoji">☀️</div>
           <div class="op-prompt-text">Summer romance that only lasted one week</div>
         </div>
-        <div class="op-prompt" onclick="opUsePrompt('Gratitude anthem for the people who stayed')">
+        <div class="op-prompt" onclick="opUsePrompt('Gratitude anthem for the people who stayed',this)">
           <div class="op-prompt-emoji">🙏</div>
           <div class="op-prompt-text">Gratitude anthem for the people who stayed</div>
         </div>
-        <div class="op-prompt" onclick="opUsePrompt('City lights, big dreams, first night in a new city')">
+        <div class="op-prompt" onclick="opUsePrompt('City lights, big dreams, first night in a new city',this)">
           <div class="op-prompt-emoji">🌆</div>
           <div class="op-prompt-text">City lights, big dreams, first night in a new city</div>
         </div>
@@ -2634,7 +2634,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="op-bottom-title">⚡ Weekly Challenge</div>
         <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:4px;line-height:1.4">Write a song about a city at 3am</div>
         <div style="font-size:10px;color:var(--tx4);margin-bottom:12px;flex:1">47 entries · 3 days left</div>
-        <button class="btn btn-sm" style="width:100%;justify-content:center;font-size:11px;border-color:var(--amberline);color:var(--amber)" onclick="opUsePrompt('a city at 3am')">Try It →</button>
+        <button class="btn btn-sm" style="width:100%;justify-content:center;font-size:11px;border-color:var(--amberline);color:var(--amber)" onclick="opUsePrompt('a city at 3am',this)">Try It →</button>
       </div>
 
     </div>
@@ -13018,25 +13018,29 @@ function opPickGenre(genre) {
   if (topicInput) topicInput.focus();
 }
 
-function opUsePrompt(text) {
-  const topicInput = document.getElementById('g-topic');
-  if (!topicInput) return;
-  topicInput.value = text;
-  topicInput.dispatchEvent(new Event('input'));
-  topicInput.focus();
-  // Trigger wizard step progression
-  if(typeof expandStep==='function') expandStep(1);
-  if(typeof onTopicInput==='function') onTopicInput();
-  topicInput.scrollIntoView({behavior:'smooth',block:'nearest'});
-  // Mark active prompt
-  document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
-  event.currentTarget?.classList.add('active');
-  // Clear active state when user manually edits the field
-  const clearActive = () => {
-    document.querySelectorAll('#output-placeholder .op-prompt').forEach(el => el.classList.remove('active'));
-    topicInput.removeEventListener('input', clearActive);
-  };
-  topicInput.addEventListener('input', clearActive, {once:true});
+function opUsePrompt(text, clickedEl) {
+  try {
+    var topicInput = document.getElementById('g-topic');
+    if (!topicInput) { console.warn('opUsePrompt: g-topic not found'); return; }
+    topicInput.value = text;
+    topicInput.dispatchEvent(new Event('input', {bubbles:true}));
+    topicInput.focus();
+    // Trigger wizard step progression
+    if(typeof expandStep === 'function') expandStep(1);
+    if(typeof onTopicInput === 'function') onTopicInput();
+    topicInput.scrollIntoView({behavior:'smooth', block:'nearest'});
+    // Mark active prompt
+    document.querySelectorAll('#output-placeholder .op-prompt').forEach(function(p){ p.classList.remove('active'); });
+    if(clickedEl) {
+      var card = clickedEl.closest('.op-prompt');
+      if(card) card.classList.add('active');
+    }
+    // Clear active state when user manually edits the field
+    topicInput.addEventListener('input', function clearActive() {
+      document.querySelectorAll('#output-placeholder .op-prompt').forEach(function(p){ p.classList.remove('active'); });
+      topicInput.removeEventListener('input', clearActive);
+    }, {once:true});
+  } catch(err) { console.error('opUsePrompt error:', err); }
 }
 
 function opLoadRecent(idx) {
