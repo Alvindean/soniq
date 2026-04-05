@@ -5683,8 +5683,9 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
     if (lhookTxt) { lhookIsoText.textContent = lhookTxt; lhookIsoEl.style.display = ''; }
     else lhookIsoEl.style.display = 'none';
   }
-  document.getElementById('lres-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
-  updateLyricsCount('lres', lyrics||raw);
+  const _lClean=stripLyricsDashes(lyrics||raw);
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(_lClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('lres', _lClean);
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -5744,8 +5745,9 @@ function loadLuckyHistItem(i){
   const out=document.getElementById('lucky-out');out.style.display='block';out.classList.add('visible');
   document.getElementById('lres-title').textContent=song.title||'Untitled';
   document.getElementById('lres-verdict').textContent=song.verdict||'';
-  document.getElementById('lres-lyrics-text').innerHTML=escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
-  updateLyricsCount('lres', song.lyrics||'');
+  const _llClean=stripLyricsDashes(song.lyrics||'');
+  document.getElementById('lres-lyrics-text').innerHTML=escHtml(_llClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('lres', _llClean);
   renderBrief('lres', song.style||'', song.brief||'');
   document.getElementById('lres-structure-text').textContent=song.structure||'';
   document.getElementById('lres-dopamine-text').textContent=song.dopamine||'';
@@ -6171,8 +6173,9 @@ function parseSongResult(raw,genre,topic,prodData){
     if (hookTxt) { hookIsoText.textContent = hookTxt; hookIsoEl.style.display = ''; }
     else hookIsoEl.style.display = 'none';
   }
-  document.getElementById('res-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
-  updateLyricsCount('res', lyrics||raw);
+  const _rClean=stripLyricsDashes(lyrics||raw);
+  document.getElementById('res-lyrics-text').innerHTML=escHtml(_rClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', _rClean);
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -6335,6 +6338,11 @@ function parseBriefSection(text, key) {
   return text.slice(start, end).trim();
 }
 
+function stripLyricsDashes(text) {
+  if (!text) return text;
+  // Remove em dashes at end of line, replace mid-line em dashes with comma
+  return text.replace(/—\s*$/gm, '').replace(/\s*—\s*/g, ', ');
+}
 function updateLyricsCount(prefix, rawText) {
   const cc = document.getElementById(prefix + '-lyrics-charcount');
   if (!cc) return;
@@ -6795,8 +6803,9 @@ function loadSongIntoOutput(song){
   document.getElementById('loaded-banner').style.display = 'flex';
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
-  document.getElementById('res-lyrics-text').innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
-  updateLyricsCount('res', song.lyrics||'');
+  const _rlClean=stripLyricsDashes(song.lyrics||'');
+  document.getElementById('res-lyrics-text').innerHTML = escHtml(_rlClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', _rlClean);
   renderBrief('res', song.style||'', song.brief||'');
   document.getElementById('res-structure-text').textContent = song.structure || '';
   document.getElementById('res-dopamine-text').textContent = song.dopamine || '';

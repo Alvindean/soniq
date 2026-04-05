@@ -2648,7 +2648,8 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
-- LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -2813,7 +2814,8 @@ SONGWRITING RULES:
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
-- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags. Complete song, within the limit.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
+- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags. Complete song, within the limit.
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
 
 Respond with EXACTLY this format:
 
@@ -3122,7 +3124,8 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
-- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags.${buildAdlibNote('hiphop')}
+- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags.
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildAdlibNote('hiphop')}
 
 Respond with EXACTLY this format:
 
