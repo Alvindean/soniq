@@ -2382,20 +2382,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <!-- Community Snippets -->
     <div class="social-card" id="ws-community-card">
       <div class="social-card-title">🌐 Community</div>
-      <div id="ws-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6">
-        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
-          <div style="font-weight:600;color:var(--tx2)">🎵 "Midnight in Lagos"</div>
-          <div style="color:var(--tx4);font-size:10px">Afrobeats · by @kwame_beats</div>
-        </div>
-        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
-          <div style="font-weight:600;color:var(--tx2)">🎸 "Last Train Home"</div>
-          <div style="color:var(--tx4);font-size:10px">Folk · by @sierra_writes</div>
-        </div>
-        <div style="padding:8px 0">
-          <div style="font-weight:600;color:var(--tx2)">✨ "Neon Daydream"</div>
-          <div style="color:var(--tx4);font-size:10px">EDM · by @synth_soul</div>
-        </div>
-      </div>
+      <div id="ws-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6"></div>
       <button class="btn btn-sm" onclick="navTo('community')" style="width:100%;justify-content:center;font-size:11px;margin-top:10px">See All →</button>
     </div>
 
@@ -12711,6 +12698,11 @@ function opLoadRecent(idx) {
 }
 
 function refreshInspirationBoard() {
+  // Defer if GENRE_COLORS isn't defined yet
+  if (typeof GENRE_COLORS === 'undefined') {
+    setTimeout(refreshInspirationBoard, 100);
+    return;
+  }
   const section = document.getElementById('op-recents-section');
   const list = document.getElementById('op-recents-list');
   if (!section || !list) return;
@@ -12719,7 +12711,7 @@ function refreshInspirationBoard() {
   section.style.display = 'block';
   list.innerHTML = recent.map((song, i) => {
     const genre = (song.genre || '').toLowerCase();
-    const color = (typeof GENRE_COLORS !== 'undefined' && GENRE_COLORS[genre]) || '#f5c000';
+    const color = GENRE_COLORS[genre] || '#f5c000';
     const meta = [song.genre, song.mood].filter(Boolean).join(' · ');
     return `<div class="op-recent-item" onclick="opLoadRecent(${i})">
       <div class="op-recent-dot" style="background:${color}"></div>
