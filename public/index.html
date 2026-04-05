@@ -719,6 +719,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .brief-prompt-charcount{
   font-size:10px;margin-top:5px;text-align:right;font-family:var(--mono);font-weight:700;
 }
+.lyrics-charcount{
+  font-size:10px;margin-top:4px;text-align:right;font-family:var(--mono);font-weight:700;
+  padding:0 2px;min-height:14px;
+}
 .brief-copy-btn{
   font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;
   border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);
@@ -2225,6 +2229,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="res-lyrics-text" class="lyrics-box"></div>
+      <div class="lyrics-charcount" id="res-lyrics-charcount"></div>
       <!-- AUDIO EMBED -->
       <div id="res-audio-embed" style="display:none;margin:12px 0;border-radius:8px;overflow:hidden;border:1px solid var(--brd)"></div>
       <!-- REVISION BAR -->
@@ -2419,6 +2424,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="lres-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="lres-lyrics-text" class="lyrics-box"></div>
+      <div class="lyrics-charcount" id="lres-lyrics-charcount"></div>
       <!-- REVISION BAR -->
       <div class="revision-bar" id="lres-revision-bar" style="display:none">
         <span class="revision-bar-label">Quick Revise:</span>
@@ -5678,6 +5684,7 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
     else lhookIsoEl.style.display = 'none';
   }
   document.getElementById('lres-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('lres', lyrics||raw);
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -5738,6 +5745,7 @@ function loadLuckyHistItem(i){
   document.getElementById('lres-title').textContent=song.title||'Untitled';
   document.getElementById('lres-verdict').textContent=song.verdict||'';
   document.getElementById('lres-lyrics-text').innerHTML=escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('lres', song.lyrics||'');
   renderBrief('lres', song.style||'', song.brief||'');
   document.getElementById('lres-structure-text').textContent=song.structure||'';
   document.getElementById('lres-dopamine-text').textContent=song.dopamine||'';
@@ -6164,6 +6172,7 @@ function parseSongResult(raw,genre,topic,prodData){
     else hookIsoEl.style.display = 'none';
   }
   document.getElementById('res-lyrics-text').innerHTML=escHtml(lyrics||raw).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', lyrics||raw);
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -6326,6 +6335,15 @@ function parseBriefSection(text, key) {
   return text.slice(start, end).trim();
 }
 
+function updateLyricsCount(prefix, rawText) {
+  const cc = document.getElementById(prefix + '-lyrics-charcount');
+  if (!cc) return;
+  const len = (rawText || '').length;
+  if (!len) { cc.textContent = ''; return; }
+  cc.textContent = len.toLocaleString() + ' / 5,000 characters (Suno lyrics limit)';
+  cc.style.color = len > 5000 ? 'var(--red)' : len > 4000 ? 'var(--amber)' : 'var(--green)';
+}
+
 function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const el = document.getElementById(prefix + '-brief-content');
   if (!el) return;
@@ -6434,7 +6452,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
         ${cpBtn('brief-core-prompt', 'Copy Prompt')}
       </div>
       <div class="brief-prompt-box" id="brief-core-prompt">${escHtml(corePrompt)}</div>
-      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/440 characters</div>
+      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/200 characters (Suno style field)</div>
     </div>
 
     <div class="brief-grid">
@@ -6495,7 +6513,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const cc = el.querySelector('#brief-charcount');
   if (cc) {
     const len = corePrompt.length;
-    cc.style.color = len > 440 ? 'var(--red)' : len > 380 ? 'var(--amber)' : 'var(--green)';
+    cc.style.color = len > 200 ? 'var(--red)' : len > 160 ? 'var(--amber)' : 'var(--green)';
   }
 }
 
@@ -6778,6 +6796,7 @@ function loadSongIntoOutput(song){
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
   document.getElementById('res-lyrics-text').innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', song.lyrics||'');
   renderBrief('res', song.style||'', song.brief||'');
   document.getElementById('res-structure-text').textContent = song.structure || '';
   document.getElementById('res-dopamine-text').textContent = song.dopamine || '';

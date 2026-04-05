@@ -2647,7 +2647,8 @@ SONGWRITING RULES:
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
-- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
+- LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -2811,7 +2812,8 @@ SONGWRITING RULES:
 - Specific imagery only — no clichés · Zeigarnik effect in chorus
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
-- Every section MUST start with its bracket tag on its own line.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
+- Every section MUST start with its bracket tag on its own line.
+- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags. Complete song, within the limit.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
 
 Respond with EXACTLY this format:
 
@@ -3119,7 +3121,8 @@ SONGWRITING RULES:
 - Internal rhyme schemes preferred over simple end rhymes (unless 'end-only' specified)
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
-- Last chorus must feel bigger than the first${buildAdlibNote('hiphop')}
+- Last chorus must feel bigger than the first
+- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags.${buildAdlibNote('hiphop')}
 
 Respond with EXACTLY this format:
 
