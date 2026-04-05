@@ -119,8 +119,9 @@ a{color:var(--amber);text-decoration:none}
 #output-placeholder .op-sub{font-size:11px}
 
 /* ── PG-WRITE 3-PANEL ── */
-/* Layout: [Controls 360px] | [Output 1fr] | [Social 220px] */
+/* Layout: [Controls 360px] | [Output + Secondary Controls 1fr] | [Social 220px] */
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
+#writer-output-controls{padding:0 0 8px}
 @media(min-width:901px){
   #pg-write.on{display:grid;grid-template-columns:360px 1fr 220px;grid-template-rows:auto;column-gap:16px;align-items:start}
   #pg-write.on > *{min-width:0}
@@ -129,17 +130,18 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .studio{grid-column:1;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;margin-bottom:0;scrollbar-width:thin}
   #pg-write.on .studio::-webkit-scrollbar{width:3px}
   #pg-write.on .studio::-webkit-scrollbar-thumb{background:var(--s5)}
-  /* Output area — col 2, big */
-  #pg-write.on .empty-state{grid-column:2;grid-row:2}
-  #pg-write.on #output-placeholder{grid-column:2;grid-row:3}
-  #pg-write.on .synopsis-card{grid-column:2;grid-row:4}
-  #pg-write.on .hist-bar{grid-column:2;grid-row:5}
-  #pg-write.on #gen-out{grid-column:2;grid-row:6}
-  #pg-write.on .key-banner{grid-column:2;grid-row:7}
-  #pg-write.on .save-bar{grid-column:2;grid-row:8}
+  /* Output column — col 2 (secondary controls + output expand together) */
+  #pg-write.on #writer-output-controls{grid-column:2;grid-row:2}
+  #pg-write.on .empty-state{grid-column:2;grid-row:3}
+  #pg-write.on #output-placeholder{grid-column:2;grid-row:4}
+  #pg-write.on .synopsis-card{grid-column:2;grid-row:5}
+  #pg-write.on .hist-bar{grid-column:2;grid-row:6}
+  #pg-write.on #gen-out{grid-column:2;grid-row:7}
+  #pg-write.on .key-banner{grid-column:2;grid-row:8}
+  #pg-write.on .save-bar{grid-column:2;grid-row:9}
   /* Social panel — col 3, sticky */
   #pg-write.on #writer-social{grid-column:3;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
-  /* Controls panel inner styles */
+  /* Left controls panel inner styles */
   #pg-write.on .studio .studio-body{padding:18px 16px}
   #pg-write.on .studio .studio-top{padding:14px 16px}
   #pg-write.on .studio .studio-hint{display:none}
@@ -153,22 +155,25 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .studio .gp{padding:10px 4px}
   #pg-write.on .studio .gp-icon{font-size:18px;margin-bottom:4px}
   #pg-write.on .studio .gp-name{font-size:10px}
-  #pg-write.on .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
-  #pg-write.on .gen-action{flex-direction:column;gap:8px}
-  #pg-write.on .gen-action .btn{width:100%;justify-content:center}
-  #pg-write.on .gen-action .btn-import{width:100%;justify-content:center}
+  /* Secondary controls (in output col) — gen button full width */
+  #pg-write.on #writer-output-controls .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
+  #pg-write.on #writer-output-controls .gen-action{flex-direction:row;flex-wrap:wrap;gap:8px;align-items:center}
+  #pg-write.on #writer-output-controls .gen-action .gen-btn{flex:1 1 100%}
+  #pg-write.on #writer-output-controls .gen-action .btn-import{flex:1}
+  #pg-write.on #writer-output-controls .params{grid-template-columns:1fr 1fr}
 }
 @media(min-width:901px) and (max-width:1200px){
   /* 2-col: controls | output (social hidden) */
   #pg-write.on{grid-template-columns:360px 1fr;column-gap:16px}
   #pg-write.on #writer-social{display:none}
   #pg-write.on .studio{grid-column:1;grid-row:2/12}
-  #pg-write.on #output-placeholder{grid-column:2;grid-row:3}
-  #pg-write.on #gen-out{grid-column:2;grid-row:6}
-  #pg-write.on .synopsis-card{grid-column:2;grid-row:4}
-  #pg-write.on .hist-bar{grid-column:2;grid-row:5}
-  #pg-write.on .key-banner{grid-column:2;grid-row:7}
-  #pg-write.on .save-bar{grid-column:2;grid-row:8}
+  #pg-write.on #writer-output-controls{grid-column:2;grid-row:2}
+  #pg-write.on #output-placeholder{grid-column:2;grid-row:4}
+  #pg-write.on #gen-out{grid-column:2;grid-row:7}
+  #pg-write.on .synopsis-card{grid-column:2;grid-row:5}
+  #pg-write.on .hist-bar{grid-column:2;grid-row:6}
+  #pg-write.on .key-banner{grid-column:2;grid-row:8}
+  #pg-write.on .save-bar{grid-column:2;grid-row:9}
 }
 @media(min-width:901px) and (max-height:700px){
   #pg-write.on .studio{top:4px;max-height:calc(100vh - 8px)}
@@ -1870,7 +1875,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="mood-grid" id="mood-grid"></div>
       <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
 
-      <!-- AGE GROUP SELECTOR -->
+      <!-- AGE / VOCAL / STRUCTURE / ADV / BLEND / LENGTH / GENERATE moved to #writer-output-controls (output column) -->
+
+    </div>
+  </div>
+
+  <!-- OUTPUT COLUMN SECONDARY CONTROLS (Age, Vocal, Structure, Adv, Blend, Length, Generate) -->
+  <div id="writer-output-controls">
+
       <label class="topic-label" style="margin-top:4px">Audience Age <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— optional, shapes vocabulary &amp; themes</span></label>
       <div class="quality-row" id="age-pills">
         <span class="qpill on" onclick="setAgeGroup(this,'')" id="age-pill-any">Any Age</span>
@@ -2363,8 +2375,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
 
-    </div>
-  </div>
+  </div><!-- /#writer-output-controls -->
 
   <!-- SOCIAL PANEL -->
   <div id="writer-social">
