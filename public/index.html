@@ -196,6 +196,11 @@ a{color:var(--amber);text-decoration:none}
 .import-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--tx4);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px}
 .import-close:hover{color:var(--tx1)}
 .gen-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 34px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 16px rgba(245,184,0,0.22)}
+.gen-btn.platinum-on{background:linear-gradient(135deg,#f5b800 0%,#c084fc 100%);box-shadow:0 2px 20px rgba(192,132,252,0.35)}
+.plat-switch{width:36px;height:20px;border-radius:10px;background:var(--b3);border:1px solid var(--b4);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+.plat-switch.on{background:linear-gradient(135deg,#f5b800,#c084fc);border-color:transparent}
+.plat-knob{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.plat-switch.on .plat-knob{transform:translateX(16px)}
 .gen-btn:hover:not(:disabled){background:#ffc820;transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,184,0,0.35)}
 .gen-btn:active:not(:disabled){transform:translateY(0)}
 .gen-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;box-shadow:none}
@@ -2086,6 +2091,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <span class="gen-btn-icon">🎵</span>
           Generate Complete Song
         </button>
+        <!-- PLATINUM MODE — admin / studio / founding only -->
+        <div id="platinum-toggle-wrap" style="display:none;align-items:center;gap:8px;margin-top:8px">
+          <label style="display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none">
+            <div class="plat-switch" id="plat-switch" onclick="togglePlatinum()" title="Top 5% hit references + cross-genre technique injected into prompt">
+              <div class="plat-knob" id="plat-knob"></div>
+            </div>
+            <span style="font-size:12px;font-weight:700;color:var(--amber);letter-spacing:0.5px">✦ PLATINUM MODE</span>
+            <span style="font-size:11px;color:var(--tx3)">Top 5% references</span>
+          </label>
+        </div>
         <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
         <!-- DAILY PROGRESS INDICATOR -->
         <div class="gen-progress" id="gen-progress">
@@ -4571,6 +4586,7 @@ if (localStorage.getItem('soniq_admin_token')) {
   S.plan = 'studio';
   S.isAdmin = true;
   S.user = { id: 'admin', email: 'admin@mysoniq.com', app_metadata: {}, user_metadata: {} };
+  setTimeout(() => { if (typeof initPlatinumToggle === 'function') initPlatinumToggle(); }, 100);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5597,7 +5613,7 @@ SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: s
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData }))
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData})=>{
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd},luckyProdData);
@@ -5790,7 +5806,8 @@ async function generateSong(){
     platform: S.platform || 'suno',
     dualPerspective: S.dualPerspective || false,
     seedLine: S.seedLine || '',
-    avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : []
+    avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
+    platinum: _platinumOn && isPlatinumEligible()
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
@@ -7878,6 +7895,29 @@ async function runCoach() {
   }
 }
 
+// ─── PLATINUM MODE ─────────────────────────────────────────────────────────
+let _platinumOn = false;
+
+function isPlatinumEligible() {
+  const PLAT_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+  return window.__soniqAdmin || PLAT_PLANS.has(S.plan);
+}
+
+function initPlatinumToggle() {
+  const wrap = document.getElementById('platinum-toggle-wrap');
+  if (wrap) wrap.style.display = isPlatinumEligible() ? 'flex' : 'none';
+}
+
+function togglePlatinum() {
+  if (!isPlatinumEligible()) return;
+  _platinumOn = !_platinumOn;
+  const sw = document.getElementById('plat-switch');
+  const btn = document.getElementById('gen-btn');
+  if (sw) sw.classList.toggle('on', _platinumOn);
+  if (btn) btn.classList.toggle('platinum-on', _platinumOn);
+  toast(_platinumOn ? '✦ Platinum Mode ON — top 5% references active' : 'Platinum Mode off');
+}
+
 function copyCoachFeedback() {
   if (!_coachFeedback) return;
   safeCopy(_coachFeedback);
@@ -8137,6 +8177,7 @@ async function loadFoundingStatus() {
         S.plan = profile?.plan || 'free';
       } catch (e) { S.plan = 'free'; }
     }
+    if (typeof initPlatinumToggle === 'function') initPlatinumToggle();
   }
 }
 
