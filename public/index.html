@@ -37,14 +37,20 @@
   --glow-amber:0 0 0 1px var(--amberline),0 4px 24px rgba(245,192,0,0.14);
   --glow-cyan:0 0 0 1px var(--cyanline),0 4px 18px rgba(0,220,192,0.12);
   --r:var(--r2);
+  --bg2:var(--s3);--bg3:var(--s4);--brd:var(--b2);
   --genre-accent:#f5c000;--genre-bg:rgba(245,192,0,0.08);
   --sp-xs:clamp(2px,0.15vw,4px);--sp-sm:clamp(6px,0.5vw,8px);--sp-md:clamp(12px,1vw,16px);--sp-lg:clamp(16px,1.5vw,24px);--sp-xl:clamp(20px,2vw,28px);--sp-xxl:clamp(28px,2.5vw,32px);
   --gap-xs:clamp(4px,0.25vw,6px);--gap-sm:clamp(6px,0.5vw,8px);--gap-md:clamp(8px,1vw,12px);--gap-lg:clamp(12px,1.5vw,20px);
 }
 html,body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+/* ── MODERN SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--s1);border-radius:3px}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--amber2),var(--s5));border-radius:3px;border:1px solid rgba(245,192,0,0.1)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--amber),var(--s6));border-color:rgba(245,192,0,0.25)}
+::-webkit-scrollbar-thumb:active{background:var(--amber2)}
+::-webkit-scrollbar-corner{background:transparent}
+*{scrollbar-width:thin;scrollbar-color:var(--s5) var(--s1)}
 button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
@@ -55,8 +61,8 @@ a{color:var(--amber);text-decoration:none}
 .writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:var(--gap-lg);align-items:start;margin-top:0}
 .writer-output{min-width:0}
 .writer-controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
-.writer-controls::-webkit-scrollbar{width:3px}
-.writer-controls::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+.writer-controls::-webkit-scrollbar{width:6px}
+.writer-controls::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--amber2),var(--s5));border-radius:3px}
 .writer-social{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
 
 /* Responsive: collapse social at 1200px */
@@ -101,7 +107,7 @@ a{color:var(--amber);text-decoration:none}
 #output-placeholder .op-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:var(--s3);font-size:12px;color:var(--tx2);cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
 #output-placeholder .op-chip:hover{background:var(--acc);border-color:var(--acc);color:#000}
 /* Writing prompts — 3 cols with full width */
-#output-placeholder .op-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap-md)}
+#output-placeholder .op-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap-md);transition:opacity .3s ease,transform .3s ease}
 #output-placeholder .op-prompt{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
 #output-placeholder .op-prompt:hover{border-color:var(--acc);background:var(--s4)}
 #output-placeholder .op-prompt.active{border-color:var(--acc);background:var(--s4);box-shadow:0 0 0 2px rgba(245,192,0,0.15)}
@@ -161,8 +167,8 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on #writer-social{display:none}
   /* Sticky left panel with scrolling */
   #pg-write.on #writer-output-controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;order:-1}
-  #pg-write.on #writer-output-controls::-webkit-scrollbar{width:3px}
-  #pg-write.on #writer-output-controls::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+  #pg-write.on #writer-output-controls::-webkit-scrollbar{width:6px}
+  #pg-write.on #writer-output-controls::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--amber2),var(--s5));border-radius:3px}
   /* Compact grids for narrower 380px panel */
   #pg-write.on #writer-output-controls .genre-grid{grid-template-columns:repeat(3,1fr);gap:6px}
   #pg-write.on #writer-output-controls .mood-grid{grid-template-columns:repeat(3,1fr);gap:6px}
@@ -202,7 +208,9 @@ a{color:var(--amber);text-decoration:none}
 .ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
 @media(min-width:1500px){
   .ad-rail-right{display:flex}
-  .wrap{margin-right:192px;max-width:none;padding-right:28px}
+  .wrap{margin-right:184px;max-width:none;padding-right:24px}
+  .comm-right{display:none}
+  .comm-layout{grid-template-columns:1fr}
 }
 
 /* ── GENRE GRID EXPAND ── */
@@ -1088,39 +1096,31 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-meta{font-size:10px;color:var(--tx4);display:flex;align-items:center;gap:10px;margin-top:8px}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
-/* ── COMMUNITY 3-COLUMN LAYOUT ── */
-.comm-layout{display:grid;grid-template-columns:220px 1fr 260px;gap:24px;align-items:start;max-width:none;margin:0;padding:20px 0}
-.comm-sidebar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:16px;position:sticky;top:16px}
-.comm-main{min-width:0}
+/* ── COMMUNITY: FILTER BAR (standalone, outside grid) ── */
+.comm-filters-bar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:8px 12px;display:flex;gap:6px;flex-wrap:nowrap;align-items:center;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.comm-filters-bar::-webkit-scrollbar{height:0;display:none}
+.comm-filter-divider{width:1px;height:20px;background:var(--b2);flex-shrink:0}
+.comm-filter-section{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.comm-filter-btn{display:inline-block;padding:5px 11px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.comm-filter-btn:hover{background:var(--s4);color:var(--tx2);border-color:var(--b3)}
+.comm-filter-btn.on{background:var(--amberbg);border-color:var(--amberline);color:var(--amber);font-weight:700}
+.comm-filter-select{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx2);font-size:11px;padding:5px 10px;outline:none;cursor:pointer}
+/* ── COMMUNITY: 2-COL GRID (feed + right) ── */
+.comm-layout{display:grid;grid-template-columns:1fr 240px;gap:20px;align-items:start;padding:0}
+.comm-main{min-width:0;min-height:calc(100vh - 200px)}
 .comm-right{position:sticky;top:16px}
-.comm-filter-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b1)}
-.comm-filter-section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
-.comm-filter-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx4);margin-bottom:8px}
-.comm-filter-btn{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:var(--r2);border:none;background:none;color:var(--tx3);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;margin-bottom:3px}
-.comm-filter-btn:hover{background:var(--s3);color:var(--tx2)}
-.comm-filter-btn.on{background:var(--s4);color:var(--tx1);font-weight:700}
-.comm-filter-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx2);font-size:12px;padding:7px 10px;outline:none;cursor:pointer}
 @media(max-width:1100px){
-  .comm-layout{grid-template-columns:180px 1fr}
-  .comm-right{display:none}
-}
-@media(max-width:1050px) and (min-width:901px){
-  .comm-layout{grid-template-columns:200px 1fr}
-  .comm-right{display:none}
+  .comm-layout{grid-template-columns:1fr 200px}
 }
 @media(max-width:900px){
-  .comm-layout{grid-template-columns:1fr;padding:12px 14px}
-  .comm-sidebar,.comm-right{display:none}
+  .comm-layout{grid-template-columns:1fr}
+  .comm-right{display:none}
+  .comm-filters-bar{margin-left:-8px;margin-right:-8px;border-radius:0;border-left:none;border-right:none}
 }
 .comm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
 .comm-title{font-size:18px;font-weight:800;color:var(--tx1)}
 .comm-subtitle{font-size:11px;color:var(--tx3);margin-top:1px}
 .comm-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
-@media(min-width:601px) and (max-width:900px){
-  .comm-layout{grid-template-columns:1fr}
-  .comm-sidebar{position:static;display:flex;gap:8px;flex-wrap:wrap}
-  .comm-sidebar .comm-filter-section{flex:1;min-width:160px;padding-bottom:0;border-bottom:none;margin-bottom:0}
-}
 /* ── PROFILE FULL-WIDTH DASHBOARD ── */
 .profile-dashboard{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;max-width:720px;margin:0 auto;padding:20px 0}
 @media(min-width:1200px){.profile-dashboard{grid-template-columns:300px 1fr}}
@@ -1316,7 +1316,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .export-btn:hover{background:var(--violet);color:#fff}
 /* ── STREAMING RAW DISPLAY ── */
 .stream-raw{font-family:var(--mono);font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow-y:auto;padding:4px 0;background:transparent;border:none;margin:0}
-.stream-raw::-webkit-scrollbar{width:3px}.stream-raw::-webkit-scrollbar-thumb{background:var(--s5)}
+.stream-raw::-webkit-scrollbar{width:6px}.stream-raw::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--amber2),var(--s5));border-radius:3px}
 
 /* ── CHORD PROGRESSION ── */
 .chords-output{padding:4px 0}
@@ -1559,9 +1559,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 }
 /* Show thin scrollbar on desktop for discoverability */
 @media(hover:hover){
-  .otabs::-webkit-scrollbar,.album-tabs::-webkit-scrollbar,.hist-items::-webkit-scrollbar{display:block;height:2px}
-  .otabs::-webkit-scrollbar-track,.album-tabs::-webkit-scrollbar-track,.hist-items::-webkit-scrollbar-track{background:var(--s2)}
-  .otabs::-webkit-scrollbar-thumb,.album-tabs::-webkit-scrollbar-thumb,.hist-items::-webkit-scrollbar-thumb{background:var(--b3);border-radius:1px}
+  .otabs::-webkit-scrollbar,.album-tabs::-webkit-scrollbar,.hist-items::-webkit-scrollbar{display:block;height:4px}
+  .otabs::-webkit-scrollbar-track,.album-tabs::-webkit-scrollbar-track,.hist-items::-webkit-scrollbar-track{background:var(--s2);border-radius:2px}
+  .otabs::-webkit-scrollbar-thumb,.album-tabs::-webkit-scrollbar-thumb,.hist-items::-webkit-scrollbar-thumb{background:linear-gradient(90deg,var(--amber2),var(--s5));border-radius:2px}
+  .otabs::-webkit-scrollbar-thumb:hover,.album-tabs::-webkit-scrollbar-thumb:hover,.hist-items::-webkit-scrollbar-thumb:hover{background:linear-gradient(90deg,var(--amber),var(--s6))}
 }
 @media(max-width:580px){
   textarea,input,select{font-size:16px!important}
@@ -2559,34 +2560,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="op-sub">Fill in your concept on the right and hit Generate</div>
     </div>
 
-    <!-- Writing prompts — 3 cols -->
+    <!-- Writing prompts — rotating -->
     <div class="op-section">
-      <div class="op-label">Need inspiration? Try a prompt</div>
-      <div class="op-prompts">
-        <div class="op-prompt" onclick="opUsePrompt('A late-night drive with someone you miss',this)">
-          <div class="op-prompt-emoji">🌙</div>
-          <div class="op-prompt-text">A late-night drive with someone you miss</div>
-        </div>
-        <div class="op-prompt" onclick="opUsePrompt('Rising from a tough time, finding strength again',this)">
-          <div class="op-prompt-emoji">💪</div>
-          <div class="op-prompt-text">Rising from a tough time, finding strength again</div>
-        </div>
-        <div class="op-prompt" onclick="opUsePrompt('The moment you realized it was over',this)">
-          <div class="op-prompt-emoji">💔</div>
-          <div class="op-prompt-text">The moment you realized it was over</div>
-        </div>
-        <div class="op-prompt" onclick="opUsePrompt('Summer romance that only lasted one week',this)">
-          <div class="op-prompt-emoji">☀️</div>
-          <div class="op-prompt-text">Summer romance that only lasted one week</div>
-        </div>
-        <div class="op-prompt" onclick="opUsePrompt('Gratitude anthem for the people who stayed',this)">
-          <div class="op-prompt-emoji">🙏</div>
-          <div class="op-prompt-text">Gratitude anthem for the people who stayed</div>
-        </div>
-        <div class="op-prompt" onclick="opUsePrompt('City lights, big dreams, first night in a new city',this)">
-          <div class="op-prompt-emoji">🌆</div>
-          <div class="op-prompt-text">City lights, big dreams, first night in a new city</div>
-        </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="op-label" style="margin-bottom:0">Need inspiration? Try a prompt</div>
+        <button id="op-refresh-prompts" onclick="rotateInspirationPrompts()" style="background:none;border:1px solid var(--b2);border-radius:var(--r2);padding:4px 10px;cursor:pointer;font-size:11px;color:var(--tx3);display:flex;align-items:center;gap:4px;transition:all .2s" onmouseover="this.style.borderColor='var(--amberline)';this.style.color='var(--amber)'" onmouseout="this.style.borderColor='var(--b2)';this.style.color='var(--tx3)'"><span id="op-refresh-icon" style="display:inline-block;transition:transform .4s">🔄</span> More</button>
+      </div>
+      <div class="op-prompts" id="op-prompts-grid">
+        <!-- Filled dynamically by rotateInspirationPrompts() -->
       </div>
     </div>
 
@@ -4091,59 +4072,46 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
      COMMUNITY PAGE
 ══════════════════════════════════ -->
 <div id="pg-community" class="pg">
-  <div class="comm-layout">
 
-    <!-- LEFT: FILTERS SIDEBAR -->
-    <div class="comm-sidebar">
-      <!-- Sort -->
-      <div class="comm-filter-section">
-        <div class="comm-filter-title">Sort By</div>
-        <button class="comm-filter-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
-        <button class="comm-filter-btn" onclick="setCommSort('new',this)">✨ New</button>
-        <button class="comm-filter-btn" onclick="setCommSort('top',this)">👑 Top</button>
-      </div>
-      <!-- Genre Filter -->
-      <div class="comm-filter-section">
-        <div class="comm-filter-title">Genre</div>
-        <select id="comm-genre-filter" class="comm-filter-select" onchange="loadCommunityFeed()">
-          <option value="">All Genres</option>
-          <option value="pop">Pop</option>
-          <option value="hiphop">Hip-Hop</option>
-          <option value="rnb">R&amp;B</option>
-          <option value="rock">Rock</option>
-          <option value="country">Country</option>
-          <option value="edm">EDM</option>
-          <option value="jazz">Jazz</option>
-          <option value="soul">Soul</option>
-          <option value="gospel">Gospel</option>
-          <option value="latin">Latin</option>
-          <option value="afrobeats">Afrobeats</option>
-          <option value="kpop">K-Pop</option>
-        </select>
-      </div>
-      <!-- Post Type Filter -->
-      <div class="comm-filter-section">
-        <div class="comm-filter-title">Post Type</div>
-        <div id="comm-type-filter">
-          <button class="comm-filter-btn on" onclick="setCommTypeFilter('',this)">All Posts</button>
-          <button class="comm-filter-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
-          <button class="comm-filter-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
-          <button class="comm-filter-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
-          <button class="comm-filter-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
-          <button class="comm-filter-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
-          <button class="comm-filter-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
-        </div>
-      </div>
-      <!-- Challenge card in sidebar -->
-      <div id="comm-challenge-card" class="comm-filter-section" style="border-color:var(--amberline);background:linear-gradient(135deg,rgba(251,191,36,.06),transparent);display:none">
-        <div style="font-size:10px;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">🏆 Weekly Challenge</div>
-        <div id="comm-challenge-title" style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:4px"></div>
-        <div id="comm-challenge-sub" style="font-size:10px;color:var(--tx3);margin-bottom:10px"></div>
-        <button class="btn btn-sm btn-amber" onclick="openChallengeWriter()" style="width:100%;justify-content:center;font-size:11px">Write Now</button>
-      </div>
+  <!-- HORIZONTAL FILTER BAR (outside grid) -->
+  <div class="comm-filters-bar">
+    <div class="comm-filter-section">
+      <button class="comm-filter-btn on" onclick="setCommSort('hot',this)">🔥 Hot</button>
+      <button class="comm-filter-btn" onclick="setCommSort('new',this)">✨ New</button>
+      <button class="comm-filter-btn" onclick="setCommSort('top',this)">👑 Top</button>
     </div>
+    <div class="comm-filter-divider"></div>
+    <div class="comm-filter-section">
+      <select id="comm-genre-filter" class="comm-filter-select" onchange="loadCommunityFeed()">
+        <option value="">All Genres</option>
+        <option value="pop">Pop</option>
+        <option value="hiphop">Hip-Hop</option>
+        <option value="rnb">R&amp;B</option>
+        <option value="rock">Rock</option>
+        <option value="country">Country</option>
+        <option value="edm">EDM</option>
+        <option value="jazz">Jazz</option>
+        <option value="soul">Soul</option>
+        <option value="gospel">Gospel</option>
+        <option value="latin">Latin</option>
+        <option value="afrobeats">Afrobeats</option>
+        <option value="kpop">K-Pop</option>
+      </select>
+    </div>
+    <div class="comm-filter-divider"></div>
+    <div class="comm-filter-section" id="comm-type-filter">
+      <button class="comm-filter-btn on" onclick="setCommTypeFilter('',this)">All</button>
+      <button class="comm-filter-btn" onclick="setCommTypeFilter('song',this)">🎵 Songs</button>
+      <button class="comm-filter-btn" onclick="setCommTypeFilter('thought',this)">💬 Thoughts</button>
+      <button class="comm-filter-btn" onclick="setCommTypeFilter('question',this)">❓ Questions</button>
+      <button class="comm-filter-btn" onclick="setCommTypeFilter('collab',this)">🤝 Collabs</button>
+      <button class="comm-filter-btn" onclick="setCommTypeFilter('tip',this)">💡 Tips</button>
+      <button class="comm-filter-btn" onclick="setCommTypeFilter('snippet',this)">🎤 Snippets</button>
+    </div>
+  </div>
 
-    <!-- CENTER: MAIN FEED -->
+  <!-- 2-COLUMN GRID: feed + right panel -->
+  <div class="comm-layout">
     <div class="comm-main">
       <!-- Header -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
@@ -4184,10 +4152,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="comm-skeleton" style="height:130px"></div>
         <div class="comm-skeleton" style="height:100px"></div>
       </div>
-      <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
-        <div style="font-size:36px;margin-bottom:12px">🎵</div>
-        <div style="font-size:15px;font-weight:600;color:var(--tx3);margin-bottom:6px">No posts yet</div>
-        <div style="font-size:12px;color:var(--tx4);margin-bottom:16px">Be the first to share a song, tip, or collab request</div>
+      <div id="comm-empty" style="display:none">
+        <div style="text-align:center;padding:40px 24px 32px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:6px">Be the first!</div>
+          <div style="display:flex;gap:6px;justify-content:center;margin-bottom:14px">
+            <span style="padding:3px 10px;border-radius:20px;background:var(--amberbg);border:1px solid var(--amberline);font-size:11px;color:var(--amber);font-weight:600">Songwriter</span>
+            <span style="padding:3px 10px;border-radius:20px;background:var(--violetbg);border:1px solid var(--violetline);font-size:11px;color:var(--violet);font-weight:600">Hip-Hop</span>
+          </div>
+          <div style="font-size:17px;font-weight:800;color:var(--tx1);margin-bottom:6px">Share your first song to the community</div>
+          <div style="font-size:12px;color:var(--tx3);line-height:1.6;max-width:400px;margin:0 auto 20px">Generate a song on the Write page, then hit 🌐 Share to post it here. The community feed will come alive as writers share their work.</div>
+          <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <span style="font-size:18px">🎵</span>
+            <span style="font-size:18px">❤️</span>
+            <span style="font-size:18px">✏️</span>
+            <span style="font-size:18px">💡</span>
+            <span style="font-size:18px">🎤</span>
+            <span style="font-size:18px">📝</span>
+          </div>
+        </div>
         <div id="comm-empty-auth"></div>
       </div>
       <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
@@ -10019,7 +10001,7 @@ function setCommTypeFilter(type, btn) {
 
 function setCommSort(sort, btn) {
   _commSort = sort;
-  document.querySelectorAll('.comm-sidebar .comm-filter-btn[onclick^="setCommSort"]').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.comm-filters-bar .comm-filter-btn[onclick^="setCommSort"]').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   _commOffset = 0;
   loadCommunityFeed();
@@ -13073,6 +13055,140 @@ function refreshInspirationBoard() {
     </div>`;
   }).join('');
 }
+
+/* ── INSPIRATION PROMPT ROTATION ENGINE ── */
+var INSPIRATION_PROMPTS = [
+  // Love & Heartbreak
+  {e:'💔',t:'The moment you realized it was over'},
+  {e:'🥀',t:'Loving someone who loves someone else'},
+  {e:'💌',t:'A letter you never sent to your ex'},
+  {e:'🪞',t:'Falling in love with someone who looks like your past'},
+  {e:'🌧️',t:'Dancing in the rain after a breakup'},
+  {e:'💍',t:'The promise ring that lost its meaning'},
+  {e:'🚪',t:'Walking out the door for the last time'},
+  {e:'📱',t:'Waiting for a text that never came'},
+  {e:'🫀',t:'Heartbeat still races when you hear their name'},
+  {e:'🥂',t:'Toasting to love that did not last'},
+  // Romance & Connection
+  {e:'🌙',t:'A late-night drive with someone you miss'},
+  {e:'☀️',t:'Summer romance that only lasted one week'},
+  {e:'🔥',t:'Chemistry you felt the second your eyes met'},
+  {e:'🛋️',t:'Falling asleep on the couch together, TV still on'},
+  {e:'✈️',t:'Long-distance love — 3 time zones apart'},
+  {e:'🌅',t:'Sunrise together after staying up all night talking'},
+  {e:'💐',t:'The first time someone made you feel enough'},
+  {e:'🎭',t:'Pretending to be strangers, then falling all over again'},
+  {e:'🏖️',t:'Ocean waves and a crush that hit different'},
+  {e:'🪐',t:'Love that feels like another universe'},
+  // Strength & Comeback
+  {e:'💪',t:'Rising from a tough time, finding strength again'},
+  {e:'🔓',t:'Breaking free from what held you back'},
+  {e:'👑',t:'Finally owning who you are, no apologies'},
+  {e:'🧱',t:'Building yourself back brick by brick'},
+  {e:'🗡️',t:'Turning pain into power'},
+  {e:'🪶',t:'Letting go of what no longer serves you'},
+  {e:'🐺',t:'Running alone but never felt more alive'},
+  {e:'⚡',t:'The exact moment you decided enough was enough'},
+  {e:'🛡️',t:'Protecting your peace at all costs'},
+  {e:'🔥',t:'Burning the bridges that led back to toxic places'},
+  // Dreams & Ambition
+  {e:'🌆',t:'City lights, big dreams, first night in a new city'},
+  {e:'🚀',t:'Quitting the 9-to-5 to chase something real'},
+  {e:'🏗️',t:'Building an empire from nothing but a dream'},
+  {e:'🎯',t:'Tunnel vision — blocking out the noise'},
+  {e:'💸',t:'From broke to making it, nobody believed in you'},
+  {e:'🌃',t:'Sleepless nights grinding while they were sleeping'},
+  {e:'🏆',t:'Standing on the stage you once stared at from the crowd'},
+  {e:'🧗',t:'The climb is lonely but the view is worth it'},
+  {e:'🗺️',t:'Leaving your hometown to become who you were meant to be'},
+  {e:'🛤️',t:'Taking the road nobody else would take'},
+  // Nostalgia & Memories
+  {e:'📼',t:'Rewinding to the summer that changed everything'},
+  {e:'🏠',t:'The house you grew up in before it all changed'},
+  {e:'🎒',t:'Last day of school, not knowing it was the last good day'},
+  {e:'🎵',t:'A song comes on and you are right back in that moment'},
+  {e:'📸',t:'Finding old photos and missing who you used to be'},
+  {e:'🛝',t:'Childhood friends you lost touch with'},
+  {e:'🚗',t:'Driving past your old neighborhood at midnight'},
+  {e:'🧸',t:'Growing up too fast and wishing you had not'},
+  {e:'🎄',t:'Holiday memories from before the family fell apart'},
+  {e:'🌻',t:'The last perfect summer before everything shifted'},
+  // Night Life & Vibes
+  {e:'🍾',t:'Popping bottles but feeling empty inside'},
+  {e:'🎶',t:'Lost in the bass at 2am, forgetting your problems'},
+  {e:'🌃',t:'Neon signs and strangers who feel like home'},
+  {e:'🥃',t:'One more drink and a conversation with yourself'},
+  {e:'🎧',t:'Headphones in, world out, walking the city alone'},
+  {e:'🪩',t:'Dancing like nobody is watching and meaning it'},
+  {e:'🚕',t:'Cab ride home replaying the whole night'},
+  {e:'🌌',t:'Rooftop views and questions about the universe'},
+  // Gratitude & Joy
+  {e:'🙏',t:'Gratitude anthem for the people who stayed'},
+  {e:'🌈',t:'Finding beauty after the storm'},
+  {e:'👨‍👩‍👧',t:'A love letter to your family, flaws and all'},
+  {e:'🤝',t:'The friend who showed up when everyone else bounced'},
+  {e:'🎉',t:'Celebrating the small wins nobody else notices'},
+  {e:'☕',t:'Simple mornings that feel like everything'},
+  {e:'🐕',t:'Your dog is the most loyal love you have ever known'},
+  {e:'🌸',t:'Grateful for the version of you that kept going'},
+  // Identity & Self
+  {e:'🪞',t:'The person in the mirror is finally someone you like'},
+  {e:'🎭',t:'Wearing masks so long you forgot your real face'},
+  {e:'🧬',t:'You are more than your last name and zip code'},
+  {e:'🌍',t:'Caught between two cultures, belonging to neither'},
+  {e:'🦋',t:'The glow-up nobody saw coming'},
+  {e:'🧠',t:'Overthinking at 3am about who you really are'},
+  {e:'💊',t:'Healing is not linear — a song about bad days in recovery'},
+  {e:'🕊️',t:'Finally forgiving yourself for what you could not control'},
+  // Street & Real Life
+  {e:'🏚️',t:'Growing up where the streetlights barely worked'},
+  {e:'🔫',t:'Lost a friend too young, still carry the weight'},
+  {e:'🏀',t:'The court was therapy when home was not safe'},
+  {e:'🚌',t:'Riding the bus with big dreams and empty pockets'},
+  {e:'🌫️',t:'Smoke in the air, trying to see through the fog'},
+  {e:'🏪',t:'Corner store memories and quarter waters'},
+  // Party & Fun
+  {e:'🥳',t:'That one night that became the group legend'},
+  {e:'🏎️',t:'Windows down, music loud, no destination'},
+  {e:'🎤',t:'Karaoke night where everyone sang off-key and it was perfect'},
+  {e:'🍕',t:'2am pizza run with your ride-or-dies'},
+  {e:'🎢',t:'Life is a rollercoaster and you just threw your hands up'},
+  {e:'🏖️',t:'Beach bonfire stories with people you just met'}
+];
+var _lastPromptSet = [];
+function rotateInspirationPrompts() {
+  var grid = document.getElementById('op-prompts-grid');
+  if (!grid) return;
+  // Shuffle and pick 6, avoiding repeats from last set
+  var pool = INSPIRATION_PROMPTS.filter(function(p){ return _lastPromptSet.indexOf(p.t) === -1; });
+  if (pool.length < 6) pool = INSPIRATION_PROMPTS.slice();
+  for (var i = pool.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  var picked = pool.slice(0, 6);
+  _lastPromptSet = picked.map(function(p){ return p.t; });
+  // Fade out
+  grid.style.opacity = '0';
+  grid.style.transform = 'translateY(6px)';
+  setTimeout(function(){
+    grid.innerHTML = picked.map(function(p){
+      return '<div class="op-prompt" onclick="opUsePrompt(\'' + p.t.replace(/'/g, "\\'") + '\',this)">'
+        + '<div class="op-prompt-emoji">' + p.e + '</div>'
+        + '<div class="op-prompt-text">' + p.t + '</div>'
+        + '</div>';
+    }).join('');
+    // Fade in
+    grid.style.transition = 'opacity .3s ease, transform .3s ease';
+    grid.style.opacity = '1';
+    grid.style.transform = 'translateY(0)';
+  }, 200);
+  // Spin the refresh icon
+  var icon = document.getElementById('op-refresh-icon');
+  if (icon) { icon.style.transform = 'rotate(360deg)'; setTimeout(function(){ icon.style.transition = 'none'; icon.style.transform = 'rotate(0deg)'; setTimeout(function(){ icon.style.transition = 'transform .4s'; }, 50); }, 400); }
+}
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function(){ rotateInspirationPrompts(); });
 
 function refreshCommunityFeed() {
   const songs = (S.library || []).slice(0, 3);
