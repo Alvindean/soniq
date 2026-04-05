@@ -26,7 +26,7 @@
 :root{
   --s0:#07070c;--s1:#0d0d14;--s2:#12121a;--s3:#1a1a24;--s4:#21212e;--s5:#2a2a3a;--s6:#333346;
   --b1:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.11);--b3:rgba(255,255,255,0.18);--b4:rgba(255,255,255,0.26);
-  --tx1:#f0f0f8;--tx2:#a0a0c4;--tx3:#6a6a90;--tx4:#3e3e58;
+  --tx1:#f0f0f8;--tx2:#a0a0c4;--tx3:#6a6a90;--tx4:#52526e;
   --amber:#f5c000;--amber2:#cc9c00;--amberbg:rgba(245,192,0,0.08);--amberline:rgba(245,192,0,0.28);--amberhov:rgba(245,192,0,0.15);
   --cyan:#00dcc0;--cyanbg:rgba(0,220,192,0.08);--cyanline:rgba(0,220,192,0.24);
   --violet:#a892ff;--violetbg:rgba(168,146,255,0.08);--violetline:rgba(168,146,255,0.24);
@@ -67,6 +67,7 @@ a{color:var(--amber);text-decoration:none}
   .writer-layout{display:block}
   .writer-controls{position:static;max-height:none;overflow:visible}
   .wrap{padding:0 16px 100px}
+  #writer-social{display:none!important}
 }
 
 /* Social panel cards */
@@ -90,6 +91,9 @@ a{color:var(--amber);text-decoration:none}
 #output-placeholder .op-icon{font-size:48px;margin-bottom:14px;opacity:.35}
 #output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:500}
 #output-placeholder .op-sub{font-size:12px;color:var(--tx4);margin-top:6px;line-height:1.5}
+@media(max-width:600px){#output-placeholder{padding:20px 14px}}
+#output-placeholder .op-txt{font-size:14px}
+#output-placeholder .op-sub{font-size:11px}
 
 /* ── PG-WRITE 3-PANEL ── */
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
@@ -108,7 +112,7 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .key-banner{grid-column:1;grid-row:7}
   #pg-write.on .save-bar{grid-column:1;grid-row:8}
   #pg-write.on .studio .studio-body{padding:20px 18px}
-  #pg-write.on .studio .topic-label{font-size:10px}
+  #pg-write.on .studio .topic-label{font-size:11px}
   /* Full-width topic input in controls panel — stack buttons below */
   #pg-write.on .studio .enhance-row{flex-direction:column;gap:6px;margin-bottom:16px}
   #pg-write.on .studio .topic-input{font-size:15px;padding:12px 14px;margin-bottom:0;width:100%;min-height:72px;resize:none}
@@ -126,6 +130,10 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .studio{grid-column:2;grid-row:2/12}
   #pg-write.on #gen-out{grid-column:1;grid-row:6}
 }
+@media(min-width:901px) and (max-height:700px){
+  #pg-write.on .studio{top:4px;max-height:calc(100vh - 8px)}
+  #pg-write.on #writer-social{top:4px;max-height:calc(100vh - 8px)}
+}
 
 /* ── HEADER ── */
 .hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 20px;border-bottom:1px solid var(--b1);margin-bottom:28px;flex-wrap:wrap}
@@ -135,7 +143,7 @@ a{color:var(--amber);text-decoration:none}
 .hdr-title span{color:var(--amber)}
 .hdr-sub{font-size:12px;color:var(--tx3);margin-top:2px;font-weight:400}
 .hdr-tags{display:flex;gap:6px;flex-wrap:wrap}
-.htag{font-size:10px;font-weight:600;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;text-transform:uppercase;background:var(--s3);border:1px solid var(--b2);color:var(--tx3)}
+.htag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;text-transform:uppercase;background:var(--s3);border:1px solid var(--b2);color:var(--tx3)}
 .htag-gold{background:var(--amberbg);color:var(--amber);border-color:var(--amberline)}
 .htag-teal{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
 .htag-v{background:var(--violetbg);color:var(--violet);border-color:var(--violetline)}
@@ -149,14 +157,14 @@ a{color:var(--amber);text-decoration:none}
 .nb .ni{font-size:18px;line-height:1}
 .nb.on .ni{filter:drop-shadow(0 0 4px rgba(245,184,0,0.5))}
 .nav-badge{
-  display:inline-block;min-width:16px;height:16px;border-radius:99px;
-  background:var(--amber);color:#08080a;font-size:9px;font-weight:700;
-  text-align:center;line-height:16px;padding:0 4px;margin-left:3px;
+  display:inline-block;min-width:18px;height:18px;border-radius:99px;
+  background:var(--amber);color:#08080a;font-size:11px;font-weight:700;
+  text-align:center;line-height:18px;padding:0 4px;margin-left:3px;
   font-family:var(--mono);
 }
 
 /* ── PAGES ── */
-.pg{display:none;will-change:opacity,transform}
+.pg{display:none}
 .pg.on{display:block;animation:pgIn 0.2s ease}
 @keyframes pgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
@@ -225,7 +233,7 @@ a{color:var(--amber);text-decoration:none}
 .blend-acc.has-blend .blend-trigger-badge{display:inline-block}
 .blend-trigger-r{display:flex;align-items:center;gap:6px}
 .blend-trigger-hint{font-size:10px;color:var(--tx3)}
-.blend-arrow{font-size:10px;color:var(--tx4);transition:transform 0.2s}
+.blend-arrow{font-size:10px;color:var(--tx3);transition:transform 0.2s}
 .blend-acc.open .blend-arrow{transform:rotate(90deg)}
 #adv-arrow{display:inline-block;transition:transform 0.2s}
 #adv-arrow.open{transform:rotate(180deg)}
@@ -257,7 +265,7 @@ a{color:var(--amber);text-decoration:none}
 
 /* ── GENERATE BUTTON ── */
 .gen-action{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.import-overlay{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.import-overlay{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
 .import-modal{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:28px 28px 24px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative}
 .import-modal h2{font-size:17px;font-weight:700;color:var(--tx1);margin:0 0 4px;letter-spacing:-.3px}
 .import-modal p{font-size:12px;color:var(--tx3);margin:0 0 20px}
@@ -274,6 +282,10 @@ a{color:var(--amber);text-decoration:none}
 .import-cancel-btn{padding:12px 20px;border-radius:var(--r3);border:1px solid var(--b2);background:transparent;color:var(--tx2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
 .import-close{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--tx4);font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px}
 .import-close:hover{color:var(--tx1)}
+@media(max-height:600px){
+  .import-modal{max-height:85vh}
+  .import-modal,.batch-modal,.vp-modal{max-height:80vh}
+}
 .gen-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 34px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 16px rgba(245,184,0,0.22)}
 .gen-btn.platinum-on{background:linear-gradient(135deg,#f5b800 0%,#c084fc 100%);box-shadow:0 2px 20px rgba(192,132,252,0.35)}
 .plat-switch{width:36px;height:20px;border-radius:10px;background:var(--b3);border:1px solid var(--b4);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
@@ -282,7 +294,7 @@ a{color:var(--amber);text-decoration:none}
 .plat-switch.on .plat-knob{transform:translateX(16px)}
 .gen-btn:hover:not(:disabled){background:#ffc820;transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,184,0,0.35)}
 .gen-btn:active:not(:disabled){transform:translateY(0)}
-.gen-btn:disabled{opacity:0.45;cursor:not-allowed;transform:none;box-shadow:none}
+.gen-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;box-shadow:none}
 .gen-btn-icon{font-size:16px}
 .btn-import{display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:var(--r4);border:1px solid var(--b3);background:var(--s3);color:var(--tx2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s}
 .btn-import:hover{border-color:var(--amberline);color:var(--tx1);background:var(--s4)}
@@ -334,7 +346,7 @@ a{color:var(--amber);text-decoration:none}
 @keyframes craftwave{0%,100%{transform:scaleY(0.4);opacity:0.4}50%{transform:scaleY(1);opacity:1}}
 @keyframes cwave{0%,100%{transform:scaleY(0.4);opacity:0.4}50%{transform:scaleY(1);opacity:1}}
 .craft-label{font-size:13px;color:var(--tx3);font-weight:500}
-.craft-sublabel{font-size:11px;color:var(--tx4)}
+.craft-sublabel{font-size:11px;color:var(--tx3)}
 
 /* ── GENERIC CARD ── */
 .card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px 26px;margin-bottom:16px}
@@ -347,7 +359,7 @@ a{color:var(--amber);text-decoration:none}
 .fld select{-webkit-appearance:none;appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 11px center;padding-right:30px}
 .fld select:focus,.fld input:focus,.fld textarea:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
 .fld textarea{resize:vertical;min-height:76px;line-height:1.6}
-input::placeholder,textarea::placeholder{color:var(--tx4)}
+input::placeholder,textarea::placeholder{color:var(--tx3)}
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 @media(max-width:620px){.g2,.g3{grid-template-columns:1fr}}
@@ -356,7 +368,7 @@ input::placeholder,textarea::placeholder{color:var(--tx4)}
 .btn{display:inline-flex;align-items:center;gap:7px;padding:10px 18px;border-radius:var(--r2);border:1px solid var(--b2);background:var(--s3);color:var(--tx1);font-size:13px;font-weight:600;letter-spacing:0.01em;cursor:pointer;transition:all 0.15s}
 .btn:hover:not(:disabled){background:var(--s4);border-color:var(--b3);transform:translateY(-1px)}
 .btn:active:not(:disabled){transform:none}
-.btn:disabled{opacity:0.35;cursor:not-allowed}
+.btn:disabled{opacity:0.55;cursor:not-allowed;color:var(--tx4)}
 .btn-gold,.btn-amber{background:var(--amber);border-color:transparent;color:#08080a;font-weight:700}
 .btn-gold:hover:not(:disabled),.btn-amber:hover:not(:disabled){background:#ffc820}
 .btn-teal,.btn-cyan{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
@@ -710,6 +722,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .camp-select optgroup{background:#1a1a24;color:#6060a0}
 .album-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 @media(max-width:580px){.album-grid{grid-template-columns:1fr}}
+@media(max-width:768px){.album-grid{grid-template-columns:1fr}}
 .album-lanes{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:14px}
 .lane-pill{font-size:11px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;user-select:none}
 .lane-pill:hover{color:var(--tx2);border-color:var(--b3)}
@@ -745,7 +758,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .gap-role-name{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px}
 .gap-role-desc{font-size:11px;color:var(--tx3);line-height:1.5}
 .gap-role-actions{display:flex;flex-direction:column;gap:5px;align-self:center;flex-shrink:0}
-.gap-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px}
+.gap-status{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;display:inline-flex;align-items:center}
 .gap-status-missing{background:var(--redbg);color:var(--red);border:1px solid var(--redline)}
 .gap-status-present{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
 .gap-write-btn{background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r1);padding:4px 10px;font-size:10px;font-weight:700;color:var(--amber);cursor:pointer;transition:all .15s;white-space:nowrap}
@@ -1247,7 +1260,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 }
 @media(max-width:440px){
   .nb .ni{font-size:15px}
-  .nb{font-size:9px;min-width:48px;padding:8px 2px;gap:3px}
+  .nb{font-size:10px!important;min-width:52px;min-height:44px;padding:8px 4px;gap:3px}
   .hdr{flex-direction:column;align-items:flex-start;gap:8px}
   .enhance-row{flex-wrap:wrap}
   .enhance-row .topic-input{min-width:0}
@@ -1258,7 +1271,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 }
 /* Mobile font floors */
 @media(max-width:480px){
-  .nb{font-size:11px!important;min-width:72px;padding:10px 6px}
+  .nb{font-size:11px!important;min-width:72px;min-height:44px;padding:10px 6px}
   .otab{font-size:11px!important}
   .topic-input{font-size:16px!important}
   .gen-btn{font-size:14px!important;padding:14px 20px!important}
@@ -1626,6 +1639,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 #nav-upgrade-btn{font-size:10px;font-weight:700;padding:4px 12px;border-radius:99px;border:1px solid rgba(168,146,255,0.4);background:rgba(168,146,255,0.08);color:var(--violet);cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font);letter-spacing:.03em}
 #nav-upgrade-btn:hover{background:rgba(168,146,255,0.16);border-color:var(--violet);color:#fff}
 
+@media(prefers-reduced-motion:reduce){
+  .comm-skeleton{animation:none;opacity:0.5}
+  .craft-bar{animation:none;opacity:0.6}
+  .pg.on{animation:none}
+  .result-card.visible{animation:none}
+  .chord-row{animation:none}
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
@@ -3857,9 +3877,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="comm-skeleton" style="height:100px"></div>
       </div>
       <div id="comm-empty" style="text-align:center;padding:48px 20px;color:var(--tx4);display:none">
-        <div style="font-size:36px;margin-bottom:8px">🎵</div>
-        <div style="font-size:14px;font-weight:600;color:var(--tx3);margin-bottom:4px">No posts yet</div>
-        <div style="font-size:12px;margin-bottom:14px">Be the first — share a song or post a thought above</div>
+        <div style="font-size:36px;margin-bottom:12px">🎵</div>
+        <div style="font-size:15px;font-weight:600;color:var(--tx3);margin-bottom:6px">No posts yet</div>
+        <div style="font-size:12px;color:var(--tx4);margin-bottom:16px">Be the first to share a song, tip, or collab request</div>
         <div id="comm-empty-auth"></div>
       </div>
       <button id="comm-load-more" onclick="loadMoreComm()" class="btn" style="display:none;width:100%;margin-top:12px;font-size:12px">Load More</button>
@@ -7177,7 +7197,7 @@ function renderEditor(){
   });
   // Close final open section
   if(sectionOpen){html+='</div></div>';}
-  body.innerHTML=html||'<div style="text-align:center;padding:48px;color:var(--tx4)">No lyrics loaded</div>';
+  body.innerHTML=html||'<div style="text-align:center;padding:60px 24px;color:var(--tx4)"><div style="font-size:36px;margin-bottom:10px">✏️</div><div style="font-size:15px;font-weight:600;color:var(--tx3);margin-bottom:6px">No lyrics loaded</div><div style="font-size:12px;margin-bottom:16px">Generate a song first, then open the Editor to refine your lyrics</div><button class="btn btn-amber" onclick="navTo(\'write\')" style="font-size:13px">✍️ Go Write a Song</button></div>';
   updEdStats();
 }
 function updLine(i,v){
