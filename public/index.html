@@ -1717,16 +1717,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <!-- LEFT AD RAIL -->
 <aside class="ad-rail ad-rail-left" aria-label="Advertisement">
   <div class="ad-rail-label">Advertisement</div>
-  <div class="ad-rail-slot">
-    <ins class="adsbygoogle" style="display:block;width:152px;min-height:300px" data-ad-format="auto" data-full-width-responsive="false"></ins>
+  <div class="ad-rail-slot" data-ad-rail="true">
+    <span style="color:var(--tx4);font-size:10px;text-align:center;padding:8px">Ad</span>
   </div>
 </aside>
 
 <!-- RIGHT AD RAIL -->
 <aside class="ad-rail ad-rail-right" aria-label="Advertisement">
   <div class="ad-rail-label">Advertisement</div>
-  <div class="ad-rail-slot">
-    <ins class="adsbygoogle" style="display:block;width:152px;min-height:300px" data-ad-format="auto" data-full-width-responsive="false"></ins>
+  <div class="ad-rail-slot" data-ad-rail="true">
+    <span style="color:var(--tx4);font-size:10px;text-align:center;padding:8px">Ad</span>
   </div>
 </aside>
 
@@ -13058,8 +13058,31 @@ function setCookieConsent(accepted) {
   localStorage.setItem('cookie_consent_ts', Date.now());
   document.getElementById('cookie-banner').classList.remove('show');
   if (accepted) {
-    // TODO: Initialize Google AdSense here when ready
-    // window.adsbygoogle = window.adsbygoogle || [];
+    // Lazy-init AdSense ad rails — only push when rails are visible (≥1500px)
+    (function initAdRails() {
+      function pushAd(slot) {
+        const ins = document.createElement('ins');
+        ins.className = 'adsbygoogle';
+        ins.style.cssText = 'display:block;width:152px;min-height:300px';
+        ins.dataset.adFormat = 'auto';
+        ins.dataset.fullWidthResponsive = 'false';
+        slot.innerHTML = '';
+        slot.appendChild(ins);
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch(e) { /* AdSense not loaded */ }
+      }
+      const mq = window.matchMedia('(min-width: 1500px)');
+      let pushed = false;
+      function onMqChange(e) {
+        if (e.matches && !pushed) {
+          pushed = true;
+          document.querySelectorAll('[data-ad-rail]').forEach(pushAd);
+        }
+      }
+      mq.addEventListener('change', onMqChange);
+      onMqChange(mq); // check immediately on load
+    })();
   }
 }
 
