@@ -98,13 +98,18 @@ a{color:var(--amber);text-decoration:none}
 #output-placeholder .op-chips{display:flex;flex-wrap:wrap;gap:6px}
 #output-placeholder .op-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:var(--s3);font-size:12px;color:var(--tx2);cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
 #output-placeholder .op-chip:hover{background:var(--acc);border-color:var(--acc);color:#000}
-/* Writing prompts */
-#output-placeholder .op-prompts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+/* Writing prompts — 3 cols with full width */
+#output-placeholder .op-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 #output-placeholder .op-prompt{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
 #output-placeholder .op-prompt:hover{border-color:var(--acc);background:var(--s4)}
 #output-placeholder .op-prompt.active{border-color:var(--acc);background:var(--s4);box-shadow:0 0 0 2px rgba(245,192,0,0.15)}
 #output-placeholder .op-prompt-emoji{font-size:18px;margin-bottom:4px}
 #output-placeholder .op-prompt-text{font-size:11px;color:var(--tx3);line-height:1.4}
+/* Bottom row: Profile | Community | Challenge */
+#output-placeholder .op-bottom-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--b2)}
+#output-placeholder .op-bottom-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r3);padding:14px;display:flex;flex-direction:column}
+#output-placeholder .op-bottom-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:10px}
+@media(max-width:700px){#output-placeholder .op-bottom-row{grid-template-columns:1fr}#output-placeholder .op-prompts{grid-template-columns:1fr 1fr}}
 /* Recent songs */
 #output-placeholder .op-recents{display:flex;flex-direction:column;gap:6px}
 #output-placeholder .op-recent-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--s3);border-radius:var(--r2);border:1px solid var(--b2);cursor:pointer;transition:border-color .15s}
@@ -119,7 +124,7 @@ a{color:var(--amber);text-decoration:none}
 #output-placeholder .op-sub{font-size:11px}
 
 /* ── PG-WRITE 3-PANEL ── */
-/* Layout: [Controls 360px] | [Output + Secondary Controls 1fr] | [Social 220px] */
+/* Layout: [Controls 360px] | [Output 1fr] — social panel merged into inspiration board */
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
 #writer-output-controls{padding:0 0 8px}
 /* Topic tool row */
@@ -145,7 +150,7 @@ a{color:var(--amber);text-decoration:none}
 #pg-write.on #writer-output-controls .gen-action .gen-btn{width:100%;justify-content:center;font-size:17px;padding:17px 24px}
 #pg-write.on #writer-output-controls .gen-action .btn-import{width:100%;justify-content:center}
 @media(min-width:901px){
-  #pg-write.on{display:grid;grid-template-columns:360px 1fr 220px;grid-template-rows:auto;column-gap:16px;align-items:start}
+  #pg-write.on{display:grid;grid-template-columns:360px 1fr;grid-template-rows:auto;column-gap:16px;align-items:start}
   #pg-write.on > *{min-width:0}
   #pg-write.on #album-track-banner{grid-column:1/-1;grid-row:1}
   /* Controls panel — col 1, sticky at top, no internal scroll */
@@ -159,8 +164,8 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on #gen-out{grid-column:2;grid-row:7}
   #pg-write.on .key-banner{grid-column:2;grid-row:8}
   #pg-write.on .save-bar{grid-column:2;grid-row:9}
-  /* Social panel — col 3, sticky */
-  #pg-write.on #writer-social{grid-column:3;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+  /* Social panel hidden — content merged into inspiration board */
+  #pg-write.on #writer-social{display:none}
   /* Left controls panel inner styles */
   #pg-write.on .studio .studio-body{padding:18px 16px}
   #pg-write.on .studio .studio-top{padding:14px 16px}
@@ -188,9 +193,6 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on #writer-output-controls .params{grid-template-columns:1fr 1fr}
 }
 @media(min-width:901px) and (max-width:1200px){
-  /* 2-col: controls | output (social hidden) */
-  #pg-write.on{grid-template-columns:360px 1fr;column-gap:16px}
-  #pg-write.on #writer-social{display:none}
   #pg-write.on .studio{grid-column:1;grid-row:2/12}
   #pg-write.on #writer-output-controls{grid-column:2;grid-row:2}
   #pg-write.on #output-placeholder{grid-column:2;grid-row:4}
@@ -2492,7 +2494,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
-    <!-- Writing prompts -->
+    <!-- Writing prompts — 3 cols now that right panel is gone -->
     <div class="op-section">
       <div class="op-label">Need inspiration? Try a prompt</div>
       <div class="op-prompts">
@@ -2523,8 +2525,57 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
+    <!-- Bottom row: Profile | Community | Challenge -->
+    <div class="op-bottom-row">
+
+      <!-- Profile mini -->
+      <div class="op-bottom-card">
+        <div class="op-bottom-title">👤 Your Profile</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <div id="op-avatar" style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:#fff;flex-shrink:0">?</div>
+          <div>
+            <div id="op-name" style="font-size:13px;font-weight:700;color:var(--tx1)">Artist</div>
+            <div id="op-plan" style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Free Plan</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-bottom:10px">
+          <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:6px 4px;text-align:center">
+            <div id="op-songs" style="font-size:15px;font-weight:800;color:var(--tx1)">0</div>
+            <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">Songs</div>
+          </div>
+          <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:6px 4px;text-align:center">
+            <div id="op-streak" style="font-size:15px;font-weight:800;color:#f97316">0🔥</div>
+            <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">Streak</div>
+          </div>
+          <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:6px 4px;text-align:center">
+            <div id="op-xp" style="font-size:15px;font-weight:800;color:var(--violet)">0</div>
+            <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">XP</div>
+          </div>
+        </div>
+        <button class="btn btn-amber btn-sm" onclick="navTo('profile')" style="width:100%;justify-content:center;font-size:11px">View Profile →</button>
+      </div>
+
+      <!-- Community recent -->
+      <div class="op-bottom-card">
+        <div class="op-bottom-title">🌐 Community</div>
+        <div id="op-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6;flex:1">
+          <div style="color:var(--tx4);font-size:11px;padding:8px 0">Loading…</div>
+        </div>
+        <button class="btn btn-sm" onclick="navTo('community')" style="width:100%;justify-content:center;font-size:11px;margin-top:8px">See All →</button>
+      </div>
+
+      <!-- Weekly challenge -->
+      <div class="op-bottom-card">
+        <div class="op-bottom-title">⚡ Weekly Challenge</div>
+        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:4px;line-height:1.4">Write a song about a city at 3am</div>
+        <div style="font-size:10px;color:var(--tx4);margin-bottom:12px;flex:1">47 entries · 3 days left</div>
+        <button class="btn btn-sm" style="width:100%;justify-content:center;font-size:11px;border-color:var(--amberline);color:var(--amber)" onclick="opUsePrompt('a city at 3am')">Try It →</button>
+      </div>
+
+    </div>
+
     <!-- Recent songs from library -->
-    <div class="op-section" id="op-recents-section" style="display:none">
+    <div class="op-section" id="op-recents-section" style="display:none;margin-top:16px">
       <div class="op-label">Continue where you left off</div>
       <div class="op-recents" id="op-recents-list"></div>
     </div>
@@ -12449,21 +12500,31 @@ function updateWriterSidebar() {
 
     const songEl = document.getElementById('ws-songs');
     if (songEl) songEl.textContent = lib.length;
+    const opSongs = document.getElementById('op-songs');
+    if (opSongs) opSongs.textContent = lib.length;
 
     const streakEl = document.getElementById('ws-streak');
     if (streakEl) streakEl.textContent = (ach.streak || 0) + '🔥';
+    const opStreak = document.getElementById('op-streak');
+    if (opStreak) opStreak.textContent = (ach.streak || 0) + '🔥';
 
     const xpEl = document.getElementById('ws-xp');
     if (xpEl) xpEl.textContent = xpSt.xp || 0;
+    const opXp = document.getElementById('op-xp');
+    if (opXp) opXp.textContent = xpSt.xp || 0;
 
     const profileData = JSON.parse(localStorage.getItem('soniq_profile') || '{}');
     const name = profileData.display_name || S.user?.email?.split('@')[0] || 'Artist';
 
     const nameEl = document.getElementById('ws-name');
     if (nameEl) nameEl.textContent = name;
+    const opName = document.getElementById('op-name');
+    if (opName) opName.textContent = name;
 
     const avatar = document.getElementById('ws-avatar');
     if (avatar) avatar.textContent = (name[0] || '?').toUpperCase();
+    const opAvatar = document.getElementById('op-avatar');
+    if (opAvatar) opAvatar.textContent = (name[0] || '?').toUpperCase();
 
     const planBadge = document.getElementById('ws-plan');
     if (planBadge) {
@@ -12473,6 +12534,8 @@ function updateWriterSidebar() {
         : plan === 'pro' || plan === 'pro_annual' ? 'Pro Plan'
         : plan.startsWith('founding') ? 'Founding Plan'
         : 'Free Plan';
+      const opPlan = document.getElementById('op-plan');
+      if (opPlan) opPlan.textContent = planBadge.textContent;
     }
   } catch(e) { /* non-critical sidebar update */ }
 }
@@ -12808,22 +12871,27 @@ function refreshInspirationBoard() {
 }
 
 function refreshCommunityFeed() {
-  const feed = document.getElementById('ws-community-feed');
-  if (!feed) return;
   const songs = (S.library || []).slice(0, 3);
-  if (songs.length === 0) {
-    feed.innerHTML = '<div style="padding:12px 0;text-align:center;color:var(--tx4)">No songs yet — generate your first!</div>';
-    return;
-  }
-  feed.innerHTML = songs.map((song, i, arr) => {
-    const genre = song.genre ? song.genre.charAt(0).toUpperCase() + song.genre.slice(1) : 'Unknown';
-    const icon = {'pop':'🎤','hiphop':'🎤','rnb':'🎶','rock':'🎸','country':'🤠','edm':'⚡','jazz':'🎷','soul':'🔥','gospel':'✝️','blues':'🎵','funk':'🎹','reggae':'🌿','afrobeats':'🥁','latin':'💃','kpop':'✨','punk':'⚡','altrock':'🎸','neosoul':'🎹','ss':'🎵','folk':'🪕','metal':'🤘','reggaeton':'🔥','children':'👶','comedy':'😄'}[song.genre] || '🎵';
-    const border = i < arr.length - 1 ? 'border-bottom:1px solid var(--b1);' : '';
-    return `<div style="padding:8px 0;${border}cursor:pointer" onclick="opLoadRecent(${i})">
-      <div style="font-weight:600;color:var(--tx2)">${icon} "${song.title || 'Untitled'}"</div>
-      <div style="color:var(--tx4);font-size:10px">${genre}${song.mood ? ' · ' + song.mood : ''}</div>
-    </div>`;
-  }).join('');
+  const renderHTML = (songs, containerId) => {
+    const feed = document.getElementById(containerId);
+    if (!feed) return;
+    if (songs.length === 0) {
+      feed.innerHTML = '<div style="padding:8px 0;text-align:center;color:var(--tx4)">No songs yet — generate your first!</div>';
+      return;
+    }
+    const icon = {'pop':'🎤','hiphop':'🎤','rnb':'🎶','rock':'🎸','country':'🤠','edm':'⚡','jazz':'🎷','soul':'🔥','gospel':'✝️','blues':'🎵','funk':'🎹','reggae':'🌿','afrobeats':'🥁','latin':'💃','kpop':'✨','punk':'⚡','altrock':'🎸','neosoul':'🎹','ss':'🎵','folk':'🪕','metal':'🤘','reggaeton':'🔥','children':'👶','comedy':'😄'};
+    feed.innerHTML = songs.map((song, i, arr) => {
+      const genre = song.genre ? song.genre.charAt(0).toUpperCase() + song.genre.slice(1) : 'Unknown';
+      const ic = icon[song.genre] || '🎵';
+      const border = i < arr.length - 1 ? 'border-bottom:1px solid var(--b1);' : '';
+      return `<div style="padding:8px 0;${border}cursor:pointer" onclick="opLoadRecent(${i})">
+        <div style="font-weight:600;color:var(--tx2)">${ic} "${song.title || 'Untitled'}"</div>
+        <div style="color:var(--tx4);font-size:10px">${genre}${song.mood ? ' · ' + song.mood : ''}</div>
+      </div>`;
+    }).join('');
+  };
+  renderHTML(songs, 'ws-community-feed');
+  renderHTML(songs, 'op-community-feed');
 }
 
 // Refresh board on load so recent songs populate immediately
