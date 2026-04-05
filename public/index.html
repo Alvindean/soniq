@@ -122,6 +122,18 @@ a{color:var(--amber);text-decoration:none}
 /* Layout: [Controls 360px] | [Output + Secondary Controls 1fr] | [Social 220px] */
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
 #writer-output-controls{padding:0 0 8px}
+/* Topic tool row */
+.topic-tool-row{display:flex;align-items:center;gap:8px;margin:8px 0 14px}
+.topic-tool-row .mic-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;font-size:12px;border-radius:var(--r2);flex-shrink:0}
+.topic-tool-row .enhance-btn{flex:1;padding:7px 14px;font-size:12px;text-align:center}
+.topic-score-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);flex-shrink:0}
+.tsb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4)}
+.tsb-num{font-size:14px;font-weight:800;color:var(--tx1);min-width:24px;text-align:center}
+.tsb-num.good{color:#4ade80}.tsb-num.ok{color:var(--amber)}.tsb-num.low{color:#f87171}
+/* Output footer bar */
+.output-footer-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 4px;padding:12px 0;border-top:1px solid var(--b1);margin-top:8px}
+.ofb-item{font-size:11px;color:var(--tx4);font-weight:500}
+.ofb-sep{color:var(--b2);font-size:11px}
 /* More options toggle */
 .more-opts-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 0;margin:10px 0 4px;background:none;border:none;border-top:1px solid var(--b1);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx4);transition:color .15s;letter-spacing:.03em}
 .more-opts-btn:hover{color:var(--tx2)}
@@ -1035,7 +1047,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .prof-stats-2col{grid-template-columns:1fr!important}
 }
 /* ── COMMUNITY ── */
-.comm-compose{background:var(--bg1);border:1px solid var(--brd);border-radius:12px;padding:14px;margin-bottom:12px}
+.comm-compose{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px 16px;margin-bottom:16px}
 .post-type-btn{background:var(--bg2);border:1px solid var(--brd);border-radius:99px;padding:4px 10px;font-size:11px;cursor:pointer;color:var(--tx3);font-family:var(--font);font-weight:600;transition:all .15s}
 .post-type-btn.on{border-color:var(--amberline);background:var(--amberbg);color:var(--amber)}
 .post-type-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;margin-right:4px}
@@ -1049,8 +1061,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .comm-sort-btn{background:none;border:none;color:var(--tx3);font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .15s;font-family:var(--font)}
 .comm-sort-btn.on{background:var(--bg3);color:var(--tx1);border-bottom:2px solid var(--amber)}
-.comm-card{background:var(--bg1);border:1px solid var(--brd);border-radius:12px;padding:16px;margin-bottom:10px;transition:border-color .2s}
-.comm-card:hover{border-color:var(--amberline)}
+.comm-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px 16px;margin-bottom:10px;transition:border-color .15s}
+.comm-card:hover{border-color:var(--b3)}
 .comm-flair{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--tx4);margin-bottom:8px}
 .comm-flair .cf-badge{background:var(--bg3);border-radius:99px;padding:2px 7px;color:var(--tx3);font-weight:600}
 .comm-title{font-size:15px;font-weight:800;color:var(--tx1);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1069,16 +1081,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── COMMUNITY 3-COLUMN LAYOUT ── */
-.comm-layout{display:grid;grid-template-columns:200px 1fr 220px;gap:20px;align-items:start;max-width:none;margin:0;padding:16px 0}
-.comm-sidebar{position:sticky;top:16px}
+.comm-layout{display:grid;grid-template-columns:220px 1fr 260px;gap:24px;align-items:start;max-width:none;margin:0;padding:20px 0}
+.comm-sidebar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:16px;position:sticky;top:16px}
 .comm-main{min-width:0}
 .comm-right{position:sticky;top:16px}
-.comm-filter-section{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px;margin-bottom:12px}
-.comm-filter-title{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.comm-filter-btn{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:var(--r1);border:none;background:transparent;color:var(--tx2);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;font-family:var(--font)}
-.comm-filter-btn:hover{background:var(--s3);color:var(--tx1)}
-.comm-filter-btn.on{background:var(--amberbg);color:var(--amber);font-weight:700}
-.comm-filter-select{width:100%;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r1);color:var(--tx2);font-size:12px;padding:7px 10px;outline:none;margin-bottom:8px;-webkit-appearance:none;appearance:none}
+.comm-filter-section{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--b1)}
+.comm-filter-section:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+.comm-filter-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx4);margin-bottom:8px}
+.comm-filter-btn{display:block;width:100%;text-align:left;padding:7px 10px;border-radius:var(--r2);border:none;background:none;color:var(--tx3);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;margin-bottom:3px}
+.comm-filter-btn:hover{background:var(--s3);color:var(--tx2)}
+.comm-filter-btn.on{background:var(--s4);color:var(--tx1);font-weight:700}
+.comm-filter-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx2);font-size:12px;padding:7px 10px;outline:none;cursor:pointer}
 @media(max-width:1100px){
   .comm-layout{grid-template-columns:180px 1fr}
   .comm-right{display:none}
@@ -1092,15 +1105,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .comm-sidebar,.comm-right{display:none}
 }
 /* ── PROFILE FULL-WIDTH DASHBOARD ── */
-.profile-dashboard{max-width:none;margin:0;padding:16px 0}
-@media(min-width:901px){
-  .profile-dashboard{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start;padding:20px 0}
-  .profile-dashboard > div:first-child{grid-column:1/-1}
-  .profile-dashboard > div:last-child{grid-column:1/-1}
-}
-@media(max-width:1100px) and (min-width:901px){
-  .profile-dashboard{grid-template-columns:1fr 1fr}
-}
+.profile-dashboard{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;max-width:none;margin:0;padding:20px 0}
+@media(min-width:1200px){.profile-dashboard{grid-template-columns:300px 1fr}}
+.profile-sidebar{position:sticky;top:16px}
+.profile-main{min-width:0}
 /* ── CAMPAIGN MODE ── */
 .camp-hero{padding:28px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px}
 .camp-hero-label{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -1882,13 +1890,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
       <!-- BIG TOPIC INPUT -->
       <label class="topic-label" for="g-topic">What is your song about?</label>
-      <div class="enhance-row">
-        <input type="text" id="g-topic" class="topic-input"
-          placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
-          onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}" />
-        <div class="enhance-row-btns">
-          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤</button>
-          <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept into a sharper, more emotionally precise version">✦ Enhance</button>
+      <textarea id="g-topic" class="topic-input" rows="2"
+        placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
+        onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}"></textarea>
+      <!-- TOOL ROW: Mic | Enhance | Score badge -->
+      <div class="topic-tool-row">
+        <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤 Mic</button>
+        <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept">✦ Enhance</button>
+        <div class="topic-score-badge" id="topic-score-badge" title="Hook score after generation">
+          <span class="tsb-label">Score</span>
+          <span class="tsb-num" id="topic-score-num">—</span>
         </div>
       </div>
 
@@ -1912,7 +1923,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div></div>
           <span id="gp-label">1 free song today</span>
         </div>
-        <span class="gen-hint">Lyrics · Production Brief · Structure · Dopamine · Score</span>
       </div>
 
       <!-- MORE OPTIONS TOGGLE -->
@@ -2558,6 +2568,19 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn-save-lib" onclick="saveLib()">Save to Library</button>
         <span class="save-bar-saved" id="res-save-bar-saved">✓ Saved!</span>
       </div>
+    </div>
+
+    <!-- OUTPUT FOOTER: what this generates -->
+    <div class="output-footer-bar">
+      <span class="ofb-item">📝 Lyrics</span>
+      <span class="ofb-sep">·</span>
+      <span class="ofb-item">🎛 Production Brief</span>
+      <span class="ofb-sep">·</span>
+      <span class="ofb-item">🏗 Structure</span>
+      <span class="ofb-sep">·</span>
+      <span class="ofb-item">🎯 Dopamine Map</span>
+      <span class="ofb-sep">·</span>
+      <span class="ofb-item">📊 Hook Score</span>
     </div>
 
     <!-- COPYRIGHT STRIP -->
