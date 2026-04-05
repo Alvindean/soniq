@@ -47,7 +47,74 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT ── */
-.wrap{max-width:1020px;margin:0 auto;padding:0 28px 120px}
+.wrap{max-width:1440px;margin:0 auto;padding:0 28px 120px}
+
+/* ── WRITER 3-PANEL LAYOUT ── */
+.writer-layout{display:grid;grid-template-columns:1fr 300px 220px;gap:20px;align-items:start;margin-top:0}
+.writer-output{min-width:0}
+.writer-controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
+.writer-controls::-webkit-scrollbar{width:3px}
+.writer-controls::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+.writer-social{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+
+/* Responsive: collapse social at 1200px */
+@media(max-width:1200px){
+  .writer-layout{grid-template-columns:1fr 300px}
+  .writer-social{display:none}
+}
+/* Responsive: collapse to single column at 900px */
+@media(max-width:900px){
+  .writer-layout{display:block}
+  .writer-controls{position:static;max-height:none;overflow:visible}
+  .wrap{padding:0 16px 100px}
+}
+
+/* Social panel cards */
+.social-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:16px;margin-bottom:12px}
+.social-card-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* Writer controls title */
+.controls-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;padding:10px 0 8px;display:none}
+
+/* studio in writer controls — no extra bottom margin needed */
+#pg-write .writer-controls .studio{margin-bottom:12px}
+
+/* Gen button full-width in controls panel */
+#pg-write .writer-controls .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px;border-radius:var(--r3)}
+#pg-write .writer-controls .gen-action{flex-direction:column;gap:8px}
+#pg-write .writer-controls .gen-action .btn{width:100%;justify-content:center}
+
+/* Output placeholder */
+#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:40px 24px;text-align:center;margin-bottom:16px}
+#output-placeholder.hide{display:none}
+#output-placeholder .op-icon{font-size:48px;margin-bottom:14px;opacity:.35}
+#output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:500}
+#output-placeholder .op-sub{font-size:12px;color:var(--tx4);margin-top:6px;line-height:1.5}
+
+/* ── PG-WRITE 3-PANEL ── */
+@media(min-width:901px){
+  #pg-write{display:grid;grid-template-columns:1fr 300px 220px;grid-template-rows:auto;column-gap:20px;align-items:start}
+  #album-track-banner{grid-column:1/-1}
+  #pg-write .empty-state{grid-column:1;grid-row:2}
+  #output-placeholder{grid-column:1;grid-row:3}
+  #pg-write .studio{grid-column:2;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;margin-bottom:0;scrollbar-width:thin}
+  #pg-write .studio::-webkit-scrollbar{width:3px}
+  #pg-write .studio::-webkit-scrollbar-thumb{background:var(--s5)}
+  #writer-social{grid-column:3;grid-row:2/10;position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto}
+  #pg-write .synopsis-card{grid-column:1;grid-row:4}
+  #pg-write .hist-bar{grid-column:1;grid-row:5}
+  #pg-write #gen-out{grid-column:1;grid-row:6}
+  #pg-write .key-banner{grid-column:1;grid-row:7}
+  #pg-write .save-bar{grid-column:1;grid-row:8}
+  #pg-write .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
+  #pg-write .gen-action{flex-direction:column;gap:8px}
+  #pg-write .gen-action .btn{width:100%;justify-content:center}
+  #pg-write .gen-action .btn-import{width:100%;justify-content:center}
+}
+@media(min-width:901px) and (max-width:1200px){
+  #pg-write{grid-template-columns:1fr 300px}
+  #writer-social{display:none}
+}
 
 /* ── HEADER ── */
 .hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 20px;border-bottom:1px solid var(--b1);margin-bottom:28px;flex-wrap:wrap}
@@ -2120,6 +2187,64 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
+  <!-- SOCIAL PANEL -->
+  <div id="writer-social">
+    <!-- Profile Mini-Card -->
+    <div class="social-card">
+      <div class="social-card-title">👤 Your Profile</div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        <div id="ws-avatar" style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;color:#fff;flex-shrink:0">?</div>
+        <div>
+          <div id="ws-name" style="font-size:13px;font-weight:700;color:var(--tx1)">Artist</div>
+          <div id="ws-plan" style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Free Plan</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;text-align:center;margin-bottom:10px">
+        <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:7px 4px">
+          <div id="ws-songs" style="font-size:16px;font-weight:800;color:var(--tx1)">0</div>
+          <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">Songs</div>
+        </div>
+        <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:7px 4px">
+          <div id="ws-streak" style="font-size:16px;font-weight:800;color:#f97316">0🔥</div>
+          <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">Streak</div>
+        </div>
+        <div style="flex:1;background:var(--s3);border-radius:var(--r1);padding:7px 4px">
+          <div id="ws-xp" style="font-size:16px;font-weight:800;color:var(--violet)">0</div>
+          <div style="font-size:9px;color:var(--tx4);text-transform:uppercase;letter-spacing:.05em">XP</div>
+        </div>
+      </div>
+      <button class="btn btn-amber btn-sm" onclick="navTo('profile')" style="width:100%;justify-content:center;font-size:11px">View Profile →</button>
+    </div>
+
+    <!-- Community Snippets -->
+    <div class="social-card" id="ws-community-card">
+      <div class="social-card-title">🌐 Community</div>
+      <div id="ws-community-feed" style="font-size:11px;color:var(--tx3);line-height:1.6">
+        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
+          <div style="font-weight:600;color:var(--tx2)">🎵 "Midnight in Lagos"</div>
+          <div style="color:var(--tx4);font-size:10px">Afrobeats · by @kwame_beats</div>
+        </div>
+        <div style="padding:8px 0;border-bottom:1px solid var(--b1)">
+          <div style="font-weight:600;color:var(--tx2)">🎸 "Last Train Home"</div>
+          <div style="color:var(--tx4);font-size:10px">Folk · by @sierra_writes</div>
+        </div>
+        <div style="padding:8px 0">
+          <div style="font-weight:600;color:var(--tx2)">✨ "Neon Daydream"</div>
+          <div style="color:var(--tx4);font-size:10px">EDM · by @synth_soul</div>
+        </div>
+      </div>
+      <button class="btn btn-sm" onclick="navTo('community')" style="width:100%;justify-content:center;font-size:11px;margin-top:10px">See All →</button>
+    </div>
+
+    <!-- Weekly Challenge -->
+    <div class="social-card">
+      <div class="social-card-title">⚡ Weekly Challenge</div>
+      <div style="font-size:12px;color:var(--tx2);font-weight:600;margin-bottom:4px">Write a song about a city at 3am</div>
+      <div style="font-size:10px;color:var(--tx4);margin-bottom:10px">47 entries · 3 days left</div>
+      <button class="btn btn-sm" style="width:100%;justify-content:center;font-size:11px;border-color:var(--amberline);color:var(--amber)" onclick="prefillConcept('a city at 3am')">Try It →</button>
+    </div>
+  </div>
+
   <!-- SYNOPSIS PREVIEW CARD -->
   <div class="synopsis-card" id="synopsis-card">
     <div class="synopsis-hdr">
@@ -2138,6 +2263,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div class="hist-bar" id="hist-bar">
     <span class="hist-label">History</span>
     <div class="hist-items" id="hist-items"></div>
+  </div>
+
+  <!-- OUTPUT PLACEHOLDER (shown before first generation) -->
+  <div id="output-placeholder">
+    <div class="op-icon">🎵</div>
+    <div class="op-txt">Your song will appear here</div>
+    <div class="op-sub">Choose a genre, describe your concept, and hit Generate ↗</div>
   </div>
 
   <!-- RESULT OUTPUT -->
@@ -6056,6 +6188,7 @@ DIRECTOR NOTES:
 
   const out=document.getElementById('gen-out');
   out.classList.add('visible');
+  document.getElementById('output-placeholder')?.classList.add('hide');
   document.getElementById('loaded-banner').style.display='none';
   document.getElementById('res-title').textContent='Crafting your song…';
   document.getElementById('res-verdict').textContent='';
@@ -6863,6 +6996,7 @@ function loadSongIntoOutput(song){
   S.currentSong = song;
   const out = document.getElementById('gen-out');
   out.classList.add('visible');
+  document.getElementById('output-placeholder')?.classList.add('hide');
   document.getElementById('loaded-banner').style.display = 'flex';
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
@@ -8096,6 +8230,8 @@ function updateAuthUI() {
     if (upgradeBtn) upgradeBtn.style.display = 'none';
     if (adminBtn) adminBtn.style.display = window.__soniqAdmin ? '' : 'none';
   }
+  // Update writer sidebar with current user data
+  if (typeof updateWriterSidebar === 'function') updateWriterSidebar();
 }
 
 // ─── UPGRADE MODAL ─────────────────────────────────────────────
@@ -11371,7 +11507,7 @@ function checkShareLink() {
     if (!song || !song.lyrics) return;
     S.currentSong = song;
     const out = document.getElementById('gen-out');
-    if (out) { out.classList.add('visible'); }
+    if (out) { out.classList.add('visible'); document.getElementById('output-placeholder')?.classList.add('hide'); }
     const titleEl = document.getElementById('res-title');
     if (titleEl) titleEl.textContent = song.title || 'Shared Song';
     const verdictEl = document.getElementById('res-verdict');
@@ -11951,6 +12087,42 @@ function loadProfilePage() {
   // Sync stats to server in background (debounced — no UI impact)
   clearTimeout(loadProfilePage._syncTimer);
   loadProfilePage._syncTimer = setTimeout(syncProfileToServer, 2000);
+}
+
+function updateWriterSidebar() {
+  try {
+    const lib = S.library || [];
+    const ach = getAchState ? getAchState() : {};
+    const xpSt = getXPState ? getXPState() : {};
+
+    const songEl = document.getElementById('ws-songs');
+    if (songEl) songEl.textContent = lib.length;
+
+    const streakEl = document.getElementById('ws-streak');
+    if (streakEl) streakEl.textContent = (ach.streak || 0) + '🔥';
+
+    const xpEl = document.getElementById('ws-xp');
+    if (xpEl) xpEl.textContent = xpSt.xp || 0;
+
+    const profileData = JSON.parse(localStorage.getItem('soniq_profile') || '{}');
+    const name = profileData.display_name || S.user?.email?.split('@')[0] || 'Artist';
+
+    const nameEl = document.getElementById('ws-name');
+    if (nameEl) nameEl.textContent = name;
+
+    const avatar = document.getElementById('ws-avatar');
+    if (avatar) avatar.textContent = (name[0] || '?').toUpperCase();
+
+    const planBadge = document.getElementById('ws-plan');
+    if (planBadge) {
+      const plan = S.plan || 'free';
+      planBadge.textContent = plan === 'studio' || plan === 'studio_annual' ? 'Studio Plan'
+        : plan === 'starter' || plan === 'starter_annual' ? 'Starter Plan'
+        : plan === 'pro' || plan === 'pro_annual' ? 'Pro Plan'
+        : plan.startsWith('founding') ? 'Founding Plan'
+        : 'Free Plan';
+    }
+  } catch(e) { /* non-critical sidebar update */ }
 }
 
 function openProfileEdit() {
