@@ -38,6 +38,8 @@
   --glow-cyan:0 0 0 1px var(--cyanline),0 4px 18px rgba(0,220,192,0.12);
   --r:var(--r2);
   --genre-accent:#f5c000;--genre-bg:rgba(245,192,0,0.08);
+  --sp-xs:clamp(2px,0.15vw,4px);--sp-sm:clamp(6px,0.5vw,8px);--sp-md:clamp(12px,1vw,16px);--sp-lg:clamp(16px,1.5vw,24px);--sp-xl:clamp(20px,2vw,28px);--sp-xxl:clamp(28px,2.5vw,32px);
+  --gap-xs:clamp(4px,0.25vw,6px);--gap-sm:clamp(6px,0.5vw,8px);--gap-md:clamp(8px,1vw,12px);--gap-lg:clamp(12px,1.5vw,20px);
 }
 html,body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 ::-webkit-scrollbar{width:3px;height:3px}
@@ -50,7 +52,7 @@ a{color:var(--amber);text-decoration:none}
 .wrap{max-width:1280px;margin:0 auto;padding:0 24px 120px}
 
 /* ── WRITER 3-PANEL LAYOUT ── */
-.writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:20px;align-items:start;margin-top:0}
+.writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:var(--gap-lg);align-items:start;margin-top:0}
 .writer-output{min-width:0}
 .writer-controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin}
 .writer-controls::-webkit-scrollbar{width:3px}
@@ -71,47 +73,47 @@ a{color:var(--amber);text-decoration:none}
 }
 
 /* Social panel cards */
-.social-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:16px;margin-bottom:12px}
-.social-card-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.social-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:var(--sp-lg);margin-bottom:var(--sp-md)}
+.social-card-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:var(--sp-md);display:flex;align-items:center;gap:var(--gap-sm)}
 
 /* Writer controls title */
 .controls-title{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;padding:10px 0 8px;display:none}
 
 /* studio in writer controls — no extra bottom margin needed */
-#pg-write .writer-controls .studio{margin-bottom:12px}
+#pg-write .writer-controls .studio{margin-bottom:var(--sp-md)}
 
 /* Gen button full-width in controls panel */
 #pg-write .writer-controls .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px;border-radius:var(--r3)}
-#pg-write .writer-controls .gen-action{flex-direction:column;gap:8px}
+#pg-write .writer-controls .gen-action{flex-direction:column;gap:var(--gap-md)}
 #pg-write .writer-controls .gen-action .btn{width:100%;justify-content:center}
 
 /* Output placeholder / Inspiration board */
-#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px 24px 28px;margin-bottom:16px;display:block}
+#output-placeholder{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px 24px 28px;margin-bottom:var(--sp-lg);display:block}
 #output-placeholder.hide{display:none}
-#output-placeholder .op-hero{display:flex;flex-direction:column;align-items:center;padding:20px 0 18px;border-bottom:1px solid var(--b2);margin-bottom:20px}
+#output-placeholder .op-hero{display:flex;flex-direction:column;align-items:center;padding:20px 0 18px;border-bottom:1px solid var(--b2);margin-bottom:var(--sp-xl)}
 #output-placeholder .op-icon{font-size:40px;margin-bottom:10px;opacity:.4}
 #output-placeholder .op-txt{font-size:15px;color:var(--tx3);font-weight:600}
 #output-placeholder .op-sub{font-size:12px;color:var(--tx4);margin-top:4px;line-height:1.5;text-align:center}
 /* Quick-start genre chips */
 #output-placeholder .op-section{margin-bottom:18px}
 #output-placeholder .op-label{font-size:11px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--tx4);margin-bottom:8px}
-#output-placeholder .op-chips{display:flex;flex-wrap:wrap;gap:6px}
+#output-placeholder .op-chips{display:flex;flex-wrap:wrap;gap:var(--gap-sm)}
 #output-placeholder .op-chip{padding:5px 12px;border-radius:20px;border:1px solid var(--b2);background:var(--s3);font-size:12px;color:var(--tx2);cursor:pointer;transition:background .15s,border-color .15s;white-space:nowrap}
 #output-placeholder .op-chip:hover{background:var(--acc);border-color:var(--acc);color:#000}
 /* Writing prompts — 3 cols with full width */
-#output-placeholder .op-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+#output-placeholder .op-prompts{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap-md)}
 #output-placeholder .op-prompt{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
 #output-placeholder .op-prompt:hover{border-color:var(--acc);background:var(--s4)}
 #output-placeholder .op-prompt.active{border-color:var(--acc);background:var(--s4);box-shadow:0 0 0 2px rgba(245,192,0,0.15)}
 #output-placeholder .op-prompt-emoji{font-size:18px;margin-bottom:4px}
 #output-placeholder .op-prompt-text{font-size:11px;color:var(--tx3);line-height:1.4}
 /* Bottom row: Profile | Community | Challenge */
-#output-placeholder .op-bottom-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;padding-top:20px;border-top:1px solid var(--b2)}
+#output-placeholder .op-bottom-row{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--gap-lg);margin-top:var(--sp-xl);padding-top:var(--sp-xl);border-top:1px solid var(--b2)}
 #output-placeholder .op-bottom-card{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r3);padding:14px;display:flex;flex-direction:column}
 #output-placeholder .op-bottom-title{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:10px}
 @media(max-width:700px){#output-placeholder .op-bottom-row{grid-template-columns:1fr}#output-placeholder .op-prompts{grid-template-columns:1fr 1fr}}
 /* Recent songs */
-#output-placeholder .op-recents{display:flex;flex-direction:column;gap:6px}
+#output-placeholder .op-recents{display:flex;flex-direction:column;gap:var(--gap-sm)}
 #output-placeholder .op-recent-item{display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--s3);border-radius:var(--r2);border:1px solid var(--b2);cursor:pointer;transition:border-color .15s}
 #output-placeholder .op-recent-item:hover{border-color:var(--acc)}
 #output-placeholder .op-recent-dot{width:8px;height:8px;border-radius:50%;background:var(--acc);flex-shrink:0}
@@ -128,15 +130,15 @@ a{color:var(--amber);text-decoration:none}
 /* IMPORTANT: use #pg-write.on (not just #pg-write) so display:none from .pg still hides it when not active */
 #writer-output-controls{padding:0 0 8px}
 /* Topic tool row */
-.topic-tool-row{display:flex;align-items:center;gap:8px;margin:8px 0 14px}
+.topic-tool-row{display:flex;align-items:center;gap:var(--gap-md);margin:8px 0 14px}
 .topic-tool-row .mic-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 12px;font-size:12px;border-radius:var(--r2);flex-shrink:0}
 .topic-tool-row .enhance-btn{flex:1;padding:7px 14px;font-size:12px;text-align:center}
-.topic-score-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);flex-shrink:0}
+.topic-score-badge{display:flex;align-items:center;gap:var(--gap-sm);padding:6px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);flex-shrink:0}
 .tsb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4)}
 .tsb-num{font-size:14px;font-weight:800;color:var(--tx1);min-width:24px;text-align:center}
 .tsb-num.good{color:#4ade80}.tsb-num.ok{color:var(--amber)}.tsb-num.low{color:#f87171}
 /* Output footer bar */
-.output-footer-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 4px;padding:12px 0;border-top:1px solid var(--b1);margin-top:8px}
+.output-footer-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 4px;padding:var(--sp-md) 0;border-top:1px solid var(--b1);margin-top:8px}
 .ofb-item{font-size:11px;color:var(--tx4);font-weight:500}
 .ofb-sep{color:var(--b2);font-size:11px}
 /* More options toggle */
@@ -149,35 +151,38 @@ a{color:var(--amber);text-decoration:none}
 #pg-write.on #writer-output-controls .gen-action{flex-direction:column;gap:8px}
 #pg-write.on #writer-output-controls .gen-action .gen-btn{width:100%;justify-content:center;font-size:17px;padding:17px 24px}
 #pg-write.on #writer-output-controls .gen-action .btn-import{width:100%;justify-content:center}
+/* 2-panel layout on desktop */
+.write-output-panel{min-width:0}
+
 @media(min-width:901px){
-  /* Single-column layout — genre/mood live in output controls, studio panel hidden */
-  #pg-write.on{display:block}
-  #pg-write.on > *{min-width:0}
-  /* Studio panel is now empty — hide it */
+  /* 2-panel grid layout: 380px controls (left/sticky) + 1fr output (right) */
+  #pg-write.on{display:grid;grid-template-columns:380px 1fr;gap:var(--sp-lg,20px);align-items:start}
   #pg-write.on .studio{display:none}
-  /* Social panel hidden */
   #pg-write.on #writer-social{display:none}
-  /* Output controls — genre/mood grids wider since full width */
-  #pg-write.on #writer-output-controls .genre-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:8px}
-  #pg-write.on #writer-output-controls .mood-grid{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
-  /* Topic input full width */
-  #pg-write.on #writer-output-controls .topic-input{font-size:16px;padding:14px 16px;min-height:72px;width:100%}
-  /* Gen button full width */
-  #pg-write.on #writer-output-controls .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
-  #pg-write.on #writer-output-controls .gen-action{flex-direction:row;flex-wrap:wrap;gap:8px;align-items:center}
+  /* Sticky left panel with scrolling */
+  #pg-write.on #writer-output-controls{position:sticky;top:16px;max-height:calc(100vh - 32px);overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;order:-1}
+  #pg-write.on #writer-output-controls::-webkit-scrollbar{width:3px}
+  #pg-write.on #writer-output-controls::-webkit-scrollbar-thumb{background:var(--s5);border-radius:2px}
+  /* Compact grids for narrower 380px panel */
+  #pg-write.on #writer-output-controls .genre-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:6px}
+  #pg-write.on #writer-output-controls .mood-grid{grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px}
+  /* Scaled inputs for 380px panel */
+  #pg-write.on #writer-output-controls .topic-input{font-size:15px;padding:12px 14px;min-height:64px;width:100%}
+  #pg-write.on #writer-output-controls .gen-btn{width:100%;justify-content:center;font-size:15px;padding:14px 20px}
+  #pg-write.on #writer-output-controls .gen-action{flex-direction:column;gap:8px}
   #pg-write.on #writer-output-controls .gen-action .gen-btn{flex:1 1 100%}
-  #pg-write.on #writer-output-controls .gen-action .btn-import{flex:1}
-  #pg-write.on #writer-output-controls .params{grid-template-columns:1fr 1fr 1fr}
+  #pg-write.on #writer-output-controls .gen-action .btn-import{width:100%;justify-content:center}
+  #pg-write.on #writer-output-controls .params{grid-template-columns:1fr 1fr}
 }
 
 /* ── HEADER ── */
-.hdr{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:26px 0 20px;border-bottom:1px solid var(--b1);margin-bottom:28px;flex-wrap:wrap}
-.hdr-l{display:flex;align-items:center;gap:12px}
+.hdr{display:flex;align-items:center;justify-content:space-between;gap:var(--gap-lg);padding:26px 0 20px;border-bottom:1px solid var(--b1);margin-bottom:28px;flex-wrap:wrap}
+.hdr-l{display:flex;align-items:center;gap:var(--gap-lg)}
 .hdr-icon{width:42px;height:42px;border-radius:11px;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;box-shadow:0 2px 16px rgba(245,184,0,0.3)}
 .hdr-title{font-size:21px;font-weight:700;letter-spacing:0.03em;color:var(--tx1)}
 .hdr-title span{color:var(--amber)}
 .hdr-sub{font-size:12px;color:var(--tx3);margin-top:2px;font-weight:400}
-.hdr-tags{display:flex;gap:6px;flex-wrap:wrap}
+.hdr-tags{display:flex;gap:var(--gap-sm);flex-wrap:wrap}
 .htag{font-size:11px;font-weight:600;padding:3px 9px;border-radius:99px;letter-spacing:0.04em;text-transform:uppercase;background:var(--s3);border:1px solid var(--b2);color:var(--tx3)}
 .htag-gold{background:var(--amberbg);color:var(--amber);border-color:var(--amberline)}
 .htag-teal{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
@@ -190,7 +195,7 @@ a{color:var(--amber);text-decoration:none}
 }
 
 /* ── AD RAILS (left + right, only at ≥1500px) ── */
-.ad-rail{display:none;position:fixed;top:0;bottom:0;width:168px;flex-direction:column;align-items:center;padding:80px 8px 24px;gap:16px;z-index:50;background:var(--s1);border-color:var(--b1)}
+.ad-rail{display:none;position:fixed;top:0;bottom:0;width:168px;flex-direction:column;align-items:center;padding:80px 8px 24px;gap:var(--gap-lg);z-index:50;background:var(--s1);border-color:var(--b1)}
 .ad-rail-left{left:0;border-right:1px solid var(--b1)}
 .ad-rail-right{right:0;border-left:1px solid var(--b1)}
 .ad-rail-label{font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--tx4);margin-bottom:4px;text-align:center}
@@ -227,25 +232,45 @@ a{color:var(--amber);text-decoration:none}
   font-family:var(--mono);
 }
 
+/* ── SIDEBAR NAV ── */
+.sidebar-nav{position:fixed;left:0;top:0;bottom:0;width:64px;background:var(--s1);border-right:1px solid var(--b1);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:2px;z-index:100;overflow-y:auto;scrollbar-width:none}
+.sidebar-nav::-webkit-scrollbar{display:none}
+.sidebar-nav .sn-logo{width:36px;height:36px;border-radius:10px;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800;color:#000;margin-bottom:12px;flex-shrink:0;box-shadow:0 2px 12px rgba(245,184,0,0.25)}
+.sb-btn{width:48px;height:48px;border-radius:var(--r2);border:none;background:transparent;color:var(--tx3);font-size:20px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0}
+.sb-btn:hover{background:var(--s3);color:var(--tx1)}
+.sb-btn.on{background:var(--s4);color:var(--tx1)}
+.sb-btn.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:var(--amber);border-radius:0 3px 3px 0}
+.sb-btn .ni{font-size:20px;line-height:1}
+.sn-spacer{flex:1}
+.sn-bottom{display:flex;flex-direction:column;align-items:center;gap:2px}
+.sn-badge{position:absolute;top:4px;right:4px;min-width:14px;height:14px;border-radius:99px;background:var(--amber);color:#08080a;font-size:9px;font-weight:700;text-align:center;line-height:14px;padding:0 3px}
+/* Mobile bottom nav */
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b1);padding:4px 8px;gap:2px;z-index:100}
+.mb-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:none;background:transparent;color:var(--tx4);font-size:9px;font-weight:600;cursor:pointer;border-radius:var(--r1)}
+.mb-btn.on{color:var(--amber)}
+.mb-btn .ni{font-size:18px;line-height:1}
+@media(max-width:900px){.sidebar-nav{display:none}.mobile-bottom-nav{display:flex}.wrap{margin-left:0!important}}
+@media(min-width:901px){.wrap{margin-left:64px}}
+
 /* ── PAGES ── */
 .pg{display:none}
 .pg.on{display:block;animation:pgIn 0.2s ease}
 @keyframes pgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 
 /* ── STUDIO — write page main card ── */
-.studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:20px;transition:border-color 0.3s}
-.studio-top{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:10px}
+.studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:var(--sp-xl);transition:border-color 0.3s}
+.studio-top{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:var(--gap-md)}
 .studio-label{font-size:12px;font-weight:600;color:var(--tx2);letter-spacing:0.04em;text-transform:uppercase}
 .studio-body{padding:28px 24px}
 
 /* ── TOPIC INPUT ── */
 .topic-label{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:block}
-.topic-input{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:18px;font-weight:500;padding:16px 18px;outline:none;transition:all 0.15s;line-height:1.4;margin-bottom:24px}
+.topic-input{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:18px;font-weight:500;padding:var(--sp-lg) 18px;outline:none;transition:all 0.15s;line-height:1.4;margin-bottom:24px}
 .topic-input:focus{border-color:var(--amberline);background:var(--s3);box-shadow:var(--glow-amber)}
 .topic-input::placeholder{color:var(--tx4);font-weight:400;font-size:16px}
 
 /* ── GENRE GRID ── */
-.genre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:8px;margin-bottom:24px}
+.genre-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(90px,1fr));gap:var(--gap-md);margin-bottom:24px}
 .gp-locked{opacity:.55;cursor:pointer}
 .gp-locked:hover{opacity:.8;border-color:var(--amber)!important}
 .gp-icon{position:relative;display:inline-block}
@@ -259,9 +284,9 @@ a{color:var(--amber);text-decoration:none}
 .gp.new-g .gp-name::after{content:' ✦';font-size:8px;color:var(--cyan);vertical-align:super}
 
 /* ── PARAM ROW ── */
-.params{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.params{display:grid;grid-template-columns:1fr 1fr 1fr;gap:var(--gap-md);margin-bottom:var(--sp-xl)}
 @media(max-width:580px){.params{grid-template-columns:1fr 1fr}}
-.param{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px;transition:border-color 0.15s}
+.param{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:var(--sp-md) 14px;transition:border-color 0.15s}
 .param:focus-within{border-color:var(--b2)}
 .param-label{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px}
 .param select{width:100%;background:transparent;border:none;color:var(--tx1);font-size:14px;font-weight:500;outline:none;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:16px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 0 center}
@@ -270,9 +295,9 @@ a{color:var(--amber);text-decoration:none}
 .param select option:checked{background:#2a2a40;color:#fff}
 
 /* ── SUBSTYLE ── */
-.substyle-wrap{margin-bottom:20px;display:none}
+.substyle-wrap{margin-bottom:var(--sp-xl);display:none}
 .substyle-label-txt{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;display:block}
-.spills{display:flex;flex-wrap:wrap;gap:6px}
+.spills{display:flex;flex-wrap:wrap;gap:var(--gap-sm)}
 .spill{font-size:12px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.12s}
 .spill:hover{color:var(--tx2);border-color:var(--b3)}
 .spill.on{background:var(--amberbg);border-color:var(--amberline);color:var(--amber)}
@@ -284,19 +309,19 @@ a{color:var(--amber);text-decoration:none}
 .qpill.on{background:var(--amberbg);border-color:var(--amberline);color:var(--amber)}
 
 /* ── BLEND ACCORDION ── */
-.blend-acc{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:20px;overflow:hidden;transition:border-color 0.2s}
+.blend-acc{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:var(--sp-xl);overflow:hidden;transition:border-color 0.2s}
 .blend-acc.open{border-color:var(--cyanline)}
-.blend-trigger{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;gap:8px}
+.blend-trigger{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;user-select:none;gap:var(--gap-md)}
 .blend-trigger:hover .blend-trigger-label{color:var(--tx2)}
 .blend-trigger:focus{outline:2px solid var(--cyan);outline-offset:2px;border-radius:var(--r1)}
-.blend-trigger-l{display:flex;align-items:center;gap:8px}
+.blend-trigger-l{display:flex;align-items:center;gap:var(--gap-md)}
 .blend-trigger-dot{width:6px;height:6px;border-radius:50%;background:var(--tx4);transition:all 0.2s;flex-shrink:0}
 .blend-acc.open .blend-trigger-dot{background:var(--cyan)}
 .blend-acc.open.has-blend .blend-trigger-dot{background:var(--amber);box-shadow:0 0 6px var(--amber)}
 .blend-trigger-label{font-size:13px;font-weight:600;color:var(--tx3);transition:color 0.15s}
 .blend-trigger-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--cyanbg);border:1px solid var(--cyanline);color:var(--cyan);display:none}
 .blend-acc.has-blend .blend-trigger-badge{display:inline-block}
-.blend-trigger-r{display:flex;align-items:center;gap:6px}
+.blend-trigger-r{display:flex;align-items:center;gap:var(--gap-sm)}
 .blend-trigger-hint{font-size:10px;color:var(--tx3)}
 .blend-arrow{font-size:10px;color:var(--tx3);transition:transform 0.2s}
 .blend-acc.open .blend-arrow{transform:rotate(90deg)}
@@ -322,26 +347,26 @@ a{color:var(--amber);text-decoration:none}
 .blend-ratio-lbl{font-size:10px;font-weight:700;min-width:52px}
 .blend-slider{flex:1;height:3px;-webkit-appearance:none;appearance:none;background:linear-gradient(to right,var(--amber),var(--cyan));border-radius:2px;outline:none;cursor:pointer}
 .blend-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--tx1);border:2px solid var(--s0);cursor:pointer;box-shadow:0 0 0 3px rgba(255,255,255,0.1)}
-.blend-ratio-display{display:flex;align-items:center;gap:8px}
+.blend-ratio-display{display:flex;align-items:center;gap:var(--gap-md)}
 .brd-val{font-size:11px;font-weight:700;font-family:var(--mono)}
 .brd-bar{flex:1;height:4px;background:var(--s5);border-radius:2px;overflow:hidden}
 .brd-fill{height:100%;background:linear-gradient(to right,var(--amber),var(--cyan));border-radius:2px;transition:width .15s}
 .blend-desc-box{font-size:11px;color:var(--tx3);line-height:1.6;background:var(--s4);border-radius:var(--r1);padding:8px 12px;min-height:32px;margin-top:8px}
 
 /* ── GENERATE BUTTON ── */
-.gen-action{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-.import-overlay{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(4px)}
+.gen-action{display:flex;align-items:center;gap:var(--gap-lg);flex-wrap:wrap}
+.import-overlay{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;padding:var(--sp-lg);backdrop-filter:blur(4px)}
 .import-modal{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:28px 28px 24px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;position:relative}
 .import-modal h2{font-size:17px;font-weight:700;color:var(--tx1);margin:0 0 4px;letter-spacing:-.3px}
 .import-modal p{font-size:12px;color:var(--tx3);margin:0 0 20px}
-.import-row{display:flex;gap:12px;margin-bottom:14px}
-.import-field{display:flex;flex-direction:column;gap:5px;flex:1}
+.import-row{display:flex;gap:var(--gap-lg);margin-bottom:14px}
+.import-field{display:flex;flex-direction:column;gap:var(--gap-xs);flex:1}
 .import-field label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em}
 .import-field input,.import-field select,.import-field textarea{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:9px 12px;outline:none;font-family:var(--font);transition:border-color .15s}
 .import-field input:focus,.import-field select:focus,.import-field textarea:focus{border-color:var(--cyan)}
 .import-field select{-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%2350506a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
 .import-field textarea{min-height:180px;resize:vertical;line-height:1.6;font-family:var(--mono,monospace);font-size:12px}
-.import-actions{display:flex;gap:10px;margin-top:6px}
+.import-actions{display:flex;gap:var(--gap-md);margin-top:6px}
 .import-submit-btn{flex:1;padding:12px;border-radius:var(--r3);border:none;background:var(--cyan);color:#06060a;font-family:var(--font);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}
 .import-submit-btn:hover{opacity:.9}
 .import-cancel-btn{padding:12px 20px;border-radius:var(--r3);border:1px solid var(--b2);background:transparent;color:var(--tx2);font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
@@ -372,6 +397,12 @@ a{color:var(--amber);text-decoration:none}
 .result-song-title{font-size:26px;font-weight:700;color:var(--tx1);letter-spacing:-0.5px;line-height:1.2}
 .result-song-verdict{font-size:13px;color:var(--tx3);margin-top:6px;font-style:italic;line-height:1.5}
 .result-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+.song-card-overflow{position:relative}
+.song-card-overflow-menu{display:none;position:absolute;right:0;top:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:4px 0;min-width:160px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.song-card-overflow-menu.open{display:block}
+.song-card-overflow-item{display:block;width:100%;padding:8px 14px;background:none;border:none;color:var(--tx2);font-size:12px;text-align:left;cursor:pointer;transition:background .1s}
+.song-card-overflow-item:hover{background:var(--s3)}
+
 .loaded-banner{display:none;align-items:center;gap:8px;padding:8px 20px;background:var(--cyanbg);border-bottom:1px solid var(--cyanline);font-size:11px;color:var(--cyan);font-weight:600}
 
 /* ── OUTPUT TABS ── */
@@ -1069,11 +1100,27 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .comm-layout{grid-template-columns:1fr;padding:12px 14px}
   .comm-sidebar,.comm-right{display:none}
 }
+.comm-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px}
+.comm-title{font-size:18px;font-weight:800;color:var(--tx1)}
+.comm-subtitle{font-size:11px;color:var(--tx3);margin-top:1px}
+.comm-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
+@media(min-width:601px) and (max-width:900px){
+  .comm-layout{grid-template-columns:1fr}
+  .comm-sidebar{position:static;display:flex;gap:8px;flex-wrap:wrap}
+  .comm-sidebar .comm-filter-section{flex:1;min-width:160px;padding-bottom:0;border-bottom:none;margin-bottom:0}
+}
 /* ── PROFILE FULL-WIDTH DASHBOARD ── */
-.profile-dashboard{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;max-width:none;margin:0;padding:20px 0}
+.profile-dashboard{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;max-width:720px;margin:0 auto;padding:20px 0}
 @media(min-width:1200px){.profile-dashboard{grid-template-columns:300px 1fr}}
 .profile-sidebar{position:sticky;top:16px}
 .profile-main{min-width:0}
+.profile-banner{background:linear-gradient(135deg,rgba(245,192,0,.06) 0%,var(--s2) 40%,rgba(168,146,255,.04) 100%);padding:32px 20px 0;position:relative;overflow:hidden;border-bottom:1px solid var(--b1)}
+.profile-banner-inner{max-width:680px;margin:0 auto;position:relative}
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.08);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+@media(max-width:600px){
+  .profile-banner{padding:20px 16px 0}
+  #pg-profile [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important}
+}
 /* ── CAMPAIGN MODE ── */
 .camp-hero{padding:28px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px}
 .camp-hero-label{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -1781,28 +1828,36 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 </div>
 
-<!-- NAV -->
-<div class="nav-scroll-wrap" id="nav-scroll-wrap">
-<nav class="nav" id="main-nav">
-  <button class="nb on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
-  <button class="nb nb-lucky" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Feel Lucky</button>
-  <button class="nb" onclick="goPg('library',this)"><span class="ni">📚</span>Library<span id="nav-lib-count" class="nav-badge" style="display:none"></span></button>
-  <button class="nb" onclick="goPg('builder',this)"><span class="ni">🎛️</span>Builder</button>
-  <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
-  <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
-  <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
-  <button class="nb" onclick="goPg('community',this)" id="nav-community-btn"><span class="ni">🌐</span>Community</button>
-  <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
-  <button class="nb" onclick="goPg('editor',this)"><span class="ni">✏️</span>Editor</button>
-  <button class="nb" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none"><span class="ni">📊</span>Admin</button>
-    <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
-      <a href="/" style="font-size:11px;color:var(--tx3);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--b1);white-space:nowrap" title="Back to mysoniq.com">◈ SONIQ</a>
-      <div id="nav-user-info" style="display:none;font-size:11px;color:var(--tx3)"></div>
-      <button id="nav-upgrade-btn" onclick="openUpgradeModal()" style="display:none" title="Upgrade to Pro">✦ Upgrade</button>
-      <button id="nav-auth-btn" onclick="openAuth()" class="btn btn-sm" style="font-size:11px;padding:4px 10px">Sign In</button>
-      <button id="nav-signout-btn" onclick="authSignOut()" class="btn btn-sm" style="display:none;font-size:11px;padding:4px 10px;color:var(--tx3)">Sign Out</button>
-    </div>
-</nav>
+<!-- SIDEBAR NAV (desktop) -->
+<div class="sidebar-nav" id="sidebar-nav">
+  <div class="sn-logo">IQ</div>
+  <button class="sb-btn on" onclick="goPg('write',this)" title="Write"><span class="ni">✍️</span></button>
+  <button class="sb-btn" onclick="goPg('lucky',this)" title="Feel Lucky"><span class="ni">🎲</span></button>
+  <button class="sb-btn" onclick="goPg('library',this)" title="Library"><span class="ni">📚</span><span id="nav-lib-count" class="sn-badge" style="display:none"></span></button>
+  <button class="sb-btn" onclick="goPg('builder',this)" title="Builder"><span class="ni">🎛️</span></button>
+  <button class="sb-btn" onclick="goPg('more',this)" title="More"><span class="ni">⚡</span></button>
+  <button class="sb-btn" onclick="goPg('album',this)" title="Album"><span class="ni">🎼</span></button>
+  <button class="sb-btn" onclick="goPg('campaign',this)" title="Campaign"><span class="ni">🚀</span></button>
+  <button class="sb-btn" onclick="goPg('community',this)" id="nav-community-btn" title="Community"><span class="ni">🌐</span></button>
+  <button class="sb-btn" onclick="goPg('editor',this)" title="Editor"><span class="ni">✏️</span></button>
+  <button class="sb-btn" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none" title="Admin"><span class="ni">📊</span></button>
+  <div class="sn-spacer"></div>
+  <div class="sn-bottom">
+    <button class="sb-btn" onclick="goPg('profile',this)" id="nav-profile-btn" title="Profile"><span class="ni">👤</span></button>
+    <div id="nav-user-info" style="display:none;font-size:9px;color:var(--tx3);text-align:center;max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></div>
+    <button id="nav-upgrade-btn" onclick="openUpgradeModal()" class="sb-btn" style="display:none" title="Upgrade"><span class="ni" style="font-size:14px;color:var(--amber)">✦</span></button>
+    <button id="nav-auth-btn" onclick="openAuth()" class="sb-btn" title="Sign In"><span class="ni" style="font-size:14px">🔑</span></button>
+    <button id="nav-signout-btn" onclick="authSignOut()" class="sb-btn" style="display:none" title="Sign Out"><span class="ni" style="font-size:14px;color:var(--tx4)">↩</span></button>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-bottom-nav" id="mobile-nav">
+  <button class="mb-btn on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
+  <button class="mb-btn" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Lucky</button>
+  <button class="mb-btn" onclick="goPg('library',this)"><span class="ni">📚</span>Library</button>
+  <button class="mb-btn" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+  <button class="mb-btn" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
 </div>
 
 <!-- ══════════════════════════════════
@@ -2410,6 +2465,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
+  <!-- RIGHT PANEL: OUTPUT ELEMENTS -->
+  <div class="write-output-panel">
+
   <!-- SYNOPSIS PREVIEW CARD -->
   <div class="synopsis-card" id="synopsis-card">
     <div class="synopsis-hdr">
@@ -2541,20 +2599,25 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
-        <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
-        <button class="like-btn" id="res-like-btn" onclick="setLike('res',true)" title="Like this song">👍</button>
-        <button class="dislike-btn" id="res-dislike-btn" onclick="setLike('res',false)" title="Dislike">👎</button>
-        <button class="btn btn-sm" onclick="printBrief('res')" title="Print song brief">🖨 Print</button>
-        <button class="btn btn-sm" onclick="shareLink('res')" title="Copy share link">🔗 Share</button>
-        <button class="btn btn-sm" onclick="shareOnX('res')" title="Share on X / Twitter" style="background:#000;color:#fff;border-color:#333">𝕏 Post</button>
-        <button class="btn btn-sm" onclick="batchGenerate()" title="Generate 3 variations in parallel">⚡ Batch x3</button>
-        <button class="btn btn-amber" onclick="openVariants()" id="variants-btn" style="display:none" title="Generate a variant of this song">🎛️ Variants</button>
-        <button class="btn" onclick="openVH()" id="vh-btn" style="display:none" title="Version history">🕐 History</button>
-        <button class="btn" onclick="openCoach()" id="coach-btn" style="display:none" title="AI Feedback Coach — get expert notes on your lyrics">🎓 Coach</button>
-        <button class="btn btn-green" onclick="openPublish()" id="publish-btn" style="display:none" title="Register this song for publishing royalties">📜 Publish</button>
-        <button class="btn" onclick="openAudioModal('res')" id="audio-btn" style="display:none" title="Add Suno/Udio/SoundCloud audio link">🎵 Audio</button>
-        <button class="btn btn-teal" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none" title="Share to SONIQ Community">🌐 Share</button>
+        <div class="song-card-overflow">
+          <button class="btn btn-sm" onclick="toggleResOverflow()" title="More options">⋯ More</button>
+          <div class="song-card-overflow-menu" id="res-overflow-menu">
+            <button class="song-card-overflow-item" onclick="cpBriefPrompt('res')">Copy Prompt</button>
+            <button class="song-card-overflow-item" onclick="setLike('res',true)">👍 Like</button>
+            <button class="song-card-overflow-item" onclick="setLike('res',false)">👎 Dislike</button>
+            <button class="song-card-overflow-item" onclick="printBrief('res')">🖨 Print</button>
+            <button class="song-card-overflow-item" onclick="shareLink('res')">🔗 Copy Link</button>
+            <button class="song-card-overflow-item" onclick="shareOnX('res')">𝕏 Post</button>
+            <button class="song-card-overflow-item" onclick="batchGenerate()">⚡ Batch x3</button>
+            <button class="song-card-overflow-item" onclick="openVariants()" id="variants-btn" style="display:none">🎛️ Variants</button>
+            <button class="song-card-overflow-item" onclick="openVH()" id="vh-btn" style="display:none">🕐 History</button>
+            <button class="song-card-overflow-item" onclick="openCoach()" id="coach-btn" style="display:none">🎓 Coach</button>
+            <button class="song-card-overflow-item" onclick="openPublish()" id="publish-btn" style="display:none">📜 Publish</button>
+            <button class="song-card-overflow-item" onclick="openAudioModal('res')" id="audio-btn" style="display:none">🎵 Audio</button>
+            <button class="song-card-overflow-item" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none">🌐 Share</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -2700,7 +2763,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
-</div>
+  </div><!-- /write-output-panel -->
+
+</div><!-- /pg-write -->
 
 <!-- ══════════════════════════════════
      FEEL LUCKY PAGE
@@ -2775,12 +2840,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')">Copy Lyrics</button>
-        <button class="btn btn-sm" onclick="cpBriefPrompt('lres')">Copy Prompt</button>
-        <button class="like-btn" id="lres-like-btn" onclick="setLike('lres',true)" title="Like this song">👍</button>
-        <button class="dislike-btn" id="lres-dislike-btn" onclick="setLike('lres',false)" title="Dislike">👎</button>
-        <button class="btn btn-sm" onclick="printBrief('lres')" title="Print song brief">🖨 Print</button>
-        <button class="btn btn-sm" onclick="shareLink('lres')" title="Copy share link">🔗 Share</button>
-        <button class="btn btn-sm" onclick="shareOnX('lres')" title="Share on X / Twitter" style="background:#000;color:#fff;border-color:#333">𝕏 Post</button>
+        <div class="song-card-overflow">
+          <button class="btn btn-sm" onclick="toggleLresOverflow()" title="More options">⋯ More</button>
+          <div class="song-card-overflow-menu" id="lres-overflow-menu">
+            <button class="song-card-overflow-item" onclick="cpBriefPrompt('lres')">Copy Prompt</button>
+            <button class="song-card-overflow-item" onclick="setLike('lres',true)">👍 Like</button>
+            <button class="song-card-overflow-item" onclick="setLike('lres',false)">👎 Dislike</button>
+            <button class="song-card-overflow-item" onclick="printBrief('lres')">🖨 Print</button>
+            <button class="song-card-overflow-item" onclick="shareLink('lres')">🔗 Copy Link</button>
+            <button class="song-card-overflow-item" onclick="shareOnX('lres')">𝕏 Post</button>
+          </div>
+        </div>
       </div>
     </div>
     <!-- COPYRIGHT STRIP -->
@@ -3847,14 +3917,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <!-- PROFILE BODY -->
   <div class="profile-dashboard">
 
-    <!-- QUICK ACTIONS -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
-      <button class="btn" onclick="navTo('write')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">✍️</span>Write</button>
-      <button class="btn" onclick="navTo('library')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">📚</span>Library</button>
-      <button class="btn" onclick="navTo('editor')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">✏️</span>Editor</button>
-      <button class="btn" onclick="navTo('lucky')" style="padding:10px 4px;font-size:12px;flex-direction:column;display:flex;align-items:center;gap:3px"><span style="font-size:18px">🎲</span>Lucky</button>
-    </div>
-
     <!-- PLAN & USAGE -->
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
@@ -4026,7 +4088,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
         <div>
           <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
-          <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips — from writers worldwide</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips · from writers worldwide</div>
         </div>
       </div>
       <!-- Compose Box -->
@@ -5378,6 +5440,14 @@ function goPg(id,el){
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
   target.classList.add('on');
   if(el) el.classList.add('on');
+  // Sidebar nav active state
+  document.querySelectorAll('.sb-btn').forEach(function(b){b.classList.remove('on')});
+  var sbBtn = document.querySelector('.sidebar-nav .sb-btn[onclick*="\''+id+'\'"]');
+  if(sbBtn) sbBtn.classList.add('on');
+  // Mobile nav active state
+  document.querySelectorAll('.mb-btn').forEach(function(b){b.classList.remove('on')});
+  var mbBtn = document.querySelector('.mobile-bottom-nav .mb-btn[onclick*="\''+id+'\'"]');
+  if(mbBtn) mbBtn.classList.add('on');
   if(id==='more'){renderFormula();renderBiblePills();loadSongs();}
   if(id==='library')renderLib();
   if(id==='builder')initBuilder();
@@ -5487,6 +5557,30 @@ function cpBriefPrompt(prefix){
 function countSyl(word){word=word.toLowerCase().replace(/[^a-z]/g,'');if(!word)return 0;if(word.length<=3)return 1;word=word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');word=word.replace(/^y/,'');const m=word.match(/[aeiouy]{1,2}/g);return m?m.length:1;}
 function lineSyl(line){return line.replace(/\[.*?\]/g,'').trim().split(/\s+/).filter(Boolean).reduce((s,w)=>s+countSyl(w),0);}
 function sylCls(n,chorus){if(n<=0)return'syl-ok';if(n>=14)return'syl-over';if(chorus&&n<=10)return'syl-ok';if(!chorus&&n<=13)return'syl-ok';return'syl-warn';}
+
+
+// ── SONG CARD OVERFLOW MENU TOGGLES ──
+function toggleResOverflow(){
+  const menu=document.getElementById('res-overflow-menu');
+  if(!menu)return;
+  const isOpen=menu.classList.contains('open');
+  document.querySelectorAll('.song-card-overflow-menu').forEach(m=>m.classList.remove('open'));
+  if(!isOpen)menu.classList.add('open');
+}
+function toggleLresOverflow(){
+  const menu=document.getElementById('lres-overflow-menu');
+  if(!menu)return;
+  const isOpen=menu.classList.contains('open');
+  document.querySelectorAll('.song-card-overflow-menu').forEach(m=>m.classList.remove('open'));
+  if(!isOpen)menu.classList.add('open');
+}
+// Close overflow menus when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.song-card-overflow')){
+    document.querySelectorAll('.song-card-overflow-menu').forEach(m=>m.classList.remove('open'));
+  }
+});
+
 
 // ═══════════════════════════════════════════════════════
 // GENERATE SONG
