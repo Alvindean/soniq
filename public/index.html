@@ -155,6 +155,12 @@ a{color:var(--amber);text-decoration:none}
 .htag-teal{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
 .htag-v{background:var(--violetbg);color:var(--violet);border-color:var(--violetline)}
 
+/* Full-width header/nav background on large screens */
+@media(min-width:1440px){
+  .hdr{margin:0 -28px;padding-left:28px;padding-right:28px}
+  .nav{margin:0 -28px 28px;border-radius:0;border-left:none;border-right:none;padding-left:28px;padding-right:28px}
+}
+
 /* ── NAV ── */
 .nav{display:flex;gap:3px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:5px;margin-bottom:28px;overflow-x:auto}
 .nav::-webkit-scrollbar{display:none}
@@ -1715,13 +1721,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="nb on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
   <button class="nb nb-lucky" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Feel Lucky</button>
   <button class="nb" onclick="goPg('library',this)"><span class="ni">📚</span>Library<span id="nav-lib-count" class="nav-badge" style="display:none"></span></button>
-  <button class="nb" onclick="goPg('editor',this)"><span class="ni">✏️</span>Editor</button>
   <button class="nb" onclick="goPg('builder',this)"><span class="ni">🎛️</span>Builder</button>
   <button class="nb" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
-  <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+  <button class="nb" onclick="goPg('campaign',this)"><span class="ni">🚀</span>Campaign</button>
   <button class="nb" onclick="goPg('community',this)" id="nav-community-btn"><span class="ni">🌐</span>Community</button>
   <button class="nb" onclick="goPg('profile',this)" id="nav-profile-btn"><span class="ni">👤</span>Profile</button>
+  <button class="nb" onclick="goPg('editor',this)"><span class="ni">✏️</span>Editor</button>
   <button class="nb" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none"><span class="ni">📊</span>Admin</button>
     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <a href="/" style="font-size:11px;color:var(--tx3);text-decoration:none;padding:4px 8px;border-radius:6px;border:1px solid var(--b1);white-space:nowrap" title="Back to mysoniq.com">◈ SONIQ</a>
@@ -5196,10 +5202,12 @@ function goPg(id,el){
     const banner = document.getElementById('album-track-banner');
     if (banner) banner.style.display = 'none';
   }
+  const target = document.getElementById('pg-'+id);
+  if (!target) { console.warn('[SONIQ] goPg: page not found: pg-'+id); return; }
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
-  document.getElementById('pg-'+id).classList.add('on');
-  el.classList.add('on');
+  target.classList.add('on');
+  if(el) el.classList.add('on');
   if(id==='more'){renderFormula();renderBiblePills();loadSongs();}
   if(id==='library')renderLib();
   if(id==='builder')initBuilder();
@@ -7168,9 +7176,20 @@ function loadLyricsIntoEditor(lyrics,title){
   document.getElementById('paste-modal').style.display='none';
 }
 function navTo(pageId){
-  // Find the nav button that navigates to this page and click it programmatically
-  const btn=Array.from(document.querySelectorAll('.nb')).find(b=>b.getAttribute('onclick')===`goPg('${pageId}',this)`);
-  if(btn)goPg(pageId,btn);
+  const btn=Array.from(document.querySelectorAll('.nb')).find(b=>{
+    const oc=b.getAttribute('onclick')||'';
+    return oc.includes(`'${pageId}'`) || oc.includes(`"${pageId}"`);
+  });
+  if(btn) goPg(pageId,btn);
+  else {
+    // Fallback: call goPg directly if button not found
+    const target=document.getElementById('pg-'+pageId);
+    if(target){
+      document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+      document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+      target.classList.add('on');
+    }
+  }
 }
 
 function renderEditor(){
