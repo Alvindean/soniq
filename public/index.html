@@ -155,7 +155,12 @@ a{color:var(--amber);text-decoration:none}
   #pg-write.on .studio .gp{padding:10px 4px}
   #pg-write.on .studio .gp-icon{font-size:18px;margin-bottom:4px}
   #pg-write.on .studio .gp-name{font-size:10px}
-  /* Secondary controls (in output col) — gen button full width */
+  /* Secondary controls (in output col) — topic input full width */
+  #pg-write.on #writer-output-controls .topic-input{font-size:16px;padding:14px 16px;min-height:72px;width:100%}
+  #pg-write.on #writer-output-controls .enhance-row{flex-direction:row;gap:8px;margin-bottom:16px;align-items:flex-start}
+  #pg-write.on #writer-output-controls .enhance-row-btns{display:flex;gap:6px;flex-shrink:0}
+  #pg-write.on #writer-output-controls .enhance-row .topic-input{flex:1}
+  /* Gen button full width */
   #pg-write.on #writer-output-controls .gen-btn{width:100%;justify-content:center;font-size:16px;padding:16px 24px}
   #pg-write.on #writer-output-controls .gen-action{flex-direction:row;flex-wrap:wrap;gap:8px;align-items:center}
   #pg-write.on #writer-output-controls .gen-action .gen-btn{flex:1 1 100%}
@@ -1854,18 +1859,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
     <div class="studio-body">
 
-      <!-- BIG TOPIC INPUT -->
-      <label class="topic-label" for="g-topic">What is your song about?</label>
-      <div class="enhance-row">
-        <input type="text" id="g-topic" class="topic-input"
-          placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
-          onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}" />
-        <div class="enhance-row-btns">
-          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤</button>
-          <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept into a sharper, more emotionally precise version">✦ Enhance</button>
-        </div>
-      </div>
-
       <!-- GENRE GRID -->
       <label class="topic-label">Genre</label>
       <div class="genre-grid" id="genre-grid"></div>
@@ -1880,8 +1873,20 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
-  <!-- OUTPUT COLUMN SECONDARY CONTROLS (Age, Vocal, Structure, Adv, Blend, Length, Generate) -->
+  <!-- OUTPUT COLUMN SECONDARY CONTROLS (Topic, Age, Vocal, Structure, Adv, Blend, Length, Generate) -->
   <div id="writer-output-controls">
+
+      <!-- BIG TOPIC INPUT -->
+      <label class="topic-label" for="g-topic">What is your song about?</label>
+      <div class="enhance-row">
+        <input type="text" id="g-topic" class="topic-input"
+          placeholder="e.g. feeling free after a breakup, a city that never loved you back…"
+          onkeydown="if((event.metaKey||event.ctrlKey)&&event.key==='Enter'){event.preventDefault();generateSong();}" />
+        <div class="enhance-row-btns">
+          <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤</button>
+          <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept into a sharper, more emotionally precise version">✦ Enhance</button>
+        </div>
+      </div>
 
       <label class="topic-label" style="margin-top:4px">Audience Age <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— optional, shapes vocabulary &amp; themes</span></label>
       <div class="quality-row" id="age-pills">
