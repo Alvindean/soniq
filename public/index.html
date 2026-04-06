@@ -1125,14 +1125,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-page-title{font-size:18px;font-weight:800;color:var(--tx1)}
 .comm-page-subtitle{font-size:11px;color:var(--tx3);margin-top:1px}
 .comm-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
-/* ── PROFILE FULL-WIDTH DASHBOARD ── */
-.profile-dashboard{display:grid;grid-template-columns:280px 1fr;gap:24px;align-items:start;max-width:720px;margin:0 auto;padding:20px 0}
-@media(min-width:1200px){.profile-dashboard{grid-template-columns:300px 1fr}}
+/* ── PROFILE FULL-WIDTH DASHBOARD (UX Grid System) ── */
+.profile-dashboard{display:flex;flex-direction:column;gap:14px;max-width:none;margin:0;padding:20px clamp(16px,3vw,32px) 0}
+/* 3-col top row: plan + genre + anthem */
+.profile-top-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+/* 2-col body rows */
+.profile-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+/* 2-col weighted: songs wider */
+.profile-2col-wide{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
 .profile-sidebar{position:sticky;top:16px}
 .profile-main{min-width:0}
 .profile-banner{background:linear-gradient(135deg,rgba(245,192,0,.06) 0%,var(--s2) 40%,rgba(168,146,255,.04) 100%);padding:32px 20px 0;position:relative;overflow:hidden;border-bottom:1px solid var(--b1)}
-.profile-banner-inner{max-width:680px;margin:0 auto;position:relative}
+.profile-banner-inner{max-width:none;margin:0 auto;position:relative;max-width:1100px}
 .profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.08);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+@media(max-width:900px){
+  .profile-top-row{grid-template-columns:1fr}
+  .profile-2col,.profile-2col-wide{grid-template-columns:1fr}
+}
 @media(max-width:600px){
   .profile-banner{padding:20px 16px 0}
   #pg-profile [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important}
@@ -3907,7 +3916,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div style="position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,rgba(251,191,36,.08) 0%,transparent 70%);pointer-events:none"></div>
     <div style="position:absolute;bottom:0;left:-20px;width:160px;height:160px;background:radial-gradient(circle,rgba(139,92,246,.06) 0%,transparent 70%);pointer-events:none"></div>
 
-    <div style="max-width:680px;margin:0 auto;position:relative">
+    <div style="max-width:1100px;margin:0 auto;position:relative">
       <!-- Avatar + name row -->
       <div style="display:flex;align-items:flex-end;gap:18px;margin-bottom:20px">
         <div id="profile-avatar" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(251,191,36,.3)">?</div>
@@ -3963,29 +3972,27 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <!-- PROFILE BODY -->
   <div class="profile-dashboard">
 
-    <!-- PLAN & USAGE -->
-    <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:700;color:var(--tx1)">📊 Plan &amp; Usage</div>
-        <div id="profile-plan-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--amberbg);border:1px solid var(--amberline);color:var(--amber);text-transform:uppercase;letter-spacing:.06em">Free</div>
-      </div>
-      <div id="profile-usage-wrap">
-        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:5px">
-          <span id="profile-usage-label">Songs used</span>
-          <span id="profile-usage-nums" style="font-weight:600;color:var(--tx2)">0 / 3</span>
+    <!-- ROW 1: Plan + Genre + Anthem (3-col) -->
+    <div class="profile-top-row">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">📊 Plan &amp; Usage</div>
+          <div id="profile-plan-badge" style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--amberbg);border:1px solid var(--amberline);color:var(--amber);text-transform:uppercase;letter-spacing:.06em">Free</div>
         </div>
-        <div style="height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:6px">
-          <div id="profile-usage-bar" style="height:100%;background:linear-gradient(90deg,var(--amber),var(--violet));border-radius:99px;width:0%;transition:width .6s ease"></div>
+        <div id="profile-usage-wrap">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--tx3);margin-bottom:5px">
+            <span id="profile-usage-label">Songs used</span>
+            <span id="profile-usage-nums" style="font-weight:600;color:var(--tx2)">0 / 3</span>
+          </div>
+          <div style="height:6px;background:var(--bg3);border-radius:99px;overflow:hidden;margin-bottom:6px">
+            <div id="profile-usage-bar" style="height:100%;background:linear-gradient(90deg,var(--amber),var(--violet));border-radius:99px;width:0%;transition:width .6s ease"></div>
+          </div>
+          <div id="profile-usage-sub" style="font-size:10px;color:var(--tx4)"></div>
         </div>
-        <div id="profile-usage-sub" style="font-size:10px;color:var(--tx4)"></div>
+        <div id="profile-upgrade-cta" style="display:none;margin-top:12px">
+          <button class="btn btn-amber" onclick="openUpgradeModal()" style="width:100%;font-size:13px;padding:9px">Upgrade Plan</button>
+        </div>
       </div>
-      <div id="profile-upgrade-cta" style="display:none;margin-top:12px">
-        <button class="btn btn-amber" onclick="openUpgradeModal()" style="width:100%;font-size:13px;padding:9px">⚡ Upgrade Plan — Unlock More Songs</button>
-      </div>
-    </div>
-
-    <!-- TOP GENRE + ANTHEM row -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div class="card" style="padding:14px">
         <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Top Genre</div>
         <div id="profile-top-genre" style="font-size:18px;font-weight:700;color:var(--tx1)">—</div>
@@ -3998,46 +4005,46 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
-    <!-- GENRE BREAKDOWN -->
-    <div class="card" id="profile-genre-breakdown-card" style="margin-bottom:16px;display:none">
-      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎸 Genre Breakdown</div>
-      <div id="profile-genre-breakdown"></div>
-    </div>
-
-    <!-- ACHIEVEMENTS -->
-    <div class="card" style="margin-bottom:16px">
-      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🏆 Achievements</div>
-      <div id="profile-achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px"></div>
-    </div>
-
-    <!-- RECENT SONGS -->
-    <div class="card" style="margin-bottom:16px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎶 Recent Songs</div>
-        <button class="btn btn-sm" onclick="navTo('library')" style="font-size:10px">View All</button>
+    <!-- ROW 2: Genre Breakdown + Achievements (2-col equal) -->
+    <div class="profile-2col">
+      <div class="card" id="profile-genre-breakdown-card" style="display:none">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎸 Genre Breakdown</div>
+        <div id="profile-genre-breakdown"></div>
       </div>
-      <div id="profile-songs-list"></div>
-      <div id="profile-no-songs" style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">No songs yet — go write one!</div>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🏆 Achievements</div>
+        <div id="profile-achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px"></div>
+      </div>
     </div>
 
-    <!-- ACCOUNT -->
-    <div class="card" style="margin-bottom:16px">
-      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">👤 Account</div>
-      <div id="profile-email-display" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd)">
-        <span style="font-size:18px">✉️</span>
-        <div>
-          <div id="profile-email-val" style="font-size:13px;color:var(--tx1);font-weight:600"></div>
-          <div id="profile-member-since" style="font-size:10px;color:var(--tx4)"></div>
+    <!-- ROW 3: Recent Songs (wider) + Account -->
+    <div class="profile-2col-wide">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎶 Recent Songs</div>
+          <button class="btn btn-sm" onclick="navTo('library')" style="font-size:10px">View All</button>
         </div>
+        <div id="profile-songs-list"></div>
+        <div id="profile-no-songs" style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">No songs yet — go write one!</div>
       </div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
-        <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
+      <div class="card">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">👤 Account</div>
+        <div id="profile-email-display" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd)">
+          <span style="font-size:18px">✉️</span>
+          <div>
+            <div id="profile-email-val" style="font-size:13px;color:var(--tx1);font-weight:600"></div>
+            <div id="profile-member-since" style="font-size:10px;color:var(--tx4)"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
+          <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
+        </div>
       </div>
     </div>
 
     <!-- Legal footer -->
-    <div style="text-align:center;padding:24px 0 8px;border-top:1px solid var(--brd);margin-top:8px">
+    <div style="text-align:center;padding:20px 0 8px;border-top:1px solid var(--brd);margin-top:4px">
       <div style="font-size:10px;color:var(--tx4);margin-bottom:8px">© 2026 Nu Wav Media LLC · SONIQ</div>
       <div style="display:flex;justify-content:center;gap:16px;flex-wrap:wrap">
         <a href="/legal/terms.html" target="_blank" style="font-size:11px;color:var(--tx3);text-decoration:none">Terms of Service</a>
@@ -8713,7 +8720,7 @@ function _initSupabase() {
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
-  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com']);
+  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com']);
   S.supabase.auth.onAuthStateChange((event, session) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
