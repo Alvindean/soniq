@@ -14018,13 +14018,20 @@ function _generateArticleContent(keyword, style) {
   const year = new Date().getFullYear();
   let html = '';
 
-  // Title
+  // Title — clean keyword to avoid "How to How to..." / "Best Tools for Best..." / year duplication
+  const kwBase = kw
+    .replace(/^how to /i, '').replace(/^best /i, '').replace(/^top \d+\s*/i, '')
+    .replace(/^what is /i, '').replace(/^why /i, '').replace(/^guide to /i, '')
+    .replace(/^learn (how to )?/i, '').replace(/\?+$/, '').trim()
+    .replace(/^./, c => c.toUpperCase());
+  const kwNoYear = kw.replace(/\s*\d{4}\s*/g, ' ').trim();
+  const kwBaseNoYear = kwBase.replace(/\s*\d{4}\s*/g, ' ').trim();
   const titles = {
-    tutorial: [`How to ${kw} (${year} Guide)`, `${kw}: Step-by-Step Tutorial`, `The Complete Guide to ${kw}`],
-    pillar: [`${kw}: The Complete ${year} Guide`, `Everything You Need to Know About ${kw}`, `${kw} — The Definitive Guide`],
-    listicle: [`Best Tools for ${kw} in ${year}`, `Top 5 ${kw} Resources Compared`, `${kw}: ${year} Comparison Guide`],
-    thought: [`${kw}: What Everyone Gets Wrong`, `The Truth About ${kw} in ${year}`, `Why ${kw} Matters More Than Ever`],
-    faq: [`${kw}: Your Questions Answered`, `${kw} FAQ — Everything You Need to Know`]
+    tutorial: [`How to ${kwBase} (${year} Guide)`, `${kw}: Step-by-Step Tutorial`, `The Complete Guide to ${kwBase}`],
+    pillar: [`${kwNoYear}: The Complete ${year} Guide`, `Everything You Need to Know About ${kwBase}`, `${kwNoYear} — The Definitive Guide`],
+    listicle: [`Best ${kwBaseNoYear} in ${year}`, `Top 5 ${kwBaseNoYear} Compared`, `${kwNoYear}: ${year} Comparison Guide`],
+    thought: [`${kwNoYear}: What Everyone Gets Wrong`, `The Truth About ${kwNoYear} in ${year}`, `Why ${kwNoYear} Matters More Than Ever`],
+    faq: [`${kwBase}: Your Questions Answered`, `${kwBase} FAQ — Everything You Need to Know`]
   };
   const title = _pickRandom(titles[style] || titles.pillar);
 
