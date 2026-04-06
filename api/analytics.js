@@ -9,22 +9,8 @@
  *   ?format=csv  →  returns users table as CSV download
  */
 
-let timingSafeEqual, createHash;
-try {
-  const crypto = require('crypto');
-  timingSafeEqual = crypto.timingSafeEqual;
-  createHash = crypto.createHash;
-} catch (e) {
-  console.error('[analytics] crypto import failed:', e.message);
-}
-
-let createClient;
-try {
-  const supa = require('@supabase/supabase-js');
-  createClient = supa.createClient;
-} catch (e) {
-  console.error('[analytics] @supabase/supabase-js import failed:', e.message);
-}
+const { timingSafeEqual, createHash } = require('crypto');
+const { createClient } = require('@supabase/supabase-js');
 
 // ---------------------------------------------------------------------------
 // Config
@@ -33,27 +19,22 @@ try {
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL || '';
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
 
-const ADMIN_EMAILS = new Set([
+const ADMIN_EMAILS = [
   'thealvindean@gmail.com',
   'alvin@nuwavmedia.com',
   'lamusicproducers8@gmail.com',
   'rainfiremusic@gmail.com'
-]);
+];
 
 // ---------------------------------------------------------------------------
 // Auth helpers
 // ---------------------------------------------------------------------------
 
 function safeEqual(a, b) {
-  if (!createHash || !timingSafeEqual) return a === b;
   if (typeof a !== 'string' || typeof b !== 'string') return false;
-  try {
-    const ha = createHash('sha256').update(a).digest();
-    const hb = createHash('sha256').update(b).digest();
-    return timingSafeEqual(ha, hb);
-  } catch {
-    return false;
-  }
+  const ha = createHash('sha256').update(a).digest();
+  const hb = createHash('sha256').update(b).digest();
+  return timingSafeEqual(ha, hb);
 }
 
 function decodeJwtPayload(token) {
@@ -71,7 +52,6 @@ function decodeJwtPayload(token) {
 async function verifySupabaseToken(token) {
   try {
     const supabase = getSupabaseClient();
-    if (!supabase) return null;
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data?.user) return null;
     return data.user;
@@ -87,16 +67,9 @@ async function verifySupabaseToken(token) {
 let _supabase = null;
 function getSupabaseClient() {
   if (_supabase) return _supabase;
-  if (!createClient) {
-    console.error('[analytics] createClient not available');
-    return null;
-  }
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) {
-    console.error('[analytics] Missing SUPABASE_URL or SUPABASE_SERVICE_KEY/SUPABASE_ANON_KEY');
-    return null;
-  }
+  if (!url || !key) throw new Error('Missing SUPABASE_URL or key');
   _supabase = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
@@ -118,14 +91,10 @@ async function redisPipeline(commands) {
       },
       body: JSON.stringify(commands)
     });
-    if (!r.ok) {
-      console.error('[analytics] Redis pipeline HTTP', r.status);
-      return [];
-    }
+    if (!r.ok) return [];
     const d = await r.json();
     return Array.isArray(d) ? d.map(x => x.result) : [];
-  } catch (e) {
-    console.error('[analytics] Redis pipeline error:', e.message);
+  } catch {
     return [];
   }
 }
@@ -176,11 +145,10 @@ function usersToCSV(users) {
 }
 
 // ---------------------------------------------------------------------------
-// Handler — entire function wrapped in try/catch for safety
+// Handler
 // ---------------------------------------------------------------------------
 
 module.exports = async function handler(req, res) {
-  // Top-level try/catch — nothing escapes
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -189,7 +157,7 @@ module.exports = async function handler(req, res) {
     if (req.method === 'OPTIONS') return res.status(200).end();
     if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-    // ---- Authentication -----------------------------------------------------
+    // ---- Authentication ---------------------------------------------------
 
     const adminPassword = process.env.ADMIN_PASSWORD;
     let authenticated = false;
@@ -211,14 +179,14 @@ module.exports = async function handler(req, res) {
         const payload = decodeJwtPayload(token);
         const claimedEmail = payload?.email || '';
 
-        if (ADMIN_EMAILS.has(claimedEmail)) {
+        if (ADMIN_EMAILS.includes(claimedEmail)) {
           try {
             const user = await verifySupabaseToken(token);
-            if (user && ADMIN_EMAILS.has(user.email)) {
+            if (user && ADMIN_EMAILS.includes(user.email)) {
               authenticated = true;
             }
-          } catch (authErr) {
-            console.error('[analytics] Supabase auth error:', authErr.message);
+          } catch {
+            // auth failed, continue unauthenticated
           }
         }
       }
@@ -229,15 +197,9 @@ module.exports = async function handler(req, res) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // ---- Data fetching ------------------------------------------------------
+    // ---- Data fetching ----------------------------------------------------
 
     const supabase = getSupabaseClient();
-    if (!supabase) {
-      return res.status(500).json({
-        error: 'Database not configured',
-        hint: 'Check SUPABASE_URL and SUPABASE_SERVICE_KEY env vars'
-      });
-    }
 
     // Build daily keys for the last 14 days
     const days = [];
@@ -265,10 +227,10 @@ module.exports = async function handler(req, res) {
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
-    // Safe wrapper — one failure doesn't kill everything
+    // Safe wrapper
     const safeFetch = (promise) =>
       promise.catch(err => {
-        console.error('[analytics] sub-query error:', err.message);
+        console.error('[analytics] query error:', err.message);
         return { data: null, error: err, count: 0 };
       });
 
@@ -296,7 +258,7 @@ module.exports = async function handler(req, res) {
           .select('id', { count: 'exact', head: true }))
       ]);
 
-    // Destructure Redis results (all default to empty/zero if Redis unavailable)
+    // Destructure Redis results
     const rr = redisResults || [];
     const totalSongsRaw        = rr[0];
     const totalPublishedRaw    = rr[1];
@@ -342,7 +304,7 @@ module.exports = async function handler(req, res) {
       try { return JSON.parse(s); } catch { return null; }
     }).filter(Boolean);
 
-    // Daily events — chronological order (oldest first)
+    // Daily events
     const daily_events = days.map((date, i) => {
       const raw = dailyResults[i];
       const obj = { date, ...parseHash(raw) };
@@ -353,9 +315,6 @@ module.exports = async function handler(req, res) {
     }).reverse();
 
     // Users array
-    if (profilesResult?.error) {
-      console.error('[analytics] profiles error:', profilesResult.error.message || profilesResult.error);
-    }
     const users = profilesResult?.data || [];
 
     // Songs by plan
@@ -377,12 +336,12 @@ module.exports = async function handler(req, res) {
           }
           songs_by_plan = Object.entries(planMap).map(([plan, count]) => ({ plan, count }));
         }
-      } catch (fallbackErr) {
-        console.error('[analytics] songs_by_plan fallback error:', fallbackErr.message);
+      } catch {
+        // songs_by_plan fallback failed, leave empty
       }
     }
 
-    // ---- CSV export ---------------------------------------------------------
+    // ---- CSV export -------------------------------------------------------
 
     if (req.query?.format === 'csv') {
       const today = new Date().toISOString().slice(0, 10);
@@ -392,7 +351,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).send(csv);
     }
 
-    // ---- JSON response ------------------------------------------------------
+    // ---- JSON response ----------------------------------------------------
 
     return res.status(200).json({
       summary,
@@ -406,12 +365,10 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (e) {
-    // Catch-all — this should NEVER let FUNCTION_INVOCATION_FAILED happen
     console.error('[analytics] FATAL:', e.message, e.stack);
     return res.status(500).json({
       error: 'Analytics error',
-      message: e.message || 'Unknown error',
-      stack: process.env.NODE_ENV === 'development' ? e.stack : undefined
+      message: e.message || 'Unknown error'
     });
   }
 };
