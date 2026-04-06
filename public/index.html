@@ -44,7 +44,8 @@
 }
 html{background:var(--s0)}
 body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-@media(min-width:901px){.wrap{margin-left:72px!important;width:calc(100% - 72px)!important;box-sizing:border-box!important}.pg{padding-left:24px!important}#pg-write.on{padding-left:0!important}}
+/* ── UX GRID SYSTEM: Sidebar-aware layout ── */
+@media(min-width:901px){body{display:flex!important;flex-direction:row!important;min-height:100vh}body::before{content:''!important;display:block!important;flex:0 0 64px!important;width:64px!important;min-height:100vh!important;pointer-events:none!important}.wrap{flex:1 1 0%!important;min-width:0!important;margin-left:0!important;width:auto!important}}
 /* ── MODERN SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--s1);border-radius:3px}
@@ -210,7 +211,7 @@ a{color:var(--amber);text-decoration:none}
 .ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
 @media(min-width:1500px){
   .ad-rail-right{display:flex}
-  .wrap{margin-right:184px;max-width:none;padding-left:24px;padding-right:24px}
+  .wrap{margin-right:184px;margin-left:0!important;max-width:none;padding-left:24px;padding-right:24px}
   .comm-right{display:none}
   .comm-layout{grid-template-columns:1fr}
   #pg-community{max-width:none;margin:0;padding-left:24px;padding-right:24px}
@@ -263,7 +264,7 @@ a{color:var(--amber);text-decoration:none}
 @media(max-width:900px){
   .sidebar-nav{display:none}
   .mobile-bottom-nav{display:flex}
-  .wrap{margin-left:0!important;padding-left:16px}
+  .wrap{margin-left:0!important;padding-left:16px;width:100%!important;flex:none!important}
   /* On mobile, when output has content, show it above controls */
   #pg-write.on{display:flex;flex-direction:column}
   #pg-write.on .write-output-panel{order:-1}
@@ -273,7 +274,7 @@ a{color:var(--amber);text-decoration:none}
   .mood-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
   .genre-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
 }
-@media(min-width:901px){.wrap{margin-left:72px!important;padding-left:24px}}
+@media(min-width:901px){.wrap{padding-left:24px}}
 
 /* ── PAGES ── */
 .pg{display:none}
@@ -5484,22 +5485,26 @@ function showErr(containerId,msg){const el=document.getElementById(containerId);
 // ═══════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════
-// ── LAYOUT ENFORCER ── ensures sidebar clearance on ALL pages at desktop
+// ── UX GRID LAYOUT ENFORCER ── ensures sidebar clearance via flexbox spacer
 function _enforceLayout(){
-  if(window.innerWidth<901)return;
+  if(window.innerWidth<901){
+    document.body.style.removeProperty('display');
+    return;
+  }
+  // Ensure body is flex row
+  document.body.style.setProperty('display','flex','important');
+  document.body.style.setProperty('flex-direction','row','important');
+  // Ensure .wrap fills remaining space
   var w=document.querySelector('.wrap');
   if(w){
-    w.style.setProperty('margin-left','72px','important');
-    w.style.setProperty('width','calc(100% - 72px)','important');
-    w.style.setProperty('box-sizing','border-box','important');
+    w.style.setProperty('flex','1 1 0%','important');
+    w.style.setProperty('min-width','0','important');
+    w.style.setProperty('margin-left','0','important');
+    w.style.setProperty('width','auto','important');
   }
-  document.querySelectorAll('.pg').forEach(function(p){
-    if(p.id==='pg-write'&&p.classList.contains('on'))return;
-    p.style.setProperty('padding-left','24px','important');
-  });
 }
-window.addEventListener('DOMContentLoaded',_enforceLayout);
-window.addEventListener('resize',function(){_enforceLayout();});
+document.addEventListener('DOMContentLoaded',_enforceLayout);
+window.addEventListener('resize',_enforceLayout);
 window.addEventListener('load',_enforceLayout);
 
 function goPg(id,el){
