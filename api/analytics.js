@@ -22,7 +22,8 @@ const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const ADMIN_EMAILS = new Set([
   'thealvindean@gmail.com',
   'alvin@nuwavmedia.com',
-  'lamusicproducers8@gmail.com'
+  'lamusicproducers8@gmail.com',
+  'rainfiremusic@gmail.com'
 ]);
 
 // ---------------------------------------------------------------------------
@@ -248,7 +249,7 @@ module.exports = async function handler(req, res) {
         redisPipeline(redisCommands).catch(() => []),
         safeFetch(supabase
           .from('profiles')
-          .select('id, email, display_name, artist_name, plan, created_at, song_count, liked_count, xp, level, streak, last_active, genres')
+          .select('id, email, display_name, artist_name, plan, created_at, song_count, liked_count, xp, level, streak, last_active, genres, founding_member, founding_tier')
           .order('created_at', { ascending: false })
           .limit(500)),
         safeFetch(supabase.rpc('songs_by_plan').catch(() => ({ data: null, error: null }))),
@@ -332,19 +333,23 @@ module.exports = async function handler(req, res) {
     if (songsByPlanResult?.data) {
       songs_by_plan = songsByPlanResult.data;
     } else {
-      // Fallback: join songs → profiles and group in JS
-      const { data: songRows } = await supabase
-        .from('songs')
-        .select('profiles!inner(plan)')
-        .limit(10000);
+      // Fallback: aggregate song_count from profiles (no FK join needed)
+      try {
+        const { data: profilePlans } = await supabase
+          .from('profiles')
+          .select('plan, song_count')
+          .gt('song_count', 0);
 
-      if (songRows) {
-        const planMap = {};
-        for (const row of songRows) {
-          const plan = row.profiles?.plan || 'unknown';
-          planMap[plan] = (planMap[plan] || 0) + 1;
+        if (profilePlans) {
+          const planMap = {};
+          for (const row of profilePlans) {
+            const plan = row.plan || 'free';
+            planMap[plan] = (planMap[plan] || 0) + (row.song_count || 0);
+          }
+          songs_by_plan = Object.entries(planMap).map(([plan, count]) => ({ plan, count }));
         }
-        songs_by_plan = Object.entries(planMap).map(([plan, count]) => ({ plan, count }));
+      } catch (fallbackErr) {
+        console.error('songs_by_plan fallback error:', fallbackErr.message);
       }
     }
 

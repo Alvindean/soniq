@@ -4,7 +4,7 @@
   "description": "SONIQ — AI Song Creation Studio",
   "private": true,
   "engines": {
-    "node": ">=18.x"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "vercel dev",
