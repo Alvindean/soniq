@@ -10,7 +10,7 @@
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const { timingSafeEqual, createHash } = require('crypto');
+const { timingSafeEqual, createHash } = require('node:crypto');
 
 // Timing-safe string comparison — hashes both values to normalize length before comparison
 function safeEqual(a, b) {

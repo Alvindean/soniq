@@ -29,7 +29,7 @@ module.exports = async function handler(req, res) {
 
   // Test crypto
   try {
-    const crypto = require('crypto');
+    const crypto = require('node:crypto');
     const hash = crypto.createHash('sha256').update('test').digest('hex');
     checks.crypto = hash ? 'ok' : 'failed';
   } catch (e) {

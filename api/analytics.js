@@ -9,7 +9,6 @@
  *   ?format=csv  →  returns users table as CSV download
  */
 
-const { timingSafeEqual, createHash } = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 
 // ---------------------------------------------------------------------------
@@ -32,9 +31,12 @@ const ADMIN_EMAILS = [
 
 function safeEqual(a, b) {
   if (typeof a !== 'string' || typeof b !== 'string') return false;
-  const ha = createHash('sha256').update(a).digest();
-  const hb = createHash('sha256').update(b).digest();
-  return timingSafeEqual(ha, hb);
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 function decodeJwtPayload(token) {
