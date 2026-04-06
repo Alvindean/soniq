@@ -211,7 +211,7 @@ a{color:var(--amber);text-decoration:none}
   .wrap{margin-right:184px;max-width:none;padding-right:24px}
   .comm-right{display:none}
   .comm-layout{grid-template-columns:1fr}
-  #pg-community{max-width:800px}
+  #pg-community{max-width:780px;margin:0 auto;padding-left:32px;padding-right:32px}
 }
 
 /* ── GENRE GRID EXPAND ── */
@@ -1098,7 +1098,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── COMMUNITY PAGE: centered with breathing room ── */
-#pg-community{max-width:900px;margin:0 auto;padding-top:8px}
+#pg-community{max-width:840px;margin:0 auto;padding:8px 36px 0;box-sizing:border-box;overflow:hidden}
 /* ── COMMUNITY: FILTER BAR ── */
 .comm-filters-bar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:8px 14px;display:flex;gap:6px;flex-wrap:nowrap;align-items:center;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box}
 .comm-filters-bar::-webkit-scrollbar{height:0;display:none}
@@ -1109,15 +1109,15 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-filter-btn.on{background:var(--amberbg);border-color:var(--amberline);color:var(--amber);font-weight:700}
 .comm-filter-select{background:var(--s3);border:1px solid var(--b2);border-radius:99px;color:var(--tx2);font-size:11px;padding:5px 10px;outline:none;cursor:pointer}
 /* ── COMMUNITY: 2-COL GRID ── */
-.comm-layout{display:grid;grid-template-columns:1fr 220px;gap:20px;align-items:start}
+.comm-layout{display:grid;grid-template-columns:1fr 200px;gap:20px;align-items:start}
 .comm-main{min-width:0;min-height:calc(100vh - 200px)}
 .comm-right{position:sticky;top:16px}
 @media(max-width:1100px){
-  #pg-community{max-width:none;padding-left:16px;padding-right:16px}
-  .comm-layout{grid-template-columns:1fr 200px}
+  #pg-community{max-width:none;padding-left:24px;padding-right:24px}
+  .comm-layout{grid-template-columns:1fr 180px}
 }
 @media(max-width:900px){
-  #pg-community{padding-left:0;padding-right:0}
+  #pg-community{padding-left:12px;padding-right:12px}
   .comm-layout{grid-template-columns:1fr}
   .comm-right{display:none}
   .comm-filters-bar{border-radius:0;border-left:none;border-right:none}
@@ -8766,14 +8766,17 @@ function _initSupabase() {
     history.replaceState(null, '', '/');
   }
 }
-// Supabase CDN loads with defer — call init when ready
+// Supabase CDN loads with defer — call init when ready (aggressive retry)
+function _tryInitSupabase(attempt) {
+  if (window.supabase) { _initSupabase(); return; }
+  if (attempt >= 10) { console.error('[SONIQ] Supabase failed to load after 10 retries'); return; }
+  console.warn('[SONIQ] Supabase not ready — retry ' + (attempt+1) + '/10');
+  setTimeout(function(){ _tryInitSupabase(attempt + 1); }, 300 * (attempt + 1));
+}
 if (window.supabase) _initSupabase();
-else document.addEventListener('DOMContentLoaded', function(){
-  if (window.supabase) _initSupabase();
-  else { console.warn('[SONIQ] Supabase library not loaded — retrying in 500ms');
-    setTimeout(function(){ if(window.supabase) _initSupabase(); else console.error('[SONIQ] Supabase failed to load'); }, 500);
-  }
-});
+else if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function(){ _tryInitSupabase(0); });
+} else { _tryInitSupabase(0); }
 
 function updateAuthUI() {
   const authBtn = document.getElementById('nav-auth-btn');
@@ -9063,15 +9066,17 @@ function showAuthError(msg) {
 }
 
 async function authSignIn() {
-  if (!S.supabase) { toast('Auth not configured yet'); return; }
+  if (!S.supabase) { showAuthError('Still connecting to auth server — please wait a moment and try again.'); _tryInitSupabase(0); return; }
   const email = document.getElementById('auth-email').value.trim();
   const password = document.getElementById('auth-password').value;
   if (!email || !password) { showAuthError('Please enter your email and password'); return; }
   const btn = document.getElementById('auth-signin-btn');
   btn.disabled = true; btn.textContent = 'Signing in…';
-  const { error } = await S.supabase.auth.signInWithPassword({ email, password });
-  if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Sign In'; }
-  else { btn.textContent = 'Sign In'; btn.disabled = false; }
+  try {
+    const { error } = await S.supabase.auth.signInWithPassword({ email, password });
+    if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Sign In'; }
+    else { btn.textContent = 'Sign In'; btn.disabled = false; }
+  } catch(e) { showAuthError('Connection error — please check your internet and try again.'); btn.disabled = false; btn.textContent = 'Sign In'; console.error('authSignIn error:', e); }
 }
 
 async function authSignUp() {
