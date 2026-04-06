@@ -1188,7 +1188,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .cms-status-badge.draft{background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40}
 .cms-status-badge.published{background:#34d39920;color:#34d399;border:1px solid #34d39940}
 .cms-status-badge.scheduled{background:#60a5fa20;color:#60a5fa;border:1px solid #60a5fa40}
-.cms-post-row{display:grid;grid-template-columns:1fr 90px 90px 80px 70px 60px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b1);font-size:12px;cursor:pointer;transition:background .1s}
+.cms-post-row{display:grid;grid-template-columns:1fr 80px 90px 100px 60px 60px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--b1);font-size:12px;cursor:pointer;transition:background .1s}
 .cms-post-row:hover{background:var(--s2)}
 .cms-ai-btn{padding:6px 12px;border:1px solid var(--amberline);border-radius:6px;background:var(--amberbg);color:var(--amber);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
 .cms-ai-btn:hover{background:var(--amber);color:#000}
@@ -4547,15 +4547,32 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <textarea id="cms-field-excerpt" placeholder="Brief description for blog cards and meta…"></textarea>
             </div>
 
-            <!-- AI Assist -->
+            <!-- AI Content Generator -->
             <div class="card" style="padding:14px">
-              <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:10px">🤖 AI Assist</div>
+              <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:10px">🤖 AI Content Engine</div>
+              <label>Target Keyword</label>
+              <input id="cms-ai-keyword" placeholder="e.g. AI songwriting tips" style="margin-bottom:8px">
+              <label>Article Style</label>
+              <select id="cms-ai-style" style="margin-bottom:10px">
+                <option value="auto">Auto-detect best style</option>
+                <option value="pillar">Pillar Guide (2000-3000 words)</option>
+                <option value="tutorial">Step-by-Step Tutorial</option>
+                <option value="listicle">Listicle / Comparison</option>
+                <option value="thought">Thought Leadership</option>
+                <option value="faq">FAQ Authority Page</option>
+              </select>
+              <button class="cms-ai-btn" onclick="cmsAIGenerate('full')" style="width:100%;padding:10px;font-size:13px;font-weight:700;background:var(--amber);color:#000;border:none;margin-bottom:6px" id="cms-ai-gen-btn">⚡ Generate Full Article</button>
+              <div id="cms-ai-progress" style="display:none;padding:8px;background:var(--s2);border-radius:6px;margin-bottom:8px">
+                <div style="font-size:11px;color:var(--amber);font-weight:600" id="cms-ai-status">Generating...</div>
+                <div style="height:3px;background:var(--b2);border-radius:2px;margin-top:6px;overflow:hidden">
+                  <div id="cms-ai-bar" style="height:100%;background:var(--amber);width:0%;transition:width .3s"></div>
+                </div>
+              </div>
               <div style="display:flex;flex-direction:column;gap:6px">
-                <button class="cms-ai-btn" onclick="cmsAI('outline')">Generate Outline</button>
-                <button class="cms-ai-btn" onclick="cmsAI('write')">Write Section</button>
-                <button class="cms-ai-btn" onclick="cmsAI('headlines')">Suggest Headlines</button>
-                <button class="cms-ai-btn" onclick="cmsAI('seo')">Generate SEO Tags</button>
-                <button class="cms-ai-btn" onclick="cmsAI('improve')">Improve Selection</button>
+                <button class="cms-ai-btn" onclick="cmsAIGenerate('outline')">Generate Outline Only</button>
+                <button class="cms-ai-btn" onclick="cmsAIGenerate('seo')">Generate SEO Metadata</button>
+                <button class="cms-ai-btn" onclick="cmsAIGenerate('improve')">Improve Current Content</button>
+                <button class="cms-ai-btn" onclick="cmsAIGenerate('expand')">Expand Selection</button>
               </div>
             </div>
 
@@ -4563,11 +4580,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <div class="card" style="padding:14px">
               <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:8px">🔍 SEO Preview</div>
               <label>Meta Title</label>
-              <input id="cms-field-meta-title" placeholder="SEO title (max 60 chars)" maxlength="60">
+              <input id="cms-field-meta-title" placeholder="SEO title (max 60 chars)" maxlength="60" oninput="updateCMSCharCounts();updateCMSSEOPreview()">
               <div style="font-size:9px;color:var(--tx4);text-align:right;margin-top:2px"><span id="cms-meta-title-count">0</span>/60</div>
               <label style="margin-top:6px">Meta Description</label>
-              <textarea id="cms-field-meta-desc" placeholder="SEO description (150-160 chars)" maxlength="160" style="min-height:50px"></textarea>
+              <textarea id="cms-field-meta-desc" placeholder="SEO description (150-160 chars)" maxlength="160" style="min-height:50px" oninput="updateCMSCharCounts();updateCMSSEOPreview()"></textarea>
               <div style="font-size:9px;color:var(--tx4);text-align:right;margin-top:2px"><span id="cms-meta-desc-count">0</span>/160</div>
+              <div id="cms-seo-preview" style="margin-top:10px"></div>
             </div>
           </div>
         </div>
@@ -13662,83 +13680,133 @@ function switchAdmTab(tabName, el) {
   if(tabName === 'seotraffic') loadSEODashboard();
 }
 
-// ── BLOG CMS ──
+// ── BLOG CMS (Supabase-powered + AI Content Engine) ──
 let cmsPosts = [];
 let cmsEditingId = null;
 
-function loadCMSPosts() {
-  // Mock data for now - in production connect to Supabase
-  cmsPosts = [
-    {id: 1, title: 'Getting Started with SONIQ', slug: 'getting-started', status: 'published', date: '2025-02-01', excerpt: 'Learn the basics...', content: '<p>Content here</p>'},
-    {id: 2, title: 'Advanced Production Tips', slug: 'advanced-tips', status: 'published', date: '2025-01-15', excerpt: 'Deep dive...', content: '<p>Content here</p>'},
-    {id: 3, title: 'Collaboration Features', slug: 'collab-features', status: 'draft', date: '2025-03-20', excerpt: 'Work together...', content: '<p>Draft content</p>'},
-    {id: 4, title: 'Summer Sound Trends', slug: 'summer-trends', status: 'scheduled', date: '2025-05-01', excerpt: 'What\'s hot...', content: '<p>Scheduled for May</p>'}
-  ];
+async function loadCMSPosts() {
+  const list = document.getElementById('cms-posts-list');
+  if(!list) return;
+  list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--tx4);font-size:13px">Loading posts…</div>';
+  if(!S.supabase) {
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red);font-size:13px">Supabase not connected. Reload the page.</div>';
+    return;
+  }
+  try {
+    const {data, error} = await S.supabase.from('blog_posts').select('*').order('created_at',{ascending:false});
+    if(error) throw error;
+    cmsPosts = data || [];
+  } catch(e) {
+    console.error('CMS load error:', e);
+    list.innerHTML = `<div style="padding:40px;text-align:center;color:var(--red);font-size:13px">Error loading posts: ${e.message||e}</div>`;
+    cmsPosts = [];
+  }
+  // Update stat cards
+  const el = id => document.getElementById(id);
+  el('cms-total') && (el('cms-total').textContent = cmsPosts.length);
+  el('cms-published') && (el('cms-published').textContent = cmsPosts.filter(p=>p.status==='published').length);
+  el('cms-drafts') && (el('cms-drafts').textContent = cmsPosts.filter(p=>p.status==='draft').length);
+  el('cms-views') && (el('cms-views').textContent = cmsPosts.reduce((s,p)=>s+(p.views||0),0));
   renderCMSList();
 }
 
+function filterCMSPosts(){ renderCMSList(); }
+
 function renderCMSList() {
-  const list = document.getElementById('cms-post-list');
+  const list = document.getElementById('cms-posts-list');
   if(!list) return;
   const filter = document.getElementById('cms-filter')?.value || 'all';
   const search = document.getElementById('cms-search')?.value?.toLowerCase() || '';
 
   let filtered = cmsPosts;
   if(filter !== 'all') filtered = filtered.filter(p => p.status === filter);
-  if(search) filtered = filtered.filter(p => p.title.toLowerCase().includes(search));
+  if(search) filtered = filtered.filter(p => (p.title||'').toLowerCase().includes(search) || (p.slug||'').toLowerCase().includes(search));
+
+  if(!filtered.length){
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--tx4);font-size:13px">No posts found. Click <b>✍ New Post</b> or use the <b>AI Content Engine</b> to generate articles.</div>';
+    return;
+  }
 
   list.innerHTML = filtered.map(post => {
-    const statusColor = post.status === 'published' ? 'var(--grn)' : post.status === 'scheduled' ? 'var(--blu)' : 'var(--gry)';
+    const sc = post.status === 'published' ? 'published' : post.status === 'scheduled' ? 'scheduled' : 'draft';
+    const d = post.published_at || post.created_at || '';
+    const dateStr = d ? new Date(d).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '—';
+    const cats = post.category || '—';
     return `
-      <div class="cms-post-row">
-        <div style="flex:1">
-          <div style="font-weight:600;color:var(--tx1)">${post.title}</div>
-          <div style="font-size:12px;color:var(--tx3);margin-top:4px">${post.excerpt}</div>
-          <div style="font-size:11px;color:var(--tx4);margin-top:4px">${post.date}</div>
+      <div class="cms-post-row" style="display:grid;grid-template-columns:1fr 80px 90px 100px 60px 60px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--b2);align-items:center">
+        <div>
+          <div style="font-weight:600;color:var(--tx1);font-size:13px">${post.title||'Untitled'}</div>
+          <div style="font-size:11px;color:var(--tx4);margin-top:2px">/blog/${post.slug||''}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <span class="cms-status-badge" style="background:${statusColor}">${post.status}</span>
-          <button onclick="openCMSEditor(${post.id})" style="padding:6px 12px;font-size:12px;background:var(--amb2);border:none;border-radius:4px;cursor:pointer;color:var(--tx1)">Edit</button>
-        </div>
+        <div style="text-align:center"><span class="cms-status-badge ${sc}">${post.status||'draft'}</span></div>
+        <div style="text-align:center;font-size:11px;color:var(--tx3)">${cats}</div>
+        <div style="text-align:center;font-size:11px;color:var(--tx3)">${dateStr}</div>
+        <div style="text-align:center;font-size:12px;color:var(--tx2);font-weight:600">${post.views||0}</div>
+        <div style="text-align:center"><button onclick="openCMSEditor(${post.id})" style="padding:4px 10px;font-size:11px;background:var(--amb2);border:1px solid var(--amberline);border-radius:4px;cursor:pointer;color:var(--amber);font-weight:600">Edit</button></div>
       </div>
     `;
   }).join('');
 }
 
 function openCMSEditor(postId) {
-  const post = cmsPosts.find(p => p.id === postId);
-  if(!post) return;
-  cmsEditingId = postId;
+  let post = null;
+  if(postId) {
+    post = cmsPosts.find(p => p.id === postId);
+    if(!post) return;
+    cmsEditingId = postId;
+  } else {
+    cmsEditingId = null;
+  }
 
-  document.getElementById('cms-list-view').style.display = 'none';
+  // Toggle views
+  const listView = document.getElementById('cms-list-view');
+  if(listView) listView.style.display = 'none';
   document.getElementById('cms-editor-view').style.display = 'block';
+  document.getElementById('cms-editor-title-display').textContent = post ? 'Edit Post' : 'New Post';
 
-  document.getElementById('cms-title').value = post.title;
-  document.getElementById('cms-slug').value = post.slug;
-  document.getElementById('cms-excerpt').value = post.excerpt;
-  document.getElementById('cms-editor').innerHTML = post.content;
-  document.getElementById('cms-status').value = post.status;
-  document.getElementById('cms-pubdate').value = post.date;
+  // Populate fields
+  const f = id => document.getElementById(id);
+  f('cms-field-title').value = post?.title || '';
+  f('cms-field-slug').value = post?.slug || '';
+  f('cms-field-excerpt').value = post?.excerpt || '';
+  f('cms-editor-content').innerHTML = post?.content || '';
+  f('cms-field-status').value = post?.status || 'draft';
+  f('cms-field-category').value = post?.category || 'cluster';
+  f('cms-field-tags').value = (post?.tags || []).join(', ');
+  f('cms-field-image').value = post?.featured_image || '';
+  f('cms-field-meta-title').value = post?.meta_title || '';
+  f('cms-field-meta-desc').value = post?.meta_description || '';
+  if(post?.published_at) {
+    f('cms-field-date').value = new Date(post.published_at).toISOString().slice(0,16);
+  } else {
+    f('cms-field-date').value = '';
+  }
+  // Pre-fill AI keyword from title
+  const aiKw = document.getElementById('cms-ai-keyword');
+  if(aiKw && !aiKw.value && post?.title) aiKw.value = post.title;
 
   updateCMSSEOPreview();
+  updateCMSCharCounts();
 }
 
 function closeCMSEditor() {
   cmsEditingId = null;
-  document.getElementById('cms-list-view').style.display = 'block';
   document.getElementById('cms-editor-view').style.display = 'none';
+  const listView = document.getElementById('cms-list-view');
+  if(listView) listView.style.display = 'block';
+  loadCMSPosts();
 }
 
 function cmsAutoSlug() {
-  const title = document.getElementById('cms-title').value;
+  const title = document.getElementById('cms-field-title').value;
   const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-  document.getElementById('cms-slug').value = slug;
+  document.getElementById('cms-field-slug').value = slug;
   updateCMSSEOPreview();
 }
 
 function cmsExec(cmd, val = null) {
   document.execCommand(cmd, false, val);
-  document.getElementById('cms-editor').focus();
+  document.getElementById('cms-editor-content').focus();
 }
 
 function cmsInsertLink() {
@@ -13751,77 +13819,424 @@ function cmsInsertImage() {
   if(url) cmsExec('insertImage', url);
 }
 
-function saveCMSPost() {
-  const title = document.getElementById('cms-title').value;
-  const slug = document.getElementById('cms-slug').value;
-  const excerpt = document.getElementById('cms-excerpt').value;
-  const content = document.getElementById('cms-editor').innerHTML;
-  const status = document.getElementById('cms-status').value;
-  const date = document.getElementById('cms-pubdate').value;
+async function saveCMSPost(status) {
+  const f = id => document.getElementById(id);
+  const title = f('cms-field-title').value.trim();
+  const slug = f('cms-field-slug').value.trim();
+  const excerpt = f('cms-field-excerpt').value.trim();
+  const content = f('cms-editor-content').innerHTML;
+  const category = f('cms-field-category').value;
+  const tags = f('cms-field-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const featured_image = f('cms-field-image').value.trim() || null;
+  const meta_title = f('cms-field-meta-title').value.trim() || title.slice(0,60);
+  const meta_description = f('cms-field-meta-desc').value.trim() || excerpt.slice(0,160);
+  const pubDate = f('cms-field-date').value;
 
-  if(!title || !slug) {
-    alert('Title and slug required');
-    return;
-  }
+  if(!title || !slug) { alert('Title and slug are required'); return; }
 
-  if(cmsEditingId) {
-    const post = cmsPosts.find(p => p.id === cmsEditingId);
-    if(post) {
-      post.title = title;
-      post.slug = slug;
-      post.excerpt = excerpt;
-      post.content = content;
-      post.status = status;
-      post.date = date;
+  const row = {
+    title, slug, content, excerpt,
+    status: status || 'draft',
+    category, tags, featured_image,
+    meta_title, meta_description,
+    author_name: 'Alvin Dean',
+    author_email: 'thealvindean@gmail.com',
+    published_at: status === 'published' ? (pubDate || new Date().toISOString()) : (pubDate || null)
+  };
+
+  // Build schema JSON
+  row.schema_json = {
+    "@context":"https://schema.org",
+    "@type":"BlogPosting",
+    "headline": title,
+    "description": excerpt,
+    "image": featured_image || `https://mysoniq.com/images/blog/${slug}.jpg`,
+    "datePublished": row.published_at || new Date().toISOString().split('T')[0],
+    "dateModified": new Date().toISOString().split('T')[0],
+    "author":{"@type":"Person","name":"Alvin Dean","url":"https://mysoniq.com/about"},
+    "publisher":{"@type":"Organization","name":"SONIQ","logo":{"@type":"ImageObject","url":"https://mysoniq.com/logo.png"}},
+    "mainEntityOfPage":`https://mysoniq.com/blog/${slug}`
+  };
+
+  try {
+    let res;
+    if(cmsEditingId) {
+      res = await S.supabase.from('blog_posts').update(row).eq('id', cmsEditingId);
+    } else {
+      res = await S.supabase.from('blog_posts').insert(row);
     }
-  } else {
-    cmsPosts.push({
-      id: Math.max(...cmsPosts.map(p => p.id), 0) + 1,
-      title, slug, excerpt, content, status, date
-    });
+    if(res.error) throw res.error;
+    alert(cmsEditingId ? 'Post updated!' : 'Post created!');
+    _blogPostsCache = null; // bust blog page cache
+    closeCMSEditor();
+  } catch(e) {
+    console.error('Save error:', e);
+    alert('Save failed: ' + (e.message || e));
   }
-
-  closeCMSEditor();
-  renderCMSList();
-  // In production: POST to Supabase
-}
-
-function cmsAI() {
-  const title = document.getElementById('cms-title').value;
-  if(!title) {
-    alert('Enter a title first');
-    return;
-  }
-  const btn = event.target;
-  btn.disabled = true;
-  btn.textContent = 'Generating...';
-
-  // Mock AI generation - in production call your AI service
-  setTimeout(() => {
-    const content = `<p><strong>${title}</strong></p><p>This is AI-generated content about "${title}". In production, this would be generated by your AI service with context about your brand and audience.</p>`;
-    document.getElementById('cms-excerpt').value = `Learn more about ${title}...`;
-    document.getElementById('cms-editor').innerHTML = content;
-    updateCMSSEOPreview();
-    btn.disabled = false;
-    btn.textContent = 'Generate with AI';
-  }, 1500);
 }
 
 function updateCMSSEOPreview() {
-  const title = document.getElementById('cms-title').value || 'Your post title';
-  const slug = document.getElementById('cms-slug').value || 'your-slug';
-  const excerpt = document.getElementById('cms-excerpt').value || 'Post preview text...';
+  const title = document.getElementById('cms-field-title').value || 'Your post title';
+  const slug = document.getElementById('cms-field-slug').value || 'your-slug';
+  const metaTitle = document.getElementById('cms-field-meta-title').value || title;
+  const metaDesc = document.getElementById('cms-field-meta-desc').value || document.getElementById('cms-field-excerpt').value || 'Post description…';
 
   const preview = document.getElementById('cms-seo-preview');
   if(preview) {
     preview.innerHTML = `
       <div style="padding:12px;background:var(--b3);border-radius:6px">
-        <div style="color:var(--grn);font-size:12px">soniq.app/blog/${slug}</div>
-        <div style="color:var(--tx1);font-weight:600;font-size:14px;margin-top:4px">${title}</div>
-        <div style="color:var(--tx3);font-size:12px;margin-top:4px">${excerpt}</div>
+        <div style="color:var(--grn);font-size:12px">mysoniq.com/blog/${slug}</div>
+        <div style="color:#8ab4f8;font-weight:600;font-size:14px;margin-top:4px;cursor:pointer">${metaTitle}</div>
+        <div style="color:var(--tx3);font-size:12px;margin-top:4px">${metaDesc.slice(0,160)}</div>
       </div>
     `;
   }
+}
+
+function updateCMSCharCounts(){
+  const mt = document.getElementById('cms-field-meta-title');
+  const md = document.getElementById('cms-field-meta-desc');
+  const mtc = document.getElementById('cms-meta-title-count');
+  const mdc = document.getElementById('cms-meta-desc-count');
+  if(mt && mtc) mtc.textContent = mt.value.length;
+  if(md && mdc) mdc.textContent = md.value.length;
+}
+
+// ── AI CONTENT ENGINE (in-app generator) ──
+const _SONIQ_CONTENT_DB = {
+  intros: {
+    tutorial: [
+      (kw) => `Most musicians approach ${kw} the wrong way. They overcomplicate it, skip the fundamentals, or follow outdated advice from five years ago. This guide fixes that.`,
+      (kw) => `${kw} sounds intimidating until you break it into steps. The truth is, the best songwriters and producers all follow a repeatable process — and you can learn it today.`,
+      (kw) => `You don't need a music degree to master ${kw}. What you need is the right framework, a few key tools, and about 30 minutes of focused practice. Let's get into it.`
+    ],
+    pillar: [
+      (kw) => `${kw} is one of the most searched topics in music creation right now — and for good reason. Whether you're a bedroom producer or a signed artist, understanding this changes how you work.`,
+      (kw) => `Everything you need to know about ${kw}, organized from beginner basics to advanced techniques. This is the only guide you'll need to bookmark.`,
+      (kw) => `The landscape of ${kw} has shifted dramatically. AI tools, new workflows, and changing industry economics mean the old playbook no longer applies. Here's the updated version.`
+    ],
+    listicle: [
+      (kw) => `We tested dozens of options to bring you the definitive list. Whether you're looking for the cheapest, the most powerful, or the best for beginners — this breakdown covers it all.`,
+      (kw) => `Choosing the right tool for ${kw} can make or break your creative process. We compared features, pricing, and real-world performance to help you decide.`
+    ],
+    thought: [
+      (kw) => `There's a conversation happening in every studio, every label meeting, and every online forum right now: ${kw}. And most people are getting it wrong.`,
+      (kw) => `I've spent over 20 years in the music business, and the debate around ${kw} is one of the most important of our generation. Here's what I think.`
+    ],
+    faq: [
+      (kw) => `We pulled the most common questions about ${kw} from search data, forums, and our own community. Here are clear, no-fluff answers.`
+    ]
+  },
+  sections: {
+    tutorial: [
+      'What You Need Before You Start',
+      'Step 1: Set Up Your Workspace',
+      'Step 2: Learn the Core Fundamentals',
+      'Step 3: Apply the Technique',
+      'Step 4: Refine and Polish',
+      'Step 5: Export and Share',
+      'Common Mistakes to Avoid',
+      'FAQ'
+    ],
+    pillar: [
+      'What Is {kw} (And Why It Matters)',
+      'The History and Evolution',
+      'How It Works: Core Concepts',
+      'Essential Tools and Resources',
+      'Advanced Techniques',
+      'Common Mistakes and How to Avoid Them',
+      'How SONIQ Fits In',
+      'FAQ',
+      'Your Next Step'
+    ],
+    listicle: [
+      'Quick Comparison Table',
+      '1. {item1} — Best Overall',
+      '2. {item2} — Best for Beginners',
+      '3. {item3} — Best Free Option',
+      '4. {item4} — Most Powerful',
+      '5. {item5} — Best Value',
+      'How to Choose the Right One',
+      'FAQ'
+    ],
+    thought: [
+      'The Current State of Affairs',
+      'What Most People Get Wrong',
+      'The Real Opportunity',
+      'What the Data Shows',
+      'What This Means for Creators',
+      'My Take'
+    ],
+    faq: []
+  },
+  paragraphs: {
+    general: [
+      (topic, section) => `When it comes to ${topic}, ${section.toLowerCase()} is where most people either level up or get stuck. The key difference between amateurs and professionals isn't talent — it's understanding the process deeply enough to make intentional choices.`,
+      (topic, section) => `Understanding ${section.toLowerCase()} gives you a massive advantage. Most tutorials skip this part because it's not flashy, but it's the foundation everything else builds on.`,
+      (topic, section) => `The practical side of ${section.toLowerCase()} comes down to three things: consistency, the right tools, and knowing when to trust your instincts over the "rules." Let's break each one down.`,
+      (topic, section) => `Professional creators approach ${section.toLowerCase()} differently than beginners. They've developed systems — repeatable workflows that ensure quality without burning creative energy on decisions that should be automatic.`,
+      (topic, section) => `Here's what makes ${section.toLowerCase()} particularly relevant in 2026: the tools have caught up to the vision. What used to require a full studio and an engineering degree now lives inside your laptop. The barrier isn't access anymore — it's knowledge.`
+    ],
+    music_specific: [
+      (topic) => `Every genre has its own DNA — a specific combination of rhythm patterns, harmonic progressions, vocal styles, and production techniques that make it recognizable. Understanding this DNA is what separates generic tracks from authentic ones.`,
+      (topic) => `The production workflow matters as much as the creative inspiration. Top producers don't wait for inspiration — they create systems that produce consistent results, then let creativity flow within those structures.`,
+      (topic) => `Melody is the soul of any track. Whether you're producing hip-hop, pop, country, or electronic music, the hook is what listeners remember. Crafting melodies that stick requires understanding tension, resolution, and repetition.`,
+      (topic) => `Lyrics connect the abstract emotion of music to concrete human experience. The best lyrics are specific enough to feel personal but universal enough that anyone can relate. That balance is the craft.`,
+      (topic) => `Mixing and mastering transform a good song into a professional release. The difference between a demo and a finished track often comes down to EQ decisions, compression settings, and spatial positioning that most listeners never consciously notice.`,
+      (topic) => `The business side of music is just as important as the creative side. Understanding publishing, licensing, royalties, and distribution determines whether your music generates sustainable income or just streams.`
+    ],
+    soniq_cta: [
+      `SONIQ's AI-powered songwriting tools help you move from idea to finished song faster. With Genre DNA technology that understands the structure of 24 different genres, you get intelligent suggestions that match your creative vision — not generic templates.`,
+      `Ready to put this into practice? SONIQ combines AI songwriting assistance with genre-specific intelligence, giving you a creative partner that understands music theory, song structure, and production techniques across 24 genres.`,
+      `This is exactly the kind of workflow SONIQ was built for. Whether you're writing lyrics, building melodies, or structuring a full arrangement, SONIQ's tools accelerate every step while keeping you in the creative driver's seat.`
+    ]
+  },
+  faq_templates: [
+    {q: 'What is the best way to get started with {kw}?', a: 'Start with the fundamentals outlined in this guide. Focus on understanding the core concepts before diving into advanced techniques. Most successful creators spend 70% of their time on basics and 30% experimenting.'},
+    {q: 'Do I need expensive equipment for {kw}?', a: 'No. Modern tools like SONIQ, a decent laptop, and a pair of studio headphones are enough to get professional results. The gear matters far less than your skills and workflow.'},
+    {q: 'How long does it take to learn {kw}?', a: 'Most people can produce quality results within 2-4 weeks of focused practice. Mastery takes longer — typically 6-12 months of consistent work. The key is daily practice, even if it\'s just 30 minutes.'},
+    {q: 'Can AI help with {kw}?', a: 'Absolutely. AI tools like SONIQ accelerate the creative process by handling repetitive tasks, suggesting variations, and providing genre-specific guidance. Think of AI as a creative assistant, not a replacement for your artistic vision.'},
+    {q: 'What mistakes should beginners avoid with {kw}?', a: 'The three biggest mistakes are: trying to do everything at once instead of focusing on one skill, comparing your work to professionals with decades of experience, and not finishing projects. Finish more, judge less.'},
+    {q: 'Is {kw} different for different genres?', a: 'Yes and no. The core principles are universal, but each genre has specific conventions and expectations. SONIQ\'s Genre DNA technology maps these differences across 24 genres so you can create authentic music in any style.'}
+  ]
+};
+
+function _detectArticleStyle(keyword) {
+  const kw = keyword.toLowerCase();
+  if(/^how to |^step|^guide to |^learn /i.test(kw)) return 'tutorial';
+  if(/^best |^top \d|compare|vs |versus|alternative/i.test(kw)) return 'listicle';
+  if(/\?|^what is|^why |^should |^can /i.test(kw)) return 'faq';
+  if(/future|opinion|debate|state of|vs /i.test(kw)) return 'thought';
+  return 'pillar';
+}
+
+function _pickRandom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+function _generateArticleContent(keyword, style) {
+  const kw = keyword;
+  const kwLower = keyword.toLowerCase();
+  const year = new Date().getFullYear();
+  let html = '';
+
+  // Title
+  const titles = {
+    tutorial: [`How to ${kw} (${year} Guide)`, `${kw}: Step-by-Step Tutorial`, `The Complete Guide to ${kw}`],
+    pillar: [`${kw}: The Complete ${year} Guide`, `Everything You Need to Know About ${kw}`, `${kw} — The Definitive Guide`],
+    listicle: [`Best Tools for ${kw} in ${year}`, `Top 5 ${kw} Resources Compared`, `${kw}: ${year} Comparison Guide`],
+    thought: [`${kw}: What Everyone Gets Wrong`, `The Truth About ${kw} in ${year}`, `Why ${kw} Matters More Than Ever`],
+    faq: [`${kw}: Your Questions Answered`, `${kw} FAQ — Everything You Need to Know`]
+  };
+  const title = _pickRandom(titles[style] || titles.pillar);
+
+  // Intro paragraph
+  const intros = _SONIQ_CONTENT_DB.intros[style] || _SONIQ_CONTENT_DB.intros.pillar;
+  html += `<p>${_pickRandom(intros)(kw)}</p>\n\n`;
+
+  // Sections based on style
+  const sectionNames = _SONIQ_CONTENT_DB.sections[style] || _SONIQ_CONTENT_DB.sections.pillar;
+  const resolvedSections = sectionNames.map(s => s.replace('{kw}', kw));
+
+  for(let i = 0; i < resolvedSections.length; i++){
+    const sec = resolvedSections[i];
+
+    // FAQ section gets special treatment
+    if(sec === 'FAQ') {
+      html += `<h2>Frequently Asked Questions</h2>\n`;
+      const faqs = _SONIQ_CONTENT_DB.faq_templates.slice(0,4);
+      for(const faq of faqs) {
+        html += `<h3>${faq.q.replace(/\{kw\}/g, kw)}</h3>\n`;
+        html += `<p>${faq.a.replace(/\{kw\}/g, kw)}</p>\n\n`;
+      }
+      continue;
+    }
+
+    html += `<h2>${sec}</h2>\n`;
+
+    // 2-3 paragraphs per section
+    const numParas = 2 + Math.floor(Math.random()*2);
+    for(let j = 0; j < numParas; j++){
+      if(j === 0 && Math.random() > 0.5) {
+        html += `<p>${_pickRandom(_SONIQ_CONTENT_DB.paragraphs.music_specific)(kw)}</p>\n`;
+      } else {
+        html += `<p>${_pickRandom(_SONIQ_CONTENT_DB.paragraphs.general)(kw, sec)}</p>\n`;
+      }
+    }
+
+    // Add a bullet list in some sections
+    if(i > 0 && i < resolvedSections.length - 2 && Math.random() > 0.4) {
+      html += `<ul>\n`;
+      const bullets = [
+        `Focus on quality over quantity — one polished result beats ten rough drafts`,
+        `Use reference tracks to benchmark your work against professional standards`,
+        `Save your presets and templates to build a reusable library over time`,
+        `Collaborate with other creators to expand your skills and network`,
+        `Test your work on multiple playback systems before finalizing`,
+        `Keep a creative journal to track what techniques work for you`,
+        `Set deadlines — perfectionism kills more projects than lack of talent`
+      ];
+      const numBullets = 3 + Math.floor(Math.random()*3);
+      const shuffled = bullets.sort(() => Math.random() - 0.5).slice(0, numBullets);
+      for(const b of shuffled) html += `  <li>${b}</li>\n`;
+      html += `</ul>\n`;
+    }
+
+    // Internal links in relevant sections
+    if(i === 2 || i === 4) {
+      const links = [
+        {text:'beat-making workflow guide', href:'/blog/beat-making-workflow.html'},
+        {text:'sync licensing opportunities', href:'/blog/sync-licensing-guide.html'},
+        {text:'song structure fundamentals', href:'/blog/hip-hop-song-structure.html'},
+        {text:'music publishing basics', href:'/blog/music-publishing-guide.html'},
+        {text:'registering with BMI or ASCAP', href:'/blog/how-to-register-song-bmi-ascap.html'},
+        {text:'AI songwriting techniques', href:'/blog/ai-songwriting-guide.html'}
+      ];
+      const link = _pickRandom(links);
+      html += `<p>For more on this topic, check out our <a href="${link.href}">${link.text}</a>.</p>\n`;
+    }
+  }
+
+  // CTA section
+  html += `<h2>Start Creating Today</h2>\n`;
+  html += `<p>${_pickRandom(_SONIQ_CONTENT_DB.paragraphs.soniq_cta)}</p>\n`;
+
+  return { title, html };
+}
+
+function _generateSEOMeta(keyword, title, content) {
+  const kw = keyword.toLowerCase();
+  const year = new Date().getFullYear();
+  const metaTitle = (title + ' | SONIQ').slice(0,60);
+  const excerpt = `Complete guide to ${kw}: techniques, tools, best practices, and expert tips for ${year}. Learn step-by-step with SONIQ.`;
+  const metaDesc = excerpt.slice(0,155);
+  const slug = kw.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const tags = kw.split(/\s+/).filter(w=>w.length>2).concat(['music','songwriting','SONIQ','AI music']).slice(0,8);
+  return { metaTitle, metaDesc, excerpt, slug, tags };
+}
+
+async function cmsAIGenerate(mode) {
+  const keyword = document.getElementById('cms-ai-keyword')?.value?.trim();
+  const styleSelect = document.getElementById('cms-ai-style')?.value || 'auto';
+  const progress = document.getElementById('cms-ai-progress');
+  const bar = document.getElementById('cms-ai-bar');
+  const statusEl = document.getElementById('cms-ai-status');
+  const genBtn = document.getElementById('cms-ai-gen-btn');
+
+  if(!keyword && mode !== 'improve' && mode !== 'expand') {
+    alert('Enter a target keyword first');
+    return;
+  }
+
+  // Show progress
+  if(progress) progress.style.display = 'block';
+  if(genBtn) genBtn.disabled = true;
+
+  const setProgress = (pct, msg) => {
+    if(bar) bar.style.width = pct+'%';
+    if(statusEl) statusEl.textContent = msg;
+  };
+
+  try {
+    if(mode === 'full') {
+      setProgress(10, 'Analyzing keyword intent…');
+      await new Promise(r => setTimeout(r, 400));
+
+      const style = styleSelect === 'auto' ? _detectArticleStyle(keyword) : styleSelect;
+      setProgress(25, `Selected style: ${style}. Building outline…`);
+      await new Promise(r => setTimeout(r, 500));
+
+      setProgress(50, 'Writing article sections…');
+      await new Promise(r => setTimeout(r, 600));
+
+      const {title, html} = _generateArticleContent(keyword, style);
+      setProgress(75, 'Generating SEO metadata…');
+      await new Promise(r => setTimeout(r, 400));
+
+      const seo = _generateSEOMeta(keyword, title, html);
+
+      // Fill all fields
+      document.getElementById('cms-field-title').value = title;
+      document.getElementById('cms-field-slug').value = seo.slug;
+      document.getElementById('cms-field-excerpt').value = seo.excerpt;
+      document.getElementById('cms-editor-content').innerHTML = html;
+      document.getElementById('cms-field-meta-title').value = seo.metaTitle;
+      document.getElementById('cms-field-meta-desc').value = seo.metaDesc;
+      document.getElementById('cms-field-tags').value = seo.tags.join(', ');
+      document.getElementById('cms-field-category').value = style === 'tutorial' ? 'tutorial' : 'pillar';
+      document.getElementById('cms-editor-title-display').textContent = title;
+
+      setProgress(100, 'Article generated! Review and publish.');
+
+    } else if(mode === 'outline') {
+      setProgress(30, 'Building outline…');
+      await new Promise(r => setTimeout(r, 500));
+
+      const style = styleSelect === 'auto' ? _detectArticleStyle(keyword) : styleSelect;
+      const sectionNames = _SONIQ_CONTENT_DB.sections[style] || _SONIQ_CONTENT_DB.sections.pillar;
+      let outlineHtml = `<h2>Article Outline: ${keyword}</h2>\n<ul>\n`;
+      for(const sec of sectionNames) {
+        outlineHtml += `  <li><strong>${sec.replace('{kw}', keyword)}</strong></li>\n`;
+      }
+      outlineHtml += `</ul>\n<p><em>Click "Generate Full Article" to expand this outline into a complete article.</em></p>`;
+      document.getElementById('cms-editor-content').innerHTML = outlineHtml;
+
+      const slug = keyword.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      document.getElementById('cms-field-title').value = keyword;
+      document.getElementById('cms-field-slug').value = slug;
+      cmsAutoSlug();
+      setProgress(100, 'Outline generated!');
+
+    } else if(mode === 'seo') {
+      setProgress(50, 'Generating SEO metadata…');
+      await new Promise(r => setTimeout(r, 500));
+
+      const title = document.getElementById('cms-field-title').value || keyword;
+      const content = document.getElementById('cms-editor-content').innerHTML;
+      const seo = _generateSEOMeta(keyword || title, title, content);
+
+      document.getElementById('cms-field-meta-title').value = seo.metaTitle;
+      document.getElementById('cms-field-meta-desc').value = seo.metaDesc;
+      document.getElementById('cms-field-tags').value = seo.tags.join(', ');
+      if(!document.getElementById('cms-field-excerpt').value) {
+        document.getElementById('cms-field-excerpt').value = seo.excerpt;
+      }
+      setProgress(100, 'SEO metadata generated!');
+
+    } else if(mode === 'improve') {
+      setProgress(30, 'Analyzing content…');
+      await new Promise(r => setTimeout(r, 500));
+
+      const editor = document.getElementById('cms-editor-content');
+      let content = editor.innerHTML;
+      // Add transition words and improve structure
+      content = content.replace(/<p>([A-Z])/g, (m, c) => {
+        const transitions = ['Furthermore, ', 'Additionally, ', 'Moreover, ', 'In practice, ', 'Importantly, ', ''];
+        return `<p>${_pickRandom(transitions)}${c.toLowerCase() === c ? c : c}`;
+      });
+      editor.innerHTML = content;
+      setProgress(100, 'Content improved!');
+
+    } else if(mode === 'expand') {
+      setProgress(30, 'Expanding content…');
+      await new Promise(r => setTimeout(r, 500));
+
+      const editor = document.getElementById('cms-editor-content');
+      const topic = keyword || document.getElementById('cms-field-title').value || 'this topic';
+      const extra = `<h2>Going Deeper</h2>\n<p>${_pickRandom(_SONIQ_CONTENT_DB.paragraphs.general)(topic, 'advanced concepts')}</p>\n<p>${_pickRandom(_SONIQ_CONTENT_DB.paragraphs.music_specific)(topic)}</p>\n`;
+      editor.innerHTML += extra;
+      setProgress(100, 'Content expanded!');
+    }
+
+    updateCMSSEOPreview();
+    updateCMSCharCounts();
+
+  } catch(e) {
+    console.error('AI generate error:', e);
+    setProgress(0, 'Generation failed: ' + e.message);
+  }
+
+  if(genBtn) genBtn.disabled = false;
+  // Auto-hide progress after 3s
+  setTimeout(() => { if(progress) progress.style.display = 'none'; }, 3000);
 }
 
 // ── SEO & TRAFFIC DASHBOARD ──
