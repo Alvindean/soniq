@@ -12769,6 +12769,10 @@ function updateStreak() {
 initGenreGrid();
 onGenreChange(S.selectedGenre);
 initMoodGrid();
+// ── Ensure genre + mood steps are OPEN on fresh page load ──
+// Genre is SONIQ's core feature — never start collapsed
+expandStep(2);
+if(S.selectedGenre) expandStep(3);
 renderLib();
 updateLibBadge();
 loadVoiceProfile();
