@@ -44,8 +44,7 @@
 }
 html{background:var(--s0)}
 body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-/* ── UX GRID SYSTEM: Sidebar clearance ── */
-@media(min-width:901px){.wrap{margin-left:64px!important}}
+/* ── UX GRID SYSTEM: Sidebar clearance is in base .wrap (margin-left:64px). Mobile override resets to 0. ── */
 /* ── MODERN SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--s1);border-radius:3px}
@@ -58,7 +57,7 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT ── */
-.wrap{max-width:1280px;margin:0 auto;padding:0 24px 120px;overflow-x:hidden;box-sizing:border-box}
+.wrap{max-width:1280px;margin:0 auto;margin-left:64px;padding:0 24px 120px;overflow-x:clip;box-sizing:border-box}
 
 /* ── WRITER 3-PANEL LAYOUT ── */
 .writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:var(--gap-lg);align-items:start;margin-top:0}
@@ -211,7 +210,7 @@ a{color:var(--amber);text-decoration:none}
 .ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
 @media(min-width:1500px){
   .ad-rail-right{display:flex}
-  .wrap{margin-right:184px;margin-left:64px!important;max-width:none;padding-left:24px;padding-right:24px}
+  .wrap{margin-right:184px;max-width:none;padding-left:24px;padding-right:24px}
   .comm-right{display:none}
   .comm-layout{grid-template-columns:1fr}
   #pg-community{max-width:none;margin:0;padding-left:28px;padding-right:28px}
@@ -264,7 +263,7 @@ a{color:var(--amber);text-decoration:none}
 @media(max-width:900px){
   .sidebar-nav{display:none}
   .mobile-bottom-nav{display:flex}
-  .wrap{margin-left:0!important;padding-left:16px;width:100%!important}
+  .wrap{margin-left:0;padding-left:16px;width:100%;max-width:100%}
   /* On mobile, when output has content, show it above controls */
   #pg-write.on{display:flex;flex-direction:column}
   #pg-write.on .write-output-panel{order:-1}
@@ -274,12 +273,22 @@ a{color:var(--amber);text-decoration:none}
   .mood-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
   .genre-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
 }
-@media(min-width:901px){.wrap{padding-left:24px}}
+/* padding-left:24px is already in base .wrap — 901px+ inherits it, mobile overrides to 16px */
 
 /* ── PAGES ── */
 .pg{display:none}
 .pg.on{display:block;animation:pgIn 0.2s ease}
 @keyframes pgIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── ACCESSIBILITY: Reduced motion ── */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important;scroll-behavior:auto!important}
+}
+/* ── ACCESSIBILITY: Focus styles for sidebar & nav ── */
+.sb-btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:var(--r2)}
+.mb-btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+.nb:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:var(--r2)}
+.btn:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 
 /* ── STUDIO — write page main card ── */
 .studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:var(--sp-xl);transition:border-color 0.3s}
@@ -1878,7 +1887,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </div>
 
 <!-- SIDEBAR NAV (desktop) -->
-<div class="sidebar-nav" id="sidebar-nav">
+<nav class="sidebar-nav" id="sidebar-nav" role="navigation" aria-label="Main navigation">
   <div class="sn-logo">IQ</div>
   <button class="sb-btn on" onclick="goPg('write',this)" title="Write"><span class="ni">✍️</span></button>
   <button class="sb-btn" onclick="goPg('lucky',this)" title="Feel Lucky"><span class="ni">🎲</span></button>
@@ -1898,16 +1907,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <button id="nav-auth-btn" onclick="openAuth()" class="sb-btn" title="Sign In"><span class="ni" style="font-size:14px">🔑</span></button>
     <button id="nav-signout-btn" onclick="authSignOut()" class="sb-btn" style="display:none" title="Sign Out"><span class="ni" style="font-size:14px;color:var(--tx4)">↩</span></button>
   </div>
-</div>
+</nav>
 
 <!-- MOBILE BOTTOM NAV -->
-<div class="mobile-bottom-nav" id="mobile-nav">
+<nav class="mobile-bottom-nav" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
   <button class="mb-btn on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
   <button class="mb-btn" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Lucky</button>
   <button class="mb-btn" onclick="goPg('library',this)"><span class="ni">📚</span>Library</button>
   <button class="mb-btn" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
   <button class="mb-btn" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
-</div>
+</nav>
 
 <!-- ══════════════════════════════════
      WRITE PAGE
