@@ -1100,6 +1100,25 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-meta{font-size:10px;color:var(--tx4);display:flex;align-items:center;gap:10px;margin-top:8px}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
+/* ── BLOG PAGE ── */
+#pg-blog .blog-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:20px;cursor:pointer;transition:all .2s}
+#pg-blog .blog-card:hover{border-color:var(--amber);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.2)}
+#pg-blog .blog-card .bc-category{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;border-radius:99px;padding:2px 10px;display:inline-block;margin-bottom:8px}
+#pg-blog .blog-card .bc-cat-pillar{background:var(--amberbg);color:var(--amber);border:1px solid var(--amberline)}
+#pg-blog .blog-card .bc-cat-tutorial{background:rgba(52,211,153,.08);color:#34d399;border:1px solid rgba(52,211,153,.15)}
+#pg-blog .blog-card .bc-cat-cluster{background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline)}
+#pg-blog .blog-card .bc-cat-comparison{background:rgba(167,139,250,.08);color:#a78bfa;border:1px solid rgba(167,139,250,.15)}
+#pg-blog .blog-card .bc-title{font-size:15px;font-weight:700;color:var(--tx1);line-height:1.35;margin-bottom:8px}
+#pg-blog .blog-card .bc-excerpt{font-size:12px;color:var(--tx3);line-height:1.5;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+#pg-blog .blog-card .bc-meta{font-size:10px;color:var(--tx4);display:flex;gap:8px;align-items:center}
+#pg-blog .blog-content h2{font-size:20px;font-weight:800;color:var(--tx1);margin:32px 0 12px;padding-top:12px;border-top:1px solid var(--b1)}
+#pg-blog .blog-content h3{font-size:16px;font-weight:700;color:var(--tx1);margin:24px 0 8px}
+#pg-blog .blog-content p{margin:0 0 16px;color:var(--tx2)}
+#pg-blog .blog-content ul,#pg-blog .blog-content ol{margin:0 0 16px;padding-left:24px;color:var(--tx2)}
+#pg-blog .blog-content li{margin-bottom:6px}
+#pg-blog .blog-content a{color:var(--amber);text-decoration:underline;text-underline-offset:2px}
+#pg-blog .blog-content strong{color:var(--tx1)}
+#pg-blog .blog-tag{font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--s3);border:1px solid var(--b2);color:var(--tx3)}
 /* ── COMMUNITY PAGE: full-width with sidebar breathing room ── */
 #pg-community{padding:8px clamp(.5rem,2vw,1.5rem) 0;box-sizing:border-box}
 /* ── COMMUNITY: FILTER BAR ── */
@@ -1914,6 +1933,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <button class="sb-btn" onclick="goPg('album',this)" title="Album"><span class="ni">🎼</span></button>
   <button class="sb-btn" onclick="goPg('campaign',this)" title="Campaign"><span class="ni">🚀</span></button>
   <button class="sb-btn" onclick="goPg('community',this)" id="nav-community-btn" title="Community"><span class="ni">🌐</span></button>
+  <button class="sb-btn" onclick="goPg('blog',this)" id="nav-blog-btn" title="Blog"><span class="ni">📝</span></button>
   <button class="sb-btn" onclick="goPg('editor',this)" title="Editor"><span class="ni">✏️</span></button>
   <button class="sb-btn" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none" title="Admin"><span class="ni">📊</span></button>
   <div class="sn-spacer"></div>
@@ -4679,6 +4699,73 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
 </div>
 
+<!-- ══════════════════════════════════
+     BLOG PAGE
+══════════════════════════════════ -->
+<div id="pg-blog" class="pg">
+  <div style="max-width:1000px;margin:0 auto;padding:20px clamp(.5rem,2vw,1.5rem) 0">
+
+    <!-- Blog Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <div style="font-size:22px;font-weight:800;color:var(--tx1)">📝 SONIQ Blog</div>
+        <div style="font-size:13px;color:var(--tx3);margin-top:4px">Songwriting guides, production tips, and industry insights</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <select id="blog-category-filter" onchange="loadBlogPosts()" style="padding:6px 12px;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s2);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer">
+          <option value="">All Categories</option>
+          <option value="pillar">Pillar Guides</option>
+          <option value="tutorial">Tutorials</option>
+          <option value="cluster">Deep Dives</option>
+          <option value="comparison">Comparisons</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Search Bar -->
+    <div style="margin-bottom:20px">
+      <input id="blog-search" type="text" placeholder="Search articles by title, tag, or keyword…"
+        oninput="filterBlogPosts()"
+        style="width:100%;padding:10px 14px;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s2);color:var(--tx1);font-size:13px;box-sizing:border-box">
+    </div>
+
+    <!-- Featured / Latest Post -->
+    <div id="blog-featured" class="card" style="margin-bottom:24px;padding:24px;display:none;cursor:pointer" onclick="openBlogPost(this.dataset.slug)">
+      <div style="display:flex;gap:6px;margin-bottom:8px">
+        <span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--amberbg);color:var(--amber);border:1px solid var(--amberline);border-radius:99px;padding:2px 10px">Featured</span>
+        <span id="blog-featured-category" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline);border-radius:99px;padding:2px 10px"></span>
+      </div>
+      <div id="blog-featured-title" style="font-size:18px;font-weight:800;color:var(--tx1);margin-bottom:8px;line-height:1.3"></div>
+      <div id="blog-featured-excerpt" style="font-size:13px;color:var(--tx3);line-height:1.6;margin-bottom:12px"></div>
+      <div style="font-size:11px;color:var(--tx4)"><span id="blog-featured-author"></span> · <span id="blog-featured-date"></span></div>
+    </div>
+
+    <!-- Blog Post Grid -->
+    <div id="blog-posts-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx4)">
+        <div style="font-size:32px;margin-bottom:12px">📝</div>
+        <div style="font-size:14px;font-weight:600">Loading articles…</div>
+      </div>
+    </div>
+
+    <!-- Blog Post Detail View (hidden by default) -->
+    <div id="blog-post-detail" style="display:none">
+      <button onclick="closeBlogPost()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:13px;font-weight:600;padding:8px 0;margin-bottom:16px;display:flex;align-items:center;gap:6px">← Back to all articles</button>
+      <div id="blog-post-category-badge" style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline);border-radius:99px;padding:2px 10px;display:inline-block;margin-bottom:12px"></div>
+      <h1 id="blog-post-title" style="font-size:28px;font-weight:800;color:var(--tx1);margin:0 0 12px;line-height:1.3"></h1>
+      <div style="font-size:12px;color:var(--tx4);margin-bottom:24px;display:flex;gap:12px;align-items:center">
+        <span id="blog-post-author"></span>
+        <span>·</span>
+        <span id="blog-post-date"></span>
+        <span id="blog-post-views" style="margin-left:auto"></span>
+      </div>
+      <div id="blog-post-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:20px"></div>
+      <div id="blog-post-content" class="blog-content" style="font-size:15px;line-height:1.8;color:var(--tx2)"></div>
+    </div>
+
+  </div>
+</div>
+
 </div><!-- /wrap -->
 
 <script>
@@ -5818,6 +5905,7 @@ function goPg(id,el){
   if(id==='builder')initBuilder();
   if(id==='lucky')renderLuckyHistory();
   if(id==='community')loadCommunityFeed();
+  if(id==='blog')loadBlogPosts();
   if(id==='profile')loadProfilePage();
   if(id==='admin'){if(S.isAdmin)loadAdminDashboard();else{toast('Admin access required');navTo('write');}}
   if(id==='editor'){
@@ -13785,6 +13873,154 @@ function renderSEOKeywords() {
       </div>
     `;
   }).join('');
+}
+
+// ═══════════════════════════════════════════════════════
+// BLOG PAGE — loads from Supabase blog_posts table
+// ═══════════════════════════════════════════════════════
+let _blogPostsCache = null;
+
+async function loadBlogPosts() {
+  const grid = document.getElementById('blog-posts-grid');
+  const featured = document.getElementById('blog-featured');
+  if (!grid) return;
+
+  // Fetch from Supabase if not cached
+  if (!_blogPostsCache) {
+    try {
+      if (!S.supabase) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx4)">Blog loading…</div>';
+        return;
+      }
+      const { data, error } = await S.supabase
+        .from('blog_posts')
+        .select('id,title,slug,excerpt,status,category,tags,author_name,published_at,created_at,views')
+        .in('status', ['published','draft'])
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      _blogPostsCache = data || [];
+    } catch (e) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx4)"><div style="font-size:32px;margin-bottom:12px">⚠️</div><div style="font-size:14px">Could not load articles</div><div style="font-size:11px;margin-top:4px;color:var(--tx4)">'+e.message+'</div></div>';
+      return;
+    }
+  }
+
+  let posts = [..._blogPostsCache];
+
+  // Filter by category
+  const catFilter = document.getElementById('blog-category-filter')?.value;
+  if (catFilter) posts = posts.filter(p => p.category === catFilter);
+
+  // Filter by search
+  const search = (document.getElementById('blog-search')?.value || '').toLowerCase().trim();
+  if (search) {
+    posts = posts.filter(p =>
+      (p.title||'').toLowerCase().includes(search) ||
+      (p.excerpt||'').toLowerCase().includes(search) ||
+      (p.tags||[]).some(t => t.toLowerCase().includes(search))
+    );
+  }
+
+  if (posts.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx4)"><div style="font-size:32px;margin-bottom:12px">📝</div><div style="font-size:14px;font-weight:600">No articles found</div></div>';
+    if (featured) featured.style.display = 'none';
+    return;
+  }
+
+  // Featured post = first one
+  if (featured && !catFilter && !search) {
+    const fp = posts[0];
+    featured.style.display = 'block';
+    featured.dataset.slug = fp.slug;
+    document.getElementById('blog-featured-title').textContent = fp.title;
+    document.getElementById('blog-featured-excerpt').textContent = fp.excerpt || '';
+    document.getElementById('blog-featured-category').textContent = fp.category || 'article';
+    document.getElementById('blog-featured-author').textContent = fp.author_name || 'SONIQ';
+    document.getElementById('blog-featured-date').textContent = formatBlogDate(fp.published_at || fp.created_at);
+    posts = posts.slice(1);
+  } else if (featured) {
+    featured.style.display = 'none';
+  }
+
+  // Render cards
+  grid.innerHTML = posts.map(p => {
+    const catClass = 'bc-cat-' + (p.category || 'cluster');
+    const date = formatBlogDate(p.published_at || p.created_at);
+    const tags = (p.tags || []).slice(0, 3).map(t => '<span class="blog-tag">' + escHtml(t) + '</span>').join('');
+    return '<div class="blog-card" onclick="openBlogPost(\'' + p.slug + '\')">' +
+      '<div class="bc-category ' + catClass + '">' + escHtml(p.category || 'article') + '</div>' +
+      '<div class="bc-title">' + escHtml(p.title) + '</div>' +
+      '<div class="bc-excerpt">' + escHtml(p.excerpt || '') + '</div>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px">' + tags + '</div>' +
+      '<div class="bc-meta"><span>' + escHtml(p.author_name || 'SONIQ') + '</span><span>·</span><span>' + date + '</span>' +
+      (p.views ? '<span style="margin-left:auto">👁 ' + p.views + '</span>' : '') +
+      '</div></div>';
+  }).join('');
+}
+
+function filterBlogPosts() {
+  loadBlogPosts();
+}
+
+async function openBlogPost(slug) {
+  const detail = document.getElementById('blog-post-detail');
+  const grid = document.getElementById('blog-posts-grid');
+  const featured = document.getElementById('blog-featured');
+  const searchBar = document.getElementById('blog-search')?.parentElement;
+  const filterBar = document.querySelector('#pg-blog > div > div:first-child');
+
+  if (!detail || !S.supabase) return;
+
+  // Fetch full post content
+  try {
+    const { data, error } = await S.supabase
+      .from('blog_posts')
+      .select('*')
+      .eq('slug', slug)
+      .single();
+    if (error) throw error;
+
+    document.getElementById('blog-post-title').textContent = data.title;
+    document.getElementById('blog-post-content').innerHTML = data.content || '';
+    document.getElementById('blog-post-author').textContent = data.author_name || 'SONIQ';
+    document.getElementById('blog-post-date').textContent = formatBlogDate(data.published_at || data.created_at);
+    document.getElementById('blog-post-category-badge').textContent = data.category || 'article';
+    const viewsEl = document.getElementById('blog-post-views');
+    if (viewsEl) viewsEl.textContent = data.views ? '👁 ' + data.views + ' views' : '';
+
+    // Tags
+    const tagsEl = document.getElementById('blog-post-tags');
+    if (tagsEl) tagsEl.innerHTML = (data.tags || []).map(t => '<span class="blog-tag">' + escHtml(t) + '</span>').join('');
+
+    // Show detail, hide grid
+    grid.style.display = 'none';
+    if (featured) featured.style.display = 'none';
+    if (searchBar) searchBar.style.display = 'none';
+    detail.style.display = 'block';
+
+    // Increment view count (fire and forget)
+    S.supabase.from('blog_posts').update({ views: (data.views || 0) + 1 }).eq('id', data.id).then(() => {});
+  } catch(e) {
+    toast('Could not load article: ' + e.message);
+  }
+}
+
+function closeBlogPost() {
+  const detail = document.getElementById('blog-post-detail');
+  const grid = document.getElementById('blog-posts-grid');
+  const searchBar = document.getElementById('blog-search')?.parentElement;
+  if (detail) detail.style.display = 'none';
+  if (grid) grid.style.display = 'grid';
+  if (searchBar) searchBar.style.display = '';
+  loadBlogPosts(); // re-render with featured
+}
+
+function formatBlogDate(dateStr) {
+  if (!dateStr) return '';
+  try {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch(e) { return dateStr; }
 }
 </script>
 
