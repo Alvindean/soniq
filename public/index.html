@@ -44,7 +44,7 @@
 }
 html{background:var(--s0)}
 body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-@media(min-width:901px){body{padding-left:72px!important}}
+@media(min-width:901px){body{display:grid!important;grid-template-columns:72px 1fr!important}.ad-rail,.sidebar-nav{grid-column:1!important;grid-row:1!important}.wrap{grid-column:2!important;grid-row:1/-1!important}}
 /* ── MODERN SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--s1);border-radius:3px}
@@ -273,7 +273,7 @@ a{color:var(--amber);text-decoration:none}
   .mood-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
   .genre-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
 }
-@media(min-width:901px){.wrap{padding-left:24px}}
+@media(min-width:901px){.wrap{grid-column:2!important;padding-left:24px}}
 
 /* ── PAGES ── */
 .pg{display:none}
