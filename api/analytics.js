@@ -233,31 +233,29 @@ module.exports = async function handler(req, res) {
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
+    // Wrap each query in its own catch so one failure doesn't kill all analytics
+    const safeFetch = (promise, fallback = { data: null, error: null, count: 0 }) =>
+      promise.catch(err => { console.error('Analytics sub-query error:', err.message); return fallback; });
+
     const [redisResults, profilesResult, songsByPlanResult, totalUsersResult, commPostsResult, commReactionsResult] =
       await Promise.all([
-        redisPipeline(redisCommands),
-        supabase
+        redisPipeline(redisCommands).catch(() => []),
+        safeFetch(supabase
           .from('profiles')
           .select('id, email, display_name, artist_name, plan, created_at, song_count, liked_count, xp, level, streak, last_active, genres')
           .order('created_at', { ascending: false })
-          .limit(500),
-        supabase
-          .from('songs')
-          .select('plan:profiles!inner(plan)', { count: 'exact' })
-          .then(async () => {
-            // Aggregate songs by plan via a dedicated query
-            return supabase.rpc('songs_by_plan').then(r => r).catch(() => ({ data: null, error: null }));
-          }),
-        supabase
+          .limit(500)),
+        safeFetch(supabase.rpc('songs_by_plan').catch(() => ({ data: null, error: null }))),
+        safeFetch(supabase
           .from('profiles')
-          .select('id', { count: 'exact', head: true }),
-        supabase
+          .select('id', { count: 'exact', head: true })),
+        safeFetch(supabase
           .from('community_posts')
           .select('id', { count: 'exact', head: true })
-          .eq('is_published', true),
-        supabase
+          .eq('is_published', true)),
+        safeFetch(supabase
           .from('community_reactions')
-          .select('id', { count: 'exact', head: true })
+          .select('id', { count: 'exact', head: true }))
       ]);
 
     // Destructure Redis results
