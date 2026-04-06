@@ -5,12 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SONIQ — AI Song Creation Studio</title>
-<meta name="description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 21 genres. Free to start." />
+<meta name="description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 24 genres. Free to start." />
 <link rel="canonical" href="https://www.mysoniq.com/app" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="SONIQ" />
 <meta property="og:title" content="SONIQ — AI Song Creation Studio" />
-<meta property="og:description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 21 genres. Free to start." />
+<meta property="og:description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 24 genres. Free to start." />
 <meta property="og:url" content="https://www.mysoniq.com/app" />
 <meta property="og:image" content="https://www.mysoniq.com/og-image.png" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -1997,7 +1997,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
 
       <!-- ══ STEP 2: GENRE (appears when topic has content) ══ -->
-      <div class="step-container step-2" id="step-2" data-step="2" style="display:none">
+      <div class="step-container step-2" id="step-2" data-step="2">
         <div class="step-header" onclick="toggleStep(2)">
           <span class="step-num" id="step-2-num">2</span>
           <span class="step-title">Pick a genre</span>
@@ -8547,7 +8547,7 @@ function isGenreFree(gid) {
 function initGenreGrid(){
   const grid = document.getElementById('genre-grid');
   if (!grid) return;
-  const VISIBLE = 6; /* 2 clean rows of 3 — no orphaned tiles */
+  const VISIBLE = 12; /* 4 rows of 3 — show free + most popular genres upfront */
   const total = GENRES_DEF.length;
   grid.innerHTML = GENRES_DEF.map((g, i) => {
     const locked = !isGenreFree(g.id);
@@ -8980,24 +8980,23 @@ function updateStepVisibility(){
   const topic = (document.getElementById('g-topic').value||'').trim();
   const step2 = document.getElementById('step-2');
   const step3 = document.getElementById('step-3');
-  // Step 2: show when topic has 3+ chars
-  if(step2){
-    const show2 = topic.length >= 3;
-    step2.style.display = show2 ? '' : 'none';
-    const n2 = document.getElementById('step-2-num');
-    if(n2) n2.className = 'step-num' + (show2 ? ' active' : '');
-  }
-  // Step 3: show when genre is selected
   const hasGenre = S.selectedGenre && document.querySelector('#genre-grid .gp.on');
+
+  // Step 2 (Genre): ALWAYS visible — genre is SONIQ's core differentiator.
+  // Mark as active by default, done when a genre is selected.
+  if(step2){
+    step2.style.display = '';
+    const n2 = document.getElementById('step-2-num');
+    if(n2) n2.className = 'step-num' + (hasGenre ? ' done' : ' active');
+  }
+
+  // Step 3 (Mood): show when genre is selected
   if(step3){
     const show3 = !!hasGenre;
     step3.style.display = show3 ? '' : 'none';
     const n3 = document.getElementById('step-3-num');
     if(n3) n3.className = 'step-num' + (show3 ? ' active' : '');
   }
-  // Mark step 2 as done if genre selected
-  const n2 = document.getElementById('step-2-num');
-  if(n2 && hasGenre) n2.className = 'step-num done';
 }
 
 function toggleStep(n){
