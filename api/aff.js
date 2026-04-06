@@ -29,7 +29,7 @@ const PARTNERS = {
   },
 };
 
-export default function handler(req, res) {
+module.exports = function handler(req, res) {
   const { p, ref } = req.query || {};
 
   if (!p || !PARTNERS[p]) {

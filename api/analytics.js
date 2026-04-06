@@ -9,15 +9,29 @@
  *   ?format=csv  →  returns users table as CSV download
  */
 
-const { timingSafeEqual, createHash } = require('crypto');
-const { createClient } = require('@supabase/supabase-js');
+let timingSafeEqual, createHash;
+try {
+  const crypto = require('crypto');
+  timingSafeEqual = crypto.timingSafeEqual;
+  createHash = crypto.createHash;
+} catch (e) {
+  console.error('[analytics] crypto import failed:', e.message);
+}
+
+let createClient;
+try {
+  const supa = require('@supabase/supabase-js');
+  createClient = supa.createClient;
+} catch (e) {
+  console.error('[analytics] @supabase/supabase-js import failed:', e.message);
+}
 
 // ---------------------------------------------------------------------------
 // Config
 // ---------------------------------------------------------------------------
 
-const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL || '';
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || '';
 
 const ADMIN_EMAILS = new Set([
   'thealvindean@gmail.com',
@@ -30,24 +44,22 @@ const ADMIN_EMAILS = new Set([
 // Auth helpers
 // ---------------------------------------------------------------------------
 
-// Timing-safe string comparison — hashes both values to normalise length
 function safeEqual(a, b) {
+  if (!createHash || !timingSafeEqual) return a === b;
   if (typeof a !== 'string' || typeof b !== 'string') return false;
-  const ha = createHash('sha256').update(a).digest();
-  const hb = createHash('sha256').update(b).digest();
-  return timingSafeEqual(ha, hb);
+  try {
+    const ha = createHash('sha256').update(a).digest();
+    const hb = createHash('sha256').update(b).digest();
+    return timingSafeEqual(ha, hb);
+  } catch {
+    return false;
+  }
 }
 
-/**
- * Decode a JWT payload without verifying the signature.
- * Full signature verification is handled by Supabase on the server side;
- * we only need the email claim to check the allow-list.
- */
 function decodeJwtPayload(token) {
   try {
     const parts = token.split('.');
     if (parts.length !== 3) return null;
-    // Base64url → Base64 → Buffer
     const base64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
     const json = Buffer.from(base64, 'base64').toString('utf8');
     return JSON.parse(json);
@@ -56,14 +68,10 @@ function decodeJwtPayload(token) {
   }
 }
 
-/**
- * Verify a Supabase Bearer token by asking Supabase to return the user.
- * This validates the signature server-side and checks expiry.
- * Returns the user object on success, null on failure.
- */
 async function verifySupabaseToken(token) {
   try {
     const supabase = getSupabaseClient();
+    if (!supabase) return null;
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data?.user) return null;
     return data.user;
@@ -79,9 +87,16 @@ async function verifySupabaseToken(token) {
 let _supabase = null;
 function getSupabaseClient() {
   if (_supabase) return _supabase;
+  if (!createClient) {
+    console.error('[analytics] createClient not available');
+    return null;
+  }
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_KEY || process.env.SUPABASE_ANON_KEY;
-  if (!url || !key) throw new Error('Supabase env vars not configured');
+  if (!url || !key) {
+    console.error('[analytics] Missing SUPABASE_URL or SUPABASE_SERVICE_KEY/SUPABASE_ANON_KEY');
+    return null;
+  }
   _supabase = createClient(url, key, {
     auth: { persistSession: false, autoRefreshToken: false }
   });
@@ -89,24 +104,32 @@ function getSupabaseClient() {
 }
 
 // ---------------------------------------------------------------------------
-// Redis helpers (mirrors admin.js)
+// Redis helpers
 // ---------------------------------------------------------------------------
 
 async function redisPipeline(commands) {
   if (!UPSTASH_URL || !UPSTASH_TOKEN) return [];
-  const r = await fetch(`${UPSTASH_URL}/pipeline`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${UPSTASH_TOKEN}`
-    },
-    body: JSON.stringify(commands)
-  });
-  const d = await r.json();
-  return Array.isArray(d) ? d.map(x => x.result) : [];
+  try {
+    const r = await fetch(`${UPSTASH_URL}/pipeline`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${UPSTASH_TOKEN}`
+      },
+      body: JSON.stringify(commands)
+    });
+    if (!r.ok) {
+      console.error('[analytics] Redis pipeline HTTP', r.status);
+      return [];
+    }
+    const d = await r.json();
+    return Array.isArray(d) ? d.map(x => x.result) : [];
+  } catch (e) {
+    console.error('[analytics] Redis pipeline error:', e.message);
+    return [];
+  }
 }
 
-// Parse ZREVRANGE result [member, score, member, score, …] → [{name, count}]
 function parseZSet(arr) {
   if (!Array.isArray(arr)) return [];
   const out = [];
@@ -116,7 +139,6 @@ function parseZSet(arr) {
   return out;
 }
 
-// Parse HGETALL result [field, value, field, value, …] → plain object
 function parseHash(arr) {
   if (!Array.isArray(arr)) return {};
   const obj = {};
@@ -139,7 +161,6 @@ const CSV_HEADERS = [
 function escapeCSV(value) {
   if (value === null || value === undefined) return '';
   const str = String(value);
-  // Wrap in quotes if the value contains a comma, quote, or newline
   if (str.includes(',') || str.includes('"') || str.includes('\n')) {
     return '"' + str.replace(/"/g, '""') + '"';
   }
@@ -155,62 +176,67 @@ function usersToCSV(users) {
 }
 
 // ---------------------------------------------------------------------------
-// Handler
+// Handler — entire function wrapped in try/catch for safety
 // ---------------------------------------------------------------------------
 
 module.exports = async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', 'same-origin');
+  // Top-level try/catch — nothing escapes
+  try {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'x-admin-key, Authorization, Content-Type');
 
-  if (req.method !== 'GET') return res.status(405).end();
+    if (req.method === 'OPTIONS') return res.status(200).end();
+    if (req.method !== 'GET') return res.status(405).json({ error: 'Method not allowed' });
 
-  // ---- Authentication -------------------------------------------------------
+    // ---- Authentication -----------------------------------------------------
 
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  let authenticated = false;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    let authenticated = false;
 
-  // Method 1: x-admin-key header
-  if (adminPassword) {
-    const provided = req.headers['x-admin-key'] || '';
-    if (provided && safeEqual(provided, adminPassword)) {
-      authenticated = true;
+    // Method 1: x-admin-key header
+    if (adminPassword) {
+      const provided = req.headers['x-admin-key'] || '';
+      if (provided && safeEqual(provided, adminPassword)) {
+        authenticated = true;
+      }
     }
-  }
 
-  // Method 2: Supabase Bearer token
-  if (!authenticated) {
-    const authHeader = req.headers['authorization'] || '';
-    const match = authHeader.match(/^Bearer\s+(.+)$/i);
-    if (match) {
-      const token = match[1];
+    // Method 2: Supabase Bearer token
+    if (!authenticated) {
+      const authHeader = req.headers['authorization'] || '';
+      const match = authHeader.match(/^Bearer\s+(.+)$/i);
+      if (match) {
+        const token = match[1];
+        const payload = decodeJwtPayload(token);
+        const claimedEmail = payload?.email || '';
 
-      // Fast pre-check: decode payload and verify email claim is in allow-list
-      // before making a network round-trip to Supabase.
-      const payload = decodeJwtPayload(token);
-      const claimedEmail = payload?.email || '';
-
-      if (ADMIN_EMAILS.has(claimedEmail)) {
-        // Full server-side verification (signature + expiry)
-        const user = await verifySupabaseToken(token);
-        if (user && ADMIN_EMAILS.has(user.email)) {
-          authenticated = true;
+        if (ADMIN_EMAILS.has(claimedEmail)) {
+          try {
+            const user = await verifySupabaseToken(token);
+            if (user && ADMIN_EMAILS.has(user.email)) {
+              authenticated = true;
+            }
+          } catch (authErr) {
+            console.error('[analytics] Supabase auth error:', authErr.message);
+          }
         }
       }
     }
-  }
 
-  if (!authenticated) {
-    await new Promise(r => setTimeout(r, 200)); // blunt timing attacks
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
+    if (!authenticated) {
+      await new Promise(r => setTimeout(r, 200));
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
 
-  // ---- Data fetching --------------------------------------------------------
+    // ---- Data fetching ------------------------------------------------------
 
-  try {
-    let supabase;
-    try {
-      supabase = getSupabaseClient();
-    } catch (envErr) {
-      return res.status(500).json({ error: 'Server config error: ' + envErr.message, hint: 'Check SUPABASE_URL and SUPABASE_SERVICE_KEY env vars in Vercel' });
+    const supabase = getSupabaseClient();
+    if (!supabase) {
+      return res.status(500).json({
+        error: 'Database not configured',
+        hint: 'Check SUPABASE_URL and SUPABASE_SERVICE_KEY env vars'
+      });
     }
 
     // Build daily keys for the last 14 days
@@ -220,14 +246,13 @@ module.exports = async function handler(req, res) {
       days.push(d.toISOString().slice(0, 10));
     }
 
-    // Fire Redis pipeline + Supabase queries concurrently
+    // Redis commands
     const redisCommands = [
       ['GET',      'soniq:total_songs'],
       ['GET',      'soniq:total_published'],
       ['ZREVRANGE', 'soniq:genres:top',  '0', '19', 'WITHSCORES'],
       ['ZREVRANGE', 'soniq:topics:top',  '0', '19', 'WITHSCORES'],
       ['LRANGE',   'soniq:recent',       '0', '49'],
-      // Community activity counters
       ['GET', 'soniq:community:posts:total'],
       ['GET', 'soniq:community:posts:song'],
       ['GET', 'soniq:community:posts:thought'],
@@ -240,19 +265,25 @@ module.exports = async function handler(req, res) {
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
-    // Wrap each query in its own catch so one failure doesn't kill all analytics
-    const safeFetch = (promise, fallback = { data: null, error: null, count: 0 }) =>
-      promise.catch(err => { console.error('Analytics sub-query error:', err.message); return fallback; });
+    // Safe wrapper — one failure doesn't kill everything
+    const safeFetch = (promise) =>
+      promise.catch(err => {
+        console.error('[analytics] sub-query error:', err.message);
+        return { data: null, error: err, count: 0 };
+      });
 
+    // Fire everything concurrently
     const [redisResults, profilesResult, songsByPlanResult, totalUsersResult, commPostsResult, commReactionsResult] =
       await Promise.all([
-        redisPipeline(redisCommands).catch(() => []),
+        redisPipeline(redisCommands),
         safeFetch(supabase
           .from('profiles')
           .select('id, email, display_name, artist_name, plan, created_at, song_count, liked_count, xp, level, streak, last_active, genres, founding_member, founding_tier')
           .order('created_at', { ascending: false })
           .limit(500)),
-        safeFetch(supabase.rpc('songs_by_plan').catch(() => ({ data: null, error: null }))),
+        safeFetch(
+          supabase.rpc('songs_by_plan').then(r => r).catch(() => ({ data: null, error: null }))
+        ),
         safeFetch(supabase
           .from('profiles')
           .select('id', { count: 'exact', head: true })),
@@ -265,40 +296,38 @@ module.exports = async function handler(req, res) {
           .select('id', { count: 'exact', head: true }))
       ]);
 
-    // Destructure Redis results
-    const [
-      totalSongsRaw,
-      totalPublishedRaw,
-      topGenresRaw,
-      topTopicsRaw,
-      recentRaw,
-      commPostsTotalRaw,
-      commPostsSongRaw,
-      commPostsThoughtRaw,
-      commPostsQuestionRaw,
-      commPostsCollabRaw,
-      commPostsTipRaw,
-      commPostsSnippetRaw,
-      commReactionsTotalRaw,
-      commCommentsTotalRaw,
-      ...dailyResults
-    ] = redisResults;
+    // Destructure Redis results (all default to empty/zero if Redis unavailable)
+    const rr = redisResults || [];
+    const totalSongsRaw        = rr[0];
+    const totalPublishedRaw    = rr[1];
+    const topGenresRaw         = rr[2];
+    const topTopicsRaw         = rr[3];
+    const recentRaw            = rr[4];
+    const commPostsTotalRaw    = rr[5];
+    const commPostsSongRaw     = rr[6];
+    const commPostsThoughtRaw  = rr[7];
+    const commPostsQuestionRaw = rr[8];
+    const commPostsCollabRaw   = rr[9];
+    const commPostsTipRaw      = rr[10];
+    const commPostsSnippetRaw  = rr[11];
+    const commReactionsTotalRaw = rr[12];
+    const commCommentsTotalRaw = rr[13];
+    const dailyResults         = rr.slice(14);
 
     // Summary
     const total_songs      = parseInt(totalSongsRaw)         || 0;
     const total_published  = parseInt(totalPublishedRaw)     || 0;
-    const total_users      = totalUsersResult.count           ?? 0;
-    // Community counts: prefer Supabase exact counts; Redis used for breakdown by post type
-    const total_posts      = commPostsResult.count            ?? parseInt(commPostsTotalRaw) || 0;
-    const total_reactions  = commReactionsResult.count        ?? parseInt(commReactionsTotalRaw) || 0;
-    const total_comments   = parseInt(commCommentsTotalRaw)   || 0;
+    const total_users      = totalUsersResult?.count         ?? 0;
+    const total_posts      = commPostsResult?.count          ?? parseInt(commPostsTotalRaw) || 0;
+    const total_reactions  = commReactionsResult?.count       ?? parseInt(commReactionsTotalRaw) || 0;
+    const total_comments   = parseInt(commCommentsTotalRaw)  || 0;
 
     const posts_by_type = {
       song:     parseInt(commPostsSongRaw)     || 0,
       thought:  parseInt(commPostsThoughtRaw)  || 0,
       question: parseInt(commPostsQuestionRaw) || 0,
       collab:   parseInt(commPostsCollabRaw)   || 0,
-      tip:      parseInt(commPostsTipRaw)       || 0,
+      tip:      parseInt(commPostsTipRaw)      || 0,
       snippet:  parseInt(commPostsSnippetRaw)  || 0,
     };
 
@@ -315,7 +344,8 @@ module.exports = async function handler(req, res) {
 
     // Daily events — chronological order (oldest first)
     const daily_events = days.map((date, i) => {
-      const obj = { date, ...parseHash(dailyResults[i]) };
+      const raw = dailyResults[i];
+      const obj = { date, ...parseHash(raw) };
       obj.total = Object.entries(obj)
         .filter(([k, v]) => k !== 'date' && typeof v === 'number')
         .reduce((acc, [, v]) => acc + v, 0);
@@ -323,17 +353,16 @@ module.exports = async function handler(req, res) {
     }).reverse();
 
     // Users array
-    if (profilesResult.error) {
-      console.error('Supabase profiles error:', profilesResult.error.message);
+    if (profilesResult?.error) {
+      console.error('[analytics] profiles error:', profilesResult.error.message || profilesResult.error);
     }
-    const users = profilesResult.data || [];
+    const users = profilesResult?.data || [];
 
-    // Songs by plan — attempt RPC first, fall back to manual aggregation
+    // Songs by plan
     let songs_by_plan = [];
     if (songsByPlanResult?.data) {
       songs_by_plan = songsByPlanResult.data;
     } else {
-      // Fallback: aggregate song_count from profiles (no FK join needed)
       try {
         const { data: profilePlans } = await supabase
           .from('profiles')
@@ -349,7 +378,7 @@ module.exports = async function handler(req, res) {
           songs_by_plan = Object.entries(planMap).map(([plan, count]) => ({ plan, count }));
         }
       } catch (fallbackErr) {
-        console.error('songs_by_plan fallback error:', fallbackErr.message);
+        console.error('[analytics] songs_by_plan fallback error:', fallbackErr.message);
       }
     }
 
@@ -377,7 +406,12 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (e) {
-    console.error('Analytics fetch error:', e.message);
-    return res.status(500).json({ error: 'Failed to fetch analytics' });
+    // Catch-all — this should NEVER let FUNCTION_INVOCATION_FAILED happen
+    console.error('[analytics] FATAL:', e.message, e.stack);
+    return res.status(500).json({
+      error: 'Analytics error',
+      message: e.message || 'Unknown error',
+      stack: process.env.NODE_ENV === 'development' ? e.stack : undefined
+    });
   }
 };
