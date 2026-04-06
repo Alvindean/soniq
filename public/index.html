@@ -44,7 +44,7 @@
 }
 html{background:var(--s0)}
 body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-@media(min-width:901px){body{display:grid!important;grid-template-columns:72px 1fr!important}.ad-rail,.sidebar-nav{grid-column:1!important}.wrap{grid-column:2!important}.pg{padding-left:32px!important}#pg-write.on{padding-left:0!important}}
+@media(min-width:901px){.wrap{margin-left:72px!important;width:calc(100% - 72px)!important;box-sizing:border-box!important}.pg{padding-left:24px!important}#pg-write.on{padding-left:0!important}}
 /* ── MODERN SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--s1);border-radius:3px}
@@ -273,7 +273,7 @@ a{color:var(--amber);text-decoration:none}
   .mood-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
   .genre-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
 }
-@media(min-width:901px){.wrap{grid-column:2!important;padding-left:24px}}
+@media(min-width:901px){.wrap{margin-left:72px!important;padding-left:24px}}
 
 /* ── PAGES ── */
 .pg{display:none}
@@ -5484,6 +5484,24 @@ function showErr(containerId,msg){const el=document.getElementById(containerId);
 // ═══════════════════════════════════════════════════════
 // NAVIGATION
 // ═══════════════════════════════════════════════════════
+// ── LAYOUT ENFORCER ── ensures sidebar clearance on ALL pages at desktop
+function _enforceLayout(){
+  if(window.innerWidth<901)return;
+  var w=document.querySelector('.wrap');
+  if(w){
+    w.style.setProperty('margin-left','72px','important');
+    w.style.setProperty('width','calc(100% - 72px)','important');
+    w.style.setProperty('box-sizing','border-box','important');
+  }
+  document.querySelectorAll('.pg').forEach(function(p){
+    if(p.id==='pg-write'&&p.classList.contains('on'))return;
+    p.style.setProperty('padding-left','24px','important');
+  });
+}
+window.addEventListener('DOMContentLoaded',_enforceLayout);
+window.addEventListener('resize',function(){_enforceLayout();});
+window.addEventListener('load',_enforceLayout);
+
 function goPg(id,el){
   // Clear album track context when leaving write page
   if (id !== 'write' && S.albumTrack) {
@@ -5519,6 +5537,8 @@ function goPg(id,el){
       if(src?.lyrics) loadLyricsIntoEditor(src.lyrics, src.title);
     }
   }
+  // Enforce layout after page switch
+  setTimeout(_enforceLayout,50);
 }
 function goStab(ns,id,el){
   const pre=ns+'-spane-';
