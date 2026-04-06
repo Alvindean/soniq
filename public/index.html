@@ -208,7 +208,7 @@ a{color:var(--amber);text-decoration:none}
 .ad-rail-slot{width:152px;min-height:300px;background:var(--s2);border:1px dashed var(--b2);border-radius:var(--r2);display:flex;align-items:center;justify-content:center;color:var(--tx4);font-size:10px;text-align:center;padding:8px}
 @media(min-width:1500px){
   .ad-rail-right{display:flex}
-  .wrap{margin-right:184px;max-width:none;padding-left:28px;padding-right:24px}
+  .wrap{margin-right:184px;max-width:none;padding-left:32px!important;padding-right:24px}
   .comm-right{display:none}
   .comm-layout{grid-template-columns:1fr}
   #pg-community{max-width:none;margin:0;padding-left:28px;padding-right:24px}
@@ -271,7 +271,7 @@ a{color:var(--amber);text-decoration:none}
   .mood-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
   .genre-grid{grid-template-columns:repeat(3,1fr)!important;gap:4px!important}
 }
-@media(min-width:901px){.wrap{margin-left:72px;padding-left:28px}}
+@media(min-width:901px){.wrap{margin-left:80px!important;padding-left:32px!important}}
 
 /* ── PAGES ── */
 .pg{display:none}
@@ -1098,7 +1098,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── COMMUNITY PAGE: centered with breathing room ── */
-#pg-community{max-width:none;margin:0;padding:8px 24px 0 28px;box-sizing:border-box}
+#pg-community{max-width:none;margin:0;padding:8px 24px 0 32px;box-sizing:border-box}
 /* ── COMMUNITY: FILTER BAR ── */
 .comm-filters-bar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:8px 14px;display:flex;gap:6px;flex-wrap:nowrap;align-items:center;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box}
 .comm-filters-bar::-webkit-scrollbar{height:0;display:none}
@@ -2652,11 +2652,11 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
+        <button class="btn btn-sm" onclick="cpBriefPrompt('res')">📋 Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
         <div class="song-card-overflow">
           <button class="btn btn-sm" onclick="toggleResOverflow()" title="More options">⋯ More</button>
           <div class="song-card-overflow-menu" id="res-overflow-menu">
-            <button class="song-card-overflow-item" onclick="cpBriefPrompt('res')">Copy Prompt</button>
             <button class="song-card-overflow-item" onclick="setLike('res',true)">👍 Like</button>
             <button class="song-card-overflow-item" onclick="setLike('res',false)">👎 Dislike</button>
             <button class="song-card-overflow-item" onclick="printBrief('res')">🖨 Print</button>
@@ -2893,10 +2893,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')">Copy Lyrics</button>
+        <button class="btn btn-sm" onclick="cpBriefPrompt('lres')">📋 Copy Prompt</button>
         <div class="song-card-overflow">
           <button class="btn btn-sm" onclick="toggleLresOverflow()" title="More options">⋯ More</button>
           <div class="song-card-overflow-menu" id="lres-overflow-menu">
-            <button class="song-card-overflow-item" onclick="cpBriefPrompt('lres')">Copy Prompt</button>
             <button class="song-card-overflow-item" onclick="setLike('lres',true)">👍 Like</button>
             <button class="song-card-overflow-item" onclick="setLike('lres',false)">👎 Dislike</button>
             <button class="song-card-overflow-item" onclick="printBrief('lres')">🖨 Print</button>
