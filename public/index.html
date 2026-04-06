@@ -1145,6 +1145,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .profile-banner{padding:20px 12px 0}
   #pg-profile [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important}
 }
+/* ── ADMIN TABS + CONTENT CMS ── */
+.adm-tabs{display:flex;gap:0;border-bottom:1px solid var(--b2);margin-bottom:20px}
+.adm-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.adm-tab:hover{color:var(--tx1)}
+.adm-tab.on{color:var(--amber);border-bottom-color:var(--amber)}
+.adm-tab-panel{display:none}
+.adm-tab-panel.on{display:block}
+.cms-toolbar{display:flex;gap:4px;padding:8px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3) var(--r3) 0 0;flex-wrap:wrap}
+.cms-toolbar button{padding:4px 10px;border:1px solid var(--b2);border-radius:4px;background:var(--s3);color:var(--tx2);font-size:12px;cursor:pointer;transition:all .15s}
+.cms-toolbar button:hover{background:var(--s4);color:var(--tx1)}
+.cms-editor{min-height:400px;padding:20px;border:1px solid var(--b2);border-top:none;border-radius:0 0 var(--r3) var(--r3);background:var(--s1);color:var(--tx1);font-size:14px;line-height:1.8;outline:none;overflow-y:auto}
+.cms-editor h2{font-size:20px;font-weight:700;margin:16px 0 8px;color:var(--tx1)}
+.cms-editor h3{font-size:16px;font-weight:600;margin:12px 0 6px;color:var(--tx2)}
+.cms-editor blockquote{border-left:3px solid var(--amber);padding-left:12px;color:var(--tx3);margin:12px 0}
+.cms-editor a{color:var(--amber);text-decoration:underline}
+.cms-editor img{max-width:100%;border-radius:8px;margin:12px 0}
+.cms-sidebar{display:flex;flex-direction:column;gap:12px}
+.cms-sidebar label{font-size:11px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;display:block}
+.cms-sidebar input,.cms-sidebar select,.cms-sidebar textarea{width:100%;padding:8px 10px;border:1px solid var(--b2);border-radius:6px;background:var(--s2);color:var(--tx1);font-size:12px;box-sizing:border-box}
+.cms-sidebar textarea{min-height:60px;resize:vertical}
+.cms-status-badge{display:inline-block;padding:2px 8px;border-radius:99px;font-size:10px;font-weight:700;text-transform:uppercase}
+.cms-status-badge.draft{background:#f59e0b20;color:#f59e0b;border:1px solid #f59e0b40}
+.cms-status-badge.published{background:#34d39920;color:#34d399;border:1px solid #34d39940}
+.cms-status-badge.scheduled{background:#60a5fa20;color:#60a5fa;border:1px solid #60a5fa40}
+.cms-post-row{display:grid;grid-template-columns:1fr 90px 90px 80px 70px 60px;align-items:center;padding:10px 12px;border-bottom:1px solid var(--b1);font-size:12px;cursor:pointer;transition:background .1s}
+.cms-post-row:hover{background:var(--s2)}
+.cms-ai-btn{padding:6px 12px;border:1px solid var(--amberline);border-radius:6px;background:var(--amberbg);color:var(--amber);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s}
+.cms-ai-btn:hover{background:var(--amber);color:#000}
 /* ── CAMPAIGN MODE ── */
 .camp-hero{padding:28px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px}
 .camp-hero-label{font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
@@ -4260,7 +4288,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
      ADMIN DASHBOARD PAGE
 ══════════════════════════════════ -->
 <div id="pg-admin" class="pg">
-  <div style="max-width:900px;margin:0 auto;padding:20px">
+  <div style="max-width:1100px;margin:0 auto;padding:20px">
+
+    <!-- Admin Tab Bar -->
+    <div class="adm-tabs">
+      <div class="adm-tab on" onclick="switchAdmTab('analytics',this)">📊 Analytics</div>
+      <div class="adm-tab" onclick="switchAdmTab('content',this)">✍ Content</div>
+      <div class="adm-tab" onclick="switchAdmTab('seotraffic',this)">🔍 SEO & Traffic</div>
+    </div>
+
+    <!-- TAB: Analytics (existing content wrapped) -->
+    <div id="adm-panel-analytics" class="adm-tab-panel on">
 
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
@@ -4368,6 +4406,275 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">🕐 Recent Activity</div>
       <div id="adm-recent"></div>
     </div>
+
+    </div><!-- end adm-panel-analytics -->
+
+    <!-- TAB: Content CMS -->
+    <div id="adm-panel-content" class="adm-tab-panel">
+
+      <!-- Content List View -->
+      <div id="cms-list-view">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:20px;font-weight:800;color:var(--tx1)">✍ Content Manager</div>
+            <div style="font-size:11px;color:var(--tx3);margin-top:2px">Create, edit, and publish blog posts</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="cms-search" placeholder="Search posts…" oninput="filterCMSPosts()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px;width:160px">
+            <select id="cms-filter" onchange="filterCMSPosts()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px">
+              <option value="all">All</option>
+              <option value="draft">Drafts</option>
+              <option value="published">Published</option>
+              <option value="scheduled">Scheduled</option>
+            </select>
+            <button class="btn btn-amber" onclick="openCMSEditor()" style="font-size:12px;padding:8px 16px">✍ New Post</button>
+          </div>
+        </div>
+
+        <!-- Stats row -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+          <div class="card" style="padding:12px;text-align:center">
+            <div id="cms-total" style="font-size:22px;font-weight:900;color:var(--amber)">0</div>
+            <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Total Posts</div>
+          </div>
+          <div class="card" style="padding:12px;text-align:center">
+            <div id="cms-published" style="font-size:22px;font-weight:900;color:#34d399">0</div>
+            <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Published</div>
+          </div>
+          <div class="card" style="padding:12px;text-align:center">
+            <div id="cms-drafts" style="font-size:22px;font-weight:900;color:#f59e0b">0</div>
+            <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Drafts</div>
+          </div>
+          <div class="card" style="padding:12px;text-align:center">
+            <div id="cms-views" style="font-size:22px;font-weight:900;color:#60a5fa">0</div>
+            <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Total Views</div>
+          </div>
+        </div>
+
+        <!-- Post list header -->
+        <div class="card" style="padding:0;overflow:hidden">
+          <div class="cms-post-row" style="background:var(--s2);font-weight:700;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;cursor:default">
+            <div>Title</div>
+            <div style="text-align:center">Status</div>
+            <div style="text-align:center">Category</div>
+            <div style="text-align:center">Date</div>
+            <div style="text-align:center">Views</div>
+            <div style="text-align:center">Edit</div>
+          </div>
+          <div id="cms-posts-list">
+            <div style="padding:40px;text-align:center;color:var(--tx4);font-size:13px">Loading posts…</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Editor View (hidden by default) -->
+      <div id="cms-editor-view" style="display:none">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <button class="btn btn-sm" onclick="closeCMSEditor()" style="font-size:18px;padding:4px 10px">←</button>
+          <div style="font-size:16px;font-weight:700;color:var(--tx1)" id="cms-editor-title-display">New Post</div>
+          <div style="flex:1"></div>
+          <button class="btn btn-sm" onclick="saveCMSPost('draft')">Save Draft</button>
+          <button class="btn btn-sm btn-teal" onclick="saveCMSPost('published')">Publish</button>
+          <button class="btn btn-sm" onclick="saveCMSPost('scheduled')" style="border-color:var(--b3)">Schedule</button>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start">
+          <!-- Left: Editor -->
+          <div>
+            <div class="cms-toolbar">
+              <button onclick="cmsExec('bold')" title="Bold"><b>B</b></button>
+              <button onclick="cmsExec('italic')" title="Italic"><i>I</i></button>
+              <button onclick="cmsExec('formatBlock','<h2>')" title="H2">H2</button>
+              <button onclick="cmsExec('formatBlock','<h3>')" title="H3">H3</button>
+              <button onclick="cmsExec('formatBlock','<blockquote>')" title="Quote">❝</button>
+              <button onclick="cmsInsertLink()" title="Link">🔗</button>
+              <button onclick="cmsInsertImage()" title="Image">🖼</button>
+              <button onclick="cmsExec('insertUnorderedList')" title="List">• List</button>
+              <button onclick="cmsExec('formatBlock','<pre>')" title="Code">&lt;/&gt;</button>
+              <button onclick="cmsExec('undo')" title="Undo">↩</button>
+              <button onclick="cmsExec('redo')" title="Redo">↪</button>
+            </div>
+            <div id="cms-editor-content" class="cms-editor" contenteditable="true" data-placeholder="Start writing your post…"></div>
+          </div>
+
+          <!-- Right: Sidebar -->
+          <div class="cms-sidebar">
+            <div class="card" style="padding:14px">
+              <label>Title</label>
+              <input id="cms-field-title" placeholder="Post title" oninput="cmsAutoSlug()">
+              <label style="margin-top:10px">Slug</label>
+              <input id="cms-field-slug" placeholder="post-url-slug">
+              <label style="margin-top:10px">Status</label>
+              <select id="cms-field-status">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+                <option value="scheduled">Scheduled</option>
+              </select>
+              <label style="margin-top:10px">Publish Date</label>
+              <input id="cms-field-date" type="datetime-local">
+              <label style="margin-top:10px">Category</label>
+              <select id="cms-field-category">
+                <option value="cluster">Cluster Article</option>
+                <option value="pillar">Pillar Guide</option>
+                <option value="tutorial">Tutorial</option>
+                <option value="news">News</option>
+              </select>
+              <label style="margin-top:10px">Tags (comma separated)</label>
+              <input id="cms-field-tags" placeholder="AI songwriting, genre DNA">
+              <label style="margin-top:10px">Featured Image URL</label>
+              <input id="cms-field-image" placeholder="https://...">
+              <label style="margin-top:10px">Excerpt</label>
+              <textarea id="cms-field-excerpt" placeholder="Brief description for blog cards and meta…"></textarea>
+            </div>
+
+            <!-- AI Assist -->
+            <div class="card" style="padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:10px">🤖 AI Assist</div>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button class="cms-ai-btn" onclick="cmsAI('outline')">Generate Outline</button>
+                <button class="cms-ai-btn" onclick="cmsAI('write')">Write Section</button>
+                <button class="cms-ai-btn" onclick="cmsAI('headlines')">Suggest Headlines</button>
+                <button class="cms-ai-btn" onclick="cmsAI('seo')">Generate SEO Tags</button>
+                <button class="cms-ai-btn" onclick="cmsAI('improve')">Improve Selection</button>
+              </div>
+            </div>
+
+            <!-- SEO Preview -->
+            <div class="card" style="padding:14px">
+              <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:8px">🔍 SEO Preview</div>
+              <label>Meta Title</label>
+              <input id="cms-field-meta-title" placeholder="SEO title (max 60 chars)" maxlength="60">
+              <div style="font-size:9px;color:var(--tx4);text-align:right;margin-top:2px"><span id="cms-meta-title-count">0</span>/60</div>
+              <label style="margin-top:6px">Meta Description</label>
+              <textarea id="cms-field-meta-desc" placeholder="SEO description (150-160 chars)" maxlength="160" style="min-height:50px"></textarea>
+              <div style="font-size:9px;color:var(--tx4);text-align:right;margin-top:2px"><span id="cms-meta-desc-count">0</span>/160</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end adm-panel-content -->
+
+    <!-- TAB: SEO & Traffic -->
+    <div id="adm-panel-seotraffic" class="adm-tab-panel">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--tx1)">🔍 SEO & Traffic</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:2px">Track rankings, traffic, and optimization opportunities</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-teal" onclick="loadSEODashboard()">🔄 Refresh</button>
+          <button class="btn btn-sm btn-amber" onclick="runSEOAudit()">🤖 Run AI Audit</button>
+        </div>
+      </div>
+
+      <!-- SEO Stats -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="seo-pages-indexed" style="font-size:22px;font-weight:900;color:#34d399">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Pages Indexed</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="seo-keywords-tracked" style="font-size:22px;font-weight:900;color:var(--amber)">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Keywords Tracked</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="seo-avg-position" style="font-size:22px;font-weight:900;color:#60a5fa">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Avg Position</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="seo-total-views" style="font-size:22px;font-weight:900;color:#a78bfa">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Total Views</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="seo-ai-citations" style="font-size:22px;font-weight:900;color:#f47292">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">AI Citations</div>
+        </div>
+      </div>
+
+      <!-- Keyword Rankings Table -->
+      <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎯 Keyword Rankings</div>
+          <button class="btn btn-sm" onclick="checkAllRankings()" style="font-size:10px">Check Now</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead>
+              <tr style="color:var(--tx3);text-transform:uppercase;font-size:9px;letter-spacing:.06em;border-bottom:1px solid var(--b1)">
+                <th style="padding:8px 12px;text-align:left">Keyword</th>
+                <th style="padding:8px;text-align:center">Position</th>
+                <th style="padding:8px;text-align:center">Change</th>
+                <th style="padding:8px;text-align:left">Target Page</th>
+                <th style="padding:8px;text-align:center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="seo-keywords-body">
+              <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--tx4)">Click "Check Now" to scan rankings</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Page Performance Database -->
+      <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">📄 All Pages — Performance Database</div>
+          <div style="display:flex;gap:6px">
+            <input id="seo-page-search" placeholder="Search pages…" style="padding:5px 9px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px;width:150px">
+            <button class="btn btn-sm" onclick="exportSEOCSV()" style="font-size:10px">⬇ CSV</button>
+          </div>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead>
+              <tr style="color:var(--tx3);text-transform:uppercase;font-size:9px;letter-spacing:.06em;border-bottom:1px solid var(--b1)">
+                <th style="padding:8px 12px;text-align:left">Page</th>
+                <th style="padding:8px;text-align:center">Type</th>
+                <th style="padding:8px;text-align:center">Status</th>
+                <th style="padding:8px;text-align:center">Views</th>
+                <th style="padding:8px;text-align:center">Top Keyword</th>
+                <th style="padding:8px;text-align:center">Rank</th>
+                <th style="padding:8px;text-align:center">SEO Score</th>
+                <th style="padding:8px;text-align:center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="seo-pages-body">
+              <tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">Click Refresh to load page data</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- AI SEO Audit Panel -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🤖 AI SEO Engine</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runContentGapAnalysis()">
+            <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:4px">Content Gap Finder</div>
+            <div style="font-size:11px;color:var(--tx3)">Find "People Also Ask" questions you haven't covered yet</div>
+          </div>
+          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runCompetitorWatch()">
+            <div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:4px">Competitor Watch</div>
+            <div style="font-size:11px;color:var(--tx3)">Check what Suno, Udio, and others are publishing</div>
+          </div>
+          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runSchemaGenerator()">
+            <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:4px">Schema Generator</div>
+            <div style="font-size:11px;color:var(--tx3)">Generate JSON-LD structured data for any page</div>
+          </div>
+          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runAICitationCheck()">
+            <div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:4px">AI Citation Check</div>
+            <div style="font-size:11px;color:var(--tx3)">See if ChatGPT/Perplexity mention SONIQ</div>
+          </div>
+        </div>
+        <div id="seo-ai-output" style="margin-top:16px;display:none">
+          <div style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:8px">AI Output:</div>
+          <div id="seo-ai-result" style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px;font-size:12px;color:var(--tx2);line-height:1.7;white-space:pre-wrap"></div>
+        </div>
+      </div>
+
+    </div><!-- end adm-panel-seotraffic -->
 
   </div>
 </div>
@@ -13243,6 +13550,239 @@ function refreshCommunityFeed() {
 
 // Refresh board on load so recent songs populate immediately
 document.addEventListener('DOMContentLoaded', () => { refreshInspirationBoard(); refreshCommunityFeed(); });
+
+// ── ADMIN TAB SYSTEM ──
+function switchAdmTab(tabName, el) {
+  // Hide all panels
+  document.querySelectorAll('.adm-tab-panel').forEach(p => p.classList.remove('on'));
+  // Deactivate all tabs
+  document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('on'));
+  // Show selected panel
+  const panel = document.getElementById(`adm-panel-${tabName}`);
+  if(panel) panel.classList.add('on');
+  // Activate selected tab
+  if(el) el.classList.add('on');
+  // Load content if needed
+  if(tabName === 'content') loadCMSPosts();
+  if(tabName === 'seotraffic') loadSEODashboard();
+}
+
+// ── BLOG CMS ──
+let cmsPosts = [];
+let cmsEditingId = null;
+
+function loadCMSPosts() {
+  // Mock data for now - in production connect to Supabase
+  cmsPosts = [
+    {id: 1, title: 'Getting Started with SONIQ', slug: 'getting-started', status: 'published', date: '2025-02-01', excerpt: 'Learn the basics...', content: '<p>Content here</p>'},
+    {id: 2, title: 'Advanced Production Tips', slug: 'advanced-tips', status: 'published', date: '2025-01-15', excerpt: 'Deep dive...', content: '<p>Content here</p>'},
+    {id: 3, title: 'Collaboration Features', slug: 'collab-features', status: 'draft', date: '2025-03-20', excerpt: 'Work together...', content: '<p>Draft content</p>'},
+    {id: 4, title: 'Summer Sound Trends', slug: 'summer-trends', status: 'scheduled', date: '2025-05-01', excerpt: 'What\'s hot...', content: '<p>Scheduled for May</p>'}
+  ];
+  renderCMSList();
+}
+
+function renderCMSList() {
+  const list = document.getElementById('cms-post-list');
+  if(!list) return;
+  const filter = document.getElementById('cms-filter')?.value || 'all';
+  const search = document.getElementById('cms-search')?.value?.toLowerCase() || '';
+
+  let filtered = cmsPosts;
+  if(filter !== 'all') filtered = filtered.filter(p => p.status === filter);
+  if(search) filtered = filtered.filter(p => p.title.toLowerCase().includes(search));
+
+  list.innerHTML = filtered.map(post => {
+    const statusColor = post.status === 'published' ? 'var(--grn)' : post.status === 'scheduled' ? 'var(--blu)' : 'var(--gry)';
+    return `
+      <div class="cms-post-row">
+        <div style="flex:1">
+          <div style="font-weight:600;color:var(--tx1)">${post.title}</div>
+          <div style="font-size:12px;color:var(--tx3);margin-top:4px">${post.excerpt}</div>
+          <div style="font-size:11px;color:var(--tx4);margin-top:4px">${post.date}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cms-status-badge" style="background:${statusColor}">${post.status}</span>
+          <button onclick="openCMSEditor(${post.id})" style="padding:6px 12px;font-size:12px;background:var(--amb2);border:none;border-radius:4px;cursor:pointer;color:var(--tx1)">Edit</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openCMSEditor(postId) {
+  const post = cmsPosts.find(p => p.id === postId);
+  if(!post) return;
+  cmsEditingId = postId;
+
+  document.getElementById('cms-list-view').style.display = 'none';
+  document.getElementById('cms-editor-view').style.display = 'block';
+
+  document.getElementById('cms-title').value = post.title;
+  document.getElementById('cms-slug').value = post.slug;
+  document.getElementById('cms-excerpt').value = post.excerpt;
+  document.getElementById('cms-editor').innerHTML = post.content;
+  document.getElementById('cms-status').value = post.status;
+  document.getElementById('cms-pubdate').value = post.date;
+
+  updateCMSSEOPreview();
+}
+
+function closeCMSEditor() {
+  cmsEditingId = null;
+  document.getElementById('cms-list-view').style.display = 'block';
+  document.getElementById('cms-editor-view').style.display = 'none';
+}
+
+function cmsAutoSlug() {
+  const title = document.getElementById('cms-title').value;
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  document.getElementById('cms-slug').value = slug;
+  updateCMSSEOPreview();
+}
+
+function cmsExec(cmd, val = null) {
+  document.execCommand(cmd, false, val);
+  document.getElementById('cms-editor').focus();
+}
+
+function cmsInsertLink() {
+  const url = prompt('Enter URL:');
+  if(url) cmsExec('createLink', url);
+}
+
+function cmsInsertImage() {
+  const url = prompt('Enter image URL:');
+  if(url) cmsExec('insertImage', url);
+}
+
+function saveCMSPost() {
+  const title = document.getElementById('cms-title').value;
+  const slug = document.getElementById('cms-slug').value;
+  const excerpt = document.getElementById('cms-excerpt').value;
+  const content = document.getElementById('cms-editor').innerHTML;
+  const status = document.getElementById('cms-status').value;
+  const date = document.getElementById('cms-pubdate').value;
+
+  if(!title || !slug) {
+    alert('Title and slug required');
+    return;
+  }
+
+  if(cmsEditingId) {
+    const post = cmsPosts.find(p => p.id === cmsEditingId);
+    if(post) {
+      post.title = title;
+      post.slug = slug;
+      post.excerpt = excerpt;
+      post.content = content;
+      post.status = status;
+      post.date = date;
+    }
+  } else {
+    cmsPosts.push({
+      id: Math.max(...cmsPosts.map(p => p.id), 0) + 1,
+      title, slug, excerpt, content, status, date
+    });
+  }
+
+  closeCMSEditor();
+  renderCMSList();
+  // In production: POST to Supabase
+}
+
+function cmsAI() {
+  const title = document.getElementById('cms-title').value;
+  if(!title) {
+    alert('Enter a title first');
+    return;
+  }
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'Generating...';
+
+  // Mock AI generation - in production call your AI service
+  setTimeout(() => {
+    const content = `<p><strong>${title}</strong></p><p>This is AI-generated content about "${title}". In production, this would be generated by your AI service with context about your brand and audience.</p>`;
+    document.getElementById('cms-excerpt').value = `Learn more about ${title}...`;
+    document.getElementById('cms-editor').innerHTML = content;
+    updateCMSSEOPreview();
+    btn.disabled = false;
+    btn.textContent = 'Generate with AI';
+  }, 1500);
+}
+
+function updateCMSSEOPreview() {
+  const title = document.getElementById('cms-title').value || 'Your post title';
+  const slug = document.getElementById('cms-slug').value || 'your-slug';
+  const excerpt = document.getElementById('cms-excerpt').value || 'Post preview text...';
+
+  const preview = document.getElementById('cms-seo-preview');
+  if(preview) {
+    preview.innerHTML = `
+      <div style="padding:12px;background:var(--b3);border-radius:6px">
+        <div style="color:var(--grn);font-size:12px">soniq.app/blog/${slug}</div>
+        <div style="color:var(--tx1);font-weight:600;font-size:14px;margin-top:4px">${title}</div>
+        <div style="color:var(--tx3);font-size:12px;margin-top:4px">${excerpt}</div>
+      </div>
+    `;
+  }
+}
+
+// ── SEO & TRAFFIC DASHBOARD ──
+function loadSEODashboard() {
+  renderSEOPages();
+  renderSEOKeywords();
+}
+
+function renderSEOPages() {
+  const table = document.getElementById('seo-pages-table');
+  if(!table) return;
+
+  const pages = [
+    {url: '/blog/getting-started', views: 1243, bounce: 32, avgTime: '2m 14s', traffic: 'organic'},
+    {url: '/features', views: 892, bounce: 28, avgTime: '3m 01s', traffic: 'direct'},
+    {url: '/pricing', views: 756, bounce: 45, avgTime: '1m 32s', traffic: 'organic'},
+    {url: '/blog/advanced-tips', views: 634, bounce: 22, avgTime: '4m 18s', traffic: 'organic'},
+    {url: '/', views: 2156, bounce: 18, avgTime: '5m 42s', traffic: 'direct'}
+  ];
+
+  table.innerHTML = pages.map(p => `
+    <div style="display:grid;grid-template-columns:1fr 80px 80px 120px 100px;gap:12px;padding:12px;border-bottom:1px solid var(--b2);align-items:center">
+      <div style="color:var(--tx1);font-size:13px">${p.url}</div>
+      <div style="text-align:center;color:var(--tx2);font-weight:600">${p.views}</div>
+      <div style="text-align:center;color:${p.bounce > 40 ? 'var(--red)' : 'var(--grn)'};font-weight:600">${p.bounce}%</div>
+      <div style="text-align:center;color:var(--tx2)">${p.avgTime}</div>
+      <div style="text-align:center;font-size:12px;color:var(--tx3)">${p.traffic}</div>
+    </div>
+  `).join('');
+}
+
+function renderSEOKeywords() {
+  const table = document.getElementById('seo-keywords-table');
+  if(!table) return;
+
+  const keywords = [
+    {keyword: 'music production', position: 3, volume: 8900, cpc: '$2.40', trend: '↑'},
+    {keyword: 'daw software', position: 5, volume: 6200, cpc: '$1.85', trend: '↑'},
+    {keyword: 'beat maker', position: 8, volume: 5400, cpc: '$1.20', trend: '↓'},
+    {keyword: 'audio editing', position: 12, volume: 4100, cpc: '$3.10', trend: '→'},
+    {keyword: 'music collaboration', position: 2, volume: 3200, cpc: '$2.80', trend: '↑'}
+  ];
+
+  table.innerHTML = keywords.map(k => {
+    const posColor = k.position <= 3 ? 'var(--grn)' : k.position <= 10 ? 'var(--amb)' : 'var(--red)';
+    return `
+      <div style="display:grid;grid-template-columns:1fr 80px 100px 100px 80px;gap:12px;padding:12px;border-bottom:1px solid var(--b2);align-items:center">
+        <div style="color:var(--tx1);font-size:13px">${k.keyword}</div>
+        <div style="text-align:center;font-weight:600;color:${posColor}">#${k.position}</div>
+        <div style="text-align:center;color:var(--tx2);font-size:12px">${k.volume.toLocaleString()} mo</div>
+        <div style="text-align:center;color:var(--tx2);font-size:12px">${k.cpc}</div>
+        <div style="text-align:center;color:${k.trend === '↑' ? 'var(--grn)' : k.trend === '↓' ? 'var(--red)' : 'var(--tx3)'};">${k.trend}</div>
+      </div>
+    `;
+  }).join('');
+}
 </script>
 
 <!-- ══ IMPORT LYRICS OVERLAY ══ -->
