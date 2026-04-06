@@ -13742,7 +13742,7 @@ function renderCMSList() {
         <div style="text-align:center;font-size:11px;color:var(--tx3)">${cats}</div>
         <div style="text-align:center;font-size:11px;color:var(--tx3)">${dateStr}</div>
         <div style="text-align:center;font-size:12px;color:var(--tx2);font-weight:600">${post.views||0}</div>
-        <div style="text-align:center"><button onclick="openCMSEditor(${post.id})" style="padding:4px 10px;font-size:11px;background:var(--amb2);border:1px solid var(--amberline);border-radius:4px;cursor:pointer;color:var(--amber);font-weight:600">Edit</button></div>
+        <div style="text-align:center"><button onclick="openCMSEditor('${post.id}')" style="padding:4px 10px;font-size:11px;background:var(--amb2);border:1px solid var(--amberline);border-radius:4px;cursor:pointer;color:var(--amber);font-weight:600">Edit</button></div>
       </div>
     `;
   }).join('');
@@ -14371,8 +14371,8 @@ async function loadBlogPosts() {
     const statusBadge = isDraft ? '<span style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:rgba(251,191,36,.08);color:#fbbf24;border:1px solid rgba(251,191,36,.15);border-radius:99px;padding:2px 8px;margin-left:6px">Draft</span>' : '';
     const adminBtns = isAdmin
       ? '<div style="display:flex;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--b1)" onclick="event.stopPropagation()">' +
-        '<button onclick="blogEditPost(' + p.id + ')" style="flex:1;padding:5px 0;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s3);color:var(--tx2);font-size:10px;font-weight:600;cursor:pointer">✏️ Edit</button>' +
-        '<button onclick="blogTogglePublish(' + p.id + ',\'' + p.status + '\')" style="flex:1;padding:5px 0;border:1px solid ' + (isDraft ? 'rgba(74,222,128,.3)' : 'var(--b2)') + ';border-radius:var(--r2);background:' + (isDraft ? 'rgba(74,222,128,.08)' : 'var(--s3)') + ';color:' + (isDraft ? '#4ade80' : 'var(--tx2)') + ';font-size:10px;font-weight:600;cursor:pointer">' + (isDraft ? '🟢 Publish' : '📝 Unpublish') + '</button>' +
+        '<button onclick="blogEditPost(\'' + p.id + '\')" style="flex:1;padding:5px 0;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s3);color:var(--tx2);font-size:10px;font-weight:600;cursor:pointer">✏️ Edit</button>' +
+        '<button onclick="blogTogglePublish(\'' + p.id + '\',\'' + p.status + '\')" style="flex:1;padding:5px 0;border:1px solid ' + (isDraft ? 'rgba(74,222,128,.3)' : 'var(--b2)') + ';border-radius:var(--r2);background:' + (isDraft ? 'rgba(74,222,128,.08)' : 'var(--s3)') + ';color:' + (isDraft ? '#4ade80' : 'var(--tx2)') + ';font-size:10px;font-weight:600;cursor:pointer">' + (isDraft ? '🟢 Publish' : '📝 Unpublish') + '</button>' +
         '</div>'
       : '';
     return '<div class="blog-card" onclick="openBlogPost(\'' + p.slug + '\')">' +
@@ -14431,8 +14431,8 @@ async function openBlogPost(slug) {
       const isDraft = data.status === 'draft';
       adminActions.style.display = 'flex';
       adminActions.innerHTML =
-        '<button onclick="blogEditPost(' + data.id + ')" style="padding:6px 14px;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:600;cursor:pointer">✏️ Edit</button>' +
-        '<button onclick="blogTogglePublish(' + data.id + ',\'' + data.status + '\')" style="padding:6px 14px;border:1px solid ' + (isDraft ? 'rgba(74,222,128,.3)' : 'var(--b2)') + ';border-radius:var(--r2);background:' + (isDraft ? 'rgba(74,222,128,.08)' : 'var(--s3)') + ';color:' + (isDraft ? '#4ade80' : 'var(--tx2)') + ';font-size:11px;font-weight:600;cursor:pointer">' + (isDraft ? '🟢 Publish' : '📝 Unpublish') + '</button>';
+        '<button onclick="blogEditPost(\'' + data.id + '\')" style="padding:6px 14px;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:600;cursor:pointer">✏️ Edit</button>' +
+        '<button onclick="blogTogglePublish(\'' + data.id + '\',\'' + data.status + '\')" style="padding:6px 14px;border:1px solid ' + (isDraft ? 'rgba(74,222,128,.3)' : 'var(--b2)') + ';border-radius:var(--r2);background:' + (isDraft ? 'rgba(74,222,128,.08)' : 'var(--s3)') + ';color:' + (isDraft ? '#4ade80' : 'var(--tx2)') + ';font-size:11px;font-weight:600;cursor:pointer">' + (isDraft ? '🟢 Publish' : '📝 Unpublish') + '</button>';
     }
 
     // Show detail, hide grid
