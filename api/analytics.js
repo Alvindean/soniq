@@ -21,6 +21,7 @@ const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const ADMIN_EMAILS = new Set([
   'thealvindean@gmail.com',
+  'alvin@nuwavmedia.com',
   'lamusicproducers8@gmail.com'
 ]);
 
@@ -204,7 +205,12 @@ module.exports = async function handler(req, res) {
   // ---- Data fetching --------------------------------------------------------
 
   try {
-    const supabase = getSupabaseClient();
+    let supabase;
+    try {
+      supabase = getSupabaseClient();
+    } catch (envErr) {
+      return res.status(500).json({ error: 'Server config error: ' + envErr.message, hint: 'Check SUPABASE_URL and SUPABASE_SERVICE_KEY env vars in Vercel' });
+    }
 
     // Build daily keys for the last 14 days
     const days = [];
