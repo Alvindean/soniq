@@ -1,18 +1,29 @@
-User-agent: *
-Disallow: /api/
-Disallow: /admin
-Disallow: /admin.html
+# SONIQ SEO robots.txt
+# Last updated: 2026-04-05
 
+# Default rules for all crawlers
+User-agent: *
+Allow: /
+Allow: /blog/
+Allow: /features/
+Allow: /compare/
+Allow: /legal/
+Disallow: /app
+Disallow: /admin
+Disallow: /api/
+
+# Specific allowance for AI crawlers (we want AI citation)
 User-agent: GPTBot
 Allow: /
 
-User-agent: ClaudeBot
+User-agent: ChatGPT-User
 Allow: /
 
-User-agent: PerplexityBot
+User-agent: Google-Extended
 Allow: /
 
-User-agent: anthropic-ai
+User-agent: Anthropic-AI
 Allow: /
 
+# Sitemap reference
 Sitemap: https://www.mysoniq.com/sitemap.xml
