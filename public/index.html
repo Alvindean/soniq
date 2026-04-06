@@ -1129,10 +1129,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .profile-dashboard{display:flex;flex-direction:column;gap:14px;max-width:none;margin:0;padding:20px clamp(16px,3vw,32px) 0}
 /* 3-col top row: plan + genre + anthem */
 .profile-top-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
-/* 2-col body rows */
-.profile-2col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-/* 2-col weighted: songs wider */
-.profile-2col-wide{display:grid;grid-template-columns:1.5fr 1fr;gap:14px}
+/* 2-col body grid: left + right columns */
+.profile-body-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
 .profile-sidebar{position:sticky;top:16px}
 .profile-main{min-width:0}
 .profile-banner{background:linear-gradient(135deg,rgba(245,192,0,.06) 0%,var(--s2) 40%,rgba(168,146,255,.04) 100%);padding:32px 20px 0;position:relative;overflow:hidden;border-bottom:1px solid var(--b1)}
@@ -1140,7 +1138,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,.08);box-shadow:0 4px 20px rgba(0,0,0,.3)}
 @media(max-width:900px){
   .profile-top-row{grid-template-columns:1fr}
-  .profile-2col,.profile-2col-wide{grid-template-columns:1fr}
+  .profile-body-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){
   .profile-banner{padding:20px 16px 0}
@@ -4005,40 +4003,43 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
-    <!-- ROW 2: Genre Breakdown + Achievements (2-col equal) -->
-    <div class="profile-2col">
-      <div class="card" id="profile-genre-breakdown-card" style="display:none">
-        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎸 Genre Breakdown</div>
-        <div id="profile-genre-breakdown"></div>
-      </div>
-      <div class="card">
-        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🏆 Achievements</div>
-        <div id="profile-achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px"></div>
-      </div>
-    </div>
-
-    <!-- ROW 3: Recent Songs (wider) + Account -->
-    <div class="profile-2col-wide">
-      <div class="card">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎶 Recent Songs</div>
-          <button class="btn btn-sm" onclick="navTo('library')" style="font-size:10px">View All</button>
+    <!-- BODY: Left + Right columns -->
+    <div class="profile-body-grid">
+      <!-- LEFT COLUMN: Genre Breakdown + Recent Songs -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card" id="profile-genre-breakdown-card" style="display:none">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🎸 Genre Breakdown</div>
+          <div id="profile-genre-breakdown"></div>
         </div>
-        <div id="profile-songs-list"></div>
-        <div id="profile-no-songs" style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">No songs yet — go write one!</div>
-      </div>
-      <div class="card">
-        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">👤 Account</div>
-        <div id="profile-email-display" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd)">
-          <span style="font-size:18px">✉️</span>
-          <div>
-            <div id="profile-email-val" style="font-size:13px;color:var(--tx1);font-weight:600"></div>
-            <div id="profile-member-since" style="font-size:10px;color:var(--tx4)"></div>
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎶 Recent Songs</div>
+            <button class="btn btn-sm" onclick="navTo('library')" style="font-size:10px">View All</button>
           </div>
+          <div id="profile-songs-list"></div>
+          <div id="profile-no-songs" style="text-align:center;padding:20px;color:var(--tx3);font-size:12px">No songs yet — go write one!</div>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
-          <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
+      </div>
+
+      <!-- RIGHT COLUMN: Achievements + Account -->
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🏆 Achievements</div>
+          <div id="profile-achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px"></div>
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">👤 Account</div>
+          <div id="profile-email-display" style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding:10px 12px;background:var(--bg2);border-radius:8px;border:1px solid var(--brd)">
+            <span style="font-size:18px">✉️</span>
+            <div>
+              <div id="profile-email-val" style="font-size:13px;color:var(--tx1);font-weight:600"></div>
+              <div id="profile-member-since" style="font-size:10px;color:var(--tx4)"></div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
+            <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
+          </div>
         </div>
       </div>
     </div>
@@ -12795,8 +12796,9 @@ async function loadAdminDashboard() {
   const adminKey = localStorage.getItem('soniq_admin_token') || '';
   const token = S.session?.access_token || '';
 
-  // Show loading state
-  ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs'].forEach(id => {
+  // Show loading state for ALL stat cards
+  const _admStatIds = ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs','adm-total-posts','adm-total-reactions'];
+  _admStatIds.forEach(id => {
     const el = document.getElementById(id); if (el) el.textContent = '…';
   });
 
@@ -12811,7 +12813,12 @@ async function loadAdminDashboard() {
     _adminUsersAll = _adminData.users || [];
     renderAdminDashboard(_adminData);
   } catch(e) {
+    // Clear loading dots on failure so user sees it failed
+    _admStatIds.forEach(id => {
+      const el = document.getElementById(id); if (el) el.textContent = '—';
+    });
     toast('⚠️ Analytics load failed: ' + e.message, 4000);
+    console.error('Admin dashboard error:', e);
   }
 }
 
