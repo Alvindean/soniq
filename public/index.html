@@ -45,7 +45,9 @@
 html{background:var(--s0)}
 body{background:var(--s0);color:var(--tx1);font-family:var(--font);font-size:15px;line-height:1.7;min-height:100vh;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
 /* ── UX GRID SYSTEM: Sidebar-aware layout ── */
-@media(min-width:901px){body{display:flex!important;flex-direction:row!important;min-height:100vh}body::before{content:''!important;display:block!important;flex:0 0 64px!important;width:64px!important;min-height:100vh!important;pointer-events:none!important}.wrap{flex:1 1 0%!important;min-width:0!important;margin-left:0!important;width:auto!important}}
+@media(min-width:901px){body{display:flex!important;flex-direction:row!important;min-height:100vh}body::before{content:''!important;display:block!important;flex:0 0 64px!important;width:64px!important;min-height:100vh!important;pointer-events:none!important}.wrap{flex:1 1 0%!important;min-width:0!important;margin-left:0!important;width:auto!important;overflow-x:hidden}}
+/* ── UX GRID SYSTEM: Page-level spacing for sidebar clearance ── */
+@media(min-width:901px){.pg{padding-left:8px;padding-right:8px}}
 /* ── MODERN SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:var(--s1);border-radius:3px}
@@ -58,7 +60,7 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT ── */
-.wrap{max-width:1280px;margin:0 auto;padding:0 24px 120px;overflow-x:hidden}
+.wrap{max-width:1280px;margin:0 auto;padding:0 24px 120px;overflow-x:hidden;box-sizing:border-box}
 
 /* ── WRITER 3-PANEL LAYOUT ── */
 .writer-layout{display:grid;grid-template-columns:1fr 360px 220px;gap:var(--gap-lg);align-items:start;margin-top:0}
@@ -199,8 +201,8 @@ a{color:var(--amber);text-decoration:none}
 
 /* Full-width header/nav background on large screens */
 @media(min-width:1440px){
-  .hdr{margin:0 -28px;padding-left:28px;padding-right:28px}
-  .nav{margin:0 -28px 28px;border-radius:0;border-left:none;border-right:none;padding-left:28px;padding-right:28px}
+  .hdr{margin:0 -24px;padding-left:24px;padding-right:24px}
+  .nav{margin:0 -24px 28px;border-radius:0;border-left:none;border-right:none;padding-left:24px;padding-right:24px}
 }
 
 /* ── AD RAILS (right only at ≥1500px — left rail disabled, sidebar uses that space) ── */
@@ -285,7 +287,7 @@ a{color:var(--amber);text-decoration:none}
 .studio{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);overflow:hidden;margin-bottom:var(--sp-xl);transition:border-color 0.3s}
 .studio-top{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:var(--gap-md)}
 .studio-label{font-size:12px;font-weight:600;color:var(--tx2);letter-spacing:0.04em;text-transform:uppercase}
-.studio-body{padding:28px 24px}
+.studio-body{padding:28px 24px;overflow:hidden;box-sizing:border-box}
 
 /* ── TOPIC INPUT ── */
 .topic-label{font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;display:block}
@@ -469,7 +471,7 @@ a{color:var(--amber);text-decoration:none}
 .craft-sublabel{font-size:11px;color:var(--tx3)}
 
 /* ── GENERIC CARD ── */
-.card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px 26px;margin-bottom:16px}
+.card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:24px 26px;margin-bottom:16px;box-sizing:border-box;max-width:100%}
 .card-title,.ctitle{font-size:15px;font-weight:700;color:var(--tx1);letter-spacing:0.01em;margin-bottom:18px;display:flex;align-items:center;gap:8px}
 
 /* ── FORMS ── */
@@ -616,7 +618,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .slot-fusion-label{font-size:10px;color:var(--tx4);text-align:center;width:100%;position:absolute;bottom:-18px;white-space:nowrap}
 
 /* ── LIBRARY ── */
-.libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+.libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;overflow:hidden}
 .libcard{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 18px;cursor:pointer;transition:all 0.15s;position:relative}
 .libcard:hover{border-color:var(--amberline);background:var(--s4);transform:translateY(-1px)}
 .lc-title{font-size:14px;font-weight:600;color:var(--tx1);margin-bottom:5px;padding-right:24px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1101,7 +1103,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .leader-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bg2)}
 .leader-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;flex-shrink:0}
 /* ── COMMUNITY PAGE: centered with breathing room ── */
-#pg-community{max-width:none;margin:0;padding:8px 24px 0 32px;box-sizing:border-box}
+#pg-community{max-width:none;margin:0;padding:8px 24px 0 24px;box-sizing:border-box}
 /* ── COMMUNITY: FILTER BAR ── */
 .comm-filters-bar{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:8px 14px;display:flex;gap:6px;flex-wrap:nowrap;align-items:center;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;box-sizing:border-box}
 .comm-filters-bar::-webkit-scrollbar{height:0;display:none}
@@ -1129,7 +1131,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-page-subtitle{font-size:11px;color:var(--tx3);margin-top:1px}
 .comm-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--amber),var(--violet));display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;color:#fff;flex-shrink:0}
 /* ── PROFILE FULL-WIDTH DASHBOARD (UX Grid System) ── */
-.profile-dashboard{display:flex;flex-direction:column;gap:14px;max-width:none;margin:0;padding:20px clamp(16px,3vw,32px) 0 clamp(20px,3vw,32px)}
+.profile-dashboard{display:flex;flex-direction:column;gap:14px;max-width:none;margin:0;padding:20px clamp(20px,3vw,32px) 0 clamp(24px,3vw,32px)}
 /* 3-col top row: plan + genre + anthem */
 .profile-top-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 /* 2-col body grid: left + right columns */
