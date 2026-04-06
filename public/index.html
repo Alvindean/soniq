@@ -9141,7 +9141,7 @@ function _initSupabase() {
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
-  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com']);
+  const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com', 'rainfiremusic@gmail.com']);
   S.supabase.auth.onAuthStateChange((event, session) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
