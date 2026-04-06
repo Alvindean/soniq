@@ -1350,6 +1350,44 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .vb-wave .b:nth-child(5){animation-delay:.48s}
 @keyframes vbwv{0%,100%{height:6px;opacity:.4}50%{height:26px;opacity:1}}
 .vb-regen-row{display:flex;justify-content:flex-end;padding:0 0 4px}
+
+/* ── SONIQ IMAGE ENGINE ── */
+.sig-overlay{position:fixed;inset:0;z-index:9999;background:rgba(2,6,23,.88);display:flex;align-items:center;justify-content:center;animation:sigFadeIn .2s ease}
+@keyframes sigFadeIn{from{opacity:0}to{opacity:1}}
+.sig-modal{background:var(--s1);border:1px solid var(--b2);border-radius:16px;width:min(620px,94vw);max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,.6)}
+.sig-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--b1)}
+.sig-title{font-size:15px;font-weight:700;color:var(--tx1)}
+.sig-title span{color:var(--amber)}
+.sig-close{background:none;border:none;color:var(--tx3);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:6px}
+.sig-close:hover{background:var(--s3);color:var(--tx1)}
+.sig-body{padding:20px 22px}
+.sig-prompt-area{width:100%;min-height:80px;padding:12px;background:var(--s2);border:1px solid var(--b2);border-radius:10px;color:var(--tx1);font-family:var(--mono);font-size:12px;line-height:1.7;resize:vertical}
+.sig-prompt-area:focus{border-color:var(--amber);outline:none;box-shadow:0 0 0 2px rgba(245,166,35,.15)}
+.sig-controls{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+.sig-style-btn{font-size:11px;padding:5px 12px;border-radius:20px;border:1px solid var(--b3);background:transparent;color:var(--tx3);cursor:pointer;font-family:var(--font);transition:all .15s}
+.sig-style-btn:hover{border-color:var(--amber);color:var(--tx1)}
+.sig-style-btn.active{background:var(--amber);color:#000;border-color:var(--amber);font-weight:600}
+.sig-size-select{font-size:11px;padding:5px 10px;border-radius:8px;border:1px solid var(--b3);background:var(--s2);color:var(--tx2);font-family:var(--font)}
+.sig-generate-btn{width:100%;margin-top:14px;padding:12px;font-size:14px;font-weight:700;border:none;border-radius:10px;background:linear-gradient(135deg,var(--amber),#e67e22);color:#000;cursor:pointer;font-family:var(--font);transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px}
+.sig-generate-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(245,166,35,.3)}
+.sig-generate-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+.sig-preview{margin-top:16px;display:none}
+.sig-preview-img{width:100%;border-radius:10px;border:1px solid var(--b2);background:var(--s2)}
+.sig-preview-actions{display:flex;gap:8px;margin-top:10px;justify-content:flex-end}
+.sig-use-btn{padding:8px 20px;font-size:12px;font-weight:700;border:none;border-radius:8px;background:var(--cyan);color:#000;cursor:pointer;font-family:var(--font);transition:all .15s}
+.sig-use-btn:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(0,234,255,.25)}
+.sig-regen-btn{padding:8px 16px;font-size:12px;font-weight:600;border:1px solid var(--b3);border-radius:8px;background:transparent;color:var(--tx2);cursor:pointer;font-family:var(--font)}
+.sig-regen-btn:hover{border-color:var(--amber);color:var(--tx1)}
+.sig-loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 20px;color:var(--tx3);font-size:12px}
+.sig-spinner{width:40px;height:40px;border:3px solid var(--b2);border-top-color:var(--amber);border-radius:50%;animation:sigSpin .8s linear infinite}
+@keyframes sigSpin{to{transform:rotate(360deg)}}
+.sig-inline-preview{margin-top:10px;border-radius:8px;overflow:hidden;border:1px solid var(--b2);position:relative;background:var(--s2);max-height:300px}
+.sig-inline-preview img{width:100%;display:block;object-fit:cover}
+.sig-inline-actions{display:flex;gap:6px;padding:8px;background:rgba(2,6,23,.7);position:absolute;bottom:0;left:0;right:0}
+.sig-mini-btn{font-size:10px;font-weight:600;padding:4px 10px;border-radius:6px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);color:#fff;cursor:pointer;backdrop-filter:blur(8px)}
+.sig-mini-btn:hover{background:rgba(255,255,255,.2)}
+.sig-mini-btn.primary{background:var(--amber);color:#000;border-color:var(--amber)}
+
 /* ── COUNTERMELODY BLOCK ── */
 .cm-section{border-left:2px solid #34d39960;background:linear-gradient(90deg,#0a1f1580,transparent)}
 .cm-device{font-size:13px;font-weight:700;color:#34d399;margin-top:4px}
@@ -4542,7 +4580,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <label style="margin-top:10px">Tags (comma separated)</label>
               <input id="cms-field-tags" placeholder="AI songwriting, genre DNA">
               <label style="margin-top:10px">Featured Image URL</label>
-              <input id="cms-field-image" placeholder="https://...">
+              <div style="display:flex;gap:6px;align-items:center">
+                <input id="cms-field-image" placeholder="https://..." style="flex:1">
+                <button onclick="sigCMSGenerate()" style="padding:6px 10px;font-size:11px;font-weight:700;background:var(--amber);color:#000;border:none;border-radius:6px;cursor:pointer;white-space:nowrap" title="Generate AI image">⚡ AI</button>
+              </div>
+              <div id="cms-image-preview" style="margin-top:6px;border-radius:6px;overflow:hidden;display:none">
+                <img id="cms-image-preview-img" style="width:100%;display:block;border-radius:6px;border:1px solid var(--b2)">
+              </div>
               <label style="margin-top:10px">Excerpt</label>
               <textarea id="cms-field-excerpt" placeholder="Brief description for blog cards and meta…"></textarea>
             </div>
@@ -10268,6 +10312,8 @@ YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene
     const socialMedia  = extractSection(raw, 'SOCIAL_MEDIA');
 
     function makeCard(icon, name, sub, chipClass, chips, promptText, copyKey) {
+      const canGenerate = (copyKey === 'cover' || copyKey === 'artist');
+      const genBtn = canGenerate ? `<button class="vb-copy-btn" style="background:var(--amber);color:#000;border-color:var(--amber)" onclick="sigQuickGen('${prefix}','${copyKey}')">⚡ Generate</button>` : '';
       return `<div class="vb-card" id="${prefix}-vb-${copyKey}">
         <div class="vb-card-head">
           <div class="vb-card-label">
@@ -10279,6 +10325,7 @@ YOUTUBE: [2–3 sentence description for a music video: sets the emotional scene
           </div>
           <div class="vb-card-acts">
             <div class="vb-platforms">${chips.map(c=>`<span class="vb-chip ${chipClass}">${c}</span>`).join('')}</div>
+            ${genBtn}
             <button class="vb-copy-btn" onclick="vbCopy('${prefix}-vb-${copyKey}',this)">Copy</button>
           </div>
         </div>
@@ -10356,6 +10403,285 @@ async function regenVisual(prefix) {
   const container = document.getElementById(prefix + '-visual-content');
   if (container) container.dataset.loaded = '';
   await loadVisualPrompts(prefix);
+}
+
+// ═══════════════════════════════════════════════════════
+// SONIQ IMAGE ENGINE — AI Image Generation
+// ═══════════════════════════════════════════════════════
+const _SIG_POLLINATIONS = 'https://image.pollinations.ai/prompt/';
+const _SIG_EDGE_FN = 'https://gotrwbhkavkqmxtnxkkj.supabase.co/functions/v1/generate-image';
+let _sigContext = null; // {type:'cover'|'artist'|'featured'|'social', prefix:'res'|'lucky', callback:fn}
+let _sigCurrentUrl = null;
+let _sigGenerating = false;
+let _sigUseEdgeFn = true; // try edge function first, fallback to direct
+
+const _SIG_STYLES = {
+  album_cover: 'album cover art, professional music industry quality, no text, square composition, dramatic lighting, high detail',
+  artist_portrait: 'professional artist portrait, music industry promo photo, cinematic lighting, fashion editorial quality, moody atmosphere',
+  blog_featured: 'modern digital illustration, clean professional blog header, tech-creative aesthetic, abstract geometric elements, gradient background',
+  social_card: 'social media visual, bold eye-catching design, vibrant colors, modern graphic design, promotional style'
+};
+
+function sigOpenModal(context, prefillPrompt) {
+  _sigContext = context;
+  _sigCurrentUrl = null;
+  // Remove existing modal if any
+  const existing = document.getElementById('sig-modal-overlay');
+  if (existing) existing.remove();
+
+  const typeLabels = {
+    cover: '🖼 Generate Cover Art',
+    artist: '🎤 Generate Artist Visual',
+    featured: '📸 Generate Featured Image',
+    social: '📱 Generate Social Card'
+  };
+  const label = typeLabels[context.type] || '🎨 Generate Image';
+
+  const overlay = document.createElement('div');
+  overlay.id = 'sig-modal-overlay';
+  overlay.className = 'sig-overlay';
+  overlay.onclick = (e) => { if(e.target === overlay) sigCloseModal(); };
+
+  overlay.innerHTML = `
+    <div class="sig-modal">
+      <div class="sig-header">
+        <div class="sig-title"><span>${label}</span></div>
+        <button class="sig-close" onclick="sigCloseModal()">&times;</button>
+      </div>
+      <div class="sig-body">
+        <label style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:6px;display:block">Image Prompt</label>
+        <textarea class="sig-prompt-area" id="sig-prompt" placeholder="Describe your image... Be specific about style, colors, mood, composition.">${escHtml(prefillPrompt || '')}</textarea>
+
+        <div class="sig-controls">
+          <button class="sig-style-btn ${context.type==='cover'?'active':''}" onclick="sigApplyStyle('album_cover',this)">Album Cover</button>
+          <button class="sig-style-btn ${context.type==='artist'?'active':''}" onclick="sigApplyStyle('artist_portrait',this)">Artist Portrait</button>
+          <button class="sig-style-btn ${context.type==='featured'?'active':''}" onclick="sigApplyStyle('blog_featured',this)">Blog Header</button>
+          <button class="sig-style-btn ${context.type==='social'?'active':''}" onclick="sigApplyStyle('social_card',this)">Social Card</button>
+          <select class="sig-size-select" id="sig-size">
+            <option value="1024x1024" ${context.type==='cover'?'selected':''}>1:1 Square</option>
+            <option value="1024x576" ${context.type==='featured'?'selected':''}>16:9 Wide</option>
+            <option value="576x1024" ${context.type==='social'?'selected':''}>9:16 Tall</option>
+            <option value="768x1024" ${context.type==='artist'?'selected':''}>3:4 Portrait</option>
+          </select>
+        </div>
+
+        <button class="sig-generate-btn" id="sig-gen-btn" onclick="sigGenerate()">
+          <span>⚡</span> Generate Image
+        </button>
+
+        <div id="sig-loading" class="sig-loading" style="display:none">
+          <div class="sig-spinner"></div>
+          <div id="sig-loading-text">Generating with FLUX AI...</div>
+        </div>
+
+        <div class="sig-preview" id="sig-preview">
+          <img class="sig-preview-img" id="sig-preview-img" alt="Generated image">
+          <div class="sig-preview-actions">
+            <button class="sig-regen-btn" onclick="sigGenerate()">↻ Regenerate</button>
+            <button class="sig-regen-btn" onclick="sigDownload()">⬇ Download</button>
+            <button class="sig-use-btn" onclick="sigUseImage()">✓ Use This Image</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Focus the prompt
+  setTimeout(() => document.getElementById('sig-prompt')?.focus(), 100);
+}
+
+function sigCloseModal() {
+  const overlay = document.getElementById('sig-modal-overlay');
+  if (overlay) {
+    overlay.style.animation = 'sigFadeIn .15s ease reverse';
+    setTimeout(() => overlay.remove(), 150);
+  }
+  _sigContext = null;
+}
+
+function sigApplyStyle(styleKey, btn) {
+  // Toggle active state
+  document.querySelectorAll('.sig-style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  // Append style suffix to prompt
+  const prompt = document.getElementById('sig-prompt');
+  if (!prompt) return;
+  const currentText = prompt.value.replace(/,?\s*(album cover art|professional artist portrait|modern digital illustration|social media visual)[^]*/i, '').trim();
+  prompt.value = currentText + (currentText ? ', ' : '') + _SIG_STYLES[styleKey];
+}
+
+async function sigGenerate() {
+  const prompt = document.getElementById('sig-prompt')?.value?.trim();
+  if (!prompt) { toast('Enter an image prompt first'); return; }
+  if (_sigGenerating) return;
+
+  _sigGenerating = true;
+  const btn = document.getElementById('sig-gen-btn');
+  const loading = document.getElementById('sig-loading');
+  const preview = document.getElementById('sig-preview');
+
+  if (btn) { btn.disabled = true; btn.innerHTML = '<span class="sig-spinner" style="width:18px;height:18px;border-width:2px;display:inline-block"></span> Generating...'; }
+  if (loading) loading.style.display = 'flex';
+  if (preview) preview.style.display = 'none';
+
+  const size = document.getElementById('sig-size')?.value || '1024x1024';
+  const [w, h] = size.split('x');
+  const seed = Math.floor(Math.random() * 999999);
+
+  // Detect active style
+  const activeStyle = document.querySelector('.sig-style-btn.active');
+  const styleMap = {'Album Cover':'album_cover','Artist Portrait':'artist_portrait','Blog Header':'blog_featured','Social Card':'social_card'};
+  const style = activeStyle ? (styleMap[activeStyle.textContent] || 'default') : 'default';
+
+  try {
+    const loadingText = document.getElementById('sig-loading-text');
+    const msgs = ['Generating with FLUX AI...', 'Composing your visual...', 'Rendering details...', 'Almost there...'];
+    let msgIdx = 0;
+    const msgInterval = setInterval(() => {
+      msgIdx = (msgIdx + 1) % msgs.length;
+      if (loadingText) loadingText.textContent = msgs[msgIdx];
+    }, 3000);
+
+    let imageUrl = '';
+
+    // Try Edge Function first (supports premium providers)
+    if (_sigUseEdgeFn) {
+      try {
+        const res = await fetch(_SIG_EDGE_FN, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ prompt, width: parseInt(w), height: parseInt(h), style, seed })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.image_url) {
+            imageUrl = data.image_url;
+            if (loadingText) loadingText.textContent = `Using ${data.provider === 'fal' ? 'FAL.ai' : data.provider === 'replicate' ? 'Replicate' : 'FLUX'} engine...`;
+          }
+        }
+      } catch(edgeErr) {
+        console.warn('Edge function unavailable, falling back to direct:', edgeErr);
+      }
+    }
+
+    // Fallback: Direct Pollinations.ai URL
+    if (!imageUrl) {
+      const encodedPrompt = encodeURIComponent(prompt);
+      imageUrl = `${_SIG_POLLINATIONS}${encodedPrompt}?width=${w}&height=${h}&seed=${seed}&model=flux&nologo=true&enhance=true`;
+    }
+
+    // Preload the image
+    await new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = resolve;
+      img.onerror = () => reject(new Error('Image generation failed'));
+      img.src = imageUrl;
+      setTimeout(() => reject(new Error('Generation timed out — try again')), 90000);
+    });
+
+    clearInterval(msgInterval);
+    _sigCurrentUrl = imageUrl;
+
+    // Show preview
+    const previewImg = document.getElementById('sig-preview-img');
+    if (previewImg) previewImg.src = imageUrl;
+    if (preview) preview.style.display = 'block';
+    if (loading) loading.style.display = 'none';
+
+    toast('🎨 Image generated!');
+  } catch(e) {
+    console.error('Image gen error:', e);
+    toast('Image generation failed — try again');
+    if (loading) loading.style.display = 'none';
+  }
+
+  _sigGenerating = false;
+  if (btn) { btn.disabled = false; btn.innerHTML = '<span>⚡</span> Generate Image'; }
+}
+
+function sigUseImage() {
+  if (!_sigCurrentUrl || !_sigContext) return;
+
+  if (_sigContext.type === 'featured') {
+    // CMS featured image
+    const field = document.getElementById('cms-field-image');
+    if (field) field.value = _sigCurrentUrl;
+    if (window._cmsImgCheck) window._cmsImgCheck();
+    toast('✓ Featured image set!');
+  } else if (_sigContext.type === 'cover' || _sigContext.type === 'artist') {
+    // Visual brief — inject preview into the card
+    const prefix = _sigContext.prefix || 'res';
+    const cardKey = _sigContext.type === 'cover' ? 'cover' : 'artist';
+    const card = document.getElementById(prefix + '-vb-' + cardKey);
+    if (card) {
+      let previewDiv = card.querySelector('.sig-inline-preview');
+      if (!previewDiv) {
+        previewDiv = document.createElement('div');
+        previewDiv.className = 'sig-inline-preview';
+        card.appendChild(previewDiv);
+      }
+      previewDiv.innerHTML = `
+        <img src="${escHtml(_sigCurrentUrl)}" alt="Generated ${cardKey} art">
+        <div class="sig-inline-actions">
+          <button class="sig-mini-btn" onclick="sigDownloadUrl('${escHtml(_sigCurrentUrl)}')">⬇ Save</button>
+          <button class="sig-mini-btn primary" onclick="sigOpenModal({type:'${cardKey}',prefix:'${prefix}'},document.getElementById('sig-prompt')?.value||'')">↻ Redo</button>
+        </div>
+      `;
+    }
+    // Also save to song object
+    const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+    if (song) song._generatedImages = song._generatedImages || {};
+    if (song) song._generatedImages[cardKey] = _sigCurrentUrl;
+    toast('✓ Image applied to ' + cardKey + '!');
+  } else if (_sigContext.callback) {
+    _sigContext.callback(_sigCurrentUrl);
+  }
+
+  sigCloseModal();
+}
+
+function sigDownload() {
+  if (!_sigCurrentUrl) return;
+  sigDownloadUrl(_sigCurrentUrl);
+}
+
+function sigDownloadUrl(url) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'soniq-image-' + Date.now() + '.png';
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  toast('⬇ Downloading image...');
+}
+
+// Quick generator for Visual Brief cards (no modal, inline)
+function sigQuickGen(prefix, type) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song?._visual) { toast('Generate visual brief first'); return; }
+
+  let prompt = '';
+  if (type === 'cover' && song._visual.coverArt) {
+    prompt = song._visual.coverArt;
+  } else if (type === 'artist' && song._visual.artistVisual) {
+    prompt = song._visual.artistVisual;
+  } else {
+    prompt = `${song.title || 'Untitled'} ${song.genre || ''} music, professional quality`;
+  }
+
+  sigOpenModal({ type, prefix }, prompt);
+}
+
+// CMS featured image generator
+function sigCMSGenerate() {
+  const title = document.getElementById('cms-field-title')?.value || '';
+  const keyword = document.getElementById('cms-ai-keyword')?.value || '';
+  const topic = keyword || title || 'music production';
+  const prompt = `Modern professional blog header image about ${topic}, dark sleek tech aesthetic with purple and cyan accent lights, abstract digital waves, clean minimal composition, no text, ${_SIG_STYLES.blog_featured}`;
+  sigOpenModal({ type: 'featured' }, prompt);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -13803,6 +14129,27 @@ function cmsAutoSlug() {
   document.getElementById('cms-field-slug').value = slug;
   updateCMSSEOPreview();
 }
+
+// CMS featured image preview
+(function(){
+  const _cmsImgCheck = () => {
+    const field = document.getElementById('cms-field-image');
+    const prev = document.getElementById('cms-image-preview');
+    const prevImg = document.getElementById('cms-image-preview-img');
+    if (!field || !prev || !prevImg) return;
+    const url = field.value.trim();
+    if (url && url.startsWith('http')) {
+      prevImg.src = url;
+      prevImg.onload = () => { prev.style.display = 'block'; };
+      prevImg.onerror = () => { prev.style.display = 'none'; };
+    } else {
+      prev.style.display = 'none';
+    }
+  };
+  // Check on input + after modal close
+  document.addEventListener('input', (e) => { if(e.target?.id === 'cms-field-image') _cmsImgCheck(); });
+  window._cmsImgCheck = _cmsImgCheck;
+})();
 
 function cmsExec(cmd, val = null) {
   document.execCommand(cmd, false, val);
