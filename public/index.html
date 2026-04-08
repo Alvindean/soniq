@@ -157,8 +157,47 @@ a{color:var(--amber);text-decoration:none}
 .tsb-num.good{color:#4ade80}.tsb-num.ok{color:var(--amber)}.tsb-num.low{color:#f87171}
 /* Output footer bar */
 .output-footer-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 4px;padding:var(--sp-md) 0;border-top:1px solid var(--b1);margin-top:8px}
-.ofb-item{font-size:11px;color:var(--tx4);font-weight:500}
+.ofb-item{font-size:11px;color:var(--tx4);font-weight:500;cursor:pointer;transition:color .15s;border-radius:4px;padding:2px 6px}
+.ofb-item:hover{color:var(--cyan);background:var(--cyanbg)}
 .ofb-sep{color:var(--b2);font-size:11px}
+
+/* ── HOOK SCORE MINI CARD ── */
+.hook-score-mini{background:var(--s2);border:1px solid var(--amberline);border-radius:var(--r2);padding:12px 16px;margin-top:10px;display:none}
+.hook-score-mini.visible{display:block;animation:pgIn .2s ease}
+.hook-score-mini .hsm-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hook-score-mini .hsm-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
+.hook-score-mini .hsm-num{font-size:20px;font-weight:800;color:var(--amber)}
+.hook-score-mini .hsm-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.hook-score-mini .hsm-item{font-size:11px;color:var(--tx3);display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--b1)}
+.hook-score-mini .hsm-item-val{font-weight:700;color:var(--tx2)}
+
+/* ── SECTION SWITCHER ── */
+.section-switcher{background:var(--s2);border:1px solid var(--cyanline);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
+.section-switcher.visible{display:block;animation:pgIn .25s ease}
+.ss-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--cyanbg)}
+.ss-hdr-title{font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}
+.ss-body{padding:14px 16px}
+.ss-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:8px 12px;outline:none;font-family:var(--font);margin-bottom:10px;cursor:pointer}
+.ss-select:focus{border-color:var(--cyanline);box-shadow:0 0 0 3px var(--cyanbg)}
+.ss-section-text{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:80px;line-height:1.6;font-family:var(--font);transition:border-color .15s}
+.ss-section-text:focus{border-color:var(--cyanline);box-shadow:0 0 0 3px var(--cyanbg)}
+.ss-presets{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.ss-preset{font-size:10px;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;user-select:none}
+.ss-preset:hover{background:var(--s4);color:var(--tx2);border-color:var(--cyanline)}
+.ss-preset.active{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
+.ss-actions{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+
+/* ── DJ FX PANEL ── */
+.djfx-panel{background:var(--s2);border:1px solid var(--violetline,#7c3aed33);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
+.djfx-panel.visible{display:block;animation:pgIn .25s ease}
+.djfx-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--violetbg,rgba(124,58,237,.08))}
+.djfx-hdr-title{font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.08em}
+.djfx-body{padding:14px 16px}
+.djfx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.djfx-btn{font-size:11px;font-weight:600;padding:8px 10px;border-radius:var(--r2);border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .15s;text-align:center;user-select:none}
+.djfx-btn:hover{background:var(--s4);color:var(--violet);border-color:var(--violetline,#7c3aed33)}
+.djfx-btn.inserted{background:var(--violetbg,rgba(124,58,237,.08));border-color:var(--violetline,#7c3aed33);color:var(--violet)}
+.djfx-hint{font-size:11px;color:var(--tx4);margin-top:8px}
 /* More options toggle */
 .more-opts-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 0;margin:10px 0 4px;background:none;border:none;border-top:1px solid var(--b1);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx4);transition:color .15s;letter-spacing:.03em}
 .more-opts-btn:hover{color:var(--tx2)}
@@ -1599,6 +1638,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .rev-pill{font-size:11px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}
 .rev-pill:hover{border-color:var(--amberline);color:var(--amber);background:var(--amberbg)}
 .rev-pill.loading{opacity:.6;cursor:not-allowed;border-color:var(--amberline);color:var(--amber)}
+
+/* ── LANGUAGE BAR ── */
+.lang-bar{display:flex;flex-wrap:wrap;gap:6px;padding:10px 24px;border-top:1px solid var(--b1);background:var(--s2)}
+.lang-bar-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;align-self:center;margin-right:4px}
+.lang-pill{font-size:11px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;white-space:nowrap}
+.lang-pill:hover{border-color:var(--cyanline);color:var(--cyan);background:var(--cyanbg)}
+.lang-pill.active{border-color:var(--cyanline);color:var(--cyan);background:var(--cyanbg);font-weight:700}
+.lang-pill.loading{opacity:.6;cursor:not-allowed;border-color:var(--cyanline);color:var(--cyan)}
 
 /* ── VERSION BAR ── */
 .version-bar{display:flex;align-items:center;gap:6px;padding:10px 24px;border-bottom:1px solid var(--b1);background:var(--s2);flex-wrap:wrap}
@@ -3555,26 +3602,37 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
 
-    <!-- OUTPUT FOOTER: what this generates -->
+    <!-- OUTPUT FOOTER: clickable links to tabs -->
     <div class="output-footer-bar">
-      <span class="ofb-item">📝 Lyrics</span>
+      <span class="ofb-item" role="button" tabindex="0" onclick="ofbJump('res','lyrics')">📝 Lyrics</span>
       <span class="ofb-sep">·</span>
-      <span class="ofb-item">🎛 Production Brief</span>
+      <span class="ofb-item" role="button" tabindex="0" onclick="ofbJump('res','brief')">🎛 Production Brief</span>
       <span class="ofb-sep">·</span>
-      <span class="ofb-item">🏗 Structure</span>
+      <span class="ofb-item" role="button" tabindex="0" onclick="ofbJump('res','structure')">🏗 Structure</span>
       <span class="ofb-sep">·</span>
-      <span class="ofb-item">🎯 Dopamine Map</span>
+      <span class="ofb-item" role="button" tabindex="0" onclick="ofbJumpMore('res','dopamine','⚡ Dopamine')">🎯 Dopamine Map</span>
       <span class="ofb-sep">·</span>
-      <span class="ofb-item">📊 Hook Score</span>
+      <span class="ofb-item" role="button" tabindex="0" onclick="ofbScrollTo('res-hook-score-mini')">🎣 Hook Score</span>
+      <span class="ofb-sep">·</span>
+      <span class="ofb-item" role="button" tabindex="0" onclick="ofbScrollTo('res-score-dashboard')">📊 Song Score</span>
     </div>
 
     <!-- COPYRIGHT STRIP -->
     <div class="copyright-strip" id="res-copyright-strip" style="display:none"></div>
 
-    <!-- SCORE DASHBOARD -->
+    <!-- HOOK SCORE MINI CARD (local chorus analysis) -->
+    <div class="hook-score-mini" id="res-hook-score-mini">
+      <div class="hsm-hdr">
+        <span class="hsm-title">🎣 Hook Score — Chorus Analysis</span>
+        <span class="hsm-num" id="res-hook-num">—</span>
+      </div>
+      <div class="hsm-grid" id="res-hook-grid"></div>
+    </div>
+
+    <!-- SCORE DASHBOARD (AI full-song analysis) -->
     <div class="score-dashboard" id="res-score-dashboard">
       <div class="score-header">
-        <span class="score-title">🎯 Song Score</span>
+        <span class="score-title">📊 Song Score — Full AI Analysis</span>
         <div class="score-overall"><span class="score-overall-num" id="res-score-num">—</span><span class="score-overall-lbl">overall<br>score</span></div>
       </div>
       <div class="score-grid" id="res-score-grid"></div>
@@ -3630,6 +3688,18 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="rev-pill" onclick="revise('res','Shift the tone darker — more shadow, tension, and unresolved feeling')">Darker</span>
         <span class="rev-pill" onclick="revise('res','Cut the song shorter — remove the least essential section, tighten every line')">Shorter</span>
         <span class="rev-pill" onclick="revise('res','Make it radio-ready — polish the hook, smooth rough edges, maximise replay')">Radio Edit</span>
+      </div>
+      <!-- LANGUAGE BAR -->
+      <div class="lang-bar" id="res-lang-bar" style="display:none">
+        <span class="lang-bar-label">🌍 Language:</span>
+        <span class="lang-pill active" onclick="translateSong('res','English',this)">English</span>
+        <span class="lang-pill" onclick="translateSong('res','Portuguese',this)">Português</span>
+        <span class="lang-pill" onclick="translateSong('res','Spanish',this)">Español</span>
+        <span class="lang-pill" onclick="translateSong('res','French',this)">Français</span>
+        <span class="lang-pill" onclick="translateSong('res','Korean',this)">한국어</span>
+        <span class="lang-pill" onclick="translateSong('res','Japanese',this)">日本語</span>
+        <span class="lang-pill" onclick="translateSong('res','Hindi',this)">हिन्दी</span>
+        <span class="lang-pill" onclick="translateSong('res','Yoruba',this)">Yorùbá</span>
       </div>
       <!-- VARIATIONS -->
       <div class="var-results" id="res-var-results">
@@ -3688,6 +3758,49 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
   </div>
 
+  <!-- SECTION SWITCHER -->
+  <div class="section-switcher" id="section-switcher">
+    <div class="ss-hdr">
+      <span class="ss-hdr-title">🎯 Section Switcher — Edit one section at a time</span>
+    </div>
+    <div class="ss-body">
+      <select class="ss-select" id="ss-section-select" onchange="ssSectionChanged()">
+        <option value="">Select a section…</option>
+      </select>
+      <div class="ss-presets" id="ss-presets"></div>
+      <textarea class="ss-section-text" id="ss-section-text" placeholder="Select a section above to edit it here…"></textarea>
+      <div class="ss-actions">
+        <button class="btn btn-cyan" id="ss-apply-btn" onclick="ssApplyEdit()">✏️ Apply Changes</button>
+        <button class="btn" id="ss-ai-btn" onclick="ssAiRewrite()" style="background:var(--s3);border:1px solid var(--b2);color:var(--tx2)">🤖 AI Rewrite</button>
+        <span style="font-size:11px;color:var(--tx4)">Changes apply only to the selected section</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- DJ FX PANEL -->
+  <div class="djfx-panel" id="djfx-panel">
+    <div class="djfx-hdr">
+      <span class="djfx-hdr-title">🎚️ DJ FX — Insert production effects</span>
+    </div>
+    <div class="djfx-body">
+      <div class="djfx-grid" id="djfx-grid">
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Filter Sweep]')">🌊 Filter Sweep</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Bass Drop]')">💥 Drop</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Build Up]')">📈 Build-Up</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Breakdown]')">🔇 Breakdown</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Echo Out]')">🔊 Echo Out</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Reverse Reverb]')">⏪ Reverse Reverb</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Vinyl Brake]')">💿 Vinyl Brake</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Stutter]')">🔁 Stutter</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Reverb Wash]')">🌀 Reverb Wash</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Gated Reverb]')">🚪 Gated Reverb</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Tremolo]')">〰️ Tremolo</button>
+        <button class="djfx-btn" onclick="insertDjFx(this,'[Tape Distortion]')">📼 Tape Distortion</button>
+      </div>
+      <div class="djfx-hint" id="djfx-hint">Select a section in the Section Switcher above, then click an FX to insert it</div>
+    </div>
+  </div>
+
   </div><!-- /write-output-panel -->
 
 </div><!-- /pg-write -->
@@ -3718,7 +3831,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div id="gz-pills-container"></div>
       <div class="gz-pair-count" id="gz-pair-count"></div>
       <div class="gz-footer">
-        <button class="gz-all" onclick="selectAllGenres()">All 24</button>
+        <button class="gz-all" onclick="selectAllGenres()">All 30</button>
         <button class="gz-clear" onclick="clearGenreZone()">Clear</button>
       </div>
     </div>
@@ -3830,6 +3943,18 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="rev-pill" onclick="revise('lres','Shift the tone darker — more shadow, tension, and unresolved feeling')">Darker</span>
         <span class="rev-pill" onclick="revise('lres','Cut the song shorter — remove the least essential section, tighten every line')">Shorter</span>
         <span class="rev-pill" onclick="revise('lres','Make it radio-ready — polish the hook, smooth rough edges, maximise replay')">Radio Edit</span>
+      </div>
+      <!-- LANGUAGE BAR (Lucky) -->
+      <div class="lang-bar" id="lres-lang-bar" style="display:none">
+        <span class="lang-bar-label">🌍 Language:</span>
+        <span class="lang-pill active" onclick="translateSong('lres','English',this)">English</span>
+        <span class="lang-pill" onclick="translateSong('lres','Portuguese',this)">Português</span>
+        <span class="lang-pill" onclick="translateSong('lres','Spanish',this)">Español</span>
+        <span class="lang-pill" onclick="translateSong('lres','French',this)">Français</span>
+        <span class="lang-pill" onclick="translateSong('lres','Korean',this)">한국어</span>
+        <span class="lang-pill" onclick="translateSong('lres','Japanese',this)">日本語</span>
+        <span class="lang-pill" onclick="translateSong('lres','Hindi',this)">हिन्दी</span>
+        <span class="lang-pill" onclick="translateSong('lres','Yoruba',this)">Yorùbá</span>
       </div>
     </div>
     <div id="lres-opane-brief" class="opane">
@@ -4234,7 +4359,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="uplan-price">$9.99<span>/mo</span></div>
         <ul class="uplan-features">
           <li>10 songs / month</li>
-          <li>All 24 genres</li>
+          <li>All 30 genres</li>
           <li>Visual Prompts</li>
           <li>Full production brief</li>
           <li>75+ quality score</li>
@@ -7196,12 +7321,12 @@ function apiErrHtml(msg, errCode) {
 const GZ_CATEGORIES = [
   { label: 'Core',       keys: ['pop','rock','rnb','hiphop','country','folk'] },
   { label: 'Electronic', keys: ['edm','altrock','punk','metal','kpop'] },
-  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae'] },
+  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae','brazilian','amapiano','dancehall','bollywood','arabesque','mandopop'] },
   { label: 'Soulful',    keys: ['jazz','blues','neosoul','gospel','ss'] },
   { label: 'Special',    keys: ['parody','comedy','children','tvmusical'] },
 ];
 
-// All 24 genres with display labels (superset of the old 18)
+// All 30 genres with display labels (superset of the old 18)
 const ALL_GENRE_LABELS = {
   pop:'Pop', hiphop:'Rap / Hip-Hop', rnb:'R&B / Soul', rock:'Rock',
   country:'Country', edm:'EDM / Electronic', latin:'Latin', reggaeton:'Reggaeton',
@@ -7209,6 +7334,7 @@ const ALL_GENRE_LABELS = {
   altrock:'Alt-Rock', reggae:'Reggae', afrobeats:'Afrobeats', blues:'Blues',
   punk:'Punk', kpop:'K-Pop', neosoul:'Neo-Soul', gospel:'Gospel',
   parody:'Parody', comedy:'Comedy', children:"Children's", tvmusical:'TV / Musical',
+  brazilian:'Brazilian', amapiano:'Amapiano', dancehall:'Dancehall', bollywood:'Bollywood', arabesque:'Arabesque', mandopop:'Mandopop',
 };
 
 // Translation to FUSION_DATA key parts (capitalized display names)
@@ -7218,6 +7344,7 @@ const GZ_FMAP = {
   jazz:'Jazz', ss:'Singer-Songwriter', altrock:'Alt-Rock', reggae:'Reggae',
   afrobeats:'Afrobeats', blues:'Blues', punk:'Punk', kpop:'K-Pop',
   neosoul:'Neo-Soul', gospel:'Gospel',
+  brazilian:'Brazilian', amapiano:'Amapiano', dancehall:'Dancehall', bollywood:'Bollywood', arabesque:'Arabesque', mandopop:'Mandopop',
   // parody/comedy/children/tvmusical have no fusion pairs — handled as single-anchor mode
 };
 
@@ -7611,9 +7738,11 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   updateShareHash(S.luckyCurrentSong);
   const _lrv=document.getElementById('lres-visual-content');if(_lrv)_lrv.dataset.loaded='';
   showCopyrightStrip('lres', title, lts);
-  // Show revision bar
+  // Show revision bar + language bar
   const lrevBar = document.getElementById('lres-revision-bar');
   if (lrevBar) lrevBar.style.display = 'flex';
+  const llangBar = document.getElementById('lres-lang-bar');
+  if (llangBar) { llangBar.style.display = 'flex'; resetLangPills(llangBar); }
   calcHookScore('lres');
   setTimeout(() => loadPromptIntelligence('lres'), 400);
   S.luckyHistory.unshift({...S.luckyCurrentSong});
@@ -8140,14 +8269,18 @@ function parseSongResult(raw,genre,topic,prodData){
   if (audioBtn) audioBtn.style.display = '';
   const commShareResBtn = document.getElementById('comm-share-res-btn');
   if (commShareResBtn) commShareResBtn.style.display = '';
-  // Show revision bar
+  // Show revision bar + language bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
+  const langBar = document.getElementById('res-lang-bar');
+  if (langBar) { langBar.style.display = 'flex'; resetLangPills(langBar); }
   // Hook score (replaces API score dashboard for this)
   calcHookScore('res');
   setTimeout(() => loadPromptIntelligence('res'), 400);
   generateScoreDashboard('res', lyrics, genre);
   document.getElementById('instant-edit-card').classList.add('visible');
+  // Populate Section Switcher and show DJ FX panel
+  ssPopulateSections();
   // Reset like/dislike buttons
   const likeB = document.getElementById('res-like-btn'); if(likeB) likeB.classList.remove('liked');
   const dislikeB = document.getElementById('res-dislike-btn'); if(dislikeB) dislikeB.classList.remove('disliked');
@@ -8934,7 +9067,7 @@ function saveEdited(){
 // ═══════════════════════════════════════════════════════
 function initBuilder(){
   if(document.getElementById('pb-genre').innerHTML)return;
-  const genres=['pop','hip-hop','R&B','rock','country','EDM','folk','latin','metal','jazz','K-pop','neo-soul','gospel','reggae','afrobeats','blues','punk','alt-rock','singer-songwriter','reggaeton','children\'s','parody','comedy','TV/musical'];
+  const genres=['pop','hip-hop','R&B','rock','country','EDM','folk','latin','metal','jazz','K-pop','neo-soul','gospel','reggae','afrobeats','blues','punk','alt-rock','singer-songwriter','reggaeton','children\'s','parody','comedy','TV/musical','Brazilian','Amapiano','Dancehall','Bollywood','Arabesque','Mandopop'];
   document.getElementById('pb-genre').innerHTML=genres.map(g=>`<div class="pbopt" onclick="pbSingle(this,'genre')">${g}</div>`).join('');
   const instrs=[
     'acoustic guitar','electric guitar','piano / Rhodes','synth / keys',
@@ -9235,7 +9368,7 @@ async function buildBlueprint(){
 // ═══════════════════════════════════════════════════════
 function renderBiblePills(){
   const el=document.getElementById('bible-pills');if(!el||el.innerHTML)return;
-  const allG=[{id:'pop',label:'Pop',new:false},{id:'hiphop',label:'Hip-Hop',new:false},{id:'rnb',label:'R&B',new:false},{id:'rock',label:'Rock',new:false},{id:'country',label:'Country',new:false},{id:'edm',label:'EDM',new:false},{id:'folk',label:'Folk',new:false},{id:'latin',label:'Latin',new:false},{id:'metal',label:'Metal',new:false},{id:'jazz',label:'Jazz',new:false},{id:'ss',label:'Singer-Songwriter',new:true},{id:'altrock',label:'Alt-Rock',new:true},{id:'reggae',label:'Reggae',new:true},{id:'afrobeats',label:'Afrobeats',new:true},{id:'blues',label:'Blues',new:true},{id:'kpop',label:'K-Pop',new:true},{id:'punk',label:'Punk',new:true},{id:'reggaeton',label:'Reggaeton',new:true},{id:'neosoul',label:'Neo-Soul',new:true},{id:'gospel',label:'Gospel',new:true},{id:'children',label:"Children's",new:true},{id:'parody',label:'Parody',new:true},{id:'comedy',label:'Comedy',new:true},{id:'tvmusical',label:'TV / Musical',new:true}];
+  const allG=[{id:'pop',label:'Pop',new:false},{id:'hiphop',label:'Hip-Hop',new:false},{id:'rnb',label:'R&B',new:false},{id:'rock',label:'Rock',new:false},{id:'country',label:'Country',new:false},{id:'edm',label:'EDM',new:false},{id:'folk',label:'Folk',new:false},{id:'latin',label:'Latin',new:false},{id:'metal',label:'Metal',new:false},{id:'jazz',label:'Jazz',new:false},{id:'ss',label:'Singer-Songwriter',new:true},{id:'altrock',label:'Alt-Rock',new:true},{id:'reggae',label:'Reggae',new:true},{id:'afrobeats',label:'Afrobeats',new:true},{id:'blues',label:'Blues',new:true},{id:'kpop',label:'K-Pop',new:true},{id:'punk',label:'Punk',new:true},{id:'reggaeton',label:'Reggaeton',new:true},{id:'neosoul',label:'Neo-Soul',new:true},{id:'gospel',label:'Gospel',new:true},{id:'children',label:"Children's",new:true},{id:'parody',label:'Parody',new:true},{id:'comedy',label:'Comedy',new:true},{id:'tvmusical',label:'TV / Musical',new:true},{id:'brazilian',label:'Brazilian',new:true},{id:'amapiano',label:'Amapiano',new:true},{id:'dancehall',label:'Dancehall',new:true},{id:'bollywood',label:'Bollywood',new:true},{id:'arabesque',label:'Arabesque',new:true},{id:'mandopop',label:'Mandopop',new:true}];
   allG.forEach(g=>{
     const p=document.createElement('span');
     p.className='pill'+(g.new?' new':'')+(g.id==='ss'?' on':'');
@@ -9477,6 +9610,12 @@ const GENRES_DEF = [
   {id:'parody',label:'Parody',icon:'🎭',new:true},
   {id:'comedy',label:'Comedy',icon:'😂',new:true},
   {id:'tvmusical',label:'TV / Musical',icon:'🎬',new:true},
+  {id:'brazilian',label:'Brazilian',icon:'🇧🇷',new:true},
+  {id:'amapiano',label:'Amapiano',icon:'🎹',new:true},
+  {id:'dancehall',label:'Dancehall',icon:'🔈',new:true},
+  {id:'bollywood',label:'Bollywood',icon:'🎬',new:true},
+  {id:'arabesque',label:'Arabesque',icon:'🕌',new:true},
+  {id:'mandopop',label:'Mandopop',icon:'🏮',new:true},
 ];
 
 function isGenreFree(gid) {
@@ -9493,7 +9632,7 @@ function initGenreGrid(){
     const overflow = i >= VISIBLE ? ' gp-overflow' : '';
     return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
-         title="${locked?'Unlock all 24 genres with Starter — from $9/mo':''}"
+         title="${locked?'Unlock all 30 genres with Starter — from $9/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
@@ -13021,6 +13160,7 @@ async function instantEdit() {
     S.currentSong.lyrics = newLyrics;
     lyricsEl.innerHTML = escHtml(newLyrics).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
     calcHookScore('res');
+    ssPopulateSections(); // refresh section switcher
     toast('⚡ Edit applied!');
     inp.value = '';
     document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
@@ -13201,24 +13341,30 @@ function renderSyncMeta(prefix) {
 }
 
 // ═══════════════════════════════════════════════════════
-// FEATURE 3: HOOK STRENGTH SCORE
+// FEATURE 3: HOOK STRENGTH SCORE (Chorus-only, local calc)
+// Now renders into its own mini card, separate from Song Score
 // ═══════════════════════════════════════════════════════
 function calcHookScore(prefix) {
   const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
   if (!song || !song.lyrics) return;
-  const dash = document.getElementById(prefix + '-score-dashboard');
-  const numEl = document.getElementById(prefix + '-score-num');
-  const grid = document.getElementById(prefix + '-score-grid');
-  if (!dash || !numEl || !grid) return;
+  let card = document.getElementById(prefix + '-hook-score-mini');
+  let numEl = document.getElementById(prefix + '-hook-num');
+  let grid = document.getElementById(prefix + '-hook-grid');
+  // Fallback: lucky page uses score dashboard directly
+  if (!card) {
+    card = document.getElementById(prefix + '-score-dashboard');
+    numEl = document.getElementById(prefix + '-score-num');
+    grid = document.getElementById(prefix + '-score-grid');
+  }
+  if (!card || !numEl || !grid) return;
+  const useMiniCard = !!document.getElementById(prefix + '-hook-score-mini');
 
-  // Extract chorus lines
   const lyrics = song.lyrics || '';
   const chorusMatch = lyrics.match(/\[Chorus\]([\s\S]*?)(?=\[|$)/i);
   const chorusLines = chorusMatch
     ? chorusMatch[1].trim().split('\n').map(l=>l.trim()).filter(Boolean)
     : lyrics.split('\n').map(l=>l.trim()).filter(Boolean).slice(0,4);
 
-  // 1. Syllable count score (ideal 6-10 per line)
   function countSyllables(line) {
     return line.toLowerCase().replace(/[^a-z]/g,'').replace(/[aeiou]{2,}/g,'a').replace(/[^aeiou]/g,'').length || 1;
   }
@@ -13227,23 +13373,19 @@ function calcHookScore(prefix) {
     : 8;
   const sylScore = avgSyl <= 10 ? 10 : avgSyl <= 14 ? 7 : 4;
 
-  // 2. Repetition pattern score
   const allWords = chorusLines.join(' ').toLowerCase().split(/\s+/);
   const wordFreq = {};
   allWords.forEach(w=>{if(w.length>2)wordFreq[w]=(wordFreq[w]||0)+1;});
   const repeated = Object.values(wordFreq).filter(c=>c>1).length;
   const repScore = Math.min(10, repeated * 2);
 
-  // 3. Singability score (avg word length < 5 = 10)
   const avgWordLen = allWords.length ? allWords.reduce((a,w)=>a+w.length,0)/allWords.length : 4;
   const singScore = avgWordLen < 5 ? 10 : avgWordLen < 6 ? 8 : avgWordLen < 7 ? 6 : 4;
 
-  // 4. Zeigarnik effect (ends on question or unresolved phrase)
   const lastLine = chorusLines[chorusLines.length-1] || '';
   const hasQ = /\?|maybe|somehow|never know|still|wonder|if only/i.test(lastLine);
   const zeigScore = hasQ ? 10 : 6;
 
-  // 5. Genre purity — checks for genre-specific bracket tags in lyrics
   const genreTags = {
     pop:['Build','Drop','Key Change','Pre-Chorus'],
     hiphop:['Trap Hi-Hat','808 Bass','Ad-lib','Double Time','Triplet Flow','Beat Switch'],
@@ -13259,6 +13401,12 @@ function calcHookScore(prefix) {
     reggae:['Dub Break','One-Drop','Offbeat'],
     latin:['Montuno','Clave','Horn Break'],
     punk:['Shout','Oi','Fast','Breakdown'],
+    brazilian:['Bossa Break','Samba','Pandeiro','Baião'],
+    amapiano:['Log Drum','Piano','Shaker','Bassline'],
+    dancehall:['Riddim','Sound System','Air Horn','Rewind'],
+    bollywood:['Tabla','Dholak','Sitar','Dhol Drop'],
+    arabesque:['Oud','Darbuka','Maqam','Quarter Tone'],
+    mandopop:['Guzheng','Erhu','Pentatonic','String Swell'],
   };
   const genreTagSet = genreTags[song.genre] || [];
   const fullLyrics  = (song.lyrics || '').toLowerCase();
@@ -13267,8 +13415,8 @@ function calcHookScore(prefix) {
 
   const overall = Math.round((sylScore + repScore + singScore + zeigScore + purityScore) / 5 * 10) / 10;
 
-  dash.classList.add('visible');
-  if (numEl) numEl.textContent = overall.toFixed(1);
+  card.classList.add('visible');
+  numEl.textContent = overall.toFixed(1);
 
   // Update the topic-area score badge
   if (prefix === 'res') {
@@ -13286,13 +13434,229 @@ function calcHookScore(prefix) {
     {label:'Zeigarnik', score:zeigScore, note:hasQ?'Ends open/unresolved':'Fully resolved ending'},
     {label:'Genre Purity', score:purityScore, note:`${genreMatches}/${Math.min(genreTagSet.length,3)} genre tags found`}
   ];
-  const colors = ['var(--amber)','var(--cyan)','var(--green)','var(--violet)','var(--pink,#ec4899)'];
-  grid.innerHTML = items.map((it,i)=>`<div class="score-item">
-    <div class="score-item-label">${it.label}</div>
-    <div class="score-bar-wrap"><div class="score-bar" style="width:${it.score*10}%;background:${colors[i]}"></div></div>
-    <div class="score-item-val" style="color:${colors[i]}">${it.score}/10</div>
-    <div class="score-item-note">${it.note}</div>
-  </div>`).join('');
+  if (useMiniCard) {
+    grid.innerHTML = items.map(it=>`<div class="hsm-item">
+      <span>${it.label}</span>
+      <span class="hsm-item-val">${it.score}/10</span>
+    </div>`).join('');
+  } else {
+    // Full dashboard format for lucky page
+    const colors = ['var(--amber)','var(--cyan)','var(--green)','var(--violet)','var(--pink,#ec4899)'];
+    grid.innerHTML = items.map((it,i)=>`<div class="score-item">
+      <div class="score-item-label">${it.label}</div>
+      <div class="score-bar-wrap"><div class="score-bar" style="width:${it.score*10}%;background:${colors[i]}"></div></div>
+      <div class="score-item-val" style="color:${colors[i]}">${it.score}/10</div>
+      <div class="score-item-note">${it.note}</div>
+    </div>`).join('');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// OUTPUT FOOTER BAR — Jump to tabs/sections
+// ═══════════════════════════════════════════════════════
+function ofbJump(ns, tabId) {
+  const tabEl = document.getElementById(ns + '-tab-' + tabId);
+  if (tabEl) {
+    goOtab(ns, tabId, tabEl);
+    tabEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+function ofbJumpMore(ns, tabId, label) {
+  goOtabMore(ns, tabId, label);
+  const pane = document.getElementById(ns + '-opane-' + tabId);
+  if (pane) pane.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function ofbScrollTo(elId) {
+  const el = document.getElementById(elId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+// ═══════════════════════════════════════════════════════
+// SECTION SWITCHER — Edit one section at a time
+// ═══════════════════════════════════════════════════════
+function ssPopulateSections() {
+  const song = S.currentSong;
+  if (!song || !song.lyrics) return;
+  const sel = document.getElementById('ss-section-select');
+  if (!sel) return;
+  // Parse sections from lyrics
+  const sections = [];
+  const regex = /\[([^\]]+)\]/g;
+  let match;
+  while ((match = regex.exec(song.lyrics)) !== null) {
+    sections.push(match[1]);
+  }
+  sel.innerHTML = '<option value="">Select a section…</option>' +
+    sections.map(s => `<option value="${escHtml(s)}">${s}</option>`).join('');
+  // Show the switcher
+  document.getElementById('section-switcher')?.classList.add('visible');
+  document.getElementById('djfx-panel')?.classList.add('visible');
+}
+
+function ssSectionChanged() {
+  const sel = document.getElementById('ss-section-select');
+  const txt = document.getElementById('ss-section-text');
+  const presets = document.getElementById('ss-presets');
+  if (!sel || !txt) return;
+  const sectionName = sel.value;
+  if (!sectionName) { txt.value = ''; presets.innerHTML = ''; return; }
+  // Extract the section content from lyrics
+  const song = S.currentSong;
+  if (!song || !song.lyrics) return;
+  const escaped = sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const sectionRegex = new RegExp('\\[' + escaped + '\\]([\\s\\S]*?)(?=\\[|$)', 'i');
+  const m = song.lyrics.match(sectionRegex);
+  txt.value = m ? m[1].trim() : '';
+  // Load smart presets based on section type
+  ssLoadPresets(sectionName);
+}
+
+function ssLoadPresets(sectionName) {
+  const presets = document.getElementById('ss-presets');
+  if (!presets) return;
+  const lower = sectionName.toLowerCase();
+  let options = [];
+  if (lower.includes('chorus') || lower.includes('hook')) {
+    options = [
+      { label: 'More anthemic', instruction: 'Make this chorus bigger, more anthemic, and more singalong-ready' },
+      { label: 'Punchier hook', instruction: 'Tighten the hook — fewer words, more punch, more repetition' },
+      { label: 'Add ad-libs', instruction: 'Add tasteful ad-libs and vocal embellishments in parentheses' },
+      { label: 'Simplify melody', instruction: 'Simplify the melody line — make it easier to hum and remember' },
+      { label: 'Emotional peak', instruction: 'Push the emotional intensity to its highest point here' },
+    ];
+  } else if (lower.includes('verse')) {
+    options = [
+      { label: 'More vivid imagery', instruction: 'Add more specific, cinematic imagery and sensory details' },
+      { label: 'First person', instruction: 'Shift to intimate first-person perspective' },
+      { label: 'Story-driven', instruction: 'Make this verse tell a clear mini-story with a beginning and end' },
+      { label: 'Tighten lines', instruction: 'Remove filler words, make every line earn its place' },
+      { label: 'Darker tone', instruction: 'Darken the mood — more shadow, tension, raw vulnerability' },
+    ];
+  } else if (lower.includes('bridge')) {
+    options = [
+      { label: 'Key change feel', instruction: 'Create a sense of harmonic shift — new emotional territory' },
+      { label: 'Stripped down', instruction: 'Strip the production mentally — intimate, vulnerable, exposed' },
+      { label: 'Plot twist', instruction: 'Introduce a revelation or perspective shift the listener does not expect' },
+      { label: 'Build to climax', instruction: 'Build tension that releases explosively into the final chorus' },
+      { label: 'Spoken word', instruction: 'Convert to a raw spoken-word moment (only if genre fits)' },
+    ];
+  } else if (lower.includes('pre-chorus') || lower.includes('prechorus')) {
+    options = [
+      { label: 'More tension', instruction: 'Build more anticipation and tension leading into the chorus' },
+      { label: 'Melodic lift', instruction: 'Create a rising melodic contour that pulls the listener forward' },
+      { label: 'Rhythmic shift', instruction: 'Change the rhythmic feel to contrast with the verse' },
+    ];
+  } else if (lower.includes('intro') || lower.includes('outro')) {
+    options = [
+      { label: 'Atmospheric', instruction: 'Make this section atmospheric and immersive — set the sonic world' },
+      { label: 'Hook tease', instruction: 'Tease the main hook melody without giving it all away' },
+      { label: 'Fade concept', instruction: 'Design a natural fade that leaves the listener wanting more' },
+    ];
+  } else {
+    options = [
+      { label: 'More energy', instruction: 'Increase the energy and intensity of this section' },
+      { label: 'More emotion', instruction: 'Push the emotional depth — make the listener feel something' },
+      { label: 'Tighten', instruction: 'Cut filler, increase specificity, make every word count' },
+    ];
+  }
+  presets.innerHTML = options.map(o =>
+    `<span class="ss-preset" onclick="ssPresetClick(this,'${escHtml(o.instruction)}')">${o.label}</span>`
+  ).join('');
+}
+
+function ssPresetClick(el, instruction) {
+  document.querySelectorAll('.ss-preset').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  // Store the instruction for AI rewrite
+  S._ssPresetInstruction = instruction;
+}
+
+function ssApplyEdit() {
+  const sel = document.getElementById('ss-section-select');
+  const txt = document.getElementById('ss-section-text');
+  if (!sel || !txt || !sel.value) { toast('Select a section first'); return; }
+  const song = S.currentSong;
+  if (!song || !song.lyrics) return;
+  const sectionName = sel.value;
+  const newContent = txt.value.trim();
+  // Replace the section in lyrics
+  const escaped = sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const sectionRegex = new RegExp('(\\[' + escaped + '\\])[\\s\\S]*?(?=\\[|$)', 'i');
+  const updated = song.lyrics.replace(sectionRegex, '$1\n' + newContent + '\n\n');
+  // Update song and re-render
+  song.lyrics = updated;
+  const clean = stripLyricsDashes(updated);
+  document.getElementById('res-lyrics-text').innerHTML = escHtml(clean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', clean);
+  calcHookScore('res');
+  ssPopulateSections(); // refresh section list in case tags changed
+  toast('✓ ' + sectionName + ' updated');
+}
+
+async function ssAiRewrite() {
+  const sel = document.getElementById('ss-section-select');
+  const txt = document.getElementById('ss-section-text');
+  if (!sel || !txt || !sel.value) { toast('Select a section first'); return; }
+  const song = S.currentSong;
+  if (!song) return;
+  const sectionName = sel.value;
+  const currentText = txt.value.trim();
+  const instruction = S._ssPresetInstruction || 'Improve this section while keeping the same theme and structure';
+  btnLoad('ss-ai-btn', '🤖 Rewriting…');
+  try {
+    const prompt = `You are rewriting ONE section of a ${song.genre||'pop'} song titled "${song.title}".
+Section: [${sectionName}]
+Current content:
+${currentText}
+
+Instruction: ${instruction}
+
+Context — full song structure:
+${song.lyrics.slice(0, 1500)}
+
+Return ONLY the rewritten section lines (no [Section] tag, no explanation, no markdown).`;
+    const result = await callClaude(prompt, 'Return only the rewritten lyrics lines. No tags, no explanation.');
+    txt.value = result.trim();
+    toast('✓ AI rewrite ready — review and Apply');
+  } catch(e) {
+    toast('Rewrite failed — try again');
+  }
+  btnDone('ss-ai-btn');
+}
+
+// ═══════════════════════════════════════════════════════
+// DJ FX PANEL — Insert production effects into lyrics
+// ═══════════════════════════════════════════════════════
+function insertDjFx(btnEl, tag) {
+  const song = S.currentSong;
+  if (!song || !song.lyrics) { toast('Generate a song first'); return; }
+  const sel = document.getElementById('ss-section-select');
+  const sectionName = sel?.value;
+  if (!sectionName) {
+    // No section selected — insert before the last chorus
+    const chorusIdx = song.lyrics.lastIndexOf('[Chorus]');
+    if (chorusIdx > -1) {
+      song.lyrics = song.lyrics.slice(0, chorusIdx) + tag + '\n' + song.lyrics.slice(chorusIdx);
+    } else {
+      // Append to end
+      song.lyrics = song.lyrics.trimEnd() + '\n\n' + tag + '\n';
+    }
+  } else {
+    // Insert at the beginning of the selected section
+    const escaped = sectionName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const sectionRegex = new RegExp('(\\[' + escaped + '\\])', 'i');
+    song.lyrics = song.lyrics.replace(sectionRegex, tag + '\n$1');
+  }
+  // Re-render lyrics
+  const clean = stripLyricsDashes(song.lyrics);
+  document.getElementById('res-lyrics-text').innerHTML = escHtml(clean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+  updateLyricsCount('res', clean);
+  // Update section text if open
+  if (sectionName) ssSectionChanged();
+  // Visual feedback
+  btnEl.classList.add('inserted');
+  setTimeout(() => btnEl.classList.remove('inserted'), 1200);
+  toast('✓ ' + tag + ' inserted');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -13314,8 +13678,8 @@ async function loadPromptIntelligence(prefix) {
   const mood  = song.mood  || (prefix === 'res' ? document.getElementById('mood')?.value  : '') || '';
 
   // Extract rough hook score from DOM (already computed by calcHookScore)
-  const numEl = document.getElementById(prefix + '-score-num');
-  const hookScore = numEl ? parseFloat(numEl.textContent) * 10 : 0; // convert 0-10 → 0-100
+  const hookNumEl = document.getElementById(prefix + '-hook-num') || document.getElementById(prefix + '-score-num');
+  const hookScore = hookNumEl ? parseFloat(hookNumEl.textContent) * 10 : 0; // convert 0-10 → 0-100
 
   list.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:8px 0">Analyzing your song…</div>';
   card.classList.add('visible');
@@ -13469,6 +13833,121 @@ function getVoiceNote() {
   if (influences) note += ` Lyric influences: ${influences}.`;
   if (forbidden) note += ` Never use these phrases: ${forbidden}.`;
   return note;
+}
+
+// ═══════════════════════════════════════════════════════
+// LANGUAGE TRANSLATION BAR
+// ═══════════════════════════════════════════════════════
+function resetLangPills(bar) {
+  if (!bar) return;
+  bar.querySelectorAll('.lang-pill').forEach((p,i) => {
+    p.classList.toggle('active', i === 0); // English is first = active
+    p.classList.remove('loading');
+  });
+}
+
+async function translateSong(prefix, lang, el) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song || !song.lyrics) { toast('Generate a song first'); return; }
+
+  // If clicking English, restore original
+  if (lang === 'English') {
+    if (song._originalLyrics) {
+      song.lyrics = song._originalLyrics;
+      const clean = stripLyricsDashes(song.lyrics);
+      document.getElementById(prefix + '-lyrics-text').innerHTML = escHtml(clean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+      updateLyricsCount(prefix, clean);
+    }
+    const bar = el.closest('.lang-bar');
+    bar.querySelectorAll('.lang-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    toast('✓ Restored English lyrics');
+    return;
+  }
+
+  // Store original English lyrics on first translate
+  if (!song._originalLyrics) {
+    song._originalLyrics = song.lyrics;
+  }
+
+  // Visual feedback
+  const bar = el.closest('.lang-bar');
+  bar.querySelectorAll('.lang-pill').forEach(p => { p.classList.remove('active'); p.classList.remove('loading'); });
+  el.classList.add('loading');
+
+  const lyricsEl = document.getElementById(prefix + '-lyrics-text');
+  lyricsEl.innerHTML = '<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Translating to ' + lang + '…</div></div>';
+
+  const langNotes = {
+    'Portuguese': 'Use Brazilian Portuguese (pt-BR). Maintain the rhythmic flow and syllable count suitable for singing in Portuguese. Adapt idioms naturally — do not translate literally.',
+    'Spanish': 'Use Latin American Spanish. Maintain singability and natural phrasing. Adapt slang and idioms to feel authentic, not translated.',
+    'French': 'Maintain poetic flow. French lyrics should feel like they were written in French — prioritize rhythm and rhyme over literal meaning.',
+    'Korean': 'Use modern Korean (한국어). Maintain K-pop-friendly phrasing. Keep English loan words where they feel natural in Korean pop music. Include romanization in parentheses after each line.',
+    'Japanese': 'Use modern Japanese. Maintain J-pop/City Pop phrasing. Mix kanji, hiragana, katakana naturally. Include romanization in parentheses after each line.',
+    'Hindi': 'Use Hindustani (Hindi-Urdu mix common in Bollywood). Maintain singability. Use Devanagari script with romanization in parentheses after each line.',
+    'Yoruba': 'Use modern Yoruba with proper tonal marks. Maintain the rhythmic feel of Afrobeats. Adapt phrases to feel authentic to Nigerian/West African music culture.',
+  };
+
+  const prompt = `You are a professional songwriter and music translator. Translate this ${song.genre||'pop'} song into ${lang}.
+
+RULES:
+- Keep ALL [Section] bracket tags in English (e.g. [Verse 1], [Chorus], [Bridge] — do NOT translate these)
+- Keep ALL production bracket tags in English (e.g. [Build Up], [Bass Drop], [Filter Sweep])
+- Translate ONLY the lyric lines between tags
+- Maintain the same number of lines per section
+- Prioritize singability, rhythm, and syllable count over literal translation
+- Rhyme scheme should work in the target language
+- Adapt metaphors and idioms naturally — make it sound like it was WRITTEN in ${lang}
+${langNotes[lang] || ''}
+
+ORIGINAL LYRICS:
+${song._originalLyrics || song.lyrics}
+
+Return ONLY the translated lyrics with [Section] tags. No explanation, no markdown.`;
+
+  try {
+    const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+    let result = '';
+    if (isVercel) {
+      await callServerStream('edit', {
+        instruction: 'Translate the full song to ' + lang,
+        lyrics: song._originalLyrics || song.lyrics,
+        genre: song.genre || 'pop',
+        title: song.title || '',
+        topic: song.topic || '',
+        mood: song.mood || '',
+        style: song.style || '',
+        brief: song.brief || '',
+        chords: song.chords || '',
+        theoryAnalysis: song.theoryAnalysis || '',
+        verdict: song.verdict || '',
+        _translationPrompt: prompt,
+      }, (chunk, text) => { result = text; });
+    } else {
+      result = await callClaude(prompt, 'You are a professional music translator. Return only translated lyrics with section tags.');
+    }
+    const translated = result.trim();
+    song.lyrics = translated;
+    song._currentLang = lang;
+    const clean = stripLyricsDashes(translated);
+    lyricsEl.innerHTML = escHtml(clean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    updateLyricsCount(prefix, clean);
+    calcHookScore(prefix);
+    if (typeof ssPopulateSections === 'function') ssPopulateSections();
+
+    el.classList.remove('loading');
+    el.classList.add('active');
+    toast('✓ Translated to ' + lang);
+    trackEvent('song_translated', { lang, genre: song.genre });
+  } catch(e) {
+    // Restore original on failure
+    const orig = song._originalLyrics || song.lyrics;
+    const clean = stripLyricsDashes(orig);
+    lyricsEl.innerHTML = escHtml(clean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    el.classList.remove('loading');
+    bar.querySelector('.lang-pill').classList.add('active'); // re-select English
+    toast('Translation failed — try again');
+  }
 }
 
 // ═══════════════════════════════════════════════════════
@@ -13653,9 +14132,11 @@ function checkShareLink() {
     if (notesEl) notesEl.textContent = song.notes || '';
     const banner = document.getElementById('loaded-banner');
     if (banner) { banner.textContent = '🔗 Loaded from shared link'; banner.style.display = 'flex'; }
-    // Show revision bar
+    // Show revision bar + language bar
     const revBar = document.getElementById('res-revision-bar');
     if (revBar) revBar.style.display = 'flex';
+    const sharedLangBar = document.getElementById('res-lang-bar');
+    if (sharedLangBar) { sharedLangBar.style.display = 'flex'; resetLangPills(sharedLangBar); }
     calcHookScore('res');
     toast('🔗 Shared song loaded!');
     // Clear hash
