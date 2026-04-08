@@ -783,6 +783,22 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 #remake-out .card{border-left:3px solid var(--cyan);animation:pgIn .3s ease}
 #remake-out .hook-score-mini{border-color:var(--cyan)}
 #remake-out .score-dashboard{display:block}
+.tech-chip{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:8px;border:1px solid var(--b2);background:var(--s1);cursor:pointer;transition:all .15s ease;font-size:12px}
+.tech-chip:hover{border-color:var(--violet);background:rgba(139,92,246,0.06)}
+.tech-chip.selected{border-color:var(--violet);background:rgba(139,92,246,0.1);box-shadow:0 0 0 1px var(--violet)}
+.tech-chip .tech-check{width:16px;height:16px;border-radius:4px;border:2px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s ease;font-size:10px}
+.tech-chip.selected .tech-check{background:var(--violet);border-color:var(--violet);color:#fff}
+.tech-chip .tech-body{flex:1;min-width:0}
+.tech-chip .tech-name{font-weight:700;color:var(--tx1);margin-bottom:2px}
+.tech-chip .tech-desc{font-size:11px;color:var(--tx3);line-height:1.3}
+.tech-chip .tech-example{font-size:10px;color:var(--tx4);font-style:italic;margin-top:3px;line-height:1.3}
+.tech-chip .tech-meta{display:flex;gap:6px;margin-top:3px}
+.tech-chip .tech-badge{font-size:9px;padding:1px 6px;border-radius:10px;font-weight:600}
+.tech-badge.diff-1{background:rgba(34,197,94,0.15);color:var(--green)}
+.tech-badge.diff-2{background:rgba(251,191,36,0.15);color:var(--amber)}
+.tech-badge.diff-3{background:rgba(239,68,68,0.15);color:var(--red)}
+.tech-badge.impact{background:rgba(6,182,212,0.15);color:var(--cyan)}
+.tech-chip.cross-genre{border-style:dashed}
 .intel-stat{background:var(--s2);border-radius:8px;padding:8px 14px;text-align:center;min-width:70px}
 .intel-num{font-size:20px;font-weight:800;color:var(--cyan);line-height:1}
 .intel-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx4);margin-top:2px}
@@ -4665,6 +4681,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
     </div>
     <div id="a-out"></div>
+    <!-- TECHNIQUE TOOLKIT — appears after analysis -->
+    <div id="a-techniques" class="card" style="display:none;margin-top:10px;border:1px solid var(--violet);border-radius:var(--r2);background:linear-gradient(135deg,rgba(139,92,246,0.04),transparent)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px">
+        <div class="ctitle" style="color:var(--violet);margin:0">🎯 Technique Toolkit</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="selectAllTechniques()" style="font-size:10px">Select All</button>
+          <button class="btn btn-sm" onclick="deselectAllTechniques()" style="font-size:10px">Clear</button>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--tx4);margin-bottom:10px">Select techniques to inject into your next Generate or Remake. The AI will actively use these craft devices.</div>
+      <div id="a-tech-grid" style="display:grid;grid-template-columns:1fr;gap:6px"></div>
+      <div id="a-tech-cross" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)">
+        <div style="font-size:11px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">🔀 Cross-Genre Techniques</div>
+        <div style="font-size:11px;color:var(--tx4);margin-bottom:6px">Borrow techniques from other genres for unexpected flavor</div>
+        <div id="a-tech-cross-grid" style="display:grid;grid-template-columns:1fr;gap:6px"></div>
+      </div>
+    </div>
     <!-- REMAKE PANEL — appears after analysis -->
     <div id="a-remake" class="card remake-panel" style="display:none">
       <div class="ctitle">🔄 Remake This Song</div>
@@ -5914,6 +5947,225 @@ const SONGS={
   parody:[{t:'Amish Paradise',a:'Weird Al Yankovic',yr:1996,structure:'V1→C→V2→C→Bridge→C',key:'Exact melodic clone of original, comedic lyric substitution, cultural contrast',score:98},{t:'White & Nerdy',a:'Weird Al Yankovic',yr:2006,structure:'V1→C→V2→C→Bridge→C',key:'Chamillionaire flow + nerd culture references, visual gags in structure',score:97},{t:'Tacky',a:'Weird Al Yankovic',yr:2014,structure:'V1→C→V2→C→Bridge→C',key:'Pharrell "Happy" structure preserved, lyric inversion for comedy',score:95},{t:'The Saga Begins',a:'Weird Al Yankovic',yr:1999,structure:'V1→C→V2→C→V3→C→Outro',key:'Don McLean "American Pie" structure, Star Wars narrative rewrite',score:96}],
   comedy:[{t:'Dick in a Box',a:'The Lonely Island ft Justin Timberlake',yr:2006,structure:'V1→C→V2→C→Bridge→C',key:'R&B parody structure, deadpan delivery, escalating absurdity',score:97},{t:'I\'m on a Boat',a:'The Lonely Island ft T-Pain',yr:2009,structure:'V1→C→V2→C→Bridge→C',key:'Rap anthem structure played straight, auto-tune hook, visual comedy',score:96},{t:'Bohemian Polka',a:'Weird Al Yankovic',yr:1993,structure:'Polka Medley',key:'Genre mash — polka arrangement of rock hits, medley = surprise density',score:94},{t:'My Ding-a-Ling',a:'Chuck Berry',yr:1972,structure:'V1→C→V2→C→V3→C→Audience',key:'Double entendre, audience participation, singalong simplicity',score:95}],
   tvmusical:[{t:'Defying Gravity',a:'Wicked Cast',yr:2003,structure:'V1→V2→Pre-C→C→Bridge→Belt→C',key:'Belt climax at the end, key change, hero moment structure',score:100},{t:'My Shot',a:'Hamilton Cast',yr:2015,structure:'V1→C→V2→C→Rap Break→Bridge→C',key:'Hip-hop musical fusion, ensemble build, revolutionary anthem arc',score:99},{t:'Shallow',a:'Lady Gaga & Bradley Cooper',yr:2018,structure:'V1→V2→Pre-C→C→V3→C→Belt',key:'Quiet acoustic start → massive belt payoff, duet tension-release',score:99},{t:'This Is Me',a:'Greatest Showman Cast',yr:2017,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Empowerment anthem, choir build, anthemic chorus designed for singalong',score:98}],
+};
+
+// ═══════════════════════════════════════════════════════
+// GENRE TECHNIQUES — Signature craft devices per genre
+// Each technique: name, description, example, difficulty (1-3), impact (1-5)
+// ═══════════════════════════════════════════════════════
+const GENRE_TECHNIQUES={
+  hiphop:[
+    {id:'multisyllabic',name:'Multisyllabic Internal Rhyme',desc:'Rhyme 3+ syllable clusters within and across bars, not just at the end',example:'"Astronomical, methodical, the chronicle\'s unstoppable" — rhyming -ical/-acle across the bar',difficulty:3,impact:5},
+    {id:'entendre',name:'Double/Triple Entendre',desc:'Lines that work on 2-3 different meaning levels simultaneously',example:'"I\'m on the fence" = undecided / literally on a fence / fencing (fighting)',difficulty:3,impact:5},
+    {id:'compound_rhyme',name:'Compound Rhyme Chains',desc:'String together 3+ multisyllabic rhymes in consecutive bars',example:'"Lost in the sauce / tossed at the cost / bossed and it crossed every thought"',difficulty:3,impact:4},
+    {id:'flow_switch',name:'Flow Switch / Cadence Break',desc:'Abruptly change rhythmic delivery mid-verse (normal → double time → triplet)',example:'Steady 4-count bars → sudden triplet burst → back to half-time',difficulty:2,impact:4},
+    {id:'assonance_chain',name:'Assonance Chain',desc:'Repeat the same vowel sound across 4+ words in a bar for rhythmic texture',example:'"Broke the mold, gold on my soul, cold but I hold" — long O chain',difficulty:2,impact:3},
+    {id:'setup_punchline',name:'Setup-Punchline Architecture',desc:'Bars 1-3 build a scenario, bar 4 recontextualizes everything with a twist',example:'3 bars about climbing → "I\'m elevated — but I never left the ground floor"',difficulty:2,impact:5},
+    {id:'wordplay_flip',name:'Homophone / Wordplay Flip',desc:'Use words that sound identical but have different meanings for dual-layer bars',example:'"Carrying weight / carry the wait" — burden vs patience',difficulty:2,impact:4}
+  ],
+  rnb:[
+    {id:'melismatic',name:'Melismatic Run Notation',desc:'Mark vocal runs where one syllable stretches across 3+ notes',example:'"I nee~ee~eed you" — the tilde marks a melismatic run',difficulty:2,impact:4},
+    {id:'whisper_belt',name:'Whisper-to-Belt Dynamic',desc:'Verse delivered in breathy whisper, chorus explodes into full belt',example:'Verse: "(whispered) I tried to walk away..." → Chorus: "BUT I CAN\'T LET GO"',difficulty:2,impact:5},
+    {id:'adlib_harmony',name:'Ad-lib Harmony Layer',desc:'Write parallel ad-lib lines that harmonize with the main vocal',example:'Main: "Stay with me tonight" / Ad-lib: "(with me, with me, ooh)"',difficulty:2,impact:3},
+    {id:'conversational',name:'Conversational Phrasing',desc:'Write verse lines as if talking to someone — incomplete thoughts, pauses',example:'"So I was thinking... maybe we could just... I don\'t know... try?"',difficulty:1,impact:4},
+    {id:'vamp_outro',name:'Vamp Outro Escalation',desc:'4-8 cycling outro lines that build in emotional intensity each pass',example:'Pass 1: "Don\'t go" → Pass 2: "Please don\'t go" → Pass 3: "BABY PLEASE DON\'T GO"',difficulty:2,impact:5}
+  ],
+  pop:[
+    {id:'topline_lock',name:'Topline Melodic Lock',desc:'Chorus melody uses only 3-4 notes in a singable range, locks into memory instantly',example:'Think "da-da DA-da" — limited pitch range = maximum stickiness',difficulty:1,impact:5},
+    {id:'millennial_whoop',name:'Melodic Interval Hook',desc:'Use a specific interval (3rd, 5th) as a recurring melodic motif between sections',example:'Post-chorus "oh-oh" built on a descending minor 3rd',difficulty:1,impact:4},
+    {id:'pre_chorus_lift',name:'Pre-Chorus Melodic Lift',desc:'Pre-chorus rises stepwise in pitch and energy to launch the chorus',example:'Each pre-chorus line 2-3 semitones higher than the last, building tension',difficulty:2,impact:5},
+    {id:'earworm_rep',name:'Title Repetition Embedding',desc:'Repeat the song title 3-5 times in the chorus using different rhythmic placements',example:'"Shake It Off" appears at start, middle, and end of chorus with varied rhythm',difficulty:1,impact:4},
+    {id:'post_chorus',name:'Post-Chorus Drop',desc:'Add a wordless or minimal-word section after the chorus for the "stuck in your head" moment',example:'"na-na-na-na" or instrumental drop that IS the earworm',difficulty:1,impact:4}
+  ],
+  country:[
+    {id:'story_song',name:'Story-Song Narrative Arc',desc:'Each verse advances a story with specific characters, settings, and timeline',example:'V1: "June of \'98, her daddy\'s porch..." V2: "That December, she called..." V3: "Now it\'s ten years gone..."',difficulty:2,impact:5},
+    {id:'talk_sing',name:'Talk-Singing Delivery',desc:'Verse delivered almost spoken, conversational — chorus lifts into melody',example:'Verse feels like telling a friend a story at the bar → Chorus is the emotional truth',difficulty:1,impact:4},
+    {id:'truck_imagery',name:'Concrete Americana Imagery',desc:'Hyper-specific details: pickup model, county road number, beer brand, season',example:'"Silverado, Route 9, August heat, cold Coors Light on the tailgate"',difficulty:1,impact:3},
+    {id:'payoff_line',name:'Last-Line Payoff / Title Drop',desc:'The final line of each verse drops the title with new emotional weight',example:'Every verse ends with "that\'s a small town" but means something different each time',difficulty:2,impact:5},
+    {id:'fiddle_answer',name:'Instrumental Answer Line',desc:'After each vocal phrase, an instrument (steel guitar/fiddle) echoes or responds',example:'"She walked away" → [steel guitar cries the melody back]',difficulty:1,impact:3}
+  ],
+  altrock:[
+    {id:'quiet_loud',name:'Quiet-Loud-Quiet Dynamic',desc:'Verse whispered/subdued → Chorus explodes → next verse drops back down',example:'Pixies/Nirvana template: mumbled verse → screamed chorus → silence → repeat',difficulty:1,impact:5},
+    {id:'dissonant_resolve',name:'Dissonance-to-Resolution',desc:'Use deliberately uncomfortable intervals in verse that resolve in chorus',example:'Verse uses minor 2nds and tritones → Chorus opens to perfect 5ths',difficulty:3,impact:4},
+    {id:'stream_conscious',name:'Stream-of-Consciousness Verse',desc:'Verse lyrics flow without traditional structure — imagery over narrative',example:'Disconnected images: "Paper cup. Cathedral ceiling. Your shoes by the door. December."',difficulty:2,impact:4},
+    {id:'anti_chorus',name:'Anti-Chorus',desc:'The chorus is quieter or more minimal than the verse, subverting expectation',example:'Big noisy verse → chorus is just one whispered line + guitar',difficulty:2,impact:4},
+    {id:'feedback_texture',name:'Noise/Feedback as Emotion',desc:'Note where distortion, feedback, or noise-texture should enter for emotional emphasis',example:'"[feedback swells]" before the final chorus — the guitar screams what words can\'t',difficulty:1,impact:3}
+  ],
+  edm:[
+    {id:'vocal_chop',name:'Vocal Chop Hook',desc:'Write a vocal line designed to be chopped, pitched, and looped as the main hook',example:'"Take me there" → chopped to "ta-ta-take-me-me-there-there" rhythmic loop',difficulty:2,impact:5},
+    {id:'build_drop',name:'Build-Drop Tension Architecture',desc:'Lyrics and energy escalate for 8 bars → silence gap → bass drop with minimal words',example:'Pre-drop: rising energy, shorter phrases → 1 beat silence → DROP: single word "NOW"',difficulty:1,impact:5},
+    {id:'filter_sweep',name:'Filter Sweep Lyrics',desc:'Write lyrics that thin out (fewer words, higher pitch) as a filter sweep rises',example:'Full verse → 4 words → 2 words → 1 word → silence → drop',difficulty:1,impact:3},
+    {id:'one_word_hook',name:'One-Word Mantra Hook',desc:'The chorus is built around a single repeated word that becomes rhythmic texture',example:'"Higher-higher-higher-higher" synced to the kick pattern',difficulty:1,impact:4},
+    {id:'breakdown_spoken',name:'Breakdown Spoken Word',desc:'Mid-song breakdown features intimate spoken/whispered lines over minimal production',example:'After 2nd drop: "(whispered) Close your eyes... breathe... let go..."',difficulty:1,impact:3}
+  ],
+  jazz:[
+    {id:'scat_section',name:'Scat Syllable Section',desc:'Write a section using non-lexical vocables for jazz improvisation feel',example:'"Doo-bah-dee-dah, shoo-bee-doo-wah" — syllables chosen for rhythmic swing',difficulty:2,impact:4},
+    {id:'chromatic_wordplay',name:'Chromatic Wordplay',desc:'Lyrics that mirror chromatic movement — each line shifts emotional "key" by a half-step',example:'Line 1: hopeful → Line 2: slightly doubtful → Line 3: wistful → Line 4: resigned — graduated shifts',difficulty:3,impact:4},
+    {id:'swing_phrasing',name:'Swing Phrasing / Behind-the-Beat',desc:'Write lyrics with long-short syllable pairs that create a swung rhythmic feel',example:'"DAAAH-dit, DAAAH-dit" — the stressed syllable lingers, the unstressed is clipped',difficulty:2,impact:3},
+    {id:'head_arrangement',name:'Head Arrangement Return',desc:'The opening melody/lyric returns at the end with subtle variation — jazz "head" form',example:'First verse melody returns as outro with one changed word that reframes everything',difficulty:2,impact:4},
+    {id:'improv_space',name:'Improvisation Space Notation',desc:'Explicitly mark sections where a musician should improvise freely',example:'"[8 bars — piano solo over Cm7-F7-Bbmaj7-Ebmaj7 changes]"',difficulty:1,impact:3}
+  ],
+  blues:[
+    {id:'aab_form',name:'AAB Lyric Form',desc:'Classic blues: first line stated, repeated with variation, third line resolves/punchlines',example:'"Woke up this morning, found my baby gone (A) / Woke up this morning, baby packed and gone (A) / Now I\'m sitting here wondering what I did wrong (B)"',difficulty:1,impact:5},
+    {id:'turnaround',name:'Turnaround Lyrics',desc:'Last 2 bars of each verse set up the return to the beginning — lyrical turnaround',example:'The final line creates a question or tension that demands another verse',difficulty:2,impact:4},
+    {id:'call_response_gtr',name:'Voice-Guitar Call & Response',desc:'Vocal phrase followed by guitar "answering" — build this into lyric spacing',example:'"I\'ve been down so long... [guitar responds]... down looks like up to me [guitar responds]"',difficulty:1,impact:4},
+    {id:'double_meaning',name:'Blues Double Meaning',desc:'Every key phrase works as both literal statement and metaphor (often suggestive)',example:'"My back door man" = literal person at back door + romantic rival',difficulty:2,impact:4},
+    {id:'moan_notation',name:'Vocal Moan/Growl Notation',desc:'Mark where raw vocal texture (moans, growls, hums) replaces clean singing',example:'"Mmm-mmm-mmm... [spoken] Lord have mercy... [growl into:] SHE LEFT ME COLD"',difficulty:1,impact:3}
+  ],
+  reggae:[
+    {id:'one_drop',name:'One-Drop Lyric Rhythm',desc:'Lyrics emphasize beats 2 and 4 (the offbeat) — words land on the "and" not the "one"',example:'Syllable stress: "and-ONE-and-TWO" becomes "and-one-AND-two-AND" — skank rhythm in words',difficulty:2,impact:4},
+    {id:'chant_down',name:'Chant-Down Hook',desc:'Chorus built as a communal chant — simple enough for crowds to sing back',example:'"One love, one heart / Let\'s get together and feel all right" — crowd-ready',difficulty:1,impact:5},
+    {id:'dub_space',name:'Dub Space Notation',desc:'Mark sections where vocals drop out for dub echo/delay processing',example:'"Freedom... [dub: free-free-freedom echoes into space]... is all we need"',difficulty:1,impact:3},
+    {id:'patois_flavor',name:'Patois/Creole Phrasing',desc:'Integrate natural Jamaican English phrasing for authentic rhythmic flow',example:'"Mi nah go" vs "I won\'t go" — the Patois version has better rhythmic bounce',difficulty:2,impact:4},
+    {id:'conscious_message',name:'Conscious Message Threading',desc:'Weave social commentary through personal narrative without preaching',example:'Personal story about walking to school becomes commentary on systemic inequality',difficulty:2,impact:5}
+  ],
+  latin:[
+    {id:'clave_sync',name:'Clave-Synced Lyrics',desc:'Syllable stress patterns align with the 3-2 or 2-3 clave rhythm',example:'3-2 clave: "da-da-DA / da-DA" — lyrics stress on the same beats as the clave pattern',difficulty:3,impact:5},
+    {id:'montuno_chant',name:'Montuno Vocal Chant',desc:'Repeated call-and-response pattern over the montuno piano figure',example:'Lead: "Azucar!" → Coro: "Dale!" → repeating with variations for 8+ bars',difficulty:1,impact:4},
+    {id:'bilingual_hook',name:'Bilingual Code-Switch Hook',desc:'Chorus alternates between Spanish and English (or other languages) seamlessly',example:'"Baila conmigo / dance with me tonight / no me dejes / hold me tight"',difficulty:2,impact:5},
+    {id:'pregon',name:'Pregón (Street Cry) Hook',desc:'Hook modeled on the traditional market call — urgent, rhythmic, attention-grabbing',example:'Short, punchy phrases that sound like they\'re calling out across a plaza',difficulty:1,impact:3},
+    {id:'sabor_adlibs',name:'Sabor Ad-libs',desc:'Genre-specific vocal exclamations woven into verses and transitions',example:'"¡Wepa!" "¡Dale!" "¡Azúcar!" "Eso es" — placed at energy peaks',difficulty:1,impact:3}
+  ],
+  punk:[
+    {id:'shout_along',name:'Shout-Along Chorus',desc:'Chorus designed to be screamed by an audience — short, rhythmic, aggressive',example:'"HEY! HO! LET\'S GO!" — maximum 6 words, maximum impact',difficulty:1,impact:5},
+    {id:'speed_verse',name:'Rapid-Fire Verse Delivery',desc:'Pack maximum syllables into minimum time — breathless urgency',example:'16 syllables per line at 180 BPM — the words tumble over each other',difficulty:2,impact:4},
+    {id:'anti_melody',name:'Anti-Melody / Spoken Scream',desc:'Verse delivered more as rhythmic speech/shouting than traditional singing',example:'The "melody" is really just pitch variation in aggressive speech',difficulty:1,impact:3},
+    {id:'political_slogan',name:'Political Slogan Hook',desc:'Chorus functions as a protest chant — fist-in-the-air singalong',example:'"NO FUTURE!" "ANARCHY!" — the hook IS the manifesto',difficulty:1,impact:4},
+    {id:'breakdown_gang',name:'Gang Vocal Breakdown',desc:'Bridge section where multiple voices pile in for group-shout effect',example:'"[ALL:] WE WON\'T BACK DOWN / [ALL:] WE WON\'T SHUT UP"',difficulty:1,impact:4}
+  ],
+  kpop:[
+    {id:'code_switch',name:'Multilingual Code-Switching',desc:'Seamlessly alternate Korean, English, and occasionally Japanese within sections',example:'"Nae mameul humchyeo / you stole my heart / 돌아와 baby"',difficulty:2,impact:5},
+    {id:'rap_sing_alt',name:'Rap-Sing Alternation',desc:'Verse delivered as rap → pre-chorus transitions to melodic → chorus is full melody',example:'Member A raps V1 → Member B sings pre-chorus → all sing chorus',difficulty:2,impact:4},
+    {id:'chant_hook',name:'Chant / Fanchant Hook',desc:'Design a hook specifically for fans to chant back at concerts',example:'"LALALA" or name-based chants built into the post-chorus',difficulty:1,impact:4},
+    {id:'concept_thread',name:'Concept Universe Threading',desc:'Lyrics reference a shared mythology/storyline across songs',example:'Colors, numbers, or symbols that connect to an overarching narrative universe',difficulty:3,impact:3},
+    {id:'key_change_final',name:'Final Chorus Key Change',desc:'Modulate up a half or whole step for the final chorus — maximum emotional lift',example:'Song in Eb → final chorus lifts to E or F for dramatic payoff',difficulty:1,impact:5}
+  ],
+  reggaeton:[
+    {id:'dembow_flow',name:'Dembow Flow Pattern',desc:'Lyrics lock into the boom-ch-boom-chick dembow riddim — syllables on the offbeats',example:'Syllable placement mirrors the tresillo: "ba-DA-ba-ba-DA-ba" pattern',difficulty:2,impact:5},
+    {id:'perreo_hook',name:'Perreo Dance Hook',desc:'Hook designed to trigger physical movement — short, rhythmic, body-oriented',example:'"Mueve-mueve-mueve" or "Dale-dale-dale" — the hook IS the dance command',difficulty:1,impact:4},
+    {id:'melodic_flow',name:'Melodic Rap-Sing Flow',desc:'Delivery sits between rapping and singing — the signature reggaeton vocal tone',example:'Not quite spoken, not quite sung — a melodic chant on 3-4 notes',difficulty:2,impact:4},
+    {id:'bilingual_verse',name:'Spanglish Verse Construction',desc:'Natural mix of Spanish and English within single lines',example:'"Tonight we gonna party, mami ven pa\' acá / no pares, don\'t stop, dale más"',difficulty:2,impact:4},
+    {id:'ad_lib_energy',name:'Hype Ad-lib Layer',desc:'Constant background ad-libs that maintain energy and fill rhythmic gaps',example:'"(¡Dale!) (Fuego!) (Eh-eh!) (Yeh-yeh!)" scattered throughout',difficulty:1,impact:3}
+  ],
+  neosoul:[
+    {id:'spoken_interlude',name:'Spoken Word Interlude',desc:'A section of pure spoken poetry over minimal musical bed',example:'"[spoken over Rhodes] And I realized... love isn\'t a destination. It\'s the 3 AM conversation..."',difficulty:2,impact:4},
+    {id:'jazz_scat_meld',name:'Jazz-Influenced Scatting',desc:'Blend scat syllables with real words — the line between melody and meaning blurs',example:'"Doo-dee-dah and I... shoo-bee falling for... mmm-hmm... you again"',difficulty:2,impact:3},
+    {id:'poetry_melody',name:'Poetry-to-Melody Transition',desc:'Verse starts as rhythmic poetry, gradually develops into sung melody',example:'Line 1: spoken → Line 2: half-sung → Line 3: full melody → Line 4: melismatic',difficulty:2,impact:5},
+    {id:'erykah_specificity',name:'Hyper-Specific Imagery',desc:'Ultra-detailed sensory images: exact brands, times, temperatures, street names',example:'"Tuesday, 3:47 AM, shea butter on my wrists, Coltrane on the turntable, rain on Lenox Ave"',difficulty:2,impact:5},
+    {id:'groove_space',name:'Rhythmic Space / Rest as Lyric',desc:'Leave deliberate gaps in vocal delivery — silence is part of the composition',example:'"I loved you... [2 beats]... more than... [2 beats]... I loved myself"',difficulty:1,impact:4}
+  ],
+  gospel:[
+    {id:'call_response',name:'Call-and-Response Structure',desc:'Lead singer calls, congregation/choir responds — write both parts',example:'Lead: "Won\'t He do it!" → Choir: "(Yes He will!)" → Lead: "Say it again!" → Choir: "(YES HE WILL!)"',difficulty:1,impact:5},
+    {id:'testimony_arc',name:'Testimony Arc',desc:'Personal story of struggle → divine intervention → transformation',example:'V1: "I was lost in darkness" → V2: "Then a hand reached down" → Chorus: "Now I see the light"',difficulty:2,impact:5},
+    {id:'praise_break',name:'Praise Break Section',desc:'Section where structured song gives way to spontaneous-feeling worship',example:'"[Praise Break — ad-lib freely] Thank you! / Glory! / Hallelujah! / Won\'t stop praising!"',difficulty:1,impact:5},
+    {id:'vamp_escalation',name:'Vamp / Tag Escalation',desc:'Repeated phrase that builds in intensity with each pass — the climax engine',example:'Pass 1: "He\'s worthy" → Pass 3: "HE\'S WORTHY!" → Pass 5: "[Full band + choir] HE\'S WORTHY!"',difficulty:1,impact:5},
+    {id:'scripture_weave',name:'Scripture Reference Weaving',desc:'Biblical phrases or references woven naturally into modern language',example:'"Valley of shadows? I walk through. Staff and rod? He\'s got those too."',difficulty:2,impact:3}
+  ],
+  brazilian:[
+    {id:'bossa_rhythm',name:'Bossa Nova Rhythmic Phrasing',desc:'Lyrics follow the syncopated bossa pattern — words arrive "behind" the beat',example:'Syllables float lazily across bar lines — never landing squarely on beat 1',difficulty:2,impact:4},
+    {id:'saudade_emotion',name:'Saudade Emotional Layering',desc:'Express longing for something you loved and lost — the untranslatable Brazilian emotion',example:'Not sadness, not nostalgia — the bittersweet joy of remembering what\'s gone',difficulty:2,impact:5},
+    {id:'nature_metaphor',name:'Natural World Metaphor System',desc:'Ocean, rain, sun, wind as stand-ins for emotional states',example:'"The wave that kissed the sand and pulled away — that\'s how you loved me"',difficulty:1,impact:4},
+    {id:'baiao_drive',name:'Baião Rhythmic Drive',desc:'Driving northeastern rhythm — lyrics with hard consonants on strong beats',example:'Percussive syllables: "TUM-ta-ta-TUM-ta" matching the zabumba pattern',difficulty:2,impact:3},
+    {id:'portuguese_melody',name:'Portuguese Vowel Melody',desc:'Use the natural musicality of Portuguese open vowels for melodic flow',example:'Words chosen for their vowel sounds: "saudade", "coração", "manhã" — they sing themselves',difficulty:2,impact:4}
+  ],
+  amapiano:[
+    {id:'log_drum_vocal',name:'Log Drum Vocal Sync',desc:'Vocal rhythm mirrors the log drum pattern — the two become one',example:'Voice hits exactly where the log drum hits: "ba-DUM... ba-ba-DUM"',difficulty:2,impact:5},
+    {id:'shaker_flow',name:'Shaker-Riding Flow',desc:'Lyrics ride on top of the shaker/hi-hat pattern, filling gaps between bass hits',example:'Light syllables on the shaker pattern, heavy syllables on the kick',difficulty:2,impact:4},
+    {id:'zulu_english',name:'Zulu-English Code Switch',desc:'Natural mixing of isiZulu (or other SA languages) with English',example:'"Ngiyak\'thanda baby / I need you tonight / umlilo in my heart"',difficulty:2,impact:4},
+    {id:'piano_stab_hook',name:'Piano Stab Vocal Hook',desc:'The vocal hook mirrors the piano stab pattern rhythmically',example:'Each word of the hook lands on a piano chord stab — locked together',difficulty:1,impact:4},
+    {id:'township_narrative',name:'Township Lifestyle Narrative',desc:'Stories from South African township life — specific, celebratory, authentic',example:'Weekend vibes, taxi rank, shisa nyama, groove culture specifics',difficulty:2,impact:3}
+  ],
+  dancehall:[
+    {id:'riddim_lock',name:'Riddim-Locked Delivery',desc:'Entire vocal delivery locked to the riddim pattern — the beat dictates the flow',example:'Every syllable falls exactly where the riddim expects it — no freestyle',difficulty:2,impact:5},
+    {id:'gun_finger_hook',name:'Gun Finger / Rewind Hook',desc:'Hook designed to make the selector pull it back — instant replay energy',example:'"Pull up! / Wheel and come again!" — the hook demands a rewind',difficulty:1,impact:5},
+    {id:'toast_style',name:'Toasting Delivery',desc:'Rhythmic chanting/speaking over the riddim — the OG rap style',example:'Not singing, not rapping — a rhythmic toast that rides the groove',difficulty:2,impact:4},
+    {id:'patois_authentic',name:'Authentic Patois Writing',desc:'Write in genuine Jamaican Creole rhythms and vocabulary',example:'"Mi deh yah / inna di dance / gyal dem a wine / gimme a chance"',difficulty:2,impact:4},
+    {id:'sound_clash',name:'Sound Clash Energy',desc:'Competitive energy — lyrics aimed at dominating the soundsystem space',example:'Boasting, challenges, crowd commands: "All sound bow down!"',difficulty:1,impact:3}
+  ],
+  bollywood:[
+    {id:'antara_mukhda',name:'Mukhda-Antara Form',desc:'Mukhda (refrain) + Antara (verse) — the classic Bollywood song structure',example:'Mukhda = catchy chorus repeated → Antara = storytelling verses between',difficulty:1,impact:4},
+    {id:'filmi_emotion',name:'Filmi Emotional Maximalism',desc:'Big emotions, no restraint — love is cosmic, loss is apocalyptic',example:'"Without you the stars refuse to shine, the ocean forgets its waves"',difficulty:1,impact:4},
+    {id:'classical_ornament',name:'Classical Vocal Ornamentation',desc:'Mark where Hindustani classical techniques apply: meend, gamak, taan',example:'"[meend] Aaaa~ah" — a slow glide between notes, Hindustani style',difficulty:3,impact:4},
+    {id:'duet_playfulness',name:'Duet Call-and-Playful-Response',desc:'Male/female vocals play off each other with teasing, flirting, challenging',example:'He: "Main deewana..." She: "Toh main kya karoon?" — playful push-pull',difficulty:1,impact:4},
+    {id:'interlude_dance',name:'Dance Break Interlude',desc:'Instrumental section designed for choreography — rhythm changes drive movement',example:'"[Dance Break — tabla + dhol, 16 bars, high energy for choreography]"',difficulty:1,impact:3}
+  ],
+  arabesque:[
+    {id:'maqam_emotion',name:'Maqam-Based Emotional Mapping',desc:'Choose lyrics that match the emotional color of the maqam (Arabic scale)',example:'Maqam Hijaz = longing/exotic → lyrics about separation and desire',difficulty:3,impact:5},
+    {id:'tarab_build',name:'Tarab Ecstatic Build',desc:'Gradually escalate emotional intensity until the audience reaches ecstatic state (tarab)',example:'Each verse more emotionally charged → bridge is pure cathartic release',difficulty:2,impact:5},
+    {id:'taqasim_space',name:'Taqasim Vocal Space',desc:'Leave room for non-metered vocal improvisation between structured sections',example:'"[Taqasim — free vocal improvisation over drone, 8 bars]"',difficulty:2,impact:4},
+    {id:'qafiya_rhyme',name:'Qafiya End-Rhyme Scheme',desc:'Strict monorhyme — all couplets end with the same rhyme sound (Arabic poetry tradition)',example:'Every line ends with "-eel": "jameel, daleel, saheel, kaleel"',difficulty:2,impact:3},
+    {id:'ya_habibi',name:'Emotional Exclamation Anchors',desc:'Strategic placement of emotional exclamations that punctuate the narrative',example:'"Ya habibi!" "Ya leil!" "Ah!" — these aren\'t filler, they\'re emotional peaks',difficulty:1,impact:3}
+  ],
+  mandopop:[
+    {id:'pentatonic_melody',name:'Pentatonic Melodic Writing',desc:'Melody stays within pentatonic scale for that distinctly Chinese melodic feel',example:'5 notes only: do-re-mi-sol-la — the gaps ARE the beauty',difficulty:2,impact:4},
+    {id:'poetic_imagery',name:'Classical Chinese Poetic Imagery',desc:'Reference natural imagery from Chinese literary tradition: moon, plum blossom, autumn, river',example:'"The autumn moon on West Lake reflects what my heart cannot say"',difficulty:2,impact:4},
+    {id:'rap_bridge_insert',name:'Rap Bridge Insert',desc:'A spoken/rapped section (often in a different language) inserted mid-ballad',example:'Beautiful ballad → sudden 8-bar rap in English or Mandarin → back to melody',difficulty:2,impact:4},
+    {id:'octave_leap',name:'Chorus Octave Leap',desc:'Chorus opens with a dramatic octave jump for maximum emotional impact',example:'Verse sits in mid-range → Chorus first word LEAPS up an octave',difficulty:2,impact:5},
+    {id:'wordplay_tonal',name:'Tonal Wordplay',desc:'Use Mandarin tonal similarities for double meanings (different characters, same pinyin)',example:'Words that sound the same but mean different things create lyrical layers',difficulty:3,impact:3}
+  ],
+  children:[
+    {id:'singback',name:'Singback Simplicity',desc:'Chorus uses max 8 words that a 5-year-old can repeat after hearing twice',example:'"Twinkle twinkle little star" — 4 unique words, instant memorization',difficulty:1,impact:5},
+    {id:'body_motion',name:'Built-In Body Motion',desc:'Lyrics trigger physical actions: clap, stomp, jump, spin, wave',example:'"Clap your hands (CLAP CLAP) / stomp your feet (STOMP STOMP)"',difficulty:1,impact:5},
+    {id:'animal_sounds',name:'Onomatopoeia / Animal Sounds',desc:'Sound effects and animal noises as integral parts of the melody',example:'"The cow goes MOO, the duck goes QUACK" — sounds ARE the hook',difficulty:1,impact:4},
+    {id:'counting_pattern',name:'Counting / Alphabet Pattern',desc:'Structure built around counting up/down or alphabet progression',example:'"1 little, 2 little, 3 little..." — the pattern IS the structure',difficulty:1,impact:4},
+    {id:'wonder_question',name:'Wonder Question Hook',desc:'Hook is a question that sparks imagination and curiosity',example:'"Why is the sky so blue? / Why do the stars shine too?" — wonder as engine',difficulty:1,impact:4}
+  ],
+  parody:[
+    {id:'lyric_swap',name:'Surgical Lyric Substitution',desc:'Keep exact melody/rhythm of original, swap words for comedic contrast',example:'Same syllable count, same stress pattern — but about filing taxes instead of heartbreak',difficulty:2,impact:5},
+    {id:'rule_of_threes',name:'Rule of Threes Comedy',desc:'Set up a pattern with 2 expected items, then subvert with the 3rd',example:'"Love, laughter, and... aggressive tax fraud" — the 3rd item breaks the pattern',difficulty:1,impact:5},
+    {id:'callback',name:'Callback Payoff',desc:'Introduce a specific absurd detail in verse 1, reference it for a bigger laugh later',example:'V1 mentions "the incident with the flamingo" → Bridge: "THE FLAMINGO IS BACK"',difficulty:2,impact:5},
+    {id:'deadpan_commit',name:'Deadpan Commitment',desc:'Deliver the most absurd lyrics with 100% emotional sincerity',example:'Belt a passionate ballad about losing your car keys — zero irony in delivery',difficulty:1,impact:4},
+    {id:'escalation_absurd',name:'Escalating Absurdity',desc:'Each verse more ridiculous than the last, but internal logic holds',example:'V1: lost my keys → V2: lost my car → V3: lost my entire zip code',difficulty:2,impact:5}
+  ],
+  comedy:[
+    {id:'punchline_architecture',name:'Punchline Architecture',desc:'Build entire verse as setup for a single devastating punchline in the last line',example:'3 lines of scenario building → Line 4 recontextualizes everything for the laugh',difficulty:2,impact:5},
+    {id:'specificity_engine',name:'Specificity Comedy Engine',desc:'Concrete details (brand names, numbers, proper nouns) are always funnier than vague references',example:'"seventeen Diet Cokes" is funnier than "lots of soda"',difficulty:1,impact:4},
+    {id:'genre_straight_man',name:'Genre as Straight Man',desc:'The music plays 100% sincerely — all comedy is lyrical',example:'Full R&B production, emotional vocal delivery — about a sandwich',difficulty:1,impact:5},
+    {id:'subverted_cliche',name:'Subverted Cliché',desc:'Take a familiar phrase and twist its meaning mid-line',example:'"I would walk 500 miles... but I just bought new shoes and they\'re really nice"',difficulty:1,impact:4},
+    {id:'act_structure',name:'Three-Act Joke Arc',desc:'V1=premise, V2=escalation, Bridge=darkest/most unhinged, Final Chorus=full payoff',example:'The song IS a long-form joke with setup, development, and punchline',difficulty:2,impact:5}
+  ],
+  tvmusical:[
+    {id:'i_want_song',name:'"I Want" Song Structure',desc:'Character sings about what they desperately want — establishes motivation and stakes',example:'"I want adventure in the great wide somewhere" — the character\'s engine',difficulty:1,impact:5},
+    {id:'belt_climax',name:'Belt Climax Payoff',desc:'Entire song builds toward one massive high-note moment near the end',example:'Quiet verse → building → building → MASSIVE BELT on the key phrase',difficulty:2,impact:5},
+    {id:'character_voice',name:'Character-Specific Voice',desc:'Lyrics could ONLY come from this specific character — vocabulary, worldview, speech patterns',example:'A scientist character uses metaphors from chemistry; a baker uses baking imagery',difficulty:2,impact:4},
+    {id:'reprise_transform',name:'Reprise / Transform',desc:'Same melody returns later with changed lyrics showing character growth',example:'Act 1: "I don\'t need anyone" → Act 2 reprise: "I need... everyone"',difficulty:2,impact:5},
+    {id:'ensemble_build',name:'Ensemble Build / Counterpoint',desc:'Multiple character voices layering on top of each other toward finale',example:'3 characters singing different melodies/lyrics simultaneously → unified final line',difficulty:3,impact:5}
+  ],
+  rock:[
+    {id:'power_chord_riff',name:'Power Chord Riff Hook',desc:'The main hook is an instrumental riff, not a vocal melody — the guitar IS the hook',example:'Think "Smoke on the Water" — da-da-DAAH, da-da-da-DAAH. The riff IS the song.',difficulty:1,impact:5},
+    {id:'guitar_solo',name:'Guitar Solo as Emotional Peak',desc:'The solo section carries the emotional climax — wordless expression where lyrics can\'t go',example:'"[Guitar Solo — 8 bars, starts restrained, builds to wailing climax]"',difficulty:1,impact:4},
+    {id:'anthem_chorus',name:'Arena Anthem Chorus',desc:'Chorus designed for 50,000 people to sing together — simple, powerful, unified',example:'"WE WILL ROCK YOU" — stomp-stomp-clap rhythm that a stadium can follow',difficulty:1,impact:5},
+    {id:'tension_release',name:'Tension-Release Riff Cycle',desc:'Verse builds tension rhythmically, chorus releases it with open chords and power',example:'Verse: tight, choppy riff → Chorus: sustained power chords that breathe',difficulty:2,impact:4},
+    {id:'vocal_grit',name:'Vocal Grit / Rasp Notation',desc:'Mark where the vocal delivery adds deliberate grit, rasp, or scream texture',example:'"[rasp] I won\'t go quietly... [scream into:] I WON\'T GO AT ALL!"',difficulty:1,impact:3}
+  ],
+  folk:[
+    {id:'storytelling_arc',name:'Narrative Storytelling Arc',desc:'The song tells a complete story with characters, setting, conflict, and resolution',example:'V1: introduce character and world → V2: conflict → V3: resolution or open question',difficulty:2,impact:5},
+    {id:'fingerpick_vocal',name:'Fingerpicking Vocal Sync',desc:'Vocal rhythm matches the fingerpicking pattern — voice and guitar breathe together',example:'Each vocal phrase sits between guitar arpeggios — they take turns',difficulty:2,impact:4},
+    {id:'imagery_landscape',name:'Landscape as Emotion',desc:'Use specific natural imagery (rivers, mountains, seasons) as emotional metaphors',example:'"The river froze in January — so did everything between us"',difficulty:1,impact:5},
+    {id:'refrain_evolution',name:'Evolving Refrain',desc:'The same refrain line means something different each time it appears',example:'"I\'ll be home soon" — hopeful in V1, desperate in V2, resigned in V3',difficulty:2,impact:5},
+    {id:'spoken_verse',name:'Spoken/Whispered Verse',desc:'One verse delivered as intimate spoken word over minimal accompaniment',example:'V3: [spoken, almost whispered] "And the truth is... I never really left that porch"',difficulty:1,impact:3}
+  ],
+  metal:[
+    {id:'blast_beat_vocal',name:'Blast Beat Vocal Rhythm',desc:'Vocal delivery matches the relentless blast beat pattern — syllables like machine gun fire',example:'16th-note syllable density: "DE-CI-MA-TION-OF-THE-WEAK-AND-BOUND"',difficulty:3,impact:4},
+    {id:'growl_clean',name:'Growl-to-Clean Dynamic',desc:'Alternate between guttural growls/screams and clean melodic singing',example:'Verse: [growl] "FROM THE ASHES" → Chorus: [clean] "we rise again..."',difficulty:2,impact:5},
+    {id:'breakdown_section',name:'Breakdown / Mosh Section',desc:'Half-tempo section designed to trigger pit movement — heavy, rhythmic, devastating',example:'"[Breakdown — half-time, open note chugs] BLEGH! / NO MERCY / NO SURRENDER"',difficulty:1,impact:5},
+    {id:'prog_time_shift',name:'Time Signature Shift',desc:'Change time signature mid-song for disorienting progressive feel',example:'Verse in 4/4 → Bridge shifts to 7/8 → Chorus returns to 4/4 with more power',difficulty:3,impact:4},
+    {id:'harmonic_minor',name:'Harmonic Minor Darkness',desc:'Use harmonic minor scale intervals in vocal melody for that distinctly "metal" darkness',example:'The raised 7th creates an exotic, sinister melodic flavor — dark but beautiful',difficulty:2,impact:4}
+  ],
+  ss:[
+    {id:'confession_voice',name:'Confessional First-Person Voice',desc:'Write as if telling a close friend your deepest truth at 2 AM — raw, unfiltered, intimate',example:'"I\'m going to tell you something I haven\'t told anyone..."',difficulty:1,impact:5},
+    {id:'detail_anchoring',name:'Specific Detail Anchoring',desc:'Ground emotional abstraction in one hyper-specific physical detail per verse',example:'"The chipped blue mug she left on the counter" — one detail carries all the grief',difficulty:1,impact:5},
+    {id:'bridge_revelation',name:'Bridge Revelation / Twist',desc:'The bridge reveals a truth that reframes every previous lyric',example:'V1-V2: seems like a love song → Bridge: "You died in April" — everything shifts',difficulty:2,impact:5},
+    {id:'piano_breath',name:'Piano/Guitar Breathing Room',desc:'Write lyrics with natural pauses where the instrument can breathe and respond',example:'"I loved you... [piano fill]... the way old houses love their ghosts"',difficulty:1,impact:4},
+    {id:'metaphor_thread',name:'Extended Metaphor Thread',desc:'One central metaphor sustained across the entire song, deepening with each verse',example:'V1: "We\'re a house" → V2: "The foundation cracked" → Bridge: "I\'m standing in the rubble"',difficulty:2,impact:5}
+  ],
+  afrobeats:[
+    {id:'afrobeats_bounce',name:'Afrobeats Bounce Pattern',desc:'Lyrics ride the infectious 3-3-2 rhythmic pattern — syllables bounce, never land flat',example:'"da-da-DA, da-da-DA, da-DA" — the Afrobeats groove is in the syllable placement',difficulty:2,impact:5},
+    {id:'pidgin_english',name:'Pidgin English Flow',desc:'Mix Standard English with Nigerian Pidgin for authentic rhythmic flavor',example:'"I dey for you / baby no wahala / we go make am / na we get the vibe"',difficulty:2,impact:4},
+    {id:'highlife_melody',name:'Highlife Melodic Reference',desc:'Reference highlife guitar-style melody lines in the vocal — sweet, circular, singable',example:'Vocal melody follows a pattern similar to highlife guitar lead lines — bright and cyclical',difficulty:2,impact:4},
+    {id:'call_crowd',name:'Call-and-Crowd Response',desc:'Design hook for audience participation — call out, crowd sings back',example:'"When I say JOOR / you say OH! / JOOR! (OH!) / JOOR! (OH!)"',difficulty:1,impact:5},
+    {id:'dance_command',name:'Dance Command Integration',desc:'Weave dance instructions naturally into lyrics — the song teaches its own dance',example:'"Bend your waist / move to the left / shake your body / give them more"',difficulty:1,impact:4}
+  ]
 };
 
 const GENRE_BIBLE={
@@ -7749,7 +8001,7 @@ ${fd?.name?'Fusion style: '+fd.name:'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}
+Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -8135,7 +8387,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -8408,7 +8660,7 @@ function parseSongResult(raw,genre,topic,prodData){
     if (!S.currentVersions) S.currentVersions = [];
     pushVersion('res');
   }
-  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,fxChain,pluginToolkit,mixBlueprint,masteringTarget,visualPrompt,videoPrompt,genre,topic,ts};
+  S.currentSong={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),title,verdict,lyrics,style:songPrompt,brief:briefRaw,structure,dopamine,chords,theoryAnalysis,notes,countermelody,fxChain,pluginToolkit,mixBlueprint,masteringTarget,visualPrompt,videoPrompt,genre,topic,ts,techniques_used:S.selectedTechniques.map(t=>t.id)};
   // Track opening lines for pattern avoidance — keep last 3
   if (lyrics) {
     const verse1Match = lyrics.match(/\[Verse\s*1?\]([\s\S]*?)(?=\[|$)/i);
@@ -9598,6 +9850,160 @@ function unlockAnalyzer(){
   const ab=document.getElementById('a-btn');if(ab)ab.disabled=false;
   btnDone('a-btn');
 }
+
+// ═══════════════════════════════════════════════════════
+// TECHNIQUE TOOLKIT — select genre-specific craft devices
+// ═══════════════════════════════════════════════════════
+S.selectedTechniques=JSON.parse(localStorage.getItem('soniq_techs')||'[]');
+
+function showTechniquePanel(genre){
+  const panel=document.getElementById('a-techniques');
+  const grid=document.getElementById('a-tech-grid');
+  const crossPanel=document.getElementById('a-tech-cross');
+  const crossGrid=document.getElementById('a-tech-cross-grid');
+  if(!panel||!grid)return;
+  // Normalize genre key
+  const gKey=genre.toLowerCase().replace(/[^a-z]/g,'').replace('hiphop','hiphop').replace('rb','rnb').replace('soul','rnb');
+  const techniques=GENRE_TECHNIQUES[gKey]||GENRE_TECHNIQUES.pop||[];
+  if(!techniques.length){panel.style.display='none';return;}
+  // Render primary genre techniques
+  grid.innerHTML=techniques.map(t=>renderTechChip(t,gKey,false)).join('');
+  // Cross-genre suggestions — pick 3-5 high-impact techniques from other genres
+  const crossTechs=getCrossGenreTechniques(gKey);
+  if(crossTechs.length){
+    crossPanel.style.display='block';
+    crossGrid.innerHTML=crossTechs.map(ct=>renderTechChip(ct.tech,ct.fromGenre,true)).join('');
+  }else{crossPanel.style.display='none';}
+  panel.style.display='block';
+  // Restore selections
+  restoreTechSelections();
+}
+
+function renderTechChip(t,genreKey,isCross){
+  const diffLabels=['','Easy','Medium','Advanced'];
+  const impactBars='★'.repeat(t.impact)+'☆'.repeat(5-t.impact);
+  const crossClass=isCross?'cross-genre':'';
+  const fromLabel=isCross?`<span class="tech-badge" style="background:rgba(139,92,246,0.15);color:var(--violet)">from ${genreKey}</span>`:'';
+  return `<div class="tech-chip ${crossClass}" data-tech-id="${t.id}" data-genre="${genreKey}" onclick="toggleTechnique(this,'${t.id}','${genreKey}')">
+    <div class="tech-check"></div>
+    <div class="tech-body">
+      <div class="tech-name">${escHtml(t.name)}</div>
+      <div class="tech-desc">${escHtml(t.desc)}</div>
+      <div class="tech-example">"${escHtml(t.example)}"</div>
+      <div class="tech-meta">
+        <span class="tech-badge diff-${t.difficulty}">${diffLabels[t.difficulty]}</span>
+        <span class="tech-badge impact">${impactBars}</span>
+        ${fromLabel}
+      </div>
+    </div>
+  </div>`;
+}
+
+function getCrossGenreTechniques(currentGenre){
+  const crossMap={
+    hiphop:['rnb','jazz','reggae','latin'],
+    rnb:['hiphop','neosoul','gospel','jazz'],
+    pop:['edm','kpop','latin','hiphop'],
+    country:['blues','folk','gospel','altrock'],
+    altrock:['punk','edm','jazz','blues'],
+    edm:['pop','hiphop','kpop','amapiano'],
+    jazz:['blues','neosoul','brazilian','hiphop'],
+    blues:['jazz','country','gospel','rnb'],
+    reggae:['dancehall','latin','hiphop','amapiano'],
+    latin:['reggaeton','brazilian','pop','hiphop'],
+    punk:['altrock','hiphop','edm','reggae'],
+    kpop:['pop','hiphop','edm','rnb'],
+    reggaeton:['latin','dancehall','hiphop','amapiano'],
+    neosoul:['rnb','jazz','gospel','hiphop'],
+    gospel:['rnb','neosoul','country','blues'],
+    brazilian:['jazz','latin','bossanova','reggae'],
+    amapiano:['dancehall','edm','hiphop','reggaeton'],
+    dancehall:['reggae','reggaeton','hiphop','amapiano'],
+    bollywood:['latin','edm','rnb','arabesque'],
+    arabesque:['bollywood','jazz','latin','neosoul'],
+    mandopop:['kpop','pop','rnb','jazz'],
+    children:['pop','country','edm','comedy'],
+    parody:['comedy','pop','hiphop','country'],
+    comedy:['parody','pop','hiphop','rnb'],
+    tvmusical:['pop','gospel','jazz','altrock'],
+    rock:['altrock','blues','metal','punk'],
+    folk:['country','ss','blues','brazilian'],
+    metal:['rock','punk','altrock','edm'],
+    ss:['folk','rnb','country','neosoul'],
+    afrobeats:['amapiano','dancehall','reggaeton','hiphop']
+  };
+  const related=crossMap[currentGenre]||['pop','hiphop','rnb'];
+  const results=[];
+  related.forEach(rg=>{
+    const techs=GENRE_TECHNIQUES[rg]||[];
+    // Pick the highest-impact technique from each related genre
+    const best=techs.filter(t=>t.impact>=4).sort((a,b)=>b.impact-a.impact)[0];
+    if(best) results.push({tech:best,fromGenre:rg});
+  });
+  return results.slice(0,4);
+}
+
+function toggleTechnique(el,techId,genreKey){
+  el.classList.toggle('selected');
+  const checkEl=el.querySelector('.tech-check');
+  if(el.classList.contains('selected')){
+    checkEl.textContent='✓';
+    if(!S.selectedTechniques.find(t=>t.id===techId)) S.selectedTechniques.push({id:techId,genre:genreKey});
+  }else{
+    checkEl.textContent='';
+    S.selectedTechniques=S.selectedTechniques.filter(t=>t.id!==techId);
+  }
+  try{localStorage.setItem('soniq_techs',JSON.stringify(S.selectedTechniques));}catch(e){}
+}
+
+function selectAllTechniques(){
+  document.querySelectorAll('#a-techniques .tech-chip').forEach(el=>{
+    if(!el.classList.contains('selected')){
+      el.classList.add('selected');
+      el.querySelector('.tech-check').textContent='✓';
+      const id=el.dataset.techId,g=el.dataset.genre;
+      if(!S.selectedTechniques.find(t=>t.id===id)) S.selectedTechniques.push({id,genre:g});
+    }
+  });
+  try{localStorage.setItem('soniq_techs',JSON.stringify(S.selectedTechniques));}catch(e){}
+}
+
+function deselectAllTechniques(){
+  document.querySelectorAll('#a-techniques .tech-chip').forEach(el=>{
+    el.classList.remove('selected');
+    el.querySelector('.tech-check').textContent='';
+  });
+  S.selectedTechniques=[];
+  try{localStorage.setItem('soniq_techs','[]');}catch(e){}
+}
+
+function restoreTechSelections(){
+  document.querySelectorAll('#a-techniques .tech-chip').forEach(el=>{
+    const id=el.dataset.techId;
+    if(S.selectedTechniques.find(t=>t.id===id)){
+      el.classList.add('selected');
+      el.querySelector('.tech-check').textContent='✓';
+    }
+  });
+}
+
+// Build technique injection string for prompts
+function getSelectedTechniquePrompt(){
+  if(!S.selectedTechniques.length) return '';
+  const lines=S.selectedTechniques.map(sel=>{
+    // Find the full technique data
+    const techs=GENRE_TECHNIQUES[sel.genre]||[];
+    const t=techs.find(x=>x.id===sel.id);
+    if(!t) return null;
+    return `- ${t.name}: ${t.desc}. Example: ${t.example}`;
+  }).filter(Boolean);
+  if(!lines.length) return '';
+  return `\n\nACTIVATED CRAFT TECHNIQUES (use these explicitly in the song — they are non-negotiable requirements):
+${lines.join('\n')}
+
+For each technique used, implement it at least once in the song. These are not suggestions — they are requirements from the songwriter.`;
+}
+
 // 🔍 Search Any Song — research via Claude, then run through analyzer
 async function searchSong(){
   const q=document.getElementById('a-search').value.trim();
@@ -9675,8 +10081,9 @@ SONGWRITER TAKEAWAYS:
     const virtualSong={t:songTitle,a:songArtist,yr:songYear,structure:songStructure,key:songGenre+' — searched song',score:'?'};
     S.lastAnalysis={raw,genre:'search',genreLabel:songGenre,song:virtualSong,songList:`"${songTitle}" by ${songArtist} (${songYear}). Structure: ${songStructure}`};
     S.selectedSong=virtualSong;
-    // Show Remake panel
+    // Show Remake panel + Technique Toolkit
     showRemakePanel(virtualSong,songGenre,raw);
+    showTechniquePanel(songGenre);
     // 🧠 Auto-save to Song Library
     learnSong({
       title:songTitle,artist:songArtist,year:songYear,genre:songGenre,
@@ -9710,7 +10117,8 @@ async function runAnalysis(){
     document.getElementById('a-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
     // Store analysis DNA for Remake
     S.lastAnalysis={raw,genre,genreLabel,song:sel,songList};
-    // Show Remake panel only if a single song was selected (multi-song remakes are confusing)
+    // Show Remake panel + Technique Toolkit only if a single song was selected
+    showTechniquePanel(genre);
     if(sel){
       showRemakePanel(sel,genreLabel,raw);
       // 🧠 Auto-save to Song Library
@@ -9773,7 +10181,7 @@ TARGET GENRE: ${targetLabel}
 INSTRUCTIONS:
 1. Keep the structural DNA that made the original work (section flow, tension-release pattern, hook placement)
 2. Apply the user's twist as the new creative direction
-3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}
+3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}
 
 DELIVER EXACTLY:
 
@@ -10110,6 +10518,25 @@ function renderIntelligence(songs,grouped){
       if(genreRemakes)html+=`Remakes created: <strong style="color:var(--cyan)">${genreRemakes}</strong><br>`;
       html+=`</div></div>`;
     });
+  }
+  // Technique usage stats
+  const allTechsUsed=songs.flatMap(s=>(s.techniques_used||[]));
+  if(allTechsUsed.length>0){
+    const techFreq={};
+    allTechsUsed.forEach(tid=>{techFreq[tid]=(techFreq[tid]||0)+1;});
+    const topTechs=Object.entries(techFreq).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    html+=`<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--violet);font-weight:700;margin:8px 0 6px">🎯 Technique Usage</div>`;
+    html+=`<div style="font-size:11px;color:var(--tx3);line-height:1.8">`;
+    topTechs.forEach(([tid,count])=>{
+      // Resolve technique name
+      let techName=tid;
+      for(const gk of Object.keys(GENRE_TECHNIQUES)){
+        const found=(GENRE_TECHNIQUES[gk]||[]).find(t=>t.id===tid);
+        if(found){techName=found.name;break;}
+      }
+      html+=`• <strong style="color:var(--tx1)">${escHtml(techName)}</strong> used ${count}x<br>`;
+    });
+    html+=`</div>`;
   }
   // Smart suggestions based on patterns
   if(totalSongs>=5){
