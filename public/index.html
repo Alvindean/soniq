@@ -3168,12 +3168,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
           <!-- ERA SELECTOR -->
           <label class="topic-label">Era</label>
-          <div class="quality-row" id="era-pills">
-            <span class="qpill" onclick="setEra(this,'classic')" data-era="classic">🎙 Classic <span style="font-size:9px;opacity:.7">pre-1980</span></span>
-            <span class="qpill" onclick="setEra(this,'vintage')" data-era="vintage">📼 Vintage <span style="font-size:9px;opacity:.7">1980–1999</span></span>
-            <span class="qpill on" onclick="setEra(this,'modern')" data-era="modern">💿 Modern <span style="font-size:9px;opacity:.7">2000–2015</span></span>
-            <span class="qpill" onclick="setEra(this,'contemporary')" data-era="contemporary">📱 Contemporary <span style="font-size:9px;opacity:.7">2016–2022</span></span>
-            <span class="qpill" onclick="setEra(this,'current')" data-era="current">🔥 Current <span style="font-size:9px;opacity:.7">2023–Now</span></span>
+          <div class="quality-row" id="era-pills" style="flex-wrap:wrap">
+            <span class="qpill" onclick="setEra(this,'fifties')" data-era="fifties">🎷 50s <span style="font-size:9px;opacity:.7">1950–1959</span></span>
+            <span class="qpill" onclick="setEra(this,'sixties')" data-era="sixties">✌️ 60s <span style="font-size:9px;opacity:.7">1960–1969</span></span>
+            <span class="qpill" onclick="setEra(this,'seventies')" data-era="seventies">🕺 70s <span style="font-size:9px;opacity:.7">1970–1979</span></span>
+            <span class="qpill" onclick="setEra(this,'vintage')" data-era="vintage">📼 80s–90s <span style="font-size:9px;opacity:.7">1980–1999</span></span>
+            <span class="qpill on" onclick="setEra(this,'modern')" data-era="modern">💿 2000s <span style="font-size:9px;opacity:.7">2000–2015</span></span>
+            <span class="qpill" onclick="setEra(this,'contemporary')" data-era="contemporary">📱 2010s <span style="font-size:9px;opacity:.7">2016–2022</span></span>
+            <span class="qpill" onclick="setEra(this,'current')" data-era="current">🔥 Now <span style="font-size:9px;opacity:.7">2023–Now</span></span>
           </div>
           <div id="era-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px"></div>
 
@@ -6166,6 +6168,315 @@ const GENRE_TECHNIQUES={
   ]
 };
 
+// ═══════════════════════════════════════════════════════════════
+// GENRE_PRODUCTION_CUES — Inline Suno metatags for all 30 genres
+// Parentheses () = vocal delivery cues INSIDE lyric lines
+// Bracket modifiers [] = section-level production direction
+// Each genre has 8 cues with suno_power effectiveness ratings
+// ═══════════════════════════════════════════════════════════════
+const GENRE_PRODUCTION_CUES={
+  hiphop:[
+    {id:'ad_lib_yeah',cue:'(yeah)',type:'adlib',placement:'verse',desc:'Classic hiphop affirmation ad-lib for momentum',suno_power:5},
+    {id:'flow_marker_breath',cue:'(breath)',type:'vocal',placement:'verse',desc:'Marks breath points to shape rap flow phrasing',suno_power:4},
+    {id:'delivery_spoken',cue:'(spoken word)',type:'vocal',placement:'verse',desc:'Shifts to spoken delivery over beat',suno_power:4},
+    {id:'energy_build',cue:'(building intensity)',type:'energy',placement:'chorus',desc:'Escalates delivery energy toward chorus peak',suno_power:4},
+    {id:'ad_lib_hook',cue:'(oh yeah)',type:'adlib',placement:'chorus',desc:'Singalong hook ad-lib for catchiness',suno_power:5},
+    {id:'production_808',cue:'[Beat drops, 808 heavy, sparse vocals]',type:'production',placement:'verse',desc:'Signals beat-focused section with minimal vocal layering',suno_power:4},
+    {id:'vocal_hey',cue:'(hey!)',type:'adlib',placement:'pre_chorus',desc:'Call-and-response trigger before chorus',suno_power:4},
+    {id:'delivery_aggressive',cue:'(aggressive flow)',type:'vocal',placement:'verse',desc:'Pushes delivery toward harder sharper articulation',suno_power:3}
+  ],
+  rnb:[
+    {id:'vocal_whisper',cue:'(whispered)',type:'vocal',placement:'verse',desc:'Intimate whispered opening for sensuality',suno_power:5},
+    {id:'vocal_belt',cue:'(belted)',type:'vocal',placement:'chorus',desc:'Full-voiced powerful delivery on chorus climax',suno_power:5},
+    {id:'production_strings',cue:'[Lush strings, smooth bass, reverb-heavy vocals]',type:'production',placement:'any',desc:'Adds orchestral warmth and atmospheric depth',suno_power:4},
+    {id:'vocal_harmonized',cue:'(harmonized)',type:'vocal',placement:'chorus',desc:'Layered harmonies for vocal richness',suno_power:4},
+    {id:'vocal_melisma',cue:'(melismatic runs)',type:'vocal',placement:'chorus',desc:'Vocal riffing and ornamental note runs',suno_power:4},
+    {id:'delivery_smooth',cue:'(smooth, sultry)',type:'vocal',placement:'verse',desc:'Polished controlled vocal tone with emotional restraint',suno_power:4},
+    {id:'production_stripped',cue:'[Stripped back, just vocal and keys]',type:'production',placement:'bridge',desc:'Minimalist moment emphasizing vocal vulnerability',suno_power:4},
+    {id:'adlib_riff',cue:'(ad-lib)',type:'adlib',placement:'outro',desc:'Freestyle vocal riffing for outro fade',suno_power:3}
+  ],
+  pop:[
+    {id:'energy_build',cue:'(building intensity)',type:'energy',placement:'pre_chorus',desc:'Creates tension leading into explosive chorus',suno_power:5},
+    {id:'vocal_belted',cue:'(belted)',type:'vocal',placement:'chorus',desc:'Big powerful vocal performance on hook',suno_power:5},
+    {id:'production_full',cue:'[Full production, synths, big drums, energy peak]',type:'production',placement:'chorus',desc:'Maximum instrumental density and catchiness',suno_power:4},
+    {id:'adlib_singalong',cue:'(oh yeah)',type:'adlib',placement:'chorus',desc:'Crowd singalong moments for engagement',suno_power:5},
+    {id:'production_stripped',cue:'[Stripped back, minimal production]',type:'production',placement:'verse',desc:'Contrast drop to verse for dynamic impact',suno_power:4},
+    {id:'vocal_bright',cue:'(bright, energetic)',type:'vocal',placement:'verse',desc:'Uplifting positive vocal tone for pop lightness',suno_power:3},
+    {id:'production_synth',cue:'[Synth-forward, pop-electronic production]',type:'production',placement:'any',desc:'Modern pop synth aesthetic with digital sheen',suno_power:4},
+    {id:'adlib_hey',cue:'(hey!)',type:'adlib',placement:'pre_chorus',desc:'Call-response energy trigger before drop',suno_power:4}
+  ],
+  country:[
+    {id:'vocal_storytelling',cue:'(conversational, storytelling)',type:'vocal',placement:'verse',desc:'Narrative delivery like telling a story',suno_power:4},
+    {id:'production_steel',cue:'[Steel guitar lead, acoustic foundation]',type:'production',placement:'verse',desc:'Classic country instrumentation moment',suno_power:4},
+    {id:'vocal_emotional',cue:'(emotional, vulnerable)',type:'vocal',placement:'bridge',desc:'Raw heartfelt vocal moment breaking character',suno_power:4},
+    {id:'production_acoustic',cue:'[Stripped back, just vocals and acoustic guitar]',type:'production',placement:'bridge',desc:'Intimate acoustic moment emphasizing lyrics',suno_power:4},
+    {id:'vocal_twang',cue:'(country twang)',type:'vocal',placement:'verse',desc:'Authentic country vocal delivery with regional feel',suno_power:3},
+    {id:'adlib_yeah',cue:'(yeah)',type:'adlib',placement:'chorus',desc:'Affirmation ad-lib for country authenticity',suno_power:4},
+    {id:'energy_build',cue:'(building emotion)',type:'energy',placement:'chorus',desc:'Emotional crescendo toward chorus peak',suno_power:4},
+    {id:'production_full',cue:'[Full band, fiddle, drums, pedal steel]',type:'production',placement:'chorus',desc:'Complete country arrangement with traditional instruments',suno_power:4}
+  ],
+  altrock:[
+    {id:'vocal_raw',cue:'(raw, unpolished)',type:'vocal',placement:'verse',desc:'Stripped authentic vocal without perfection',suno_power:4},
+    {id:'vocal_screaming',cue:'(screaming)',type:'vocal',placement:'chorus',desc:'Intense cathartic vocal release',suno_power:4},
+    {id:'production_distortion',cue:'[Distorted guitars, aggressive drums, raw energy]',type:'production',placement:'chorus',desc:'Heavy distorted instrumentation for alt-rock edge',suno_power:4},
+    {id:'energy_quiet_loud',cue:'(building from quiet to loud)',type:'energy',placement:'verse',desc:'Dynamic contrast from stripped to explosive',suno_power:4},
+    {id:'vocal_falsetto',cue:'(falsetto)',type:'vocal',placement:'bridge',desc:'Vulnerable high register for emotional contrast',suno_power:4},
+    {id:'production_stripped',cue:'[Stripped back, just guitar and vocals]',type:'production',placement:'verse',desc:'Minimalist moment emphasizing songwriting',suno_power:4},
+    {id:'vocal_halftime',cue:'(half-time feel)',type:'vocal',placement:'bridge',desc:'Slowed delivery for weight and introspection',suno_power:3},
+    {id:'adlib_yeah',cue:'(yeah!)',type:'adlib',placement:'chorus',desc:'Gritty affirmation ad-lib for authenticity',suno_power:3}
+  ],
+  edm:[
+    {id:'build_intensity',cue:'(building intensity)',type:'energy',placement:'pre_chorus',desc:'Signals rising energy before the drop',suno_power:5},
+    {id:'vocal_chop',cue:'(vocal chops)',type:'vocal',placement:'any',desc:'Rhythmic stuttering effect on vocal delivery',suno_power:4},
+    {id:'filter_sweep',cue:'(filter sweep)',type:'production',placement:'verse',desc:'Synthesizer filter automation sweep',suno_power:4},
+    {id:'dropped_bass',cue:'(dropped bass)',type:'energy',placement:'chorus',desc:'Emphasizes bass-heavy moment in the mix',suno_power:5},
+    {id:'synth_lead',cue:'(soaring synth lead)',type:'production',placement:'bridge',desc:'Prominent synthesizer melody line',suno_power:4},
+    {id:'stuttered_beat',cue:'(stuttered beat)',type:'energy',placement:'outro',desc:'Rhythmic hesitation before final section',suno_power:3},
+    {id:'sidechain',cue:'(pumping sidechain)',type:'production',placement:'any',desc:'Ducking compression effect on the beat',suno_power:4},
+    {id:'spoken_drop',cue:'(spoken word over drop)',type:'vocal',placement:'pre_chorus',desc:'Spoken word delivery just before beat drops',suno_power:4}
+  ],
+  jazz:[
+    {id:'scat_singing',cue:'(scat singing)',type:'vocal',placement:'bridge',desc:'Wordless vocal improvisation with rhythmic syllables',suno_power:5},
+    {id:'swing_feel',cue:'(swing feel)',type:'production',placement:'any',desc:'Laid-back swing rhythm interpretation',suno_power:4},
+    {id:'improvised',cue:'(improvised solo)',type:'vocal',placement:'verse',desc:'Freestyle instrumental or vocal improvisation',suno_power:4},
+    {id:'snappy_rhythm',cue:'(snappy rhythm)',type:'energy',placement:'chorus',desc:'Crisp syncopated rhythmic feel',suno_power:3},
+    {id:'breathy_vocal',cue:'(breathy, intimate)',type:'vocal',placement:'verse',desc:'Intimate whispered breathing vocal delivery',suno_power:4},
+    {id:'upright_bass',cue:'(upright bass walks)',type:'production',placement:'any',desc:'Walking bass line emphasis in arrangement',suno_power:3},
+    {id:'brushed_drums',cue:'(brushed drums)',type:'production',placement:'verse',desc:'Softer brush technique on drums',suno_power:3},
+    {id:'harmonized_layers',cue:'(harmonized layers)',type:'vocal',placement:'chorus',desc:'Stacked harmony vocal parts for depth',suno_power:4}
+  ],
+  blues:[
+    {id:'raw_grit',cue:'(raw, gritty)',type:'vocal',placement:'verse',desc:'Rough unpolished emotional vocal intensity',suno_power:4},
+    {id:'call_response',cue:'(call and response)',type:'vocal',placement:'any',desc:'Back-and-forth vocal exchange pattern',suno_power:4},
+    {id:'slide_guitar',cue:'(slide guitar)',type:'production',placement:'verse',desc:'Sliding strings on guitar emphasis',suno_power:4},
+    {id:'wailing',cue:'(wailing)',type:'vocal',placement:'chorus',desc:'Sustained emotional vocal cry',suno_power:4},
+    {id:'bent_notes',cue:'(bent notes)',type:'vocal',placement:'bridge',desc:'Pitch bending for expressive vocal phrasing',suno_power:3},
+    {id:'harmonica',cue:'(harmonica break)',type:'production',placement:'bridge',desc:'Harmonica as lead instrumental moment',suno_power:3},
+    {id:'deep_emotion',cue:'(deep emotion)',type:'energy',placement:'verse',desc:'Profound feeling infused vocal delivery',suno_power:4},
+    {id:'calling_out',cue:'(calling out)',type:'vocal',placement:'outro',desc:'Raw unrehearsed vocal outburst finale',suno_power:3}
+  ],
+  reggae:[
+    {id:'offbeat',cue:'(offbeat emphasis)',type:'energy',placement:'any',desc:'Syncopated reggae rhythm feel',suno_power:4},
+    {id:'dub_echo',cue:'(dub echo)',type:'production',placement:'verse',desc:'Spacious echo and reverb effect',suno_power:4},
+    {id:'chanting',cue:'(chanting)',type:'vocal',placement:'chorus',desc:'Call-and-chant style vocal arrangement',suno_power:4},
+    {id:'laid_back',cue:'(laid back, relaxed)',type:'energy',placement:'verse',desc:'Slower meditative reggae pace',suno_power:4},
+    {id:'one_drop',cue:'(one-drop beat)',type:'production',placement:'any',desc:'Minimalist drum pattern on beat three',suno_power:3},
+    {id:'horn_section',cue:'(horn section swell)',type:'production',placement:'chorus',desc:'Bright brass instruments emphasis',suno_power:3},
+    {id:'melodica',cue:'(melodica lead)',type:'production',placement:'bridge',desc:'Melodica as featured melodic instrument',suno_power:2},
+    {id:'patois',cue:'(patois inflection)',type:'vocal',placement:'verse',desc:'Caribbean dialect vocal coloring',suno_power:3}
+  ],
+  latin:[
+    {id:'rhythm_break',cue:'(rhythm break)',type:'energy',placement:'bridge',desc:'Isolated percussion for dynamic rhythmic moment',suno_power:4},
+    {id:'clave_pocket',cue:'(clave pocket)',type:'production',placement:'any',desc:'Foundational clave rhythm pattern emphasis',suno_power:3},
+    {id:'passionate',cue:'(passionate, fiery)',type:'energy',placement:'chorus',desc:'Intense Latin passion vocal delivery',suno_power:4},
+    {id:'call_response',cue:'(call and response)',type:'vocal',placement:'verse',desc:'Call-and-response vocal exchange pattern',suno_power:3},
+    {id:'congas',cue:'(congas tumbao)',type:'production',placement:'verse',desc:'Traditional congas rhythmic pattern',suno_power:3},
+    {id:'bilingual',cue:'(switches to Spanish)',type:'vocal',placement:'bridge',desc:'Language transition into Spanish delivery',suno_power:3},
+    {id:'brass_stab',cue:'(brass stab)',type:'production',placement:'pre_chorus',desc:'Punchy brass accent marking sections',suno_power:4},
+    {id:'percussion_swell',cue:'(percussion builds)',type:'energy',placement:'outro',desc:'Layered percussion intensifying toward ending',suno_power:4}
+  ],
+  punk:[
+    {id:'shouted',cue:'(shouted)',type:'vocal',placement:'chorus',desc:'Raw shouted delivery for punk aggression',suno_power:5},
+    {id:'gang_vocal',cue:'(gang vocals)',type:'adlib',placement:'chorus',desc:'Multiple voices chanting together for anthems',suno_power:5},
+    {id:'sneered',cue:'(sneered)',type:'vocal',placement:'verse',desc:'Contemptuous vocal delivery with attitude',suno_power:4},
+    {id:'distorted_vocal',cue:'[distorted vocal effect]',type:'production',placement:'any',desc:'Grit and distortion on vocal tracks',suno_power:4},
+    {id:'power_chord',cue:'[heavy power chords, fast tempo]',type:'production',placement:'verse',desc:'Aggressive guitar-driven instrumentation',suno_power:5},
+    {id:'mosh_energy',cue:'(building to mosh pit energy)',type:'energy',placement:'bridge',desc:'Escalating intensity for live crowd feeling',suno_power:4},
+    {id:'spit_vocal',cue:'(spitting lyrics)',type:'vocal',placement:'verse',desc:'Fast aggressive vocal delivery style',suno_power:4},
+    {id:'feedback_outro',cue:'[feedback and distortion build]',type:'production',placement:'outro',desc:'Classic punk ending with guitar feedback',suno_power:4}
+  ],
+  kpop:[
+    {id:'rap_switch',cue:'[rap section, rapid delivery]',type:'production',placement:'verse',desc:'Transitions to rap with energetic flow',suno_power:5},
+    {id:'fan_chant',cue:'(fan chant, synchronized)',type:'adlib',placement:'chorus',desc:'Audience participation K-pop concert moment',suno_power:5},
+    {id:'key_shift',cue:'[modulate up half-step, vocal run]',type:'production',placement:'pre_chorus',desc:'Key change for climactic build-up',suno_power:4},
+    {id:'breathy_vocal',cue:'(breathy, intimate)',type:'vocal',placement:'verse',desc:'Soft close-miked vocal for emotional connection',suno_power:4},
+    {id:'vocal_layering',cue:'(harmonized, lush layering)',type:'vocal',placement:'chorus',desc:'Rich vocal stacking for polished K-pop sound',suno_power:5},
+    {id:'synth_beat',cue:'[bright synths, programmed beat]',type:'production',placement:'chorus',desc:'Electronic instrumentation of modern K-pop',suno_power:4},
+    {id:'talk_sing',cue:'(talk-singing, rhythmic)',type:'vocal',placement:'verse',desc:'Speech-like delivery over beat',suno_power:4},
+    {id:'whisper_run',cue:'(whispered vocal run)',type:'vocal',placement:'bridge',desc:'Delicate run leading into final chorus',suno_power:3}
+  ],
+  reggaeton:[
+    {id:'dembow',cue:'[dembow rhythm, steady pocket]',type:'production',placement:'verse',desc:'Signature reggaeton drum pattern emphasis',suno_power:5},
+    {id:'perreo',cue:'(sensual, grinding rhythm)',type:'energy',placement:'chorus',desc:'Dance-floor intimacy and body-roll energy',suno_power:4},
+    {id:'bilingual_hook',cue:'(Spanish/English code-switch)',type:'adlib',placement:'chorus',desc:'Language alternation for cultural authenticity',suno_power:4},
+    {id:'rapid_flow',cue:'[rapid fire delivery, flow switching]',type:'production',placement:'verse',desc:'Fast-paced rap-reggaeton hybrid delivery',suno_power:5},
+    {id:'swagger_adlib',cue:'(uh, dale)',type:'adlib',placement:'any',desc:'Street attitude with ad-lib interjections',suno_power:4},
+    {id:'trap_hybrid',cue:'[trap-reggaeton hybrid, hi-hat rolls]',type:'production',placement:'bridge',desc:'Modern trap-influenced reggaeton production',suno_power:4},
+    {id:'echo_layer',cue:'(echoed, layered)',type:'production',placement:'outro',desc:'Spatial vocal effect for club remix feel',suno_power:3},
+    {id:'bass_locked',cue:'[bass locked in, syncopated groove]',type:'production',placement:'chorus',desc:'Heavy bass foundation for reggaeton',suno_power:5}
+  ],
+  neosoul:[
+    {id:'breathy_groove',cue:'(breathy, loose pocket)',type:'vocal',placement:'verse',desc:'Relaxed vocal delivery locked into groove',suno_power:4},
+    {id:'space_breath',cue:'[spacious arrangement, room to breathe]',type:'production',placement:'verse',desc:'Minimalist instrumentation highlighting vocals',suno_power:4},
+    {id:'vamp_escalate',cue:'[layering instruments, building texture]',type:'production',placement:'chorus',desc:'Instruments stack gradually for neo-soul dynamics',suno_power:5},
+    {id:'melismatic_run',cue:'(fluid vocal run, soulful)',type:'vocal',placement:'bridge',desc:'Extended melodic runs over groove',suno_power:4},
+    {id:'analog_vibe',cue:'[vintage analog keys, warm tone]',type:'production',placement:'any',desc:'Retro instrumentation for classic soul feel',suno_power:4},
+    {id:'call_respond',cue:'(call and response, layered)',type:'adlib',placement:'chorus',desc:'Self-harmonizing vocal dialogue',suno_power:4},
+    {id:'whisper_intimate',cue:'(whispered, close-miked intimacy)',type:'vocal',placement:'verse',desc:'Ultra-close vocal delivery for vulnerability',suno_power:3},
+    {id:'vocal_ad_lib',cue:'(oh yeah, mmm)',type:'adlib',placement:'outro',desc:'Soulful ad-libs and vocal textures over groove',suno_power:4}
+  ],
+  gospel:[
+    {id:'call_response',cue:'(call and response with choir)',type:'adlib',placement:'verse',desc:'Lead vocalist calls, choir responds in unison',suno_power:5},
+    {id:'testimony_build',cue:'[speaking into singing, building intensity]',type:'production',placement:'verse',desc:'Spoken testimony transitions to vocal',suno_power:4},
+    {id:'choir_swell',cue:'(choir swell, powerful harmony)',type:'vocal',placement:'chorus',desc:'Full choir enters with rich harmony stacking',suno_power:5},
+    {id:'belted_powerful',cue:'(belted, powerful, inspired)',type:'vocal',placement:'chorus',desc:'Powerful belted delivery for emotional peak',suno_power:5},
+    {id:'organ_led',cue:'[organ-led, spiritual arrangement]',type:'production',placement:'any',desc:'Classic gospel organ foundation',suno_power:4},
+    {id:'ad_lib_spirit',cue:'(oh Lord, hallelujah, yes)',type:'adlib',placement:'chorus',desc:'Spiritual exclamations and riffs',suno_power:4},
+    {id:'vocal_run_glory',cue:'(jubilant vocal run)',type:'vocal',placement:'bridge',desc:'Celebratory melismatic run',suno_power:4},
+    {id:'fade_amen',cue:'[fade with amen chorus repeat]',type:'production',placement:'outro',desc:'Classic gospel ending with amen repetition',suno_power:5}
+  ],
+  brazilian:[
+    {id:'bossa_whisper',cue:'(whispered, intimate)',type:'vocal',placement:'verse',desc:'Breathy intimate vocal for bossa nova feel',suno_power:4},
+    {id:'samba_rhythmic',cue:'(rhythmic, syncopated)',type:'energy',placement:'chorus',desc:'Syncopated delivery matching samba percussion',suno_power:4},
+    {id:'tropicalia_warmth',cue:'(warm, melancholic)',type:'vocal',placement:'any',desc:'Emotionally warm tone with subtle melancholy',suno_power:3},
+    {id:'samba_production',cue:'[acoustic guitar, samba drums, building energy]',type:'production',placement:'verse',desc:'Classic samba instrumentation foundation',suno_power:4},
+    {id:'bossa_adlib',cue:'(mm-hmm, yeah)',type:'adlib',placement:'chorus',desc:'Subtle Brazilian ad-lib for bossa groove pocket',suno_power:3},
+    {id:'percussive_accent',cue:'(sharp, percussive)',type:'energy',placement:'pre_chorus',desc:'Punchy delivery matching samba percussion hits',suno_power:3},
+    {id:'carnival_build',cue:'(building intensity, celebratory)',type:'energy',placement:'chorus',desc:'Escalating vocal energy for carnival atmosphere',suno_power:4},
+    {id:'bossa_stripped',cue:'[stripped back, vocal-focused, minimal]',type:'production',placement:'chorus',desc:'Intimate chorus arrangement centering vocals',suno_power:4}
+  ],
+  amapiano:[
+    {id:'log_drum_lock',cue:'(rhythmic lock, on-beat)',type:'energy',placement:'verse',desc:'Tight rhythmic delivery aligned with log drum patterns',suno_power:4},
+    {id:'vocal_chops',cue:'(chopped, staccato)',type:'vocal',placement:'chorus',desc:'Clipped vocal phrases mimicking amapiano vocal chop production',suno_power:4},
+    {id:'township_swagger',cue:'(township swagger, confident)',type:'energy',placement:'verse',desc:'Assured delivery reflecting South African township confidence',suno_power:3},
+    {id:'amapiano_groove',cue:'[smooth log drums, layered pads, pocket groove]',type:'production',placement:'verse',desc:'Signature amapiano sonic palette with groove',suno_power:4},
+    {id:'melodic_float',cue:'(floating, relaxed)',type:'vocal',placement:'pre_chorus',desc:'Laid-back floating delivery over amapiano synths',suno_power:3},
+    {id:'responsive_adlib',cue:'(ayy, eish)',type:'adlib',placement:'chorus',desc:'South African township ad-lib for authenticity',suno_power:3},
+    {id:'percussive_snap',cue:'(snap, percussive groove)',type:'energy',placement:'pre_chorus',desc:'Sharp percussive timing matching amapiano beat snap',suno_power:3},
+    {id:'amapiano_climax',cue:'[full production, driving bass, vocal emphasis]',type:'production',placement:'chorus',desc:'Full amapiano sound design for chorus impact',suno_power:4}
+  ],
+  dancehall:[
+    {id:'toasting',cue:'(rapid-fire toasting, rhythmic)',type:'vocal',placement:'verse',desc:'Quick-paced conversational dancehall toasting style',suno_power:4},
+    {id:'air_horn',cue:'(air horn, drop)',type:'adlib',placement:'chorus',desc:'Punctuates beat drops with air horn energy',suno_power:3},
+    {id:'riddim_lock',cue:'(on-riddim, locked)',type:'energy',placement:'verse',desc:'Vocal locked tight to dancehall riddim beat',suno_power:4},
+    {id:'dancehall_production',cue:'[drums heavy, riddim lock, bass-driven]',type:'production',placement:'verse',desc:'Dancehall riddim production foundation',suno_power:4},
+    {id:'slack_adlib',cue:'(ay, wah done)',type:'adlib',placement:'chorus',desc:'Jamaican dancehall ad-lib phrase for authenticity',suno_power:3},
+    {id:'echo_effect',cue:'(echo, delay repeat)',type:'production',placement:'outro',desc:'Vocal echo/delay effects common in dancehall',suno_power:3},
+    {id:'skank_rhythm',cue:'(skank rhythm, bounce)',type:'energy',placement:'pre_chorus',desc:'Bouncy delivery matching upstroke guitar',suno_power:3},
+    {id:'dancehall_climax',cue:'[full riddim, layered vocals, energetic drop]',type:'production',placement:'chorus',desc:'Peak dancehall production with layered effects',suno_power:4}
+  ],
+  bollywood:[
+    {id:'dramatic_build',cue:'(dramatic, building crescendo)',type:'energy',placement:'bridge',desc:'Theatrical escalation for Bollywood climactic moments',suno_power:4},
+    {id:'classical_ornament',cue:'(with classical ornamentation)',type:'vocal',placement:'any',desc:'Classical Indian vocal embellishments and flourish',suno_power:3},
+    {id:'playback_smooth',cue:'(playback style, smooth)',type:'vocal',placement:'verse',desc:'Polished playback singing delivery tradition',suno_power:4},
+    {id:'bollywood_production',cue:'[orchestral strings, sitar undertone, melodic focus]',type:'production',placement:'verse',desc:'Lush Bollywood orchestral arrangement',suno_power:4},
+    {id:'emotional_swell',cue:'(emotionally resonant, swelling)',type:'energy',placement:'chorus',desc:'Emotionally expressive delivery with dynamic crescendo',suno_power:4},
+    {id:'tanpura_rhythm',cue:'(rhythmic, sustained drone)',type:'energy',placement:'pre_chorus',desc:'Vocal phrasing locked to traditional drone rhythm',suno_power:3},
+    {id:'melodic_ornament',cue:'(melismatic, ornamental)',type:'vocal',placement:'chorus',desc:'Flowing melismatic passages in Bollywood melodic style',suno_power:3},
+    {id:'bollywood_finale',cue:'[full orchestra, dramatic strings, triumphant]',type:'production',placement:'chorus',desc:'Grand Bollywood finale with orchestral power',suno_power:4}
+  ],
+  arabesque:[
+    {id:'quarter_tone',cue:'(quarter-tone ornament)',type:'vocal',placement:'any',desc:'Microtonal ornaments of Arabic vocal tradition',suno_power:3},
+    {id:'oud_driven',cue:'(oud-driven, warm)',type:'production',placement:'verse',desc:'Oud instrument foundation creating warm melodic bed',suno_power:4},
+    {id:'emotional_crescendo',cue:'(building emotion, heartfelt)',type:'energy',placement:'chorus',desc:'Deeply emotional vocal escalation in Arabic tradition',suno_power:4},
+    {id:'arabesque_production',cue:'[oud prominent, qanun layers, emotional depth]',type:'production',placement:'verse',desc:'Traditional Arabic instrumentation with oud and qanun',suno_power:4},
+    {id:'maqam_inflection',cue:'(maqam-inflected, modal)',type:'vocal',placement:'any',desc:'Traditional maqam modal scales and phrases',suno_power:3},
+    {id:'undulating_rhythm',cue:'(undulating, rhythmic grace)',type:'energy',placement:'chorus',desc:'Flowing rhythmic delivery matching dance movement',suno_power:3},
+    {id:'vocal_layering',cue:'(layered, harmonic blend)',type:'vocal',placement:'bridge',desc:'Multiple vocal layers creating rich harmonic texture',suno_power:3},
+    {id:'arabesque_peak',cue:'[full ensemble, vocal intensity, ornamental flourish]',type:'production',placement:'chorus',desc:'Rich Arabic ensemble at peak vocal interplay',suno_power:4}
+  ],
+  mandopop:[
+    {id:'breathy_verse',cue:'(breathy, soft)',type:'vocal',placement:'verse',desc:'Soft breathy delivery for emotional introspective verses',suno_power:4},
+    {id:'belted_emotion',cue:'(belted, powerful)',type:'vocal',placement:'chorus',desc:'Full-voice emotional belting for dramatic moments',suno_power:5},
+    {id:'vibrato_sustain',cue:'(vibrato, sustained)',type:'vocal',placement:'chorus',desc:'Added vibrato on held notes for classic mandopop feel',suno_power:4},
+    {id:'melancholic_tone',cue:'(melancholic, tender)',type:'energy',placement:'verse',desc:'Sad reflective emotional tone throughout line',suno_power:4},
+    {id:'key_lift',cue:'[lifted key, building intensity]',type:'production',placement:'pre_chorus',desc:'Key modulation and dramatic build',suno_power:3},
+    {id:'orchestral_swell',cue:'[orchestral strings, lush arrangement]',type:'production',placement:'chorus',desc:'Rich string instrumentation for emotional lift',suno_power:4},
+    {id:'ad_lib_riff',cue:'(oh, yeah)',type:'adlib',placement:'chorus',desc:'Spontaneous ad-lib flourishes',suno_power:3},
+    {id:'sparse_intimate',cue:'[stripped back, intimate, minimal]',type:'production',placement:'bridge',desc:'Minimal arrangement for vulnerability in bridge',suno_power:3}
+  ],
+  children:[
+    {id:'singalong_bright',cue:'(bright, singalong)',type:'energy',placement:'chorus',desc:'Cheerful participatory vocal style kids can join',suno_power:5},
+    {id:'spoken_bouncy',cue:'(spoken, bouncy rhythm)',type:'vocal',placement:'verse',desc:'Rhythmic spoken delivery with movement cues',suno_power:4},
+    {id:'giggle_playful',cue:'(giggly, playful)',type:'adlib',placement:'any',desc:'Lighthearted giggling and playful interjections',suno_power:4},
+    {id:'call_response',cue:'(call-and-response, echo)',type:'vocal',placement:'chorus',desc:'Back-and-forth echo pattern for interactive engagement',suno_power:4},
+    {id:'happy_energy',cue:'[upbeat, fun, happy energy throughout]',type:'energy',placement:'any',desc:'Pervasive cheerful tone for entire section',suno_power:5},
+    {id:'xylophone_pop',cue:'[bright percussion, xylophone, playful production]',type:'production',placement:'chorus',desc:'Colorful percussion-forward arrangement',suno_power:3},
+    {id:'whoosh_sound',cue:'(whoosh, zoom)',type:'adlib',placement:'verse',desc:'Playful onomatopoeia and sound effect cues',suno_power:3},
+    {id:'simple_melody',cue:'[simple melody, easy to follow]',type:'production',placement:'verse',desc:'Clear catchy melodic line for memorability',suno_power:4}
+  ],
+  parody:[
+    {id:'deadpan',cue:'(deadpan, monotone)',type:'vocal',placement:'verse',desc:'Flat sarcastic delivery undermining the lyrics',suno_power:4},
+    {id:'exaggerated_belt',cue:'(exaggerated, over-the-top belting)',type:'vocal',placement:'chorus',desc:'Absurdly dramatic vocal for comedic contrast',suno_power:4},
+    {id:'genre_mimic',cue:'(imitating opera voice)',type:'vocal',placement:'any',desc:'Vocal parody of specific genre conventions',suno_power:3},
+    {id:'awkward_pause',cue:'(long pause)',type:'production',placement:'verse',desc:'Timed comedic silence for punchline effect',suno_power:2},
+    {id:'knowing_wink',cue:'(knowing, wink in voice)',type:'vocal',placement:'any',desc:'Conspiratorial tone breaking the fourth wall',suno_power:3},
+    {id:'cheap_synth',cue:'[80s synth, cheap production, overdone]',type:'production',placement:'any',desc:'Deliberately retro production aesthetic',suno_power:3},
+    {id:'spoken_aside',cue:'(whispered aside)',type:'adlib',placement:'bridge',desc:'Breaking character for meta commentary',suno_power:3},
+    {id:'woah_reaction',cue:'(woah, wait what?)',type:'adlib',placement:'chorus',desc:'Surprised vocal reactions for comedy',suno_power:4}
+  ],
+  comedy:[
+    {id:'timing_pause',cue:'(pause for laugh)',type:'production',placement:'verse',desc:'Built-in comedic timing delay for punchline',suno_power:3},
+    {id:'spoken_punchline',cue:'(spoken, dry humor)',type:'vocal',placement:'verse',desc:'Standup comedy matter-of-fact delivery',suno_power:4},
+    {id:'absurd_confidence',cue:'(confident, matter-of-fact)',type:'energy',placement:'chorus',desc:'Serious delivery of nonsensical lyrics',suno_power:4},
+    {id:'comedic_build',cue:'[building tension, comedic crescendo]',type:'energy',placement:'pre_chorus',desc:'Section intensifying toward a punchline',suno_power:3},
+    {id:'deflated',cue:'(deflated, embarrassed)',type:'vocal',placement:'bridge',desc:'Defeated vocal delivery after comedic mistake',suno_power:3},
+    {id:'character_voice',cue:'(high-pitched character voice)',type:'vocal',placement:'verse',desc:'Distinct comedic character vocal performance',suno_power:3},
+    {id:'fake_laugh',cue:'(awkward laugh, hey hey)',type:'adlib',placement:'any',desc:'Self-satisfied laughter at own joke',suno_power:3},
+    {id:'rapid_fire',cue:'(rapid, breathless delivery)',type:'vocal',placement:'verse',desc:'Fast comedic patter for rapid-fire jokes',suno_power:3}
+  ],
+  tvmusical:[
+    {id:'theatrical_belt',cue:'(theatrical, belted power)',type:'vocal',placement:'chorus',desc:'Broadway-style powerful vocal for big moments',suno_power:5},
+    {id:'character_shift',cue:'(character voice, new persona)',type:'vocal',placement:'verse',desc:'Distinct character-based vocal performance',suno_power:4},
+    {id:'emotional_soar',cue:'(emotional, soaring, triumphant)',type:'energy',placement:'chorus',desc:'Rising emotional intensity and vocal power',suno_power:5},
+    {id:'duet_harmony',cue:'(harmonized, layered duet)',type:'vocal',placement:'chorus',desc:'Multiple vocal layers for duet/ensemble effect',suno_power:4},
+    {id:'full_orchestra',cue:'[full orchestra, big ensemble, dramatic]',type:'production',placement:'chorus',desc:'Large-scale orchestral arrangement',suno_power:4},
+    {id:'intimate_moment',cue:'[soft strings, intimate, solo spotlight]',type:'production',placement:'bridge',desc:'Stripped moment emphasizing character connection',suno_power:4},
+    {id:'grand_finale',cue:'(crescendo, reaching final note)',type:'energy',placement:'outro',desc:'Buildup to climactic final moment',suno_power:4},
+    {id:'spoken_reveal',cue:'(spoken dramatically)',type:'vocal',placement:'bridge',desc:'Narrative moment with dramatic spoken delivery',suno_power:3}
+  ],
+  rock:[
+    {id:'power_belt',cue:'(belted, powerful)',type:'vocal',placement:'chorus',desc:'Full-voice belted delivery for chorus impact',suno_power:5},
+    {id:'quiet_building',cue:'(building intensity)',type:'energy',placement:'verse',desc:'Gradual volume and intensity rise within verse',suno_power:4},
+    {id:'stripped_guitar',cue:'[stripped back, acoustic guitar only]',type:'production',placement:'verse',desc:'Minimalist arrangement highlighting vocals',suno_power:4},
+    {id:'full_band_crash',cue:'[full band, crashing cymbals]',type:'production',placement:'chorus',desc:'Dense instrumentation with prominent percussion',suno_power:5},
+    {id:'ad_lib_yeah',cue:'(yeah!, oh!)',type:'adlib',placement:'chorus',desc:'Energetic vocal interjections',suno_power:4},
+    {id:'half_time',cue:'(half-time feel)',type:'energy',placement:'bridge',desc:'Sudden tempo drop creating dramatic contrast',suno_power:4},
+    {id:'screaming_raw',cue:'(screaming, raw)',type:'vocal',placement:'bridge',desc:'Intense unfiltered vocal for emotional peak',suno_power:5},
+    {id:'harmonized_outro',cue:'(harmonized voices, layered)',type:'vocal',placement:'outro',desc:'Stacked vocal layers for wall-of-sound finish',suno_power:4}
+  ],
+  folk:[
+    {id:'whispered_intimate',cue:'(whispered, intimate)',type:'vocal',placement:'verse',desc:'Close-mic delivery creating confessional atmosphere',suno_power:5},
+    {id:'fingerpick',cue:'[fingerpicked acoustic, minimal arrangement]',type:'production',placement:'verse',desc:'Delicate guitar work with space for storytelling',suno_power:4},
+    {id:'storytelling_pause',cue:'(pause, breathe)',type:'energy',placement:'verse',desc:'Deliberate silence for narrative emphasis',suno_power:3},
+    {id:'warm_lift',cue:'[warm, layered vocals, light strings]',type:'production',placement:'chorus',desc:'Emotional swell with subtle string accompaniment',suno_power:4},
+    {id:'falsetto_delicate',cue:'(falsetto, delicate)',type:'vocal',placement:'chorus',desc:'Higher register for vulnerable soaring moments',suno_power:4},
+    {id:'harmonic_shimmer',cue:'(harmonized, breathy)',type:'vocal',placement:'bridge',desc:'Ethereal layered voices with light consonants',suno_power:4},
+    {id:'campfire_outro',cue:'[acoustic, fading, intimate]',type:'production',placement:'outro',desc:'Gradual fade suggesting acoustic setting',suno_power:4},
+    {id:'call_response',cue:'(call and response, conversational)',type:'adlib',placement:'any',desc:'Back-and-forth vocal delivery mimicking dialogue',suno_power:4}
+  ],
+  metal:[
+    {id:'guttural_growl',cue:'(growling, aggressive)',type:'vocal',placement:'verse',desc:'Deep menacing vocal delivery for intensity',suno_power:5},
+    {id:'full_scream',cue:'(screaming, brutal)',type:'vocal',placement:'chorus',desc:'Extreme vocal intensity for peak moments',suno_power:5},
+    {id:'blast_beat',cue:'[blast beats, tremolo picking]',type:'production',placement:'verse',desc:'Rapid-fire drums and guitar for chaos',suno_power:4},
+    {id:'breakdown',cue:'[breakdown, heavy, slow]',type:'production',placement:'bridge',desc:'Tempo reduction emphasizing low-end heaviness',suno_power:5},
+    {id:'double_bass',cue:'(double bass drums pounding)',type:'energy',placement:'chorus',desc:'Signature metal kick pattern driving momentum',suno_power:4},
+    {id:'harmonized_scream',cue:'(dual vocals, harmonized screams)',type:'vocal',placement:'chorus',desc:'Layered vocal screams for stadium effect',suno_power:4},
+    {id:'building_dread',cue:'(building dread, menacing)',type:'energy',placement:'pre_chorus',desc:'Atmospheric build toward explosion',suno_power:4},
+    {id:'fade_silence',cue:'[fading to silence, last crash]',type:'production',placement:'outro',desc:'Dramatic ending with final cymbal swell',suno_power:4}
+  ],
+  ss:[
+    {id:'confessional',cue:'(whispered, confessional)',type:'vocal',placement:'verse',desc:'Raw intimate vocal delivery like diary entry',suno_power:5},
+    {id:'solo_guitar',cue:'[solo acoustic guitar, just voice]',type:'production',placement:'verse',desc:'Minimal arrangement emphasizing vulnerability',suno_power:5},
+    {id:'voice_crack',cue:'(voice cracking, emotion)',type:'vocal',placement:'verse',desc:'Authentic emotional strain in delivery',suno_power:4},
+    {id:'gentle_swell',cue:'[gentle swell, strings enter, warmer]',type:'production',placement:'chorus',desc:'Gradual instrument addition for emotional lift',suno_power:4},
+    {id:'raw_belt',cue:'(belted, raw, honest)',type:'vocal',placement:'chorus',desc:'Powerful but unpolished vocal peak',suno_power:4},
+    {id:'bridge_silence',cue:'(pause, silence, breath)',type:'energy',placement:'bridge',desc:'Intentional space for introspection',suno_power:3},
+    {id:'falsetto_yearning',cue:'(falsetto, yearning)',type:'vocal',placement:'bridge',desc:'High register expressing longing or despair',suno_power:4},
+    {id:'intimate_fade',cue:'[stripped back, fading away, intimate]',type:'production',placement:'outro',desc:'Vulnerable fade suggesting unresolved emotion',suno_power:4}
+  ],
+  afrobeats:[
+    {id:'call_response',cue:'(call and response, energetic)',type:'adlib',placement:'chorus',desc:'Interactive vocal exchanges for dancefloor engagement',suno_power:5},
+    {id:'pidgin_adlib',cue:'(Pidgin ad-lib, playful)',type:'adlib',placement:'any',desc:'Authentic West African language interjections',suno_power:4},
+    {id:'percussion_groove',cue:'[percussion break, drums groove, locked-in]',type:'production',placement:'verse',desc:'Tight rhythm section driving the pocket',suno_power:5},
+    {id:'layered_vocals',cue:'(layered, harmonized)',type:'vocal',placement:'chorus',desc:'Rich stacked vocals typical of afrobeats',suno_power:4},
+    {id:'dance_energy',cue:'(building dance energy, infectious)',type:'energy',placement:'pre_chorus',desc:'Rhythmic tension leading to dancefloor moment',suno_power:4},
+    {id:'synth_swell',cue:'[full synths, sweeping strings, celebratory]',type:'production',placement:'chorus',desc:'Bright uplifting instrumental texture',suno_power:4},
+    {id:'rhythmic_spoken',cue:'(rhythmic spoken word, swagger)',type:'vocal',placement:'verse',desc:'Semi-rapped delivery over steady beat',suno_power:4},
+    {id:'hi_energy_outro',cue:'[high energy, fade with claps and congas]',type:'production',placement:'outro',desc:'Celebratory ending with hand percussion',suno_power:4}
+  ]
+};
+
 const GENRE_BIBLE={
   hiphop:{
     dna:'Bars are currency — 1 bar = 1 line. 16-bar verse = 16 lines. Hook = 8 bars = 8 lines (or 4 unique lines repeated). Ad-libs in parentheses: (yeah) (uh) (let\'s go). Internal rhymes every 2-3 syllables create density. Flow variation (normal → double time → triplet) is the surprise weapon.',
@@ -7999,7 +8310,7 @@ ${fd?.name?'Fusion style: '+fd.name:'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}
+Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -8018,7 +8329,7 @@ LYRICS:
 [Write the complete song lyrics below. EVERY SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. 4 lines per verse, 2-4 per chorus. Every word must earn its place.]
 
 SONG PROMPT:
-[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]
+[Under 440 chars. Core genre + sub-genre feel, era-specific production texture that makes the song SOUND like the time period, key instruments (4-5) authentic to both genres and era, BPM range, tempo feel, vocal descriptor, counter-melody device. NO artist names.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -8384,8 +8695,8 @@ Mood: ${mood}
 Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
-Era: ${{classic:'Classic (pre-1980) — analog warmth, live band, raw delivery',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks',modern:'Modern (2000–2015) — polished, digital sheen, chart-ready',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}
+Era: ${{fifties:'1950s — rock & roll, doo-wop, stand-up bass, tube amp warmth, Sun Records echo, simple 3-chord progressions, call-and-response, vocal group harmonies',sixties:'1960s — British Invasion jangle, Motown orchestral soul, psychedelic reverb/delay, folk protest acoustic, Phil Spector wall of sound, fuzz guitar, Hammond organ',seventies:'1970s — disco four-on-the-floor, funk slap bass, punk 3-chord raw energy, prog rock odd time signatures, early analog synths, Moog basslines, wah-wah guitar',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks, gated reverb, grunge distortion, 808s, sampling',modern:'Modern (2000–2015) — polished digital production, Auto-Tune, chart-ready anthems, compressed loudness war sound',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics, bedroom pop, 808 sub-bass',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed, micro-genre blending'}[S.selectedEra]||'Modern (2000–2015)'}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}${getProductionCuePrompt(genre)}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -8408,7 +8719,7 @@ LYRICS:
 [Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
 
 SONG PROMPT:
-[The AI music platform style prompt. Under 440 characters. Include: core genre, sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device (the secondary melodic layer specific to this genre — e.g. "pedal steel answer-line", "piano montuno", "choir call-response", "guitar talks back to vocal"). NO artist names.]
+[The AI music platform style prompt — this is what drives the actual music generation. Under 440 characters. MUST include: core genre, sub-genre feel, era-specific production texture (match the selected era — e.g. 50s = "tube amp warmth, stand-up bass, Sun Records slap echo"; 70s = "analog synths, funk slap bass, warm vinyl feel"), key instruments (4-5) authentic to the era, BPM range, tempo feel, vocal descriptor, counter-melody device (the secondary melodic layer — e.g. "pedal steel answer-line", "piano montuno", "choir call-response"). NO artist names. The prompt must sound like the era FEELS, not just the genre.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -8418,13 +8729,13 @@ TEMPO & KEY:
 [BPM range · Suggested key · Time signature · Feel — e.g. "92-96 BPM · D minor · 4/4 · slow-burning, hypnotic groove"]
 
 ARRANGEMENT BLUEPRINT:
-[Section by section: what instruments enter/drop, energy shifts — e.g. "Verse 1: sparse piano + brushed snare only / Pre-chorus: bass enters, tension builds / Chorus: full production erupts"]
+[Section by section: what instruments enter/drop, energy shifts. Use era-authentic instruments and production techniques — e.g. for 50s: "stand-up bass + brushed snare / electric guitar with spring reverb enters at chorus"; for 70s: "Moog bass + wah guitar / synth pad swells into chorus". Match the sonic palette to the selected era.]
 
 VOCAL DIRECTION:
-[Delivery style per section — e.g. "Verse: intimate, almost spoken, close-mic / Chorus: pushed, emotional, slight rasp on high notes / Bridge: raw, exposed, like confessing"]
+[Delivery style per section matching the era's vocal conventions — e.g. 50s: crooner smoothness, vocal group harmonies; 60s: raw soul belting, psychedelic double-tracking; 70s: falsetto disco, punk sneer; modern: Auto-Tune shimmer, breathy intimacy]
 
 SONIC REFERENCES:
-[3 production reference points describing the target sound — no artist names, describe the sonic feel — e.g. "Sparse midnight R&B with cathedral reverb · Punchy modern drums with tape warmth · Layered harmonies building to a gospel swell"]
+[3 production reference points describing the target sound — no artist names, describe the sonic feel WITH era-specific texture — e.g. "Warm tube-amp distortion with 50s slap echo · Motown-style reverb on snare with string section swell · Doo-wop vocal stack with finger-snaps"]
 
 PLATFORM TIPS:
 [3 specific actionable tips for getting the best result from AI music platforms for this exact song]
@@ -9857,6 +10168,7 @@ S.selectedTechniques=JSON.parse(localStorage.getItem('soniq_techs')||'[]').filte
   const techs=GENRE_TECHNIQUES[sel.genre]||[];
   return techs.some(t=>t.id===sel.id);
 });
+S._activeCues=[];
 
 function showTechniquePanel(genre){
   const panel=document.getElementById('a-techniques');
@@ -10026,6 +10338,110 @@ function getTechGenreMismatchCount(targetGenre){
   return S.selectedTechniques.filter(t=>t.genre!==_g).length;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// PRODUCTION CUE SYSTEM — Inline Suno metatag injection + learning
+// ═══════════════════════════════════════════════════════════════
+
+// Get production cues for a genre, ranked by fusion learning effectiveness
+function getProductionCuesForGenre(genre){
+  const _g=(genre||'').toLowerCase().replace(/[^a-z]/g,'');
+  // Reuse GENRE_ALIAS for normalization
+  const GENRE_ALIAS_LOCAL={'hiphop':'hiphop','hip hop':'hiphop','rap':'hiphop','rb':'rnb','rnb':'rnb','rbsoul':'rnb','soul':'rnb',
+    'singersongwriter':'ss','singer songwriter':'ss','neosoul':'neosoul','neo soul':'neosoul','kpop':'kpop','k pop':'kpop',
+    'tvmusical':'tvmusical','tv musical':'tvmusical','childrens':'children','afrobeats':'afrobeats','afrobeat':'afrobeats',
+    'alternativerock':'altrock','alternative':'altrock','altrock':'altrock','alternative rock':'altrock',
+    'electronicdancemusic':'edm','electronic':'edm','edm':'edm','hiphop':'hiphop','pop':'pop','country':'country',
+    'jazz':'jazz','blues':'blues','reggae':'reggae','latin':'latin','punk':'punk','kpop':'kpop',
+    'reggaeton':'reggaeton','gospel':'gospel','brazilian':'brazilian','amapiano':'amapiano',
+    'dancehall':'dancehall','bollywood':'bollywood','arabesque':'arabesque','mandopop':'mandopop',
+    'children':'children','parody':'parody','comedy':'comedy','rock':'rock','folk':'folk','metal':'metal',
+    'ss':'ss','afrobeats':'afrobeats','tvmusical':'tvmusical','neosoul':'neosoul'};
+  const gKey=GENRE_ALIAS_LOCAL[_g]||_g;
+  const cues=GENRE_PRODUCTION_CUES[gKey]||[];
+  if(!cues.length) return [];
+  // Merge with learned effectiveness data
+  const effectiveness=getCueEffectiveness(gKey);
+  return cues.map(c=>{
+    const eff=effectiveness[c.id];
+    return {...c, learned_score:eff?eff.avg_rating:null, times_used:eff?eff.count:0};
+  }).sort((a,b)=>{
+    // Sort by: learned effectiveness first (if data exists), then suno_power
+    if(a.learned_score!==null && b.learned_score!==null) return b.learned_score-a.learned_score;
+    if(a.learned_score!==null) return -1;
+    if(b.learned_score!==null) return 1;
+    return b.suno_power-a.suno_power;
+  });
+}
+
+// Fusion Learning Model — analyze which cues correlate with higher-rated songs
+function getCueEffectiveness(genre){
+  const songs=getLearnedSongs().filter(s=>{
+    const sg=(s.genre||'').toLowerCase().replace(/[^a-z]/g,'');
+    return sg===genre && s.user_rating && s.cues_used && s.cues_used.length>0;
+  });
+  if(!songs.length) return {};
+  const cueStats={};
+  songs.forEach(s=>{
+    (s.cues_used||[]).forEach(cueId=>{
+      if(!cueStats[cueId]) cueStats[cueId]={total_rating:0,count:0};
+      cueStats[cueId].total_rating+=s.user_rating;
+      cueStats[cueId].count++;
+    });
+  });
+  // Compute averages
+  Object.keys(cueStats).forEach(id=>{
+    cueStats[id].avg_rating=+(cueStats[id].total_rating/cueStats[id].count).toFixed(2);
+  });
+  return cueStats;
+}
+
+// Build the production cue prompt injection for AI generation
+function getProductionCuePrompt(genre){
+  const cues=getProductionCuesForGenre(genre);
+  if(!cues.length) return '';
+  // Select top cues by section placement to avoid overloading
+  const byPlacement={};
+  cues.forEach(c=>{
+    const p=c.placement||'any';
+    if(!byPlacement[p]) byPlacement[p]=[];
+    byPlacement[p].push(c);
+  });
+  // Pick best cues: max 2 per placement, max 6 total
+  const selected=[];
+  const placements=['verse','pre_chorus','chorus','bridge','outro','any'];
+  for(const p of placements){
+    const available=(byPlacement[p]||[]).filter(c=>!selected.find(s=>s.id===c.id));
+    const pick=available.slice(0,2);
+    selected.push(...pick);
+    if(selected.length>=6) break;
+  }
+  if(!selected.length) return '';
+  // Track which cues we're injecting for learning
+  S._activeCues=selected.map(c=>c.id);
+  // Build the prompt
+  const cueLines=selected.map(c=>{
+    const learnNote=c.learned_score!==null?` [effectiveness: ${c.learned_score}/5 from ${c.times_used} songs]`:'';
+    return `  - ${c.cue} → place in ${c.placement==='any'?'any section':c.placement}. ${c.desc}${learnNote}`;
+  });
+  const genreLabel=(genre||'').replace(/([A-Z])/g,' $1').trim();
+  return `\n\nSUNO PRODUCTION CUES (embed these inline within the lyrics — they dramatically improve AI music generation quality):
+Genre-matched cues for ${genreLabel}:
+${cueLines.join('\n')}
+
+PLACEMENT RULES:
+- Parentheses cues like (whispered) or (belted) go INSIDE lyric lines, right before the text they affect
+- Bracket cues like [full band, crashing cymbals] go on their own line before the section they modify
+- Use 3-5 cues per song — enough to guide production, not so many they clutter
+- Place the most impactful cue at the first chorus entry
+- Contrast is king: if verse uses (whispered), chorus should use (belted) or similar opposite
+- Ad-lib cues like (yeah) or (hey!) go naturally between phrases, not forced`;
+}
+
+// Get which cues were used in current generation (for learning tracking)
+function getActiveCueIds(){
+  return S._activeCues||[];
+}
+
 // 🔍 Search Any Song — research via Claude, then run through analyzer
 async function searchSong(){
   const q=document.getElementById('a-search').value.trim();
@@ -10115,6 +10531,7 @@ SONGWRITER TAKEAWAYS:
       musical_key:keyParsed,key_trait:songStructure,
       analysis_raw:raw,searched_query:q,
       techniques_used:S.selectedTechniques.map(t=>t.id),
+      cues_used:getActiveCueIds(),
       ratings:{hook:(raw.match(/Hook:\s*(\d+)/)||[])[1],structure:(raw.match(/Structure:\s*(\d+)/)||[])[1],emotion:(raw.match(/Emotion:\s*(\d+)/)||[])[1],lyrics:(raw.match(/Lyrics:\s*(\d+)/)||[])[1],commercial:(raw.match(/Commercial:\s*(\d+)/)||[])[1]}
     });
     // Update library count
@@ -10150,7 +10567,7 @@ async function runAnalysis(){
       learnSong({
         title:sel.t,artist:sel.a,year:String(sel.yr),genre:genreLabel,
         source:'library',structure:sel.structure,key_trait:sel.key,
-        analysis_raw:raw,techniques_used:S.selectedTechniques.map(t=>t.id),ratings:{}
+        analysis_raw:raw,techniques_used:S.selectedTechniques.map(t=>t.id),cues_used:getActiveCueIds(),ratings:{}
       });
       const lc=document.getElementById('a-library-count');if(lc)lc.textContent=getLearnedSongs().length;
     }else{document.getElementById('a-remake').style.display='none';}
@@ -10215,7 +10632,7 @@ TARGET GENRE: ${targetLabel}
 INSTRUCTIONS:
 1. Keep the structural DNA that made the original work (section flow, tension-release pattern, hook placement)
 2. Apply the user's twist as the new creative direction
-3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}
+3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}${getProductionCuePrompt(targetGenre||a.genre||'pop')}
 
 DELIVER EXACTLY:
 
@@ -10225,7 +10642,7 @@ DNA KEPT: [2-3 bullet points — which structural/psychological elements from th
 
 TWIST APPLIED: [2-3 bullet points — how the user's idea changed the song's direction]
 
-SONG PROMPT: [under 440 chars, no artist names, include instruments (4-5), BPM, vocal style, counter-melody device — Suno-ready]
+SONG PROMPT: [under 440 chars, no artist names, include: genre, era-specific production texture, instruments (4-5) authentic to genre and era, BPM, vocal style, counter-melody device — Suno-ready]
 
 LYRICS:
 [Full lyrics with structure brackets like [Verse 1], [Chorus], [Bridge], etc. Match the bar counts and section flow of the original DNA]
@@ -10303,6 +10720,7 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
         source:a.genre==='search'?'search':'library',
         remake_twist:twist,remake_genre:targetLabel,remake_output:raw,
         techniques_used:S.selectedTechniques.map(t=>t.id),
+        cues_used:getActiveCueIds(),
         times_remade:1
       });
     }
@@ -10441,7 +10859,8 @@ async function syncToCloud(songData){
       searched_query:songData.searched_query||'',
       times_remade:songData.times_remade||0,
       user_rating:songData.user_rating||null,
-      techniques_used:songData.techniques_used||[]
+      techniques_used:songData.techniques_used||[],
+      cues_used:songData.cues_used||[]
     };
     await S.supabase.from('learned_songs').upsert(row,{onConflict:'id',ignoreDuplicates:false});
   }catch(e){console.warn('Cloud sync failed:',e.message);}
@@ -10951,15 +11370,20 @@ function lockedGenreClick(gid) {
 // ERA SELECTOR
 // ═══════════════════════════════════════════════════════
 const ERA_DESCS = {
-  classic:      'Pre-1980 vocabulary: analog warmth, live band dynamics, raw emotional delivery.',
-  vintage:      '1980–1999 production: drum machines, synth pads, MTV-era hooks and gated reverb.',
-  modern:       '2000–2015 sound: polished production, digital sheen, chart-ready anthems.',
-  contemporary: '2016–2022 aesthetic: lo-fi textures, trap hi-hats, streaming-optimised dynamics.',
+  fifties:      '1950s sound: rock & roll birth, doo-wop harmonies, early R&B, stand-up bass, Sun Records warmth.',
+  sixties:      '1960s revolution: British Invasion jangle, Motown polish, psychedelic textures, folk protest, Phil Spector wall of sound.',
+  seventies:    '1970s diversity: disco grooves, funk basslines, punk raw energy, prog rock ambition, early synth experiments.',
+  vintage:      '1980–1999 production: drum machines, synth pads, MTV-era hooks, gated reverb, grunge rawness.',
+  modern:       '2000–2015 sound: polished production, digital sheen, chart-ready anthems, Auto-Tune emergence.',
+  contemporary: '2016–2022 aesthetic: lo-fi textures, trap hi-hats, streaming-optimised dynamics, bedroom pop.',
   current:      '2023–Now: hyperpop edges, AI-era production, ultra-compressed modern sound.',
 };
 function setEra(el, val) {
+  // Migrate legacy 'classic' era to 'seventies'
+  if(val==='classic') val='seventies';
   document.querySelectorAll('#era-pills .qpill').forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
+  if(el) el.classList.add('on');
+  else{const pill=document.querySelector(`#era-pills .qpill[data-era="${val}"]`);if(pill)pill.classList.add('on');}
   S.selectedEra = val;
   const desc = document.getElementById('era-desc');
   if (desc) desc.textContent = ERA_DESCS[val] || '';
