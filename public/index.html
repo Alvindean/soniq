@@ -512,8 +512,14 @@ a{color:var(--amber);text-decoration:none}
 .otab-pane-enter{animation:tabIn .2s ease both}
 @keyframes tabIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 .opane-hint{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:10px}
-.lyrics-box{font-family:var(--mono);font-size:13.5px;line-height:2.3;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:22px}
+.lyrics-box{font-family:var(--mono);font-size:13.5px;line-height:2.3;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:22px;position:relative}
 .lyrics-box .tag{color:var(--amber);font-weight:700}
+/* Collapsible lyrics */
+.lyrics-box.collapsed{max-height:180px;overflow:hidden}
+.lyrics-box.collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,var(--s1));pointer-events:none}
+.lyrics-toggle{display:none;margin:8px 0 4px;padding:6px 16px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.04em;text-transform:uppercase}
+.lyrics-toggle:hover{border-color:var(--amber);color:var(--amber);background:var(--amberbg)}
+.lyrics-toggle.visible{display:inline-flex;align-items:center;gap:5px}
 .style-box{background:var(--cyanbg);border:1px solid var(--cyanline);border-radius:var(--r2);padding:14px 16px;font-family:var(--mono);font-size:13px;color:var(--cyan);line-height:1.7;word-break:break-word}
 .prose-box{background:var(--s1);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;font-size:13px;color:var(--tx2);line-height:1.8;white-space:pre-wrap;word-break:break-word}
 
@@ -3754,7 +3760,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <div id="res-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
-      <div id="res-lyrics-text" class="lyrics-box"></div>
+      <div id="res-lyrics-text" class="lyrics-box collapsed"></div>
+      <button class="lyrics-toggle visible" id="res-lyrics-toggle" onclick="toggleLyrics('res')">▼ Show full lyrics</button>
       <div class="lyrics-charcount" id="res-lyrics-charcount"></div>
       <!-- CREATIVE PROMPTS (Image + Video) -->
       <div id="res-creative-prompts" style="display:none"></div>
@@ -4013,7 +4020,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <div id="lres-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
-      <div id="lres-lyrics-text" class="lyrics-box"></div>
+      <div id="lres-lyrics-text" class="lyrics-box collapsed"></div>
+      <button class="lyrics-toggle visible" id="lres-lyrics-toggle" onclick="toggleLyrics('lres')">▼ Show full lyrics</button>
       <div class="lyrics-charcount" id="lres-lyrics-charcount"></div>
       <!-- CREATIVE PROMPTS (Image + Video) -->
       <div id="lres-creative-prompts" style="display:none"></div>
@@ -8658,6 +8666,7 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   document.getElementById('lres-lyrics-text').innerHTML=escHtml(_lClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   updateLyricsCount('lres', _lClean);
   renderCreativePrompts('lres', visualPrompt, videoPrompt);
+  autoCollapseLyrics('lres');
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -9165,6 +9174,7 @@ function parseSongResult(raw,genre,topic,prodData){
   document.getElementById('res-lyrics-text').innerHTML=escHtml(_rClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   updateLyricsCount('res', _rClean);
   renderCreativePrompts('res', visualPrompt, videoPrompt);
+  autoCollapseLyrics('res');
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -9336,6 +9346,30 @@ function stripLyricsDashes(text) {
   // Remove em dashes at end of line, replace mid-line em dashes with comma
   return text.replace(/—\s*$/gm, '').replace(/\s*—\s*/g, ', ');
 }
+function toggleLyrics(prefix) {
+  const box = document.getElementById(prefix + '-lyrics-text');
+  const btn = document.getElementById(prefix + '-lyrics-toggle');
+  if (!box || !btn) return;
+  const isCollapsed = box.classList.toggle('collapsed');
+  btn.innerHTML = isCollapsed ? '▼ Show full lyrics' : '▲ Collapse lyrics';
+}
+
+// Auto-collapse lyrics if content is long enough to warrant it
+function autoCollapseLyrics(prefix) {
+  const box = document.getElementById(prefix + '-lyrics-text');
+  const btn = document.getElementById(prefix + '-lyrics-toggle');
+  if (!box || !btn) return;
+  const contentHeight = box.scrollHeight;
+  if (contentHeight > 240) {
+    box.classList.add('collapsed');
+    btn.classList.add('visible');
+    btn.innerHTML = '▼ Show full lyrics';
+  } else {
+    box.classList.remove('collapsed');
+    btn.classList.remove('visible');
+  }
+}
+
 function updateLyricsCount(prefix, rawText) {
   const cc = document.getElementById(prefix + '-lyrics-charcount');
   if (!cc) return;
@@ -16215,6 +16249,7 @@ function checkShareLink() {
     if (verdictEl) verdictEl.textContent = song.verdict || '';
     const lyricsEl = document.getElementById('res-lyrics-text');
     if (lyricsEl) lyricsEl.innerHTML = escHtml(song.lyrics||'').replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
+    autoCollapseLyrics('res');
     renderBrief('res', song.style||'', song.brief||'');
     const structEl = document.getElementById('res-structure-text');
     if (structEl) structEl.textContent = song.structure || '';
