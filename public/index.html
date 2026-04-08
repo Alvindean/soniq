@@ -3742,6 +3742,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="res-lyrics-text" class="lyrics-box"></div>
       <div class="lyrics-charcount" id="res-lyrics-charcount"></div>
+      <!-- CREATIVE PROMPTS (Image + Video) -->
+      <div id="res-creative-prompts" style="display:none"></div>
       <!-- AUDIO EMBED -->
       <div id="res-audio-embed" style="display:none;margin:12px 0;border-radius:8px;overflow:hidden;border:1px solid var(--brd)"></div>
       <!-- REVISION BAR -->
@@ -3999,6 +4001,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="lres-lyrics-text" class="lyrics-box"></div>
       <div class="lyrics-charcount" id="lres-lyrics-charcount"></div>
+      <!-- CREATIVE PROMPTS (Image + Video) -->
+      <div id="lres-creative-prompts" style="display:none"></div>
       <!-- REVISION BAR -->
       <div class="revision-bar" id="lres-revision-bar" style="display:none">
         <span class="revision-bar-label">Quick Revise:</span>
@@ -6261,6 +6265,92 @@ const ERA_GENRE_OVERRIDES={
 };
 
 // ═══════════════════════════════════════════════════════════════
+// MUSIC_ACADEMIA — Songwriting frameworks from university-level
+// music courses taught by legendary artists & producers
+// Each framework maps to genres where its principles apply most
+// ═══════════════════════════════════════════════════════════════
+const MUSIC_ACADEMIA={
+  lupe_fiasco_mit:{
+    name:'Lupe Fiasco — MIT "Rap Theory & Practice"',
+    principles:[
+      'BAR ARCHITECTURE: Every bar is a micro-composition. Count syllables per bar — density creates intensity. Sparse bars = emphasis. Dense bars = urgency.',
+      'WORDPLAY LAYERING: Stack meanings — surface narrative + metaphorical subtext + phonetic wordplay in every line. Best lyrics reward 3rd listen.',
+      'CONCEPTUAL COMMITMENT: Choose a central conceit and NEVER break character. "Kick Push" = skateboarding as life metaphor. Every image must serve the concept.',
+      'INTERNAL RHYME DENSITY: Rhyming at end-of-line is amateur. Place rhymes mid-bar, across bars, in unexpected positions. This creates flow.',
+      'NARRATIVE PERSPECTIVE: Use specific POV — not "people struggle" but "she counts the change from the vending machine". Specificity IS universality.'
+    ],
+    genres:['hiphop','rap','trap','drill','conscious','spoken_word','experimental','alternative']
+  },
+  ninth_wonder_harvard:{
+    name:'9th Wonder — Harvard "Hip-Hop Sampling" & Duke "History of Hip-Hop"',
+    principles:[
+      'SAMPLING AS ARCHAEOLOGY: Every beat contains a conversation with the past. Production should reference, honor, and transform its source material.',
+      'DRUM POCKET THEORY: The space BETWEEN hits matters more than the hits themselves. Swing, pocket, and micro-timing create the feeling people call "groove".',
+      'ARRANGEMENT AS NARRATIVE: A beat should evolve like a story — intro sets mood, verse provides context, hook delivers the thesis, bridge pivots, outro resolves.',
+      'SONIC TEXTURE PALETTE: Limit your sonic palette intentionally. Soulquarians used 5-7 textures max. Too many sounds = too many characters = no story.',
+      'EMOTIONAL FREQUENCY: Every key and BPM combo triggers a specific emotional frequency. Minor + slow = introspection. Major + uptempo = triumph. Know the science.'
+    ],
+    genres:['hiphop','rnb','soul','neo_soul','jazz','lo_fi','boom_bap','alternative']
+  },
+  questlove_nyu:{
+    name:'Questlove — NYU "Classic Albums"',
+    principles:[
+      'ALBUM ARC AS EMOTIONAL JOURNEY: Even a single song exists on an emotional arc. Open with tension, build expectation, deliver catharsis, leave an aftertaste.',
+      'THE 3-SECOND TEST: A hit song declares itself in the first 3 seconds. An intro sound, a vocal texture, a rhythmic hook — something that says "stop and listen."',
+      'IMPERFECTION AS SIGNATURE: The "mistakes" that define classics — the breath before a note, the off-grid snare, the cracked voice — these are features, not bugs.',
+      'GROOVE OVER PERFECTION: Music that is mathematically perfect is emotionally dead. Leave room for human timing, for the push-pull between instruments.',
+      'REFERENCE POINT THEORY: Great songs exist in conversation with 2-3 older songs. The listener may not know the references, but they feel the depth.'
+    ],
+    genres:['pop','rock','rnb','soul','funk','jazz','alternative','indie','blues','country']
+  },
+  swizz_beatz_nyu:{
+    name:'Swizz Beatz — NYU "Producer as Entrepreneur/Creative"',
+    principles:[
+      'THE DROP PHILOSOPHY: Build tension for 4-8 bars, then REMOVE elements to create the drop. Silence is the most powerful instrument.',
+      'ENERGY ARCHITECTURE: Map energy 1-10 across the entire song. Verse = 5, pre-chorus = 7, chorus = 9, bridge = 4, final chorus = 10. Never flatline.',
+      'SONIC BRANDING: Every song needs ONE signature sound that makes it instantly identifiable in 2 seconds of a TikTok scroll.',
+      'SIMPLICITY DOCTRINE: The best hooks are 4-6 words. The best melodies are 5-7 notes. Complexity is easy — simplicity that hits is craft.',
+      'COLLISION THEORY: Put two things together that should NOT work. Classical piano + 808 bass. Gospel choir + trap hi-hats. The friction creates heat.'
+    ],
+    genres:['hiphop','pop','edm','trap','dance','electropop','experimental','hyperpop','latin_trap']
+  },
+  gza_harvard:{
+    name:'GZA — Harvard "Science of Hip-Hop"',
+    principles:[
+      'LYRICAL PRECISION: Every word must earn its place. If a word can be cut without losing meaning, cut it. Dense writing = respect for the listener.',
+      'CONCEPTUAL ARCHITECTURE: Structure lyrics like a chess game — opening establishes position, middle develops strategy, end delivers checkmate.',
+      'VOCABULARY AS PAINT: Technical language from ANY field (science, philosophy, street, cuisine) creates unique imagery. "Liquid swords" > "sharp words".',
+      'STORYTELLING THROUGH SPECIFICS: Replace every adjective with a concrete detail. Not "the hard streets" but "the stairwell where the lightbulb\'s been out since June."',
+      'RHYTHM MATHEMATICS: Syllable patterns follow mathematical progressions. 8-8-8-12 creates anticipation. 12-12-8-4 creates compression. Map your syllable counts.'
+    ],
+    genres:['hiphop','rap','conscious','spoken_word','experimental','alternative','drill','trap']
+  },
+  bun_b_rice:{
+    name:'Bun B — Rice University "Religion & Hip-Hop in America"',
+    principles:[
+      'CULTURAL GROUNDING: Music that endures comes from a specific place, community, and experience. Root every song in geography and lived truth.',
+      'ORAL TRADITION TECHNIQUE: Rap is the latest form of oral storytelling — use techniques of repetition, call-and-response, and rhythmic emphasis from that lineage.',
+      'AUTHENTICITY OVER TECHNIQUE: A perfectly delivered lie loses to a raw truth every time. Write from what you know, then learn to say it with skill.',
+      'COMMUNAL RESONANCE: The best songs say something one person feels but a million people recognize. Write the specific, deliver the universal.',
+      'NARRATIVE PATIENCE: Let a story breathe. Not every bar needs a punchline. Build scenes, establish characters, THEN deliver the turn.'
+    ],
+    genres:['hiphop','rap','country','gospel','blues','soul','rnb','southern_rap','conscious','spoken_word','folk']
+  }
+};
+
+// Genre → applicable academic frameworks mapping (pre-computed for speed)
+const GENRE_ACADEMIA_MAP=(function(){
+  const map={};
+  Object.entries(MUSIC_ACADEMIA).forEach(([key,course])=>{
+    course.genres.forEach(g=>{
+      if(!map[g])map[g]=[];
+      map[g].push(key);
+    });
+  });
+  return map;
+})();
+
+// ═══════════════════════════════════════════════════════════════
 // GENRE_PRODUCTION_CUES — Inline Suno metatags for all 30 genres
 // Parentheses () = vocal delivery cues INSIDE lyric lines
 // Bracket modifiers [] = section-level production direction
@@ -8402,7 +8492,7 @@ ${fd?.name?'Fusion style: '+fd.name:'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}${getEraGenreDNA(g1)}
+Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}${getEraGenreDNA(g1)}${getAcademicFrameworkPrompt(g1)}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -8461,7 +8551,13 @@ COUNTERMELODY:
 DEVICE: [Name the specific counter-melodic instrument/voice for this genre — e.g. "Pedal steel guitar" or "Piano montuno" or "Choir response" or "Guitar talks back to vocal"]
 WHAT IT DOES: [One sentence: where in the song it plays, what it plays against, and the emotional effect it creates]
 HOW TO PROMPT: [Exact language to add to the Suno/Udio style prompt to trigger this counter-melody — e.g. "add pedal steel answer fills" or "piano montuno backing pattern" or "choir call and response" — under 60 chars]
-SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: subtle / Chorus: prominent / Bridge: leads"]`;
+SECTION MAP: [Which sections it appears in and how it changes — e.g. "Verse: subtle / Chorus: prominent / Bridge: leads"]
+
+VISUAL PROMPT:
+[A single detailed AI image generation prompt (60-100 words) for cover art / promotional image that captures this song's emotional world. Include: visual style, color palette (3-4 colors), subject/scene as lyric metaphor, atmosphere/lighting, texture. NO text in image. Optimized for Midjourney / FLUX / Ideogram.]
+
+VIDEO PROMPT:
+[A single detailed AI video generation prompt (60-100 words) for a short-form music video (15-45 sec, 9:16 vertical). Include: opening shot, camera movement, transitions synced to energy, color grading, subject direction, key visual moments matching chorus peaks. Optimized for Runway / Kling / Sora.]`;
 
   const luckyOut=document.getElementById('lucky-out');
   luckyOut.style.display='block';
@@ -8547,6 +8643,7 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   const _lClean=stripLyricsDashes(lyrics||raw);
   document.getElementById('lres-lyrics-text').innerHTML=escHtml(_lClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   updateLyricsCount('lres', _lClean);
+  renderCreativePrompts('lres', visualPrompt, videoPrompt);
   document.getElementById('lres-structure-text').textContent=structure||'';
   document.getElementById('lres-dopamine-text').textContent=dopamine||'';
   document.getElementById('lres-notes-text').textContent=notes||'';
@@ -8788,7 +8885,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{fifties:'1950s — rock & roll, doo-wop, stand-up bass, tube amp warmth, Sun Records echo, simple 3-chord progressions, call-and-response, vocal group harmonies',sixties:'1960s — British Invasion jangle, Motown orchestral soul, psychedelic reverb/delay, folk protest acoustic, Phil Spector wall of sound, fuzz guitar, Hammond organ',seventies:'1970s — disco four-on-the-floor, funk slap bass, punk 3-chord raw energy, prog rock odd time signatures, early analog synths, Moog basslines, wah-wah guitar',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks, gated reverb, grunge distortion, 808s, sampling',modern:'Modern (2000–2015) — polished digital production, Auto-Tune, chart-ready anthems, compressed loudness war sound',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics, bedroom pop, 808 sub-bass',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed, micro-genre blending'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}${getProductionCuePrompt(genre)}${getEraGenreDNA(genre)}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}${getProductionCuePrompt(genre)}${getEraGenreDNA(genre)}${getAcademicFrameworkPrompt(genre)}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -8859,7 +8956,13 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]`;
+5. [tip 5]
+
+VISUAL PROMPT:
+[A single detailed AI image generation prompt (60-100 words) for cover art / promotional image that captures this song's emotional world. Include: visual style (cinematic, painterly, neon-lit, etc.), color palette (3-4 specific colors), subject/scene that metaphorically represents the lyrics, atmosphere/lighting, texture. NO text in image. Optimized for Midjourney / FLUX / Ideogram. The image should make someone FEEL the song before hearing it.]
+
+VIDEO PROMPT:
+[A single detailed AI video generation prompt (60-100 words) for a short-form music video (15-45 sec, 9:16 vertical). Include: opening shot, camera movement (slow zoom, tracking, handheld), visual transitions synced to song energy, color grading matching the mood, subject/talent direction, key visual moments that match chorus/hook energy peaks. Optimized for Runway / Kling / Sora. The video should capture the song's emotional arc in motion.]`;
 
   const out=document.getElementById('gen-out');
   out.classList.add('visible');
@@ -9047,6 +9150,7 @@ function parseSongResult(raw,genre,topic,prodData){
   const _rClean=stripLyricsDashes(lyrics||raw);
   document.getElementById('res-lyrics-text').innerHTML=escHtml(_rClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   updateLyricsCount('res', _rClean);
+  renderCreativePrompts('res', visualPrompt, videoPrompt);
   document.getElementById('res-structure-text').textContent=structure||'';
   document.getElementById('res-dopamine-text').textContent=dopamine||'';
   document.getElementById('res-notes-text').textContent=notes||'';
@@ -10529,6 +10633,58 @@ PLACEMENT RULES:
 - Ad-lib cues like (yeah) or (hey!) go naturally between phrases, not forced`;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// ACADEMIC FRAMEWORK PROMPT — Injects university-level songwriting
+// principles based on genre. Selects 2 most relevant courses,
+// picks 2 principles from each = 4 total principles per song.
+// ═══════════════════════════════════════════════════════════════
+function getAcademicFrameworkPrompt(genre){
+  genre=genre||S.selectedGenre||'pop';
+  const _g=(genre||'').toLowerCase().replace(/[\s\-\/]+/g,'_');
+  const gKey=typeof GENRE_ALIAS_LOCAL!=='undefined'?(GENRE_ALIAS_LOCAL[_g]||_g):_g;
+
+  // Find applicable courses for this genre
+  const courseKeys=GENRE_ACADEMIA_MAP[gKey]||GENRE_ACADEMIA_MAP['pop']||[];
+  if(!courseKeys.length)return '';
+
+  // Select up to 2 courses — prefer variety
+  const selected=courseKeys.slice(0,Math.min(2,courseKeys.length));
+
+  // From each course, pick 2 principles (rotate based on a simple hash of genre+era)
+  const era=S.selectedEra||'modern';
+  const hash=(gKey+era).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const principles=[];
+
+  selected.forEach((courseKey,ci)=>{
+    const course=MUSIC_ACADEMIA[courseKey];
+    if(!course)return;
+    const pList=course.principles;
+    const startIdx=(hash+ci*7)%pList.length;
+    principles.push({
+      source:course.name.split('—')[0].trim(),
+      p1:pList[startIdx%pList.length],
+      p2:pList[(startIdx+1)%pList.length]
+    });
+  });
+
+  if(!principles.length)return '';
+
+  let prompt='\n\n🎓 ACADEMIC SONGWRITING FRAMEWORK:\n';
+  prompt+='Apply these university-level songwriting principles (from real courses taught by legendary artists):\n\n';
+
+  principles.forEach(p=>{
+    prompt+=`[${p.source}]\n- ${p.p1}\n- ${p.p2}\n\n`;
+  });
+
+  prompt+='INTEGRATION RULES:\n';
+  prompt+='- These principles are GUIDELINES, not rigid rules — apply them where they elevate the song\n';
+  prompt+='- If a principle conflicts with the genre\'s DNA or the user\'s intent, the genre/intent wins\n';
+  prompt+='- Use these to add DEPTH and CRAFT, not to make the song academic or stiff\n';
+  prompt+='- The listener should FEEL these principles, never notice them intellectually';
+
+  return prompt;
+}
+
 // Get which cues were used in current generation (for learning tracking)
 function getActiveCueIds(){
   return S._activeCues||[];
@@ -10755,7 +10911,7 @@ TARGET GENRE: ${targetLabel}
 INSTRUCTIONS:
 1. Keep the structural DNA that made the original work (section flow, tension-release pattern, hook placement)
 2. Apply the user's twist as the new creative direction
-3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}${getProductionCuePrompt(targetGenre||a.genre||'pop')}${getEraGenreDNA(targetGenre||a.genre||'pop')}
+3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}${getProductionCuePrompt(targetGenre||a.genre||'pop')}${getEraGenreDNA(targetGenre||a.genre||'pop')}${getAcademicFrameworkPrompt(targetGenre||a.genre||'pop')}
 
 DELIVER EXACTLY:
 
@@ -10770,7 +10926,13 @@ SONG PROMPT: [under 440 chars, no artist names, include: genre, era-specific pro
 LYRICS:
 [Full lyrics with structure brackets like [Verse 1], [Chorus], [Bridge], etc. Match the bar counts and section flow of the original DNA]
 
-WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic while feeling new]`;
+WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic while feeling new]
+
+VISUAL PROMPT:
+[A single detailed AI image prompt (60-100 words) for cover art capturing the remade song's vibe. Visual style, color palette, subject/scene as metaphor, atmosphere. NO text in image. Optimized for Midjourney / FLUX / Ideogram.]
+
+VIDEO PROMPT:
+[A single detailed AI video prompt (60-100 words) for a 15-45 sec vertical music video. Opening shot, camera movement, transitions, color grading, key moments. Optimized for Runway / Kling / Sora.]`;
 
   btnLoad('remake-btn','Generating…');
   // Collapse technique panel to reduce scroll distance to output
@@ -10782,13 +10944,19 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
     // Parse out key sections for copy buttons
     const titleMatch=raw.match(/SONG TITLE:\s*(.+)/);
     const promptMatch=raw.match(/SONG PROMPT:\s*([\s\S]*?)(?=\n\n(?:LYRICS|DNA KEPT|TWIST|WHY))/);
-    const lyricsMatch=raw.match(/LYRICS:\s*([\s\S]*?)(?=\n\n(?:WHY THIS WORKS|$))/);
+    const lyricsMatch=raw.match(/LYRICS:\s*([\s\S]*?)(?=\n\n(?:WHY THIS WORKS|VISUAL PROMPT|$))/);
+    const visualMatch=raw.match(/VISUAL PROMPT:\s*([\s\S]*?)(?=\n\n(?:VIDEO PROMPT|$))/);
+    const videoMatch=raw.match(/VIDEO PROMPT:\s*([\s\S]*?)$/);
     const songTitle=titleMatch?titleMatch[1].trim():'Untitled Remake';
     const songPrompt=promptMatch?promptMatch[1].trim():'';
     const songLyrics=lyricsMatch?lyricsMatch[1].trim():'';
+    const rmkVisualPrompt=visualMatch?visualMatch[1].trim():'';
+    const rmkVideoPrompt=videoMatch?videoMatch[1].trim():'';
     // Store for safe copy (avoid template literal injection)
     S._remakeLyrics=songLyrics;
     S._remakePrompt=songPrompt;
+    S._remakeVisual=rmkVisualPrompt;
+    S._remakeVideo=rmkVideoPrompt;
     // Store remake song data for editor/save integration
     S._remakeTitle=songTitle;
     S._remakeGenre=targetLabel;
@@ -10818,6 +10986,17 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
         </div>
         <div class="score-grid" id="rmk-score-grid"></div>
       </div>
+      ${(rmkVisualPrompt||rmkVideoPrompt)?`<div class="creative-prompts-card" style="margin:12px 0;padding:14px 16px;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2)">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber);margin-bottom:10px">🎨 Creative Prompts — Copy & Paste</div>
+        ${rmkVisualPrompt?`<div style="margin-bottom:10px">
+          <div class="vp-label"><span>🖼 Image / Cover Art</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Midjourney · FLUX · Ideogram</span></div>
+          <div class="vp-prompt-box">${escHtml(rmkVisualPrompt)}<button class="vp-copy-btn" onclick="safeCopy(S._remakeVisual,'Image prompt')">Copy</button></div>
+        </div>`:''}
+        ${rmkVideoPrompt?`<div>
+          <div class="vp-label"><span>🎬 Video / Motion</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Runway · Kling · Sora</span></div>
+          <div class="vp-prompt-box">${escHtml(rmkVideoPrompt)}<button class="vp-copy-btn" onclick="safeCopy(S._remakeVideo,'Video prompt')">Copy</button></div>
+        </div>`:''}
+      </div>`:''}
       <div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${html}</div>
     </div>`;
     // Run scoring on the remade song
@@ -12988,6 +13167,32 @@ async function loadMoodBoard(prefix) {
   } catch(e) {
     container.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:16px">Moodboard unavailable.</div>';
   }
+}
+
+// ═══════════════════════════════════════════════════════
+// CREATIVE PROMPTS CARD — Image + Video prompts inline
+// Shows below lyrics for instant copy-paste into AI tools
+// ═══════════════════════════════════════════════════════
+function renderCreativePrompts(prefix, visualPrompt, videoPrompt) {
+  const container = document.getElementById(prefix + '-creative-prompts');
+  if (!container) return;
+  if (!visualPrompt && !videoPrompt) { container.style.display = 'none'; return; }
+
+  container.style.display = '';
+  container.innerHTML = `
+    <div style="margin:14px 0;padding:16px 18px;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--amber)">🎨 Creative Prompts — Copy & Paste into AI Tools</div>
+      </div>
+      ${visualPrompt ? `<div style="margin-bottom:${videoPrompt ? '12' : '0'}px">
+        <div class="vp-label"><span>🖼 Image / Cover Art Prompt</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Midjourney · FLUX · Ideogram · DALL-E</span></div>
+        <div class="vp-prompt-box" id="${prefix}-cp-visual">${escHtml(visualPrompt)}<button class="vp-copy-btn" onclick="copyEl('${prefix}-cp-visual',this)">Copy</button></div>
+      </div>` : ''}
+      ${videoPrompt ? `<div>
+        <div class="vp-label"><span>🎬 Video / Motion Prompt</span><span style="color:var(--tx4);font-size:9px;font-weight:400">Runway · Kling · Sora · Veo</span></div>
+        <div class="vp-prompt-box" id="${prefix}-cp-video">${escHtml(videoPrompt)}<button class="vp-copy-btn" onclick="copyEl('${prefix}-cp-video',this)">Copy</button></div>
+      </div>` : ''}
+    </div>`;
 }
 
 // ═══════════════════════════════════════════════════════
