@@ -777,6 +777,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .fgroup-hdr.open+.fgroup-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;padding-top:4px;padding-bottom:8px}
 .fcard{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px}
 .fcard:hover{border-color:var(--cyanline);background:var(--s3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.remake-panel{margin-top:12px;border:1px solid var(--amber);border-radius:var(--r2);background:linear-gradient(135deg,rgba(251,191,36,0.04),transparent)}
+.remake-panel .ctitle{color:var(--amber)}
+.remake-dna-item{display:flex;gap:6px;margin-bottom:4px}.remake-dna-item b{color:var(--amber);min-width:80px;flex-shrink:0}
+#remake-out .card{border-left:3px solid var(--cyan)}
+.intel-stat{background:var(--s2);border-radius:8px;padding:8px 14px;text-align:center;min-width:70px}
+.intel-num{font-size:20px;font-weight:800;color:var(--cyan);line-height:1}
+.intel-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx4);margin-top:2px}
 .fcard-score{font-size:22px;font-weight:800;min-width:36px;text-align:center;line-height:1}
 .fcard-info{flex:1;min-width:0}
 .fcard-name{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px}
@@ -4613,10 +4620,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <label>Genre</label>
           <select id="a-genre" onchange="loadSongs()">
             <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option><option value="rnb">R&B / Soul</option>
+            <option value="neosoul">Neo-Soul</option><option value="gospel">Gospel</option><option value="kpop">K-Pop</option>
             <option value="rock">Rock</option><option value="country">Country</option><option value="edm">EDM</option>
-            <option value="folk">Folk</option><option value="latin">Latin</option><option value="metal">Metal</option>
-            <option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option><option value="altrock">Alt-Rock</option>
-            <option value="reggaeton">Reggaeton</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option><option value="blues">Blues</option><option value="punk">Punk</option>
+            <option value="folk">Folk</option><option value="latin">Latin</option><option value="reggaeton">Reggaeton</option>
+            <option value="metal">Metal</option><option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option>
+            <option value="altrock">Alt-Rock</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option>
+            <option value="blues">Blues</option><option value="punk">Punk</option>
+            <option value="brazilian">Brazilian</option><option value="amapiano">Amapiano</option><option value="dancehall">Dancehall</option>
+            <option value="bollywood">Bollywood</option><option value="arabesque">Arabesque</option><option value="mandopop">Mandopop</option>
           </select>
         </div>
         <div class="fld">
@@ -4631,7 +4642,54 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div id="a-sel" style="font-size:11px;color:var(--tx4);margin-bottom:10px">No song selected — will analyze all</div>
       <button class="btn btn-gold" id="a-btn" onclick="runAnalysis()">🔬 Analyze</button>
     </div>
+    <div class="card" style="margin-top:10px;border:1px solid var(--b2);background:var(--s1)">
+      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:8px">🔍 Or search any song</div>
+      <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap">
+        <input id="a-search" type="text" placeholder="e.g. Blinding Lights by The Weeknd" style="flex:1;min-width:180px;background:var(--s2);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:8px 12px;font-size:13px" onkeydown="if(event.key==='Enter')searchSong()">
+        <button class="btn" id="a-search-btn" onclick="searchSong()" style="background:var(--cyan);color:#000;font-weight:700">🔍 Search</button>
+      </div>
+      <div style="font-size:10px;color:var(--tx4);margin-top:4px">Type any song — we'll research it and run it through the full analyzer</div>
+    </div>
+    <!-- SONG LIBRARY + INTELLIGENCE -->
+    <div id="a-library" class="card" style="margin-top:10px;border:1px solid var(--b1)">
+      <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="const c=document.getElementById('a-library-inner');c.style.display=c.style.display==='none'?'block':'none';this.querySelector('.lib-arrow').textContent=c.style.display==='none'?'▸':'▾';renderLibrary()">
+        <div style="font-size:13px;font-weight:700;color:var(--tx1)">📚 Song Library <span id="a-library-count" style="color:var(--tx4);font-weight:400;font-size:11px">0</span></div>
+        <span class="lib-arrow" style="color:var(--tx4);font-size:12px">▸</span>
+      </div>
+      <div id="a-library-inner" style="display:none;margin-top:10px">
+        <div id="a-intelligence" style="display:none;margin-bottom:10px;padding:10px;background:var(--s1);border-radius:8px;border:1px solid var(--b2)"></div>
+        <div id="a-library-cards"></div>
+      </div>
+    </div>
     <div id="a-out"></div>
+    <!-- REMAKE PANEL — appears after analysis -->
+    <div id="a-remake" class="card remake-panel" style="display:none">
+      <div class="ctitle">🔄 Remake This Song</div>
+      <div id="remake-dna" style="font-size:12px;line-height:1.6;color:var(--tx3);margin-bottom:12px;padding:10px;background:var(--s1);border-radius:8px;border-left:3px solid var(--amber)"></div>
+      <div class="fld" style="margin-bottom:10px">
+        <label>Your Twist — what's new?</label>
+        <textarea id="remake-twist" rows="3" placeholder="e.g. Make it about leaving a 9-to-5 for music… add a gospel bridge… flip it to Amapiano…" style="width:100%;background:var(--s1);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:10px;font-size:13px;resize:vertical"></textarea>
+      </div>
+      <div class="g2" style="margin-bottom:10px">
+        <div class="fld">
+          <label>Target Genre</label>
+          <select id="remake-genre">
+            <option value="">Keep original genre</option>
+            <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option><option value="rnb">R&B / Soul</option>
+            <option value="neosoul">Neo-Soul</option><option value="gospel">Gospel</option><option value="kpop">K-Pop</option>
+            <option value="rock">Rock</option><option value="country">Country</option><option value="edm">EDM</option>
+            <option value="folk">Folk</option><option value="latin">Latin</option><option value="reggaeton">Reggaeton</option>
+            <option value="metal">Metal</option><option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option>
+            <option value="altrock">Alt-Rock</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option>
+            <option value="blues">Blues</option><option value="punk">Punk</option>
+            <option value="brazilian">Brazilian</option><option value="amapiano">Amapiano</option><option value="dancehall">Dancehall</option>
+            <option value="bollywood">Bollywood</option><option value="arabesque">Arabesque</option><option value="mandopop">Mandopop</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-gold" id="remake-btn" onclick="remakeSong()">🔄 Generate Remake</button>
+    </div>
+    <div id="remake-out"></div>
   </div>
   <!-- FORMULA -->
   <div id="more-spane-formula" class="spane">
@@ -5839,6 +5897,15 @@ const SONGS={
     {t:'MIROH',a:'Stray Kids',yr:2019,structure:'Intro→V1→Pre-C→C→V2→Pre-C→C→3RACHA Rap→Bridge→C',key:'Self-produced, heavy 808s, extended rap section earns emotional final chorus',score:95},
   ],
   punk:[{t:'Anarchy in the U.K.',a:'Sex Pistols',yr:1976,structure:'V1→C→V2→C→Bridge→C',key:'Confrontational opening, sneering vocal = genre definition',score:100},{t:'London Calling',a:'The Clash',yr:1979,structure:'V1→C→V2→C→Bridge→C',key:'Political urgency, reggae influence, apocalyptic delivery',score:100},{t:'Blitzkrieg Bop',a:'Ramones',yr:1976,structure:'Intro→V1→C→V2→C→Outro',key:'"Hey ho lets go" — 4 words that launched a genre',score:100},{t:'Should I Stay',a:'The Clash',yr:1982,structure:'V1→C→V2→C→Bridge→C',key:'Bilingual chorus, classic hooks inside punk energy',score:99}],
+  reggaeton:[{t:'Gasolina',a:'Daddy Yankee',yr:2004,structure:'Hook→V1→Hook→V2→Hook→Bridge→Hook',key:'Hook-first, infectious dembow groove, genre-defining energy',score:98},{t:'Tusa',a:'Karol G ft Nicki Minaj',yr:2019,structure:'V1→C→V2→C→Bridge→C',key:'Bilingual female anthem, trap-reggaeton hybrid, emotional hook',score:96},{t:'Dákiti',a:'Bad Bunny ft Jhay Cortez',yr:2020,structure:'Hook→V1→Hook→V2→Hook→Outro',key:'Minimal dembow, ethereal vocals, hypnotic repetition',score:97},{t:'Con Calma',a:'Daddy Yankee ft Snow',yr:2019,structure:'Hook→V1→Hook→V2→Hook→Outro',key:'Nostalgia sample + modern reggaeton = dopamine double hit',score:95}],
+  neosoul:[{t:'Tyrone',a:'Erykah Badu',yr:1997,structure:'V1→V2→V3→Hook→Outro',key:'Spoken-word energy, live band groove, audience interaction as structure',score:99},{t:'Untitled (How Does It Feel)',a:'D\'Angelo',yr:2000,structure:'V1→C→V2→C→Outro',key:'Behind-the-beat vocal, dense harmony, sensual minimalism',score:100},{t:'Golden',a:'Jill Scott',yr:2004,structure:'V1→C→V2→C→Bridge→C',key:'Spoken-to-sung transition, jazz harmony, uplifting mantra chorus',score:97},{t:'Brown Sugar',a:'D\'Angelo',yr:1995,structure:'V1→C→V2→C→Bridge→C',key:'Prince-influenced falsetto, jazz chord voicings, analog warmth',score:98}],
+  gospel:[{t:'Oh Happy Day',a:'Edwin Hawkins Singers',yr:1967,structure:'C→V1→C→V2→C→Vamp',key:'Call-response choir, simple hook repeated to ecstasy, spiritual build',score:100},{t:'Total Praise',a:'Richard Smallwood',yr:1996,structure:'V1→V2→C→Vamp→Tag',key:'Choral crescendo, key modulations, orchestral gospel',score:99},{t:'Break Every Chain',a:'Tasha Cobbs',yr:2013,structure:'V1→C→V2→C→Bridge→Vamp',key:'Repetition as spiritual weapon, worship vamp builds to peak',score:98},{t:'Take Me to the King',a:'Tamela Mann',yr:2012,structure:'V1→C→V2→C→Bridge→C→Vamp',key:'Ballad vulnerability, belt chorus, live congregation energy',score:97}],
+  brazilian:[{t:'Garota de Ipanema',a:'Tom Jobim & Vinicius',yr:1962,structure:'A→B→A',key:'Bossa nova standard, chromatic harmony, whispered vocal, global crossover',score:100},{t:'Magalenha',a:'Sergio Mendes',yr:1992,structure:'V1→C→V2→C→Bridge→C',key:'Batucada percussion, call-response hook, carnival energy',score:97},{t:'Mas Que Nada',a:'Jorge Ben Jor',yr:1963,structure:'C→V1→C→V2→C→Outro',key:'Samba-rock fusion, nonsense syllable hook, infectious groove',score:99},{t:'Ai Se Eu Te Pego',a:'Michel Teló',yr:2011,structure:'Hook→V1→Hook→V2→Hook',key:'Sertanejo universitário, singalong hook, viral dance simplicity',score:95}],
+  amapiano:[{t:'Mnike',a:'Tyler ICU ft Tumelo.za & DJ Maphorisa',yr:2023,structure:'Intro→Hook→V1→Hook→V2→Hook→Outro',key:'Log drum bassline, vocal chant hook, percussive build',score:97},{t:'Water',a:'Tyla',yr:2023,structure:'V1→C→V2→C→Bridge→C',key:'Amapiano-pop crossover, log drum + R&B vocal, global smash',score:98},{t:'Ke Star',a:'Focalistic ft Vigro Deep',yr:2020,structure:'Hook→V1→Hook→V2→Hook→Outro',key:'Pitori vocal style, log drum groove, street anthem energy',score:96},{t:'Abalele',a:'Kabza De Small & DJ Maphorisa',yr:2021,structure:'V1→C→V2→C→Vamp→Outro',key:'Zulu vocal harmony, piano stabs, hypnotic percussion loop',score:97}],
+  dancehall:[{t:'Murder She Wrote',a:'Chaka Demus & Pliers',yr:1992,structure:'Hook→V1→Hook→V2→Hook→Outro',key:'Riddim-driven, singalong hook, DJ-MC dual vocal, carnival energy',score:99},{t:'Pon de Replay',a:'Rihanna',yr:2005,structure:'V1→C→V2→C→Bridge→C',key:'Dancehall-pop crossover, command hook, riddim + pop structure',score:97},{t:'Temperature',a:'Sean Paul',yr:2005,structure:'V1→C→V2→C→Bridge→C',key:'Double-time flow, riddim backbone, ragga-pop global smash',score:96},{t:'Bam Bam',a:'Sister Nancy',yr:1982,structure:'Hook→V1→Hook→V2→Hook',key:'Stalag riddim, toasting vocal, most-sampled dancehall track',score:100}],
+  bollywood:[{t:'Chaiyya Chaiyya',a:'Sukhwinder Singh & Sapna Awasthi',yr:1998,structure:'V1→C→V2→C→Bridge→C',key:'Sufi-folk fusion, train-top choreography, qawwali rhythm meets film pop',score:99},{t:'Jai Ho',a:'A.R. Rahman',yr:2008,structure:'V1→C→V2→C→Bridge→C→Outro',key:'Global crossover, tabla + electronic, Oscar-winning, call-response',score:98},{t:'Tujhe Dekha Toh',a:'Kumar Sanu & Lata Mangeshkar',yr:1995,structure:'V1→C→V2→Interlude→C→V3→C',key:'Romantic duet template, string melody hook, eternal Bollywood formula',score:100},{t:'Ghoomar',a:'Shreya Ghoshal',yr:2018,structure:'C→V1→C→V2→C→Dance Break→C',key:'Rajasthani folk rhythm, twirl choreography, classical vocal runs',score:96}],
+  arabesque:[{t:'Enta Omri',a:'Umm Kulthum',yr:1964,structure:'Intro→Taqasim→V1→Instrumental→V2→Climax',key:'45-minute live performance, maqam modulation, tarab emotional peak',score:100},{t:'Habibi Ya Nour El Ain',a:'Amr Diab',yr:1996,structure:'V1→C→V2→C→Bridge→C',key:'Arabic pop crossover, flamenco guitar + oud, Mediterranean fusion',score:98},{t:'Didi',a:'Khaled',yr:1992,structure:'Hook→V1→Hook→V2→Hook→Outro',key:'Raï-pop fusion, hand-clap rhythm, North African party anthem',score:97},{t:'3 Daqat',a:'Abu ft Yousra',yr:2014,structure:'V1→C→V2→C→Bridge→C',key:'Mahraganat influence, male-female duet, modern Egyptian pop formula',score:96}],
+  mandopop:[{t:'Qi Li Xiang',a:'Jay Chou',yr:2004,structure:'V1→C→V2→C→Rap Break→Bridge→C',key:'Chinese melody + R&B groove + rap verse, Chou formula template',score:99},{t:'Tian Mi Mi',a:'Teresa Teng',yr:1979,structure:'V1→C→V2→C→Outro',key:'Pentatonic melody, waltz time, cross-strait cultural bridge',score:100},{t:'Xiao Xing Yun',a:'Hebe Tien',yr:2014,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Guitar-pop simplicity, conversational verse, anthemic chorus lift',score:96},{t:'Nian Nian',a:'JJ Lin',yr:2015,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Piano ballad, octave vocal leap in chorus, emotional restraint in verse',score:97}],
 };
 
 const GENRE_BIBLE={
@@ -9486,7 +9553,7 @@ async function generateFusion(){
 }
 
 // ═══════════════════════════════════════════════════════
-// ANALYZE
+// ANALYZE + RANDOM + REMAKE
 // ═══════════════════════════════════════════════════════
 function loadSongs(){
   const genre=document.getElementById('a-genre')?.value;if(!genre)return;
@@ -9511,6 +9578,98 @@ function selSong(i){
   S.selectedSong=SONGS[genre]?.[i];
   document.getElementById('a-sel').textContent=`Selected: "${S.selectedSong?.t}" — click Analyze`;
 }
+// Helper: lock/unlock both analyze buttons to prevent race condition
+function lockAnalyzer(msg){
+  btnLoad('a-search-btn',msg||'Working…');
+  const ab=document.getElementById('a-btn');if(ab)ab.disabled=true;
+  document.getElementById('a-remake').style.display='none';
+  document.getElementById('remake-out').innerHTML='';
+}
+function unlockAnalyzer(){
+  btnDone('a-search-btn');
+  const ab=document.getElementById('a-btn');if(ab)ab.disabled=false;
+  btnDone('a-btn');
+}
+// 🔍 Search Any Song — research via Claude, then run through analyzer
+async function searchSong(){
+  const q=document.getElementById('a-search').value.trim();
+  if(!q){document.getElementById('a-search').focus();toast('⚠️ Type a song name');return;}
+  lockAnalyzer('Searching…');
+  document.getElementById('a-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Researching "'+escHtml(q)+'"…</span></div></div>';
+  // Step 1: Research the song
+  const researchPrompt=`Research this song: "${q}"
+
+Provide a COMPLETE musicology analysis. If you recognize the song, draw from your full knowledge. If the query is ambiguous, pick the most famous version.
+
+Return in EXACTLY this format:
+
+SONG: [Full title]
+ARTIST: [Artist name]
+YEAR: [Release year]
+GENRE: [Primary genre]
+STRUCTURE: [Section flow like V1→Pre-C→C→V2→Pre-C→C→Bridge→C]
+BPM: [Estimated BPM]
+KEY: [Musical key]
+
+STRUCTURAL PATTERNS:
+[Detailed section analysis — bar counts, timing, arrangement choices, how sections connect]
+
+PSYCHOLOGICAL WHY:
+[Dopamine triggers, tension-release cycles, prediction error, Zeigarnik effect, why the brain locks onto this song]
+
+LYRIC PATTERNS:
+[Rhyme schemes, syllable density, imagery, emotional arc, narrative technique]
+
+WHY IT HIT:
+[The 2-3 specific elements that made this song cross over and become memorable]
+
+RATINGS:
+Hook: X/10
+Structure: X/10
+Emotion: X/10
+Lyrics: X/10
+Commercial: X/10
+
+SONGWRITER TAKEAWAYS:
+[3 immediately actionable insights a songwriter can steal from this song]`;
+  try{
+    const raw=await callClaude(researchPrompt,'You are a musicologist, neuroscientist, and hit songwriter with encyclopedic knowledge of every charting song in history. Provide detailed, actionable analysis. Be specific about bar counts, chord progressions, and structural decisions.',3000);
+    // Parse out song metadata for the Remake panel
+    const songMatch=raw.match(/SONG:\s*(.+)/);
+    const artistMatch=raw.match(/ARTIST:\s*(.+)/);
+    const yearMatch=raw.match(/YEAR:\s*(\d+)/);
+    const genreMatch=raw.match(/GENRE:\s*(.+)/);
+    const structMatch=raw.match(/STRUCTURE:\s*(.+)/);
+    const songTitle=songMatch?songMatch[1].trim():q;
+    const songArtist=artistMatch?artistMatch[1].trim():'';
+    const songYear=yearMatch?yearMatch[1].trim():'';
+    const songGenre=genreMatch?genreMatch[1].trim():'';
+    const songStructure=structMatch?structMatch[1].trim():'';
+    // Display analysis
+    document.getElementById('a-out').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div><span style="font-size:16px;font-weight:700">${escHtml(songTitle)}</span> <span style="color:var(--tx3);font-size:13px">by ${escHtml(songArtist)} (${escHtml(songYear)})</span></div><span class="bdg bdg-gold">${escHtml(songGenre)}</span></div><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    // Store analysis DNA for Remake — build a virtual song object
+    const virtualSong={t:songTitle,a:songArtist,yr:songYear,structure:songStructure,key:songGenre+' — searched song',score:'?'};
+    S.lastAnalysis={raw,genre:'search',genreLabel:songGenre,song:virtualSong,songList:`"${songTitle}" by ${songArtist} (${songYear}). Structure: ${songStructure}`};
+    S.selectedSong=virtualSong;
+    // Show Remake panel
+    showRemakePanel(virtualSong,songGenre,raw);
+    // 🧠 Auto-save to Song Library
+    learnSong({
+      title:songTitle,artist:songArtist,year:songYear,genre:songGenre,
+      source:'search',structure:songStructure,bpm:(raw.match(/BPM:\s*(\d+)/)||[])[1]||'',
+      musical_key:(raw.match(/KEY:\s*(.+)/i)||[])[1]||'',key_trait:songStructure,
+      analysis_raw:raw,searched_query:q,
+      ratings:{hook:(raw.match(/Hook:\s*(\d+)/)||[])[1],structure:(raw.match(/Structure:\s*(\d+)/)||[])[1],emotion:(raw.match(/Emotion:\s*(\d+)/)||[])[1],lyrics:(raw.match(/Lyrics:\s*(\d+)/)||[])[1],commercial:(raw.match(/Commercial:\s*(\d+)/)||[])[1]}
+    });
+    // Update library count
+    const lc=document.getElementById('a-library-count');if(lc)lc.textContent=getLearnedSongs().length;
+    toast(`✓ Found & analyzed "${songTitle}" — saved to library`);
+  }catch(e){
+    showErr('a-out',e.message);
+    toast('⚠️ Search failed');
+  }
+  unlockAnalyzer();
+}
 async function runAnalysis(){
   const genre=document.getElementById('a-genre').value;
   const genreLabel=document.getElementById('a-genre').options[document.getElementById('a-genre').selectedIndex].text;
@@ -9520,12 +9679,346 @@ async function runAnalysis(){
   const songList=sel?`"${sel.t}" by ${sel.a} (${sel.yr}). Structure: ${sel.structure}. Notes: ${sel.key}`:songs.map(s=>`• "${s.t}" by ${s.a} (${s.yr}) — ${s.structure}`).join('\n');
   const prompt=`Analyze these ${genreLabel} songs as a musicologist, neuroscientist, and hit songwriter:\n\n${songList}\n\nFocus: ${focus}\n\nProvide:\n1. STRUCTURAL PATTERNS — sections, bar counts, timing\n2. PSYCHOLOGICAL WHY — dopamine, Zeigarnik, prediction error, tension-release\n3. LYRIC PATTERNS — rhyme schemes, syllable density, imagery, emotional arc\n4. WHY IT HIT — the 2-3 specific elements that made this cross over\n5. RATINGS — Hook/Structure/Emotion/Lyrics/Commercial (each 1-10) per song\n6. SONGWRITER TAKEAWAYS — 3 immediately actionable insights`;
   btnLoad('a-btn','Analyzing…');
+  lockAnalyzer('Analyzing…');
   document.getElementById('a-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Analyzing songs…</span></div></div>';
   try{
-    const raw=await callClaude(prompt,'You are a musicologist, neuroscientist, and hit songwriter. Provide detailed, actionable analysis.');
+    const raw=await callClaude(prompt,'You are a musicologist, neuroscientist, and hit songwriter. Provide detailed, actionable analysis.',3000);
     document.getElementById('a-out').innerHTML=`<div class="card"><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    // Store analysis DNA for Remake
+    S.lastAnalysis={raw,genre,genreLabel,song:sel,songList};
+    // Show Remake panel only if a single song was selected (multi-song remakes are confusing)
+    if(sel){
+      showRemakePanel(sel,genreLabel,raw);
+      // 🧠 Auto-save to Song Library
+      learnSong({
+        title:sel.t,artist:sel.a,year:String(sel.yr),genre:genreLabel,
+        source:'library',structure:sel.structure,key_trait:sel.key,
+        analysis_raw:raw,ratings:{}
+      });
+      const lc=document.getElementById('a-library-count');if(lc)lc.textContent=getLearnedSongs().length;
+    }else{document.getElementById('a-remake').style.display='none';}
   }catch(e){showErr('a-out',e.message);}
-  btnDone('a-btn');
+  unlockAnalyzer();
+}
+function showRemakePanel(song,genreLabel,analysisRaw){
+  const panel=document.getElementById('a-remake');
+  const dna=document.getElementById('remake-dna');
+  // Extract key DNA points from the analysis
+  const songName=song?`"${song.t}" by ${song.a}`:'Multiple songs';
+  const structure=song?.structure||'Various';
+  const keyNote=song?.key||'See analysis above';
+  dna.innerHTML=`<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:6px;font-weight:700">🧬 Song DNA — ${escHtml(songName)}</div>`+
+    `<div class="remake-dna-item"><b>Genre:</b> <span>${escHtml(genreLabel)}</span></div>`+
+    `<div class="remake-dna-item"><b>Structure:</b> <span>${escHtml(structure)}</span></div>`+
+    `<div class="remake-dna-item"><b>Key trait:</b> <span>${escHtml(keyNote)}</span></div>`+
+    `<div style="font-size:11px;color:var(--tx4);margin-top:6px">The full analysis above is the DNA. Add your twist below to create something new.</div>`;
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+// 🔄 Remake — generate new song using analysis DNA + user's twist
+async function remakeSong(){
+  const twist=document.getElementById('remake-twist').value.trim();
+  if(!twist){document.getElementById('remake-twist').focus();toast('⚠️ Add your twist first');return;}
+  const a=S.lastAnalysis;if(!a){toast('⚠️ Analyze a song first');return;}
+  const targetGenre=document.getElementById('remake-genre').value;
+  const targetLabel=targetGenre?document.querySelector(`#remake-genre option[value="${targetGenre}"]`).text:a.genreLabel;
+  // Build the remake prompt
+  const prompt=`You are a hit songwriter, producer, and musicologist. You just analyzed what makes a song work. Now use that DNA to write a BRAND NEW song with the user's twist.
+
+ORIGINAL SONG DNA:
+${a.song?`Song: "${a.song.t}" by ${a.song.a} (${a.song.yr})
+Structure: ${a.song.structure}
+Key trait: ${a.song.key}
+Score: ${a.song.score}/100`:`Songs analyzed: ${a.songList}`}
+
+FULL ANALYSIS (the DNA):
+${a.raw}
+
+USER'S TWIST:
+${twist}
+
+TARGET GENRE: ${targetLabel}
+
+INSTRUCTIONS:
+1. Keep the structural DNA that made the original work (section flow, tension-release pattern, hook placement)
+2. Apply the user's twist as the new creative direction
+3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}
+
+DELIVER EXACTLY:
+
+SONG TITLE: [title]
+
+DNA KEPT: [2-3 bullet points — which structural/psychological elements from the original you preserved and why]
+
+TWIST APPLIED: [2-3 bullet points — how the user's idea changed the song's direction]
+
+SONG PROMPT: [under 440 chars, no artist names, include instruments (4-5), BPM, vocal style, counter-melody device — Suno-ready]
+
+LYRICS:
+[Full lyrics with structure brackets like [Verse 1], [Chorus], [Bridge], etc. Match the bar counts and section flow of the original DNA]
+
+WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic while feeling new]`;
+
+  btnLoad('remake-btn','Generating…');
+  document.getElementById('remake-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Remixing DNA with your twist…</span></div></div>';
+  try{
+    const raw=await callClaude(prompt,'You are a hit songwriter and producer. Write complete, ready-to-use songs with Suno-compatible structure brackets and style prompts.',3500);
+    const html=escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    // Parse out key sections for copy buttons
+    const titleMatch=raw.match(/SONG TITLE:\s*(.+)/);
+    const promptMatch=raw.match(/SONG PROMPT:\s*([\s\S]*?)(?=\n\n(?:LYRICS|DNA KEPT|TWIST|WHY))/);
+    const lyricsMatch=raw.match(/LYRICS:\s*([\s\S]*?)(?=\n\n(?:WHY THIS WORKS|$))/);
+    const songTitle=titleMatch?titleMatch[1].trim():'Untitled Remake';
+    const songPrompt=promptMatch?promptMatch[1].trim():'';
+    const songLyrics=lyricsMatch?lyricsMatch[1].trim():'';
+    // Store for safe copy (avoid template literal injection)
+    S._remakeLyrics=songLyrics;
+    S._remakePrompt=songPrompt;
+    document.getElementById('remake-out').innerHTML=`<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:16px;font-weight:700;color:var(--cyan)">🔄 ${escHtml(songTitle)}</div>
+        <div style="display:flex;gap:6px">
+          ${songLyrics?`<button class="btn btn-sm" onclick="safeCopy(S._remakeLyrics)">Copy Lyrics</button>`:''}
+          ${songPrompt?`<button class="btn btn-sm" onclick="safeCopy(S._remakePrompt)">Copy Prompt</button>`:''}
+        </div>
+      </div>
+      <div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${html}</div>
+    </div>`;
+    // 🧠 Update learned song with remake data
+    if(a.song){
+      learnSong({
+        title:a.song.t||a.song.title,artist:a.song.a||a.song.artist,
+        year:String(a.song.yr||a.song.year||''),genre:a.genreLabel,
+        source:a.genre==='search'?'search':'library',
+        remake_twist:twist,remake_genre:targetLabel,remake_output:raw,
+        times_remade:1
+      });
+    }
+    toast('✓ Remake generated — saved to library');
+  }catch(e){
+    document.getElementById('remake-out').innerHTML=`<div style="color:var(--red);font-size:13px;padding:8px 0">⚠️ ${escHtml(e.message)}</div>`;
+    toast('⚠️ Remake failed');
+  }
+  btnDone('remake-btn');
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG INTELLIGENCE ENGINE — Learn, Save, Pattern Recognition
+// ═══════════════════════════════════════════════════════
+const LEARN_KEY='soniq_learned_songs';
+
+// ── Storage Layer ──
+function getLearnedSongs(){
+  try{return JSON.parse(localStorage.getItem(LEARN_KEY)||'[]');}catch(e){return[];}
+}
+function saveLearnedSongs(arr){
+  try{localStorage.setItem(LEARN_KEY,JSON.stringify(arr));}catch(e){console.warn('localStorage full');}
+}
+// Save a song analysis to local + cloud
+async function learnSong(songData){
+  const songs=getLearnedSongs();
+  // Deduplicate by title+artist (case-insensitive)
+  const key=(songData.title+songData.artist).toLowerCase().replace(/\s/g,'');
+  const existing=songs.findIndex(s=>(s.title+s.artist).toLowerCase().replace(/\s/g,'')===key);
+  if(existing>=0){
+    // Update existing — keep higher data, merge
+    songs[existing]={...songs[existing],...songData,times_remade:(songs[existing].times_remade||0)+(songData.times_remade||0),updated_at:new Date().toISOString()};
+  }else{
+    songData.id=songData.id||crypto.randomUUID();
+    songData.created_at=new Date().toISOString();
+    songData.updated_at=new Date().toISOString();
+    songData.times_remade=songData.times_remade||0;
+    songs.unshift(songData);
+  }
+  // Cap at 200 songs locally
+  if(songs.length>200)songs.length=200;
+  saveLearnedSongs(songs);
+  // Cloud sync (fire-and-forget)
+  syncToCloud(songData);
+  // Refresh library UI if visible
+  if(document.getElementById('a-library')?.style.display!=='none')renderLibrary();
+  return songData;
+}
+// Cloud sync — save to Supabase if logged in
+async function syncToCloud(songData){
+  if(!S.supabase||!S.session?.user?.id)return;
+  try{
+    const row={
+      user_id:S.session.user.id,
+      title:songData.title||'',
+      artist:songData.artist||'',
+      year:songData.year||'',
+      genre:songData.genre||'',
+      source:songData.source||'search',
+      structure:songData.structure||'',
+      bpm:songData.bpm||'',
+      musical_key:songData.musical_key||'',
+      key_trait:songData.key_trait||'',
+      analysis_raw:songData.analysis_raw||'',
+      ratings:songData.ratings||{},
+      remake_twist:songData.remake_twist||null,
+      remake_genre:songData.remake_genre||null,
+      remake_output:songData.remake_output||null,
+      searched_query:songData.searched_query||'',
+      times_remade:songData.times_remade||0,
+      user_rating:songData.user_rating||null
+    };
+    await S.supabase.from('learned_songs').upsert(row,{onConflict:'id',ignoreDuplicates:false});
+  }catch(e){console.warn('Cloud sync failed:',e.message);}
+}
+// Load from cloud on login (merge with local)
+async function syncFromCloud(){
+  if(!S.supabase||!S.session?.user?.id)return;
+  try{
+    const{data,error}=await S.supabase.from('learned_songs').select('*').eq('user_id',S.session.user.id).order('created_at',{ascending:false}).limit(200);
+    if(error||!data)return;
+    const local=getLearnedSongs();
+    const localKeys=new Set(local.map(s=>(s.title+s.artist).toLowerCase().replace(/\s/g,'')));
+    let merged=0;
+    data.forEach(row=>{
+      const key=(row.title+row.artist).toLowerCase().replace(/\s/g,'');
+      if(!localKeys.has(key)){
+        local.push({
+          id:row.id,title:row.title,artist:row.artist,year:row.year,genre:row.genre,
+          source:row.source,structure:row.structure,bpm:row.bpm,musical_key:row.musical_key,
+          key_trait:row.key_trait,analysis_raw:row.analysis_raw,ratings:row.ratings||{},
+          remake_twist:row.remake_twist,remake_genre:row.remake_genre,remake_output:row.remake_output,
+          searched_query:row.searched_query,times_remade:row.times_remade||0,
+          user_rating:row.user_rating,created_at:row.created_at,updated_at:row.updated_at
+        });
+        merged++;
+      }
+    });
+    if(merged>0){
+      local.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+      if(local.length>200)local.length=200;
+      saveLearnedSongs(local);
+      toast(`☁️ Synced ${merged} songs from cloud`);
+    }
+  }catch(e){console.warn('Cloud sync pull failed:',e.message);}
+}
+
+// ── Song Library UI ──
+function renderLibrary(){
+  const container=document.getElementById('a-library-cards');
+  if(!container)return;
+  const songs=getLearnedSongs();
+  const count=document.getElementById('a-library-count');
+  if(count)count.textContent=songs.length;
+  if(songs.length===0){
+    container.innerHTML='<div style="text-align:center;padding:20px;color:var(--tx4);font-size:12px">No songs learned yet. Search or analyze a song to start building your library.</div>';
+    // Hide intelligence panel
+    const intel=document.getElementById('a-intelligence');
+    if(intel)intel.style.display='none';
+    return;
+  }
+  // Group by genre
+  const grouped={};
+  songs.forEach(s=>{
+    const g=s.genre||'Unknown';
+    if(!grouped[g])grouped[g]=[];
+    grouped[g].push(s);
+  });
+  let html='';
+  Object.keys(grouped).sort().forEach(genre=>{
+    const gs=grouped[genre];
+    html+=`<div style="margin-bottom:8px">
+      <div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);font-weight:700;margin-bottom:4px;cursor:pointer" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'grid':'none'">${escHtml(genre)} (${gs.length}) ▾</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:6px">`;
+    gs.forEach((s,i)=>{
+      const globalIdx=songs.indexOf(s);
+      html+=`<div class="fcard" onclick="reopenAnalysis(${globalIdx})" style="padding:8px 10px;cursor:pointer">
+        <div style="flex:1;min-width:0">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${escHtml(s.title)}</div>
+          <div style="font-size:10px;color:var(--tx3)">${escHtml(s.artist)} · ${escHtml(s.year||'')}</div>
+          <div style="font-size:9px;color:var(--tx4);margin-top:2px">${escHtml(s.structure||'').substring(0,40)}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          ${s.times_remade?`<span style="font-size:9px;color:var(--cyan)">🔄 ×${s.times_remade}</span>`:''}
+          <span style="font-size:9px;color:var(--tx4)">${s.source==='search'?'🔍':'📚'}</span>
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  container.innerHTML=html;
+  // Run pattern intelligence
+  renderIntelligence(songs,grouped);
+}
+// Reopen a saved analysis
+function reopenAnalysis(idx){
+  const songs=getLearnedSongs();
+  const s=songs[idx];if(!s)return;
+  // Display the saved analysis
+  if(s.analysis_raw){
+    document.getElementById('a-out').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div><span style="font-size:16px;font-weight:700">${escHtml(s.title)}</span> <span style="color:var(--tx3);font-size:13px">by ${escHtml(s.artist)} (${escHtml(s.year||'')})</span></div><span class="bdg bdg-gold">${escHtml(s.genre)}</span></div><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(s.analysis_raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    // Restore state for Remake
+    const virtualSong={t:s.title,a:s.artist,yr:s.year,structure:s.structure,key:s.key_trait||s.genre,score:'?'};
+    S.lastAnalysis={raw:s.analysis_raw,genre:s.genre,genreLabel:s.genre,song:virtualSong,songList:`"${s.title}" by ${s.artist} (${s.year}). Structure: ${s.structure}`};
+    S.selectedSong=virtualSong;
+    showRemakePanel(virtualSong,s.genre,s.analysis_raw);
+    toast(`📚 Loaded "${s.title}" from library`);
+    // Scroll to output
+    document.getElementById('a-out').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+// ── Pattern Intelligence Engine ──
+function renderIntelligence(songs,grouped){
+  const panel=document.getElementById('a-intelligence');
+  if(!panel)return;
+  if(songs.length<3){panel.style.display='none';return;}
+  panel.style.display='block';
+  let html='';
+  // Global insights
+  const totalSongs=songs.length;
+  const totalRemakes=songs.reduce((sum,s)=>sum+(s.times_remade||0),0);
+  const topGenres=Object.entries(grouped).sort((a,b)=>b[1].length-a[1].length).slice(0,3);
+  html+=`<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+    <div class="intel-stat"><div class="intel-num">${totalSongs}</div><div class="intel-label">Songs Learned</div></div>
+    <div class="intel-stat"><div class="intel-num">${Object.keys(grouped).length}</div><div class="intel-label">Genres</div></div>
+    <div class="intel-stat"><div class="intel-num">${totalRemakes}</div><div class="intel-label">Remakes</div></div>
+  </div>`;
+  // Per-genre pattern analysis (only for genres with 3+ songs)
+  const deepGenres=Object.entries(grouped).filter(([,arr])=>arr.length>=3).sort((a,b)=>b[1].length-a[1].length);
+  if(deepGenres.length>0){
+    html+=`<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--cyan);font-weight:700;margin:8px 0 6px">🧠 Pattern Insights</div>`;
+    deepGenres.forEach(([genre,gs])=>{
+      // Analyze structures
+      const structures=gs.map(s=>s.structure).filter(Boolean);
+      const structFreq={};
+      structures.forEach(st=>{
+        // Simplify structure to key pattern
+        const simplified=st.replace(/\d/g,'').replace(/→/g,'→');
+        structFreq[simplified]=(structFreq[simplified]||0)+1;
+      });
+      const topStruct=Object.entries(structFreq).sort((a,b)=>b[1]-a[1])[0];
+      // Analyze BPMs
+      const bpms=gs.map(s=>parseInt(s.bpm)).filter(n=>!isNaN(n));
+      const avgBpm=bpms.length?Math.round(bpms.reduce((a,b)=>a+b,0)/bpms.length):null;
+      // Count remakes
+      const genreRemakes=gs.reduce((sum,s)=>sum+(s.times_remade||0),0);
+      html+=`<div style="background:var(--s2);border-radius:8px;padding:8px 10px;margin-bottom:6px;border-left:3px solid var(--cyan)">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:4px">${escHtml(genre)} <span style="color:var(--tx4);font-weight:400">(${gs.length} songs)</span></div>
+        <div style="font-size:11px;color:var(--tx3);line-height:1.6">`;
+      if(topStruct)html+=`Most common structure: <strong style="color:var(--tx1)">${escHtml(topStruct[0].substring(0,50))}</strong> (${topStruct[1]}/${gs.length})<br>`;
+      if(avgBpm)html+=`Average BPM: <strong style="color:var(--tx1)">${avgBpm}</strong><br>`;
+      if(genreRemakes)html+=`Remakes created: <strong style="color:var(--cyan)">${genreRemakes}</strong><br>`;
+      html+=`</div></div>`;
+    });
+  }
+  // Smart suggestions based on patterns
+  if(totalSongs>=5){
+    const mostStudied=topGenres[0];
+    const leastStudied=Object.entries(grouped).sort((a,b)=>a[1].length-b[1].length)[0];
+    html+=`<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);font-weight:700;margin:10px 0 6px">💡 Suggestions</div>`;
+    html+=`<div style="font-size:11px;color:var(--tx3);line-height:1.8">`;
+    html+=`• You've studied <strong>${mostStudied[0]}</strong> the most (${mostStudied[1].length} songs) — try fusing it with <strong>${leastStudied[0]}</strong><br>`;
+    if(totalRemakes===0)html+=`• You haven't tried Remake yet — pick your favorite analysis and add a twist<br>`;
+    if(Object.keys(grouped).length<4)html+=`• Expand your range — you've only explored ${Object.keys(grouped).length} genres. Search a song from a genre you've never tried<br>`;
+    html+=`</div>`;
+  }
+  panel.innerHTML=html;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -10312,6 +10805,7 @@ function _initSupabase() {
       closeAuth();
       loadFoundingStatus();
       initOnboarding();
+      syncFromCloud(); // 🧠 Pull learned songs from cloud
       // Resume any generation that was blocked by the auth gate
       if (S._pendingGenerate) {
         const pending = S._pendingGenerate;
@@ -14709,6 +15203,9 @@ document.addEventListener('DOMContentLoaded', () => {
   if (typeof liuInit === 'function') {
     liuInit();
   }
+  // 🧠 Initialize Song Library count
+  const lc=document.getElementById('a-library-count');
+  if(lc)lc.textContent=getLearnedSongs().length;
 });
 </script>
 <!-- ══ ANALYTICS + GAMIFICATION ══ -->
