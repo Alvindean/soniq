@@ -5,12 +5,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SONIQ — AI Song Creation Studio</title>
-<meta name="description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 24 genres. Free to start." />
+<meta name="description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 30 genres. Free to start." />
 <link rel="canonical" href="https://www.mysoniq.com/app" />
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="SONIQ" />
 <meta property="og:title" content="SONIQ — AI Song Creation Studio" />
-<meta property="og:description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 24 genres. Free to start." />
+<meta property="og:description" content="Generate complete songs with genre DNA, music theory, production briefs, sync metadata, and copyright registration. 30 genres. Free to start." />
 <meta property="og:url" content="https://www.mysoniq.com/app" />
 <meta property="og:image" content="https://www.mysoniq.com/og-image.png" />
 <meta name="twitter:card" content="summary_large_image" />
@@ -3573,21 +3573,21 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">📋 Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
+        <button class="btn btn-sm" onclick="batchGenerate()">⚡ Batch x3</button>
+        <button class="btn btn-sm" onclick="openAudioModal('res')" id="audio-btn" style="display:none">🎵 Audio</button>
+        <button class="btn btn-sm" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none">🌐 Share</button>
+        <button class="btn btn-sm" id="res-like-btn" onclick="setLike('res',true)">👍 Like</button>
+        <button class="btn btn-sm" onclick="openCoach()" id="coach-btn" style="display:none">🎓 Coach</button>
+        <button class="btn btn-sm" onclick="openPublish()" id="publish-btn" style="display:none">📜 Publish</button>
+        <button class="btn btn-sm" onclick="shareLink('res')">🔗 Link</button>
         <div class="song-card-overflow">
-          <button class="btn btn-sm" onclick="toggleResOverflow()" title="More options">⋯ More</button>
+          <button class="btn btn-sm" onclick="toggleResOverflow()" title="More options">⋯</button>
           <div class="song-card-overflow-menu" id="res-overflow-menu">
-            <button class="song-card-overflow-item" onclick="setLike('res',true)">👍 Like</button>
-            <button class="song-card-overflow-item" onclick="setLike('res',false)">👎 Dislike</button>
-            <button class="song-card-overflow-item" onclick="printBrief('res')">🖨 Print</button>
-            <button class="song-card-overflow-item" onclick="shareLink('res')">🔗 Copy Link</button>
-            <button class="song-card-overflow-item" onclick="shareOnX('res')">𝕏 Post</button>
-            <button class="song-card-overflow-item" onclick="batchGenerate()">⚡ Batch x3</button>
-            <button class="song-card-overflow-item" onclick="openVariants()" id="variants-btn" style="display:none">🎛️ Variants</button>
+            <button class="song-card-overflow-item" id="res-dislike-btn" onclick="setLike('res',false)">👎 Dislike</button>
             <button class="song-card-overflow-item" onclick="openVH()" id="vh-btn" style="display:none">🕐 History</button>
-            <button class="song-card-overflow-item" onclick="openCoach()" id="coach-btn" style="display:none">🎓 Coach</button>
-            <button class="song-card-overflow-item" onclick="openPublish()" id="publish-btn" style="display:none">📜 Publish</button>
-            <button class="song-card-overflow-item" onclick="openAudioModal('res')" id="audio-btn" style="display:none">🎵 Audio</button>
-            <button class="song-card-overflow-item" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none">🌐 Share</button>
+            <button class="song-card-overflow-item" onclick="printBrief('res')">🖨 Print</button>
+            <button class="song-card-overflow-item" onclick="shareOnX('res')">𝕏 Post on X</button>
+            <button class="song-card-overflow-item" onclick="openVariants()" id="variants-btn" style="display:none">🎛️ Variants</button>
           </div>
         </div>
       </div>
@@ -7416,7 +7416,7 @@ function clearGenreZone(){
   renderGenreZonePills();
   updateGenreZoneBadge();
   updateGenreZonePairCount();
-  toast('🎲 Genre filter cleared — all 24 genres active');
+  toast('🎲 Genre filter cleared — all 30 genres active');
 }
 function selectAllGenres(){
   S.luckyLockedGenres=Object.keys(ALL_GENRE_LABELS);
@@ -15607,7 +15607,7 @@ const _SONIQ_CONTENT_DB = {
     ],
     soniq_cta: [
       `SONIQ's AI-powered songwriting tools help you move from idea to finished song faster. With Genre DNA technology that understands the structure of 24 different genres, you get intelligent suggestions that match your creative vision — not generic templates.`,
-      `Ready to put this into practice? SONIQ combines AI songwriting assistance with genre-specific intelligence, giving you a creative partner that understands music theory, song structure, and production techniques across 24 genres.`,
+      `Ready to put this into practice? SONIQ combines AI songwriting assistance with genre-specific intelligence, giving you a creative partner that understands music theory, song structure, and production techniques across 30 genres.`,
       `This is exactly the kind of workflow SONIQ was built for. Whether you're writing lyrics, building melodies, or structuring a full arrangement, SONIQ's tools accelerate every step while keeping you in the creative driver's seat.`
     ]
   },
@@ -15617,7 +15617,7 @@ const _SONIQ_CONTENT_DB = {
     {q: 'How long does it take to learn {kw}?', a: 'Most people can produce quality results within 2-4 weeks of focused practice. Mastery takes longer — typically 6-12 months of consistent work. The key is daily practice, even if it\'s just 30 minutes.'},
     {q: 'Can AI help with {kw}?', a: 'Absolutely. AI tools like SONIQ accelerate the creative process by handling repetitive tasks, suggesting variations, and providing genre-specific guidance. Think of AI as a creative assistant, not a replacement for your artistic vision.'},
     {q: 'What mistakes should beginners avoid with {kw}?', a: 'The three biggest mistakes are: trying to do everything at once instead of focusing on one skill, comparing your work to professionals with decades of experience, and not finishing projects. Finish more, judge less.'},
-    {q: 'Is {kw} different for different genres?', a: 'Yes and no. The core principles are universal, but each genre has specific conventions and expectations. SONIQ\'s Genre DNA technology maps these differences across 24 genres so you can create authentic music in any style.'}
+    {q: 'Is {kw} different for different genres?', a: 'Yes and no. The core principles are universal, but each genre has specific conventions and expectations. SONIQ\'s Genre DNA technology maps these differences across 30 genres so you can create authentic music in any style.'}
   ]
 };
 

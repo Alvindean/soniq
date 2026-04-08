@@ -695,7 +695,7 @@ const FUSION_DATA={
   'Afrobeats+Punk':{name:'Afro-Punk',tip:'Afropunk is a real movement. The DIY energy of punk + the groove of Afrobeats = a genuinely political, joyful sound.',q:{overall:68,compat:64,structural:66,commercial:66},artists:'TV on the Radio, Bloc Party, Santigold, badXchannels'}
 };
 
-const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop','parody':'Parody','comedy':'Comedy','neosoul':'Neo-Soul','gospel':'Gospel','children':"Children's",'tvmusical':'TV / Musical'};
+const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop','parody':'Parody','comedy':'Comedy','neosoul':'Neo-Soul','gospel':'Gospel','children':"Children's",'tvmusical':'TV / Musical','brazilian':'Brazilian','amapiano':'Amapiano','dancehall':'Dancehall','bollywood':'Bollywood','arabesque':'Arabesque','mandopop':'Mandopop'};
 
 // ── GENRE EXPERT AGENTS ──────────────────────────────────────────────────────
 // Each genre has a distinct creative worldview — philosophy, current state,
@@ -899,6 +899,60 @@ const GENRE_AGENTS = {
     open_question: 'What story can only be told through song?',
     creative_tension: { exploitation: 'Established dramatic song grammar', exploration: 'Musical style fusion, complex morally ambiguous characters' },
     version: '1.0'
+  },
+  brazilian: {
+    philosophy: 'Brazilian music is where rhythm meets philosophy. The violão is not just accompaniment — it is the emotional narrator. Bossa nova proved that restraint is power, samba proved that celebration is resistance, and MPB proved that poetry belongs in pop. Every song must carry saudade — the untranslatable longing that makes Brazilian music universally devastating.',
+    current_state: 'Global fusion era. Anitta bridging funk carioca to pop. Sertanejo dominating domestic charts. MPB legacy artists still defining quality. Bossa nova experiencing a Gen-Z revival through lo-fi playlists and bedroom producers.',
+    trajectory: 'Toward global fusion without losing Portuguese intimacy. Funk carioca production techniques entering mainstream pop. Sertanejo expanding beyond Brazil. The violão tradition finding new contexts in electronic and ambient music.',
+    non_negotiables: ['The violão fingerpicking pattern must be distinctive and emotionally memorable','Portuguese lyrics create intimacy impossible in English — honor the language','Rhythmic complexity (pandeiro, surdo, cuíca) must weave texture, not just timekeep','Saudade is the emotional center — even celebratory songs carry bittersweet weight','The chorus must be singable for someone who doesn\'t speak Portuguese'],
+    open_question: 'How does saudade survive translation into global pop contexts?',
+    creative_tension: { exploitation: 'Bossa nova sophistication, samba rhythmic tradition', exploration: 'Funk carioca aggression, electronic fusion, global crossover production' },
+    version: '1.0'
+  },
+  amapiano: {
+    philosophy: 'The groove IS the song. Amapiano inverts Western pop hierarchy — melody serves rhythm, vocals serve the beat, and the log drum bassline is the hook. Township energy made global. The suspended piano chord that never resolves creates infinite anticipation — the musical equivalent of a question that doesn\'t need an answer.',
+    current_state: 'Global explosion. Tyla\'s Grammy validation. Uncle Waffles as cultural ambassador. The sound moving from South African townships to global festival stages. Fusion with Afrobeats, hip-hop, and house accelerating.',
+    trajectory: 'Toward mainstream Western crossover while preserving township authenticity. Log drum bass becoming a universal production element. Bilingual Zulu-English lyrics becoming the standard. Live instrumentation (piano, percussion) replacing purely digital production.',
+    non_negotiables: ['The log drum bassline IS the hook — it must be hypnotic and instantly recognizable','Piano chords use suspended voicings (7sus4, 9sus4) — never fully resolve','The beat never stops — even the bridge maintains groove momentum','Conversational, bilingual lyrics (Zulu + English) carry narrative naturally','Shaker and hi-hat micro-variations create the groove detail work'],
+    open_question: 'Can amapiano maintain township authenticity while becoming the world\'s groove language?',
+    creative_tension: { exploitation: 'Log drum groove, township energy, suspended harmony', exploration: 'Global fusion, live instrumentation, emotional ballad territory' },
+    version: '1.0'
+  },
+  dancehall: {
+    philosophy: 'Dancehall is reggae\'s electric future and hip-hop\'s Caribbean cousin. The riddim is the stage, the deejay is the performer, and the sound system is the cathedral. Patois is a feature, not a limitation — it carries cultural weight that no translation can replicate. Confidence is the core emotion.',
+    current_state: 'Global crossover era. Drake and Rihanna brought dancehall cadences to mainstream pop. Shenseea and Popcaan leading the new wave. Digital riddims and trap-influenced production expanding the sonic palette.',
+    trajectory: 'Toward deeper fusion with hip-hop and pop while the purist riddim tradition strengthens underground. Patois becoming a prestige dialect in global music. Sound system culture experiencing digital reinvention.',
+    non_negotiables: ['Patois is the feature — use authentic Jamaican Creole phonetics and phrasing','Toasting/deejaying delivery: rapid-fire with internal rhymes and syllable precision','The chorus hook must be sung (not toasted) — ideally by a different voice','Riddim evolution: shift the drum pattern in verse 2 or bridge to build energy','Boasting and sound system culture: confidence, competitive wordplay, party energy'],
+    open_question: 'How does dancehall maintain Jamaican cultural ownership while becoming global pop vocabulary?',
+    creative_tension: { exploitation: 'Classic riddim tradition, sound system culture', exploration: 'Trap fusion, pop crossover, digital production experimentation' },
+    version: '1.0'
+  },
+  bollywood: {
+    philosophy: 'A Bollywood song carries the emotional weight of an entire scene — romance, betrayal, triumph, redemption in a single composition. The playback singing tradition means the voice is the actor\'s soul externalized. Indian classical ragas provide emotional specificity that Western major/minor cannot achieve. Every song is simultaneously intimate and epic.',
+    current_state: 'Arijit Singh era of vulnerable male vocals. A.R. Rahman\'s global influence continuing. Streaming fragmenting the film-song connection. Independent Indian music rising alongside the film tradition. Bollywood dance numbers crossing into global viral moments.',
+    trajectory: 'Toward emotional intimacy (stripped, piano-driven) coexisting with orchestral maximalism. Indie Indian artists challenging the playback monopoly. Hindi lyrics reaching global audiences through streaming. Classical raga influence becoming more subtle but persistent.',
+    non_negotiables: ['Reference specific ragas for emotional specificity (Yaman for devotion, Bhairav for melancholy)','Playback tradition: the vocal switches between character perspectives — use Singer A/B tags','Dramatic key changes between chorus and final chorus create emotional catharsis','Strings must swell at emotional peaks — the orchestra IS the emotional amplifier','Hindi/Urdu lyrics unlock Bollywood\'s power — universal themes of love, fate, separation, reunion'],
+    open_question: 'Can Bollywood\'s emotional maximalism survive the streaming era\'s preference for brevity?',
+    creative_tension: { exploitation: 'Raga tradition, orchestral drama, playback singing', exploration: 'Intimate stripped production, indie sensibility, global crossover' },
+    version: '1.0'
+  },
+  arabesque: {
+    philosophy: 'Arabesque music exists between the notes that Western scales cannot reach. Quarter-tones create emotional complexity no major/minor dichotomy can capture. The oud and the human voice are the same instrument — both capable of infinite ornamental expression. Melisma is not decoration, it IS the emotional language.',
+    current_state: 'Khaleeji Gulf Pop dominating commercial charts. Raï North African tradition experiencing global curiosity. Maqam classical tradition preserved by masters while pop experiments with fusion. Amr Diab and Nancy Ajram defining modern commercial arabesque.',
+    trajectory: 'Toward fusion with electronic production and global pop while preserving maqam authenticity. Quarter-tone singing entering Western experimental music. Arabic lyrics becoming prestige language in global pop (similar to K-Pop\'s path). Oud experiencing a classical revival.',
+    non_negotiables: ['Reference specific maqams (Rast, Hijaz, Kurd, Nahawand) — each has distinct emotional DNA','Vocal melisma (ornamental runs) ARE the emotional language — encourage extended passages','Oud and qanun are characters, not accompaniment — as emotionally present as the voice','Darbuka rhythms provide spiritual anchor — specify patterns (Baladi, Masmoudi, Fallahi)','Instrumental sections are storytelling moments, not breaks — they advance the emotional arc'],
+    open_question: 'How does quarter-tone emotional complexity translate for ears trained on Western equal temperament?',
+    creative_tension: { exploitation: 'Maqam tradition, ornamental vocal mastery, classical instruments', exploration: 'Electronic fusion, global pop accessibility, simplified harmony for crossover' },
+    version: '1.0'
+  },
+  mandopop: {
+    philosophy: 'Mandopop is where pentatonic scales create distinctly Chinese emotional flavor and Western pop production creates universal accessibility. Mandarin\'s four tones allow melodic nuances impossible in English — the tonal language IS the melody. The ballad tradition runs deep: vulnerability, longing, and emotional precision define the genre.',
+    current_state: 'Jay Chou\'s legacy towering over the genre. JJ Lin and G.E.M. leading the new generation. C-pop (broader Chinese pop) expanding through streaming. Mandopop hip-hop and rock subgenres growing. The ballad tradition remaining commercially dominant.',
+    trajectory: 'Toward global crossover through streaming platforms. Mandarin lyrics becoming prestige language in Asian pop. Hip-hop and rock influences broadening the genre beyond ballads. Production quality matching K-Pop standards. Classical Chinese musical elements finding new contexts.',
+    non_negotiables: ['Pentatonic scales (do-re-mi-sol-la) create authentically Chinese emotional flavor','Tonal language: Mandarin\'s 4 tones must inform melody contours for authentic phrasing','Piano is the lead instrument — prominent in verses and bridge, strings swell in choruses','Vulnerability and longing are central — love and loss are universal themes','Each verse must reveal a new facet of the emotional journey — second verse deepens, never repeats'],
+    open_question: 'Can Mandopop\'s ballad-driven emotional depth compete with K-Pop\'s production maximalism on the global stage?',
+    creative_tension: { exploitation: 'Pentatonic tradition, ballad mastery, piano-driven intimacy', exploration: 'Hip-hop fusion, rock energy, K-Pop production techniques, classical Chinese instrumentation' },
+    version: '1.0'
   }
 };
 
@@ -987,6 +1041,12 @@ const GENRE_SUNO_BRACKETS = {
   parody:     { verse:'[Verse | Sincere Delivery | Absurd Content | Straight-Faced]', chorus:'[Chorus | Comedic Payoff | Maximum Commitment | Catchy]', bridge:'[Bridge | Escalation | Most Unhinged Moment]', outro:'[Outro | Callback | Final Punchline]', transitions:['[Pre-Chorus | Tension Build | Serious Face]','[Instrumental Break | Genre-Authentic]'], delivery:'The music must be COMPLETELY sincere — [Sincere | No Winking]. Comedy lives in lyrics only. Use [Spoken | Deadpan] for the most absurd bridge lines. The final line of the song is the biggest punchline — mark it [Punchline | Final Line].' },
   comedy:     { verse:'[Verse | Setup | Premise Established | Conversational]', chorus:'[Chorus | Comedic Hook | Maximum Funny | Catchy]', bridge:'[Bridge | Darkest Point | Most Unhinged | Escalation]', outro:'[Outro | Final Punchline | Payoff | Callback]', transitions:['[Pre-Chorus | Tension | Stakes Rising]','[Instrumental Break | Comedic Timing]'], delivery:'Use [Spoken | Deadpan] for setup lines. Use [Shouted | Committed] for the chorus punchlines. Mark the callback in the outro as [Callback | Punchline Payoff]. The final line of the entire song is THE punchline — mark it [Final Punchline | Song Ends Here].' },
   tvmusical:  { verse:'[Verse | Character Voice | Dramatic | Scene-Setting]', chorus:'[Chorus | Belted | Emotional Peak | Theatrical]', bridge:'[Bridge | Darkest Moment | Turning Point | Intimate]', outro:'[Outro | Resolution | Reprise Melody | Curtain]', transitions:['[Intro | Orchestral Swell | Cinematic]','[Pre-Chorus | Tension Build | Dramatic]','[Underscore | Dialogue Ready]'], delivery:'Use [Belted] for the biggest theatrical moments. Use [Spoken | In Character] for dialogue-adjacent lines. Mark the dramatic turning point as [Turning Point | Key Change | Climax]. TV themes get [Theme Sting] at the end. Jingles get [Product Name | Sung | Catchy] on every chorus.' },
+  brazilian:  { verse:'[Verse | Conversational | Warm | Intimate]', chorus:'[Chorus | Singable | Emotional | Warm]', bridge:'[Bridge | Violão Solo | Fingerpicked]', outro:'[Outro | Pandeiro Groove | Vocal Vamp | Fade]', transitions:['[Intro | Violão | Fingerpicked | Solo]','[Percussion Break | Pandeiro | Surdo]','[Instrumental Break | Bossa]'], delivery:'Use [Whispered] for bossa nova intimacy — close-mic breathy vocals. Mark violão breaks as [Violão Solo | Fingerpicked]. For samba energy, use [Celebratory | Full Percussion]. Bridge should be the violão\'s moment — strip vocals and let the guitar breathe.' },
+  amapiano:   { verse:'[Verse | Conversational | Groove-Led | Low Energy]', chorus:'[Chorus | Log Drum Hook | Singalong | Groove Peak]', bridge:'[Bridge | Piano Riff | Escalation | Beat Never Stops]', outro:'[Outro | Groove Vamp | Log Drum | Fading]', transitions:['[Intro | Log Drum Groove | 16 bars]','[Piano Break | Jazzy | Suspended]','[Shaker Build | Rising Energy]'], delivery:'The beat never stops — mark all sections as [Groove Continues]. Use [Call and Response] for chorus. Mark log drum bass patterns as [Log Drum | Syncopated | Hook]. The piano should use suspended chords — mark as [Piano | 7sus4 | Unresolved].' },
+  dancehall:  { verse:'[Verse | Toasting | Rapid-Fire | Riddim-Led]', chorus:'[Chorus | Sung Hook | Repeated | Different Voice]', bridge:'[Bridge | Riddim Shift | Deejay Breakdown]', outro:'[Outro | Riddim Vamp | Air Horn | Fade]', transitions:['[Intro | Riddim | Electronic | 8 bars]','[Riddim Switch | Energy Shift]','[Air Horn | Rewind | Crowd]'], delivery:'Verse = toasting/deejaying (rapid-fire spoken delivery over riddim). Chorus = SUNG by different artist or voice. Mark patois as [Patois | Jamaican Creole]. Use [Air Horn] and [Pull Up] for hype moments. Mark riddim shifts as [Riddim Switch | New Pattern].' },
+  bollywood:  { verse:'[Verse | Dramatic | Narrative | Cinematic | Sparse]', chorus:'[Chorus | Emotional Peak | Full Orchestra | Playback Singer]', bridge:'[Bridge | Turning Point | Key Change | Musical Climax]', outro:'[Outro | Orchestral Reprise | Thematic | Fade]', transitions:['[Intro | Orchestral Swell | 8 bars]','[Pre-Chorus | Emotional Rise | Strings Build]','[Instrumental Break | Tabla + Strings]'], delivery:'Use [Singer A] and [Singer B] for duet sections. Mark raga references as [Raga | Specific Name]. Use [Melismatic | Vocal Run] for ornamental vocal passages. The final chorus must be the biggest production moment — mark as [Final Chorus | Maximum | Key Change]. Bridge = emotional turning point, mark as [Turning Point | Dramatic].' },
+  arabesque:  { verse:'[Verse | Ornamental | Sparse | Oud-Led | Melismatic]', chorus:'[Chorus | Full Orchestra | Emotional | Maqam Peak]', bridge:'[Bridge | Oud Improvisation | Quarter-Tone | Free Time]', outro:'[Outro | Maqam Reprise | Oud | Fade]', transitions:['[Intro | Oud Solo | Maqam Exploration | 8 bars]','[Darbuka Break | Rhythmic | Baladi]','[Qanun Interlude | Shimmering]'], delivery:'Mark maqam references as [Maqam | Specific Name] (Rast, Hijaz, Kurd, Nahawand). Use [Melisma | Ornamental | Free] for vocal runs — encourage long ornamental passages. Mark quarter-tone moments as [Quarter Tone | Between Notes]. Instrumental sections are storytelling — mark as [Oud Takasim | Improvisation].' },
+  mandopop:   { verse:'[Verse | Intimate | Piano-Driven | Narrative]', chorus:'[Chorus | Melodic Peak | String Swell | Anthemic]', bridge:'[Bridge | Stripped | Piano Solo | Turning Point]', outro:'[Outro | Orchestral Reprise | Thematic | Fade]', transitions:['[Intro | Piano Solo | Emotional | 8 bars]','[Pre-Chorus | Emotional Rise | Strings Enter]','[Instrumental Break | Pentatonic | Orchestral]'], delivery:'Use pentatonic melodies — mark as [Pentatonic | Chinese Scale]. Mark tonal language inflections as [Tonal | Mandarin Melody Contour]. Piano is the lead instrument in verses — mark as [Piano Lead | Counter-Melody]. Strings swell at chorus — mark as [String Swell | Orchestral]. Bridge = piano solo moment, mark as [Piano Solo | Emotional | Stripped].' },
 };
 
 const SUBSTYLE_BRACKETS={
@@ -1481,6 +1541,12 @@ const GENRE_RHYME_PREF = {
   latin:     ['ABAB', 'AABB', 'ABCB'],
   reggaeton: ['AABB', 'Internal', 'Chain'],
   afrobeats: ['AABB', 'ABCB', 'Internal'],
+  brazilian: ['ABCB', 'Slant', 'AABB'],
+  amapiano:  ['AABB', 'Internal', 'ABCB'],
+  dancehall: ['Internal', 'Chain', 'AABB'],
+  bollywood: ['ABAB', 'AABB', 'ABCB'],
+  arabesque: ['Slant', 'ABCB', 'AABA'],
+  mandopop:  ['ABAB', 'AABB', 'ABCB'],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1584,6 +1650,12 @@ const GENRE_SYLLABLE_BUDGETS = {
   comedy:    { verse: '6–14', chorus: '4–10', hook: '3–8',  bridge: '4–10', prechorus: '4–9' },
   children:  { verse: '4–8',  chorus: '3–6',  hook: '2–5',  bridge: '3–6',  prechorus: '3–5' },
   tvmusical: { verse: '8–14', chorus: '6–11', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
+  brazilian: { verse: '7–12', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
+  amapiano:  { verse: '6–10', chorus: '4–8',  hook: '2–5',  bridge: '4–8',  prechorus: '4–7' },
+  dancehall: { verse: '10–18', chorus: '6–10', hook: '4–7', bridge: '8–14', prechorus: '6–10' },
+  bollywood: { verse: '8–14', chorus: '6–11', hook: '4–8',  bridge: '6–12', prechorus: '6–9' },
+  arabesque: { verse: '6–12', chorus: '5–10', hook: '3–7',  bridge: '5–10', prechorus: '5–8' },
+  mandopop:  { verse: '7–12', chorus: '5–9',  hook: '3–6',  bridge: '5–9',  prechorus: '5–8' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1613,6 +1685,12 @@ const GENRE_FX_PROFILES = {
   neosoul:   { reverb: 'Warm plate on vocal (2s), room on live drums', delay: 'Analog echo on guitar/keys, subtle on vocal', compression: 'LA-2A optical on vocal, parallel compression on drums', eq: 'Warm 200–400 Hz on keys and vocal, air at 10 kHz', width: 'Live band stereo spread', sidechain: 'Very light' },
   gospel:    { reverb: 'Large hall (3–5s) on choir and lead vocal', delay: 'Long feedback echo on vocal runs', compression: 'Gentle optical on lead, dynamic choir mix', eq: 'Full and rich 100–400 Hz, presence on lead vocal 3–5 kHz', width: 'Wide choir, center lead vocal', sidechain: 'None' },
   ss:        { reverb: 'Small room or hall depending on feel (0.8–2.5s)', delay: 'Tape slap on vocal and guitar', compression: 'Gentle 2–3 dB on vocal, minimal bus', eq: 'Natural — subtle warmth and air only', width: 'Slightly narrow for intimacy', sidechain: 'None' },
+  brazilian: { reverb: 'Warm room (1–2s) on vocal and violão, plate on percussion', delay: 'Subtle tape echo on guitar fingerpicking, analog slap on vocal', compression: 'Gentle optical on vocal (2–3 dB), light bus glue — preserve dynamics', eq: 'Warmth 150–300 Hz on violão, air at 8–10 kHz on vocal, bright attack on pandeiro', width: 'Intimate center vocal, violão slightly wide, percussion spread', sidechain: 'None — bossa intimacy, light kick→bass for samba' },
+  amapiano:  { reverb: 'Short room on log drum (0.3s), medium plate on vocal', delay: '1/8 ping-pong on piano, subtle slap on vocal', compression: 'Heavy bus compression for groove density, sidechain pump on pads', eq: 'Deep sub boost 40–70 Hz on log drum, piano presence 3–5 kHz, air on vocal', width: 'Wide piano and shaker, mono log drum and kick', sidechain: 'Log drum→pads moderate pump — the groove breathes' },
+  dancehall: { reverb: 'Dark plate (0.8s) on riddim synth, short room on vocal', delay: 'Triplet echo on deejay vocal, 1/4 dotted on chorus hook', compression: 'Hard limiting on riddim bass, aggressive bus compression for loudness', eq: 'Heavy sub 50–80 Hz on riddim bass, scooped mids on synth, bright vocal presence', width: 'Wide riddim synths, mono bass and kick', sidechain: 'Aggressive kick→riddim bass pump' },
+  bollywood: { reverb: 'Large hall (3–5s) on strings and choir, plate on lead vocal (2s)', delay: '1/4 dotted on vocal tails, reverb pre-delay on strings', compression: 'Optical on lead vocal, dynamic string mix — preserve orchestral dynamics', eq: 'Full orchestral spectrum, presence 3–5 kHz on vocal, warmth on strings 200–400 Hz', width: 'Wide orchestral spread, center vocal, tabla center-right', sidechain: 'Very light — let the orchestra breathe' },
+  arabesque: { reverb: 'Large hall (3–5s) on oud and vocal, spring on darbuka', delay: 'Analog tape echo on oud, long feedback delay on vocal melisma', compression: 'Gentle optical on vocal — preserve melismatic dynamics, minimal bus', eq: 'Warm oud body 200–400 Hz, air on qanun 10–14 kHz, natural vocal EQ', width: 'Oud center, qanun wide, darbuka slightly right, vocal center', sidechain: 'None — preserve natural dynamics and ornamental space' },
+  mandopop:  { reverb: 'Polished hall (2–3s) on vocal and piano, large hall on strings', delay: '1/4 dotted on piano, reverb tail on vocal', compression: 'Optical on vocal, light bus glue — preserve emotional dynamics', eq: 'Piano presence 3–5 kHz, string warmth 200–400 Hz, air on vocal 12–14 kHz', width: 'Piano slightly wide, strings wide, vocal center', sidechain: 'Very light kick→bass only' },
 };
 
 const GENRE_PLUGIN_CHAINS = {
@@ -1636,6 +1714,12 @@ const GENRE_PLUGIN_CHAINS = {
   neosoul:   { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD LA-2A', 'Waves J37 Tape', 'Soundtoys EchoBoy', 'FabFilter Pro-Q 3'] },
   gospel:    { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'TDR Nova'], paid: ['UAD Ocean Way Studios', 'Waves SSL G-Bus', 'FabFilter Pro-Q 3'] },
   ss:        { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Studer A800', 'Waves Renaissance Compressor', 'Soundtoys EchoBoy'] },
+  brazilian: { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Studer A800', 'Soundtoys EchoBoy', 'Waves Renaissance Compressor', 'FabFilter Pro-Q 3'] },
+  amapiano:  { free: ['OTT', 'Valhalla Supermassive', 'TDR Nova', 'LFO Tool'], paid: ['FabFilter Pro-L 2', 'Waves SSL G-Bus', 'Xfer LFO Tool', 'iZotope Ozone 10'] },
+  dancehall: { free: ['OTT', 'Valhalla Supermassive', 'LFO Tool', 'GVST GClip'], paid: ['FabFilter Pro-L 2', 'Waves SSL G-Bus', 'Soundtoys EchoBoy', 'Xfer LFO Tool'] },
+  bollywood: { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'TDR Nova'], paid: ['UAD Ocean Way Studios', 'Waves SSL G-Bus', 'FabFilter Pro-Q 3', 'Soundtoys EchoBoy'] },
+  arabesque: { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Fairchild 670', 'Waves Kramer Master Tape', 'Soundtoys EchoBoy', 'FabFilter Pro-Q 3'] },
+  mandopop:  { free: ['Valhalla Supermassive', 'TDR Nova', 'TAL-Reverb-4'], paid: ['FabFilter Pro-Q 3', 'Waves SSL E-Channel', 'Soundtoys EchoBoy', 'UAD Ocean Way Studios'] },
 };
 
 const MASTERING_TARGETS = {
@@ -1659,11 +1743,17 @@ const MASTERING_TARGETS = {
   neosoul:   { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 9–12', brightness: 'Warm with air', stereoWidth: 'Moderate', notes: 'Groove and warmth. Preserve dynamics and musical feel.' },
   gospel:    { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 9–12', brightness: 'Full and rich', stereoWidth: 'Wide choir', notes: 'Room to breathe. Choir dynamics and lead vocal must coexist.' },
   ss:        { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 11–14', brightness: 'Natural', stereoWidth: 'Intimate', notes: 'Preserve performance vulnerability. No over-compression.' },
+  brazilian: { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 10–14', brightness: 'Warm-natural', stereoWidth: 'Intimate-moderate', notes: 'Bossa nova: maximum dynamics, whisper-quiet intimacy. Samba: more energy, punchier. Preserve violão transients and pandeiro detail.' },
+  amapiano:  { lufs: '-10 to -12 LUFS', dynamicRange: 'DR 6–8', brightness: 'Bright with deep sub', stereoWidth: 'Wide', notes: 'Log drum sub must translate. Piano needs clarity. Competitive loudness for club/streaming crossover.' },
+  dancehall: { lufs: '-9 to -11 LUFS', dynamicRange: 'DR 5–7', brightness: 'Bright and punchy', stereoWidth: 'Wide', notes: 'Riddim bass must punch through. Vocal presence critical. Loud and aggressive mastering.' },
+  bollywood: { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 8–11', brightness: 'Full spectrum', stereoWidth: 'Wide orchestral', notes: 'Preserve orchestral dynamics. Vocal must sit above strings without crushing. Tabla and dholak transients need headroom.' },
+  arabesque: { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 10–14', brightness: 'Warm', stereoWidth: 'Moderate', notes: 'Preserve melismatic vocal dynamics and oud ornamental detail. Quarter-tones need headroom — no heavy limiting.' },
+  mandopop:  { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 8–11', brightness: 'Bright with warmth', stereoWidth: 'Wide', notes: 'Piano clarity essential. String arrangements need space. Vocal presence must be pristine — Mandopop is vocal-forward.' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AD-LIB BIBLE + VOCAL STACK PROFILES
-// Ad-lib guide for all 24 genres: signature sounds, placement, density, Suno
+// Ad-lib guide for all 30 genres: signature sounds, placement, density, Suno
 // parentheses syntax. Vocal stack profiles: how many layers per section.
 // Injected into song prompts via buildAdlibNote() and buildVocalStackNote().
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1837,6 +1927,48 @@ const ADLIB_BIBLE = {
     example: 'Theme: "(Da-da-da!) [show name]"; Musical: "(Yes!) I want it! (I want it!)"',
     outro: 'character leitmotif returns; theme is instantly singable on exit',
   },
+  brazilian: {
+    sounds: ['ahh', 'ooh', 'la-la-la', 'eh', 'ô'],
+    placement: 'chorus response (ahh), bridge hum (la-la-la), outro pandeiro-synced vamp',
+    density: 'medium — vocables ride the swing, never overpower the violão',
+    example: '"Garota de Ipanema (ahh) walking by (la-la-la)"',
+    outro: '(ahh) (la-la-la) pandeiro-synced vocal fade, violão remains',
+  },
+  amapiano: {
+    sounds: ['eh', 'yeah', 'yay', 'alright', 'eish'],
+    placement: 'every bar (ride the log drum), chorus hook repeats, between verses as groove glue',
+    density: 'high — vocables ARE the beat, short and punchy',
+    example: '"Feel the groove (eh!) all night (yeah!) township love (alright!)"',
+    outro: '(eh!) (yeah!) rhythmic vocal vamp over log drum fade',
+  },
+  dancehall: {
+    sounds: ['yo', 'bruk out', 'yeah boy', 'forward', 'pull up'],
+    placement: 'verse punctuation (after boast lines), chorus response, intro riddim hype',
+    density: 'high — confident, celebratory, part of the toasting tradition',
+    example: '"Me a di best (yo!) nah stop (pull up!) real badman ting (forward!)"',
+    outro: '(pull up!) (yeah boy!) riddim vamp with deejay ad-libs fade',
+  },
+  bollywood: {
+    sounds: ['aah', 'ooh', 'na-na-na', 'hai', 'ho'],
+    placement: 'chorus emotional peak (aah), bridge vocal flourish, pre-chorus rise',
+    density: 'medium — vocables extend emotion, never interrupt the dramatic arc',
+    example: '"Tujhe dekha toh (aah) jaana sanam (na-na-na)"',
+    outro: '(aah) orchestral reprise with melismatic vocal run fade',
+  },
+  arabesque: {
+    sounds: ['ya', 'aah', 'yalla', 'oh', 'habibi'],
+    placement: 'bridge vocal improvisation (melisma), chorus emotional release, oud breaks',
+    density: 'medium-low — ornamental and devotional, each vocable carries weight',
+    example: '"Ya habibi (aah) maqam soul (ya) quarter tone heart (oh)"',
+    outro: '(ya) (aah) melismatic improvisation over oud fade',
+  },
+  mandopop: {
+    sounds: ['aah', 'ooh', 'la-la', 'na-na', 'wo'],
+    placement: 'chorus emotional peak, bridge vocal flourish, outro thematic reprise',
+    density: 'low-medium — vocal flourishes extend the emotional arc, not rhythmic',
+    example: '"Yue liang (aah) dai biao (la-la) wo de xin (ooh)"',
+    outro: '(aah) piano counter-melody with vocal flourish reprise fade',
+  },
 };
 
 // Vocal stacking per genre: how many layers in each section
@@ -1866,6 +1998,12 @@ const VOCAL_STACK_PROFILES = {
   comedy:    { verse: 'single (sincere)', chorus: 'single (commitment)', finalChorus: 'single (straight-faced)', method: 'Sincere production makes the joke land harder' },
   children:  { verse: 'single (warm)', chorus: 'double (big and friendly)', finalChorus: 'group stack (everyone joins)', method: 'Final chorus group sound models communal participation for children' },
   tvmusical: { verse: 'single (character voice)', chorus: 'character + harmony', finalChorus: 'company stack (cast joins)', method: 'Stack builds as more characters join; climax is everyone together' },
+  brazilian: { verse: 'single (intimate, close mic)', chorus: 'subtle double + backing harmony', finalChorus: 'double + group vocal swell', method: 'Bossa: resist stacking, intimacy is everything. Samba: group vocals build naturally in final chorus' },
+  amapiano: { verse: 'single (conversational)', chorus: 'double + rhythmic ad-lib layer', finalChorus: 'double + crowd chant layer', method: 'Stacking is rhythmic not harmonic — ad-libs ride the log drum groove' },
+  dancehall: { verse: 'single (toasting, confident)', chorus: 'double (sung hook by different voice)', finalChorus: 'double + crowd response layer', method: 'Deejay verse stays single; chorus sung by separate artist creates natural stack' },
+  bollywood: { verse: 'single (character A)', chorus: 'double + orchestral harmony', finalChorus: '4-6 layer + full string section', method: 'Dramatic escalation from intimate verse to transcendent final chorus; duets add natural second voice' },
+  arabesque: { verse: 'single (ornamental, melismatic)', chorus: 'single + oud counter (instruments = stack)', finalChorus: 'double + instrumental counter-lines', method: 'Never over-stack vocals — the oud and qanun ARE the second voice. Melisma replaces stacking' },
+  mandopop: { verse: 'single (intimate, piano-accompanied)', chorus: 'double + string harmony', finalChorus: 'triple + full orchestral layer', method: 'Builds from piano intimacy to orchestral grandeur; vocal layers mirror the arrangement escalation' },
 };
 
 // Maps FUSION_DATA capitalized/hyphenated genre tokens → ADLIB_BIBLE keys
@@ -1875,7 +2013,9 @@ const _FUSION_KEY_MAP = {
   'Hip-Hop': 'hiphop', 'Jazz': 'jazz', 'K-Pop': 'kpop', 'Latin': 'latin',
   'Neo-Soul': 'neosoul', 'Pop': 'pop', 'Punk': 'punk', 'R&B': 'rnb',
   'Reggae': 'reggae', 'Reggaeton': 'reggaeton', 'Rock': 'rock',
-  'Singer-Songwriter': 'ss', 'Soul': 'neosoul'
+  'Singer-Songwriter': 'ss', 'Soul': 'neosoul',
+  'Brazilian': 'brazilian', 'Amapiano': 'amapiano', 'Dancehall': 'dancehall',
+  'Bollywood': 'bollywood', 'Arabesque': 'arabesque', 'Mandopop': 'mandopop'
 };
 function _normalizeGenreKey(genre) {
   return _FUSION_KEY_MAP[genre] || genre;
@@ -2125,6 +2265,60 @@ const GENRE_HIT_REFERENCES = {
     ],
     defining: 'Song replaces what dialogue cannot express. Character is revealed, not described. Rhyme scheme IS personality. Lyric must advance the story.',
     crossFrom: 'pop', crossTechnique: 'Hook accessibility — the tune must outlive the show. Singable leaving the venue.',
+  },
+  brazilian: {
+    hits: [
+      { title: 'Garota de Ipanema', artist: 'Tom Jobim & João Gilberto', technique: 'Whisper-quiet delivery of a simple observation — restraint and sophistication beat bombast at every level' },
+      { title: 'Mas Que Nada', artist: 'Jorge Ben Jor', technique: 'Vocable hook as identity — the "ooh ari-rai-oh" IS the song. No translation needed.' },
+      { title: 'Envolver', artist: 'Anitta', technique: 'Global dance beat meets Portuguese intimacy — the hook rides the rhythm without losing cultural identity' },
+    ],
+    defining: 'Rhythmic sophistication that sounds effortless. The violão fingerpicking carries emotional memory. Saudade in every chord change.',
+    crossFrom: 'jazz', crossTechnique: 'Suspended and extended chords — maj7, 9ths, 13ths create harmonic sophistication that rewards repeated listening.',
+  },
+  amapiano: {
+    hits: [
+      { title: 'Water', artist: 'Tyla', technique: 'Minimal vocal melody riding the log drum groove — the beat is the hook, the voice is the passenger' },
+      { title: 'Ke Star', artist: 'Focalistic & Vigro Deep', technique: 'Conversational bilingual delivery over hypnotic log drum — lyrics serve the groove, not the other way around' },
+      { title: 'Adiwele', artist: 'DJ Maphorisa & Kabza De Small', technique: 'Piano chord suspension that never resolves — infinite anticipation becomes euphoria through repetition' },
+    ],
+    defining: 'The log drum bassline IS the hook. The groove is the song. Piano suspensions create tension that resolves through repetition, not harmonic movement.',
+    crossFrom: 'edm', crossTechnique: 'Build-and-drop structure — use anticipation mechanics but land on groove, not a wall of sound.',
+  },
+  dancehall: {
+    hits: [
+      { title: 'One Dance', artist: 'Drake ft. Wizkid & Kyla', technique: 'Dancehall riddim stripped to its essence — non-Jamaican artist proved the riddim carries the genre, not the accent' },
+      { title: 'Murder She Wrote', artist: 'Chaka Demus & Pliers', technique: 'Sung chorus vs. toasted verse — the vocal contrast IS the structure' },
+      { title: 'Cheap Thrills', artist: 'Sia ft. Sean Paul', technique: 'Pop hook over dancehall rhythm — the riddim makes a basic lyric feel exotic and essential' },
+    ],
+    defining: 'The riddim is the stage. Toasting verses meet sung choruses. Patois carries cultural weight no translation can replicate. Confidence is the core emotion.',
+    crossFrom: 'hiphop', crossTechnique: 'Lyrical density and flow variation in verses — pack internal rhymes while riding the riddim.',
+  },
+  bollywood: {
+    hits: [
+      { title: 'Jai Ho', artist: 'A.R. Rahman', technique: 'Raga-influenced melody over global production — cultural specificity IS the hook that no Western scale can replicate' },
+      { title: 'Tum Hi Ho', artist: 'Arijit Singh', technique: 'Stripped piano intimacy building to orchestral catharsis — dynamic arc carries the entire emotional journey of a scene' },
+      { title: 'Chaiyya Chaiyya', artist: 'A.R. Rahman / Sukhwinder Singh', technique: 'Rhythmic intensity and physical energy in vocal delivery — the voice becomes percussion' },
+    ],
+    defining: 'Every song IS a scene — romance, betrayal, triumph in one composition. Raga specificity creates emotional precision. The orchestra IS the emotional amplifier.',
+    crossFrom: 'gospel', crossTechnique: 'Emotional escalation — build from intimate testimony to full-choir transcendence. Each repeat bigger than the last.',
+  },
+  arabesque: {
+    hits: [
+      { title: 'Enta Omri', artist: 'Umm Kulthum', technique: '30+ minute emotional journey through maqam modulation — proved extended form beats pop concision when the voice commands it' },
+      { title: 'Habibi Ya Nour El Ain', artist: 'Amr Diab', technique: 'Pop simplicity over maqam framework — accessible hook with quarter-tone emotional depth underneath' },
+      { title: 'Didi', artist: 'Cheb Khaled', technique: 'Raï rebellion meets global dancefloor — raw emotional urgency transcends language barriers' },
+    ],
+    defining: 'Quarter-tones create emotional complexity Western scales cannot reach. Melisma IS the language. Oud and voice are the same instrument. Instrumental sections tell the story.',
+    crossFrom: 'jazz', crossTechnique: 'Improvisation as emotional truth — the unplanned ornamental run reveals what the composed melody cannot.',
+  },
+  mandopop: {
+    hits: [
+      { title: 'An Jing', artist: 'Jay Chou', technique: 'Piano counter-melody as emotional narrator — the instrument tells the story the voice cannot admit' },
+      { title: 'Yue Liang Dai Biao Wo De Xin', artist: 'Teresa Teng', technique: 'Pentatonic simplicity as emotional universality — five notes carry more feeling than twelve' },
+      { title: 'That Girl', artist: 'JJ Lin', technique: 'English crossover with Mandopop emotional DNA — the ballad vulnerability survives language change' },
+    ],
+    defining: 'Pentatonic melodies create distinctly Chinese emotional flavor. Piano is the lead instrument. Vulnerability and longing are the emotional core. Tonal language shapes melody.',
+    crossFrom: 'pop', crossTechnique: 'Hook precision — the chorus must be undeniable regardless of language. Melodic clarity transcends linguistic barriers.',
   },
 };
 
@@ -2401,6 +2595,78 @@ const GENRE_SECTION_DNA = {
       preferred_prechorus: ['Lyric Elevator', 'Whisper to Roar', 'Harmonic Pivot'],
       preferred_postchorus: ['Ad-Lib Showcase', 'Hook Echo', 'Punchy Counter-Statement'],
       examples: '"Defying Gravity" (Wicked) — bridge modulates up 3 semitones to the climax that changes the character. "Being Alive" (Company) — bridge is the emotional core of the entire show. "Seasons of Love" (RENT) — bridge adds new melodic counter-line over the whole cast.',
+    },
+  },
+  brazilian: {
+    bridge: {
+      harmonic: 'Bossa: ii7→V7→Imaj7 (the jazz cadence) or ♭II9 (Neapolitan color). Samba: IV→iv→I (major-minor shift). MPB: chromatic modulation through augmented chords. Bridge often features a violão solo section — the guitar becomes the vocalist.',
+      counter: 'Violão fingerpicking takes the melodic lead — independent counter-melody that weaves around the vocal. Pandeiro provides rhythmic counter-texture.',
+      preferred_bridge: ['Instrumental Showcase', 'Emotional Reversal', 'Confessional Drop', 'Harmonic Pivot'],
+      preferred_outro: ['Groove Vamp', 'Spiral Vamp', 'Callback Resolution'],
+      preferred_verse2: ['Deeper Specific', 'The Other Side', 'Zoom Out'],
+      preferred_prechorus: ['Harmonic Pivot', 'Whisper to Roar', 'Question Drop'],
+      preferred_postchorus: ['Hook Echo', 'Breath and Reset'],
+      examples: '"Girl from Ipanema" — bridge modulates to unexpected ♭VI area, the violão pattern shifts, emotional temperature drops. "Mas Que Nada" — bridge is the percussion break with call-response vocables. "Águas de Março" — bridge strips to voice + guitar in conversational mode.',
+    },
+  },
+  amapiano: {
+    bridge: {
+      harmonic: 'Piano riff escalation over the same log drum pattern — harmony doesn\'t change, ENERGY does. Suspended chords (7sus4, 9sus4) maintain tension. The bridge is a piano showcase — arpeggiated chords replace block chords.',
+      counter: 'Piano arpeggiation becomes the counter-line. Log drum syncopation shifts slightly. Hi-hat patterns add new textural layer.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Escalation Climb', 'Instrumental Showcase'],
+      preferred_outro: ['Groove Vamp', 'Spiral Vamp', 'Crowd Takeover'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'Zoom Out'],
+      preferred_prechorus: ['Velocity Surge', 'Tension Ramp'],
+      preferred_postchorus: ['Drop Groove', 'Hook Echo'],
+      examples: '"Water" (Tyla) — bridge strips to log drum + vocal, piano re-enters with new arpeggiated pattern for escalation. "Ke Star" (Focalistic) — bridge is a drum breakdown, log drum becomes primary melodic voice.',
+    },
+  },
+  dancehall: {
+    bridge: {
+      harmonic: 'Riddim shift — the drum pattern changes or strips to bass + kick only. Harmonic movement minimal (i→♭VII or i→iv). The bridge energy comes from rhythmic change, not chord change.',
+      counter: 'Riddim synth counter-pattern becomes primary. Chorus hook sung softly underneath as textural callback.',
+      preferred_bridge: ['Rhythmic Breakdown', 'Left-Turn Narrative', 'Escalation Climb'],
+      preferred_outro: ['Groove Vamp', 'Cold Stop', 'Crowd Takeover'],
+      preferred_verse2: ['Antagonist Voice', 'Deeper Specific', 'Consequence'],
+      preferred_prechorus: ['Velocity Surge', 'Call-Setup'],
+      preferred_postchorus: ['Drop Groove', 'Punchy Counter-Statement'],
+      examples: '"One Dance" (Drake) — bridge strips riddim to minimal, voice becomes the groove. "Murder She Wrote" — bridge is riddim shift with new synth pattern, deejay flow changes cadence.',
+    },
+  },
+  bollywood: {
+    bridge: {
+      harmonic: 'Dramatic key change +2 to +3 semitones for the final chorus. Bridge uses raga-specific scale modes not heard in verse/chorus — introduces new melodic territory. ♭VI→♭VII→I borrowed cadence for Western-influenced sections.',
+      counter: 'Full string section plays sweeping counter-melody. Tabla enters with new rhythmic pattern. Second playback singer may enter with harmony.',
+      preferred_bridge: ['Emotional Reversal', 'Escalation Climb', 'Instrumental Showcase', 'Left-Turn Narrative'],
+      preferred_outro: ['Callback Resolution', 'Spiral Vamp', 'Dialogue / Spoken Coda'],
+      preferred_verse2: ['The Other Side', 'Consequence', 'Deeper Specific'],
+      preferred_prechorus: ['Whisper to Roar', 'Lyric Elevator', 'Harmonic Pivot'],
+      preferred_postchorus: ['Hook Echo', 'Ad-Lib Showcase'],
+      examples: '"Jai Ho" — bridge modulates through multiple raga modes before landing on the final chorus key. "Tum Hi Ho" — bridge strips to piano + voice at lowest dynamic before orchestral explosion.',
+    },
+  },
+  arabesque: {
+    bridge: {
+      harmonic: 'Maqam modulation — shift to a related maqam for the bridge (e.g., Rast → Bayati). The quarter-tone melodic territory creates emotional space Western bridges cannot. Oud takasim (improvisation) section replaces structured harmony.',
+      counter: 'Oud takes full melodic lead — improvised ornamental counter-melody. Qanun provides shimmering harmonic texture underneath. Darbuka shifts to a new rhythm pattern.',
+      preferred_bridge: ['Instrumental Showcase', 'Confessional Drop', 'Emotional Reversal', 'Harmonic Pivot'],
+      preferred_outro: ['Groove Vamp', 'Spiral Vamp', 'Callback Resolution'],
+      preferred_verse2: ['Deeper Specific', 'The Other Side', 'Zoom Out'],
+      preferred_prechorus: ['Harmonic Pivot', 'Whisper to Roar'],
+      preferred_postchorus: ['Hook Echo', 'Breath and Reset'],
+      examples: '"Enta Omri" (Umm Kulthum) — bridge is a 10-minute maqam modulation and oud improvisation section. "Habibi Ya Nour El Ain" (Amr Diab) — bridge simplifies to oud + vocal before full production returns.',
+    },
+  },
+  mandopop: {
+    bridge: {
+      harmonic: 'Piano solo section over iv→♭VII→I or vi→IV→V→I. Key change +2 semitones common before final chorus. Bridge introduces pentatonic variation not heard in verse/chorus — the "new melodic discovery" moment.',
+      counter: 'Piano plays independent counter-melody. Strings enter with sweeping counter-line. Vocal may strip to single note sustained over piano movement.',
+      preferred_bridge: ['Confessional Drop', 'Emotional Reversal', 'Instrumental Showcase', 'Escalation Climb'],
+      preferred_outro: ['Callback Resolution', 'Spiral Vamp', 'Groove Vamp'],
+      preferred_verse2: ['Deeper Specific', 'Consequence', 'The Other Side'],
+      preferred_prechorus: ['Whisper to Roar', 'Lyric Elevator', 'Harmonic Pivot'],
+      preferred_postchorus: ['Hook Echo', 'Breath and Reset'],
+      examples: '"An Jing" (Jay Chou) — bridge is piano solo with sustained vocal note, then modulates up for final chorus. "Yue Liang Dai Biao Wo De Xin" (Teresa Teng) — bridge strips to voice alone before string re-entry.',
     },
   },
 };
