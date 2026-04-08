@@ -1620,7 +1620,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 @media print{
   body{background:#fff!important;color:#111!important;font-family:Georgia,serif}
-  .nav,.hdr-tags,.result-acts,.save-bar,.otabs,.loaded-banner,.gen-action,.studio,.key-banner,#pg-lucky,#pg-library,#pg-editor,#pg-builder,#pg-more,#pg-campaign,.score-dashboard,.var-results,.revision-bar,.version-bar{display:none!important}
+  .nav,.hdr-tags,.result-acts,.save-bar,.otabs,.loaded-banner,.gen-action,.studio,.key-banner,#pg-lucky,#pg-library,#pg-editor,#pg-builder,#pg-more,#pg-campaign,.score-dashboard,.var-results,.revision-bar,.version-bar,#a-techniques{display:none!important}
   #pg-write{display:block!important}
   #gen-out{display:block!important;border:none!important;box-shadow:none!important}
   .result-card{border:none!important}
@@ -9853,7 +9853,10 @@ function unlockAnalyzer(){
 // ═══════════════════════════════════════════════════════
 // TECHNIQUE TOOLKIT — select genre-specific craft devices
 // ═══════════════════════════════════════════════════════
-S.selectedTechniques=JSON.parse(localStorage.getItem('soniq_techs')||'[]');
+S.selectedTechniques=JSON.parse(localStorage.getItem('soniq_techs')||'[]').filter(sel=>{
+  const techs=GENRE_TECHNIQUES[sel.genre]||[];
+  return techs.some(t=>t.id===sel.id);
+});
 
 function showTechniquePanel(genre){
   const panel=document.getElementById('a-techniques');
@@ -10002,17 +10005,25 @@ function restoreTechSelections(){
 function getSelectedTechniquePrompt(){
   if(!S.selectedTechniques.length) return '';
   const lines=S.selectedTechniques.map(sel=>{
-    // Find the full technique data
     const techs=GENRE_TECHNIQUES[sel.genre]||[];
     const t=techs.find(x=>x.id===sel.id);
     if(!t) return null;
-    return `- ${t.name}: ${t.desc}. Example: ${t.example}`;
+    return `- [${sel.genre}] ${t.name}: ${t.desc}. Example: ${t.example}`;
   }).filter(Boolean);
   if(!lines.length) return '';
+  // Detect cross-genre techniques
+  const genres=[...new Set(S.selectedTechniques.map(t=>t.genre))];
+  const crossNote=genres.length>1?`\nNote: Techniques from multiple genres (${genres.join(', ')}) are selected — adapt each naturally to the target genre. Cross-genre borrowing is intentional.`:'';
   return `\n\nACTIVATED CRAFT TECHNIQUES (use these explicitly in the song — they are non-negotiable requirements):
-${lines.join('\n')}
+${lines.join('\n')}${crossNote}
 
-For each technique used, implement it at least once in the song. These are not suggestions — they are requirements from the songwriter.`;
+For each technique listed, implement it at least once in the song. These are not suggestions — they are requirements from the songwriter.`;
+}
+// Count how many selected techniques are from a different genre
+function getTechGenreMismatchCount(targetGenre){
+  if(!S.selectedTechniques.length||!targetGenre) return 0;
+  const _g=targetGenre.toLowerCase().replace(/[^a-z]/g,'');
+  return S.selectedTechniques.filter(t=>t.genre!==_g).length;
 }
 
 // 🔍 Search Any Song — research via Claude, then run through analyzer
@@ -10071,8 +10082,8 @@ SONGWRITER TAKEAWAYS:
     const songGenre=genreMatch?genreMatch[1].trim():'';
     const songStructure=structMatch?structMatch[1].trim():'';
     // Display analysis with enriched header
-    const bpmParsed=(raw.match(/BPM:\s*(\d+)/)||[])[1]||'';
-    const keyParsed=(raw.match(/KEY:\s*(.+)/i)||[])[1]||'';
+    const bpmParsed=(raw.match(/BPM:\s*[~≈]?\s*(?:approximately|approx\.?|around|about|~)?\s*(\d+)/i)||[])[1]||'';
+    const keyParsed=(raw.match(/KEY:\s*([A-G](?:#|♯|b|♭)?(?:\s*(?:major|minor|maj|min|m(?:aj|in)?))?)/i)||[])[1]||'';
     // Store clean text for copy (avoids copying UI elements)
     S._searchAnalysisText=`${songTitle} by ${songArtist} (${songYear})${bpmParsed?' · '+bpmParsed+' BPM':''}${keyParsed?' · Key of '+keyParsed.trim():''}\n${songStructure?'Structure: '+songStructure+'\n':''}\n${raw}`;
     document.getElementById('a-out').innerHTML=`<div class="card" style="border-left:3px solid var(--amber)">
@@ -10100,9 +10111,10 @@ SONGWRITER TAKEAWAYS:
     // 🧠 Auto-save to Song Library
     learnSong({
       title:songTitle,artist:songArtist,year:songYear,genre:songGenre,
-      source:'search',structure:songStructure,bpm:(raw.match(/BPM:\s*(\d+)/)||[])[1]||'',
-      musical_key:(raw.match(/KEY:\s*(.+)/i)||[])[1]||'',key_trait:songStructure,
+      source:'search',structure:songStructure,bpm:bpmParsed,
+      musical_key:keyParsed,key_trait:songStructure,
       analysis_raw:raw,searched_query:q,
+      techniques_used:S.selectedTechniques.map(t=>t.id),
       ratings:{hook:(raw.match(/Hook:\s*(\d+)/)||[])[1],structure:(raw.match(/Structure:\s*(\d+)/)||[])[1],emotion:(raw.match(/Emotion:\s*(\d+)/)||[])[1],lyrics:(raw.match(/Lyrics:\s*(\d+)/)||[])[1],commercial:(raw.match(/Commercial:\s*(\d+)/)||[])[1]}
     });
     // Update library count
@@ -10138,7 +10150,7 @@ async function runAnalysis(){
       learnSong({
         title:sel.t,artist:sel.a,year:String(sel.yr),genre:genreLabel,
         source:'library',structure:sel.structure,key_trait:sel.key,
-        analysis_raw:raw,ratings:{}
+        analysis_raw:raw,techniques_used:S.selectedTechniques.map(t=>t.id),ratings:{}
       });
       const lc=document.getElementById('a-library-count');if(lc)lc.textContent=getLearnedSongs().length;
     }else{document.getElementById('a-remake').style.display='none';}
@@ -10151,13 +10163,22 @@ function showRemakePanel(song,genreLabel,analysisRaw){
   const songName=song?`"${song.t}" by ${song.a}`:'Multiple songs';
   const structure=song?.structure||'Various';
   const keyNote=song?.key||'See analysis above';
-  // Parse ratings from analysis if available
+  // Parse all 5 ratings from analysis if available
   const hookR=(analysisRaw.match(/Hook:\s*(\d+)/)||[])[1]||'';
   const structR=(analysisRaw.match(/Structure:\s*(\d+)/)||[])[1]||'';
   const emotR=(analysisRaw.match(/Emotion:\s*(\d+)/)||[])[1]||'';
-  const ratingsHtml=(hookR||structR||emotR)?`<div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">${hookR?`<span class="intel-stat" style="padding:4px 10px;min-width:auto"><span class="intel-num" style="font-size:14px">🎣 ${hookR}</span><span class="intel-label">/10</span></span>`:''
-  }${structR?`<span class="intel-stat" style="padding:4px 10px;min-width:auto"><span class="intel-num" style="font-size:14px">📐 ${structR}</span><span class="intel-label">/10</span></span>`:''
-  }${emotR?`<span class="intel-stat" style="padding:4px 10px;min-width:auto"><span class="intel-num" style="font-size:14px">💛 ${emotR}</span><span class="intel-label">/10</span></span>`:''}</div>`:'';
+  const lyrR=(analysisRaw.match(/Lyrics:\s*(\d+)/)||[])[1]||'';
+  const commR=(analysisRaw.match(/Commercial:\s*(\d+)/)||[])[1]||'';
+  const ratingChips=[
+    hookR?['🎣',hookR,'Hook']:null,
+    structR?['📐',structR,'Structure']:null,
+    emotR?['💛',emotR,'Emotion']:null,
+    lyrR?['✍️',lyrR,'Lyrics']:null,
+    commR?['📻',commR,'Commercial']:null
+  ].filter(Boolean);
+  const ratingsHtml=ratingChips.length?`<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">${ratingChips.map(([icon,val,label])=>
+    `<span class="intel-stat" style="padding:3px 8px;min-width:auto" title="${label}"><span class="intel-num" style="font-size:13px">${icon} ${val}</span><span class="intel-label">/10</span></span>`
+  ).join('')}</div>`:'';
   dna.innerHTML=`<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:6px;font-weight:700">🧬 Song DNA — ${escHtml(songName)}</div>`+
     `<div class="remake-dna-item"><b>Genre:</b> <span>${escHtml(genreLabel)}</span></div>`+
     `<div class="remake-dna-item"><b>Structure:</b> <span style="font-family:var(--mono);font-size:11px">${escHtml(structure)}</span></div>`+
@@ -10212,6 +10233,8 @@ LYRICS:
 WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic while feeling new]`;
 
   btnLoad('remake-btn','Generating…');
+  // Collapse technique panel to reduce scroll distance to output
+  const _techP=document.getElementById('a-techniques');if(_techP)_techP.style.display='none';
   document.getElementById('remake-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Remixing DNA with your twist…</span></div></div>';
   try{
     const raw=await callClaude(prompt,'You are a hit songwriter and producer. Write complete, ready-to-use songs with Suno-compatible structure brackets and style prompts.',3500);
@@ -10266,6 +10289,11 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
       S.currentSong=prevSong;
       // Async song score
       generateScoreDashboard('rmk',songLyrics,targetLabel);
+    }else{
+      // No lyrics extracted — show fallback in score areas
+      const noLyrMsg='<div style="text-align:center;color:var(--tx4);font-size:11px;padding:6px 0">No lyrics detected — score unavailable</div>';
+      document.getElementById('rmk-hook-score-mini').innerHTML=noLyrMsg;
+      document.getElementById('rmk-score-dashboard').innerHTML=noLyrMsg;
     }
     // 🧠 Update learned song with remake data
     if(a.song){
@@ -10274,6 +10302,7 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
         year:String(a.song.yr||a.song.year||''),genre:a.genreLabel,
         source:a.genre==='search'?'search':'library',
         remake_twist:twist,remake_genre:targetLabel,remake_output:raw,
+        techniques_used:S.selectedTechniques.map(t=>t.id),
         times_remade:1
       });
     }
@@ -10411,7 +10440,8 @@ async function syncToCloud(songData){
       remake_output:songData.remake_output||null,
       searched_query:songData.searched_query||'',
       times_remade:songData.times_remade||0,
-      user_rating:songData.user_rating||null
+      user_rating:songData.user_rating||null,
+      techniques_used:songData.techniques_used||[]
     };
     await S.supabase.from('learned_songs').upsert(row,{onConflict:'id',ignoreDuplicates:false});
   }catch(e){console.warn('Cloud sync failed:',e.message);}
@@ -10555,6 +10585,12 @@ function renderIntelligence(songs,grouped){
       if(topStruct)html+=`Most common structure: <strong style="color:var(--tx1)">${escHtml(topStruct[0].substring(0,50))}</strong> (${topStruct[1]}/${gs.length})<br>`;
       if(avgBpm)html+=`Average BPM: <strong style="color:var(--tx1)">${avgBpm}</strong><br>`;
       if(genreRemakes)html+=`Remakes created: <strong style="color:var(--cyan)">${genreRemakes}</strong><br>`;
+      // Show average user rating if any songs were rated
+      const rated=gs.filter(s=>s.user_rating);
+      if(rated.length){
+        const avgRating=(rated.reduce((sum,s)=>sum+s.user_rating,0)/rated.length).toFixed(1);
+        html+=`Avg rating: <strong style="color:var(--amber)">${avgRating}/5</strong> (${rated.length} rated)<br>`;
+      }
       html+=`</div></div>`;
     });
   }
