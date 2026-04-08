@@ -780,7 +780,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .remake-panel{margin-top:12px;border:1px solid var(--amber);border-radius:var(--r2);background:linear-gradient(135deg,rgba(251,191,36,0.04),transparent)}
 .remake-panel .ctitle{color:var(--amber)}
 .remake-dna-item{display:flex;gap:6px;margin-bottom:4px}.remake-dna-item b{color:var(--amber);min-width:80px;flex-shrink:0}
-#remake-out .card{border-left:3px solid var(--cyan)}
+#remake-out .card{border-left:3px solid var(--cyan);animation:pgIn .3s ease}
+#remake-out .hook-score-mini{border-color:var(--cyan)}
+#remake-out .score-dashboard{display:block}
 .intel-stat{background:var(--s2);border-radius:8px;padding:8px 14px;text-align:center;min-width:70px}
 .intel-num{font-size:20px;font-weight:800;color:var(--cyan);line-height:1}
 .intel-label{font-size:9px;text-transform:uppercase;letter-spacing:0.5px;color:var(--tx4);margin-top:2px}
@@ -9651,8 +9653,24 @@ SONGWRITER TAKEAWAYS:
     const songYear=yearMatch?yearMatch[1].trim():'';
     const songGenre=genreMatch?genreMatch[1].trim():'';
     const songStructure=structMatch?structMatch[1].trim():'';
-    // Display analysis
-    document.getElementById('a-out').innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px"><div><span style="font-size:16px;font-weight:700">${escHtml(songTitle)}</span> <span style="color:var(--tx3);font-size:13px">by ${escHtml(songArtist)} (${escHtml(songYear)})</span></div><span class="bdg bdg-gold">${escHtml(songGenre)}</span></div><div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+    // Display analysis with enriched header
+    const bpmParsed=(raw.match(/BPM:\s*(\d+)/)||[])[1]||'';
+    const keyParsed=(raw.match(/KEY:\s*(.+)/i)||[])[1]||'';
+    document.getElementById('a-out').innerHTML=`<div class="card" style="border-left:3px solid var(--amber)">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div>
+          <div style="font-size:16px;font-weight:700">${escHtml(songTitle)}</div>
+          <div style="color:var(--tx3);font-size:12px;margin-top:2px">${escHtml(songArtist)} · ${escHtml(songYear)}${bpmParsed?' · '+bpmParsed+' BPM':''}${keyParsed?' · Key of '+escHtml(keyParsed.trim()):''}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span class="bdg bdg-gold">${escHtml(songGenre)}</span>
+          <button class="btn btn-sm" onclick="safeCopy(document.getElementById('a-out').innerText,'Analysis')" style="font-size:11px">📋 Copy</button>
+        </div>
+      </div>
+      ${songStructure?`<div style="background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--cyan);overflow-x:auto;white-space:nowrap">📐 ${escHtml(songStructure)}</div>`:''}
+      <div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--b1);text-align:center;font-size:11px;color:var(--tx4)">⬇️ Scroll down to remix this song's DNA into something new</div>
+    </div>`;
     // Store analysis DNA for Remake — build a virtual song object
     const virtualSong={t:songTitle,a:songArtist,yr:songYear,structure:songStructure,key:songGenre+' — searched song',score:'?'};
     S.lastAnalysis={raw,genre:'search',genreLabel:songGenre,song:virtualSong,songList:`"${songTitle}" by ${songArtist} (${songYear}). Structure: ${songStructure}`};
@@ -9709,15 +9727,22 @@ async function runAnalysis(){
 function showRemakePanel(song,genreLabel,analysisRaw){
   const panel=document.getElementById('a-remake');
   const dna=document.getElementById('remake-dna');
-  // Extract key DNA points from the analysis
   const songName=song?`"${song.t}" by ${song.a}`:'Multiple songs';
   const structure=song?.structure||'Various';
   const keyNote=song?.key||'See analysis above';
+  // Parse ratings from analysis if available
+  const hookR=(analysisRaw.match(/Hook:\s*(\d+)/)||[])[1]||'';
+  const structR=(analysisRaw.match(/Structure:\s*(\d+)/)||[])[1]||'';
+  const emotR=(analysisRaw.match(/Emotion:\s*(\d+)/)||[])[1]||'';
+  const ratingsHtml=(hookR||structR||emotR)?`<div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">${hookR?`<span class="intel-stat" style="padding:4px 10px;min-width:auto"><span class="intel-num" style="font-size:14px">🎣 ${hookR}</span><span class="intel-label">/10</span></span>`:''
+  }${structR?`<span class="intel-stat" style="padding:4px 10px;min-width:auto"><span class="intel-num" style="font-size:14px">📐 ${structR}</span><span class="intel-label">/10</span></span>`:''
+  }${emotR?`<span class="intel-stat" style="padding:4px 10px;min-width:auto"><span class="intel-num" style="font-size:14px">💛 ${emotR}</span><span class="intel-label">/10</span></span>`:''}</div>`:'';
   dna.innerHTML=`<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--amber);margin-bottom:6px;font-weight:700">🧬 Song DNA — ${escHtml(songName)}</div>`+
     `<div class="remake-dna-item"><b>Genre:</b> <span>${escHtml(genreLabel)}</span></div>`+
-    `<div class="remake-dna-item"><b>Structure:</b> <span>${escHtml(structure)}</span></div>`+
+    `<div class="remake-dna-item"><b>Structure:</b> <span style="font-family:var(--mono);font-size:11px">${escHtml(structure)}</span></div>`+
     `<div class="remake-dna-item"><b>Key trait:</b> <span>${escHtml(keyNote)}</span></div>`+
-    `<div style="font-size:11px;color:var(--tx4);margin-top:6px">The full analysis above is the DNA. Add your twist below to create something new.</div>`;
+    ratingsHtml+
+    `<div style="font-size:11px;color:var(--tx4);margin-top:8px">The analysis above is the DNA. Add your creative twist below to generate something new.</div>`;
   panel.style.display='block';
   panel.scrollIntoView({behavior:'smooth',block:'nearest'});
 }
@@ -9780,16 +9805,47 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
     // Store for safe copy (avoid template literal injection)
     S._remakeLyrics=songLyrics;
     S._remakePrompt=songPrompt;
-    document.getElementById('remake-out').innerHTML=`<div class="card">
+    // Store remake song data for editor/save integration
+    S._remakeTitle=songTitle;
+    S._remakeGenre=targetLabel;
+    S._remakeTwist=twist;
+    S._remakeRaw=raw;
+    document.getElementById('remake-out').innerHTML=`<div class="card" style="border-left:3px solid var(--cyan)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div style="font-size:16px;font-weight:700;color:var(--cyan)">🔄 ${escHtml(songTitle)}</div>
-        <div style="display:flex;gap:6px">
-          ${songLyrics?`<button class="btn btn-sm" onclick="safeCopy(S._remakeLyrics)">Copy Lyrics</button>`:''}
-          ${songPrompt?`<button class="btn btn-sm" onclick="safeCopy(S._remakePrompt)">Copy Prompt</button>`:''}
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="btn btn-cyan btn-sm" onclick="remakePushToEditor()">✏️ Edit</button>
+          <button class="btn btn-sm" id="remake-save-btn" onclick="remakeSaveToLib()">💾 Save</button>
+          ${songLyrics?`<button class="btn btn-sm" onclick="safeCopy(S._remakeLyrics,'Lyrics')">📋 Lyrics</button>`:''}
+          ${songPrompt?`<button class="btn btn-sm" onclick="safeCopy(S._remakePrompt,'Prompt')">📋 Prompt</button>`:''}
+          <button class="btn btn-sm" id="remake-like-btn" onclick="remakeRate(true)" style="opacity:0.6">👍</button>
+          <button class="btn btn-sm" id="remake-dislike-btn" onclick="remakeRate(false)" style="opacity:0.6">👎</button>
         </div>
+      </div>
+      <!-- Hook Score Mini -->
+      <div class="hook-score-mini" id="rmk-hook-score-mini" style="margin-bottom:10px">
+        <div class="hsm-hdr"><span class="hsm-title">🎣 Hook Score</span><span class="hsm-num" id="rmk-hook-num">—</span></div>
+        <div class="hsm-grid" id="rmk-hook-grid"></div>
+      </div>
+      <!-- Song Score Dashboard -->
+      <div class="score-dashboard" id="rmk-score-dashboard" style="margin-bottom:10px">
+        <div class="score-hdr">
+          <div class="score-overall"><span class="score-overall-num" id="rmk-score-num">—</span><span class="score-overall-lbl">overall<br>score</span></div>
+        </div>
+        <div class="score-grid" id="rmk-score-grid"></div>
       </div>
       <div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${html}</div>
     </div>`;
+    // Run scoring on the remade song
+    if(songLyrics){
+      // Temporarily store for hook score calc
+      const prevSong=S.currentSong;
+      S.currentSong={title:songTitle,lyrics:songLyrics,genre:targetLabel,prompt:songPrompt};
+      calcHookScore('rmk');
+      S.currentSong=prevSong;
+      // Async song score
+      generateScoreDashboard('rmk',songLyrics,targetLabel);
+    }
     // 🧠 Update learned song with remake data
     if(a.song){
       learnSong({
@@ -9806,6 +9862,48 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
     toast('⚠️ Remake failed');
   }
   btnDone('remake-btn');
+}
+
+// 🔄 Remake — Push to Editor
+function remakePushToEditor(){
+  if(!S._remakeLyrics){toast('No lyrics to edit');return;}
+  loadLyricsIntoEditor(S._remakeLyrics,S._remakeTitle||'Untitled Remake');
+  // Set editor song metadata
+  S.editorSong={title:S._remakeTitle||'Untitled Remake',lyrics:S._remakeLyrics,genre:S._remakeGenre||'',topic:S._remakeTwist||''};
+  navTo('editor');
+  toast('✓ Loaded remake into Editor');
+}
+
+// 🔄 Remake — Save to main Library
+function remakeSaveToLib(){
+  if(!S._remakeLyrics){toast('Nothing to save');return;}
+  const song={
+    title:S._remakeTitle||'Untitled Remake',
+    lyrics:S._remakeLyrics,
+    prompt:S._remakePrompt||'',
+    genre:S._remakeGenre||'',
+    topic:S._remakeTwist||'',
+    ts:Date.now()
+  };
+  S.library.push(song);
+  try{localStorage.setItem('soniq_lib',JSON.stringify(S.library));}catch(e){}
+  const btn=document.getElementById('remake-save-btn');
+  if(btn){btn.textContent='✓ Saved';btn.disabled=true;}
+  toast('✓ Saved to Library');
+}
+
+// 🔄 Remake — Rate (Like/Dislike)
+function remakeRate(isLike){
+  const likeBtn=document.getElementById('remake-like-btn');
+  const dislikeBtn=document.getElementById('remake-dislike-btn');
+  if(likeBtn) likeBtn.style.opacity=isLike?'1':'0.3';
+  if(dislikeBtn) dislikeBtn.style.opacity=isLike?'0.3':'1';
+  // Update in learned songs
+  const songs=getLearnedSongs();
+  const key=((S._remakeTitle||'')+('remake')).toLowerCase().replace(/\s/g,'');
+  const match=songs.find(s=>(s.title+(s.source||'')).toLowerCase().replace(/\s/g,'')===key);
+  if(match){match.user_rating=isLike?5:1;match.updated_at=new Date().toISOString();saveLearnedSongs(songs);}
+  toast(isLike?'👍 Liked!':'👎 Noted — we\'ll learn from this');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -14031,7 +14129,7 @@ function renderSyncMeta(prefix) {
 // Now renders into its own mini card, separate from Song Score
 // ═══════════════════════════════════════════════════════
 function calcHookScore(prefix) {
-  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  const song = prefix === 'res' || prefix === 'rmk' ? S.currentSong : S.luckyCurrentSong;
   if (!song || !song.lyrics) return;
   let card = document.getElementById(prefix + '-hook-score-mini');
   let numEl = document.getElementById(prefix + '-hook-num');
