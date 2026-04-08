@@ -59,25 +59,29 @@ function getThisMonth() {
   return new Date().toISOString().slice(0, 7); // YYYY-MM
 }
 
-// free = 3 lifetime songs (trial); paid = monthly
+// free = 5 songs/month (playground); paid = monthly
 const PLAN_LIMITS = {
-  free:                3,    // lifetime trial
-  founding_t1:         20,   // per month ($5 early founder)
-  founding_t1_annual:  20,
-  founding_t2:         10,   // per month ($9.99 entry)
-  founding_t2_annual:  10,
-  pro:                 20,   // per month ($19)
-  pro_annual:          20,
-  studio:              50,   // per month ($49)
-  studio_annual:       50,
-  founding:            50,   // legacy
+  free:                5,    // per month (playground)
+  creator:             30,   // per month ($7)
+  creator_annual:      30,
+  founding_t1:         30,   // grandfathered founders get creator limits
+  founding_t1_annual:  30,
+  founding_t2:         30,   // grandfathered founders get creator limits
+  founding_t2_annual:  30,
+  pro:                 9999, // unlimited ($19)
+  pro_annual:          9999,
+  studio:              9999, // unlimited ($39)
+  studio_annual:       9999,
+  founding:            9999, // legacy
 };
 
 // Emails that always get Studio plan + unlimited access (no admin token needed)
 const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com', 'rainfiremusic@gmail.com', 'eric@warkershall.com']);
 
-// Plans that use monthly counting (free uses lifetime)
+// All plans now use monthly counting (including free)
 const MONTHLY_LIMIT_PLANS = new Set([
+  'free',
+  'creator','creator_annual',
   'founding_t1','founding_t1_annual',
   'founding_t2','founding_t2_annual',
   'pro','pro_annual',
@@ -87,6 +91,7 @@ const MONTHLY_LIMIT_PLANS = new Set([
 // Minimum quality score per plan (0 = no guarantee)
 const PLAN_MIN_SCORES = {
   free:               0,
+  creator:            75,  creator_annual:      75,
   founding_t2:        75,  founding_t2_annual:  75,
   founding_t1:        75,  founding_t1_annual:  75,
   pro:                81,  pro_annual:          81,
@@ -95,6 +100,7 @@ const PLAN_MIN_SCORES = {
 };
 
 const PLAN_MAX_RETRIES = {
+  creator: 2,     creator_annual: 2,
   founding_t2: 2, founding_t2_annual: 2,
   founding_t1: 2, founding_t1_annual: 2,
   pro: 2,         pro_annual: 2,
@@ -353,21 +359,16 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const limit = PLAN_LIMITS[plan] ?? 3;
-  if (!req._adminBypass && isFinite(limit)) {
-    const isLifetime = plan === 'free';
-    const redisKey   = isLifetime
-      ? `soniq:ratelimit:lifetime:${user.id}`
-      : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+  const limit = PLAN_LIMITS[plan] ?? 5;
+  if (!req._adminBypass && isFinite(limit) && limit < 9999) {
+    const redisKey = `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
     const current = parseInt(await redisGet(redisKey) || '0', 10);
     if (current >= limit) {
-      const upgradeHint = isLifetime
-        ? 'Your 3 free songs are used. Upgrade to keep creating.'
-        : plan === 'founding_t2' || plan === 'founding_t2_annual'
-          ? 'Upgrade to Pro for 20 songs/month.'
-          : plan === 'pro' || plan === 'pro_annual'
-            ? 'Upgrade to Studio for 50 songs/month.'
-            : 'Contact info@mysoniq.com for Enterprise volume.';
+      const upgradeHint = plan === 'free'
+        ? 'You\'ve used all 5 free songs this month. Upgrade to Creator for 30 songs/month — just $7.'
+        : plan === 'creator' || plan === 'creator_annual' || plan === 'founding_t2' || plan === 'founding_t2_annual' || plan === 'founding_t1' || plan === 'founding_t1_annual'
+          ? 'You\'ve hit your limit. Upgrade to Pro for unlimited songs — $19/mo.'
+          : 'Contact info@mysoniq.com for Enterprise volume.';
       return res.status(429).json({
         error: 'limit_reached',
         message: upgradeHint,
@@ -537,14 +538,11 @@ module.exports = async function handler(req, res) {
 
   const errors = [];
 
-  // Helper: increment rate limit after successful generation
+  // Helper: increment rate limit after successful generation (all plans use monthly now)
   const recordUsage = () => {
-    if (!req._adminBypass && isFinite(limit)) {
-      const isLifetime = plan === 'free';
-      const redisKey   = isLifetime
-        ? `soniq:ratelimit:lifetime:${user.id}`
-        : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
-      const ttl = isLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+    if (!req._adminBypass && isFinite(limit) && limit < 9999) {
+      const redisKey = `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+      const ttl = 32 * 24 * 3600;
       redisIncrExpire(redisKey, ttl);
     }
   };

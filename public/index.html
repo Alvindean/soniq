@@ -1192,6 +1192,19 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .btn-dl{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--r4);border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s}
 .btn-dl:hover{background:var(--cyan);color:#050505}
 .save-bar-saved{font-size:11px;color:var(--green);font-weight:600;display:none;align-items:center;gap:4px}
+/* Quick Copy + Feature Discovery */
+.quick-copy-bar{display:none;gap:8px;flex-wrap:wrap;padding:12px 16px;margin-bottom:12px;background:linear-gradient(135deg,var(--s2),var(--s1));border:1px solid var(--b2);border-radius:var(--r3)}
+.quick-copy-bar.visible{display:flex}
+.qcb-btn{display:inline-flex;align-items:center;gap:6px;padding:10px 16px;border-radius:var(--r4);border:1px solid var(--b3);background:var(--s3);color:var(--tx1);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap}
+.qcb-btn:hover{border-color:var(--amberline);background:var(--s4);transform:translateY(-1px)}
+.qcb-btn.qcb-primary{border-color:var(--amberline);background:var(--amberbg);color:var(--amber)}
+.qcb-btn.qcb-primary:hover{background:var(--amber);color:#050505}
+.qcb-divider{width:1px;background:var(--b2);margin:0 4px}
+.feat-disco{display:none;gap:6px;padding:10px 14px;margin:-4px 0 14px;border-radius:var(--r3);flex-wrap:wrap;align-items:center}
+.feat-disco.visible{display:flex}
+.feat-disco-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx4);margin-right:4px}
+.fd-pill{font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s2);color:var(--tx3);cursor:pointer;transition:all .15s;white-space:nowrap}
+.fd-pill:hover{border-color:var(--cyanline);color:var(--cyan);background:var(--s3)}
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
   .nav{overflow-x:auto;-webkit-overflow-scrolling:touch;gap:2px}
@@ -3489,8 +3502,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
         <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
         <div class="gen-progress" id="gen-progress">
-          <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div></div>
-          <span id="gp-label">1 free song today</span>
+          <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div><div class="gp-pip" id="gp-pip-2"></div><div class="gp-pip" id="gp-pip-3"></div><div class="gp-pip" id="gp-pip-4"></div><div class="gp-pip" id="gp-pip-5"></div></div>
+          <span id="gp-label">5 free songs this month</span>
         </div>
       </div>
 
@@ -3684,6 +3697,30 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn-save-lib" onclick="saveLib()">Save to Library</button>
         <span class="save-bar-saved" id="res-save-bar-saved">✓ Saved!</span>
       </div>
+    </div>
+
+    <!-- QUICK COPY BAR — prominent copy actions -->
+    <div class="quick-copy-bar" id="res-quick-copy">
+      <button class="qcb-btn qcb-primary" onclick="cpField('res-lyrics-text')" title="Copy lyrics → paste into Suno, Udio, or any AI music tool">📋 Copy Lyrics</button>
+      <button class="qcb-btn qcb-primary" onclick="cpBriefPrompt('res')" title="Copy the song prompt → paste into Style/Genre field">🎛 Copy Song Prompt</button>
+      <button class="qcb-btn" onclick="cpVisualPrompt('res')" title="Copy image prompt → paste into Midjourney, FLUX, DALL-E">🖼 Copy Image Prompt</button>
+      <button class="qcb-btn" onclick="cpVideoPrompt('res')" title="Copy video prompt → paste into Runway, Sora, Kling">🎬 Copy Video Prompt</button>
+      <div class="qcb-divider"></div>
+      <button class="qcb-btn" onclick="openEditor()" title="Edit lyrics in the SONIQ editor">✏️ Edit</button>
+      <button class="qcb-btn" onclick="saveLib()" title="Save to your library">💾 Save</button>
+    </div>
+
+    <!-- FEATURE DISCOVERY — shows other things they can do -->
+    <div class="feat-disco" id="res-feat-disco">
+      <span class="feat-disco-label">Explore:</span>
+      <span class="fd-pill" onclick="ofbScrollTo('res-hook-score-mini')">🎣 Hook Score</span>
+      <span class="fd-pill" onclick="ofbScrollTo('res-score-dashboard')">📊 Song Score</span>
+      <span class="fd-pill" onclick="goOtab('res','chords',document.getElementById('res-tab-chords'))">🎸 Chords</span>
+      <span class="fd-pill" onclick="goOtabMore('res','dopamine','⚡ Dopamine')">⚡ Dopamine Map</span>
+      <span class="fd-pill" onclick="tryOpenVisual('res')">🎬 Visual Prompts</span>
+      <span class="fd-pill" onclick="tryOpenSync('res')">📋 Sync Metadata</span>
+      <span class="fd-pill" onclick="generateVariations('res')">✨ Variations</span>
+      <span class="fd-pill" onclick="batchGenerate()">⚡ Batch x3</span>
     </div>
 
     <!-- OUTPUT FOOTER: clickable links to tabs -->
@@ -3980,6 +4017,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     </div>
     <!-- COPYRIGHT STRIP -->
     <div class="copyright-strip" id="lres-copyright-strip" style="display:none"></div>
+    <!-- QUICK COPY BAR (Lucky) -->
+    <div class="quick-copy-bar" id="lres-quick-copy">
+      <button class="qcb-btn qcb-primary" onclick="cpField('lres-lyrics-text')" title="Copy lyrics → paste into Suno, Udio, or any AI music tool">📋 Copy Lyrics</button>
+      <button class="qcb-btn qcb-primary" onclick="cpBriefPrompt('lres')" title="Copy the song prompt">🎛 Copy Song Prompt</button>
+      <button class="qcb-btn" onclick="cpVisualPrompt('lres')" title="Copy image prompt">🖼 Copy Image Prompt</button>
+      <button class="qcb-btn" onclick="cpVideoPrompt('lres')" title="Copy video prompt">🎬 Copy Video Prompt</button>
+    </div>
     <!-- SCORE DASHBOARD -->
     <div class="score-dashboard" id="lres-score-dashboard">
       <div class="score-header">
@@ -4431,7 +4475,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="upgrade-top">
       <div class="upgrade-eyebrow">Unlock SONIQ</div>
       <div class="upgrade-headline">You've found your flow.</div>
-      <div class="upgrade-sub" id="upgrade-sub-text">1 song a day isn't enough for a real session.</div>
+      <div class="upgrade-sub" id="upgrade-sub-text">Unlock unlimited songs, all genres, and pro features.</div>
     </div>
 
     <!-- Founding tier banner — shown when spots available -->
@@ -4442,45 +4486,56 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="ufb-spots" id="upgrade-tier-spot"></div>
     </div>
 
+    <!-- Annual / Monthly toggle -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:0 0 18px">
+      <span id="billing-label-monthly" style="font-size:12px;font-weight:700;color:var(--tx2);transition:color .2s">Monthly</span>
+      <button id="billing-toggle" onclick="toggleBillingCycle()" style="position:relative;width:48px;height:26px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);cursor:pointer;padding:0;transition:background .2s" aria-label="Toggle annual pricing">
+        <span id="billing-toggle-dot" style="position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--amber);transition:left .2s"></span>
+      </button>
+      <span id="billing-label-annual" style="font-size:12px;font-weight:700;color:var(--tx4);transition:color .2s">Annual</span>
+      <span id="billing-save-badge" style="display:none;font-size:10px;font-weight:800;color:#000;background:var(--green,#34d399);padding:2px 8px;border-radius:99px">SAVE 25-30%</span>
+    </div>
+
     <!-- 3-tier plan cards -->
     <div class="upgrade-plans">
-      <div class="uplan" id="uplan-starter" onclick="startCheckoutPlan('founding_t2')">
-        <div class="uplan-name">Entry</div>
-        <div class="uplan-price">$9.99<span>/mo</span></div>
+      <div class="uplan" id="uplan-creator" onclick="startCheckoutPlan(S._annualBilling?'creator_annual':'creator')">
+        <div class="uplan-name">Creator</div>
+        <div class="uplan-price" id="uplan-creator-price">$7<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>10 songs / month</li>
-          <li>All 30 genres</li>
-          <li>Visual Prompts</li>
+          <li>30 songs / month</li>
+          <li>All 24 genres</li>
+          <li>Visual + Video prompts</li>
           <li>Full production brief</li>
-          <li>75+ quality score</li>
-          <li>Theory Analysis</li>
+          <li>Chord progressions</li>
+          <li>Save to library</li>
         </ul>
         <div class="uplan-cta">Get Started →</div>
       </div>
-      <div class="uplan uplan-featured" id="uplan-pro" onclick="startCheckoutPlan('pro')">
-        <div class="uplan-badge">Most Popular</div>
+      <div class="uplan uplan-featured" id="uplan-pro" onclick="startCheckoutPlan(S._annualBilling?'pro_annual':'pro')">
+        <div class="uplan-badge">Best Value</div>
         <div class="uplan-name">Pro</div>
-        <div class="uplan-price">$19<span>/mo</span></div>
+        <div class="uplan-price" id="uplan-pro-price">$19<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>20 songs / month</li>
-          <li>81+ quality score</li>
+          <li>Unlimited songs</li>
           <li>Album Planner</li>
-          <li>Rap Lab</li>
-          <li>Batch ×3 generate</li>
+          <li>Rap Lab + Fusion</li>
+          <li>Batch generation</li>
+          <li>Publishing registration</li>
           <li>Sync metadata</li>
+          <li>Priority queue</li>
         </ul>
         <div class="uplan-cta">Go Pro →</div>
       </div>
-      <div class="uplan" id="uplan-studio" onclick="startCheckoutPlan('studio')">
+      <div class="uplan" id="uplan-studio" onclick="startCheckoutPlan(S._annualBilling?'studio_annual':'studio')">
         <div class="uplan-name">Studio</div>
-        <div class="uplan-price">$49<span>/mo</span></div>
+        <div class="uplan-price" id="uplan-studio-price">$39<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>50 songs / month</li>
-          <li>85+ quality score</li>
-          <li>100% publishing yours</li>
-          <li>PDF Export</li>
-          <li>Artist Voice Profile</li>
-          <li>Priority API</li>
+          <li>Unlimited songs</li>
+          <li>Platinum mode</li>
+          <li>Commercial licensing</li>
+          <li>White-label export</li>
+          <li>Royalty tracking</li>
+          <li>Dedicated support</li>
         </ul>
         <div class="uplan-cta">Go Studio →</div>
       </div>
@@ -7569,7 +7624,7 @@ async function callServerStream(action, params, onChunk, signal) {
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
     if (res.status === 401) {
-      openAuth('Create your free account to generate your song — 1 free song every day');
+      openAuth('Create your free account — 5 free songs every month');
       const err = new Error(e.message || 'Sign in to generate songs');
       err.code = 'auth_required';
       throw err;
@@ -7630,7 +7685,7 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
     });
     const ct = res.headers.get('content-type') || '';
     if (res.status === 401) {
-      openAuth('Create your free account to generate your song — 1 free song every day');
+      openAuth('Create your free account — 5 free songs every month');
       const err = new Error('Sign in to generate songs');
       err.code = 'auth_required';
       throw err;
@@ -7921,6 +7976,18 @@ function cpBriefPrompt(prefix){
   const text=briefEl?.textContent||song?.style||'';
   if(!text){toast('Generate a song first');return;}
   safeCopy(text, 'Song prompt copied');
+}
+function cpVisualPrompt(prefix){
+  const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
+  const text=song?.visualPrompt||S._remakeVisual||'';
+  if(!text){toast('No image prompt — generate a song first');return;}
+  safeCopy(text,'Image prompt copied — paste into Midjourney, FLUX, or DALL-E');
+}
+function cpVideoPrompt(prefix){
+  const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
+  const text=song?.videoPrompt||S._remakeVideo||'';
+  if(!text){toast('No video prompt — generate a song first');return;}
+  safeCopy(text,'Video prompt copied — paste into Runway, Sora, or Kling');
 }
 function countSyl(word){word=word.toLowerCase().replace(/[^a-z]/g,'');if(!word)return 0;if(word.length<=3)return 1;word=word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');word=word.replace(/^y/,'');const m=word.match(/[aeiouy]{1,2}/g);return m?m.length:1;}
 function lineSyl(line){return line.replace(/\[.*?\]/g,'').trim().split(/\s+/).filter(Boolean).reduce((s,w)=>s+countSyl(w),0);}
@@ -8240,9 +8307,9 @@ function apiErrHtml(msg, errCode) {
   const isOverload = m.includes('overloaded') || m.includes('529');
   let hint = '';
   if (isAuthRequired) {
-    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account to generate your song — 1 free song every day\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
+    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account — 5 free songs every month\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
   } else if (isLimitReached) {
-    hint = '<br><br>You\'ve used your 1 free song today. Upgrade from $9/mo to unlock unlimited generations.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock Unlimited →</button>';
+    hint = '<br><br>You\'ve used your free songs this month. Upgrade from $7/mo for more — or go Pro for unlimited.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock More Songs →</button>';
   } else if (isCredits) {
     hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
   } else if (isKey) {
@@ -8417,7 +8484,7 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 
 function feelLucky(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 1 free song every day');
+    openAuth('Create your free account — 5 free songs every month');
     S._pendingGenerate = 'lucky';
     return;
   }
@@ -8691,6 +8758,8 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   if (llangBar) { llangBar.style.display = 'flex'; resetLangPills(llangBar); }
   calcHookScore('lres');
   setTimeout(() => loadPromptIntelligence('lres'), 400);
+  // Show quick copy bar
+  const lqcb=document.getElementById('lres-quick-copy');if(lqcb)lqcb.classList.add('visible');
   S.luckyHistory.unshift({...S.luckyCurrentSong});
   if(S.luckyHistory.length>20)S.luckyHistory=S.luckyHistory.slice(0,20);
   renderLuckyHistory();
@@ -8743,7 +8812,7 @@ const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','roc
 
 async function generateSong(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 1 free song every day');
+    openAuth('Create your free account — 5 free songs every month');
     S._pendingGenerate = 'song';
     return;
   }
@@ -9047,24 +9116,27 @@ VIDEO PROMPT:
 }
 
 function parseSection(raw, key, nextKey){
-  // Try all common formats Claude might use for headers
-  const patterns=[
-    key+':\n', key+': \n', key+':  \n',  // header then newline
-    key+': ',                              // header space content (same line)
-    key+':',                               // bare header
-  ];
+  // Build all possible header formats: plain, markdown ##, markdown #, with/without colon
+  function headerPatterns(k){
+    return [
+      '## '+k+':\n','## '+k+': \n','## '+k+':\n','## '+k+'\n',  // ## HEADER: or ## HEADER
+      '# '+k+':\n','# '+k+': \n','# '+k+':\n','# '+k+'\n',     // # HEADER: or # HEADER
+      k+':\n', k+': \n', k+':  \n',                              // HEADER: (plain)
+      '## '+k+': ','## '+k+':','# '+k+': ','# '+k+':',          // markdown same-line
+      k+': ',k+':',                                               // plain same-line
+    ];
+  }
   let start=-1;
-  for(const p of patterns){
+  for(const p of headerPatterns(key)){
     const i=raw.indexOf(p);
     if(i!==-1){start=i+p.length;break;}
   }
   if(start===-1)return'';
-  // Skip any leading newlines after header
-  while(start<raw.length&&raw[start]==='\n')start++;
+  // Skip any leading newlines/whitespace after header
+  while(start<raw.length&&(raw[start]==='\n'||raw[start]==='\r'))start++;
   let end=raw.length;
   if(nextKey){
-    // Find next header — try all patterns for the next key too
-    for(const p of[nextKey+':\n',nextKey+': \n',nextKey+':  \n',nextKey+': ',nextKey+':']){
+    for(const p of headerPatterns(nextKey)){
       const ni=raw.indexOf(p,start);
       if(ni>start){end=ni;break;}
     }
@@ -9238,6 +9310,9 @@ function parseSongResult(raw,genre,topic,prodData){
   // Reset like/dislike buttons
   const likeB = document.getElementById('res-like-btn'); if(likeB) likeB.classList.remove('liked');
   const dislikeB = document.getElementById('res-dislike-btn'); if(dislikeB) dislikeB.classList.remove('disliked');
+  // Show quick copy bar + feature discovery
+  const qcb=document.getElementById('res-quick-copy');if(qcb)qcb.classList.add('visible');
+  const fd=document.getElementById('res-feat-disco');if(fd)fd.classList.add('visible');
   toast('✓ Song generated: "'+title+'"');
   trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
@@ -9250,7 +9325,7 @@ function parseSongResult(raw,genre,topic,prodData){
 var OB_KEY           = 'soniq:onboarding:v1:complete';
 var OB_DAILY_KEY     = 'soniq:daily:songs';
 var OB_DAILY_DATE_KEY= 'soniq:daily:date';
-var OB_FREE_LIMIT    = 3;
+var OB_FREE_LIMIT    = 5;
 var _nudgeTimer      = null;
 
 function getDailySongCount() {
@@ -9309,7 +9384,7 @@ function showGenNudge(songNum) {
   if (window.__soniqAdmin || isFounder || isPaid) return;
   var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
   if (remaining > 0) {
-    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> — or go unlimited from $9/mo.';
+    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> this month — upgrade from $7/mo for more.';
   } else {
     txt.innerHTML = 'You\'ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong>. Upgrade to keep creating.';
   }
@@ -9606,9 +9681,9 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
         <div class="theory-header">🎼 Theory Analysis</div>
         <div class="theory-lock-gate">
           <div class="tlg-icon">🔒</div>
-          <div class="tlg-title">Full theory analysis unlocks with Starter</div>
+          <div class="tlg-title">Full theory analysis unlocks with Creator</div>
           <div class="tlg-sub">Scale · Key feel · Outlier chords · Voice leading · Tension rating · Archetype</div>
-          <button class="tlg-btn" onclick="openUpgradeModal()">Unlock from $9/mo →</button>
+          <button class="tlg-btn" onclick="openUpgradeModal()">Unlock from $7/mo →</button>
         </div>
       </div>`;
     } else {
@@ -10091,7 +10166,7 @@ function initBuilder(){
 
 async function generateFromBuilder(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 1 free song every day');
+    openAuth('Create your free account — 5 free songs every month');
     S._pendingGenerate = 'builder';
     return;
   }
@@ -10335,7 +10410,7 @@ function showFusion(g1,g2){
 
 async function generateFusion(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account to generate your song — 1 free song every day');
+    openAuth('Create your free account — 5 free songs every month');
     S._pendingGenerate = 'fusion';
     return;
   }
@@ -10998,11 +11073,11 @@ VIDEO PROMPT:
     const raw=await callClaude(prompt,'You are a hit songwriter and producer. Write complete, ready-to-use songs with Suno-compatible structure brackets and style prompts.',3500);
     const html=escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
     // Parse out key sections for copy buttons
-    const titleMatch=raw.match(/SONG TITLE:\s*(.+)/);
-    const promptMatch=raw.match(/SONG PROMPT:\s*([\s\S]*?)(?=\n\n(?:LYRICS|DNA KEPT|TWIST|WHY))/);
-    const lyricsMatch=raw.match(/LYRICS:\s*([\s\S]*?)(?=\n\n(?:WHY THIS WORKS|VISUAL PROMPT|$))/);
-    const visualMatch=raw.match(/VISUAL PROMPT:\s*([\s\S]*?)(?=\n\n(?:VIDEO PROMPT|$))/);
-    const videoMatch=raw.match(/VIDEO PROMPT:\s*([\s\S]*?)$/);
+    const titleMatch=raw.match(/(?:#+ )?SONG TITLE:?\s*(.+)/);
+    const promptMatch=raw.match(/(?:#+ )?SONG PROMPT:?\s*([\s\S]*?)(?=\n\n(?:(?:#+ )?(?:LYRICS|DNA KEPT|TWIST|WHY)))/);
+    const lyricsMatch=raw.match(/(?:#+ )?LYRICS:?\s*([\s\S]*?)(?=\n\n(?:(?:#+ )?(?:WHY THIS WORKS|VISUAL PROMPT)|$))/);
+    const visualMatch=raw.match(/(?:#+ )?VISUAL PROMPT:?\s*([\s\S]*?)(?=\n\n(?:(?:#+ )?VIDEO PROMPT|$))/);
+    const videoMatch=raw.match(/(?:#+ )?VIDEO PROMPT:?\s*([\s\S]*?)$/);
     const songTitle=titleMatch?titleMatch[1].trim():'Untitled Remake';
     const songPrompt=promptMatch?promptMatch[1].trim():'';
     const songLyrics=lyricsMatch?lyricsMatch[1].trim():'';
@@ -11694,7 +11769,7 @@ function initGenreGrid(){
     const overflow = i >= VISIBLE ? ' gp-overflow' : '';
     return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
-         title="${locked?'Unlock all 30 genres with Starter — from $9/mo':''}"
+         title="${locked?'Unlock all 24 genres with Creator — from $7/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
@@ -11720,7 +11795,7 @@ function toggleGenreExpand(){
 }
 
 function lockedGenreClick(gid) {
-  toast('🔒 ' + (GENRES_DEF.find(g=>g.id===gid)?.label||'This genre') + ' unlocks with Starter — from $9/mo');
+  toast('🔒 ' + (GENRES_DEF.find(g=>g.id===gid)?.label||'This genre') + ' unlocks with Creator — from $7/mo');
   openUpgradeModal();
 }
 
@@ -12277,7 +12352,7 @@ async function openUpgradeModal() {
   document.body.style.overflow = 'hidden';
   // Update sub-text based on context
   const sub = document.getElementById('upgrade-sub-text');
-  if (sub) sub.textContent = S.user ? '1 song a day isn\'t enough for a real session.' : 'Sign in first, then pick your plan.';
+  if (sub) sub.textContent = S.user ? 'Unlock unlimited songs, all genres, and pro features.' : 'Sign in first, then pick your plan.';
   // Show founding banner if spots available
   try {
     const res = await fetch('/api/founding');
@@ -12329,16 +12404,47 @@ function closeUpgradeModal() {
   document.body.style.overflow = '';
 }
 
+// Billing cycle toggle (annual vs monthly)
+S._annualBilling = false;
+function toggleBillingCycle() {
+  S._annualBilling = !S._annualBilling;
+  const dot = document.getElementById('billing-toggle-dot');
+  const badge = document.getElementById('billing-save-badge');
+  const lm = document.getElementById('billing-label-monthly');
+  const la = document.getElementById('billing-label-annual');
+  if (S._annualBilling) {
+    dot.style.left = '25px';
+    badge.style.display = '';
+    lm.style.color = 'var(--tx4)';
+    la.style.color = 'var(--amber)';
+    document.getElementById('uplan-creator-price').innerHTML = '$5<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$60/yr — save 29%</div>';
+    document.getElementById('uplan-pro-price').innerHTML = '$15<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$180/yr — save 21%</div>';
+    document.getElementById('uplan-studio-price').innerHTML = '$29<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$348/yr — save 26%</div>';
+  } else {
+    dot.style.left = '3px';
+    badge.style.display = 'none';
+    lm.style.color = 'var(--tx2)';
+    la.style.color = 'var(--tx4)';
+    document.getElementById('uplan-creator-price').innerHTML = '$7<span>/mo</span>';
+    document.getElementById('uplan-pro-price').innerHTML = '$19<span>/mo</span>';
+    document.getElementById('uplan-studio-price').innerHTML = '$39<span>/mo</span>';
+  }
+}
+
 // Direct Stripe Payment Links (fallback if checkout API unavailable)
+// NOTE: Creator + new Studio + new Pro Annual links need to be created in Stripe and updated here
 const STRIPE_PAYMENT_LINKS = {
+  creator:            '', // TODO: Create in Stripe → $7/mo recurring
+  creator_annual:     '', // TODO: Create in Stripe → $60/yr recurring
+  pro:                'https://buy.stripe.com/8x2bJ2g5v2eI4VmbgT5Vu0d',
+  pro_annual:         '', // TODO: Create in Stripe → $180/yr recurring
+  studio:             '', // TODO: Create in Stripe → $39/mo recurring
+  studio_annual:      '', // TODO: Create in Stripe → $348/yr recurring
+  // Legacy founding links (still work for grandfathered users)
   founding_t1:        'https://buy.stripe.com/4gM14o8D32eI1Ja2Kn5Vu09',
   founding_t1_annual: 'https://buy.stripe.com/5kQcN606xdXq4Vmet55Vu0a',
   founding_t2:        'https://buy.stripe.com/cNi00k8D36uY0F64Sv5Vu0b',
   founding_t2_annual: 'https://buy.stripe.com/9B6eVe3iJ06AfA04Sv5Vu0c',
-  pro:                'https://buy.stripe.com/8x2bJ2g5v2eI4VmbgT5Vu0d',
-  pro_annual:         'https://buy.stripe.com/dRmcN606x6uY87y0Cf5Vu0e',
-  studio:             'https://buy.stripe.com/7sYcN63iJ4mQdrSdp15Vu0f',
-  studio_annual:      'https://buy.stripe.com/aFa6oIaLb4mQafGgBd5Vu0g',
 };
 
 // Tracks which plan is currently shown in the upgrade modal — set by loadUpgradeTier()
@@ -13291,7 +13397,7 @@ function renderCreativePrompts(prefix, visualPrompt, videoPrompt) {
 function tryOpenVisual(prefix) {
   if (!window.__soniqAdmin && !PAID_PLANS.has(S.plan)) {
     if (!S.user) { openAuth('Sign in and upgrade to unlock Visual Prompts, Music Video concepts & Social Media captions'); return; }
-    toast('🎬 Visual Prompts unlock with Starter — artist visuals, music video concepts & social captions');
+    toast('🎬 Visual Prompts unlock with Creator — artist visuals, music video concepts & social captions');
     openUpgradeModal();
     return;
   }
@@ -13302,7 +13408,7 @@ function tryOpenVisual(prefix) {
 function tryOpenSync(prefix) {
   if (!window.__soniqAdmin && !PAID_PLANS.has(S.plan)) {
     if (!S.user) { openAuth('Sign in and upgrade to unlock Sync Metadata'); return; }
-    toast('📋 Sync Metadata unlocks with Starter — mood tags, BPM, placement categories for licensing');
+    toast('📋 Sync Metadata unlocks with Pro — mood tags, BPM, placement categories for licensing');
     openUpgradeModal();
     return;
   }
@@ -15856,9 +15962,9 @@ async function loadPromptIntelligence(prefix) {
 // Only studio / studio_annual plans can access Studio features.
 // ═══════════════════════════════════════════════════════
 const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
-const PAID_PLANS   = new Set(['pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
-// Genres available on free plan — premium genres require Starter+
-const FREE_GENRES  = new Set(['pop','hiphop','rnb','rock','country','edm']);
+const PAID_PLANS   = new Set(['creator','creator_annual','pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+// Genres available on free (Playground) plan — Creator+ gets all genres
+const FREE_GENRES  = new Set(['pop','hiphop','rnb','rock','country','edm','trap','lofi']);
 
 function requireStudio(featureName) {
   if (window.__soniqAdmin || STUDIO_PLANS.has(S.plan)) return true;
@@ -16493,9 +16599,8 @@ function checkAchievements(trigger, extra) {
 
   if (trigger === 'song_generated') {
     awardXP('song_generated');
-    const _plan = S.plan || 'free';
-    const _isLifetime = _plan === 'free';
-    const _uKey = _isLifetime ? 'soniq_usage_lifetime' : `soniq_usage_${new Date().toISOString().slice(0,7)}`;
+    // All plans use monthly tracking now (including free/Playground)
+    const _uKey = `soniq_usage_${new Date().toISOString().slice(0,7)}`;
     localStorage.setItem(_uKey, String((parseInt(localStorage.getItem(_uKey)||'0',10)+1)));
     updateStreak();
     unlock('first_song');
@@ -16706,51 +16811,55 @@ function loadProfilePage() {
 
   // Plan & Usage
   const PLAN_DISPLAY = {
-    free:'Free',pro:'Pro',pro_annual:'Pro',studio:'Studio',studio_annual:'Studio',
-    founding:'Founding',founding_t1:'Founding T1',founding_t1_annual:'Founding T1',
-    founding_t2:'Founding T2',founding_t2_annual:'Founding T2',
-    starter:'Starter',starter_annual:'Starter'
+    free:'Playground',creator:'Creator',creator_annual:'Creator',
+    pro:'Pro',pro_annual:'Pro',studio:'Studio',studio_annual:'Studio',
+    founding:'Founding',founding_t1:'Founding',founding_t1_annual:'Founding',
+    founding_t2:'Founding',founding_t2_annual:'Founding',
+    starter:'Creator',starter_annual:'Creator'
   };
   const CLIENT_PLAN_LIMITS = {
-    free:3,founding_t1:20,founding_t1_annual:20,founding_t2:10,founding_t2_annual:10,
-    pro:20,pro_annual:20,studio:50,studio_annual:50,founding:50,starter:10,starter_annual:10
+    free:5,creator:30,creator_annual:30,
+    founding_t1:30,founding_t1_annual:30,founding_t2:30,founding_t2_annual:30,
+    pro:Infinity,pro_annual:Infinity,studio:Infinity,studio_annual:Infinity,
+    founding:Infinity,starter:30,starter_annual:30
   };
   const plan = S.plan || 'free';
   const planLabel = PLAN_DISPLAY[plan] || plan.charAt(0).toUpperCase()+plan.slice(1);
-  const planLimit = CLIENT_PLAN_LIMITS[plan] ?? 3;
-  const isLifetime = plan === 'free';
+  const planLimit = CLIENT_PLAN_LIMITS[plan] ?? 5;
   let isUnlimited = planLimit === Infinity || !isFinite(planLimit);
 
-  // Track usage in localStorage
+  // All plans use monthly tracking now (including free/Playground)
   const thisMonth = new Date().toISOString().slice(0,7);
-  const usageKey = isLifetime ? 'soniq_usage_lifetime' : `soniq_usage_${thisMonth}`;
+  const usageKey = `soniq_usage_${thisMonth}`;
   const usageCount = parseInt(localStorage.getItem(usageKey) || '0', 10);
 
   // Plan badge — only use hex colors to avoid invalid "var(--x)60" CSS
   const planBadge = document.getElementById('profile-plan-badge');
   planBadge.textContent = planLabel;
-  const PLAN_HEX = {free:'#94a3b8',pro:'#60a5fa',studio:'#fbbf24',founding:'#a78bfa',founding_t1:'#a78bfa',founding_t1_annual:'#a78bfa',founding_t2:'#34d399',founding_t2_annual:'#34d399',starter:'#60a5fa',starter_annual:'#60a5fa'};
+  const PLAN_HEX = {free:'#94a3b8',creator:'#00d4b8',creator_annual:'#00d4b8',pro:'#60a5fa',pro_annual:'#60a5fa',studio:'#fbbf24',studio_annual:'#fbbf24',founding:'#a78bfa',founding_t1:'#a78bfa',founding_t1_annual:'#a78bfa',founding_t2:'#34d399',founding_t2_annual:'#34d399',starter:'#00d4b8',starter_annual:'#00d4b8'};
   const pc = PLAN_HEX[plan] || '#fbbf24';
   planBadge.style.color = pc;
   planBadge.style.borderColor = pc + '60';
   planBadge.style.background  = pc + '18';
 
-  // Studio/founding admins are effectively unlimited — treat as such
-  isUnlimited = !isFinite(planLimit) || ['studio','studio_annual','founding'].includes(plan) && CLIENT_PLAN_LIMITS[plan] >= 50 && S.isAdmin;
+  // Pro/Studio/admins are unlimited
+  isUnlimited = !isFinite(planLimit) || S.isAdmin;
   if (isUnlimited) {
     document.getElementById('profile-usage-bar').style.width = '100%';
     document.getElementById('profile-usage-nums').textContent = `${usageCount} generated`;
     document.getElementById('profile-usage-label').textContent = 'Plan: ' + planLabel;
-    document.getElementById('profile-usage-sub').textContent = 'No monthly cap — create freely';
+    document.getElementById('profile-usage-sub').textContent = 'Unlimited — create freely';
   } else {
     const usagePct = Math.min(100, Math.round(usageCount / planLimit * 100));
     document.getElementById('profile-usage-bar').style.width = usagePct + '%';
     document.getElementById('profile-usage-nums').textContent = `${usageCount} / ${planLimit}`;
-    document.getElementById('profile-usage-label').textContent = isLifetime ? 'Lifetime songs used' : `Songs this month (${thisMonth})`;
-    document.getElementById('profile-usage-sub').textContent = isLifetime
-      ? `${planLimit - usageCount} free song${planLimit - usageCount !== 1 ? 's' : ''} remaining`
-      : `${Math.max(0, planLimit - usageCount)} remaining · resets ${new Date(new Date().getFullYear(), new Date().getMonth()+1, 1).toLocaleDateString(undefined,{month:'short',day:'numeric'})}`;
-    if (plan === 'free' && usageCount >= planLimit) {
+    document.getElementById('profile-usage-label').textContent = `Songs this month (${thisMonth})`;
+    const remaining = Math.max(0, planLimit - usageCount);
+    const resetDate = new Date(new Date().getFullYear(), new Date().getMonth()+1, 1).toLocaleDateString(undefined,{month:'short',day:'numeric'});
+    document.getElementById('profile-usage-sub').textContent = plan === 'free'
+      ? `${remaining} free song${remaining !== 1 ? 's' : ''} left this month · resets ${resetDate}`
+      : `${remaining} remaining · resets ${resetDate}`;
+    if ((plan === 'free' || plan === 'creator' || plan === 'creator_annual') && usageCount >= planLimit) {
       document.getElementById('profile-upgrade-cta').style.display = '';
     }
   }
@@ -16879,10 +16988,10 @@ function updateWriterSidebar() {
     if (planBadge) {
       const plan = S.plan || 'free';
       planBadge.textContent = plan === 'studio' || plan === 'studio_annual' ? 'Studio Plan'
-        : plan === 'starter' || plan === 'starter_annual' ? 'Starter Plan'
+        : plan === 'creator' || plan === 'creator_annual' || plan === 'starter' || plan === 'starter_annual' ? 'Creator Plan'
         : plan === 'pro' || plan === 'pro_annual' ? 'Pro Plan'
         : plan.startsWith('founding') ? 'Founding Plan'
-        : 'Free Plan';
+        : 'Playground';
       const opPlan = document.getElementById('op-plan');
       if (opPlan) opPlan.textContent = planBadge.textContent;
     }

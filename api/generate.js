@@ -57,16 +57,19 @@ const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail
 
 // Must match stream.js exactly — generate.js is a fallback path for the same users
 const PLAN_LIMITS = {
-  free:                3,   // lifetime trial
-  founding_t1:         20,  founding_t1_annual: 20,
-  founding_t2:         10,  founding_t2_annual: 10,
-  pro:                 20,  pro_annual:         20,
-  studio:              50,  studio_annual:      50,
-  founding:            50,
-  starter: 10, starter_annual: 10, // legacy
+  free:                5,    // per month (playground)
+  creator:             30,   creator_annual:      30,
+  founding_t1:         30,   founding_t1_annual:  30,
+  founding_t2:         30,   founding_t2_annual:  30,
+  pro:                 9999, pro_annual:          9999,
+  studio:              9999, studio_annual:       9999,
+  founding:            9999,
+  starter: 30, starter_annual: 30, // legacy
 };
 
 const MONTHLY_LIMIT_PLANS = new Set([
+  'free',
+  'creator','creator_annual',
   'founding_t1','founding_t1_annual',
   'founding_t2','founding_t2_annual',
   'pro','pro_annual',
@@ -187,17 +190,14 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  const limit = PLAN_LIMITS[plan] ?? 3;
-  if (!isAdmin && isFinite(limit)) {
-    const isLifetime = plan === 'free';
-    const redisKey = isLifetime
-      ? `soniq:ratelimit:lifetime:${user.id}`
-      : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+  const limit = PLAN_LIMITS[plan] ?? 5;
+  if (!isAdmin && isFinite(limit) && limit < 9999) {
+    const redisKey = `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
     const current = parseInt(await redisGet(redisKey) || '0', 10);
     if (current >= limit) {
-      const upgradeHint = isLifetime
-        ? 'Your 3 free songs are used. Upgrade to keep creating.'
-        : 'Monthly limit reached. Upgrade for more songs.';
+      const upgradeHint = plan === 'free'
+        ? 'You\'ve used all 5 free songs this month. Upgrade to Creator — just $7/mo.'
+        : 'Monthly limit reached. Upgrade to Pro for unlimited songs.';
       return res.status(429).json({ error: 'limit_reached', message: upgradeHint, limit, plan });
     }
   }
@@ -264,12 +264,9 @@ module.exports = async function handler(req, res) {
   const errors = [];
 
   const recordUsage = () => {
-    if (!isAdmin && isFinite(limit)) {
-      const isLifetime = plan === 'free';
-      const redisKey = isLifetime
-        ? `soniq:ratelimit:lifetime:${user.id}`
-        : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
-      const ttl = isLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+    if (!isAdmin && isFinite(limit) && limit < 9999) {
+      const redisKey = `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+      const ttl = 32 * 24 * 3600;
       redisIncrExpire(redisKey, ttl);
     }
   };

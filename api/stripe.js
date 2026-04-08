@@ -58,25 +58,32 @@ const ALLOWED_ORIGINS = [
 ];
 
 const PLAN_TO_PRICE = {
-  founding_t1:        process.env.STRIPE_FOUNDING_T1_PRICE_ID,
-  founding_t1_annual: process.env.STRIPE_FOUNDING_T1_ANNUAL_PRICE_ID,
-  founding_t2:        process.env.STRIPE_FOUNDING_T2_PRICE_ID,
-  founding_t2_annual: process.env.STRIPE_FOUNDING_T2_ANNUAL_PRICE_ID,
+  // New pricing tiers
+  creator:            process.env.STRIPE_CREATOR_PRICE_ID,
+  creator_annual:     process.env.STRIPE_CREATOR_ANNUAL_PRICE_ID,
   pro:                process.env.STRIPE_PRO_PRICE_ID,
   pro_annual:         process.env.STRIPE_PRO_ANNUAL_PRICE_ID,
   studio:             process.env.STRIPE_STUDIO_PRICE_ID,
   studio_annual:      process.env.STRIPE_STUDIO_ANNUAL_PRICE_ID,
+  // Legacy founding tiers (grandfathered)
+  founding_t1:        process.env.STRIPE_FOUNDING_T1_PRICE_ID,
+  founding_t1_annual: process.env.STRIPE_FOUNDING_T1_ANNUAL_PRICE_ID,
+  founding_t2:        process.env.STRIPE_FOUNDING_T2_PRICE_ID,
+  founding_t2_annual: process.env.STRIPE_FOUNDING_T2_ANNUAL_PRICE_ID,
 };
 
 const PLAN_LABELS = {
+  creator:            'Creator — $7/mo',
+  creator_annual:     'Creator Annual — $60/yr',
+  pro:                'Pro — $19/mo',
+  pro_annual:         'Pro Annual — $180/yr',
+  studio:             'Studio — $39/mo',
+  studio_annual:      'Studio Annual — $348/yr',
+  // Legacy
   founding_t1:        'Early Founder — $5/mo',
   founding_t1_annual: 'Early Founder Annual — $42/yr',
   founding_t2:        'Entry — $9.99/mo',
   founding_t2_annual: 'Entry Annual — $84/yr',
-  pro:                'Pro — $19/mo',
-  pro_annual:         'Pro Annual — $114/yr',
-  studio:             'Studio — $49/mo',
-  studio_annual:      'Studio Annual — $468/yr',
 };
 
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
