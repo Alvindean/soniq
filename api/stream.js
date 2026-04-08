@@ -73,6 +73,8 @@ const PLAN_LIMITS = {
   studio:              9999, // unlimited ($39)
   studio_annual:       9999,
   founding:            9999, // legacy
+  starter:             30,   // legacy alias for creator
+  starter_annual:      30,
 };
 
 // Emails that always get Studio plan + unlimited access (no admin token needed)
@@ -85,7 +87,8 @@ const MONTHLY_LIMIT_PLANS = new Set([
   'founding_t1','founding_t1_annual',
   'founding_t2','founding_t2_annual',
   'pro','pro_annual',
-  'studio','studio_annual','founding'
+  'studio','studio_annual','founding',
+  'starter','starter_annual'
 ]);
 
 // Minimum quality score per plan (0 = no guarantee)
@@ -458,7 +461,7 @@ module.exports = async function handler(req, res) {
         if (p.genre && !FREE_GENRES_SET.has(p.genre) && !PAID_PLANS_SET.has(plan) && !req._adminBypass) {
           return res.status(403).json({
             error: 'plan_required',
-            message: `${p.genre} genre unlocks with Starter — upgrade to access all 14 genres.`
+            message: `${p.genre} genre unlocks with Creator — upgrade to access all 30 genres.`
           });
         }
 

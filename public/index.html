@@ -834,14 +834,39 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .qbval{font-size:10px;font-weight:700;color:var(--tx2);min-width:24px;font-family:var(--mono)}
 
 /* ── ANALYZER CARDS ── */
-.sggrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.az-section{margin-bottom:24px}
+.az-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx4);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.az-section-title::after{content:'';flex:1;height:1px;background:var(--b1)}
+.az-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
+@media(max-width:540px){.az-controls{grid-template-columns:1fr}}
+.sggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 @media(max-width:540px){.sggrid{grid-template-columns:1fr}}
-.sgcard{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:10px 12px;cursor:pointer;transition:all 0.15s}
-.sgcard:hover{border-color:var(--b2);background:var(--s4)}
+.sgcard{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:14px 16px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.sgcard::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:transparent;transition:background .2s}
+.sgcard:hover{border-color:var(--b3);background:var(--s3);transform:translateY(-1px);box-shadow:0 4px 16px rgba(0,0,0,0.2)}
+.sgcard:hover::before{background:var(--amber)}
 .sgcard.on{border-color:var(--amberline);background:var(--amberbg)}
-.sg-title{font-size:13px;font-weight:600;color:var(--tx1)}
-.sg-meta{font-size:10px;color:var(--tx4);margin-top:2px}
-.sg-key{font-size:11px;color:var(--tx2);margin-top:4px;line-height:1.5}
+.sgcard.on::before{background:var(--amber)}
+.sg-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.sg-title{font-size:14px;font-weight:700;color:var(--tx1)}
+.sg-score{font-size:12px;font-weight:800;color:#000;background:var(--amber);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sg-meta{font-size:10px;color:var(--tx4);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.sg-structure{font-size:9px;font-weight:600;color:var(--cyan);background:var(--s4);padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:6px;font-family:var(--mono,monospace);letter-spacing:.02em}
+.sg-key{font-size:11px;color:var(--tx3);line-height:1.5}
+/* Search bar */
+.az-search-wrap{display:flex;gap:8px;align-items:stretch}
+.az-search-input{flex:1;padding:12px 16px;border-radius:var(--r3);border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:14px;font-family:var(--font);transition:border-color .2s}
+.az-search-input:focus{border-color:var(--amber);outline:none;box-shadow:0 0 0 3px rgba(245,192,0,0.1)}
+.az-search-input::placeholder{color:var(--tx4)}
+.az-search-btn{padding:12px 24px;border-radius:var(--r3);border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);font-weight:700;font-size:13px;font-family:var(--font);cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:6px}
+.az-search-btn:hover{background:var(--cyan);color:#050505}
+.az-search-btn:disabled{opacity:0.5;cursor:not-allowed}
+/* Analysis output */
+.az-out{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:20px 24px;line-height:1.8;font-size:13px;color:var(--tx2);white-space:pre-wrap}
+.az-out h3,.az-out strong{color:var(--tx1)}
+/* Quick analyze actions */
+.az-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.az-actions .btn{min-width:120px}
 
 /* ── FORMULA ── */
 .fitem{border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px;margin-bottom:8px;background:var(--s2)}
@@ -2878,7 +2903,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="hdr-icon">🎵</div>
     <div>
       <div class="hdr-title"><span>SON</span>IQ</div>
-      <div class="hdr-sub">AI Song Creation Studio · 24 Genres · AI Ready</div>
+      <div class="hdr-sub">AI Song Creation Studio · 30 Genres · AI Ready</div>
     </div>
   </div>
   <div class="hdr-tags">
@@ -4503,7 +4528,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="uplan-price" id="uplan-creator-price">$7<span>/mo</span></div>
         <ul class="uplan-features">
           <li>30 songs / month</li>
-          <li>All 24 genres</li>
+          <li>All 30 genres</li>
           <li>Visual + Video prompts</li>
           <li>Full production brief</li>
           <li>Chord progressions</li>
@@ -4715,45 +4740,56 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <!-- ANALYZE -->
   <div id="more-spane-analyze" class="spane on">
     <div class="card">
-      <div class="ctitle">🔬 Song Structure Analyzer</div>
-      <div class="g2" style="margin-bottom:10px">
-        <div class="fld">
-          <label>Genre</label>
-          <select id="a-genre" onchange="loadSongs()">
-            <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option><option value="rnb">R&B / Soul</option>
-            <option value="neosoul">Neo-Soul</option><option value="gospel">Gospel</option><option value="kpop">K-Pop</option>
-            <option value="rock">Rock</option><option value="country">Country</option><option value="edm">EDM</option>
-            <option value="folk">Folk</option><option value="latin">Latin</option><option value="reggaeton">Reggaeton</option>
-            <option value="metal">Metal</option><option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option>
-            <option value="altrock">Alt-Rock</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option>
-            <option value="blues">Blues</option><option value="punk">Punk</option>
-            <option value="brazilian">Brazilian</option><option value="amapiano">Amapiano</option><option value="dancehall">Dancehall</option>
-            <option value="bollywood">Bollywood</option><option value="arabesque">Arabesque</option><option value="mandopop">Mandopop</option>
-            <option value="children">Children's</option><option value="parody">Parody</option><option value="comedy">Comedy</option><option value="tvmusical">TV / Musical</option>
-          </select>
+      <div class="ctitle" style="margin-bottom:4px">🔬 Song Structure Analyzer</div>
+      <div style="font-size:12px;color:var(--tx3);margin-bottom:16px">Reverse-engineer any hit. Understand why it works. Steal the DNA for your own songs.</div>
+
+      <!-- SEARCH FIRST — most important action -->
+      <div class="az-section">
+        <div class="az-section-title">Search any song</div>
+        <div class="az-search-wrap">
+          <input id="a-search" type="text" class="az-search-input" placeholder="Type any song — e.g. Blinding Lights, 6 Foot 7 Foot, APT." onkeydown="if(event.key==='Enter')searchSong()">
+          <button class="az-search-btn" id="a-search-btn" onclick="searchSong()">🔍 Analyze</button>
         </div>
-        <div class="fld">
-          <label>Focus</label>
-          <select id="a-focus">
-            <option value="full">Full deep dive</option><option value="structure">Structure only</option>
-            <option value="psychology">Psychology & neuroscience</option><option value="lyrics">Lyric patterns</option>
-          </select>
+        <div style="font-size:10px;color:var(--tx4);margin-top:6px">We'll research the song, break down its structure, psychology, and lyric patterns — then let you remake it</div>
+      </div>
+
+      <!-- GENRE PRESETS -->
+      <div class="az-section">
+        <div class="az-section-title">Or pick a reference song</div>
+        <div class="az-controls">
+          <div class="fld">
+            <label>Genre</label>
+            <select id="a-genre" onchange="loadSongs()">
+              <option value="pop">Pop</option><option value="hiphop">Hip-Hop</option><option value="rnb">R&B / Soul</option>
+              <option value="neosoul">Neo-Soul</option><option value="gospel">Gospel</option><option value="kpop">K-Pop</option>
+              <option value="rock">Rock</option><option value="country">Country</option><option value="edm">EDM</option>
+              <option value="folk">Folk</option><option value="latin">Latin</option><option value="reggaeton">Reggaeton</option>
+              <option value="metal">Metal</option><option value="jazz">Jazz</option><option value="ss">Singer-Songwriter</option>
+              <option value="altrock">Alt-Rock</option><option value="reggae">Reggae</option><option value="afrobeats">Afrobeats</option>
+              <option value="blues">Blues</option><option value="punk">Punk</option>
+              <option value="brazilian">Brazilian</option><option value="amapiano">Amapiano</option><option value="dancehall">Dancehall</option>
+              <option value="bollywood">Bollywood</option><option value="arabesque">Arabesque</option><option value="mandopop">Mandopop</option>
+              <option value="children">Children's</option><option value="parody">Parody</option><option value="comedy">Comedy</option><option value="tvmusical">TV / Musical</option>
+            </select>
+          </div>
+          <div class="fld">
+            <label>Focus</label>
+            <select id="a-focus">
+              <option value="full">Full deep dive</option><option value="structure">Structure only</option>
+              <option value="psychology">Psychology & neuroscience</option><option value="lyrics">Lyric patterns</option>
+            </select>
+          </div>
+        </div>
+        <div class="sggrid" id="a-songs"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div id="a-sel" style="font-size:11px;color:var(--tx4)">No song selected — will analyze all</div>
+          <button class="btn btn-gold" id="a-btn" onclick="runAnalysis()" style="padding:10px 24px">🔬 Analyze</button>
         </div>
       </div>
-      <div class="sggrid" id="a-songs"></div>
-      <div id="a-sel" style="font-size:11px;color:var(--tx4);margin-bottom:10px">No song selected — will analyze all</div>
-      <button class="btn btn-gold" id="a-btn" onclick="runAnalysis()">🔬 Analyze</button>
     </div>
-    <div class="card" style="margin-top:10px;border:1px solid var(--b2);background:var(--s1)">
-      <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:8px">🔍 Or search any song</div>
-      <div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap">
-        <input id="a-search" type="text" placeholder="e.g. Blinding Lights by The Weeknd" style="flex:1;min-width:180px;background:var(--s2);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:8px 12px;font-size:13px" onkeydown="if(event.key==='Enter')searchSong()">
-        <button class="btn" id="a-search-btn" onclick="searchSong()" style="background:var(--cyan);color:#000;font-weight:700">🔍 Search</button>
-      </div>
-      <div style="font-size:10px;color:var(--tx4);margin-top:4px">Type any song — we'll research it and run it through the full analyzer</div>
-    </div>
+
     <!-- SONG LIBRARY + INTELLIGENCE -->
-    <div id="a-library" class="card" style="margin-top:10px;border:1px solid var(--b1)">
+    <div id="a-library" class="card" style="margin-top:12px;border:1px solid var(--b1)">
       <div style="display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="const c=document.getElementById('a-library-inner');c.style.display=c.style.display==='none'?'block':'none';this.querySelector('.lib-arrow').textContent=c.style.display==='none'?'▸':'▾';renderLibrary()">
         <div style="font-size:13px;font-weight:700;color:var(--tx1)">📚 Song Library <span id="a-library-count" style="color:var(--tx4);font-weight:400;font-size:11px">0</span></div>
         <span class="lib-arrow" style="color:var(--tx4);font-size:12px">▸</span>
@@ -5995,9 +6031,9 @@ function trackEvent(event, meta) {
 // ═══════════════════════════════════════════════════════
 
 const SONGS={
-  pop:[{t:'Blinding Lights',a:'The Weeknd',yr:2019,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Synth-pop hook at :32, chorus 4x, bridge contrast',score:98},{t:'Shape of You',a:'Ed Sheeran',yr:2017,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Marimba tropical hook, singalong chorus, post-chorus groove',score:95},{t:'Uptown Funk',a:'Mark Ronson ft Bruno Mars',yr:2014,structure:'Intro→V1→C→V2→C→Bridge→C',key:'Funk revival, brass stab hook, call-response',score:97},{t:'Rolling in the Deep',a:'Adele',yr:2010,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Stripped verse → full drum chorus, emotional bridge',score:96}],
-  hiphop:[{t:'HUMBLE.',a:'Kendrick Lamar',yr:2017,structure:'Intro→C→V1→C→V2→C→Outro',key:'Chorus-first structure, minimalist beat, 16-bar verses',score:99},{t:"God's Plan",a:'Drake',yr:2018,structure:'V1→Hook→V2→Hook→Outro',key:'Melodic hook, 12-bar verses, sparse trap production',score:97},{t:'Sicko Mode',a:'Travis Scott',yr:2018,structure:'V1→V2→Hook→V3→Bridge→Hook',key:'3 beat switches = 3 dopamine resets',score:98},{t:'Alright',a:'Kendrick Lamar',yr:2015,structure:'V1→Hook→V2→Hook→V3→Hook',key:'Jazz sample, conscious storytelling, hook as anthem',score:98}],
-  rnb:[{t:'No Scrubs',a:'TLC',yr:1999,structure:'V1→C→V2→C→Bridge→C',key:'3-part harmony, hooky attitude, conversational verse',score:96},{t:'Drunk in Love',a:'Beyoncé',yr:2013,structure:'V1→C→Bridge→V2→C',key:'Hypnotic chorus repetition, sensory verse detail',score:97},{t:'Stay With Me',a:'Sam Smith',yr:2014,structure:'V1→C→V2→C→Bridge→C',key:'Gospel choir chorus, vulnerability, crescendo dynamic',score:95},{t:'Killing Me Softly',a:'Fugees',yr:1996,structure:'V1→C→V2→C→V3→C',key:'Call-response vocal, storytelling, timeless simplicity',score:98}],
+  pop:[{t:'Blinding Lights',a:'The Weeknd',yr:2019,structure:'V1→Pre→C→V2→Pre→C→Br→C',key:'Synth-pop hook at :32, chorus 4x, 80s revival bridge contrast',score:98},{t:'APT.',a:'ROSÉ & Bruno Mars',yr:2024,structure:'C→V1→C→V2→C→Br→C',key:'Chorus-first, chant hook, K-pop meets retro pop, infectious simplicity',score:96},{t:'Espresso',a:'Sabrina Carpenter',yr:2024,structure:'V1→Pre→C→V2→Pre→C→Br→C',key:'Disco-pop groove, breathy verse to belt chorus, earworm metaphor hook',score:97},{t:'Rolling in the Deep',a:'Adele',yr:2010,structure:'V1→Pre→C→V2→Pre→C→Br→C',key:'Stripped verse → full drum chorus, emotional bridge, gospel stomp',score:96}],
+  hiphop:[{t:'Not Like Us',a:'Kendrick Lamar',yr:2024,structure:'C→V1→C→V2→C→V3→C',key:'West coast bounce, DJ Mustard beat, 3 verses building aggression, chorus as chant',score:99},{t:'HUMBLE.',a:'Kendrick Lamar',yr:2017,structure:'C→V1→C→V2→C→Outro',key:'Chorus-first structure, minimalist beat, 16-bar verses, percussive flow',score:98},{t:'Sicko Mode',a:'Travis Scott',yr:2018,structure:'V1→V2→Hook→V3→Br→Hook',key:'3 beat switches = 3 dopamine resets, Drake feature, psychedelic trap',score:98},{t:'6 Foot 7 Foot',a:'Lil Wayne',yr:2011,structure:'C→V1→C→V2→C→V3',key:'Punchline density, Harry Belafonte sample, wordplay-over-melody architecture',score:97}],
+  rnb:[{t:'Snooze',a:'SZA',yr:2022,structure:'V1→C→V2→C→Br→C→Outro',key:'Guitar-driven neo-R&B, raw vocal runs, vulnerability in melody',score:97},{t:'Drunk in Love',a:'Beyoncé',yr:2013,structure:'V1→C→Br→V2→C',key:'Hypnotic chorus repetition, sensory verse detail, minimalist production',score:97},{t:'Die With A Smile',a:'Lady Gaga & Bruno Mars',yr:2024,structure:'V1→C→V2→C→Br→C',key:'Power ballad duet, country-soul crossover, vocal restraint to belt arc',score:96},{t:'Killing Me Softly',a:'Fugees',yr:1996,structure:'V1→C→V2→C→V3→C',key:'Call-response vocal, storytelling, Lauryn Hill ad-libs, timeless simplicity',score:98}],
   rock:[{t:'Bohemian Rhapsody',a:'Queen',yr:1975,structure:'Ballad→Guitar→Operatic→Hard Rock',key:'5 genre shifts — maximum dopamine unpredictability',score:100},{t:'Smells Like Teen Spirit',a:'Nirvana',yr:1991,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Quiet/loud dynamic IS the formula',score:99},{t:'Mr. Brightside',a:'The Killers',yr:2003,structure:'V1→V2→C→Bridge→C',key:'No pre-chorus, breathless momentum, anthemic',score:98},{t:"Sweet Child O' Mine",a:"Guns N' Roses",yr:1987,structure:'Intro→V1→V2→C→V3→C→Bridge→Solo',key:'Riff as instant identifier, solo as narrative peak',score:99}],
   country:[{t:'Before He Cheats',a:'Carrie Underwood',yr:2005,structure:'V1→C→V2→C→Bridge→C',key:'Narrative verse, explosive chorus, guitar solo bridge',score:97},{t:'Friends in Low Places',a:'Garth Brooks',yr:1990,structure:'V1→C→V2→C→Bridge→C',key:'Everyman theme, singalong chorus, key change finale',score:99},{t:'Jolene',a:'Dolly Parton',yr:1973,structure:'V1→C→V2→C→V3→C',key:'Name earworm, desperate vocal, deceptive simplicity',score:100},{t:'Old Town Road',a:'Lil Nas X',yr:2019,structure:'V1→Hook→V2→Hook→Outro',key:'Trap + country fusion created cultural rupture',score:95}],
   edm:[{t:'Levels',a:'Avicii',yr:2011,structure:'Intro→Build→Drop→Break→Build→Drop',key:'Perfect 4-bar build, euphoric drop = dopamine explosion',score:100},{t:'One More Time',a:'Daft Punk',yr:2000,structure:'V1→Drop→V2→Drop→Break→Drop',key:'Vocodered hook, French house groove, mantra repetition',score:99},{t:'Animals',a:'Martin Garrix',yr:2013,structure:'Intro→Build→Drop→Break→Build→Drop',key:'Wordless — pure expectation/reward cycle',score:95},{t:'Clarity',a:'Zedd ft Foxes',yr:2012,structure:'V1→Pre-C→C→V2→Pre-C→C→Bridge→C',key:'Vocalist on verses, electro-house chorus eruption',score:97}],
@@ -6927,6 +6963,396 @@ const GENRE_BIBLE={
   edm:{dna:'Drop-driven structure, electronic production, 4-on-the-floor kick, tension/release arc, euphoric peak moments, anonymous subject.',structure:'Intro (build) → Drop → Break → Drop 2 (bigger) → Outro. The build IS the tension. The drop IS the payoff. Everything serves the drop.',suno:'"EDM, synth lead, 4-on-the-floor kick, 128 BPM, festival drop" for festival. "Deep house, bass-driven, warm, 120 BPM" for underground.',keys:['The drop must be worth the build — if the buildup is epic the drop must be devastating','Vocals are usually hooks — minimal lyrics, maximum repetition','Breakdown creates anticipation — strip everything except a single element','Specify BPM — it is the genre\'s most fundamental parameter'],artists:'Calvin Harris · Martin Garrix · Avicii · Deadmau5 · Daft Punk · Skrillex · Disclosure · Flume',counter:{device:'Drop counter-melody synth / bass synth vs. lead',does:'The drop counter-melody is a secondary synth line that plays simultaneously with the main lead synth during the drop — two melodic voices creating counterpoint at peak energy. Below them, the bass synth plays a third counter-melodic line. The arpeggiated lead in the breakdown provides pre-drop counter-melody, building tension.',howto:'drop counter-melody synth, bass synth counter-line, arpeggio build counter',map:'Build: arpeggiated synth creates anticipatory counter-melody / Drop: two synths in counterpoint / Breakdown: stripped to single counter-melody line / Drop 2: both counter-melodies return louder'},outliers:[{song:'"Levels" — Avicii',rule:'Sampled Etta James gospel vocal ("Something\'s Got a Hold on Me") over an electronic rave drop — grandma\'s church music in the club',result:'Became the anthem of a generation, proved emotional vocal authenticity over a drop hits harder than any synth hook'},{song:'"Get Lucky" — Daft Punk ft. Pharrell',rule:'70s disco funk with live instruments only — no synthesizers in the drop in an era of pure digital production',result:'Fastest-selling UK single in history at release, proved live organic groove beats programmed perfection in EDM context'},{song:'"Titanium" — David Guetta ft. Sia',rule:'Lyrical emotional depth and ballad structure in a genre that avoids narrative and favors anonymous subject matter',result:'Multi-platinum global hit that crossover EDM onto pop radio permanently — emotion won over atmosphere'}]},
   country:{dna:'Storytelling over everything, authentic emotion, rural/small-town imagery, guitar as emotional anchor, hook grounded in relatable universal truth.',structure:'Verse (story) → Chorus (universal truth) → Verse 2 (story deepens) → Chorus → Bridge (turn/reveal) → Final Chorus. Second verse MUST deepen the story emotionally.',suno:'"country, acoustic guitar, pedal steel, fiddle, 100 BPM, warm" for classic. "country pop, electric guitar, modern production, 120 BPM" for Nashville pop.',keys:['Second verse must be the emotional payoff — not a repeat of verse 1','Chorus is universal truth extracted from specific verse story','Pedal steel and fiddle are genre signals — specify them','Bridge is the revelation — what the narrator finally understands'],artists:'Dolly Parton · Garth Brooks · Johnny Cash · Kacey Musgraves · Chris Stapleton · Zach Bryan · Luke Combs · Carrie Underwood',counter:{device:'Pedal steel answer-line / fiddle counter-melody',does:'Country\'s definitive counter-melody is the pedal steel guitar — it plays an answering melodic phrase between vocal lines that aches with emotional resonance. In bluegrass, the fiddle plays a counter-melody against the vocal simultaneously. Both voices — vocal and pedal steel — are in constant melodic conversation.',howto:'pedal steel guitar answer fills, fiddle counter-melody, steel guitar response line',map:'Verse: pedal steel answers after each vocal phrase / Chorus: steel or fiddle counter-line under the hook / Bridge: pedal steel takes melodic lead while vocal drops / Outro: steel guitar leads the fade'},outliers:[{song:'"Old Town Road" — Lil Nas X',rule:'Trap 808 beat plus banjo — Billboard controversially removed it from country charts for insufficient genre purity',result:'Longest #1 run in Billboard Hot 100 history at the time — the banjo was country enough for 19 weeks'},{song:'"Before He Cheats" — Carrie Underwood',rule:'Violent revenge fantasy with property destruction — aggressive content far outside mainstream country\'s "accept and endure" tradition',result:'Multiple Grammy winner that became an anthem, proved country women were allowed to be dangerous'},{song:'"Islands in the Stream" — Dolly Parton & Kenny Rogers',rule:'Disco-influenced production with a synthesizer groove in country — absolutely wrong for the genre',result:'#1 country AND pop crossover simultaneously, proved great songwriting (Barry Gibb) transcends production rules'}]},
   jazz:{dna:'Improvisation over harmony, chord substitution, rhythmic sophistication, the conversation between instruments, space as music.',structure:'Head (melody) → Solos → Head out. Blues form (12-bar) or AABA (32-bar standard). The arrangement is a vehicle for improvisation.',suno:'"jazz, piano trio, upright bass, brushed drums, 120 BPM swing" for classic. "jazz fusion, electric piano, 100 BPM" for fusion.',keys:['The melody (head) is the launching pad — state it cleanly, then destroy it in the solo','Walking bass is always a counter-melody','Chord substitution creates harmonic surprise — ii-V-I can be approached from anywhere','Silence is the most important note in jazz'],artists:'Miles Davis · John Coltrane · Bill Evans · Thelonious Monk · Charlie Parker · Herbie Hancock · Esperanza Spalding · Kamasi Washington',counter:{device:'Walking bass (primary counter) / piano comping / horn counterpoint',does:'Jazz has the richest counter-melody tradition: the walking bass is ALWAYS a counter-melody — it creates an independent melodic line of its own against the soloist. Piano comping creates harmonic counter-commentary. In ensemble sections, horns play genuine counterpoint — multiple independent melodic lines simultaneously, each complete on its own.',howto:'walking bass counter-melody, piano comp counter-voice, horn counterpoint lines',map:'Throughout: walking bass provides constant counter / Head: piano comps creates harmonic counter / Solos: bass and comping in three-voice counterpoint / Ensemble: full horn counterpoint'},outliers:[{song:'"Take Five" — Dave Brubeck Quartet',rule:'5/4 time signature — commercially unthinkable, programmers said listeners couldn\'t feel an odd meter',result:'First jazz instrumental to sell over 1 million copies, proved listeners feel groove not math'},{song:'"Round Midnight" — Thelonious Monk',rule:'Extremely dissonant angular melody that sounded "wrong" to bebop musicians trained in smooth lines',result:'Most recorded jazz standard written by a living composer — the wrongness WAS the emotional truth'},{song:'"A Love Supreme" — John Coltrane',rule:'Four-part spiritual suite with no traditional song structure, no hooks, no commercial concessions',result:'Best-selling jazz album of all time — proved jazz listeners wanted transcendence more than entertainment'}]}
+};
+
+// ═══════════════════════════════════════════════════════════════
+// FLOW_MATRIX — Section-aware lyric writing instructions
+// Tells the AI HOW to write differently for each song section,
+// not just WHAT to deliver (production cues handle delivery).
+// ═══════════════════════════════════════════════════════════════
+const FLOW_MATRIX={
+  // ── Universal defaults (apply when no genre override exists) ──
+  _default:{
+    verse:{
+      syllableDensity:'8-13 syllables per line, varied line lengths',
+      vocabulary:'Narrative, specific, sensory detail — names, places, timestamps, textures',
+      sentenceStructure:'Complex sentences, enjambment across lines, conversational phrasing',
+      rhythm:'Syncopated, conversational flow — words land slightly off the expected beat',
+      repetition:'Minimal — each line introduces new information or imagery',
+      lineLength:'Varied — alternate long lines (10-13 syl) with short punches (4-7 syl)',
+      breathPattern:'Natural speech breathing — longer phrases with caesura pauses mid-line',
+    },
+    prechorus:{
+      syllableDensity:'6-10 syllables per line, tightening toward chorus',
+      vocabulary:'Transitional — shift from narrative to emotional, build anticipation language',
+      sentenceStructure:'Shorter fragments building momentum, incomplete thoughts that chorus resolves',
+      rhythm:'Accelerating — each line slightly faster or more urgent than the last',
+      repetition:'One phrase can repeat to build tension (e.g. "I know, I know, I know...")',
+      lineLength:'Progressive shortening — start at 10 syl, end at 5-6 syl',
+      breathPattern:'Quickening — less space between lines, sense of urgency',
+    },
+    chorus:{
+      syllableDensity:'4-8 syllables per line, simple and singable',
+      vocabulary:'Universal, emotional, action verbs — monosyllabic words dominate',
+      sentenceStructure:'Fragments, declarations, imperatives — no subordinate clauses',
+      rhythm:'Locked to the beat — predictable, symmetrical, easy to sing along first listen',
+      repetition:'High — title/hook phrase repeats 2-3x, parallel structure across lines',
+      lineLength:'Uniform — all lines roughly the same length for symmetry',
+      breathPattern:'Spaced — clear gaps between phrases for audience singalong',
+    },
+    bridge:{
+      syllableDensity:'6-11 syllables, flexible — the section that breaks all patterns',
+      vocabulary:'Pivot language — questions, revelations, contradictions, confessions',
+      sentenceStructure:'Questions, conditional statements ("what if..."), or raw unfiltered confession',
+      rhythm:'Deliberately different from verse AND chorus — if verse was syncopated, bridge is straight; if verse was straight, bridge is syncopated',
+      repetition:'One repeated mantra phrase is powerful here, building to emotional peak',
+      lineLength:'Free — this is the section where rigid patterns break down intentionally',
+      breathPattern:'Held tension — longer phrases with fewer pauses, building to final chorus release',
+    },
+    outro:{
+      syllableDensity:'3-6 syllables per line — stripping down',
+      vocabulary:'Echo of chorus hook, final emotional image, resolution or unresolved question',
+      sentenceStructure:'Fragments, echoes, fading repetitions of the core phrase',
+      rhythm:'Decelerating — each line slightly slower, more space, floating',
+      repetition:'The hook phrase repeated with slight variation — each repeat quieter or more intimate',
+      lineLength:'Short and getting shorter — final line should be the shortest in the song',
+      breathPattern:'Exhaling — maximum space between lines, letting the song breathe out',
+    }
+  },
+  // ── Genre-specific overrides (merge over _default) ──
+  hiphop:{
+    verse:{
+      syllableDensity:'12-20 syllables per line — dense, packed, multisyllabic',
+      vocabulary:'Internal rhyme chains, double/triple entendres, slang + elevated vocabulary mixed',
+      sentenceStructure:'Run-on bars, enjambment as flow device, punchline setup-payoff every 2-4 bars',
+      rhythm:'Triplet flows alternate with straight 16ths, pocket shifts mid-verse, syncopation against the beat',
+      repetition:'Minimal in lyrics but rhyme patterns repeat (AABB, ABAB, internal chains)',
+      lineLength:'Long — 14-20 syllables standard, with occasional short punchline bars (4-6 syl)',
+      breathPattern:'Rapper breathing — phrases push past natural breath points for rhythmic tension',
+    },
+    chorus:{
+      syllableDensity:'4-8 syllables — dramatic contrast from dense verses',
+      vocabulary:'Melodic, singable, anthem-like — monosyllabic simplicity against verse complexity',
+      rhythm:'Half-time feel relative to verse — spacious, locked to the beat pocket',
+    },
+    bridge:{
+      vocabulary:'Raw vulnerability — the mask drops, the flex stops, genuine confession',
+      rhythm:'Spoken word pacing or double-time explosion — never the same as verse flow',
+    }
+  },
+  pop:{
+    verse:{
+      syllableDensity:'8-11 syllables — clean, digestible',
+      vocabulary:'Relatable everyday language, sensory specifics that trigger memory (coffee, 3am, your car)',
+      rhythm:'Conversational but melodic — every phrase has a singable contour',
+      lineLength:'Consistent 8-10 syl lines with one short punch line per verse',
+    },
+    chorus:{
+      syllableDensity:'4-7 syllables — the simpler the stickier',
+      vocabulary:'One-syllable power words: love, run, break, fall, burn, hold, gone',
+      repetition:'Title phrase appears 3-4 times in chorus, parallel structure mandatory',
+      rhythm:'Metrically perfect — every accent lands on a strong beat',
+    },
+    bridge:{
+      vocabulary:'The unsaid thing — the emotional truth the verses danced around',
+      sentenceStructure:'One long vulnerable sentence or a series of rapid-fire questions',
+    }
+  },
+  rnb:{
+    verse:{
+      syllableDensity:'8-12 syllables, with room for melisma and vocal runs between words',
+      vocabulary:'Intimate, sensory, time-stamped — "2am", "silk", "your perfume on my sheets"',
+      rhythm:'Behind-the-beat phrasing — words land late, dragging the groove, Dilla-feel',
+      breathPattern:'Whispered spaces — deliberate gaps for vocal texture and runs',
+    },
+    chorus:{
+      syllableDensity:'5-9 syllables with melismatic stretching of key words',
+      vocabulary:'Emotional declarations with sensory anchors',
+      rhythm:'Locks to the groove but with vocal embellishment between the structural notes',
+    },
+    bridge:{
+      vocabulary:'The breakdown confession — spoken-word adjacent, vulnerability at maximum',
+      rhythm:'Half-time or rubato — time stretches, the groove loosens',
+    }
+  },
+  country:{
+    verse:{
+      syllableDensity:'9-13 syllables — storytelling demands space',
+      vocabulary:'Cinematic specifics: truck brand, road name, dog breed, whiskey type, town name',
+      sentenceStructure:'Complete narrative sentences — each verse is a scene with setting, action, consequence',
+      rhythm:'Conversational drawl — words stretch on vowels, consonants clip',
+      lineLength:'Alternating long narrative lines (12-13) and short emotional punches (5-7)',
+    },
+    chorus:{
+      vocabulary:'Universal truth extracted from the specific story — the moral, the feeling, the lesson',
+      sentenceStructure:'Declaration or question that could be a tattoo or bumper sticker',
+    },
+    bridge:{
+      vocabulary:'The reveal — what the narrator finally understands that changes everything',
+      sentenceStructure:'One powerful realization expressed simply',
+    }
+  },
+  rock:{
+    verse:{
+      syllableDensity:'8-12 syllables, driving forward momentum',
+      vocabulary:'Visceral, physical, concrete — fists, roads, fire, steel, blood, wire',
+      rhythm:'Driving and relentless — words push forward without pause',
+      breathPattern:'Breathless intensity — minimal gaps, building to chorus explosion',
+    },
+    chorus:{
+      syllableDensity:'5-9 syllables — shoutable',
+      vocabulary:'Anthemic, collective — "we", "us", "tonight", "alive"',
+      rhythm:'Pounding quarter notes — every syllable lands like a fist on a strong beat',
+      repetition:'Title phrase as battle cry — repeat 3-4 times',
+    },
+    bridge:{
+      rhythm:'Half-time or breakdown — the moment of vulnerability before the final surge',
+      vocabulary:'Quiet truth amid the storm — the softest moment in the song',
+    }
+  },
+  trap:{
+    verse:{
+      syllableDensity:'10-18 syllables — hi-hat density demands more words per bar',
+      vocabulary:'Ad-libs woven into text, brand names, flex vocabulary, code-switching',
+      rhythm:'Triplet flow dominant, with sudden switches to double-time or half-time mid-verse',
+      repetition:'Key flex phrases repeat with escalation ("drip drip", "yeah yeah yeah")',
+      lineLength:'Variable — 16-syl run-on lines interrupted by 3-syl ad-lib bars',
+    },
+    chorus:{
+      syllableDensity:'3-6 syllables — hypnotic minimalism',
+      vocabulary:'One sticky phrase repeated with melodic Auto-Tune contour',
+      rhythm:'Half-time relative to verse — spacious, floating over the 808',
+      repetition:'Maximum — the entire chorus can be one phrase repeated 4-6 times with slight variation',
+    }
+  },
+  edm:{
+    verse:{
+      syllableDensity:'6-9 syllables — vocals are texture, not narrative',
+      vocabulary:'Abstract, atmospheric — sky, light, fade, falling, colors, weightless',
+      rhythm:'Floating above the beat — not locked to the kick pattern',
+    },
+    chorus:{
+      syllableDensity:'3-6 syllables — the vocal is a hook, not a sentence',
+      vocabulary:'One universal phrase — "let go", "feel alive", "we are one"',
+      repetition:'The entire chorus IS one repeated phrase with production escalation underneath',
+      rhythm:'Synced to the drop — every syllable aligns with the bass/synth hit',
+    }
+  },
+  jazz:{
+    verse:{
+      syllableDensity:'8-14 syllables — sophisticated, conversational',
+      vocabulary:'Elevated but not pretentious — wit, wordplay, double meanings, urbane cool',
+      sentenceStructure:'Conversational — as if telling a story over cocktails, enjambment across bar lines',
+      rhythm:'Swung — words fall on the "and" of beats, behind the pulse, laid-back',
+    },
+    chorus:{
+      syllableDensity:'6-10 syllables — the singable truth amid the sophistication',
+      vocabulary:'Deceptively simple — the chorus of a jazz standard sounds effortless',
+      rhythm:'Lands on the beat more squarely than the verse — contrast creates memorability',
+    }
+  },
+  gospel:{
+    verse:{
+      vocabulary:'Testimony language — "I was lost", "the valley", "my burden", "He reached down"',
+      sentenceStructure:'First person testimony building toward collective declaration',
+      rhythm:'Conversational preacher cadence — building, not rushing',
+    },
+    chorus:{
+      vocabulary:'Declaration and praise — "He is", "I am free", "hallelujah", "worthy"',
+      repetition:'High — the declaration IS the repetition, each repeat louder and more certain',
+      rhythm:'Congregational — every word lands where a group can join in',
+    },
+    bridge:{
+      vocabulary:'Direct address to God — the most intimate, raw, vulnerable moment',
+      repetition:'One phrase repeated 4-8 times with escalating intensity — this is "the shout"',
+      rhythm:'Breaks free of the groove — the Spirit moves, the meter loosens',
+    }
+  },
+  lofi:{
+    verse:{
+      syllableDensity:'7-11 syllables — unhurried, reflective',
+      vocabulary:'Interior monologue, rainy-day specifics, nostalgia anchors — coffee, windows, 4am',
+      rhythm:'Deliberately behind the beat — words arrive late, dragging like waking from a dream',
+      breathPattern:'Long pauses between lines — silence is content',
+    },
+    chorus:{
+      syllableDensity:'4-7 syllables — a sigh, not a shout',
+      vocabulary:'Gentle, resigned, bittersweet — acceptance not triumph',
+      rhythm:'Floating — loosely tethered to the beat, no urgency',
+    }
+  },
+  reggae:{
+    verse:{
+      vocabulary:'Consciousness, community, Jah, Babylon, roots, fire, earth, one love',
+      rhythm:'Locked to the offbeat skank — words ride the "and" of beats 2 and 4',
+      sentenceStructure:'Declarative wisdom, proverb-like constructions — "The stone that the builder refuse..."',
+    },
+    chorus:{
+      vocabulary:'Mantra — resolution, peace, unity, love',
+      rhythm:'Swaying — the chorus is a meditation, not a climax',
+      repetition:'High — the comforting mantra repeats to create communal peace',
+    }
+  },
+  afrobeats:{
+    verse:{
+      syllableDensity:'7-11 syllables — conversational, call-and-response built in',
+      vocabulary:'Pidgin English, Yoruba/local phrases, celebration, dance instruction',
+      rhythm:'Polyrhythmic — words weave between percussion layers, landing on different drum hits',
+    },
+    chorus:{
+      syllableDensity:'4-7 syllables — melodically simple, rhythmically complex',
+      vocabulary:'Hook is melodic contour more than lyric content — the SOUND of the words matters',
+      repetition:'Hook repeats 4-6 times — each repeat is a dance invitation',
+    }
+  },
+  kpop:{
+    verse:{
+      vocabulary:'Visual, conceptual, abstract imagery — feelings as colors, metaphors as physics',
+      rhythm:'Precise 8-count phrasing — every word lands in choreography-friendly patterns',
+      lineLength:'Strictly 8-bar sections — count the bars, not just the syllables',
+    },
+    chorus:{
+      syllableDensity:'4-7 syllables — maximum earworm, minimum complexity',
+      vocabulary:'English hook phrase mixed with Korean emotional lines',
+      repetition:'Title phrase in English repeated 3-4 times for global memorability',
+    },
+    bridge:{
+      vocabulary:'The rap break — completely different register, different flow, different voice',
+      rhythm:'Rhythmic counterpoint to everything before it — the controlled chaos',
+    }
+  },
+  ss:{
+    verse:{
+      syllableDensity:'10-15 syllables — the story needs room',
+      vocabulary:'Hyper-specific diary language — house numbers, dog names, weather that day, the exact shirt',
+      sentenceStructure:'Run-on confessional sentences that spill across lines like thoughts tumbling out',
+      rhythm:'Free and conversational — the guitar sets the pulse, the voice rides over it loosely',
+      lineLength:'Long, uneven — mimics natural thought, not musical meter',
+    },
+    chorus:{
+      syllableDensity:'5-9 syllables — the emotional distillation of the verse diary',
+      vocabulary:'Simple emotional truth — what all those details were really about',
+    }
+  },
+  blues:{
+    verse:{
+      syllableDensity:'8-12 syllables per AAB line',
+      vocabulary:'Earthy, physical — trouble, road, woman, river, rain, devil, morning, gone',
+      sentenceStructure:'AAB form: state the line, repeat it (with slight variation), then resolve/twist',
+      rhythm:'Shuffle feel — words swing between the beats, drag on vowels',
+      repetition:'Structural — the A line repeats by design, B line is the payoff',
+    }
+  },
+  latin:{
+    verse:{
+      vocabulary:'Romantic, passionate — corazón, fuego, noche, baila, siente, alma',
+      rhythm:'Locked to the clave or dembow — words fall on rhythmic accent points',
+    },
+    chorus:{
+      vocabulary:'Dance instruction or romantic declaration — the body moves before the mind processes',
+      repetition:'Hook repeats with bilingual variation — Spanish then English or vice versa',
+    }
+  },
+  reggaeton:{
+    verse:{
+      syllableDensity:'10-14 syllables — rapid-fire over dembow',
+      vocabulary:'Street credibility + romance — perreo, calle, mami, fuego, flow',
+      rhythm:'Locked to dembow pattern — every syllable sits in the syncopated pocket',
+    },
+    chorus:{
+      syllableDensity:'4-7 syllables — the catchiest thing in the song by far',
+      repetition:'Massive — hook phrase 4-6 times, each with slight melodic variation',
+    }
+  },
+  punk:{
+    verse:{
+      syllableDensity:'8-12 syllables — fast, no wasted words',
+      vocabulary:'Fury, institutional critique, personal rage — concrete targets not abstractions',
+      rhythm:'Breakneck — words slam into each other, no space, no breath, pure velocity',
+      breathPattern:'None — the lack of breath IS the aggression',
+    },
+    chorus:{
+      syllableDensity:'4-8 syllables — a slogan, a chant, a war cry',
+      vocabulary:'Shoutable — if 1000 people can\'t scream it in unison, rewrite it',
+      repetition:'The chorus IS the title repeated as a mantra of fury',
+    }
+  },
+  neosoul:{
+    verse:{
+      syllableDensity:'8-12 syllables with space for vocal improvisation between words',
+      vocabulary:'Sensory, present-tense, intimate — incense, vinyl crackle, morning light, your hands',
+      rhythm:'Behind the beat — Dilla pocket, words arrive after you expect them',
+      breathPattern:'Spacious — the rests between words carry as much meaning as the words',
+    },
+    chorus:{
+      vocabulary:'Emotional mantra — not a hook per se but a feeling crystallized in one phrase',
+      rhythm:'Slightly more on-beat than verse — just enough to feel the groove shift',
+    }
+  },
+  altrock:{
+    verse:{
+      vocabulary:'Ambiguous, imagistic — specific images with opaque meaning, outsider perspective',
+      rhythm:'Restrained, tight — words held back, tension building',
+      breathPattern:'Controlled — saving energy for the chorus explosion',
+    },
+    chorus:{
+      vocabulary:'The emotional eruption — all restraint drops, visceral and raw',
+      rhythm:'Open, loud, unrestrained — the dynamic payoff for verse restraint',
+      syllableDensity:'5-9 syllables — shouted more than sung',
+    }
+  },
+  parody:{
+    verse:{
+      vocabulary:'Absurdist rewrite of serious themes — mundane subjects with dramatic vocabulary',
+      sentenceStructure:'Mirror the original verse structure exactly — the joke is in the lyric swap',
+      rhythm:'Match the original song\'s exact rhythm — comedic contrast lives in lyric-melody mismatch',
+    },
+    chorus:{
+      vocabulary:'The punchline delivery — the funniest version of the original hook',
+      repetition:'Match original chorus repetition exactly — the form is sacred, only words change',
+    }
+  },
+  comedy:{
+    verse:{
+      vocabulary:'Escalating absurdity — verse 1 is silly, verse 2 is committed, bridge is unhinged',
+      sentenceStructure:'Setup-punchline rhythm — every 2-4 lines should land a laugh',
+      rhythm:'Played completely straight musically — the comedy is only lyrical',
+    },
+    chorus:{
+      vocabulary:'The recurring joke — singable AND the funniest part simultaneously',
+      repetition:'Each chorus repeat adds a new layer to the joke through context shift',
+    }
+  },
+  tvmusical:{
+    verse:{
+      vocabulary:'Character-specific — every word must sound like ONLY this character in THIS moment could say it',
+      sentenceStructure:'Starts where dialogue left off — the song is the emotional overflow that speech cannot contain',
+      rhythm:'Theatrical pacing — lines build dramatic momentum toward the chorus declaration',
+    },
+    chorus:{
+      vocabulary:'The "I want" declaration — character states deepest desire or truth in singable, universal terms',
+      repetition:'The declaration repeats with escalating conviction — each repeat more certain',
+      rhythm:'Broadway belt phrasing — clear, projected, every word landing for the back row',
+    },
+    bridge:{
+      vocabulary:'The dramatic turn — revelation, betrayal, or deepest vulnerability',
+      rhythm:'Rubato or recitative — time stretches for dramatic effect before the final chorus',
+    }
+  },
+  children:{
+    verse:{
+      syllableDensity:'5-8 syllables — short, clear, age-appropriate',
+      vocabulary:'Concrete nouns, action verbs, colors, animals, sounds — no abstractions',
+      sentenceStructure:'Simple subject-verb-object, one idea per line, educational repetition built in',
+      rhythm:'Bouncy, predictable meter — nursery rhyme cadence, strong rhyme on every couplet',
+    },
+    chorus:{
+      syllableDensity:'3-6 syllables — singable by a 5-year-old',
+      vocabulary:'Call-and-response words, sound effects, body movement cues (clap, jump, spin)',
+      repetition:'Maximum — the entire chorus is designed to be memorized in one listen',
+      rhythm:'Clap-along tempo — every beat is obvious and body-movement-friendly',
+    }
+  }
 };
 
 const FORMULA_LAWS=[
@@ -8581,7 +9007,7 @@ ${fd?.name?'Fusion style: '+fd.name:'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}${getEraGenreDNA(g1)}${getAcademicFrameworkPrompt(g1)}
+Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}${getEraGenreDNA(g1)}${getAcademicFrameworkPrompt(g1)}${getFlowDirective(g1)}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -8977,7 +9403,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${S.quality}
 Era: ${{fifties:'1950s — rock & roll, doo-wop, stand-up bass, tube amp warmth, Sun Records echo, simple 3-chord progressions, call-and-response, vocal group harmonies',sixties:'1960s — British Invasion jangle, Motown orchestral soul, psychedelic reverb/delay, folk protest acoustic, Phil Spector wall of sound, fuzz guitar, Hammond organ',seventies:'1970s — disco four-on-the-floor, funk slap bass, punk 3-chord raw energy, prog rock odd time signatures, early analog synths, Moog basslines, wah-wah guitar',vintage:'Vintage (1980–1999) — synth pads, drum machines, MTV-era hooks, gated reverb, grunge distortion, 808s, sampling',modern:'Modern (2000–2015) — polished digital production, Auto-Tune, chart-ready anthems, compressed loudness war sound',contemporary:'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics, bedroom pop, 808 sub-bass',current:'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed, micro-genre blending'}[S.selectedEra]||'Modern (2000–2015)'}
-Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}${getProductionCuePrompt(genre)}${getEraGenreDNA(genre)}${getAcademicFrameworkPrompt(genre)}
+Song length: ${{short:'Short (~2 min, ~2 verses + chorus)',medium:'Medium (~3 min, standard structure)',long:'Long (~4 min, full structure with bridge)',extended:'Extended (~5+ min, full epic structure)'}[S.selectedLength]||'Medium'}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${hiphopNote}${hookNote}${comedyNote}${voiceNote}${getSelectedTechniquePrompt()}${getProductionCuePrompt(genre)}${getEraGenreDNA(genre)}${getAcademicFrameworkPrompt(genre)}${getFlowDirective(genre)}
 
 SONGWRITING RULES:
 - Hook must arrive within 30 seconds
@@ -10459,11 +10885,14 @@ function loadSongs(){
   const grid=document.getElementById('a-songs');if(!grid)return;
   grid.innerHTML=songs.map((s,i)=>`
     <div class="sgcard" id="asc${i}" onclick="selSong(${i})">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <div class="sg-title">${s.t}</div>
-        <span class="bdg bdg-gold">${s.score}</span>
+      <div class="sg-top">
+        <div>
+          <div class="sg-title">${s.t}</div>
+          <div class="sg-meta">${s.a} · ${s.yr}</div>
+        </div>
+        <div class="sg-score">${s.score}</div>
       </div>
-      <div class="sg-meta">${s.a} · ${s.yr}</div>
+      <div class="sg-structure">${s.structure}</div>
       <div class="sg-key">${s.key}</div>
     </div>`).join('');
 }
@@ -10816,6 +11245,69 @@ function getAcademicFrameworkPrompt(genre){
   return prompt;
 }
 
+// ═══════════════════════════════════════════════════════════════
+// FLOW DIRECTIVE — Section-aware lyric writing instructions
+// Merges genre-specific overrides onto _default rules, then
+// formats a prompt block that tells the AI HOW to write each section.
+// ═══════════════════════════════════════════════════════════════
+function getFlowDirective(genre){
+  genre=genre||S.selectedGenre||'pop';
+  const _g=(genre||'').toLowerCase().replace(/[\s\-\/]+/g,'');
+  // Resolve alias
+  const FLOW_ALIAS={hiphop:'hiphop','hip hop':'hiphop',rap:'hiphop',rb:'rnb','r b':'rnb',rnb:'rnb',
+    singersongwriter:'ss',ss:'ss',altrock:'altrock','alt rock':'altrock',alternative:'altrock',
+    electronic:'edm',dance:'edm',house:'edm',techno:'edm',dubstep:'edm',
+    latina:'latin',salsa:'latin',bachata:'latin',cumbia:'latin',bossanova:'latin',
+    'tv/musical':'tvmusical',tvmusical:'tvmusical',musical:'tvmusical',
+    'neo-soul':'neosoul',neosoul:'neosoul'};
+  const gKey=FLOW_ALIAS[_g]||_g;
+
+  const defaults=FLOW_MATRIX._default;
+  const overrides=FLOW_MATRIX[gKey]||{};
+  const sections=['verse','prechorus','chorus','bridge','outro'];
+  const sectionLabels={verse:'VERSE',prechorus:'PRE-CHORUS',chorus:'CHORUS',bridge:'BRIDGE',outro:'OUTRO'};
+  const dimensions=['syllableDensity','vocabulary','sentenceStructure','rhythm','repetition','lineLength','breathPattern'];
+  const dimLabels={syllableDensity:'Syllable density',vocabulary:'Vocabulary',sentenceStructure:'Sentence structure',
+    rhythm:'Rhythm & flow',repetition:'Repetition pattern',lineLength:'Line length',breathPattern:'Breath & pacing'};
+
+  // Select 3-4 most impactful dimensions per section (don't overload the prompt)
+  // Priority: vocabulary, rhythm, syllableDensity are always included; rotate others
+  const priorityDims=['vocabulary','rhythm','syllableDensity'];
+  const era=S.selectedEra||'modern';
+  const hash=(gKey+(era||'')).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const secondaryDims=['sentenceStructure','repetition','lineLength','breathPattern'];
+
+  let prompt='\n\n🎵 ADAPTIVE FLOW MATRIX — Write each section DIFFERENTLY:\n';
+  prompt+='These are lyric WRITING instructions (how to construct lines), not delivery/vocal instructions:\n\n';
+
+  sections.forEach((sec,si)=>{
+    const merged=Object.assign({},defaults[sec]||{},overrides[sec]||{});
+    if(!Object.keys(merged).length)return;
+
+    // Always include priority dims, then 1-2 secondary dims (rotated)
+    const activeDims=[...priorityDims];
+    const secHash=(hash+si*13)%secondaryDims.length;
+    activeDims.push(secondaryDims[secHash%secondaryDims.length]);
+    if(si===0||si===2) activeDims.push(secondaryDims[(secHash+1)%secondaryDims.length]); // verse & chorus get extra
+
+    prompt+=`[${sectionLabels[sec]}]\n`;
+    activeDims.forEach(dim=>{
+      if(merged[dim]){
+        prompt+=`• ${dimLabels[dim]}: ${merged[dim]}\n`;
+      }
+    });
+    prompt+='\n';
+  });
+
+  prompt+='FLOW RULES:\n';
+  prompt+='- Each section must feel NOTICEABLY different in rhythm, density, and vocabulary\n';
+  prompt+='- The contrast between verse density and chorus simplicity creates the emotional dynamics\n';
+  prompt+='- Bridge MUST break the pattern established by verse and chorus — different rhythm, different sentence type\n';
+  prompt+='- These are writing instructions — apply them to how you CONSTRUCT lyrics, not how they are sung';
+
+  return prompt;
+}
+
 // Get which cues were used in current generation (for learning tracking)
 function getActiveCueIds(){
   return S._activeCues||[];
@@ -11042,7 +11534,7 @@ TARGET GENRE: ${targetLabel}
 INSTRUCTIONS:
 1. Keep the structural DNA that made the original work (section flow, tension-release pattern, hook placement)
 2. Apply the user's twist as the new creative direction
-3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}${getProductionCuePrompt(targetGenre||a.genre||'pop')}${getEraGenreDNA(targetGenre||a.genre||'pop')}${getAcademicFrameworkPrompt(targetGenre||a.genre||'pop')}
+3. ${targetGenre&&targetGenre!==a.genre?`Shift the genre from ${a.genreLabel} to ${targetLabel} — adapt production, rhythm, and vocal style accordingly`:'Stay in the same genre but make it feel fresh and distinct'}${getSelectedTechniquePrompt()}${getProductionCuePrompt(targetGenre||a.genre||'pop')}${getEraGenreDNA(targetGenre||a.genre||'pop')}${getAcademicFrameworkPrompt(targetGenre||a.genre||'pop')}${getFlowDirective(targetGenre||a.genre||'pop')}
 
 DELIVER EXACTLY:
 
@@ -11769,7 +12261,7 @@ function initGenreGrid(){
     const overflow = i >= VISIBLE ? ' gp-overflow' : '';
     return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
-         title="${locked?'Unlock all 24 genres with Creator — from $7/mo':''}"
+         title="${locked?'Unlock all 30 genres with Creator — from $7/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
@@ -12381,7 +12873,7 @@ async function openUpgradeModal() {
     } else if (data.current_tier === 2 && t2SpotsLeft > 0) {
       if (banner) banner.style.display = 'flex';
       if (tierIcon) tierIcon.textContent = '⚡';
-      if (tierName) tierName.textContent = 'Founding Member — $9.99/mo forever';
+      if (tierName) tierName.textContent = 'Founding Member — Locked Rate';
       if (tierBadge) tierBadge.textContent = 'Founding';
       if (tierSpot) tierSpot.textContent = t2SpotsLeft + ' of 1500 spots left';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - t2SpotsLeft);
@@ -12513,7 +13005,7 @@ async function loadFoundingStatus() {
           offerEl.style.display = '';
           offerEl.style.color = '#fb923c';
         } else if (data.current_tier === 2) {
-          offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — Founding Member rate — $9.99/mo · <span id="founding-spots">' + (data.tier2?.spots_left ?? '...') + '</span> spots left';
+          offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — Locked founding rate · <span id="founding-spots">' + (data.tier2?.spots_left ?? '...') + '</span> spots left';
           offerEl.style.display = '';
           offerEl.style.color = '#a78bfa';
         } else {
