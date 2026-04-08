@@ -58,7 +58,7 @@ button,input,select,textarea{font-family:var(--font)}
 a{color:var(--amber);text-decoration:none}
 
 /* ── LAYOUT — Nu Wav UX Grid System ── */
-.wrap{max-width:1800px;margin:0 auto;padding:0 clamp(1rem,5vw,4rem) 120px;overflow-x:clip;box-sizing:border-box;width:100%}
+.wrap{max-width:1800px;margin:0 auto;padding:0 clamp(8px,5vw,4rem) 120px;overflow-x:clip;box-sizing:border-box;width:100%}
 
 /* ── WRITER 3-PANEL LAYOUT ── */
 .writer-layout{display:grid;grid-template-columns:1fr minmax(400px,480px) 240px;gap:clamp(1rem,2vw,2rem);align-items:start;margin-top:0}
@@ -72,6 +72,10 @@ a{color:var(--amber);text-decoration:none}
 @media(max-width:1200px){
   .writer-layout{grid-template-columns:1fr minmax(360px,1fr)}
   .writer-social{display:none}
+}
+/* Responsive: intermediate breakpoint for tablets */
+@media(max-width:1100px){
+  .writer-layout{grid-template-columns:1fr minmax(320px,380px)}
 }
 /* Responsive: collapse to single column at 900px */
 @media(max-width:900px){
@@ -154,7 +158,7 @@ a{color:var(--amber);text-decoration:none}
 .topic-score-badge{display:flex;align-items:center;gap:var(--gap-sm);padding:6px 12px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);flex-shrink:0}
 .tsb-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--tx4)}
 .tsb-num{font-size:14px;font-weight:800;color:var(--tx1);min-width:24px;text-align:center}
-.tsb-num.good{color:#4ade80}.tsb-num.ok{color:var(--amber)}.tsb-num.low{color:#f87171}
+.tsb-num.good{color:#4ade80}.tsb-num.ok{color:var(--amber)}.tsb-num.low{color:#ff6b6b}
 /* Output footer bar */
 .output-footer-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 4px;padding:var(--sp-md) 0;border-top:1px solid var(--b1);margin-top:8px}
 .ofb-item{font-size:11px;color:var(--tx4);font-weight:500;cursor:pointer;transition:color .15s;border-radius:4px;padding:2px 6px}
@@ -413,6 +417,8 @@ a{color:var(--amber);text-decoration:none}
 #adv-arrow.open{transform:rotate(180deg)}
 .blend-inner{display:none;padding:18px 16px;border-top:1px solid var(--b1)}
 .blend-acc.open .blend-inner{display:block}
+/* Auto-expand first accordion on mobile for discoverability */
+@media(max-width:600px){.blend-acc:first-of-type .blend-inner{display:block}.blend-acc:first-of-type .blend-arrow{transform:rotate(90deg)}}
 .blend-2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
 @media(max-width:500px){.blend-2col{grid-template-columns:1fr}}
 .blend-field label{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:7px;display:block}
@@ -709,7 +715,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .ll-regen{background:transparent;border:none;color:var(--tx4);font-size:13px;padding:3px 5px;border-radius:4px;opacity:0;transition:all 0.15s;flex-shrink:0}
 .lline:hover .ll-regen{opacity:1}
 .ll-regen:hover{color:var(--amber);background:var(--amberbg)}
-.ll-regen:disabled{opacity:0.3;cursor:not-allowed}
+.ll-regen:disabled{opacity:0.5;cursor:not-allowed}
 
 /* ── PROMPT BUILDER ── */
 .pbsec{margin-bottom:22px}
@@ -896,10 +902,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   .genre-grid{grid-template-columns:repeat(auto-fill,minmax(80px,1fr))}
   .params{grid-template-columns:1fr 1fr}
 }
+@media(max-width:360px){
+  .params{grid-template-columns:1fr}
+}
 /* On mobile, expand button stays visible — same collapse behaviour as desktop */
 @media(max-width:580px){
   .spill,.qpill,.lane-pill,.mood-pill,.lpill{min-height:36px;padding:8px 12px;display:inline-flex;align-items:center;}
   .nb{min-height:48px;padding:8px 6px;}
+  /* Mobile touch targets — WCAG 44px minimum */
+  .btn-xs,.btn-sm,.vp-copy-btn,.brief-copy-btn,.sync-copy-all-btn{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
+  .otab{min-height:44px;display:inline-flex;align-items:center}
+  .ll-regen{min-height:44px;min-width:44px;opacity:1}
 }
 
 /* ── CONCEPT ENHANCE ── */
@@ -1688,7 +1701,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .sync-row{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--b1)}
 .sync-row:last-child{border-bottom:none}
 .sync-key{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;min-width:120px;flex-shrink:0;padding-top:2px}
-.sync-val{font-size:13px;color:var(--tx1);line-height:1.5;flex:1}
+.sync-val{font-size:13px;color:var(--tx1);line-height:1.5;flex:1;word-break:break-word;overflow-wrap:break-word}
 .sync-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .sync-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--cyanbg);color:var(--cyan);border:1px solid var(--cyanline)}
 .sync-copy-all-btn{font-size:11px;font-weight:700;padding:6px 14px;border-radius:99px;border:1px solid var(--amberline);background:var(--amberbg);color:var(--amber);cursor:pointer;transition:all .15s;margin-top:10px}
@@ -2789,7 +2802,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <body>
 
 <!-- LEFT AD RAIL -->
-<aside class="ad-rail ad-rail-left" aria-label="Advertisement">
+<aside class="ad-rail ad-rail-left" aria-hidden="true">
   <div class="ad-rail-label">Advertisement</div>
   <div class="ad-rail-slot" data-ad-rail="true">
     <span style="color:var(--tx4);font-size:10px;text-align:center;padding:8px">Ad</span>
@@ -2797,7 +2810,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </aside>
 
 <!-- RIGHT AD RAIL -->
-<aside class="ad-rail ad-rail-right" aria-label="Advertisement">
+<aside class="ad-rail ad-rail-right" aria-hidden="true">
   <div class="ad-rail-label">Advertisement</div>
   <div class="ad-rail-slot" data-ad-rail="true">
     <span style="color:var(--tx4);font-size:10px;text-align:center;padding:8px">Ad</span>
@@ -2831,6 +2844,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div class="kb-row">
     <input id="kb-input" class="kb-input" type="password" placeholder="sk-or-v1-... or sk-ant-api03-..."
       onkeydown="if(event.key==='Enter')saveKey()"/>
+    <button type="button" onclick="const i=document.getElementById('kb-input');i.type=i.type==='password'?'text':'password';this.textContent=i.type==='password'?'👁':'🙈'" style="background:none;border:1px solid var(--b2);border-radius:var(--r1);padding:6px 10px;color:var(--tx3);cursor:pointer;font-size:14px" title="Toggle key visibility">👁</button>
     <button class="kb-save" onclick="saveKey()">Save &amp; Start →</button>
   </div>
   <div class="kb-err" id="kb-err"></div>
@@ -3634,8 +3648,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
-        <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
-        <button class="btn btn-sm" onclick="cpBriefPrompt('res')">📋 Copy Prompt</button>
+        <button class="btn btn-sm" onclick="cpField('res-lyrics-text')" title="Copy song lyrics for pasting into Suno/Udio">Copy Lyrics</button>
+        <button class="btn btn-sm" onclick="cpBriefPrompt('res')" title="Copy the style/genre prompt for AI music platforms">📋 Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
         <button class="btn btn-sm" onclick="batchGenerate()">⚡ Batch x3</button>
         <button class="btn btn-sm" onclick="openAudioModal('res')" id="audio-btn" style="display:none">🎵 Audio</button>
@@ -3943,8 +3957,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
-        <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')">Copy Lyrics</button>
-        <button class="btn btn-sm" onclick="cpBriefPrompt('lres')">📋 Copy Prompt</button>
+        <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')" title="Copy song lyrics for pasting into Suno/Udio">Copy Lyrics</button>
+        <button class="btn btn-sm" onclick="cpBriefPrompt('lres')" title="Copy the style/genre prompt for AI music platforms">📋 Copy Prompt</button>
         <div class="song-card-overflow">
           <button class="btn btn-sm" onclick="toggleLresOverflow()" title="More options">⋯ More</button>
           <div class="song-card-overflow-menu" id="lres-overflow-menu">
@@ -7869,7 +7883,7 @@ document.addEventListener('click',e=>{
 // ═══════════════════════════════════════════════════════
 // UTILITIES
 // ═══════════════════════════════════════════════════════
-function toast(msg,dur=2500){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),dur);}
+function toast(msg,dur){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');const d=dur||Math.max(2500,Math.min(msg.length*50,6000));setTimeout(()=>t.classList.remove('show'),d);}
 function safeCopy(text, label) {
   const msg = label || 'Copied';
   if (navigator?.clipboard?.writeText) {
@@ -7890,7 +7904,7 @@ function fallbackCopy(text, msg) {
     toast('⚠️ Copy failed — select and copy manually');
   }
 }
-function cpField(id){const el=document.getElementById(id);if(!el)return;safeCopy(el.textContent||el.innerText,'Copied to clipboard');}
+function cpField(id){const el=document.getElementById(id);if(!el)return;const txt=(el.textContent||el.innerText||'').trim();if(!txt||!el.offsetHeight){toast('Nothing to copy — generate a song first');return;}safeCopy(txt,'Copied to clipboard');}
 function cpBriefPrompt(prefix){
   const el=document.getElementById(prefix==='res'?'res-title':'lres-title');
   // Get the prompt from brief-core-prompt span inside the brief-output
@@ -9360,7 +9374,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const platTips      = parseBriefSection(raw, 'PLATFORM TIPS');
 
   const cpBtn = (id, label='Copy') =>
-    `<button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${id}').textContent)">${label}</button>`;
+    `<button class="brief-copy-btn" onclick="safeCopy(document.getElementById('${id}').textContent,'${label} copied')">${label}</button>`;
 
   // Helper: parse key:value lines from a section block
   const parseKV = (block) => {
@@ -9648,14 +9662,22 @@ function persistLib(){
     // Also keep old key in sync for backwards compat
     localStorage.setItem('sce5_lib', JSON.stringify(S.library));
   } catch(e) {
-    // localStorage full — trim and retry
-    try {
-      S.library = S.library.slice(0, 50);
-      localStorage.setItem('soniq_library', JSON.stringify(S.library));
-      toast('⚠️ Library trimmed to 50 songs — storage full');
-    } catch(e2) {
+    // localStorage full — ask before trimming
+    const trimCount = S.library.length - 50;
+    if (trimCount > 0 && confirm(`Storage full. Remove your ${trimCount} oldest songs to make room? This cannot be undone.`)) {
+      try {
+        S.library = S.library.slice(0, 50);
+        localStorage.setItem('soniq_library', JSON.stringify(S.library));
+        toast('⚠️ Library trimmed to 50 songs');
+      } catch(e2) {
+        toast('⚠️ Storage full — songs cannot be saved. Clear browser storage.');
+        console.error('Library save failed completely:', e2);
+      }
+    } else if (trimCount <= 0) {
       toast('⚠️ Storage full — songs cannot be saved. Clear browser storage.');
-      console.error('Library save failed completely:', e2);
+    } else {
+      toast('Song not saved — storage is full');
+      console.error('Library save declined by user:', e);
     }
   }
   updateLibBadge();
@@ -10301,8 +10323,8 @@ async function generateFusion(){
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
           <div style="font-size:16px;font-weight:700">"${title}"</div>
           <div style="display:flex;gap:6px">
-            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('fd-lyr').textContent)">Copy Lyrics</button>
-            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('fd-sty').textContent)">Copy Style</button>
+            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('fd-lyr').textContent,'Lyrics copied')">Copy Lyrics</button>
+            <button class="btn btn-sm" onclick="safeCopy(document.getElementById('fd-sty').textContent,'Style prompt copied')">Copy Style</button>
           </div>
         </div>
         <pre id="fd-lyr" style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:10px">${lyrics}</pre>
@@ -11764,8 +11786,10 @@ async function generateVariant() {
 
   const loadingEl = document.getElementById('variant-loading');
   const goBtn = document.getElementById('variant-go-btn');
+  const goBtnOrigText = goBtn.innerHTML;
   loadingEl.style.display = 'block';
   goBtn.disabled = true;
+  goBtn.innerHTML = '<span class="ld" style="display:inline-flex;gap:3px;vertical-align:middle"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span> Generating…';
 
   try {
     const body = {
@@ -11804,6 +11828,7 @@ async function generateVariant() {
   } finally {
     loadingEl.style.display = 'none';
     goBtn.disabled = false;
+    goBtn.innerHTML = goBtnOrigText;
   }
 }
 
@@ -11934,6 +11959,7 @@ function removePlTrack(plIdx, trackIdx) {
 function deletePlaylist(plIdx) {
   const playlists = plLoad();
   const name = playlists[plIdx].name;
+  if(!confirm(`Delete "${name}"? This cannot be undone.`))return;
   playlists.splice(plIdx, 1);
   plSave(playlists);
   renderPlaylists();
@@ -11943,8 +11969,7 @@ function deletePlaylist(plIdx) {
 function copyPlaylist(plIdx) {
   const pl = plLoad()[plIdx];
   const text = `${pl.name}\n${'─'.repeat(pl.name.length)}\n${pl.tracks.map((t,i) => `${i+1}. ${t.title}${t.genre ? ' ('+t.genre+')' : ''}`).join('\n')}`;
-  safeCopy(text);
-  toast('Setlist copied to clipboard');
+  safeCopy(text, 'Setlist copied');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -12048,8 +12073,7 @@ function togglePlatinum() {
 
 function copyCoachFeedback() {
   if (!_coachFeedback) return;
-  safeCopy(_coachFeedback);
-  toast('Feedback copied to clipboard');
+  safeCopy(_coachFeedback, 'Feedback copied');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -12418,7 +12442,39 @@ async function showFoundingUpsell() {
 
 function closeAuth() {
   document.getElementById('auth-modal').style.display = 'none';
+  document.body.style.overflow = '';
 }
+
+// ─── GLOBAL MODAL UTILITIES ─────────────────────────────────
+// Escape key closes topmost modal + body scroll lock
+(function(){
+  const MODALS = [
+    {id:'auth-modal', close:()=>typeof closeAuth==='function'&&closeAuth(), z:950},
+    {id:'pub-modal', close:()=>typeof closePublish==='function'&&closePublish(), z:910},
+    {id:'profile-edit-modal', close:()=>typeof closeProfileEdit==='function'&&closeProfileEdit(), z:920},
+    {id:'share-modal', close:()=>typeof closeShareModal==='function'&&closeShareModal(), z:920},
+    {id:'audio-modal', close:()=>typeof closeAudioModal==='function'&&closeAudioModal(), z:921},
+    {id:'comment-drawer', close:()=>typeof closeCommentDrawer==='function'&&closeCommentDrawer(), z:919},
+    {id:'coach-modal', close:()=>typeof closeCoach==='function'&&closeCoach(), z:903},
+    {id:'pl-picker-modal', close:()=>typeof closePlPicker==='function'&&closePlPicker(), z:902},
+    {id:'vh-modal', close:()=>typeof closeVH==='function'&&closeVH(), z:901},
+    {id:'variants-modal', close:()=>typeof closeVariants==='function'&&closeVariants(), z:900},
+    {id:'pwd-reset-modal', close:()=>{const m=document.getElementById('pwd-reset-modal');if(m)m.style.display='none';document.body.style.overflow='';}, z:960}
+  ];
+  document.addEventListener('keydown', function(e){
+    if(e.key!=='Escape')return;
+    // Find highest-z visible modal
+    let top=null;
+    MODALS.forEach(m=>{const el=document.getElementById(m.id);if(el&&el.style.display!=='none'&&el.offsetParent!==null){if(!top||m.z>top.z)top=m;}});
+    if(top){e.preventDefault();top.close();}
+  });
+  // Body scroll lock observer
+  const lockObserver=new MutationObserver(()=>{
+    const anyOpen=MODALS.some(m=>{const el=document.getElementById(m.id);return el&&el.style.display!=='none';});
+    document.body.style.overflow=anyOpen?'hidden':'';
+  });
+  lockObserver.observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['style']});
+})();
 
 // ─── PASSWORD RESET MODAL ──────────────────────────────────────
 function openPasswordResetModal() {
@@ -14337,7 +14393,7 @@ async function writeAllConcepts() {
 }
 
 function cpText(text) {
-  safeCopy(text||'');
+  safeCopy(text||'', 'Copied');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -15362,10 +15418,8 @@ function renderSyncMeta(prefix) {
   const bpm = bpmMap[genre] || '80–130 BPM';
   const bestFor = syncMap[genre] || 'General Commercial · TV Placement · Digital Content';
 
-  const copyAll = () => {
-    const txt = `SYNC METADATA — "${song.title||'Untitled'}"\nMood Tags: ${moods.join(' · ')}\nBPM Estimate: ${bpm}\nInstrumentation: ${instrStr}\nBest For: ${bestFor}\nLicense: Non-exclusive sync recommended`;
-    safeCopy(txt, 'Sync metadata copied!');
-  };
+  // Store sync text for safe copy (no toString injection)
+  S._syncMeta = `SYNC METADATA — "${song.title||'Untitled'}"\nMood Tags: ${moods.join(' · ')}\nBPM Estimate: ${bpm}\nInstrumentation: ${instrStr}\nBest For: ${bestFor}\nLicense: Non-exclusive sync recommended`;
 
   el.innerHTML = `<div class="sync-meta-card">
     <div class="sync-row"><div class="sync-key">Mood Tags</div><div class="sync-val"><div class="sync-tags">${moods.map(m=>`<span class="sync-tag">${m}</span>`).join('')}</div></div></div>
@@ -15374,7 +15428,7 @@ function renderSyncMeta(prefix) {
     <div class="sync-row"><div class="sync-key">Best For</div><div class="sync-val">${bestFor}</div></div>
     <div class="sync-row"><div class="sync-key">License</div><div class="sync-val">Non-exclusive sync recommended</div></div>
   </div>
-  <button class="sync-copy-all-btn" onclick="(${copyAll.toString()})()">Copy All Metadata</button>`;
+  <button class="sync-copy-all-btn" onclick="safeCopy(S._syncMeta,'Sync metadata copied')">Copy All Metadata</button>`;
   showEmptyTabState(prefix + '-sync-content', 'Sync metadata generated on first click');
 }
 
