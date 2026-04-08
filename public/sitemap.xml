@@ -144,6 +144,56 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Priority 0.8: New blog posts (Supabase CMS) -->
+  <url>
+    <loc>https://www.mysoniq.com/blog/how-to-write-song-with-ai</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/best-ai-lyric-generators</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/best-ai-songwriting-tools-2026</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/songwriting-tips-for-beginners</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/how-to-write-a-hook</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/music-production-workflow-2026</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/ai-music-vs-human-music</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.mysoniq.com/blog/how-to-sell-beats-online</loc>
+    <lastmod>2026-04-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Priority 0.8: Comparison pages (planned) -->
   <url>
     <loc>https://www.mysoniq.com/compare/soniq-vs-suno</loc>

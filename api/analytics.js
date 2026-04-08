@@ -14,7 +14,8 @@ const ADMIN_EMAILS = [
   'thealvindean@gmail.com',
   'alvin@nuwavmedia.com',
   'lamusicproducers8@gmail.com',
-  'rainfiremusic@gmail.com'
+  'rainfiremusic@gmail.com',
+  'eric@warkershall.com'
 ];
 
 // --- Auth helpers ---

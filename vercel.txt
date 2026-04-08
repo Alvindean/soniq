@@ -1,0 +1,43 @@
+{
+  "version": 2,
+  "name": "soniq",
+  "framework": null,
+  "buildCommand": "",
+  "outputDirectory": "public",
+  "installCommand": "npm ci",
+  "functions": {
+    "api/stream.js":         { "maxDuration": 60 },
+    "api/generate.js":       { "maxDuration": 60 },
+    "api/admin.js":          { "maxDuration": 15 },
+    "api/publish.js":        { "maxDuration": 15 },
+    "api/stripe.js":         { "maxDuration": 30 },
+    "api/founding.js":       { "maxDuration": 10 },
+    "api/admin-session.js":  { "maxDuration": 10 },
+    "api/stripe-checkout.js": { "maxDuration": 30 },
+    "api/stripe-webhook.js": { "maxDuration": 30 }
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io https://gotrwbhkavkqmxtnxkkj.supabase.co https://*.supabase.co https://api.resend.com; img-src 'self' data: blob:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(), geolocation=()" }
+      ]
+    }
+  ],
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/legal/(.*)", "dest": "/legal/$1" },
+    { "src": "/blog", "dest": "/blog/index.html" },
+    { "src": "/blog/(.*)\\.html", "dest": "/blog/$1.html" },
+    { "src": "/blog/(.*)", "dest": "/blog/$1.html" },
+    { "src": "/app", "dest": "/index.html" },
+    { "src": "/", "dest": "/landing.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

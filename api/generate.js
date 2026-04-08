@@ -53,7 +53,7 @@ function getThisMonth() {
 }
 
 // Emails that always get Studio plan + unlimited access
-const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com', 'rainfiremusic@gmail.com']);
+const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com', 'rainfiremusic@gmail.com', 'eric@warkershall.com']);
 
 // Must match stream.js exactly — generate.js is a fallback path for the same users
 const PLAN_LIMITS = {
