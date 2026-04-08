@@ -738,14 +738,51 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
 /* ── FUSION MATRIX ── */
 .fwrap{overflow-x:auto;padding-bottom:6px}
+/* ── FUSION GRID (improved) ── */
 .fgrid{display:grid;gap:2px}
-.fax{font-size:8px;font-weight:700;color:var(--tx3);display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;line-height:1.2}
-.fax.row{justify-content:flex-end;padding-right:5px;text-align:right}
-.fc{border-radius:5px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3px 2px;min-height:42px;font-size:8.5px;font-weight:600;border:1px solid transparent;line-height:1.2;text-align:center;gap:1px}
-.fc:hover{transform:scale(1.07);z-index:2;position:relative;border-color:rgba(255,255,255,0.2)!important}
+.fax{font-size:10px;font-weight:700;color:var(--tx2);display:flex;align-items:center;justify-content:center;text-align:center;padding:3px 2px;line-height:1.15;min-width:0}
+.fax.row{justify-content:flex-end;padding-right:6px;text-align:right}
+.fc{border-radius:6px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;min-height:48px;font-size:9.5px;font-weight:600;border:1px solid transparent;line-height:1.2;text-align:center;gap:2px;position:relative}
+.fc:hover{transform:scale(1.12);z-index:10;position:relative;border-color:rgba(255,255,255,0.25)!important;box-shadow:0 4px 16px rgba(0,0,0,0.5)}
 .fc.empty{background:var(--s3);cursor:default;color:var(--tx4)}
-.fc.empty:hover{transform:none}
-.fc-score{font-size:9px;font-weight:700;opacity:0.9}
+.fc.empty:hover{transform:none;box-shadow:none}
+.fc-score{font-size:10px;font-weight:800;opacity:0.95}
+.fc-name{font-size:8px;opacity:0.8;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+/* ── FUSION TOOLTIP ── */
+.ftip{position:fixed;z-index:999;background:var(--s1);border:1px solid var(--cyanline);border-radius:var(--r2);padding:12px 14px;min-width:220px;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.6);pointer-events:none;opacity:0;transition:opacity 0.12s}
+.ftip.on{opacity:1}
+.ftip-name{font-size:14px;font-weight:700;color:var(--tx1);margin-bottom:2px}
+.ftip-genres{font-size:11px;color:var(--tx3);margin-bottom:6px}
+.ftip-score{display:inline-flex;align-items:center;gap:6px;font-size:20px;font-weight:800;margin-bottom:6px}
+.ftip-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:0.02em}
+.ftip-tip{font-size:11px;color:var(--tx2);line-height:1.5}
+.ftip-cta{font-size:10px;color:var(--cyan);margin-top:6px;font-weight:600}
+/* ── FUSION VIEW TOGGLE ── */
+.fview-toggle{display:flex;gap:0;border:1px solid var(--b2);border-radius:var(--r2);overflow:hidden;width:fit-content}
+.fview-btn{font-size:11px;font-weight:600;padding:6px 14px;cursor:pointer;background:var(--s3);color:var(--tx3);border:none;transition:all 0.12s}
+.fview-btn.on{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
+.fview-btn:hover:not(.on){background:var(--s4);color:var(--tx2)}
+/* ── FUSION CARD LIST ── */
+.fcards{display:none}
+.fcards.on{display:block}
+.fgroup{margin-bottom:16px}
+.fgroup-hdr{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;user-select:none}
+.fgroup-hdr:hover .fgroup-label{color:var(--cyan)}
+.fgroup-chevron{font-size:10px;color:var(--tx4);transition:transform 0.15s;width:14px}
+.fgroup-hdr.open .fgroup-chevron{transform:rotate(90deg)}
+.fgroup-label{font-size:13px;font-weight:700;color:var(--tx2);transition:color 0.12s}
+.fgroup-count{font-size:11px;color:var(--tx4);font-weight:600}
+.fgroup-cards{display:none;padding-left:4px}
+.fgroup-hdr.open+.fgroup-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;padding-top:4px;padding-bottom:8px}
+.fcard{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px}
+.fcard:hover{border-color:var(--cyanline);background:var(--s3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.fcard-score{font-size:22px;font-weight:800;min-width:36px;text-align:center;line-height:1}
+.fcard-info{flex:1;min-width:0}
+.fcard-name{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px}
+.fcard-genres{font-size:10px;color:var(--tx3);margin-bottom:4px}
+.fcard-tip{font-size:11px;color:var(--tx3);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:600px){.fgroup-hdr.open+.fgroup-cards{grid-template-columns:1fr}}
 .fdpanel{background:var(--s2);border:1px solid var(--amberline);border-radius:var(--r3);padding:18px 20px;margin-top:14px;display:none}
 .fdpanel.on{display:block;animation:pgIn 0.18s ease}
 .qring{display:flex;align-items:center;gap:20px;padding:14px 0;flex-wrap:wrap}
@@ -4657,9 +4694,15 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <div id="more-spane-fusion" class="spane">
     <div class="card">
       <div class="ctitle">🔀 Genre Fusion Matrix + Quality Predictor</div>
-      <div class="tipbox" style="margin-bottom:14px">Color brightness = fusion quality. Click any cell for formula + quality breakdown, then generate a song.</div>
-      <div style="font-size:11px;color:var(--tx4);margin-bottom:10px">Tap any cell to see fusion details</div>
-      <div class="fwrap"><div id="fm"></div></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+        <div class="tipbox" style="margin:0;flex:1;min-width:200px">Heat map: <span style="color:#f87171">red</span> → <span style="color:#fbbf24">amber</span> → <span style="color:#4ade80">green</span> = fusion quality. Click any cell for details.</div>
+        <div class="fview-toggle">
+          <button class="fview-btn on" id="fv-grid" onclick="setFusionView('grid')">⊞ Grid</button>
+          <button class="fview-btn" id="fv-list" onclick="setFusionView('list')">☰ List</button>
+        </div>
+      </div>
+      <div class="fwrap" id="fwrap-grid"><div id="fm"></div></div>
+      <div class="fcards" id="fwrap-cards"></div>
     </div>
     <div class="fdpanel" id="fd-panel">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
@@ -6439,7 +6482,62 @@ const FUSION_DATA={
   'Reggae+Afrobeats':{name:'Caribbean Afrobeats',tip:'The African diaspora connection is the entire music. One-drop + Afrobeats groove = the global roots sound.',q:{overall:86,compat:88,structural:84,commercial:82},artists:'Chronixx, Protoje, Koffee, Damian Marley, WizKid'},
   // Afrobeats missing
   'Afrobeats+Blues':{name:'Afro-Blues',tip:'Both traditions trace directly to West African music. The blues riff in the guitar IS the African talking drum pattern.',q:{overall:82,compat:82,structural:80,commercial:74},artists:'Fela Kuti, Seun Kuti, Asa, Nneka'},
-  'Afrobeats+Punk':{name:'Afro-Punk',tip:'Afropunk is a real movement. The DIY energy of punk + the groove of Afrobeats = a genuinely political, joyful sound.',q:{overall:68,compat:64,structural:66,commercial:66},artists:'TV on the Radio, Bloc Party, Santigold, badXchannels'}
+  'Afrobeats+Punk':{name:'Afro-Punk',tip:'Afropunk is a real movement. The DIY energy of punk + the groove of Afrobeats = a genuinely political, joyful sound.',q:{overall:68,compat:64,structural:66,commercial:66},artists:'TV on the Radio, Bloc Party, Santigold, badXchannels'},
+  // ── BRAZILIAN FUSIONS ──
+  'Brazilian+Pop':{name:'Bossa Pop',tip:'Bossa nova sophistication under a pop hook — the most universally loved acoustic music on earth. Violão fingerpicking IS the identity.',q:{overall:90,compat:88,structural:86,commercial:92},artists:'Anitta, Bebel Gilberto, Seu Jorge, Marisa Monte'},
+  'Brazilian+Hip-Hop':{name:'Brazilian Rap',tip:'Portuguese rhythmic density over 808s. São Paulo underground meets favela storytelling. Funk carioca bass + rap flow.',q:{overall:84,compat:80,structural:82,commercial:86},artists:'Emicida, Racionais MC\'s, Criolo, Djonga'},
+  'Brazilian+R&B':{name:'MPB Soul',tip:'Tim Maia invented this — Brazilian soul with violão warmth. The groove breathes naturally. Never rush.',q:{overall:88,compat:87,structural:85,commercial:86},artists:'Tim Maia, Jorge Ben Jor, Seu Jorge, Liniker'},
+  'Brazilian+Jazz':{name:'Bossa Jazz',tip:'The original fusion that conquered the world. Stan Getz + João Gilberto = the template. Extended chords under whispered vocals.',q:{overall:94,compat:96,structural:90,commercial:88},artists:'Tom Jobim, Stan Getz, João Gilberto, Gal Costa'},
+  'Brazilian+EDM':{name:'Brazilian Bass',tip:'Alok and Vintage Culture built a global sound. Samba percussion samples + house drops = festival-ready Brazilian energy.',q:{overall:86,compat:82,structural:84,commercial:90},artists:'Alok, Vintage Culture, KVSH, Cat Dealers'},
+  'Brazilian+Latin':{name:'Tropical Latin',tip:'Portuguese + Spanish = the entire continent singing together. Samba meets salsa at carnival. Maximum celebration energy.',q:{overall:90,compat:92,structural:88,commercial:90},artists:'Anitta, J Balvin (Bola Rebola), Cardi B, Karol G'},
+  'Brazilian+Reggae':{name:'Reggae Brasileiro',tip:'Salvador de Bahia is reggae\'s second home. One-drop over pandeiro = the warmest groove on earth.',q:{overall:82,compat:84,structural:80,commercial:78},artists:'Natiruts, Cidade Negra, O Rappa, Tribo de Jah'},
+  'Brazilian+Afrobeats':{name:'Afro-Brazilian',tip:'The transatlantic African rhythm connection. Candomblé percussion + Afrobeats groove = the deepest rhythmic fusion possible.',q:{overall:88,compat:90,structural:86,commercial:84},artists:'Carlinhos Brown, Olodum, Daniela Mercury, Iza'},
+  'Brazilian+Country':{name:'Sertanejo Crossover',tip:'Sertanejo IS Brazilian country — acoustic guitars, romantic stories, massive hooks. The biggest domestic genre in Brazil.',q:{overall:80,compat:76,structural:78,commercial:82},artists:'Gusttavo Lima, Marília Mendonça, Jorge & Mateus'},
+  'Brazilian+Reggaeton':{name:'Funk Reggaeton',tip:'Funk carioca bass + dembow rhythm = the favela-to-club pipeline. Anitta\'s entire global strategy lives here.',q:{overall:88,compat:86,structural:84,commercial:92},artists:'Anitta, MC Kevinho, Ludmilla, Pedro Sampaio'},
+  // ── AMAPIANO FUSIONS ──
+  'Amapiano+Pop':{name:'Amapi-Pop',tip:'Tyla proved this works globally. Log drum groove under a pop vocal hook = the smoothest crossover in modern music.',q:{overall:92,compat:90,structural:88,commercial:94},artists:'Tyla, Uncle Waffles, Ayra Starr, Elaine'},
+  'Amapiano+Hip-Hop':{name:'Piano Trap',tip:'Log drum bass replaces the 808. Conversational rap delivery over the groove. Focalistic\'s blueprint.',q:{overall:86,compat:84,structural:82,commercial:88},artists:'Focalistic, Cassper Nyovest, Nasty C, Costa Titch'},
+  'Amapiano+R&B':{name:'Amapiano R&B',tip:'The most velvet groove possible. Smooth vocals over suspended piano chords + log drum = late-night perfection.',q:{overall:88,compat:86,structural:84,commercial:88},artists:'Tyla, Elaine, Ami Faku, Sun-El Musician'},
+  'Amapiano+EDM':{name:'Amapiano House',tip:'Amapiano IS a house music evolution. Deep house warmth + log drum bass + township energy. Black Coffee\'s universe.',q:{overall:90,compat:92,structural:88,commercial:90},artists:'Black Coffee, DJ Maphorisa, Kabza De Small, Themba'},
+  'Amapiano+Afrobeats':{name:'Afro-Piano',tip:'Nigeria meets South Africa — the two biggest African music movements fusing. WizKid + Kabza De Small = global domination.',q:{overall:94,compat:93,structural:90,commercial:94},artists:'WizKid, Burna Boy, Kabza De Small, DBN Gogo'},
+  'Amapiano+Latin':{name:'Amapiano Latino',tip:'Log drum groove + Latin percussion = a rhythm combination nobody expected and everybody loves. Experimental but explosive.',q:{overall:80,compat:76,structural:78,commercial:84},artists:'Experimental — Major Lazer, DJ Snake'},
+  'Amapiano+Reggaeton':{name:'Piano Dembow',tip:'Log drum syncopation over dembow rhythm. Two of the biggest streaming genres colliding. The TikTok algorithm loves this.',q:{overall:82,compat:78,structural:80,commercial:88},artists:'Experimental — emerging territory'},
+  'Amapiano+Dancehall':{name:'Caribbean Piano',tip:'Log drum meets riddim bass — both electronic, both groove-first. The shaker and the hi-hat are siblings.',q:{overall:84,compat:82,structural:80,commercial:84},artists:'Experimental — Popcaan, WizKid'},
+  // ── DANCEHALL FUSIONS ──
+  'Dancehall+Pop':{name:'Dancehall Pop',tip:'Rihanna built an empire here. Riddim groove under a massive pop chorus. The accent makes the hook exotic.',q:{overall:92,compat:90,structural:88,commercial:94},artists:'Rihanna, Drake, Sean Paul, Shaggy'},
+  'Dancehall+Hip-Hop':{name:'Dancehall Rap',tip:'Drake\'s Views era — toasting flow meets trap cadence. The patois adds swagger no American accent can replicate.',q:{overall:90,compat:88,structural:86,commercial:92},artists:'Drake, Popcaan, Vybz Kartel, Buju Banton'},
+  'Dancehall+R&B':{name:'Lovers Rock',tip:'The gentlest dancehall — romance over riddim. Smooth vocals, sensual rhythm, Caribbean warmth.',q:{overall:86,compat:84,structural:82,commercial:86},artists:'Rihanna, Popcaan, Shenseea, Koffee'},
+  'Dancehall+Reggae':{name:'Modern Roots',tip:'Dancehall IS reggae\'s electronic evolution. Same spiritual roots, digital production. The one-drop meets the riddim.',q:{overall:88,compat:92,structural:86,commercial:84},artists:'Damian Marley, Protoje, Koffee, Chronixx'},
+  'Dancehall+EDM':{name:'Electronic Dancehall',tip:'Major Lazer built a global brand on this. Electronic drops over riddim beats. Festival-ready Caribbean energy.',q:{overall:88,compat:86,structural:84,commercial:90},artists:'Major Lazer, DJ Snake, Diplo, Skrillex'},
+  'Dancehall+Afrobeats':{name:'Afro-Dancehall',tip:'The Caribbean-African connection. Both traditions share rhythmic DNA. WizKid and Popcaan are already fusing this naturally.',q:{overall:90,compat:90,structural:86,commercial:90},artists:'WizKid, Popcaan, Burna Boy, Koffee'},
+  'Dancehall+Latin':{name:'Caribbean Latin',tip:'Reggaeton came FROM dancehall — this is the reunion. Riddim + Latin percussion = the original Caribbean sound system.',q:{overall:86,compat:88,structural:84,commercial:86},artists:'Sean Paul, Daddy Yankee, J Balvin, Bad Bunny'},
+  'Dancehall+Reggaeton':{name:'Riddim Dembow',tip:'The closest cousins in global music. Same Caribbean roots, different decades. The fusion is almost seamless.',q:{overall:90,compat:92,structural:88,commercial:90},artists:'Sean Paul, Daddy Yankee, Vybz Kartel, Don Omar'},
+  // ── BOLLYWOOD FUSIONS ──
+  'Bollywood+Pop':{name:'Bollywood Pop',tip:'A.R. Rahman proved this wins Oscars. Indian classical melody over global pop production = a sound that moves billions.',q:{overall:90,compat:88,structural:86,commercial:92},artists:'A.R. Rahman, Pritam, Arijit Singh, Vishal-Shekhar'},
+  'Bollywood+Hip-Hop':{name:'Desi Hip-Hop',tip:'Indian street rap over Bollywood orchestration. Hindi/Punjabi bars + tabla + 808 = the Indian Drake moment.',q:{overall:84,compat:80,structural:82,commercial:86},artists:'Divine, Naezy, Raftaar, Badshah, Diljit Dosanjh'},
+  'Bollywood+R&B':{name:'Indian R&B',tip:'Bollywood playback singing tradition IS R&B — emotional vocal runs over lush production. The bridge is where both peak.',q:{overall:86,compat:84,structural:84,commercial:84},artists:'Arijit Singh, Pritam, Armaan Malik, Jonita Gandhi'},
+  'Bollywood+EDM':{name:'Bollywood Electronic',tip:'Nucleya built India\'s electronic scene. Bollywood vocal samples + bass drops = the Indian festival sound.',q:{overall:86,compat:82,structural:84,commercial:90},artists:'Nucleya, KSHMR, DJ Snake, Ritviz'},
+  'Bollywood+Latin':{name:'Bollywood Latino',tip:'Both traditions love dramatic arcs and emotional maximalism. Tabla + Latin percussion = rhythmic fireworks.',q:{overall:78,compat:74,structural:76,commercial:80},artists:'Experimental — emerging Bollywood-Latin crossovers'},
+  'Bollywood+Afrobeats':{name:'Afro-Bollywood',tip:'Both genres prioritize rhythm and call-response. The talking drum and the tabla are spiritual siblings.',q:{overall:80,compat:78,structural:78,commercial:82},artists:'Burna Boy (Indian-influenced), WizKid'},
+  'Bollywood+K-Pop':{name:'K-Bollywood',tip:'Two of the biggest music industries in Asia. K-Pop precision + Bollywood drama = an untapped 4-billion-person market.',q:{overall:82,compat:78,structural:80,commercial:88},artists:'BTS × Bollywood collaborations, emerging territory'},
+  // ── ARABESQUE FUSIONS ──
+  'Arabesque+Pop':{name:'Arabic Pop',tip:'Amr Diab\'s formula — maqam melodies under pop production. Quarter-tone hooks that sound exotic to Western ears.',q:{overall:88,compat:86,structural:84,commercial:90},artists:'Amr Diab, Nancy Ajram, Elissa, Mohammed Assaf'},
+  'Arabesque+Hip-Hop':{name:'Arabic Rap',tip:'Palestinian and Lebanese rap scenes are the fastest growing. Arabic bars over maqam-sampled beats = politically charged artistry.',q:{overall:82,compat:78,structural:80,commercial:82},artists:'DAM, El Rass, Cairokee, MC Abdul'},
+  'Arabesque+R&B':{name:'Arabian R&B',tip:'Melismatic vocal tradition meets R&B smoothness — both genres live in the ornamental vocal run. Natural siblings.',q:{overall:84,compat:82,structural:82,commercial:82},artists:'Fairuz (modern), Elissa, Mashrou\' Leila'},
+  'Arabesque+EDM':{name:'Arabic Electronic',tip:'Oud samples over house beats. The quarter-tone melody over a four-on-the-floor kick = the Dubai club sound.',q:{overall:84,compat:80,structural:82,commercial:88},artists:'DJ Khaled Hadj Brahim, Acid Arab, Deena Abdelwahed'},
+  'Arabesque+Latin':{name:'Mediterranean Fusion',tip:'Both traditions share North African / Moorish rhythmic roots. The oud and the flamenco guitar are cousins.',q:{overall:82,compat:82,structural:80,commercial:78},artists:'Natacha Atlas, Ojos de Brujo, Manu Chao'},
+  'Arabesque+Afrobeats':{name:'Afro-Arab',tip:'North African traditions (Raï, Gnawa) already bridge this. The darbuka and the talking drum share polyrhythmic DNA.',q:{overall:82,compat:80,structural:80,commercial:80},artists:'Cheb Khaled, Tinariwen, Bombino, Mdou Moctar'},
+  'Arabesque+Jazz':{name:'Oriental Jazz',tip:'Maqam scales and jazz improvisation are deeply compatible — both value ornamental expression and harmonic exploration.',q:{overall:86,compat:88,structural:84,commercial:76},artists:'Anouar Brahem, Rabih Abou-Khalil, Ibrahim Maalouf'},
+  'Arabesque+Bollywood':{name:'Indo-Arabic',tip:'Two of the world\'s great melodic traditions. Both use ornamental vocal runs and non-Western scales. The fusion is ancient and powerful.',q:{overall:84,compat:86,structural:82,commercial:80},artists:'A.R. Rahman, Nusrat Fateh Ali Khan, Sonu Nigam'},
+  // ── MANDOPOP FUSIONS ──
+  'Mandopop+Pop':{name:'C-Pop Crossover',tip:'Jay Chou proved Mandarin can be global pop language. Pentatonic hooks over Western production = the sound of modern China.',q:{overall:90,compat:88,structural:86,commercial:92},artists:'Jay Chou, JJ Lin, G.E.M., Jolin Tsai'},
+  'Mandopop+Hip-Hop':{name:'Chinese Rap',tip:'Higher Brothers opened the global lane. Mandarin tonal language creates flow patterns impossible in English.',q:{overall:84,compat:80,structural:82,commercial:86},artists:'Higher Brothers, MC HotDog, Lex, VaVa'},
+  'Mandopop+R&B':{name:'Chinese R&B',tip:'Pentatonic scales over R&B chord progressions = emotional specificity Western R&B cannot achieve. Very intimate.',q:{overall:86,compat:84,structural:84,commercial:84},artists:'Eason Chan, JJ Lin, Eric Chou, Yoga Lin'},
+  'Mandopop+EDM':{name:'C-Pop Electronic',tip:'The Chinese festival scene is massive. Pentatonic melodies + electronic drops = a sound for 1.4 billion people.',q:{overall:82,compat:78,structural:80,commercial:88},artists:'Alan Walker × Chinese artists, CORSAK, Lay Zhang'},
+  'Mandopop+K-Pop':{name:'CK-Pop',tip:'The two biggest Asian pop markets converging. K-Pop production precision + Mandarin melodic tradition = the Asian pop superpower.',q:{overall:88,compat:86,structural:86,commercial:92},artists:'EXO, NCT, f(x), Jay Chou × K-Pop collaborations'},
+  'Mandopop+Jazz':{name:'Chinese Jazz',tip:'Pentatonic jazz — the five-note scale IS modal jazz. Miles Davis and Chinese folk melody share the same harmonic universe.',q:{overall:82,compat:82,structural:80,commercial:74},artists:'Fujii Kaze (adjacent), Eason Chan (jazz tracks)'},
+  'Mandopop+Bollywood':{name:'Asian Crossover',tip:'The two largest Asian music traditions. Pentatonic melodies + raga scales = melodic complexity no Western scale can touch.',q:{overall:78,compat:76,structural:76,commercial:80},artists:'Experimental — emerging Asian fusion territory'},
+  'Mandopop+Arabesque':{name:'Silk Road Fusion',tip:'The ancient trade route as musical metaphor. Pentatonic meets maqam. Erhu meets oud. 3000 years of cultural exchange in a song.',q:{overall:76,compat:74,structural:74,commercial:72},artists:'Yo-Yo Ma (Silk Road), Kitaro, experimental territory'}
 };
 
 function safeParseLib() {
@@ -9193,40 +9291,128 @@ function copyBuilderPrompt(){
 // ═══════════════════════════════════════════════════════
 // FUSION MATRIX + QUALITY PREDICTOR
 // ═══════════════════════════════════════════════════════
-const FG=['Pop','Hip-Hop','R&B','Neo-Soul','Gospel','K-Pop','EDM','Latin','Reggaeton','Country','Singer-Songwriter','Alt-Rock','Jazz','Reggae','Afrobeats','Blues','Punk'];
+const FG=['Pop','Hip-Hop','R&B','Neo-Soul','Gospel','K-Pop','EDM','Latin','Reggaeton','Country','Singer-Songwriter','Alt-Rock','Jazz','Reggae','Afrobeats','Blues','Punk','Brazilian','Amapiano','Dancehall','Bollywood','Arabesque','Mandopop'];
 
 function scoreColor(s){
-  if(!s)return{bg:'#111118',t:'#303040'};
-  if(s>=93)return{bg:'#0a2818',t:'#40c880'};
-  if(s>=88)return{bg:'#0c2010',t:'#35a868'};
-  if(s>=82)return{bg:'#112016',t:'#2a8850'};
-  if(s>=76)return{bg:'#141a14',t:'#1e6840'};
-  return{bg:'#121610',t:'#185030'};
+  if(!s)return{bg:'#16161e',t:'#404050'};
+  if(s>=93)return{bg:'#052e16',t:'#4ade80'};
+  if(s>=88)return{bg:'#0a2818',t:'#22c55e'};
+  if(s>=82)return{bg:'#1a1c12',t:'#a3e635'};
+  if(s>=76)return{bg:'#1c1a10',t:'#fbbf24'};
+  if(s>=70)return{bg:'#1c1510',t:'#fb923c'};
+  return{bg:'#1c1010',t:'#f87171'};
 }
+
+function scoreBadge(s){
+  if(!s)return{label:'?',color:'#404050',bg:'#16161e'};
+  if(s>=93)return{label:'S+',color:'#4ade80',bg:'#052e16'};
+  if(s>=88)return{label:'A',color:'#22c55e',bg:'#0a2818'};
+  if(s>=82)return{label:'B+',color:'#a3e635',bg:'#1a1c12'};
+  if(s>=76)return{label:'B',color:'#fbbf24',bg:'#1c1a10'};
+  if(s>=70)return{label:'C',color:'#fb923c',bg:'#1c1510'};
+  return{label:'D',color:'#f87171',bg:'#1c1010'};
+}
+
+// ── Tooltip state ──
+let _ftipEl=null;
+function showFusionTip(e,g1,g2){
+  const k1=`${g1}+${g2}`,k2=`${g2}+${g1}`;
+  const fd=FUSION_DATA[k1]||FUSION_DATA[k2];
+  if(!_ftipEl){_ftipEl=document.createElement('div');_ftipEl.className='ftip';document.body.appendChild(_ftipEl);}
+  const s=fd?.q?.overall;
+  const b=scoreBadge(s);
+  _ftipEl.innerHTML=`
+    <div class="ftip-name">${fd?fd.name:g1+' × '+g2}</div>
+    <div class="ftip-genres">${g1} × ${g2}</div>
+    <div class="ftip-score" style="color:${b.color}">${s||'?'} <span class="ftip-badge" style="color:${b.color};background:${b.bg}">${b.label}</span></div>
+    <div class="ftip-tip">${fd?.tip||'Experimental — click to explore'}</div>
+    <div class="ftip-cta">Click to see full breakdown →</div>`;
+  const r=e.target.closest('.fc').getBoundingClientRect();
+  let left=r.right+8,top=r.top;
+  if(left+300>window.innerWidth){left=r.left-308;}
+  if(top+200>window.innerHeight){top=window.innerHeight-210;}
+  if(top<8)top=8;
+  _ftipEl.style.left=left+'px';_ftipEl.style.top=top+'px';
+  _ftipEl.classList.add('on');
+}
+function hideFusionTip(){if(_ftipEl)_ftipEl.classList.remove('on');}
 
 function initFusion(){
   const el=document.getElementById('fm');if(el.innerHTML)return;
   const n=FG.length;
-  let html=`<div class="fgrid" style="grid-template-columns:58px repeat(${n},1fr)">`;
+  let html=`<div class="fgrid" style="grid-template-columns:64px repeat(${n},minmax(44px,1fr))">`;
   html+='<div></div>';
-  FG.forEach(g=>{html+=`<div class="fax" style="font-size:8px;font-weight:700;color:var(--tx4);padding:3px 2px;text-align:center;line-height:1.2">${g}</div>`;});
+  FG.forEach(g=>{
+    const short=g.replace('Singer-Songwriter','S-SW').replace('Neo-Soul','Neo').replace('Alt-Rock','Alt').replace('Afrobeats','Afro').replace('Reggaeton','Regt').replace('Brazilian','Braz').replace('Amapiano','Amapi').replace('Dancehall','Danc').replace('Bollywood','Bolly').replace('Arabesque','Arab').replace('Mandopop','Mando');
+    html+=`<div class="fax">${short}</div>`;
+  });
   FG.forEach((g1,i)=>{
-    html+=`<div class="fax row" style="font-size:8px;font-weight:700;color:var(--tx4);text-align:right;padding-right:4px">${g1}</div>`;
+    const short1=g1.replace('Singer-Songwriter','S-SW').replace('Neo-Soul','Neo').replace('Alt-Rock','Alt').replace('Afrobeats','Afro').replace('Reggaeton','Regt').replace('Brazilian','Braz').replace('Amapiano','Amapi').replace('Dancehall','Danc').replace('Bollywood','Bolly').replace('Arabesque','Arab').replace('Mandopop','Mando');
+    html+=`<div class="fax row">${short1}</div>`;
     FG.forEach((g2,j)=>{
       if(i===j){html+=`<div class="fc empty">—</div>`;return;}
       const k1=`${g1}+${g2}`,k2=`${g2}+${g1}`;
       const fd=FUSION_DATA[k1]||FUSION_DATA[k2];
       const score=fd?.q?.overall;
       const c=scoreColor(score);
-      const lbl=fd?fd.name.split(' ').slice(0,2).join(' '):'?';
-      html+=`<div class="fc" style="background:${c.bg};color:${c.t}" onclick="showFusion('${g1}','${g2}')">
-        <div>${lbl}</div>
-        ${score?`<div class="fc-score">${score}</div>`:''}
+      html+=`<div class="fc" style="background:${c.bg};color:${c.t}" onclick="showFusion('${g1.replace(/'/g,"\\'")}','${g2.replace(/'/g,"\\'")}');hideFusionTip()" onmouseenter="showFusionTip(event,'${g1.replace(/'/g,"\\'")}','${g2.replace(/'/g,"\\'")}');" onmouseleave="hideFusionTip()">
+        ${score?`<div class="fc-score">${score}</div>`:'<div class="fc-score" style="opacity:0.4">?</div>'}
       </div>`;
     });
   });
   html+='</div>';
   el.innerHTML=html;
+  // Also build card list
+  initFusionCards();
+}
+
+function initFusionCards(){
+  const container=document.getElementById('fwrap-cards');
+  if(container.innerHTML)return;
+  // Group fusions by genre
+  const groups={};
+  FG.forEach(g=>{groups[g]=[];});
+  Object.keys(FUSION_DATA).forEach(key=>{
+    const [g1,g2]=key.split('+');
+    const fd=FUSION_DATA[key];
+    if(groups[g1])groups[g1].push({g1,g2,fd,key});
+    if(groups[g2])groups[g2].push({g1,g2,fd,key});
+  });
+  let html='';
+  FG.forEach((genre,gi)=>{
+    const pairs=groups[genre]||[];
+    pairs.sort((a,b)=>(b.fd?.q?.overall||0)-(a.fd?.q?.overall||0));
+    if(!pairs.length)return;
+    const open=gi===0?' open':'';
+    html+=`<div class="fgroup">
+      <div class="fgroup-hdr${open}" onclick="this.classList.toggle('open')">
+        <span class="fgroup-chevron">▶</span>
+        <span class="fgroup-label">${genre} Fusions</span>
+        <span class="fgroup-count">(${pairs.length})</span>
+      </div>
+      <div class="fgroup-cards">`;
+    pairs.forEach(p=>{
+      const s=p.fd?.q?.overall;
+      const c=scoreColor(s);
+      html+=`<div class="fcard" onclick="showFusion('${p.g1.replace(/'/g,"\\'")}','${p.g2.replace(/'/g,"\\'")}')">
+        <div class="fcard-score" style="color:${c.t}">${s||'?'}</div>
+        <div class="fcard-info">
+          <div class="fcard-name">${p.fd.name}</div>
+          <div class="fcard-genres">${p.g1} × ${p.g2}</div>
+          <div class="fcard-tip">${p.fd.tip||''}</div>
+        </div>
+      </div>`;
+    });
+    html+=`</div></div>`;
+  });
+  container.innerHTML=html;
+}
+
+function setFusionView(view){
+  document.getElementById('fv-grid').classList.toggle('on',view==='grid');
+  document.getElementById('fv-list').classList.toggle('on',view==='list');
+  document.getElementById('fwrap-grid').style.display=view==='grid'?'':'none';
+  document.getElementById('fwrap-cards').classList.toggle('on',view==='list');
 }
 
 function showFusion(g1,g2){
