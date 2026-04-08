@@ -9844,6 +9844,7 @@ function lockAnalyzer(msg){
   const ab=document.getElementById('a-btn');if(ab)ab.disabled=true;
   document.getElementById('a-remake').style.display='none';
   document.getElementById('remake-out').innerHTML='';
+  const techPanel=document.getElementById('a-techniques');if(techPanel)techPanel.style.display='none';
 }
 function unlockAnalyzer(){
   btnDone('a-search-btn');
@@ -9863,7 +9864,19 @@ function showTechniquePanel(genre){
   const crossGrid=document.getElementById('a-tech-cross-grid');
   if(!panel||!grid)return;
   // Normalize genre key
-  const gKey=genre.toLowerCase().replace(/[^a-z]/g,'').replace('hiphop','hiphop').replace('rb','rnb').replace('soul','rnb');
+  // Normalize free-text genre labels to GENRE_TECHNIQUES keys
+  const _g=genre.toLowerCase().replace(/[^a-z0-9 /\-]/g,'').trim();
+  const GENRE_ALIAS={'hiphop':'hiphop','hip hop':'hiphop','rap':'hiphop','raphiphop':'hiphop','rb':'rnb','r b':'rnb','rnb':'rnb','rbsoul':'rnb','soul':'rnb',
+    'singersongwriter':'ss','singer songwriter':'ss','ss':'ss','altrock':'altrock','alt rock':'altrock','alternative':'altrock',
+    'neosoul':'neosoul','neo soul':'neosoul','kpop':'kpop','k pop':'kpop','edm':'edm','electronic':'edm',
+    'tvmusical':'tvmusical','tv musical':'tvmusical','musical':'tvmusical','childrens':'children','children':'children',
+    'afrobeats':'afrobeats','afrobeat':'afrobeats','reggaeton':'reggaeton','dancehall':'dancehall',
+    'pop':'pop','rock':'rock','country':'country','folk':'folk','latin':'latin','metal':'metal',
+    'jazz':'jazz','blues':'blues','reggae':'reggae','punk':'punk','gospel':'gospel',
+    'brazilian':'brazilian','amapiano':'amapiano','bollywood':'bollywood','arabesque':'arabesque','mandopop':'mandopop',
+    'parody':'parody','comedy':'comedy'};
+  const gStripped=_g.replace(/[^a-z]/g,'');
+  const gKey=GENRE_ALIAS[gStripped]||GENRE_ALIAS[_g]||gStripped;
   const techniques=GENRE_TECHNIQUES[gKey]||GENRE_TECHNIQUES.pop||[];
   if(!techniques.length){panel.style.display='none';return;}
   // Render primary genre techniques
@@ -9916,7 +9929,7 @@ function getCrossGenreTechniques(currentGenre){
     reggaeton:['latin','dancehall','hiphop','amapiano'],
     neosoul:['rnb','jazz','gospel','hiphop'],
     gospel:['rnb','neosoul','country','blues'],
-    brazilian:['jazz','latin','bossanova','reggae'],
+    brazilian:['jazz','latin','neosoul','reggae'],
     amapiano:['dancehall','edm','hiphop','reggaeton'],
     dancehall:['reggae','reggaeton','hiphop','amapiano'],
     bollywood:['latin','edm','rnb','arabesque'],
@@ -10062,6 +10075,8 @@ SONGWRITER TAKEAWAYS:
     // Display analysis with enriched header
     const bpmParsed=(raw.match(/BPM:\s*(\d+)/)||[])[1]||'';
     const keyParsed=(raw.match(/KEY:\s*(.+)/i)||[])[1]||'';
+    // Store clean text for copy (avoids copying UI elements)
+    S._searchAnalysisText=`${songTitle} by ${songArtist} (${songYear})${bpmParsed?' · '+bpmParsed+' BPM':''}${keyParsed?' · Key of '+keyParsed.trim():''}\n${songStructure?'Structure: '+songStructure+'\n':''}\n${raw}`;
     document.getElementById('a-out').innerHTML=`<div class="card" style="border-left:3px solid var(--amber)">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">
         <div>
@@ -10070,12 +10085,12 @@ SONGWRITER TAKEAWAYS:
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
           <span class="bdg bdg-gold">${escHtml(songGenre)}</span>
-          <button class="btn btn-sm" onclick="safeCopy(document.getElementById('a-out').innerText,'Analysis')" style="font-size:11px">📋 Copy</button>
+          <button class="btn btn-sm" onclick="safeCopy(S._searchAnalysisText,'Analysis')" style="font-size:11px">📋 Copy</button>
         </div>
       </div>
       ${songStructure?`<div style="background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;font-family:var(--mono);color:var(--cyan);overflow-x:auto;white-space:nowrap">📐 ${escHtml(songStructure)}</div>`:''}
       <div style="font-size:13px;line-height:1.8;white-space:pre-wrap">${escHtml(raw).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
-      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--b1);text-align:center;font-size:11px;color:var(--tx4)">⬇️ Scroll down to remix this song's DNA into something new</div>
+      <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--b1);text-align:center;font-size:11px;color:var(--tx4)">⬇️ Select techniques below, then add your twist to remix this song's DNA</div>
     </div>`;
     // Store analysis DNA for Remake — build a virtual song object
     const virtualSong={t:songTitle,a:songArtist,yr:songYear,structure:songStructure,key:songGenre+' — searched song',score:'?'};
@@ -10275,9 +10290,19 @@ WHY THIS WORKS: [2-3 sentences on why this remake carries the original's magic w
 // 🔄 Remake — Push to Editor
 function remakePushToEditor(){
   if(!S._remakeLyrics){toast('No lyrics to edit');return;}
+  // Set S.currentSong so editor save/export functions work correctly
+  S.currentSong={
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    title:S._remakeTitle||'Untitled Remake',
+    lyrics:S._remakeLyrics,
+    style:S._remakePrompt||'',
+    genre:S._remakeGenre||'',
+    topic:S._remakeTwist||'',
+    verdict:'Remade from '+((S.lastAnalysis?.song?.t)||'original song'),
+    techniques_used:S.selectedTechniques.map(t=>t.id),
+    ts:Date.now()
+  };
   loadLyricsIntoEditor(S._remakeLyrics,S._remakeTitle||'Untitled Remake');
-  // Set editor song metadata
-  S.editorSong={title:S._remakeTitle||'Untitled Remake',lyrics:S._remakeLyrics,genre:S._remakeGenre||'',topic:S._remakeTwist||''};
   navTo('editor');
   toast('✓ Loaded remake into Editor');
 }
@@ -10285,16 +10310,24 @@ function remakePushToEditor(){
 // 🔄 Remake — Save to main Library
 function remakeSaveToLib(){
   if(!S._remakeLyrics){toast('Nothing to save');return;}
+  const id=Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+  // Check for duplicate by title
+  const existing=S.library.findIndex(s=>s.title===S._remakeTitle);
+  if(existing>=0){toast('Already saved');return;}
   const song={
+    id,
     title:S._remakeTitle||'Untitled Remake',
     lyrics:S._remakeLyrics,
+    style:S._remakePrompt||'',
     prompt:S._remakePrompt||'',
     genre:S._remakeGenre||'',
     topic:S._remakeTwist||'',
+    verdict:'Remade from '+((S.lastAnalysis?.song?.t)||'original song'),
+    techniques_used:S.selectedTechniques.map(t=>t.id),
     ts:Date.now()
   };
   S.library.push(song);
-  try{localStorage.setItem('soniq_lib',JSON.stringify(S.library));}catch(e){}
+  persistLib();
   const btn=document.getElementById('remake-save-btn');
   if(btn){btn.textContent='✓ Saved';btn.disabled=true;}
   toast('✓ Saved to Library');
@@ -10306,11 +10339,18 @@ function remakeRate(isLike){
   const dislikeBtn=document.getElementById('remake-dislike-btn');
   if(likeBtn) likeBtn.style.opacity=isLike?'1':'0.3';
   if(dislikeBtn) dislikeBtn.style.opacity=isLike?'0.3':'1';
-  // Update in learned songs
+  // Update in learned songs — match using same key as learnSong() (title+artist)
   const songs=getLearnedSongs();
-  const key=((S._remakeTitle||'')+('remake')).toLowerCase().replace(/\s/g,'');
-  const match=songs.find(s=>(s.title+(s.source||'')).toLowerCase().replace(/\s/g,'')===key);
-  if(match){match.user_rating=isLike?5:1;match.updated_at=new Date().toISOString();saveLearnedSongs(songs);}
+  const a=S.lastAnalysis;
+  const artist=a?.song?.a||a?.song?.artist||'';
+  const title=a?.song?.t||a?.song?.title||S._remakeTitle||'';
+  const key=(title+artist).toLowerCase().replace(/\s/g,'');
+  const match=songs.find(s=>(s.title+(s.artist||'')).toLowerCase().replace(/\s/g,'')===key);
+  if(match){
+    match.user_rating=isLike?5:1;
+    match.updated_at=new Date().toISOString();
+    saveLearnedSongs(songs);
+  }
   toast(isLike?'👍 Liked!':'👎 Noted — we\'ll learn from this');
 }
 
@@ -10469,6 +10509,7 @@ function reopenAnalysis(idx){
     S.lastAnalysis={raw:s.analysis_raw,genre:s.genre,genreLabel:s.genre,song:virtualSong,songList:`"${s.title}" by ${s.artist} (${s.year}). Structure: ${s.structure}`};
     S.selectedSong=virtualSong;
     showRemakePanel(virtualSong,s.genre,s.analysis_raw);
+    showTechniquePanel(s.genre);
     toast(`📚 Loaded "${s.title}" from library`);
     // Scroll to output
     document.getElementById('a-out').scrollIntoView({behavior:'smooth',block:'start'});
