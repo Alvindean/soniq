@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SONIQ — New Features UI Preview</title>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --s1: #101018;
+  --s2: #16161f;
+  --s3: #1c1c28;
+  --s4: #242434;
+  --b1: #2a2a3a;
+  --b2: #3a3a4e;
+  --b3: #4a4a5e;
+  --tx1: #f0f0f5;
+  --tx2: #c0c0d0;
+  --tx3: #8080a0;
+  --tx4: #606080;
+  --amber: #f59e0b;
+  --amberline: rgba(245,158,11,.25);
+  --amberbg: rgba(245,158,11,.08);
+  --cyan: #06b6d4;
+  --cyanline: rgba(6,182,212,.25);
+  --cyanbg: rgba(6,182,212,.08);
+  --violet: #7c3aed;
+  --violetline: rgba(124,58,237,.25);
+  --violetbg: rgba(124,58,237,.08);
+  --green: #22c55e;
+  --red: #ef4444;
+  --r2: 8px;
+  --r3: 12px;
+  --sp-md: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { background: var(--bg); color: var(--tx1); font-family: var(--font); padding: 24px; max-width: 680px; margin: 0 auto; }
+h2 { color: var(--amber); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; margin: 32px 0 12px; }
+.preview-label { color: var(--tx4); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+
+/* Output Footer Bar */
+.output-footer-bar{display:flex;align-items:center;flex-wrap:wrap;gap:6px 4px;padding:var(--sp-md) 0;border-top:1px solid var(--b1);margin-top:8px}
+.ofb-item{font-size:11px;color:var(--tx4);font-weight:500;cursor:pointer;transition:color .15s;border-radius:4px;padding:2px 6px}
+.ofb-item:hover{color:var(--cyan);background:var(--cyanbg)}
+.ofb-sep{color:var(--b2);font-size:11px}
+
+/* Hook Score Mini Card */
+.hook-score-mini{background:var(--s2);border:1px solid var(--amberline);border-radius:var(--r2);padding:12px 16px;margin-top:10px}
+.hook-score-mini .hsm-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hook-score-mini .hsm-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
+.hook-score-mini .hsm-num{font-size:20px;font-weight:800;color:var(--amber)}
+.hook-score-mini .hsm-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.hook-score-mini .hsm-item{font-size:11px;color:var(--tx3);display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid var(--b1)}
+.hook-score-mini .hsm-item-val{font-weight:700;color:var(--tx2)}
+
+/* Section Switcher */
+.section-switcher{background:var(--s2);border:1px solid var(--cyanline);border-radius:var(--r3);margin-bottom:16px;overflow:hidden}
+.ss-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--cyanbg)}
+.ss-hdr-title{font-size:10px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.08em}
+.ss-body{padding:14px 16px}
+.ss-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:8px 12px;outline:none;font-family:var(--font);margin-bottom:10px;cursor:pointer}
+.ss-section-text{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:80px;line-height:1.6;font-family:var(--font)}
+.ss-presets{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
+.ss-preset{font-size:10px;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s}
+.ss-preset:hover{background:var(--s4);color:var(--tx2);border-color:var(--cyanline)}
+.ss-preset.active{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
+.ss-actions{display:flex;gap:8px;margin-top:10px;align-items:center;flex-wrap:wrap}
+.btn{padding:8px 16px;border-radius:var(--r2);border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font)}
+.btn-cyan{background:var(--cyan);color:#000}
+.btn-secondary{background:var(--s3);border:1px solid var(--b2);color:var(--tx2)}
+
+/* DJ FX Panel */
+.djfx-panel{background:var(--s2);border:1px solid var(--violetline);border-radius:var(--r3);margin-bottom:16px;overflow:hidden}
+.djfx-hdr{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--b1);background:var(--violetbg)}
+.djfx-hdr-title{font-size:10px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.08em}
+.djfx-body{padding:14px 16px}
+.djfx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}
+.djfx-btn{font-size:11px;font-weight:600;padding:8px 10px;border-radius:var(--r2);border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .15s;text-align:center}
+.djfx-btn:hover{background:var(--s4);color:var(--violet);border-color:var(--violetline)}
+.djfx-btn.inserted{background:var(--violetbg);border-color:var(--violetline);color:var(--violet)}
+.djfx-hint{font-size:11px;color:var(--tx4);margin-top:8px}
+</style>
+</head>
+<body>
+
+<h1 style="font-size:18px;margin-bottom:6px">SONIQ New Features Preview</h1>
+<p style="font-size:12px;color:var(--tx3);margin-bottom:24px">Visual audit of 4 new UI components</p>
+
+<!-- 1. OUTPUT FOOTER BAR -->
+<h2>1. Clickable Output Footer Bar</h2>
+<p class="preview-label">Before: static labels. Now: clickable jump links</p>
+<div class="output-footer-bar">
+  <span class="ofb-item" role="button" tabindex="0">📝 Lyrics</span>
+  <span class="ofb-sep">·</span>
+  <span class="ofb-item" role="button" tabindex="0">🎛 Production Brief</span>
+  <span class="ofb-sep">·</span>
+  <span class="ofb-item" role="button" tabindex="0">🏗 Structure</span>
+  <span class="ofb-sep">·</span>
+  <span class="ofb-item" role="button" tabindex="0">🎯 Dopamine Map</span>
+  <span class="ofb-sep">·</span>
+  <span class="ofb-item" role="button" tabindex="0">🎣 Hook Score</span>
+  <span class="ofb-sep">·</span>
+  <span class="ofb-item" role="button" tabindex="0">📊 Song Score</span>
+</div>
+
+<!-- 2. HOOK SCORE MINI CARD -->
+<h2>2. Hook Score Mini Card (Chorus-Only Analysis)</h2>
+<p class="preview-label">Separate from Song Score. Local calc, instant, 0-10 scale</p>
+<div class="hook-score-mini">
+  <div class="hsm-hdr">
+    <span class="hsm-title">🎣 Hook Score — Chorus Analysis</span>
+    <span class="hsm-num">7.6</span>
+  </div>
+  <div class="hsm-grid">
+    <div class="hsm-item"><span>Syllable Count</span><span class="hsm-item-val">10/10</span></div>
+    <div class="hsm-item"><span>Repetition</span><span class="hsm-item-val">6/10</span></div>
+    <div class="hsm-item"><span>Singability</span><span class="hsm-item-val">8/10</span></div>
+    <div class="hsm-item"><span>Zeigarnik</span><span class="hsm-item-val">6/10</span></div>
+    <div class="hsm-item"><span>Genre Purity</span><span class="hsm-item-val">8/10</span></div>
+  </div>
+</div>
+
+<!-- 3. SECTION SWITCHER -->
+<h2>3. Section Switcher</h2>
+<p class="preview-label">Edit one section at a time with smart presets</p>
+<div class="section-switcher">
+  <div class="ss-hdr">
+    <span class="ss-hdr-title">🎯 Section Switcher — Edit one section at a time</span>
+  </div>
+  <div class="ss-body">
+    <select class="ss-select">
+      <option>Select a section…</option>
+      <option selected>Chorus</option>
+      <option>Verse 1</option>
+      <option>Pre-Chorus</option>
+      <option>Bridge</option>
+      <option>Outro</option>
+    </select>
+    <div class="ss-presets">
+      <span class="ss-preset active">More anthemic</span>
+      <span class="ss-preset">Punchier hook</span>
+      <span class="ss-preset">Add ad-libs</span>
+      <span class="ss-preset">Simplify melody</span>
+      <span class="ss-preset">Emotional peak</span>
+    </div>
+    <textarea class="ss-section-text" placeholder="Chorus lyrics appear here for editing…">I can feel the fire rising
+Every word a spark that burns
+We were always meant for something
+Now it's finally our turn</textarea>
+    <div class="ss-actions">
+      <button class="btn btn-cyan">✏️ Apply Changes</button>
+      <button class="btn btn-secondary">🤖 AI Rewrite</button>
+      <span style="font-size:11px;color:var(--tx4)">Changes apply only to the selected section</span>
+    </div>
+  </div>
+</div>
+
+<!-- 4. DJ FX PANEL -->
+<h2>4. DJ FX Panel</h2>
+<p class="preview-label">12 production effects, insert bracket tags into lyrics</p>
+<div class="djfx-panel">
+  <div class="djfx-hdr">
+    <span class="djfx-hdr-title">🎚️ DJ FX — Insert production effects</span>
+  </div>
+  <div class="djfx-body">
+    <div class="djfx-grid">
+      <button class="djfx-btn">🌊 Filter Sweep</button>
+      <button class="djfx-btn inserted">💥 Drop</button>
+      <button class="djfx-btn">📈 Build-Up</button>
+      <button class="djfx-btn">🔇 Breakdown</button>
+      <button class="djfx-btn">🔊 Echo Out</button>
+      <button class="djfx-btn">⏪ Reverse Reverb</button>
+      <button class="djfx-btn">💿 Vinyl Brake</button>
+      <button class="djfx-btn">🔁 Stutter</button>
+      <button class="djfx-btn">🌀 Reverb Wash</button>
+      <button class="djfx-btn">🚪 Gated Reverb</button>
+      <button class="djfx-btn">〰️ Tremolo</button>
+      <button class="djfx-btn">📼 Tape Distortion</button>
+    </div>
+    <div class="djfx-hint">Select a section in the Section Switcher above, then click an FX to insert it</div>
+  </div>
+</div>
+
+<div style="margin-top:40px;padding:16px;background:var(--s2);border-radius:var(--r3);border:1px solid var(--b1)">
+  <div style="font-size:10px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">UI/UX Audit Notes</div>
+  <ul style="font-size:12px;color:var(--tx3);line-height:1.8;padding-left:16px">
+    <li>Footer bar items highlight cyan on hover — clear affordance they're clickable</li>
+    <li>Hook Score (chorus, 0-10) clearly separated from Song Score (AI, 0-100)</li>
+    <li>Section Switcher presets change per section type (verse/chorus/bridge/etc)</li>
+    <li>DJ FX shows "inserted" state with violet highlight after clicking</li>
+    <li>All components use consistent SONIQ design language (colors, radii, spacing)</li>
+    <li>Accessible: role="button", tabindex="0" on footer items</li>
+  </ul>
+</div>
+
+</body>
+</html>

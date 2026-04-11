@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SONIQ Endpoint Monitor — 2026-04-10</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 32px; background: #0a0a0f; color: #e0e0e0; }
+  h1 { color: #fff; font-size: 24px; margin-bottom: 4px; }
+  .subtitle { color: #888; font-size: 14px; margin-bottom: 24px; }
+  .summary-bar { display: flex; gap: 16px; margin-bottom: 28px; }
+  .summary-card { padding: 16px 24px; border-radius: 10px; flex: 1; text-align: center; }
+  .summary-card .num { font-size: 32px; font-weight: 700; }
+  .summary-card .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-top: 4px; color: #aaa; }
+  .ok-card { background: #0d2818; border: 1px solid #1a5c2e; }
+  .ok-card .num { color: #4ade80; }
+  .warn-card { background: #2a1f00; border: 1px solid #5c4a00; }
+  .warn-card .num { color: #facc15; }
+  .crit-card { background: #2a0a0a; border: 1px solid #5c1a1a; }
+  .crit-card .num { color: #f87171; }
+  table { width: 100%; border-collapse: collapse; background: #12121a; border-radius: 10px; overflow: hidden; }
+  th { background: #1a1a2e; color: #aaa; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px; text-align: left; }
+  td { padding: 12px 16px; border-bottom: 1px solid #1e1e2e; font-size: 14px; }
+  tr:last-child td { border-bottom: none; }
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+  .badge-ok { background: #0d2818; color: #4ade80; }
+  .badge-warn { background: #2a1f00; color: #facc15; }
+  .badge-crit { background: #2a0a0a; color: #f87171; }
+  .code { font-family: 'SF Mono', monospace; font-size: 13px; }
+  .note { margin-top: 24px; padding: 16px; background: #1a1a2e; border-left: 3px solid #6366f1; border-radius: 6px; font-size: 13px; color: #aaa; }
+  .crit-section { margin-top: 28px; padding: 20px; background: #1a0a0a; border: 1px solid #5c1a1a; border-radius: 10px; }
+  .crit-section h2 { color: #f87171; font-size: 18px; margin: 0 0 12px 0; }
+</style>
+</head>
+<body>
+
+<h1>SONIQ Endpoint Monitor</h1>
+<p class="subtitle">Production: www.mysoniq.com &mdash; Scan: April 10, 2026 at 7:07 PM UTC</p>
+
+<div class="summary-bar">
+  <div class="summary-card ok-card">
+    <div class="num">7</div>
+    <div class="label">OK</div>
+  </div>
+  <div class="summary-card warn-card">
+    <div class="num">2</div>
+    <div class="label">Warning</div>
+  </div>
+  <div class="summary-card crit-card">
+    <div class="num">2</div>
+    <div class="label">Critical</div>
+  </div>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Endpoint</th>
+      <th>Expected</th>
+      <th>Received</th>
+      <th>Status</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td class="code">/api/health</td>
+      <td class="code">200</td>
+      <td class="code">200</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Supabase OK, Redis OK (3 songs), Crypto OK. <strong>Note:</strong> SUPABASE_SERVICE_KEY = false</td>
+    </tr>
+    <tr>
+      <td class="code">/api/analytics</td>
+      <td class="code">401</td>
+      <td class="code">TIMEOUT</td>
+      <td><span class="badge badge-crit">CRITICAL</span></td>
+      <td>Function unresponsive — 3 consecutive attempts all timed out. Possible FUNCTION_INVOCATION_FAILED.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/founding</td>
+      <td class="code">200</td>
+      <td class="code">200</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Returning correct tier data. Tier 1 active, 500 spots, $5/mo.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/generate</td>
+      <td class="code">401/405</td>
+      <td class="code">405</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Correctly rejects GET with "Method not allowed". POST-only endpoint working.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/stripe</td>
+      <td class="code">405</td>
+      <td class="code">405</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Correctly rejects GET. POST-only endpoint.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/stream</td>
+      <td class="code">401/405</td>
+      <td class="code">405</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Correctly rejects GET. POST-only with admin token required.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/community</td>
+      <td class="code">200/405</td>
+      <td class="code">400</td>
+      <td><span class="badge badge-warn">WARNING</span></td>
+      <td>Returns 400 "unknown_action" instead of expected 200/405. Needs an action query param — functional but unexpected status.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/admin</td>
+      <td class="code">401</td>
+      <td class="code">TIMEOUT</td>
+      <td><span class="badge badge-crit">CRITICAL</span></td>
+      <td>Function unresponsive — 3 consecutive attempts all timed out. Possible FUNCTION_INVOCATION_FAILED.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/publish</td>
+      <td class="code">401</td>
+      <td class="code">401</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Correctly returns "unauthorized" for unauthenticated request.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/track</td>
+      <td class="code">405</td>
+      <td class="code">405</td>
+      <td><span class="badge badge-ok">OK</span></td>
+      <td>Correctly rejects GET. POST-only endpoint.</td>
+    </tr>
+    <tr>
+      <td class="code">/api/aff</td>
+      <td class="code">302/200</td>
+      <td class="code">400</td>
+      <td><span class="badge badge-warn">WARNING</span></td>
+      <td>Returns 400 "Unknown partner" — functional but requires a partner code param to redirect. Behaves correctly given no input.</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="crit-section">
+  <h2>CRITICAL ISSUES — Immediate Attention Required</h2>
+  <p><strong>/api/analytics</strong> — This endpoint is completely unresponsive. Three consecutive fetch attempts all resulted in timeouts. The serverless function is likely crashing on invocation (FUNCTION_INVOCATION_FAILED). This affects any dashboard or analytics reporting that depends on this endpoint.</p>
+  <p><strong>/api/admin</strong> — This endpoint is completely unresponsive. Three consecutive fetch attempts all resulted in timeouts. The serverless function is likely crashing on invocation (FUNCTION_INVOCATION_FAILED). This blocks all admin panel operations.</p>
+  <p style="margin-top: 16px; color: #888;"><strong>Recommended next step:</strong> Check Vercel function logs for both endpoints to identify the crash cause. Common culprits: missing environment variable, unhandled promise rejection, or dependency import failure.</p>
+</div>
+
+<div class="note">
+  <strong>Health check detail:</strong> SUPABASE_SERVICE_KEY shows <code>false</code> in /api/health. This may indicate the service key is not set in the production environment. Verify this is intentional — if the analytics or admin functions depend on the service key, this could be the root cause of both CRITICAL failures.
+</div>
+
+</body>
+</html>

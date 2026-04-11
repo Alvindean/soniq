@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fusion UI Preview</title>
+<style>
+:root{--s1:#0a0a12;--s2:#10101a;--s3:#16161e;--s4:#1c1c28;--s5:#222232;--b1:#1e1e2e;--b2:#2a2a3a;--tx1:#f0f0f5;--tx2:#a0a0b0;--tx3:#707080;--tx4:#505060;--cyan:#22d3ee;--cyanbg:rgba(34,211,238,0.08);--cyanline:rgba(34,211,238,0.25);--green:#4ade80;--amber:#fbbf24;--amberline:rgba(251,191,36,0.25);--red:#f87171;--violet:#a78bfa;--r2:8px;--r3:12px;--mono:'SF Mono',monospace;font-family:system-ui,-apple-system,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--s1);color:var(--tx1);padding:20px;max-width:1200px;margin:0 auto}
+.card{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r3);padding:20px}
+.ctitle{font-size:18px;font-weight:700;margin-bottom:12px}
+.tipbox{font-size:11px;color:var(--tx3);padding:8px 12px;background:var(--s3);border-radius:var(--r2);line-height:1.5}
+.fgrid{display:grid;gap:2px}
+.fax{font-size:10px;font-weight:700;color:var(--tx2);display:flex;align-items:center;justify-content:center;text-align:center;padding:3px 2px;line-height:1.15;min-width:0}
+.fax.row{justify-content:flex-end;padding-right:6px;text-align:right}
+.fc{border-radius:6px;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;min-height:48px;font-size:9.5px;font-weight:600;border:1px solid transparent;line-height:1.2;text-align:center;gap:2px;position:relative}
+.fc:hover{transform:scale(1.12);z-index:10;position:relative;border-color:rgba(255,255,255,0.25)!important;box-shadow:0 4px 16px rgba(0,0,0,0.5)}
+.fc.empty{background:var(--s3);cursor:default;color:var(--tx4)}
+.fc.empty:hover{transform:none;box-shadow:none}
+.fc-score{font-size:10px;font-weight:800;opacity:0.95}
+.fwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:8px}
+.ftip{position:fixed;z-index:999;background:var(--s1);border:1px solid var(--cyanline);border-radius:var(--r2);padding:12px 14px;min-width:220px;max-width:300px;box-shadow:0 8px 32px rgba(0,0,0,0.6);pointer-events:none;opacity:0;transition:opacity 0.12s}
+.ftip.on{opacity:1}
+.ftip-name{font-size:14px;font-weight:700;color:var(--tx1);margin-bottom:2px}
+.ftip-genres{font-size:11px;color:var(--tx3);margin-bottom:6px}
+.ftip-score{display:inline-flex;align-items:center;gap:6px;font-size:20px;font-weight:800;margin-bottom:6px}
+.ftip-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;letter-spacing:0.02em}
+.ftip-tip{font-size:11px;color:var(--tx2);line-height:1.5}
+.ftip-cta{font-size:10px;color:var(--cyan);margin-top:6px;font-weight:600}
+.fview-toggle{display:flex;gap:0;border:1px solid var(--b2);border-radius:var(--r2);overflow:hidden;width:fit-content}
+.fview-btn{font-size:11px;font-weight:600;padding:6px 14px;cursor:pointer;background:var(--s3);color:var(--tx3);border:none;transition:all 0.12s}
+.fview-btn.on{background:var(--cyanbg);color:var(--cyan);border-color:var(--cyanline)}
+.fview-btn:hover:not(.on){background:var(--s4);color:var(--tx2)}
+.fcards{display:none}
+.fcards.on{display:block}
+.fgroup{margin-bottom:16px}
+.fgroup-hdr{display:flex;align-items:center;gap:8px;padding:8px 0;cursor:pointer;user-select:none}
+.fgroup-hdr:hover .fgroup-label{color:var(--cyan)}
+.fgroup-chevron{font-size:10px;color:var(--tx4);transition:transform 0.15s;width:14px}
+.fgroup-hdr.open .fgroup-chevron{transform:rotate(90deg)}
+.fgroup-label{font-size:13px;font-weight:700;color:var(--tx2);transition:color 0.12s}
+.fgroup-count{font-size:11px;color:var(--tx4);font-weight:600}
+.fgroup-cards{display:none;padding-left:4px}
+.fgroup-hdr.open+.fgroup-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px;padding-top:4px;padding-bottom:8px}
+.fcard{background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:12px 14px;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;gap:12px}
+.fcard:hover{border-color:var(--cyanline);background:var(--s3);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+.fcard-score{font-size:22px;font-weight:800;min-width:36px;text-align:center;line-height:1}
+.fcard-info{flex:1;min-width:0}
+.fcard-name{font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:2px}
+.fcard-genres{font-size:10px;color:var(--tx3);margin-bottom:4px}
+.fcard-tip{font-size:11px;color:var(--tx3);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+@media(max-width:600px){.fgroup-hdr.open+.fgroup-cards{grid-template-columns:1fr}}
+h2{font-size:16px;margin:30px 0 10px;color:var(--cyan)}
+</style>
+</head>
+<body>
+<h2>Fusion Grid — Heat Map Preview (sample 8x8)</h2>
+<div class="card">
+<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+  <div class="tipbox" style="margin:0;flex:1;min-width:200px">Heat map: <span style="color:#f87171">red</span> → <span style="color:#fbbf24">amber</span> → <span style="color:#4ade80">green</span> = fusion quality. Click any cell for details.</div>
+  <div class="fview-toggle">
+    <button class="fview-btn on" id="fv-grid" onclick="setView('grid')">⊞ Grid</button>
+    <button class="fview-btn" id="fv-list" onclick="setView('list')">☰ List</button>
+  </div>
+</div>
+<div class="fwrap" id="fwrap-grid"><div id="fm"></div></div>
+<div class="fcards" id="fwrap-cards"></div>
+</div>
+
+<script>
+const FG=['Pop','Hip-Hop','R&B','K-Pop','EDM','Brazilian','Amapiano','Dancehall'];
+const SAMPLE_DATA={
+  'Pop+Hip-Hop':{name:'Pop-Rap',tip:'Never rap the chorus.',q:{overall:95}},
+  'Pop+R&B':{name:'Neo-Soul Pop',tip:'Add ad-libs under chorus.',q:{overall:93}},
+  'Pop+K-Pop':{name:'Global Pop',tip:'Pre-chorus is what separates K-pop.',q:{overall:95}},
+  'Pop+EDM':{name:'Dance Pop',tip:'Drop should remove all verse instruments.',q:{overall:94}},
+  'Pop+Brazilian':{name:'Bossa Pop',tip:'Violão fingerpicking IS the identity.',q:{overall:90}},
+  'Pop+Amapiano':{name:'Amapi-Pop',tip:'Tyla proved this works globally.',q:{overall:92}},
+  'Pop+Dancehall':{name:'Dancehall Pop',tip:'Rihanna built an empire here.',q:{overall:92}},
+  'Hip-Hop+R&B':{name:'Melodic Rap',tip:'Hook must feel completely different from verse.',q:{overall:97}},
+  'Hip-Hop+K-Pop':{name:'K-Hip-Hop',tip:'Rap break must be in Korean.',q:{overall:93}},
+  'Hip-Hop+EDM':{name:'Trap EDM',tip:'808 bass and EDM drop are the same energy.',q:{overall:86}},
+  'Hip-Hop+Brazilian':{name:'Brazilian Rap',tip:'Portuguese rhythmic density over 808s.',q:{overall:84}},
+  'Hip-Hop+Amapiano':{name:'Piano Trap',tip:'Log drum bass replaces the 808.',q:{overall:86}},
+  'Hip-Hop+Dancehall':{name:'Dancehall Rap',tip:'Drake\'s Views era.',q:{overall:90}},
+  'R&B+K-Pop':{name:'K-R&B',tip:'Crisp K-pop production and warm R&B.',q:{overall:91}},
+  'R&B+EDM':{name:'Electronic R&B',tip:'The Weeknd blueprint.',q:{overall:88}},
+  'R&B+Brazilian':{name:'MPB Soul',tip:'Tim Maia invented this.',q:{overall:88}},
+  'R&B+Amapiano':{name:'Amapiano R&B',tip:'Smooth vocals over suspended piano.',q:{overall:88}},
+  'R&B+Dancehall':{name:'Lovers Rock',tip:'Romance over riddim.',q:{overall:86}},
+  'K-Pop+EDM':{name:'K-Pop Dance',tip:'The chorus IS the drop.',q:{overall:94}},
+  'K-Pop+Brazilian':{name:'K-Bossa',tip:'Experimental — K-pop precision + bossa.',q:{overall:72}},
+  'K-Pop+Amapiano':{name:'K-Piano',tip:'Emerging fusion territory.',q:{overall:78}},
+  'K-Pop+Dancehall':{name:'K-Dancehall',tip:'Caribbean influence in K-pop.',q:{overall:74}},
+  'EDM+Brazilian':{name:'Brazilian Bass',tip:'Alok built a global sound.',q:{overall:86}},
+  'EDM+Amapiano':{name:'Amapiano House',tip:'Deep house + log drum.',q:{overall:90}},
+  'EDM+Dancehall':{name:'Electronic Dancehall',tip:'Major Lazer.',q:{overall:88}},
+  'Brazilian+Amapiano':{name:'Afro-Bossa',tip:'Experimental cross-continental groove.',q:{overall:76}},
+  'Brazilian+Dancehall':{name:'Caribbean Bossa',tip:'Reggae brasileiro meets riddim.',q:{overall:74}},
+  'Amapiano+Dancehall':{name:'Caribbean Piano',tip:'Log drum meets riddim.',q:{overall:84}},
+};
+
+function scoreColor(s){
+  if(!s)return{bg:'#16161e',t:'#404050'};
+  if(s>=93)return{bg:'#052e16',t:'#4ade80'};
+  if(s>=88)return{bg:'#0a2818',t:'#22c55e'};
+  if(s>=82)return{bg:'#1a1c12',t:'#a3e635'};
+  if(s>=76)return{bg:'#1c1a10',t:'#fbbf24'};
+  if(s>=70)return{bg:'#1c1510',t:'#fb923c'};
+  return{bg:'#1c1010',t:'#f87171'};
+}
+function scoreBadge(s){
+  if(!s)return{label:'?',color:'#404050',bg:'#16161e'};
+  if(s>=93)return{label:'S+',color:'#4ade80',bg:'#052e16'};
+  if(s>=88)return{label:'A',color:'#22c55e',bg:'#0a2818'};
+  if(s>=82)return{label:'B+',color:'#a3e635',bg:'#1a1c12'};
+  if(s>=76)return{label:'B',color:'#fbbf24',bg:'#1c1a10'};
+  if(s>=70)return{label:'C',color:'#fb923c',bg:'#1c1510'};
+  return{label:'D',color:'#f87171',bg:'#1c1010'};
+}
+
+let _ftipEl=null;
+function showTip(e,g1,g2){
+  const k1=g1+'+'+g2,k2=g2+'+'+g1;
+  const fd=SAMPLE_DATA[k1]||SAMPLE_DATA[k2];
+  if(!_ftipEl){_ftipEl=document.createElement('div');_ftipEl.className='ftip';document.body.appendChild(_ftipEl);}
+  const s=fd?.q?.overall;
+  const b=scoreBadge(s);
+  _ftipEl.innerHTML=`
+    <div class="ftip-name">${fd?fd.name:g1+' × '+g2}</div>
+    <div class="ftip-genres">${g1} × ${g2}</div>
+    <div class="ftip-score" style="color:${b.color}">${s||'?'} <span class="ftip-badge" style="color:${b.color};background:${b.bg}">${b.label}</span></div>
+    <div class="ftip-tip">${fd?.tip||'Experimental — click to explore'}</div>
+    <div class="ftip-cta">Click to see full breakdown →</div>`;
+  const r=e.target.closest('.fc').getBoundingClientRect();
+  let left=r.right+8,top=r.top;
+  if(left+300>window.innerWidth)left=r.left-308;
+  if(top+200>window.innerHeight)top=window.innerHeight-210;
+  if(top<8)top=8;
+  _ftipEl.style.left=left+'px';_ftipEl.style.top=top+'px';
+  _ftipEl.classList.add('on');
+}
+function hideTip(){if(_ftipEl)_ftipEl.classList.remove('on');}
+
+// Build grid
+const n=FG.length;
+let html=`<div class="fgrid" style="grid-template-columns:64px repeat(${n},minmax(44px,1fr))">`;
+html+='<div></div>';
+FG.forEach(g=>{
+  const short=g.replace('Hip-Hop','HH').replace('Brazilian','Braz').replace('Amapiano','Amapi').replace('Dancehall','Danc');
+  html+=`<div class="fax">${short}</div>`;
+});
+FG.forEach((g1,i)=>{
+  const short1=g1.replace('Hip-Hop','HH').replace('Brazilian','Braz').replace('Amapiano','Amapi').replace('Dancehall','Danc');
+  html+=`<div class="fax row">${short1}</div>`;
+  FG.forEach((g2,j)=>{
+    if(i===j){html+=`<div class="fc empty">—</div>`;return;}
+    const k1=g1+'+'+g2,k2=g2+'+'+g1;
+    const fd=SAMPLE_DATA[k1]||SAMPLE_DATA[k2];
+    const score=fd?.q?.overall;
+    const c=scoreColor(score);
+    html+=`<div class="fc" style="background:${c.bg};color:${c.t}" onmouseenter="showTip(event,'${g1}','${g2}')" onmouseleave="hideTip()">
+      ${score?`<div class="fc-score">${score}</div>`:'<div class="fc-score" style="opacity:0.4">?</div>'}
+    </div>`;
+  });
+});
+html+='</div>';
+document.getElementById('fm').innerHTML=html;
+
+// Build cards
+const groups={};
+FG.forEach(g=>{groups[g]=[];});
+Object.keys(SAMPLE_DATA).forEach(key=>{
+  const [g1,g2]=key.split('+');
+  const fd=SAMPLE_DATA[key];
+  if(groups[g1])groups[g1].push({g1,g2,fd,key});
+  if(groups[g2])groups[g2].push({g1,g2,fd,key});
+});
+let chtml='';
+FG.forEach((genre,gi)=>{
+  const pairs=groups[genre]||[];
+  pairs.sort((a,b)=>(b.fd?.q?.overall||0)-(a.fd?.q?.overall||0));
+  if(!pairs.length)return;
+  const open=gi===0?' open':'';
+  chtml+=`<div class="fgroup"><div class="fgroup-hdr${open}" onclick="this.classList.toggle('open')"><span class="fgroup-chevron">▶</span><span class="fgroup-label">${genre} Fusions</span><span class="fgroup-count">(${pairs.length})</span></div><div class="fgroup-cards">`;
+  pairs.forEach(p=>{
+    const s=p.fd?.q?.overall;
+    const c=scoreColor(s);
+    chtml+=`<div class="fcard"><div class="fcard-score" style="color:${c.t}">${s||'?'}</div><div class="fcard-info"><div class="fcard-name">${p.fd.name}</div><div class="fcard-genres">${p.g1} × ${p.g2}</div><div class="fcard-tip">${p.fd.tip||''}</div></div></div>`;
+  });
+  chtml+=`</div></div>`;
+});
+document.getElementById('fwrap-cards').innerHTML=chtml;
+
+function setView(v){
+  document.getElementById('fv-grid').classList.toggle('on',v==='grid');
+  document.getElementById('fv-list').classList.toggle('on',v==='list');
+  document.getElementById('fwrap-grid').style.display=v==='grid'?'':'none';
+  document.getElementById('fwrap-cards').classList.toggle('on',v==='list');
+}
+</script>
+</body>
+</html>
