@@ -1154,6 +1154,24 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .rewrite-cancel:hover{color:var(--tx1)}
 .rewrite-result{margin-top:8px;font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;border-top:1px solid var(--b1);padding-top:8px;display:none}
 .rewrite-use-btn{font-size:11px;font-weight:600;padding:4px 12px;border-radius:99px;border:1px solid var(--greenline);background:var(--greenbg);color:var(--green);cursor:pointer;margin-top:6px;display:none}
+/* ── SOCIAL KIT ── */
+.skit-modal{position:fixed;inset:0;z-index:9200;background:rgba(0,0,0,0.72);display:none;align-items:center;justify-content:center;padding:16px;}
+.skit-modal.show{display:flex;}
+.skit-box{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r4);width:100%;max-width:620px;max-height:92vh;overflow-y:auto;padding:24px;}
+.skit-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.skit-title{font-size:16px;font-weight:800;color:var(--tx1);}
+.skit-close{background:none;border:none;color:var(--tx3);font-size:20px;cursor:pointer;padding:4px 8px;border-radius:var(--r1);}
+.skit-close:hover{color:var(--tx1);}
+.skit-gen-btn{width:100%;padding:11px;border-radius:var(--r2);border:none;background:linear-gradient(135deg,var(--amber),#f97316);color:#000;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:18px;transition:opacity .15s;}
+.skit-gen-btn:hover{opacity:.88;}
+.skit-gen-btn:disabled{opacity:.4;cursor:default;}
+.skit-section{margin-bottom:18px;}
+.skit-sec-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;}
+.skit-copy-btn{font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;border:1px solid var(--b3);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .15s;}
+.skit-copy-btn:hover{border-color:var(--amber);color:var(--amber);}
+.skit-content{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 14px;font-size:12px;color:var(--tx2);line-height:1.7;min-height:48px;white-space:pre-wrap;word-break:break-word;}
+.skit-badge{display:inline-block;background:var(--s4);border:1px solid var(--b3);border-radius:99px;padding:2px 8px;font-size:10px;font-weight:700;color:var(--tx3);margin-bottom:8px;}
+.skit-ratio{font-size:10px;color:var(--tx4);background:var(--s4);border-radius:4px;padding:2px 6px;}
 /* ── SCORE DASHBOARD ── */
 .score-dashboard{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:18px;margin-bottom:14px;display:none}
 .score-dashboard.visible{display:block}
@@ -1634,6 +1652,31 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .gp-pip.used{background:var(--amber);border-color:var(--amber);}
 .gp-pip.current{background:var(--amber);border-color:var(--amber);box-shadow:0 0 6px rgba(245,192,0,0.5);animation:pipPulse 1.2s ease-in-out infinite;}
 @keyframes pipPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.35);}}
+/* ── Studio Stages Progress Overlay ── */
+#studio-stages{position:fixed;bottom:0;left:0;right:0;z-index:9990;background:linear-gradient(to top,rgba(10,10,14,0.97) 0%,rgba(10,10,14,0.88) 100%);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--b2);padding:14px 20px;display:none;flex-direction:column;gap:8px;align-items:center;}
+#studio-stages.show{display:flex;}
+.ss-track{display:flex;align-items:center;gap:0;width:100%;max-width:600px;}
+.ss-step{display:flex;flex-direction:column;align-items:center;flex:1;position:relative;}
+.ss-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:50%;right:-50%;height:2px;background:var(--b3);z-index:0;}
+.ss-step.done::after{background:var(--amber);}
+.ss-step.active::after{background:linear-gradient(to right,var(--amber),var(--b3));}
+.ss-dot{width:28px;height:28px;border-radius:50%;background:var(--s3);border:2px solid var(--b3);display:flex;align-items:center;justify-content:center;font-size:12px;position:relative;z-index:1;transition:all 0.35s ease;flex-shrink:0;}
+.ss-step.done .ss-dot{background:var(--amber);border-color:var(--amber);color:#000;}
+.ss-step.active .ss-dot{background:var(--s4);border-color:var(--amber);box-shadow:0 0 0 4px rgba(245,192,0,0.18);animation:ssDotPulse 1.1s ease-in-out infinite;}
+.ss-lbl{font-size:9px;color:var(--tx4);margin-top:4px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;text-align:center;white-space:nowrap;}
+.ss-step.active .ss-lbl{color:var(--amber);}
+.ss-step.done .ss-lbl{color:var(--tx3);}
+@keyframes ssDotPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,192,0,0.18);}50%{box-shadow:0 0 0 8px rgba(245,192,0,0.06);}}
+.ss-status{font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.02em;text-align:center;}
+.ss-status span{color:var(--amber);}
+/* ── Producer XP Toast ── */
+#xp-toast{position:fixed;top:64px;right:20px;z-index:10000;background:linear-gradient(135deg,var(--violetbg),var(--s3));border:1px solid var(--violetline);border-radius:var(--r3);padding:10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(0,0,0,0.5);opacity:0;transform:translateY(-12px) scale(0.93);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;}
+#xp-toast.show{opacity:1;transform:translateY(0) scale(1);}
+.xp-icon{font-size:20px;}
+.xp-body{display:flex;flex-direction:column;gap:1px;}
+.xp-label{font-size:11px;font-weight:700;color:var(--violet);text-transform:uppercase;letter-spacing:.06em;}
+.xp-amount{font-size:17px;font-weight:800;color:var(--tx1);}
+.xp-level{font-size:10px;color:var(--tx3);}
 /* Post-gen nudge */
 .gen-nudge{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);z-index:9980;background:linear-gradient(135deg,#1a1408,var(--s3));border:1px solid var(--amberline);border-radius:var(--r4);padding:12px 20px 12px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.55);opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;max-width:480px;white-space:nowrap;}
 .gen-nudge.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto;}
@@ -1745,6 +1788,102 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   <span class="gn-text" id="gn-text">Song <strong>1</strong> generated. <strong>2 left</strong> today.</span>
   <a class="gn-link" href="#" onclick="event.preventDefault();openUpgradeModal();closeGenNudge()">Go Unlimited →</a>
   <button class="gn-close" onclick="closeGenNudge()" title="Dismiss">✕</button>
+</div>
+
+<!-- STUDIO STAGES PROGRESS OVERLAY -->
+<div id="studio-stages">
+  <div class="ss-track">
+    <div class="ss-step" id="ss-s1">
+      <div class="ss-dot" id="ss-d1">⚙</div>
+      <div class="ss-lbl">Prompt</div>
+    </div>
+    <div class="ss-step" id="ss-s2">
+      <div class="ss-dot" id="ss-d2">✍</div>
+      <div class="ss-lbl">Writing</div>
+    </div>
+    <div class="ss-step" id="ss-s3">
+      <div class="ss-dot" id="ss-d3">🎛</div>
+      <div class="ss-lbl">Producing</div>
+    </div>
+    <div class="ss-step" id="ss-s4">
+      <div class="ss-dot" id="ss-d4">🎯</div>
+      <div class="ss-lbl">Scoring</div>
+    </div>
+    <div class="ss-step" id="ss-s5">
+      <div class="ss-dot" id="ss-d5">✅</div>
+      <div class="ss-lbl">Done</div>
+    </div>
+  </div>
+  <div class="ss-status" id="ss-status"><span>Building your song…</span></div>
+</div>
+
+<!-- PRODUCER XP TOAST -->
+<div id="xp-toast">
+  <div class="xp-icon">⚡</div>
+  <div class="xp-body">
+    <div class="xp-label">Producer XP</div>
+    <div class="xp-amount" id="xp-amount">+50 XP</div>
+    <div class="xp-level" id="xp-level">Level 1 · Bedroom Producer</div>
+  </div>
+</div>
+
+<!-- SOCIAL KIT MODAL -->
+<div class="skit-modal" id="skit-modal">
+  <div class="skit-box">
+    <div class="skit-header">
+      <div class="skit-title">📦 Song Publishing Kit</div>
+      <button class="skit-close" onclick="closeSocialKit()">✕</button>
+    </div>
+    <button class="skit-gen-btn" id="skit-gen-btn" onclick="generateSocialKit()">✨ Generate Publishing Kit</button>
+    <div id="skit-content" style="display:none">
+      <div class="skit-section">
+        <div class="skit-sec-label">
+          <span>🖼 Cover Art Prompt <span class="skit-ratio">1:1</span></span>
+          <button class="skit-copy-btn" onclick="skitCopy('skit-cover-art')">Copy</button>
+        </div>
+        <div class="skit-content" id="skit-cover-art">—</div>
+      </div>
+      <div class="skit-section">
+        <div class="skit-sec-label">
+          <span>🎬 Lyric Video Prompt <span class="skit-ratio">9:16</span></span>
+          <button class="skit-copy-btn" onclick="skitCopy('skit-lyric-video')">Copy</button>
+        </div>
+        <div class="skit-content" id="skit-lyric-video">—</div>
+      </div>
+      <div class="skit-section">
+        <div class="skit-sec-label">
+          <span>📝 Caption</span>
+          <button class="skit-copy-btn" onclick="skitCopy('skit-caption')">Copy</button>
+        </div>
+        <div class="skit-content" id="skit-caption">—</div>
+      </div>
+      <div class="skit-section">
+        <div class="skit-sec-label">
+          <span>📄 Description</span>
+          <button class="skit-copy-btn" onclick="skitCopy('skit-description')">Copy</button>
+        </div>
+        <div class="skit-content" id="skit-description">—</div>
+      </div>
+      <div class="skit-section">
+        <div class="skit-sec-label">
+          <span>#️⃣ Hashtags (30)</span>
+          <button class="skit-copy-btn" onclick="skitCopy('skit-hashtags')">Copy</button>
+        </div>
+        <div class="skit-content" id="skit-hashtags">—</div>
+      </div>
+      <div class="skit-section">
+        <div class="skit-sec-label">
+          <span>🎤 Hook Quote <span style="font-size:9px;color:var(--tx4)">(for text overlay)</span></span>
+          <button class="skit-copy-btn" onclick="skitCopy('skit-hook-quote')">Copy</button>
+        </div>
+        <div class="skit-content" id="skit-hook-quote">—</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-sm btn-amber" onclick="skitCopyAll()" style="flex:1;justify-content:center">📋 Copy All</button>
+        <button class="btn btn-sm" onclick="skitSave()" style="flex:1;justify-content:center">💾 Save to Song</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- API KEY BANNER -->
@@ -2555,6 +2694,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-green" onclick="openPublish()" id="publish-btn" style="display:none" title="Register this song for publishing royalties">📜 Publish</button>
         <button class="btn" onclick="openAudioModal('res')" id="audio-btn" style="display:none" title="Add Suno/Udio/SoundCloud audio link">🎵 Audio</button>
         <button class="btn btn-teal" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none" title="Share to SONIQ Community">🌐 Share</button>
+        <button class="btn" onclick="openSocialKit('res')" id="res-skit-btn" style="display:none;background:linear-gradient(135deg,#1a0a2e,var(--s3));border-color:var(--violetline);color:var(--violet)" title="Generate cover art prompt, lyric video, social copy &amp; hashtags">📦 Kit</button>
       </div>
     </div>
 
@@ -2922,6 +3062,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm btn-amber" onclick="showPasteModal()" title="Paste lyrics from clipboard">📥 Paste</button>
         <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
         <button class="btn" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
+        <button class="btn btn-sm" onclick="clearEditor()" title="Clear all lyrics from editor" style="border-color:var(--redline,#7f1d1d);color:var(--red,#f87171);background:transparent">🗑 Clear All</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
@@ -6497,6 +6638,7 @@ DIRECTOR NOTES:
   out.classList.add('visible');
   document.getElementById('output-placeholder')?.classList.add('hide');
   document.getElementById('loaded-banner').style.display='none';
+  setGenStage(1);
   document.getElementById('res-title').textContent='Crafting your song…';
   document.getElementById('res-verdict').textContent='';
   document.getElementById('res-lyrics-text').innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Writing your song…</div><div class="craft-sublabel">Lyrics · Chords · Production Brief · Structure · Dopamine</div></div>';
@@ -6518,6 +6660,7 @@ DIRECTOR NOTES:
     const streamCb = (chunk,full) => {
       if(firstChunk){
         firstChunk=false;
+        setGenStage(2);
         lyricsEl.innerHTML='<pre class="stream-raw" id="stream-display"></pre>';
       }
       const el=document.getElementById('stream-display');
@@ -6526,16 +6669,20 @@ DIRECTOR NOTES:
     let raw, genProdData;
     if (isVercel) {
       // Server-side prompt building — IP stays hidden
+      setGenStage(2);
       const result = await callServerStream('generate', songParams, streamCb, genSignal);
       raw = result.text;
       genProdData = result.meta?.prodData;
     } else {
       // Local dev fallback — client builds prompt
+      setGenStage(2);
       raw = await callClaudeStream(prompt, system, streamCb, genSignal);
     }
+    setGenStage(3);
     S.genController = null;
     parseSongResult(raw, genreLabel, topic, genProdData);
   }catch(e){
+    clearGenStage();
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
     if(e.code==='auth_required'){btnDone('gen-btn');return;}
     if(e.code==='limit_reached'){
@@ -6727,10 +6874,13 @@ function parseSongResult(raw,genre,topic,prodData){
   if (audioBtn) audioBtn.style.display = '';
   const commShareResBtn = document.getElementById('comm-share-res-btn');
   if (commShareResBtn) commShareResBtn.style.display = '';
+  const skitBtn = document.getElementById('res-skit-btn');
+  if (skitBtn) skitBtn.style.display = '';
   // Show revision bar
   const revBar = document.getElementById('res-revision-bar');
   if (revBar) revBar.style.display = 'flex';
   // Hook score (replaces API score dashboard for this)
+  setGenStage(4);
   calcHookScore('res');
   setTimeout(() => loadPromptIntelligence('res'), 400);
   generateScoreDashboard('res', lyrics, genre);
@@ -6738,6 +6888,9 @@ function parseSongResult(raw,genre,topic,prodData){
   // Reset like/dislike buttons
   const likeB = document.getElementById('res-like-btn'); if(likeB) likeB.classList.remove('liked');
   const dislikeB = document.getElementById('res-dislike-btn'); if(dislikeB) dislikeB.classList.remove('disliked');
+  setGenStage(5);
+  setTimeout(clearGenStage, 1200);
+  earnXP(50, genre);
   toast('✓ Song generated: "'+title+'"');
   trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
@@ -13223,6 +13376,217 @@ function initCookieConsent() {
 }
 
 initCookieConsent();
+</script>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// STUDIO STAGES PROGRESS + PRODUCER XP
+// ═══════════════════════════════════════════════════════
+const SS_LABELS = ['', 'Building Prompt…', 'Writing Lyrics…', 'Producing Brief…', 'Scoring Song…', 'Done! ✓'];
+
+function setGenStage(n) {
+  const overlay = document.getElementById('studio-stages');
+  const status = document.getElementById('ss-status');
+  if (!overlay) return;
+  overlay.classList.add('show');
+  for (let i = 1; i <= 5; i++) {
+    const step = document.getElementById('ss-s' + i);
+    if (!step) continue;
+    step.classList.remove('active', 'done');
+    if (i < n) step.classList.add('done');
+    else if (i === n) step.classList.add('active');
+  }
+  if (status) status.innerHTML = '<span>' + (SS_LABELS[n] || '') + '</span>';
+}
+
+function clearGenStage() {
+  const overlay = document.getElementById('studio-stages');
+  if (!overlay) return;
+  overlay.classList.remove('show');
+  for (let i = 1; i <= 5; i++) {
+    const step = document.getElementById('ss-s' + i);
+    if (step) step.classList.remove('active', 'done');
+  }
+}
+
+// ── Producer XP ──
+const XP_LEVELS = [
+  [0,    'Bedroom Producer'],
+  [100,  'Unsigned Artist'],
+  [250,  'Studio Regular'],
+  [500,  'Rising Creator'],
+  [1000, 'Pro Songwriter'],
+  [2000, 'Hit Maker'],
+  [5000, 'Chart Legend'],
+];
+
+function getProducerXP() { return parseInt(localStorage.getItem('soniq_producer_xp') || '0', 10); }
+function setProducerXP(v) { localStorage.setItem('soniq_producer_xp', String(v)); }
+
+function getXPLevel(xp) {
+  let level = XP_LEVELS[0];
+  for (const l of XP_LEVELS) { if (xp >= l[0]) level = l; else break; }
+  return level;
+}
+
+let _xpToastTimer = null;
+function earnXP(amount, reason) {
+  const prev = getProducerXP();
+  const next = prev + amount;
+  setProducerXP(next);
+  const lvl = getXPLevel(next);
+  const prevLvl = getXPLevel(prev);
+  const leveledUp = lvl[1] !== prevLvl[1];
+
+  // Update all XP displays in the UI
+  document.querySelectorAll('#ws-xp, #op-xp').forEach(el => { el.textContent = next; });
+
+  // Show XP toast
+  const toast = document.getElementById('xp-toast');
+  const amtEl = document.getElementById('xp-amount');
+  const lvlEl = document.getElementById('xp-level');
+  if (toast && amtEl && lvlEl) {
+    amtEl.textContent = '+' + amount + ' XP';
+    lvlEl.textContent = leveledUp
+      ? '🎉 Level Up! → ' + lvl[1]
+      : 'Level: ' + lvl[1];
+    toast.classList.add('show');
+    if (_xpToastTimer) clearTimeout(_xpToastTimer);
+    _xpToastTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// LYRIC EDITOR — CLEAR ALL
+// ═══════════════════════════════════════════════════════
+function clearEditor() {
+  if (!confirm('Clear all lyrics from the editor? This cannot be undone.')) return;
+  const body = document.getElementById('ed-body');
+  if (body) body.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--tx4);font-size:13px">Generate a song on the Write page, then click <strong style="color:var(--tx2)">✏️ Edit</strong> to load it here for syllable editing, or click <strong style="color:var(--tx2)">Paste Lyrics</strong> to load any lyrics.</div>';
+  const stats = ['ed-total','ed-avg','ed-over'];
+  stats.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '0'; });
+  if (typeof toast === 'function') toast('Editor cleared');
+}
+
+// ═══════════════════════════════════════════════════════
+// SONG PUBLISHING KIT (Social Media Pack)
+// ═══════════════════════════════════════════════════════
+let _skitSongRef = null;
+
+function openSocialKit(prefix) {
+  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song) { if (typeof toast === 'function') toast('Generate a song first'); return; }
+  _skitSongRef = song;
+  const modal = document.getElementById('skit-modal');
+  if (!modal) return;
+  modal.classList.add('show');
+  // Reset
+  document.getElementById('skit-content').style.display = 'none';
+  const genBtn = document.getElementById('skit-gen-btn');
+  if (genBtn) { genBtn.disabled = false; genBtn.textContent = '✨ Generate Publishing Kit'; }
+}
+
+function closeSocialKit() {
+  const modal = document.getElementById('skit-modal');
+  if (modal) modal.classList.remove('show');
+}
+
+async function generateSocialKit() {
+  const song = _skitSongRef;
+  if (!song) return;
+  const genBtn = document.getElementById('skit-gen-btn');
+  if (genBtn) { genBtn.disabled = true; genBtn.textContent = '⏳ Generating Kit…'; }
+
+  const prompt = `You are a music marketing expert and creative director. For the song below, generate a complete publishing kit optimized for social media.
+
+SONG TITLE: ${song.title || 'Untitled'}
+GENRE: ${song.genre || 'pop'}
+TOPIC: ${song.topic || ''}
+LYRICS SNIPPET:
+${(song.lyrics || '').slice(0, 800)}
+
+Return ONLY valid JSON with this exact structure (no markdown, no extra text):
+{
+  "cover_art": "A detailed Midjourney/DALL-E prompt for a 1:1 cover art image that captures the mood, genre, and theme of this song. Include style, lighting, color palette, and visual elements.",
+  "lyric_video": "A 9:16 vertical lyric video visual concept — describe the background, animation style, font aesthetic, color scheme, and text overlay placement for a TikTok/Reels lyric video.",
+  "caption": "A short, punchy Instagram/TikTok caption (under 150 chars) that hooks the viewer — include one emoji. NO hashtags here.",
+  "description": "A 2-3 sentence YouTube/platform description that tells the story of the song and invites listeners in. Conversational tone.",
+  "hashtags": "#tag1 #tag2 #tag3 ... (exactly 30 hashtags — mix genre-specific, mood, trending, and broad reach tags)",
+  "hook_quote": "The single most shareable lyric line or hook from this song — max 12 words, perfect for text overlay on a video or image thumbnail."
+}`;
+
+  try {
+    const raw = await callClaude(prompt, 'Return only valid JSON. No markdown fences.', 1200);
+    const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
+    if (!jsonStr) throw new Error('no json');
+    const data = JSON.parse(jsonStr);
+    document.getElementById('skit-cover-art').textContent = data.cover_art || '—';
+    document.getElementById('skit-lyric-video').textContent = data.lyric_video || '—';
+    document.getElementById('skit-caption').textContent = data.caption || '—';
+    document.getElementById('skit-description').textContent = data.description || '—';
+    document.getElementById('skit-hashtags').textContent = data.hashtags || '—';
+    document.getElementById('skit-hook-quote').textContent = data.hook_quote || '—';
+    document.getElementById('skit-content').style.display = 'block';
+    if (genBtn) { genBtn.disabled = false; genBtn.textContent = '🔄 Regenerate'; }
+    // Save to song object and localStorage
+    if (_skitSongRef) {
+      _skitSongRef.socialKit = data;
+      try {
+        const lib = JSON.parse(localStorage.getItem('soniq_library') || '[]');
+        const idx = lib.findIndex(s => s.id === _skitSongRef.id);
+        if (idx !== -1) { lib[idx].socialKit = data; localStorage.setItem('soniq_library', JSON.stringify(lib)); }
+      } catch(e) {}
+    }
+  } catch(e) {
+    if (genBtn) { genBtn.disabled = false; genBtn.textContent = '✨ Generate Publishing Kit'; }
+    if (typeof toast === 'function') toast('Kit generation failed — try again', 3000);
+  }
+}
+
+function skitCopy(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const text = el.textContent.trim();
+  navigator.clipboard?.writeText(text).then(() => {
+    if (typeof toast === 'function') toast('Copied to clipboard!');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    if (typeof toast === 'function') toast('Copied!');
+  });
+}
+
+function skitCopyAll() {
+  const fields = ['skit-cover-art','skit-lyric-video','skit-caption','skit-description','skit-hashtags','skit-hook-quote'];
+  const labels = ['COVER ART PROMPT (1:1)','LYRIC VIDEO CONCEPT (9:16)','CAPTION','DESCRIPTION','HASHTAGS (30)','HOOK QUOTE (text overlay)'];
+  let out = '';
+  fields.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el && el.textContent.trim() !== '—') {
+      out += '── ' + labels[i] + ' ──\n' + el.textContent.trim() + '\n\n';
+    }
+  });
+  if (!out.trim()) { if (typeof toast === 'function') toast('Generate the kit first'); return; }
+  navigator.clipboard?.writeText(out.trim()).then(() => {
+    if (typeof toast === 'function') toast('Full kit copied to clipboard!');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = out.trim(); document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    if (typeof toast === 'function') toast('Copied!');
+  });
+}
+
+function skitSave() {
+  if (!_skitSongRef) return;
+  if (typeof toast === 'function') toast('💾 Kit saved to song!');
+}
+
+// Close social kit on backdrop click
+document.getElementById('skit-modal')?.addEventListener('click', function(e) {
+  if (e.target === this) closeSocialKit();
+});
 </script>
 </body>
 </html>
