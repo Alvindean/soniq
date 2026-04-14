@@ -8603,8 +8603,11 @@ function syncRapDimPills() {
   Object.entries(dimMap).forEach(([key, elId]) => {
     const container = document.getElementById(elId);
     if (!container) return;
+    const val = dims[key];
     container.querySelectorAll('.rl-dpill').forEach(p => {
-      p.classList.toggle('on', p.getAttribute('onclick').includes(`'${dims[key]}'`));
+      const m = p.getAttribute('onclick').match(/'([^']+)'\s*\)$/);
+      const pillVal = m ? m[1] : null;
+      p.classList.toggle('on', Array.isArray(val) ? val.includes(pillVal) : pillVal === val);
     });
   });
 }
