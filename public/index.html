@@ -8613,9 +8613,18 @@ function syncRapDimPills() {
 }
 
 function setRapDim(el, dim, value) {
-  S.rapDimensions[dim] = value;
-  document.querySelectorAll(`#rld-${dim==='rhymeArch'?'rhyme':dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
+  if (dim === 'flow' || dim === 'rhymeArch') {
+    if (!Array.isArray(S.rapDimensions[dim])) S.rapDimensions[dim] = [S.rapDimensions[dim]];
+    const arr = S.rapDimensions[dim];
+    const idx = arr.indexOf(value);
+    if (idx >= 0) { if (arr.length > 1) arr.splice(idx, 1); }
+    else { arr.push(value); }
+    el.classList.toggle('on', S.rapDimensions[dim].includes(value));
+  } else {
+    S.rapDimensions[dim] = value;
+    document.querySelectorAll(`#rld-${dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
+    el.classList.add('on');
+  }
 }
 
 function setRapLabTab(el, cat) {
