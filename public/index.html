@@ -7931,7 +7931,7 @@ const MOOD_COLORS = {
 const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
   rapStyle: 'trap',
-  rapDimensions: { flow:'syncopated', rhymeArch:'end-only', density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
+  rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
@@ -8584,7 +8584,7 @@ function onRapStyleSelect(styleId) {
   S.rapStyle = styleId;
   S.rapLabActive = true;
   const defaults = RAP_DIM_DEFAULTS[styleId] || {};
-  S.rapDimensions = { ...defaults };
+  S.rapDimensions = { ...defaults, flow: [defaults.flow || 'syncopated'], rhymeArch: [defaults.rhymeArch || 'end-only'] };
   // Update card selection
   document.querySelectorAll('.rl-style-card').forEach(c => c.classList.toggle('on', c.dataset.style === styleId));
   // Show dimensions panel
