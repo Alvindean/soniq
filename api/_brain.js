@@ -3121,7 +3121,7 @@ function buildRapLabPrompt(params) {
   const hookNote = HOOK_STYLE_NOTES[hookStyle] || '';
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
-  const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT default to generic trap production.` : '';
+  const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
 
   const system = `${style.agent}
 
