@@ -3120,6 +3120,8 @@ function buildRapLabPrompt(params) {
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const hookNote = HOOK_STYLE_NOTES[hookStyle] || '';
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
+  const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
+  const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT default to generic trap production.` : '';
 
   const system = `${style.agent}
 
@@ -3143,7 +3145,7 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 ${hookNote ? '\n' + hookNote : ''}
 
 BRACKET REQUIREMENTS:
-${bracketInstructionServer('hiphop', 'full', null)}
+${bracketInstructionServer('hiphop', 'full', style.label)}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
@@ -3165,7 +3167,7 @@ LYRICS:
 [Complete song lyrics only. EVERY SECTION starts with its bracket tag. Clean lyrics — no annotations, no notes, no commentary embedded in the lyrics.]
 
 SONG PROMPT:
-[Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
+[${rapSubSunoTag ? `MUST lead with: "${rapSubSunoTag}" — ` : ''}Under 440 chars. ${style.label} style. NO artist names.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
