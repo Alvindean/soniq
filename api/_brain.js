@@ -3139,10 +3139,20 @@ function buildRapLabPrompt(params) {
   const dims = {
     flow:          flowArr,
     rhymeArch:     rhymeArr,
-    density:       rapDimensions.density       || style.defaults.density,
-    vocabRegister: rapDimensions.vocabRegister || style.defaults.vocabRegister,
-    persona:       rapDimensions.persona       || style.defaults.persona
+    density:       Array.isArray(rapDimensions.density)
+                     ? rapDimensions.density.filter(Boolean)
+                     : [rapDimensions.density || style.defaults.density],
+    vocabRegister: Array.isArray(rapDimensions.vocabRegister)
+                     ? rapDimensions.vocabRegister.filter(Boolean)
+                     : [rapDimensions.vocabRegister || style.defaults.vocabRegister],
+    persona:       Array.isArray(rapDimensions.persona)
+                     ? rapDimensions.persona.filter(Boolean)
+                     : [rapDimensions.persona || style.defaults.persona]
   };
+  // Guarantee at least one entry per dimension (fallback to style default)
+  if (!dims.density.length)       dims.density       = [style.defaults.density];
+  if (!dims.vocabRegister.length) dims.vocabRegister = [style.defaults.vocabRegister];
+  if (!dims.persona.length)       dims.persona       = [style.defaults.persona];
 
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const hookNote = HOOK_STYLE_NOTES[hookStyle] || '';
@@ -3166,9 +3176,9 @@ Quality target: ${quality}
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • FLOW STYLE: ${dims.flow.join(' + ')} — ${dims.flow.map(f => FLOW_NOTES[f]).filter(Boolean).join(' / ')}${dims.flow.length > 1 ? `\n  ↳ FLOW BLEND: Primary flow [${dims.flow[0]}] drives VERSE bars — this is the workhorse delivery. Secondary flow [${dims.flow.slice(1).join(' + ')}] enters in HOOK and/or BRIDGE. The contrast between them creates the dynamic arc: verse attacks differently than hook. Do NOT alternate flows randomly bar-by-bar — assign them structurally by section.` : ''}
 • RHYME ARCHITECTURE: ${dims.rhymeArch.join(' + ')} — ${dims.rhymeArch.map(r => RHYME_NOTES[r]).filter(Boolean).join(' / ')}${dims.rhymeArch.length > 1 ? `\n  ↳ RHYME BLEND: [${dims.rhymeArch[0]}] anchors the HOOK — accessible, memorable, easy to catch on repeat listens. [${dims.rhymeArch.slice(1).join(' + ')}] deepens the VERSE — where craft and complexity live. Don't mix schemes randomly within a section; assign them intentionally by function.` : ''}
-• SYLLABIC DENSITY: ${dims.density} — ${DENSITY_NOTES[dims.density]}
-• VOCABULARY REGISTER: ${dims.vocabRegister} — ${VOCAB_NOTES[dims.vocabRegister]}
-• PERSONA: ${dims.persona} — ${PERSONA_NOTES[dims.persona]}
+• SYLLABIC DENSITY: ${dims.density.join(' + ')} — ${dims.density.map(d => DENSITY_NOTES[d]).filter(Boolean).join(' / ')}${dims.density.length > 1 ? `\n  ↳ DENSITY BLEND: Primary [${dims.density[0]}] drives VERSE 1 and HOOK — the main syllable count. Secondary [${dims.density.slice(1).join(' + ')}] is the UNDERTONE — surfaces in VERSE 2 and BRIDGE as a deliberate contrast in syllable pacing. Do NOT alternate bar-by-bar; switch structurally at section boundaries.` : ''}
+• VOCABULARY REGISTER: ${dims.vocabRegister.join(' + ')} — ${dims.vocabRegister.map(v => VOCAB_NOTES[v]).filter(Boolean).join(' / ')}${dims.vocabRegister.length > 1 ? `\n  ↳ VOCAB BLEND: Primary [${dims.vocabRegister[0]}] sets the main diction — VERSE 1, HOOK, and overall voice. Secondary [${dims.vocabRegister.slice(1).join(' + ')}] is the UNDERTONE — weave it into VERSE 2 and the BRIDGE for register contrast and thematic depth. The tension between the two is the craft move.` : ''}
+• PERSONA: ${dims.persona.join(' + ')} — ${dims.persona.map(p => PERSONA_NOTES[p]).filter(Boolean).join(' / ')}${dims.persona.length > 1 ? `\n  ↳ PERSONA BLEND: Primary [${dims.persona[0]}] anchors VERSE 1 and HOOK — whose voice the listener meets first. Secondary [${dims.persona.slice(1).join(' + ')}] is the UNDERTONE — takes over VERSE 2 or the BRIDGE as a perspective shift. Make the switch intentional (signpost with a pivot line); do NOT flip mid-bar.` : ''}
 ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}
 
 BRACKET REQUIREMENTS:
@@ -3207,7 +3217,7 @@ FLOW BREAKDOWN:
 [3-5 lines: bar-by-bar flow pattern guide for the main verse. Where accents land, syllable density, rhythmic signature.]
 
 RAP LAB SETTINGS USED:
-Style: ${style.label} | Flow: ${dims.flow.join('+')} | Rhyme: ${dims.rhymeArch.join('+')} | Density: ${dims.density} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
+Style: ${style.label} | Flow: ${dims.flow.join('+')} | Rhyme: ${dims.rhymeArch.join('+')} | Density: ${dims.density.join('+')} | Vocab: ${dims.vocabRegister.join('+')} | Persona: ${dims.persona.join('+')}
 
 DIRECTOR NOTES:
 1. [Production decision specific to THIS song and style]
