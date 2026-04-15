@@ -3162,7 +3162,8 @@ function buildRapLabPrompt(params) {
     rapStyle = 'trap',
     rapDimensions = {},
     hookStyle = 'auto',
-    freestyleMode = false
+    freestyleMode = false,
+    barSwitch = 0
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -3225,6 +3226,14 @@ function buildRapLabPrompt(params) {
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
+  const _barN = [2,4,8].includes(barSwitch) ? barSwitch : 0;
+  const barSwitchLock = _barN ? `
+
+🔀 BAR SWITCH — every ${_barN} bars (${_barN === 2 ? 'AGGRESSIVE' : _barN === 4 ? 'frequent' : 'moderate'}):
+- Force a perceptible delivery switch every ${_barN} bars across all VERSE sections (not in the hook).
+- Each switch must change AT LEAST ONE of: flow pattern, syllable density, rhyme scheme density, or vocal energy/cadence.
+- Switches must feel intentional and audible — not random. Mark the bar where the switch happens with a clear pivot (a punchline, a question, an ad-lib, a held syllable, or a silence beat).
+- Do NOT switch the topic mid-bar. Switches are DELIVERY moves, not subject matter changes.${_barN === 2 ? '\n- At 2-bar intervals this is high-difficulty: every other bar must feel new. Use this to create chaos-controlled energy where the listener never settles.' : ''}` : '';
   const freestyleLock = freestyleMode ? `
 
 🎤 FREESTYLE MODE — HARD STRUCTURAL OVERRIDE (non-negotiable):
@@ -3256,7 +3265,7 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • SYLLABIC DENSITY: ${dims.density.join(' + ')} — ${dims.density.map(d => DENSITY_NOTES[d]).filter(Boolean).join(' / ')}${dims.density.length > 1 ? `\n  ↳ DENSITY BLEND: Primary [${dims.density[0]}] drives VERSE 1 and HOOK — the main syllable count. Secondary [${dims.density.slice(1).join(' + ')}] is the UNDERTONE — surfaces in VERSE 2 and BRIDGE as a deliberate contrast in syllable pacing. Do NOT alternate bar-by-bar; switch structurally at section boundaries.` : ''}
 • VOCABULARY REGISTER: ${dims.vocabRegister.join(' + ')} — ${dims.vocabRegister.map(v => VOCAB_NOTES[v]).filter(Boolean).join(' / ')}${dims.vocabRegister.length > 1 ? `\n  ↳ VOCAB BLEND: Primary [${dims.vocabRegister[0]}] sets the main diction — VERSE 1, HOOK, and overall voice. Secondary [${dims.vocabRegister.slice(1).join(' + ')}] is the UNDERTONE — weave it into VERSE 2 and the BRIDGE for register contrast and thematic depth. The tension between the two is the craft move.` : ''}
 • PERSONA: ${dims.persona.join(' + ')} — ${dims.persona.map(p => PERSONA_NOTES[p]).filter(Boolean).join(' / ')}${dims.persona.length > 1 ? `\n  ↳ PERSONA BLEND: Primary [${dims.persona[0]}] anchors VERSE 1 and HOOK — whose voice the listener meets first. Secondary [${dims.persona.slice(1).join(' + ')}] is the UNDERTONE — takes over VERSE 2 or the BRIDGE as a perspective shift. Make the switch intentional (signpost with a pivot line); do NOT flip mid-bar.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}${barSwitchLock}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode

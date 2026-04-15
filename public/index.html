@@ -1840,6 +1840,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .rl-dpill.on-2{background:rgba(245,165,36,.18);border-color:var(--amber,#f5a524);color:var(--amber,#f5a524);box-shadow:inset 0 0 0 1px rgba(245,165,36,.45)}
 .rl-dpill.on-2::before{content:'◐ ';color:var(--amber,#f5a524);font-size:9px;margin-right:1px;opacity:.9}
 .rl-dpill.on-2::after{content:' ·undertone';font-size:9px;opacity:.85;letter-spacing:.02em;font-weight:700}
+/* Bar Switch — cycles Off → 8 → 4 → 2 (state 0..3). Color escalates to red. */
+.bar-switch{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.04em;transition:all .15s}
+.bar-switch:hover{filter:brightness(1.1)}
+.bar-switch .bs-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#444;transition:all .15s}
+.bar-switch[data-state="1"]{border-color:var(--cyanline);background:var(--cyanbg);color:var(--cyan)}
+.bar-switch[data-state="1"] .bs-dot{background:var(--cyan);box-shadow:0 0 6px rgba(0,210,230,.6)}
+.bar-switch[data-state="2"]{border-color:var(--amber,#f5a524);background:rgba(245,165,36,.18);color:var(--amber,#f5a524)}
+.bar-switch[data-state="2"] .bs-dot{background:var(--amber,#f5a524);box-shadow:0 0 8px rgba(245,165,36,.7)}
+.bar-switch[data-state="3"]{border-color:#ff4060;background:rgba(255,64,96,.18);color:#ff7a90;animation:bsPulse 1.6s ease-in-out infinite}
+.bar-switch[data-state="3"] .bs-dot{background:#ff4060;box-shadow:0 0 10px rgba(255,64,96,.85)}
+@keyframes bsPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,64,96,.35)}50%{box-shadow:0 0 0 6px rgba(255,64,96,0)}}
 /* Dimension row accent: tiny color-coded stripe on the label above each row.
    Helps users map pill colors to function: Primary=cyan, Undertone=amber. */
 .rl-dim-pills{position:relative}
@@ -3265,6 +3276,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <span class="rl-dpill" onclick="setRapDim(this,'persona','second-person')">Second Person</span>
               <span class="rl-dpill" onclick="setRapDim(this,'persona','collective-we')">Collective We</span>
             </div>
+          </div>
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Bar Switch</span>
+            <div class="rl-dim-legend" style="font-size:9px"><span style="color:var(--tx3)">click to cycle: Off → 8 → 4 → 2 bars</span></div>
+            <button type="button" class="bar-switch" id="bar-switch" data-state="0" onclick="cycleBarSwitch()" title="Force a perceptible delivery switch every N bars to keep verses dynamic">
+              <span class="bs-dot"></span>
+              <span class="bs-label">Off</span>
+            </button>
           </div>
           <div class="rl-agent-badge" id="rl-agent-badge"></div>
         </div>
@@ -8747,6 +8766,22 @@ function syncRapDimPills() {
   });
 }
 
+// Bar Switch — cycles 0 (Off) → 1 (8 bars) → 2 (4 bars) → 3 (2 bars / red) → 0
+window.cycleBarSwitch = function(){
+  const btn = document.getElementById('bar-switch');
+  if(!btn) return;
+  const cur = parseInt(btn.getAttribute('data-state') || '0', 10);
+  const next = (cur + 1) % 4;
+  btn.setAttribute('data-state', String(next));
+  const labels = ['Off', 'Every 8 bars', 'Every 4 bars', 'Every 2 bars (aggressive)'];
+  btn.querySelector('.bs-label').textContent = labels[next];
+  const map = [0, 8, 4, 2];
+  S.barSwitch = map[next];
+  if(typeof toast === 'function'){
+    toast(next === 0 ? 'Bar switch off' : `Switch every ${map[next]} bars`);
+  }
+};
+
 function setRapDim(el, dim, value) {
   if (dim === 'flow' || dim === 'rhymeArch') {
     if (!Array.isArray(S.rapDimensions[dim])) S.rapDimensions[dim] = [S.rapDimensions[dim]];
@@ -9493,6 +9528,7 @@ async function generateSong(){
     seedLine: S.seedLine || '',
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
     freestyleMode: S.freestyleMode === true,
+    barSwitch: (typeof S.barSwitch === 'number' && [2,4,8].includes(S.barSwitch)) ? S.barSwitch : 0,
     platinum: _platinumOn && isPlatinumEligible()
   };
   // Clear album context after use
