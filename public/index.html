@@ -515,8 +515,8 @@ a{color:var(--amber);text-decoration:none}
 .lyrics-box{font-family:var(--mono);font-size:13.5px;line-height:2.3;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:22px;position:relative}
 .lyrics-box .tag{color:var(--amber);font-weight:700}
 /* Collapsible lyrics */
-.lyrics-box.collapsed{max-height:180px;overflow:hidden}
-.lyrics-box.collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:60px;background:linear-gradient(transparent,var(--s1));pointer-events:none}
+.lyrics-box.collapsed{max-height:110px;overflow:hidden}
+.lyrics-box.collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:90px;background:linear-gradient(transparent 0%,rgba(0,0,0,.2) 30%,var(--s1) 100%);pointer-events:none}
 .lyrics-toggle{display:none;margin:8px 0 4px;padding:6px 16px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.04em;text-transform:uppercase}
 .lyrics-toggle:hover{border-color:var(--amber);color:var(--amber);background:var(--amberbg)}
 .lyrics-toggle.visible{display:inline-flex;align-items:center;gap:5px}
@@ -9979,12 +9979,14 @@ function toggleLyrics(prefix) {
 }
 
 // Auto-collapse lyrics if content is long enough to warrant it
+// Lowered threshold so the internal structure/scaffolding is hidden
+// by default — users see a short teaser and must click to reveal.
 function autoCollapseLyrics(prefix) {
   const box = document.getElementById(prefix + '-lyrics-text');
   const btn = document.getElementById(prefix + '-lyrics-toggle');
   if (!box || !btn) return;
   const contentHeight = box.scrollHeight;
-  if (contentHeight > 240) {
+  if (contentHeight > 130) {
     box.classList.add('collapsed');
     btn.classList.add('visible');
     btn.innerHTML = '▼ Show full lyrics';
