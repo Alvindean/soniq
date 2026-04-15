@@ -13052,7 +13052,7 @@ function _initSupabase() {
     if (event === 'SIGNED_IN') {
       closeAuth();
       loadFoundingStatus();
-      initOnboarding();
+      if (typeof initOnboarding === 'function') initOnboarding();
       syncFromCloud(); // 🧠 Pull learned songs from cloud
       // Resume any generation that was blocked by the auth gate
       if (S._pendingGenerate) {
