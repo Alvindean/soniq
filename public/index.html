@@ -2852,7 +2852,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .ss-timer{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:3px 9px;border-radius:99px;background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.35);color:var(--amber,#f5a524);font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
 .ss-timer[hidden]{display:none}
 
-.quick-features{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding:2px 0}
+.quick-features{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px 0;padding:2px 0;justify-content:center}
 .qf-pill{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
 .qf-pill:hover{border-color:rgba(245,165,36,.55);color:var(--tx1);background:rgba(245,165,36,.08)}
 .qf-pill[data-on="true"]{background:linear-gradient(135deg,rgba(245,165,36,.25),rgba(245,165,36,.12));border-color:var(--amber,#f5a524);color:var(--amber,#f5a524)}
@@ -3556,6 +3556,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
       <!-- ══ GENERATE (always at bottom of wizard) ══ -->
       <div class="gen-action" id="gen-action-main">
+        <!-- v2.1 Quick Feature Strip — sits directly above Generate so toggles inform the click -->
+        <div id="quick-features" class="quick-features" role="toolbar" aria-label="Quick features">
+          <button type="button" class="qf-pill" id="qf-edge" data-on="false" onclick="qfToggleEdge()" title="Inject edgier lyrical choices into the next generation">🔥 Edge: <span class="qf-state">Off</span></button>
+          <button type="button" class="qf-pill" id="qf-freestyle" data-on="false" onclick="qfToggleFreestyle()" title="Freestyle mode — looser structure, improvised feel">🎤 Freestyle</button>
+          <button type="button" class="qf-pill" id="qf-sample" onclick="openSamplePanel()" title="Pick a standout line from the current song as the seed for the next">⚡ Sample This</button>
+          <button type="button" class="qf-pill" id="qf-analyze" onclick="qfAnalyzeUrl()" title="Analyze a song URL and extract its style cues">🔍 Analyze URL</button>
+        </div>
         <button class="gen-btn" id="gen-btn" onclick="generateSong()">
           <span class="gen-btn-icon">🎵</span>
           Generate Complete Song
@@ -3574,13 +3581,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div><div class="gp-pip" id="gp-pip-2"></div><div class="gp-pip" id="gp-pip-3"></div><div class="gp-pip" id="gp-pip-4"></div><div class="gp-pip" id="gp-pip-5"></div></div>
           <span id="gp-label">5 free songs this month</span>
           <span id="ss-timer" class="ss-timer" hidden>⏱ <span id="ss-timer-val">0s</span></span>
-        </div>
-        <!-- v2.1 Quick Feature Strip -->
-        <div id="quick-features" class="quick-features" role="toolbar" aria-label="Quick features">
-          <button type="button" class="qf-pill" id="qf-edge" data-on="false" onclick="qfToggleEdge()" title="Inject edgier lyrical choices into the next generation">🔥 Edge: <span class="qf-state">Off</span></button>
-          <button type="button" class="qf-pill" id="qf-freestyle" data-on="false" onclick="qfToggleFreestyle()" title="Freestyle mode — looser structure, improvised feel">🎤 Freestyle</button>
-          <button type="button" class="qf-pill" id="qf-sample" onclick="openSamplePanel()" title="Pick a standout line from the current song as the seed for the next">⚡ Sample This</button>
-          <button type="button" class="qf-pill" id="qf-analyze" onclick="qfAnalyzeUrl()" title="Analyze a song URL and extract its style cues">🔍 Analyze URL</button>
         </div>
       </div>
 
