@@ -515,8 +515,10 @@ a{color:var(--amber);text-decoration:none}
 .lyrics-box{font-family:var(--mono);font-size:13.5px;line-height:2.3;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:22px;position:relative}
 .lyrics-box .tag{color:var(--amber);font-weight:700}
 /* Collapsible lyrics */
-.lyrics-box.collapsed{max-height:110px;overflow:hidden}
-.lyrics-box.collapsed::after{content:'';position:absolute;bottom:0;left:0;right:0;height:90px;background:linear-gradient(transparent 0%,rgba(0,0,0,.2) 30%,var(--s1) 100%);pointer-events:none}
+/* Hidden by default — only a "Reveal lyrics" button remains visible.
+   Prevents the entire generation scaffolding from being on-screen unsolicited. */
+.lyrics-box.collapsed{max-height:0;padding-top:0;padding-bottom:0;border-color:transparent;overflow:hidden;opacity:0;margin-bottom:0}
+.lyrics-box.collapsed::after{display:none}
 .lyrics-toggle{display:none;margin:8px 0 4px;padding:6px 16px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;letter-spacing:.04em;text-transform:uppercase}
 .lyrics-toggle:hover{border-color:var(--amber);color:var(--amber);background:var(--amberbg)}
 .lyrics-toggle.visible{display:inline-flex;align-items:center;gap:5px}
@@ -3896,7 +3898,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="res-lyrics-text" class="lyrics-box collapsed"></div>
-      <button class="lyrics-toggle visible" id="res-lyrics-toggle" onclick="toggleLyrics('res')">▼ Show full lyrics</button>
+      <button class="lyrics-toggle visible" id="res-lyrics-toggle" onclick="toggleLyrics('res')">▼ Reveal lyrics</button>
       <div class="lyrics-charcount" id="res-lyrics-charcount"></div>
       <!-- CREATIVE PROMPTS (Image + Video) -->
       <div id="res-creative-prompts" style="display:none"></div>
@@ -4164,7 +4166,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="lres-opane-lyrics" class="opane on">
       <div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>
       <div id="lres-lyrics-text" class="lyrics-box collapsed"></div>
-      <button class="lyrics-toggle visible" id="lres-lyrics-toggle" onclick="toggleLyrics('lres')">▼ Show full lyrics</button>
+      <button class="lyrics-toggle visible" id="lres-lyrics-toggle" onclick="toggleLyrics('lres')">▼ Reveal lyrics</button>
       <div class="lyrics-charcount" id="lres-lyrics-charcount"></div>
       <!-- CREATIVE PROMPTS (Image + Video) -->
       <div id="lres-creative-prompts" style="display:none"></div>
@@ -10041,25 +10043,25 @@ function toggleLyrics(prefix) {
   const btn = document.getElementById(prefix + '-lyrics-toggle');
   if (!box || !btn) return;
   const isCollapsed = box.classList.toggle('collapsed');
-  btn.innerHTML = isCollapsed ? '▼ Show full lyrics' : '▲ Collapse lyrics';
+  btn.innerHTML = isCollapsed ? '▼ Reveal lyrics' : '▲ Hide lyrics';
 }
 
-// Auto-collapse lyrics if content is long enough to warrant it
-// Lowered threshold so the internal structure/scaffolding is hidden
-// by default — users see a short teaser and must click to reveal.
+// Always collapse lyrics on render — the box is fully hidden and only
+// a "Reveal lyrics" button is visible. Keeps the result card compact
+// and prevents the internal structure/scaffolding from being on-screen
+// unsolicited.
 function autoCollapseLyrics(prefix) {
   const box = document.getElementById(prefix + '-lyrics-text');
   const btn = document.getElementById(prefix + '-lyrics-toggle');
   if (!box || !btn) return;
-  const contentHeight = box.scrollHeight;
-  if (contentHeight > 130) {
-    box.classList.add('collapsed');
-    btn.classList.add('visible');
-    btn.innerHTML = '▼ Show full lyrics';
-  } else {
+  if (!(box.textContent || '').trim()) {
     box.classList.remove('collapsed');
     btn.classList.remove('visible');
+    return;
   }
+  box.classList.add('collapsed');
+  btn.classList.add('visible');
+  btn.innerHTML = '▼ Reveal lyrics';
 }
 
 function updateLyricsCount(prefix, rawText) {
