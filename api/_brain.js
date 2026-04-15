@@ -2426,7 +2426,8 @@ function buildSongPrompt(params) {
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
-    freestyleMode = false, breakRule = false, eraUndertone = ''
+    freestyleMode = false, breakRule = false, eraUndertone = '',
+    graftGenre = '', graftSection = 'chorus', invertCounter = false
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -2623,6 +2624,35 @@ Rule: ${_poa.rule}`;
     breakRuleNote = `\n\n🎲 BREAK ONE RULE — explicit permission granted:\n${_pick.song} broke "${_pick.rule}" → ${_pick.result}\nFind YOUR song's equivalent rule-break. Pick one ${genreLabel} convention and deliberately violate it for the same kind of payoff. The rule-break must be intentional, audible, and central to why this song lands. Do NOT just decorate — commit.`;
   }
 
+  // ── CROSS-GENRE SECTION GRAFT — lift DNA + counter-melody from a
+  //    secondary genre and apply it to ONE section only ────────────────────
+  let graftNote = '';
+  if (graftGenre && graftGenre !== genre && GENRE_BIBLE[graftGenre]) {
+    const _g = GENRE_BIBLE[graftGenre];
+    const _sec = ['verse','chorus','bridge'].includes(graftSection) ? graftSection : 'chorus';
+    const _counter = _g.counter
+      ? `Counter-melody for the grafted section: ${_g.counter.device} — ${_g.counter.does}`
+      : '';
+    const _keys = Array.isArray(_g.keys) && _g.keys.length
+      ? `Keys to honor in the grafted ${_sec}: ${_g.keys.slice(0,2).join(' / ')}`
+      : '';
+    graftNote = `\n\n🧬 SECTION GRAFT — ${_sec.toUpperCase()} tinted with ${GENRE_LABELS[graftGenre]||graftGenre}:
+The ${_sec} should carry ${GENRE_LABELS[graftGenre]||graftGenre} DNA: ${_g.dna || 'genre conventions apply'}
+${_counter}
+${_keys}
+The rest of the song stays in ${genreLabel}. The graft is structural — the listener should feel a shift when the ${_sec} arrives. Do NOT just borrow a word or a tag; bend the melodic shape, cadence, and instrumentation cues of the ${_sec} toward the grafted genre.`;
+  }
+
+  // ── INVERT COUNTER-MELODY — flip where the genre's counter-melody lives
+  let invertCounterNote = '';
+  if (invertCounter && GENRE_BIBLE[genre] && GENRE_BIBLE[genre].counter) {
+    const _c = GENRE_BIBLE[genre].counter;
+    invertCounterNote = `\n\n🔄 COUNTER-MELODY INVERSION:
+In ${genreLabel}, the counter-melody normally lives here: ${_c.map || 'standard section placement'}.
+INVERT IT. Put the counter-melody where it does NOT normally belong (e.g. move a chorus-level counter into the verses, or move a verse-level counter into the chorus, or pull the bridge counter out and let the bridge run naked). Leave the sections that normally carry the counter deliberately sparse — the missing voice should feel felt.
+This is a structural rule-break, not a cosmetic one. Describe the inversion explicitly in the COUNTERMELODY and SONG PROMPT sections.`;
+  }
+
   // ── Key psychology injection ────────────────────────────────────────────
   const _keyPsych = MUSIC_THEORY_BIBLE.keyPsychology;
   const _keyPool  = Object.keys(_keyPsych);
@@ -2704,7 +2734,7 @@ SONGWRITING RULES:
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
 - LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 

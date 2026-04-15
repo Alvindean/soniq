@@ -3333,6 +3333,42 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="qpill" onclick="setEraUndertone(this,'current')" data-era="current">🔥 Now</span>
           </div>
 
+          <!-- STYLE BENDERS — unique-song generators -->
+          <label class="topic-label" style="margin-top:4px">Style Benders <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— make the song more unique</span></label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:6px;align-items:center">
+            <select id="graft-genre" onchange="updateGraftGenre(this.value)" style="background:#1a1a24;border:1px solid #35354a;border-radius:var(--r2);color:#e0e0f0;font-size:11px;padding:6px 8px;outline:none">
+              <option value="">Graft another genre…</option>
+              <option value="pop">Pop</option>
+              <option value="rnb">R&amp;B</option>
+              <option value="rock">Rock</option>
+              <option value="country">Country</option>
+              <option value="hiphop">Hip-Hop</option>
+              <option value="soul">Soul</option>
+              <option value="jazz">Jazz</option>
+              <option value="blues">Blues</option>
+              <option value="folk">Folk</option>
+              <option value="reggae">Reggae</option>
+              <option value="afrobeats">Afrobeats</option>
+              <option value="latin">Latin</option>
+              <option value="kpop">K-Pop</option>
+              <option value="gospel">Gospel</option>
+              <option value="neosoul">Neo-Soul</option>
+              <option value="electronic">Electronic</option>
+              <option value="indie">Indie</option>
+              <option value="punk">Punk</option>
+              <option value="metal">Metal</option>
+              <option value="ss">Singer-Songwriter</option>
+            </select>
+            <span style="font-size:11px;color:var(--tx3)">onto</span>
+            <select id="graft-section" onchange="updateGraftSection(this.value)" style="background:#1a1a24;border:1px solid #35354a;border-radius:var(--r2);color:#e0e0f0;font-size:11px;padding:6px 8px;outline:none">
+              <option value="chorus">Chorus</option>
+              <option value="verse">Verse</option>
+              <option value="bridge">Bridge</option>
+            </select>
+            <button type="button" class="qf-pill" id="qf-invert-counter" data-on="false" onclick="qfToggleInvertCounter()" title="Flip where the genre's counter-melody normally sits — forces a structural rearrangement">🔄 Invert Counter-Melody</button>
+          </div>
+          <div id="graft-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:14px"></div>
+
           <!-- BRACKET FORMATTING -->
           <label class="bracket-label">Suno Bracket Formatting</label>
           <div class="bracket-pills" id="bracket-pills">
@@ -8501,25 +8537,24 @@ function fallbackCopy(text, msg) {
   }
 }
 function cpField(id){const el=document.getElementById(id);if(!el)return;const txt=(el.textContent||el.innerText||'').trim();if(!txt||!el.offsetHeight){toast('Nothing to copy — generate a song first');return;}safeCopy(txt,'Copied to clipboard');}
-// Suno style field fits 1000 chars on v3.5/v4. Trim the copied prompt
-// by at least 5% AND to <= SUNO_STYLE_MAX so it always fits.
-const SUNO_STYLE_MAX = 950; // leave 50-char buffer under Suno's 1000
+// Suno style field holds 1000 chars on v3.5 / v4 / v5. Use nearly the
+// full budget — we only trim if we actually exceed it. Filler-removal
+// and dedupe still run because they never remove signal.
+const SUNO_STYLE_MAX = 990; // 10-char safety under Suno's 1000
 function compressSunoPrompt(raw){
   if(!raw) return '';
   let s = String(raw);
-  // normalize whitespace / punctuation
   s = s.replace(/\r/g,'').replace(/\n+/g,', ').replace(/\s{2,}/g,' ').trim();
-  // strip filler phrases (safe — these add nothing to a style prompt)
+  // strip filler phrases (these carry zero signal for a style prompt)
   const fillers = [
     /\bthat is\b/gi, /\bwhich is\b/gi, /\bin order to\b/gi,
     /\bvery\s+/gi, /\breally\s+/gi, /\bquite\s+/gi,
     /\bplease\s+/gi, /\bkindly\s+/gi,
     /\bas well as\b/gi, /\bin addition to\b/gi,
     /\bfeel free to\b/gi, /\bmake sure to\b/gi,
-    /\ba lot of\b/gi, /\bsort of\b/gi, /\bkind of\b/gi,
-    /\s+—\s+/g  // em-dash clauses are usually decorative
+    /\ba lot of\b/gi, /\bsort of\b/gi, /\bkind of\b/gi
   ];
-  const fillerReplacements = ['','','to',' ',' ',' ','','','and','and','','','many','','',', '];
+  const fillerReplacements = ['','','to',' ',' ',' ','','','and','and','','','many','',''];
   fillers.forEach((r,i)=>{ s = s.replace(r, fillerReplacements[i]); });
   // dedupe comma-separated tags (case-insensitive, keep first)
   const parts = s.split(/\s*,\s*/);
@@ -8533,17 +8568,8 @@ function compressSunoPrompt(raw){
     kept.push(p.trim());
   }
   s = kept.join(', ').replace(/,\s*,/g, ',').replace(/\s{2,}/g,' ').trim();
-  // ensure at least 5% reduction vs raw
-  const minReduced = Math.floor(String(raw).length * 0.95);
-  if(s.length > minReduced){
-    // drop lowest-value trailing clauses until we hit the 5% floor
-    const tags = s.split(/\s*,\s*/);
-    while(tags.length > 1 && s.length > minReduced){
-      tags.pop();
-      s = tags.join(', ');
-    }
-  }
-  // hard-cap to Suno ceiling
+  // ONLY trim if we actually exceed Suno's budget — no forced reduction.
+  // Previous version chopped content even when the prompt already fit.
   if(s.length > SUNO_STYLE_MAX){
     s = s.slice(0, SUNO_STYLE_MAX);
     const lastComma = s.lastIndexOf(',');
@@ -8555,15 +8581,16 @@ function compressSunoPrompt(raw){
 
 function cpBriefPrompt(prefix){
   const el=document.getElementById(prefix==='res'?'res-title':'lres-title');
-  // Get the prompt from brief-core-prompt span inside the brief-output
   const briefEl=document.querySelector(`#${prefix}-brief-content .brief-prompt-box`);
   const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
   const raw=briefEl?.textContent||song?.style||'';
   if(!raw){toast('Generate a song first');return;}
   const trimmed = compressSunoPrompt(raw);
-  const saved = Math.max(0, raw.length - trimmed.length);
-  const pct = raw.length ? Math.round(saved * 100 / raw.length) : 0;
-  safeCopy(trimmed, `Prompt copied (${trimmed.length} chars, −${pct}% for Suno)`);
+  const room = SUNO_STYLE_MAX - trimmed.length;
+  const msg = room >= 0
+    ? `Prompt copied (${trimmed.length}/${SUNO_STYLE_MAX} chars, ${room} spare for Suno)`
+    : `Prompt copied (${trimmed.length} chars — trimmed to fit Suno)`;
+  safeCopy(trimmed, msg);
 }
 function cpVisualPrompt(prefix){
   const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
@@ -9552,6 +9579,9 @@ async function generateSong(){
     barSwitch: (typeof S.barSwitch === 'number' && [2,4,8].includes(S.barSwitch)) ? S.barSwitch : 0,
     breakRule: S.breakRule === true,
     eraUndertone: typeof S.eraUndertone === 'string' ? S.eraUndertone : '',
+    graftGenre: typeof S.graftGenre === 'string' ? S.graftGenre : '',
+    graftSection: ['verse','chorus','bridge'].includes(S.graftSection) ? S.graftSection : 'chorus',
+    invertCounter: S.invertCounter === true,
     platinum: _platinumOn && isPlatinumEligible()
   };
   // Clear album context after use
@@ -17752,6 +17782,36 @@ document.addEventListener('DOMContentLoaded', () => {
     b.setAttribute('data-on', on ? 'true' : 'false');
     try { S.breakRule = on; } catch(e){}
     if(typeof toast === 'function') toast(on ? '🎲 Rule-break on — one outlier rule will be honored next gen' : 'Rule-break off');
+  };
+
+  window.updateGraftGenre = function(val){
+    try { S.graftGenre = val || ''; } catch(e){}
+    _refreshGraftDesc();
+  };
+  window.updateGraftSection = function(val){
+    try { S.graftSection = val || 'chorus'; } catch(e){}
+    _refreshGraftDesc();
+  };
+  function _refreshGraftDesc(){
+    var d = document.getElementById('graft-desc');
+    if(!d) return;
+    if(S.graftGenre){
+      d.textContent = '→ The ' + (S.graftSection||'chorus') + ' will be grafted with ' + S.graftGenre + ' DNA; the rest stays in the primary genre.';
+    } else {
+      d.textContent = '';
+    }
+  }
+
+  window.qfToggleInvertCounter = function(){
+    var b = document.getElementById('qf-invert-counter');
+    if(!b) return;
+    var on = b.getAttribute('data-on') === 'true';
+    on = !on;
+    b.setAttribute('data-on', on ? 'true' : 'false');
+    try { S.invertCounter = on; } catch(e){}
+    if(typeof toast === 'function'){
+      toast(on ? '🔄 Counter-melody inversion on — where it normally sits, it won\'t' : 'Counter-melody inversion off');
+    }
   };
 
   window.setEraUndertone = function(el, value){
