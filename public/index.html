@@ -9486,6 +9486,7 @@ async function generateSong(){
     dualPerspective: S.dualPerspective || false,
     seedLine: S.seedLine || '',
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
+    freestyleMode: S.freestyleMode === true,
     platinum: _platinumOn && isPlatinumEligible()
   };
   // Clear album context after use

@@ -2425,7 +2425,8 @@ function buildSongPrompt(params) {
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
-    platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false
+    platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
+    freestyleMode = false
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -2433,7 +2434,19 @@ function buildSongPrompt(params) {
   const vocal = sanitizeInput(rawVocal);
 
   const genreLabel = GENRE_LABELS[genre] || genre;
-  const structStr = STRUCTURES[structure] || STRUCTURES.standard;
+  // Freestyle = bars-only override regardless of genre
+  const structStr = freestyleMode
+    ? '[Intro | optional, beat only] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
+    : (STRUCTURES[structure] || STRUCTURES.standard);
+  const freestyleSongLock = freestyleMode ? `
+
+🎤 FREESTYLE MODE — HARD STRUCTURAL OVERRIDE (non-negotiable, supersedes the genre's default structure):
+- This is a freestyle. NO hook. NO chorus. NO pre-chorus. NO bridge. NO post-chorus. NO refrain. NO sung melodic hook of any kind.
+- Output is sequential VERSES only — continuous bars / lines from start to finish.
+- Allowed section markers: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (if length permits), [Outro] (optional). NOTHING ELSE.
+- DO NOT emit [Hook], [Chorus], [Pre-Chorus], [Bridge], [Post-Chorus], [Refrain], [Drop] under any circumstances — even if the genre normally requires them.
+- Energy and arc come from line-by-line escalation across verses, not from a verse↔chorus dynamic.
+- Each verse: 12-24 lines of unbroken thought. Let the idea drive length, not a template.` : '';
 
   // Bible notes
   const bibleNote = GENRE_BIBLE[genre] ? `\nGenre DNA: ${GENRE_BIBLE[genre].dna}` : '';
@@ -2664,7 +2677,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${freestyleSongLock}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -2834,7 +2847,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${freestyleSongLock}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -3101,7 +3114,8 @@ function buildRapLabPrompt(params) {
     era = 'current',
     rapStyle = 'trap',
     rapDimensions = {},
-    hookStyle = 'auto'
+    hookStyle = 'auto',
+    freestyleMode = false
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -3154,11 +3168,27 @@ function buildRapLabPrompt(params) {
   if (!dims.vocabRegister.length) dims.vocabRegister = [style.defaults.vocabRegister];
   if (!dims.persona.length)       dims.persona       = [style.defaults.persona];
 
-  const structStr = STRUCTURES[structure] || STRUCTURES.standard;
-  const hookNote = HOOK_STYLE_NOTES[hookStyle] || '';
+  // FREESTYLE MODE — hard structural override: no hook, no chorus, just bars.
+  // Replaces the genre/STRUCTURES default with a verses-only spine and forces
+  // the bracket instruction to a stripped set later in the prompt.
+  const structStr = freestyleMode
+    ? '[Intro | 4-8 bars beat] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
+    : (STRUCTURES[structure] || STRUCTURES.standard);
+  const hookNote = freestyleMode ? '' : (HOOK_STYLE_NOTES[hookStyle] || '');
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
+  const freestyleLock = freestyleMode ? `
+
+🎤 FREESTYLE MODE — HARD STRUCTURAL OVERRIDE (non-negotiable):
+- This is a freestyle. NO hook. NO chorus. NO pre-chorus. NO bridge. NO post-chorus. NO refrain.
+- Output is sequential VERSES only — continuous bars from start to finish.
+- Allowed section markers: [Intro] (optional, beat only), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (if length permits), [Outro] (optional, bars trail off).
+- DO NOT emit [Hook], [Chorus], [Pre-Chorus], [Bridge], [Post-Chorus], [Refrain], [Drop] — under any circumstances.
+- Each verse should feel like an unbroken stream of consciousness — bars rolling into bars without resolution into a sung hook.
+- The energy arc is built through DENSITY and RHYME ESCALATION across verses, not through the verse↔chorus dynamic.
+- No melodic sung sections. Spoken-rapped delivery throughout.
+- Verses can vary in length (12-24 bars each) — let the thought drive the bar count, not a template.` : '';
 
   const system = `${style.agent}
 
@@ -3179,10 +3209,12 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • SYLLABIC DENSITY: ${dims.density.join(' + ')} — ${dims.density.map(d => DENSITY_NOTES[d]).filter(Boolean).join(' / ')}${dims.density.length > 1 ? `\n  ↳ DENSITY BLEND: Primary [${dims.density[0]}] drives VERSE 1 and HOOK — the main syllable count. Secondary [${dims.density.slice(1).join(' + ')}] is the UNDERTONE — surfaces in VERSE 2 and BRIDGE as a deliberate contrast in syllable pacing. Do NOT alternate bar-by-bar; switch structurally at section boundaries.` : ''}
 • VOCABULARY REGISTER: ${dims.vocabRegister.join(' + ')} — ${dims.vocabRegister.map(v => VOCAB_NOTES[v]).filter(Boolean).join(' / ')}${dims.vocabRegister.length > 1 ? `\n  ↳ VOCAB BLEND: Primary [${dims.vocabRegister[0]}] sets the main diction — VERSE 1, HOOK, and overall voice. Secondary [${dims.vocabRegister.slice(1).join(' + ')}] is the UNDERTONE — weave it into VERSE 2 and the BRIDGE for register contrast and thematic depth. The tension between the two is the craft move.` : ''}
 • PERSONA: ${dims.persona.join(' + ')} — ${dims.persona.map(p => PERSONA_NOTES[p]).filter(Boolean).join(' / ')}${dims.persona.length > 1 ? `\n  ↳ PERSONA BLEND: Primary [${dims.persona[0]}] anchors VERSE 1 and HOOK — whose voice the listener meets first. Secondary [${dims.persona.slice(1).join(' + ')}] is the UNDERTONE — takes over VERSE 2 or the BRIDGE as a perspective shift. Make the switch intentional (signpost with a pivot line); do NOT flip mid-bar.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}
 
 BRACKET REQUIREMENTS:
-${bracketInstructionServer('hiphop', 'full', style.label)}
+${freestyleMode
+  ? 'Use ONLY: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (optional), [Outro] (optional). Inline ad-libs in (parentheses) on the same line as bars are allowed. NO hook/chorus/bridge/pre-chorus brackets of any kind.'
+  : bracketInstructionServer('hiphop', 'full', style.label)}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
