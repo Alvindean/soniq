@@ -260,6 +260,18 @@
     }
 
     .nav-links a:hover { color: var(--text); }
+    .nav-login {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 8px 14px;
+      border-radius: 8px;
+      transition: all .15s;
+      margin-right: 4px;
+    }
+    .nav-login:hover { color: var(--gold); background: rgba(245,165,36,.08); }
+    @media (max-width: 900px) { .nav-login { display: none; } }
 
     .btn {
       display: inline-flex;
@@ -1474,6 +1486,7 @@
       <li><a href="#pricing">Pricing</a></li>
       <li><a href="/blog">Blog</a></li>
     </ul>
+    <a href="/app#account" class="nav-login" id="nav-login">Log in</a>
     <a href="/app" class="btn btn-primary nav-links">Try Free →</a>
     <button class="hamburger" id="hamburger" aria-label="Menu">
       <span></span><span></span><span></span>
@@ -1485,6 +1498,7 @@
     <a href="#how-it-works" class="mobile-link">How It Works</a>
     <a href="#pricing" class="mobile-link">Pricing</a>
     <a href="/blog" class="mobile-link">Blog</a>
+    <a href="/app#account" class="mobile-link" style="color:var(--gold);">Log in</a>
     <a href="/app" class="btn btn-primary" style="margin-top:8px;text-align:center;">Try Free →</a>
   </div>
 
