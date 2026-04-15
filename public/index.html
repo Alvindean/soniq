@@ -3322,6 +3322,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
           <div id="era-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px"></div>
 
+          <!-- ERA UNDERTONE -->
+          <label class="topic-label" style="margin-top:4px">Era Undertone <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— tints V2 / bridge with vocabulary from a different decade</span></label>
+          <div class="quality-row" id="era-undertone-pills" style="flex-wrap:wrap;margin-bottom:12px">
+            <span class="qpill on" onclick="setEraUndertone(this,'')" data-era="">None</span>
+            <span class="qpill" onclick="setEraUndertone(this,'classic')" data-era="classic">🎷 Classic</span>
+            <span class="qpill" onclick="setEraUndertone(this,'vintage')" data-era="vintage">📼 80s–90s</span>
+            <span class="qpill" onclick="setEraUndertone(this,'modern')" data-era="modern">💿 2000s</span>
+            <span class="qpill" onclick="setEraUndertone(this,'contemporary')" data-era="contemporary">📱 2010s</span>
+            <span class="qpill" onclick="setEraUndertone(this,'current')" data-era="current">🔥 Now</span>
+          </div>
+
           <!-- BRACKET FORMATTING -->
           <label class="bracket-label">Suno Bracket Formatting</label>
           <div class="bracket-pills" id="bracket-pills">
@@ -3603,6 +3614,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <button type="button" class="qf-pill" id="qf-freestyle" data-on="false" onclick="qfToggleFreestyle()" title="Freestyle mode — looser structure, improvised feel">🎤 Freestyle</button>
           <button type="button" class="qf-pill" id="qf-sample" onclick="openSamplePanel()" title="Pick a standout line from the current song as the seed for the next">⚡ Sample This</button>
           <button type="button" class="qf-pill" id="qf-analyze" onclick="qfAnalyzeUrl()" title="Analyze a song URL and extract its style cues">🔍 Analyze URL</button>
+          <button type="button" class="qf-pill" id="qf-break-rule" data-on="false" onclick="qfToggleBreakRule()" title="Pick one famous rule-breaker from this genre and take permission to break the same rule">🎲 Break One Rule</button>
         </div>
         <button class="gen-btn" id="gen-btn" onclick="generateSong()">
           <span class="gen-btn-icon">🎵</span>
@@ -17480,6 +17492,72 @@ document.addEventListener('DOMContentLoaded', () => {
   const lc=document.getElementById('a-library-count');
   if(lc)lc.textContent=getLearnedSongs().length;
 });
+
+/* ═════════════════════════════════════════════════════
+   v2.1 VERDICT SANITIZER — strip scaffolding from the
+   public verdict line. Internal markers like LYRICS:,
+   SONG PROMPT:, PRODUCTION BRIEF:, TEMPO & KEY:, FLOW
+   BREAKDOWN:, RAP LAB SETTINGS USED:, DIRECTOR NOTES:,
+   VOCAL STACKING:, STRUCTURE:, COUNTERMELODY:, DOPAMINE:,
+   NOTES: — anything at or after the first marker gets
+   cut. A MutationObserver enforces this on every write
+   so every code path (live gen, load-from-history,
+   shared link) is covered.
+   ═════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+  var MARKERS = [
+    'LYRICS:','SONG PROMPT:','PRODUCTION BRIEF:','TEMPO & KEY:',
+    'FLOW BREAKDOWN:','RAP LAB SETTINGS USED:','DIRECTOR NOTES:',
+    'VOCAL STACKING','STRUCTURE:','COUNTERMELODY:','DOPAMINE:',
+    'CORE PROMPT:','PROD BRIEF','VARIANT','HOOK SCORE:','NOTES:'
+  ];
+  function sanitize(s){
+    if(!s) return '';
+    var out = String(s);
+    for(var i=0;i<MARKERS.length;i++){
+      var idx = out.indexOf(MARKERS[i]);
+      if(idx !== -1) out = out.slice(0, idx);
+    }
+    out = out.replace(/\s+/g,' ').trim();
+    // Drop trailing fragments
+    out = out.replace(/[,;:\-—\s]+$/,'');
+    // Cap at 320 chars — a verdict is one pitch sentence, not a paragraph
+    if(out.length > 320){
+      var tail = out.slice(0, 320);
+      var lastDot = Math.max(tail.lastIndexOf('.'), tail.lastIndexOf('!'), tail.lastIndexOf('?'));
+      out = (lastDot > 160 ? tail.slice(0, lastDot+1) : tail).trim();
+    }
+    return out;
+  }
+  function attach(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    // Clean initial value immediately (handles pre-observer renders)
+    var initial = el.textContent || '';
+    var cleaned = sanitize(initial);
+    if(cleaned !== initial) el.textContent = cleaned;
+    // Guard every future write
+    var running = false;
+    var obs = new MutationObserver(function(){
+      if(running) return;
+      var cur = el.textContent || '';
+      var c = sanitize(cur);
+      if(c !== cur){
+        running = true;
+        el.textContent = c;
+        setTimeout(function(){ running = false; }, 0);
+      }
+    });
+    obs.observe(el, {childList:true, characterData:true, subtree:true});
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    attach('res-verdict');
+    attach('lres-verdict');
+  });
+  // Expose for manual use
+  window._sanitizeVerdict = sanitize;
+})();
 
 /* ═════════════════════════════════════════════════════
    v2.1 UI BEHAVIOR — topbar, timer, quick features,
