@@ -2426,7 +2426,7 @@ function buildSongPrompt(params) {
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
-    freestyleMode = false
+    freestyleMode = false, breakRule = false, eraUndertone = ''
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -2609,6 +2609,20 @@ Rule: ${_poa.rule}`;
     ? `\n\nERA ANCHORS (${_eraVoc.label}): Weave 2-3 of these into the lyrics to lock the song in its era: ${_eraVoc.anchors.slice(0,8).join(', ')}. Forbidden anachronisms: ${_eraVoc.forbidden.slice(0,5).join(', ')}.`
     : '';
 
+  // ── Era UNDERTONE — secondary era tint for V2 / bridge ──────────────────
+  const _undEra = (eraUndertone && eraUndertone !== era) ? ERA_VOCABULARY[eraUndertone] : null;
+  const eraUndertoneNote = _undEra
+    ? `\n\nERA UNDERTONE (${_undEra.label}): Verse 2 and the bridge should tint with vocabulary from this era — pull 1-2 anchors from: ${_undEra.anchors.slice(0,6).join(', ')}. This is a TEXTURE layer; do not let it overpower the primary era. The contrast between the two eras IS the craft move.`
+    : '';
+
+  // ── BREAK ONE RULE — pick a random outlier from this genre and grant
+  //    explicit permission to commit to the same rule-break ────────────────
+  let breakRuleNote = '';
+  if (breakRule && genreOutliers && genreOutliers.length) {
+    const _pick = genreOutliers[Math.floor(Math.random() * genreOutliers.length)];
+    breakRuleNote = `\n\n🎲 BREAK ONE RULE — explicit permission granted:\n${_pick.song} broke "${_pick.rule}" → ${_pick.result}\nFind YOUR song's equivalent rule-break. Pick one ${genreLabel} convention and deliberately violate it for the same kind of payoff. The rule-break must be intentional, audible, and central to why this song lands. Do NOT just decorate — commit.`;
+  }
+
   // ── Key psychology injection ────────────────────────────────────────────
   const _keyPsych = MUSIC_THEORY_BIBLE.keyPsychology;
   const _keyPool  = Object.keys(_keyPsych);
@@ -2690,7 +2704,7 @@ SONGWRITING RULES:
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
 - LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -3163,7 +3177,8 @@ function buildRapLabPrompt(params) {
     rapDimensions = {},
     hookStyle = 'auto',
     freestyleMode = false,
-    barSwitch = 0
+    barSwitch = 0,
+    breakRule = false
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -3226,6 +3241,13 @@ function buildRapLabPrompt(params) {
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
+  // Break One Rule for Rap Lab (uses hip-hop outliers)
+  let breakRuleLock = '';
+  if (breakRule && GENRE_BIBLE && GENRE_BIBLE.hiphop && GENRE_BIBLE.hiphop.outliers && GENRE_BIBLE.hiphop.outliers.length) {
+    const _outliers = GENRE_BIBLE.hiphop.outliers;
+    const _pick = _outliers[Math.floor(Math.random() * _outliers.length)];
+    breakRuleLock = `\n\n🎲 BREAK ONE RULE — explicit permission granted:\n${_pick.song} broke "${_pick.rule}" → ${_pick.result}\nFind YOUR song's equivalent rule-break inside ${style.label}. Pick one convention of this style and deliberately violate it for the same kind of payoff. Must be intentional, audible, and central to why this song lands.`;
+  }
   const _barN = [2,4,8].includes(barSwitch) ? barSwitch : 0;
   const barSwitchLock = _barN ? `
 
@@ -3265,7 +3287,7 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • SYLLABIC DENSITY: ${dims.density.join(' + ')} — ${dims.density.map(d => DENSITY_NOTES[d]).filter(Boolean).join(' / ')}${dims.density.length > 1 ? `\n  ↳ DENSITY BLEND: Primary [${dims.density[0]}] drives VERSE 1 and HOOK — the main syllable count. Secondary [${dims.density.slice(1).join(' + ')}] is the UNDERTONE — surfaces in VERSE 2 and BRIDGE as a deliberate contrast in syllable pacing. Do NOT alternate bar-by-bar; switch structurally at section boundaries.` : ''}
 • VOCABULARY REGISTER: ${dims.vocabRegister.join(' + ')} — ${dims.vocabRegister.map(v => VOCAB_NOTES[v]).filter(Boolean).join(' / ')}${dims.vocabRegister.length > 1 ? `\n  ↳ VOCAB BLEND: Primary [${dims.vocabRegister[0]}] sets the main diction — VERSE 1, HOOK, and overall voice. Secondary [${dims.vocabRegister.slice(1).join(' + ')}] is the UNDERTONE — weave it into VERSE 2 and the BRIDGE for register contrast and thematic depth. The tension between the two is the craft move.` : ''}
 • PERSONA: ${dims.persona.join(' + ')} — ${dims.persona.map(p => PERSONA_NOTES[p]).filter(Boolean).join(' / ')}${dims.persona.length > 1 ? `\n  ↳ PERSONA BLEND: Primary [${dims.persona[0]}] anchors VERSE 1 and HOOK — whose voice the listener meets first. Secondary [${dims.persona.slice(1).join(' + ')}] is the UNDERTONE — takes over VERSE 2 or the BRIDGE as a perspective shift. Make the switch intentional (signpost with a pivot line); do NOT flip mid-bar.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}${barSwitchLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}${barSwitchLock}${breakRuleLock}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode

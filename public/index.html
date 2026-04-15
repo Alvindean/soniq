@@ -9359,7 +9359,16 @@ VIDEO PROMPT:
 
 function parseLuckyResult(raw,fusionName,meta,prodData){
   const title=parseSection(raw,'TITLE','VERDICT')||fusionName+' Song';
-  const verdict=parseSection(raw,'VERDICT','HOOK ISOLATION')||parseSection(raw,'VERDICT','LYRICS');
+  // Defensive verdict parse: try multiple downstream markers so we never
+  // fall through to end-of-string and pack the whole dump into verdict.
+  // Final cap = first paragraph + 320 chars (one-sentence pitch).
+  const _vRaw = parseSection(raw,'VERDICT','HOOK ISOLATION')
+              ||parseSection(raw,'VERDICT','LYRICS')
+              ||parseSection(raw,'VERDICT','SONG PROMPT')
+              ||parseSection(raw,'VERDICT','TEMPO')
+              ||parseSection(raw,'VERDICT','PRODUCTION BRIEF')
+              ||'';
+  const verdict=(_vRaw.split(/\n\s*\n/)[0]||'').replace(/\s+/g,' ').trim().slice(0,320);
   const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
   const lyrics=parseSection(raw,'LYRICS','SONG PROMPT');
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
@@ -9541,6 +9550,8 @@ async function generateSong(){
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
     freestyleMode: S.freestyleMode === true,
     barSwitch: (typeof S.barSwitch === 'number' && [2,4,8].includes(S.barSwitch)) ? S.barSwitch : 0,
+    breakRule: S.breakRule === true,
+    eraUndertone: typeof S.eraUndertone === 'string' ? S.eraUndertone : '',
     platinum: _platinumOn && isPlatinumEligible()
   };
   // Clear album context after use
@@ -9875,7 +9886,16 @@ function copyCopyrightClaim(ns) {
 
 function parseSongResult(raw,genre,topic,prodData){
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
-  const verdict=parseSection(raw,'VERDICT','HOOK ISOLATION')||parseSection(raw,'VERDICT','LYRICS');
+  // Defensive verdict parse: try multiple downstream markers so we never
+  // fall through to end-of-string and pack the whole dump into verdict.
+  // Final cap = first paragraph + 320 chars (one-sentence pitch).
+  const _vRaw = parseSection(raw,'VERDICT','HOOK ISOLATION')
+              ||parseSection(raw,'VERDICT','LYRICS')
+              ||parseSection(raw,'VERDICT','SONG PROMPT')
+              ||parseSection(raw,'VERDICT','TEMPO')
+              ||parseSection(raw,'VERDICT','PRODUCTION BRIEF')
+              ||'';
+  const verdict=(_vRaw.split(/\n\s*\n/)[0]||'').replace(/\s+/g,' ').trim().slice(0,320);
   const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
   const lyrics=parseSection(raw,'LYRICS','SONG PROMPT');
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
@@ -17506,27 +17526,43 @@ document.addEventListener('DOMContentLoaded', () => {
    ═════════════════════════════════════════════════════ */
 (function(){
   'use strict';
+  // Markers MUST be colon-anchored or unambiguous full phrases — this avoids
+  // false cuts on legitimate words like "variant", "notes", "structure" used
+  // in a sentence. Each marker is also boundary-checked (preceded by start
+  // of string, newline, or whitespace) so mid-sentence collisions don't fire.
   var MARKERS = [
     'LYRICS:','SONG PROMPT:','PRODUCTION BRIEF:','TEMPO & KEY:',
     'FLOW BREAKDOWN:','RAP LAB SETTINGS USED:','DIRECTOR NOTES:',
-    'VOCAL STACKING','STRUCTURE:','COUNTERMELODY:','DOPAMINE:',
-    'CORE PROMPT:','PROD BRIEF','VARIANT','HOOK SCORE:','NOTES:'
+    'VOCAL STACKING (DIRECTOR NOTE)','VOCAL STACKING:',
+    'STRUCTURE:','COUNTERMELODY:','DOPAMINE:','CORE PROMPT:',
+    'HOOK SCORE:','HOOK ISOLATION:'
   ];
   function sanitize(s){
     if(!s) return '';
     var out = String(s);
     for(var i=0;i<MARKERS.length;i++){
-      var idx = out.indexOf(MARKERS[i]);
+      var m = MARKERS[i];
+      // Boundary-check: marker must be at start, after newline, or after whitespace
+      var idx = -1, search = 0;
+      while(search < out.length){
+        var found = out.indexOf(m, search);
+        if(found === -1) break;
+        var prev = found === 0 ? '\n' : out.charAt(found - 1);
+        if(prev === '\n' || prev === '\r' || prev === ' ' || prev === '\t' || found === 0){
+          idx = found; break;
+        }
+        search = found + 1;
+      }
       if(idx !== -1) out = out.slice(0, idx);
     }
     out = out.replace(/\s+/g,' ').trim();
-    // Drop trailing fragments
     out = out.replace(/[,;:\-—\s]+$/,'');
-    // Cap at 320 chars — a verdict is one pitch sentence, not a paragraph
-    if(out.length > 320){
-      var tail = out.slice(0, 320);
+    // Cap at 450 chars — accommodates a richer 2-sentence pitch but still
+    // prevents whole-dump leaks. Cut at last sentence boundary.
+    if(out.length > 450){
+      var tail = out.slice(0, 450);
       var lastDot = Math.max(tail.lastIndexOf('.'), tail.lastIndexOf('!'), tail.lastIndexOf('?'));
-      out = (lastDot > 160 ? tail.slice(0, lastDot+1) : tail).trim();
+      out = (lastDot > 200 ? tail.slice(0, lastDot+1) : tail).trim();
     }
     return out;
   }
@@ -17706,6 +17742,28 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch(e){}
 
     if(typeof toast === 'function') toast(on ? 'Freestyle on — Hook Style overridden' : 'Freestyle off — Hook Style restored');
+  };
+
+  window.qfToggleBreakRule = function(){
+    var b = document.getElementById('qf-break-rule');
+    if(!b) return;
+    var on = b.getAttribute('data-on') === 'true';
+    on = !on;
+    b.setAttribute('data-on', on ? 'true' : 'false');
+    try { S.breakRule = on; } catch(e){}
+    if(typeof toast === 'function') toast(on ? '🎲 Rule-break on — one outlier rule will be honored next gen' : 'Rule-break off');
+  };
+
+  window.setEraUndertone = function(el, value){
+    try { S.eraUndertone = value || ''; } catch(e){}
+    var wrap = document.getElementById('era-undertone-pills');
+    if(wrap){
+      wrap.querySelectorAll('.qpill').forEach(function(p){ p.classList.remove('on'); });
+      if(el && el.classList) el.classList.add('on');
+    }
+    if(typeof toast === 'function'){
+      toast(value ? ('Era undertone: ' + value + ' (V2 / bridge)') : 'Era undertone off');
+    }
   };
 
   window.qfAnalyzeUrl = async function(){
