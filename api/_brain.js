@@ -2698,7 +2698,7 @@ HOOK SELF-CHECK: After writing the chorus, verify: (1) Is the title or central p
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
 
-TITLE: [song title]
+TITLE: [song title — if the title is in any language other than English, append an English translation in parentheses, e.g. "Calle Vacía (Empty Street)" or "夜の海 (Night Ocean)". English-only titles need no parenthetical.]
 
 VERDICT: [one sentence on why this song will connect with listeners]
 
@@ -2860,7 +2860,7 @@ SONGWRITING RULES:
 
 Respond with EXACTLY this format:
 
-TITLE: [song title]
+TITLE: [song title — if the title is in any language other than English, append an English translation in parentheses, e.g. "Calle Vacía (Empty Street)" or "夜の海 (Night Ocean)". English-only titles need no parenthetical.]
 
 VERDICT: [one sentence on why this song will connect]
 
@@ -3284,7 +3284,7 @@ SONGWRITING RULES:
 
 Respond with EXACTLY this format:
 
-TITLE: [song title]
+TITLE: [song title — if the title is in any language other than English, append an English translation in parentheses, e.g. "Calle Vacía (Empty Street)" or "夜の海 (Night Ocean)". English-only titles need no parenthetical.]
 
 VERDICT: [one sentence on why this song will connect]
 
