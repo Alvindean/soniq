@@ -2853,6 +2853,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .ss-timer[hidden]{display:none}
 
 .quick-features{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px 0;padding:2px 0;justify-content:center}
+.qf-overridden{opacity:.4;pointer-events:none;filter:grayscale(.5);transition:opacity .15s}
+.qf-override-note{margin:6px 0 4px 0;padding:5px 10px;font-size:10px;font-weight:700;color:var(--amber,#f5a524);background:rgba(245,165,36,.1);border:1px dashed rgba(245,165,36,.45);border-radius:6px;letter-spacing:.03em;text-transform:uppercase}
 .qf-pill{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
 .qf-pill:hover{border-color:rgba(245,165,36,.55);color:var(--tx1);background:rgba(245,165,36,.08)}
 .qf-pill[data-on="true"]{background:linear-gradient(135deg,rgba(245,165,36,.25),rgba(245,165,36,.12));border-color:var(--amber,#f5a524);color:var(--amber,#f5a524)}
@@ -17422,7 +17424,49 @@ document.addEventListener('DOMContentLoaded', () => {
     on = !on;
     b.setAttribute('data-on', on ? 'true' : 'false');
     try { window.__qfFreestyle = on; } catch(e){}
-    if(typeof toast === 'function') toast(on ? 'Freestyle on — looser structure' : 'Freestyle off');
+
+    // Freestyle OVERRIDES Hook Style — save previous selection, force 'freestyle'
+    // (not present in HOOK_STYLE_NOTES so no hook note is added to the prompt),
+    // also short-circuits the substyle fallback since it only runs when hookStyle==='auto'.
+    try {
+      var pillsWrap = document.getElementById('hook-style-pills');
+      if(typeof S !== 'undefined'){
+        if(on){
+          window.__qfPrevHookStyle = S.hookStyle || 'auto';
+          S.hookStyle = 'freestyle';
+          S.freestyleMode = true;
+        } else {
+          S.hookStyle = window.__qfPrevHookStyle || 'auto';
+          S.freestyleMode = false;
+          window.__qfPrevHookStyle = null;
+        }
+      }
+      if(pillsWrap){
+        if(on){
+          pillsWrap.classList.add('qf-overridden');
+          if(!document.getElementById('qf-override-note')){
+            var note = document.createElement('div');
+            note.id = 'qf-override-note';
+            note.className = 'qf-override-note';
+            note.textContent = '🎤 Freestyle is overriding Hook Style';
+            pillsWrap.parentNode.insertBefore(note, pillsWrap);
+          }
+        } else {
+          pillsWrap.classList.remove('qf-overridden');
+          var n = document.getElementById('qf-override-note');
+          if(n) n.parentNode.removeChild(n);
+          // Re-highlight the saved pill if restorable
+          var restored = (typeof S !== 'undefined' && S.hookStyle) ? S.hookStyle : 'auto';
+          pillsWrap.querySelectorAll('.bpill').forEach(function(p){
+            p.classList.remove('on');
+            var oc = p.getAttribute('onclick') || '';
+            if(oc.indexOf("'" + restored + "'") !== -1) p.classList.add('on');
+          });
+        }
+      }
+    } catch(e){}
+
+    if(typeof toast === 'function') toast(on ? 'Freestyle on — Hook Style overridden' : 'Freestyle off — Hook Style restored');
   };
 
   window.qfAnalyzeUrl = async function(){
