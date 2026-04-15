@@ -8450,14 +8450,69 @@ function fallbackCopy(text, msg) {
   }
 }
 function cpField(id){const el=document.getElementById(id);if(!el)return;const txt=(el.textContent||el.innerText||'').trim();if(!txt||!el.offsetHeight){toast('Nothing to copy — generate a song first');return;}safeCopy(txt,'Copied to clipboard');}
+// Suno style field fits 1000 chars on v3.5/v4. Trim the copied prompt
+// by at least 5% AND to <= SUNO_STYLE_MAX so it always fits.
+const SUNO_STYLE_MAX = 950; // leave 50-char buffer under Suno's 1000
+function compressSunoPrompt(raw){
+  if(!raw) return '';
+  let s = String(raw);
+  // normalize whitespace / punctuation
+  s = s.replace(/\r/g,'').replace(/\n+/g,', ').replace(/\s{2,}/g,' ').trim();
+  // strip filler phrases (safe — these add nothing to a style prompt)
+  const fillers = [
+    /\bthat is\b/gi, /\bwhich is\b/gi, /\bin order to\b/gi,
+    /\bvery\s+/gi, /\breally\s+/gi, /\bquite\s+/gi,
+    /\bplease\s+/gi, /\bkindly\s+/gi,
+    /\bas well as\b/gi, /\bin addition to\b/gi,
+    /\bfeel free to\b/gi, /\bmake sure to\b/gi,
+    /\ba lot of\b/gi, /\bsort of\b/gi, /\bkind of\b/gi,
+    /\s+—\s+/g  // em-dash clauses are usually decorative
+  ];
+  const fillerReplacements = ['','','to',' ',' ',' ','','','and','and','','','many','','',', '];
+  fillers.forEach((r,i)=>{ s = s.replace(r, fillerReplacements[i]); });
+  // dedupe comma-separated tags (case-insensitive, keep first)
+  const parts = s.split(/\s*,\s*/);
+  const seen = Object.create(null);
+  const kept = [];
+  for(const p of parts){
+    const key = p.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+    if(!key) continue;
+    if(seen[key]) continue;
+    seen[key] = true;
+    kept.push(p.trim());
+  }
+  s = kept.join(', ').replace(/,\s*,/g, ',').replace(/\s{2,}/g,' ').trim();
+  // ensure at least 5% reduction vs raw
+  const minReduced = Math.floor(String(raw).length * 0.95);
+  if(s.length > minReduced){
+    // drop lowest-value trailing clauses until we hit the 5% floor
+    const tags = s.split(/\s*,\s*/);
+    while(tags.length > 1 && s.length > minReduced){
+      tags.pop();
+      s = tags.join(', ');
+    }
+  }
+  // hard-cap to Suno ceiling
+  if(s.length > SUNO_STYLE_MAX){
+    s = s.slice(0, SUNO_STYLE_MAX);
+    const lastComma = s.lastIndexOf(',');
+    if(lastComma > SUNO_STYLE_MAX * 0.7) s = s.slice(0, lastComma);
+    s = s.trim().replace(/[,;:\-\s]+$/,'');
+  }
+  return s;
+}
+
 function cpBriefPrompt(prefix){
   const el=document.getElementById(prefix==='res'?'res-title':'lres-title');
   // Get the prompt from brief-core-prompt span inside the brief-output
   const briefEl=document.querySelector(`#${prefix}-brief-content .brief-prompt-box`);
   const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
-  const text=briefEl?.textContent||song?.style||'';
-  if(!text){toast('Generate a song first');return;}
-  safeCopy(text, 'Song prompt copied');
+  const raw=briefEl?.textContent||song?.style||'';
+  if(!raw){toast('Generate a song first');return;}
+  const trimmed = compressSunoPrompt(raw);
+  const saved = Math.max(0, raw.length - trimmed.length);
+  const pct = raw.length ? Math.round(saved * 100 / raw.length) : 0;
+  safeCopy(trimmed, `Prompt copied (${trimmed.length} chars, −${pct}% for Suno)`);
 }
 function cpVisualPrompt(prefix){
   const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
