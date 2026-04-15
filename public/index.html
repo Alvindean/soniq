@@ -2836,6 +2836,47 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ═════════════════════════════════════════════════════
+   v2.1 UI ADDITIONS — topbar, quick features, timer,
+   sample pill/panel, v2.1 header tag
+   ═════════════════════════════════════════════════════ */
+.gen-topbar{position:fixed;top:0;left:0;right:0;height:3px;background:transparent;z-index:99999;pointer-events:none;opacity:0;transition:opacity .25s}
+.gen-topbar.on{opacity:1}
+.gtb-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--amber,#f5a524),#ffd166,var(--amber,#f5a524));box-shadow:0 0 10px rgba(245,165,36,.55);transition:width .4s ease-out;border-radius:0 2px 2px 0}
+.gen-topbar.indeterminate .gtb-fill{width:40%;animation:gtbSlide 1.2s ease-in-out infinite}
+@keyframes gtbSlide{0%{margin-left:-40%}100%{margin-left:100%}}
+
+.htag.v21-tag{background:linear-gradient(135deg,rgba(245,165,36,.18),rgba(245,165,36,.08));border:1px solid rgba(245,165,36,.45);color:var(--amber,#f5a524);font-weight:700;letter-spacing:.04em}
+
+.ss-timer{display:inline-flex;align-items:center;gap:4px;margin-left:8px;padding:3px 9px;border-radius:99px;background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.35);color:var(--amber,#f5a524);font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+.ss-timer[hidden]{display:none}
+
+.quick-features{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;padding:2px 0}
+.qf-pill{display:inline-flex;align-items:center;gap:4px;padding:6px 12px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);font-size:11px;font-weight:600;letter-spacing:.02em;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:inherit}
+.qf-pill:hover{border-color:rgba(245,165,36,.55);color:var(--tx1);background:rgba(245,165,36,.08)}
+.qf-pill[data-on="true"]{background:linear-gradient(135deg,rgba(245,165,36,.25),rgba(245,165,36,.12));border-color:var(--amber,#f5a524);color:var(--amber,#f5a524)}
+.qf-pill .qf-state{font-weight:700;color:inherit}
+
+.sample-pill{position:absolute;display:none;align-items:center;gap:6px;padding:6px 11px;background:linear-gradient(135deg,var(--amber,#f5a524),#ffb347);color:#1a1a24;font-size:11px;font-weight:700;border-radius:99px;border:1px solid rgba(0,0,0,.2);box-shadow:0 4px 14px rgba(245,165,36,.45);cursor:pointer;z-index:9998;letter-spacing:.02em;user-select:none}
+.sample-pill.show{display:inline-flex;animation:spFade .18s ease-out}
+.sample-pill:hover{filter:brightness(1.08)}
+@keyframes spFade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+.sample-panel{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);background:var(--s2,#14141c);border-left:1px solid var(--b2,#2a2a3a);box-shadow:-10px 0 40px rgba(0,0,0,.55);z-index:10000;transform:translateX(100%);transition:transform .25s ease-out;display:flex;flex-direction:column;color:var(--tx1,#e0e0f0)}
+.sample-panel.open{transform:translateX(0)}
+.sp-head{padding:16px 18px;border-bottom:1px solid var(--b2,#2a2a3a);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.sp-title{font-weight:800;font-size:14px;color:var(--amber,#f5a524);letter-spacing:.04em;text-transform:uppercase}
+.sp-close{background:transparent;border:none;color:var(--tx3,#8a8aa0);font-size:22px;cursor:pointer;line-height:1;padding:0 4px}
+.sp-close:hover{color:var(--tx1,#e0e0f0)}
+.sp-body{flex:1;overflow-y:auto;padding:14px 18px}
+.sp-hint{font-size:11px;color:var(--tx3,#8a8aa0);margin-bottom:12px;line-height:1.5}
+.sp-line{display:block;width:100%;text-align:left;padding:10px 12px;margin-bottom:6px;background:var(--s3,#1a1a24);border:1px solid var(--b2,#2a2a3a);border-radius:8px;color:var(--tx1,#e0e0f0);font-size:13px;line-height:1.4;cursor:pointer;transition:all .15s;font-family:inherit}
+.sp-line:hover{border-color:var(--amber,#f5a524);background:rgba(245,165,36,.08)}
+.sp-line.picked{border-color:var(--amber,#f5a524);background:rgba(245,165,36,.15);box-shadow:inset 0 0 0 1px rgba(245,165,36,.35)}
+.sp-empty{padding:20px;text-align:center;color:var(--tx3,#8a8aa0);font-size:12px;line-height:1.6}
+.sp-foot{padding:12px 18px;border-top:1px solid var(--b2,#2a2a3a);display:flex;gap:8px;justify-content:flex-end}
+
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
@@ -2844,6 +2885,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 <script src="./lib/smart-lyrics-upgrade-integration.js"></script>
 </head>
 <body>
+<!-- v2.1 topbar progress -->
+<div id="gen-topbar" class="gen-topbar" aria-hidden="true"><div class="gtb-fill" id="gen-topbar-fill"></div></div>
 
 <!-- LEFT AD RAIL -->
 <aside class="ad-rail ad-rail-left" aria-hidden="true">
@@ -2908,6 +2951,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
   </div>
   <div class="hdr-tags">
     <span class="htag htag-gold">v12</span>
+    <span class="htag v21-tag" title="UI refresh">v2.1</span>
     <button onclick="showKeyScreen()" style="font-size:10px;font-weight:600;padding:3px 10px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;letter-spacing:.03em">🔑 API Key</button>
   </div>
 </div>
@@ -3529,6 +3573,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="gen-progress" id="gen-progress">
           <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div><div class="gp-pip" id="gp-pip-2"></div><div class="gp-pip" id="gp-pip-3"></div><div class="gp-pip" id="gp-pip-4"></div><div class="gp-pip" id="gp-pip-5"></div></div>
           <span id="gp-label">5 free songs this month</span>
+          <span id="ss-timer" class="ss-timer" hidden>⏱ <span id="ss-timer-val">0s</span></span>
+        </div>
+        <!-- v2.1 Quick Feature Strip -->
+        <div id="quick-features" class="quick-features" role="toolbar" aria-label="Quick features">
+          <button type="button" class="qf-pill" id="qf-edge" data-on="false" onclick="qfToggleEdge()" title="Inject edgier lyrical choices into the next generation">🔥 Edge: <span class="qf-state">Off</span></button>
+          <button type="button" class="qf-pill" id="qf-freestyle" data-on="false" onclick="qfToggleFreestyle()" title="Freestyle mode — looser structure, improvised feel">🎤 Freestyle</button>
+          <button type="button" class="qf-pill" id="qf-sample" onclick="openSamplePanel()" title="Pick a standout line from the current song as the seed for the next">⚡ Sample This</button>
+          <button type="button" class="qf-pill" id="qf-analyze" onclick="qfAnalyzeUrl()" title="Analyze a song URL and extract its style cues">🔍 Analyze URL</button>
         </div>
       </div>
 
@@ -3691,6 +3743,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
+        <button class="btn btn-sm" onclick="copyTitle('res')" title="Copy the song title">📋 Title</button>
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')" title="Copy song lyrics for pasting into Suno/Udio">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')" title="Copy the style/genre prompt for AI music platforms">📋 Copy Prompt</button>
@@ -4025,6 +4078,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
+        <button class="btn btn-sm" onclick="copyTitle('lres')" title="Copy the song title">📋 Title</button>
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')" title="Copy song lyrics for pasting into Suno/Udio">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('lres')" title="Copy the style/genre prompt for AI music platforms">📋 Copy Prompt</button>
@@ -17263,6 +17317,331 @@ document.addEventListener('DOMContentLoaded', () => {
   const lc=document.getElementById('a-library-count');
   if(lc)lc.textContent=getLearnedSongs().length;
 });
+
+/* ═════════════════════════════════════════════════════
+   v2.1 UI BEHAVIOR — topbar, timer, quick features,
+   copy title, Sample This (pill + panel)
+   ═════════════════════════════════════════════════════ */
+(function(){
+  'use strict';
+
+  // ─── Generation lifecycle detection via MutationObserver on #res-title
+  var _genActive = false;
+  var _genStartMs = 0;
+  var _genTimerInt = null;
+  var _topbarInt = null;
+
+  function _startGenUi(){
+    if(_genActive) return;
+    _genActive = true;
+    _genStartMs = Date.now();
+    // topbar
+    var bar = document.getElementById('gen-topbar');
+    var fill = document.getElementById('gen-topbar-fill');
+    if(bar && fill){
+      bar.classList.add('on');
+      fill.style.width = '8%';
+      var p = 8;
+      _topbarInt = setInterval(function(){
+        p = Math.min(92, p + Math.max(0.6, (92 - p) * 0.04));
+        fill.style.width = p + '%';
+      }, 400);
+    }
+    // timer
+    var t = document.getElementById('ss-timer');
+    var tv = document.getElementById('ss-timer-val');
+    if(t && tv){
+      t.hidden = false;
+      tv.textContent = '0s';
+      _genTimerInt = setInterval(function(){
+        tv.textContent = Math.floor((Date.now() - _genStartMs) / 1000) + 's';
+      }, 500);
+    }
+  }
+
+  function _stopGenUi(){
+    if(!_genActive) return;
+    _genActive = false;
+    if(_topbarInt){ clearInterval(_topbarInt); _topbarInt = null; }
+    if(_genTimerInt){ clearInterval(_genTimerInt); _genTimerInt = null; }
+    var bar = document.getElementById('gen-topbar');
+    var fill = document.getElementById('gen-topbar-fill');
+    if(bar && fill){
+      fill.style.width = '100%';
+      setTimeout(function(){
+        bar.classList.remove('on');
+        setTimeout(function(){ fill.style.width = '0%'; }, 260);
+      }, 400);
+    }
+    var t = document.getElementById('ss-timer');
+    if(t){ setTimeout(function(){ t.hidden = true; }, 1400); }
+  }
+
+  var GEN_START_MARKERS = ['crafting', 'writing song'];
+  function _isGenText(txt){
+    if(!txt) return false;
+    var l = txt.toLowerCase();
+    return GEN_START_MARKERS.some(function(m){ return l.indexOf(m) !== -1; });
+  }
+
+  function _wireTitleObserver(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    var obs = new MutationObserver(function(){
+      var txt = el.textContent || '';
+      if(_isGenText(txt)) _startGenUi();
+      else if(_genActive && txt && txt !== '—' && txt !== '…') _stopGenUi();
+    });
+    obs.observe(el, {childList:true, characterData:true, subtree:true});
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    _wireTitleObserver('res-title');
+    _wireTitleObserver('lres-title');
+    _mountSamplePanel();
+    _wireSampleSelection();
+  });
+
+  // ─── Quick Feature pill handlers
+  window.qfToggleEdge = function(){
+    var b = document.getElementById('qf-edge');
+    if(!b) return;
+    var on = b.getAttribute('data-on') === 'true';
+    on = !on;
+    b.setAttribute('data-on', on ? 'true' : 'false');
+    var s = b.querySelector('.qf-state');
+    if(s) s.textContent = on ? 'On' : 'Off';
+    try { window.__qfEdge = on; } catch(e){}
+    if(typeof toast === 'function') toast(on ? 'Edge mode on — next song will be bolder' : 'Edge mode off');
+  };
+
+  window.qfToggleFreestyle = function(){
+    var b = document.getElementById('qf-freestyle');
+    if(!b) return;
+    var on = b.getAttribute('data-on') === 'true';
+    on = !on;
+    b.setAttribute('data-on', on ? 'true' : 'false');
+    try { window.__qfFreestyle = on; } catch(e){}
+    if(typeof toast === 'function') toast(on ? 'Freestyle on — looser structure' : 'Freestyle off');
+  };
+
+  window.qfAnalyzeUrl = async function(){
+    var url = prompt('Paste a song URL to analyze (YouTube, Spotify, SoundCloud, Suno):');
+    if(!url) return;
+    url = url.trim();
+    if(!/^https?:\/\//i.test(url)){
+      if(typeof toast === 'function') toast('Please paste a full URL (starts with http/https)');
+      return;
+    }
+    if(typeof toast === 'function') toast('Analyzing URL…');
+    try {
+      var r = await fetch('/api/analyze-url', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({url:url})
+      });
+      var data = await r.json().catch(function(){ return null; });
+      if(!r.ok || !data){
+        if(typeof toast === 'function') toast('Analyze failed — endpoint returned ' + r.status);
+        return;
+      }
+      if(typeof toast === 'function') toast('Analysis ready — check console');
+      try { console.log('[Analyze URL]', data); } catch(e){}
+      var seed = data.seedLine || data.hook || data.tagline || '';
+      if(seed){
+        var si = document.getElementById('seed-line-input');
+        if(si){
+          si.value = seed;
+          si.dispatchEvent(new Event('input', {bubbles:true}));
+        }
+      }
+    } catch(err){
+      if(typeof toast === 'function') toast('Analyze URL not available');
+    }
+  };
+
+  // ─── Copy Title
+  window.copyTitle = function(prefix){
+    var el = document.getElementById((prefix || 'res') + '-title');
+    if(!el){ if(typeof toast==='function') toast('No title to copy'); return; }
+    var txt = (el.textContent || '').trim();
+    if(!txt || txt === '—' || /crafting|writing|daily limit|error/i.test(txt)){
+      if(typeof toast === 'function') toast('No title yet — generate a song first');
+      return;
+    }
+    if(typeof safeCopy === 'function'){
+      safeCopy(txt, 'Title copied');
+    } else {
+      try { navigator.clipboard.writeText(txt); if(typeof toast==='function') toast('Title copied'); }
+      catch(e){ if(typeof toast==='function') toast('Copy failed'); }
+    }
+  };
+
+  // ─── Sample This — floating pill on lyric selection
+  var _samplePillEl = null;
+  function _ensureSamplePill(){
+    if(_samplePillEl) return _samplePillEl;
+    var p = document.createElement('div');
+    p.id = 'sample-pill';
+    p.className = 'sample-pill';
+    p.textContent = '⚡ Sample This';
+    p.addEventListener('mousedown', function(e){ e.preventDefault(); });
+    p.addEventListener('click', function(){
+      var sel = window.getSelection();
+      var txt = sel ? sel.toString().trim() : '';
+      if(txt) commitSample(txt);
+      _hideSamplePill();
+    });
+    document.body.appendChild(p);
+    _samplePillEl = p;
+    return p;
+  }
+  function _hideSamplePill(){ if(_samplePillEl) _samplePillEl.classList.remove('show'); }
+
+  function _wireSampleSelection(){
+    ['res-lyrics-text','lres-lyrics-text'].forEach(function(id){
+      var box = document.getElementById(id);
+      if(!box) return;
+      box.addEventListener('mouseup', function(){
+        setTimeout(function(){
+          var sel = window.getSelection();
+          if(!sel || sel.isCollapsed){ _hideSamplePill(); return; }
+          var txt = sel.toString().trim();
+          if(txt.length < 4 || txt.length > 140){ _hideSamplePill(); return; }
+          // ensure selection is inside this lyrics box
+          var anchor = sel.anchorNode;
+          var inside = false;
+          var n = anchor;
+          while(n){ if(n === box){ inside = true; break; } n = n.parentNode; }
+          if(!inside){ _hideSamplePill(); return; }
+          var rect;
+          try { rect = sel.getRangeAt(0).getBoundingClientRect(); } catch(e){ return; }
+          if(!rect || !rect.width){ _hideSamplePill(); return; }
+          var pill = _ensureSamplePill();
+          pill.style.left = (rect.left + window.scrollX + rect.width/2 - 55) + 'px';
+          pill.style.top  = (rect.top  + window.scrollY - 38) + 'px';
+          pill.classList.add('show');
+        }, 10);
+      });
+    });
+    document.addEventListener('mousedown', function(e){
+      if(_samplePillEl && !_samplePillEl.contains(e.target)) _hideSamplePill();
+    });
+  }
+
+  window.commitSample = function(line){
+    if(!line) return;
+    line = String(line).replace(/\s+/g,' ').trim();
+    if(line.length > 120) line = line.slice(0,120);
+    var si = document.getElementById('seed-line-input');
+    if(si){
+      si.value = line;
+      si.dispatchEvent(new Event('input', {bubbles:true}));
+      si.focus();
+      si.blur();
+    }
+    if(typeof toast === 'function') toast('Seed line set: ' + (line.length>42 ? line.slice(0,42)+'…' : line));
+    _closeSamplePanel();
+  };
+
+  // ─── Sample Panel — auto-extract standout lines
+  function _mountSamplePanel(){
+    if(document.getElementById('sample-panel')) return;
+    var wrap = document.createElement('div');
+    wrap.id = 'sample-panel';
+    wrap.className = 'sample-panel';
+    wrap.innerHTML =
+      '<div class="sp-head">' +
+        '<div class="sp-title">⚡ Sample This</div>' +
+        '<button class="sp-close" type="button" aria-label="Close" onclick="closeSamplePanel()">×</button>' +
+      '</div>' +
+      '<div class="sp-body">' +
+        '<div class="sp-hint">Tap a standout line to use it as the <strong>Seed Line</strong> for your next generation. You can also highlight any lyric and hit the floating ⚡ pill.</div>' +
+        '<div id="sp-lines"></div>' +
+      '</div>' +
+      '<div class="sp-foot">' +
+        '<button class="btn btn-sm" type="button" onclick="closeSamplePanel()">Close</button>' +
+      '</div>';
+    document.body.appendChild(wrap);
+  }
+
+  function _extractStandoutLines(text){
+    if(!text) return [];
+    var raw = String(text).split(/\n+/);
+    var out = [];
+    var seen = Object.create(null);
+    for(var i=0;i<raw.length;i++){
+      var line = raw[i].trim();
+      if(!line) continue;
+      if(/^\[.*\]$/.test(line)) continue;              // section markers
+      if(/^\(.*\)$/.test(line)) continue;              // stage directions
+      if(line.length < 14 || line.length > 120) continue;
+      if(/^(verse|chorus|bridge|hook|outro|intro|pre-?chorus)\b/i.test(line)) continue;
+      var key = line.toLowerCase().replace(/[^a-z0-9]+/g,' ').trim();
+      if(seen[key]) continue;
+      seen[key] = true;
+      var score = 0;
+      if(/["'"'].+["'"']/.test(line)) score += 2;
+      if(/[—–-]/.test(line)) score += 1;
+      if(/\b(i|you|we|never|always|still|never|gone|home|heart|fire|ghost|sleep|remember)\b/i.test(line)) score += 1;
+      var words = line.split(/\s+/).length;
+      if(words >= 6 && words <= 14) score += 2;
+      out.push({line:line, score:score});
+      if(out.length >= 40) break;
+    }
+    out.sort(function(a,b){ return b.score - a.score; });
+    return out.slice(0, 8).map(function(o){ return o.line; });
+  }
+
+  function _currentLyricsText(){
+    var ids = ['res-lyrics-text','lres-lyrics-text'];
+    for(var i=0;i<ids.length;i++){
+      var el = document.getElementById(ids[i]);
+      if(el){
+        var t = (el.innerText || el.textContent || '').trim();
+        if(t) return t;
+      }
+    }
+    return '';
+  }
+
+  window.openSamplePanel = function(){
+    _mountSamplePanel();
+    var panel = document.getElementById('sample-panel');
+    var list = document.getElementById('sp-lines');
+    if(!panel || !list) return;
+    var lyrics = _currentLyricsText();
+    var lines = _extractStandoutLines(lyrics);
+    list.innerHTML = '';
+    if(!lines.length){
+      list.innerHTML = '<div class="sp-empty">No lyrics yet — generate a song, then open Sample This to pick a seed line for your next run.</div>';
+    } else {
+      lines.forEach(function(ln){
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'sp-line';
+        b.textContent = ln;
+        b.addEventListener('click', function(){
+          list.querySelectorAll('.sp-line').forEach(function(x){ x.classList.remove('picked'); });
+          b.classList.add('picked');
+          commitSample(ln);
+        });
+        list.appendChild(b);
+      });
+    }
+    panel.classList.add('open');
+  };
+  function _closeSamplePanel(){
+    var p = document.getElementById('sample-panel');
+    if(p) p.classList.remove('open');
+  }
+  window.closeSamplePanel = _closeSamplePanel;
+
+  // Safety net — stop UI if generation stalls for > 3 minutes
+  setInterval(function(){
+    if(_genActive && (Date.now() - _genStartMs) > 180000) _stopGenUi();
+  }, 5000);
+})();
 </script>
 <!-- ══ ANALYTICS + GAMIFICATION ══ -->
 <script>
