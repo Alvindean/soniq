@@ -2714,6 +2714,14 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
+🚫 CRAFT VOCABULARY FIREWALL — ABSOLUTE RULE:
+Any technique name that appears in the instructions below — including but not limited to "undertone", "primary", "secondary", "blend", "graft", "invert", "counter-melody", "internal rhyme", "multi-syllabic", "triplet", "syncopated", "freestyle", "hook", "chorus", "verse", "bridge", "rule-break", "era anchor" — is INSTRUCTION VOCABULARY. It tells YOU how to execute the craft.
+It is NOT song vocabulary. DO NOT use any of those words as:
+  • Rhyme words
+  • Lyric content ("this chorus hits different" is fine as natural speech; "my rhyme is internal" is forbidden)
+  • Titles
+DEMONSTRATE the technique in the writing. NEVER NAME IT in the writing. If a line would rhyme on or showcase a technique name, rewrite with different words.
+
 Genre: ${genreLabel}
 Topic: ${topic}
 Mood: ${mood}
@@ -3310,6 +3318,15 @@ Mood: ${mood}
 Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
+
+🚫 CRAFT VOCABULARY FIREWALL — ABSOLUTE RULE:
+The technique names used below to control your craft — specifically: "internal", "multi-syllabic", "end-only", "chain", "mosaic", "slant", "triplet", "syncopated", "on-beat", "double-time", "conversational", "behind-beat", "sparse", "medium", "dense", "ultra-dense", "street-coded", "conscious-literary", "abstract-surreal", "minimal-phonetic", "academic", "first-person-raw", "character", "omniscient", "second-person", "collective-we", "undertone", "primary", "secondary", "blend", "freestyle", "hook", "chorus", "verse", "bridge" — are INSTRUCTION VOCABULARY for YOU. They tell you HOW to execute the craft.
+They are NOT song vocabulary. DO NOT use any of them as:
+  • Rhyme words (never rhyme on "internal", "triplet", "undertone", etc.)
+  • Lyric content (never write a line like "my flow is triplet")
+  • Bar-internal words (don't sneak them mid-line either)
+DEMONSTRATE the technique in the writing. NEVER NAME IT in the writing.
+If a line would use one of these words, rewrite that line with different vocabulary.
 
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • FLOW STYLE: ${dims.flow.join(' + ')} — ${dims.flow.map(f => FLOW_NOTES[f]).filter(Boolean).join(' / ')}${dims.flow.length > 1 ? `\n  ↳ FLOW BLEND: Primary flow [${dims.flow[0]}] drives VERSE bars — this is the workhorse delivery. Secondary flow [${dims.flow.slice(1).join(' + ')}] enters in HOOK and/or BRIDGE. The contrast between them creates the dynamic arc: verse attacks differently than hook. Do NOT alternate flows randomly bar-by-bar — assign them structurally by section.` : ''}
