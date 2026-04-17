@@ -80,10 +80,12 @@ module.exports = async function handler(req, res) {
   const adminTokenHeader = req.headers['x-admin-token'] || '';
   let isAdminRequest = false;
   if (adminTokenHeader) {
-    const secret = process.env.ADMIN_TOKEN_SECRET || 'soniq-default-secret';
+    const secret = process.env.ADMIN_TOKEN_SECRET;
     const adminPw = process.env.ADMIN_PASSWORD || '';
-    const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
-    isAdminRequest = (adminTokenHeader === expected);
+    if (secret && secret.length >= 16 && adminPw) {
+      const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
+      isAdminRequest = (adminTokenHeader === expected);
+    }
   }
 
   // GET /api/publish — list user's registrations (merged from publish-list.js)

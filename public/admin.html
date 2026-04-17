@@ -149,7 +149,8 @@ document.getElementById('pw-input').addEventListener('keydown', e => {
 async function loadData() {
   document.getElementById('content').innerHTML = '<div class="loading">Loading analytics…</div>';
   try {
-    const r = await fetch(`/api/admin?key=${encodeURIComponent(_adminKey)}`);
+    // Send via header — query-string passwords leak to Vercel/CDN logs, browser history, and referrers.
+    const r = await fetch('/api/admin', { headers: { 'x-admin-key': _adminKey } });
     if (r.status === 401) {
       document.getElementById('dashboard').style.display = 'none';
       document.getElementById('login-screen').style.display = 'flex';

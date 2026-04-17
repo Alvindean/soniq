@@ -4,15 +4,60 @@
 
 export const config = { maxDuration: 30 };
 
+// Origin allowlist — wildcard CORS turned this endpoint into a free
+// URL-fetch proxy for any site on the web. Now locked to our own
+// origins + local dev.
+const ALLOWED_ORIGINS = new Set([
+  'https://mysoniq.com',
+  'https://www.mysoniq.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000'
+]);
+
+// Hostname denylist — block SSRF to cloud-metadata + private networks.
+// Any URL resolving to one of these gets rejected before we fetch.
+function isPrivateOrMetadataHost(hostname) {
+  const h = String(hostname || '').toLowerCase();
+  if (!h) return true;
+  if (h === 'localhost' || h === '0.0.0.0' || h === '::1') return true;
+  if (h === '169.254.169.254' || h.startsWith('169.254.')) return true; // AWS/Azure/GCP metadata
+  if (h === 'metadata.google.internal') return true;
+  if (/^10\./.test(h)) return true;
+  if (/^192\.168\./.test(h)) return true;
+  if (/^172\.(1[6-9]|2\d|3[01])\./.test(h)) return true;
+  if (/^127\./.test(h)) return true;
+  if (/^fc[0-9a-f]{2}:/i.test(h) || /^fd[0-9a-f]{2}:/i.test(h)) return true; // IPv6 unique-local
+  return false;
+}
+
 export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  const origin = req.headers.origin || '';
+  if (ALLOWED_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  // Reject cross-origin POSTs that did not come from an allowed origin
+  if (origin && !ALLOWED_ORIGINS.has(origin)) {
+    return res.status(403).json({ error: 'Origin not allowed' });
+  }
 
   const { url } = req.body || {};
   if (!url || typeof url !== 'string') return res.status(400).json({ error: 'url required' });
+
+  // Validate scheme + host before any fetch — no SSRF to internal networks
+  let parsed;
+  try { parsed = new URL(url.trim()); } catch { return res.status(400).json({ error: 'invalid url' }); }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    return res.status(400).json({ error: 'only http/https URLs allowed' });
+  }
+  if (isPrivateOrMetadataHost(parsed.hostname)) {
+    return res.status(403).json({ error: 'URL host not allowed' });
+  }
 
   try {
     const result = await fetchURLContent(url.trim());

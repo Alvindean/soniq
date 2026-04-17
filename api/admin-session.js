@@ -63,8 +63,11 @@ module.exports = async function handler(req, res) {
     return res.status(401).json({ error: 'unauthorized' });
   }
 
-  // Generate deterministic HMAC token
-  const secret = process.env.ADMIN_TOKEN_SECRET || 'soniq-default-secret';
+  // Generate deterministic HMAC token — FAIL CLOSED if env missing
+  const secret = process.env.ADMIN_TOKEN_SECRET;
+  if (!secret || secret.length < 16) {
+    return res.status(500).json({ error: 'server misconfigured' });
+  }
   const token = createHmac('sha256', secret)
     .update(ADMIN_PASSWORD)
     .digest('hex');

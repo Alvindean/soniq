@@ -203,9 +203,9 @@ a{color:var(--amber);text-decoration:none}
 .djfx-btn.inserted{background:var(--violetbg,rgba(124,58,237,.08));border-color:var(--violetline,#7c3aed33);color:var(--violet)}
 .djfx-hint{font-size:11px;color:var(--tx4);margin-top:8px}
 /* More options toggle */
-.more-opts-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 0;margin:10px 0 4px;background:none;border:none;border-top:1px solid var(--b1);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx4);transition:color .15s;letter-spacing:.03em}
-.more-opts-btn:hover{color:var(--tx2)}
-.more-opts-btn[aria-expanded="true"]{color:var(--tx2)}
+.more-opts-btn{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px 0;margin:10px 0 4px;background:none;border:none;border-top:1px solid var(--b1);cursor:pointer;font-size:11px;font-weight:600;color:var(--tx4);transition:color .15s,opacity .2s;letter-spacing:.03em;opacity:.62}
+.more-opts-btn:hover{color:var(--tx2);opacity:1}
+.more-opts-btn[aria-expanded="true"]{color:var(--tx2);opacity:1}
 #more-opts-panel{padding-top:8px}
 /* Generate block above the fold */
 #pg-write.on #gen-action-main{margin-bottom:0}
@@ -466,13 +466,14 @@ a{color:var(--amber);text-decoration:none}
   .import-modal{max-height:85vh}
   .import-modal,.batch-modal,.vp-modal{max-height:80vh}
 }
-.gen-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 34px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 16px rgba(245,184,0,0.22)}
+.gen-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 34px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 10px rgba(245,184,0,0.14);animation:genBreathe 2.4s ease-in-out infinite}
+@keyframes genBreathe{0%,100%{box-shadow:0 2px 10px rgba(245,184,0,0.14)}50%{box-shadow:0 3px 18px rgba(245,184,0,0.28)}}
 .gen-btn.platinum-on{background:linear-gradient(135deg,#f5b800 0%,#c084fc 100%);box-shadow:0 2px 20px rgba(192,132,252,0.35)}
 .plat-switch{width:36px;height:20px;border-radius:10px;background:var(--b3);border:1px solid var(--b4);position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
 .plat-switch.on{background:linear-gradient(135deg,#f5b800,#c084fc);border-color:transparent}
 .plat-knob{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
 .plat-switch.on .plat-knob{transform:translateX(16px)}
-.gen-btn:hover:not(:disabled){background:#ffc820;transform:translateY(-1px);box-shadow:0 4px 24px rgba(245,184,0,0.35)}
+.gen-btn:hover:not(:disabled){background:#ffc820;transform:translateY(-1px);box-shadow:0 6px 32px rgba(245,184,0,0.45);animation:none}
 .gen-btn:active:not(:disabled){transform:translateY(0)}
 .gen-btn:disabled{opacity:0.55;cursor:not-allowed;transform:none;box-shadow:none}
 .gen-btn-icon{font-size:16px}
@@ -2885,6 +2886,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .qf-pill:hover{border-color:rgba(245,165,36,.55);color:var(--tx1);background:rgba(245,165,36,.08)}
 .qf-pill[data-on="true"]{background:linear-gradient(135deg,rgba(245,165,36,.25),rgba(245,165,36,.12));border-color:var(--amber,#f5a524);color:var(--amber,#f5a524)}
 .qf-pill .qf-state{font-weight:700;color:inherit}
+/* v2.1 refresh — differentiate toggle pills (LED dot) from action pills (arrow).
+   Toggles carry state, actions fire and return. Users can tell at a glance. */
+.qf-pill.toggle::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#3a3a4a;margin-right:5px;transition:background .15s,box-shadow .15s;vertical-align:middle}
+.qf-pill.toggle[data-on="true"]::before{background:var(--amber,#f5a524);box-shadow:0 0 6px rgba(245,165,36,.85)}
+.qf-pill.action{font-weight:600}
+.qf-pill.action::after{content:' →';opacity:.55;transition:opacity .15s,transform .15s;display:inline-block}
+.qf-pill.action:hover::after{opacity:1;transform:translateX(2px)}
+.quick-features .qf-sep{display:inline-block;width:1px;height:18px;background:var(--b1);margin:0 4px;align-self:center}
 
 .sample-pill{position:absolute;display:none;align-items:center;gap:6px;padding:6px 11px;background:linear-gradient(135deg,var(--amber,#f5a524),#ffb347);color:#1a1a24;font-size:11px;font-weight:700;border-radius:99px;border:1px solid rgba(0,0,0,.2);box-shadow:0 4px 14px rgba(245,165,36,.45);cursor:pointer;z-index:9998;letter-spacing:.02em;user-select:none}
 .sample-pill.show{display:inline-flex;animation:spFade .18s ease-out}
@@ -3219,10 +3228,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
         <div class="rl-style-grid" id="rl-style-grid"></div>
         <div class="rl-dimensions" id="rl-dimensions" style="display:none">
-          <div class="rl-dim-header">Fine-tune dimensions</div>
+          <div class="rl-dim-header" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <span>Fine-tune dimensions</span>
+            <span class="rl-dim-legend" style="margin:0"><span class="lg-prim"><span class="lg-dot prim"></span>primary</span><span class="lg-und"><span class="lg-dot und"></span>undertone (V2 / bridge)</span></span>
+          </div>
           <div class="rl-dim-row">
             <span class="rl-dim-label">Flow</span>
-            <div class="rl-dim-legend"><span class="lg-prim"><span class="lg-dot prim"></span>primary</span><span class="lg-und"><span class="lg-dot und"></span>undertone (V2 / bridge)</span></div>
             <div class="rl-dim-pills" id="rld-flow">
               <span class="rl-dpill on" onclick="setRapDim(this,'flow','syncopated')">Syncopated</span>
               <span class="rl-dpill" onclick="setRapDim(this,'flow','on-beat')">On-Beat</span>
@@ -3234,7 +3245,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
           <div class="rl-dim-row">
             <span class="rl-dim-label">Rhyme</span>
-            <div class="rl-dim-legend"><span class="lg-prim"><span class="lg-dot prim"></span>primary</span><span class="lg-und"><span class="lg-dot und"></span>undertone (V2 / bridge)</span></div>
             <div class="rl-dim-pills" id="rld-rhyme">
               <span class="rl-dpill on" onclick="setRapDim(this,'rhymeArch','end-only')">End Only</span>
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','internal')">Internal</span>
@@ -3247,7 +3257,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
           <div class="rl-dim-row">
             <span class="rl-dim-label">Density</span>
-            <div class="rl-dim-legend"><span class="lg-prim"><span class="lg-dot prim"></span>primary</span><span class="lg-und"><span class="lg-dot und"></span>undertone (V2 / bridge)</span></div>
             <div class="rl-dim-pills" id="rld-density">
               <span class="rl-dpill" onclick="setRapDim(this,'density','sparse')">Sparse 1–4/bar</span>
               <span class="rl-dpill on" onclick="setRapDim(this,'density','medium')">Medium 5–8/bar</span>
@@ -3257,7 +3266,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
           <div class="rl-dim-row">
             <span class="rl-dim-label">Vocab</span>
-            <div class="rl-dim-legend"><span class="lg-prim"><span class="lg-dot prim"></span>primary</span><span class="lg-und"><span class="lg-dot und"></span>undertone (V2 / bridge)</span></div>
             <div class="rl-dim-pills" id="rld-vocab">
               <span class="rl-dpill on" onclick="setRapDim(this,'vocabRegister','street-coded')">Street-Coded</span>
               <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','conscious-literary')">Conscious</span>
@@ -3268,7 +3276,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
           <div class="rl-dim-row">
             <span class="rl-dim-label">Persona</span>
-            <div class="rl-dim-legend"><span class="lg-prim"><span class="lg-dot prim"></span>primary</span><span class="lg-und"><span class="lg-dot und"></span>undertone (V2 / bridge)</span></div>
             <div class="rl-dim-pills" id="rld-persona">
               <span class="rl-dpill on" onclick="setRapDim(this,'persona','first-person-raw')">First Person</span>
               <span class="rl-dpill" onclick="setRapDim(this,'persona','character')">Character</span>
@@ -3646,11 +3653,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="gen-action" id="gen-action-main">
         <!-- v2.1 Quick Feature Strip — sits directly above Generate so toggles inform the click -->
         <div id="quick-features" class="quick-features" role="toolbar" aria-label="Quick features">
-          <button type="button" class="qf-pill" id="qf-edge" data-on="false" onclick="qfToggleEdge()" title="Inject edgier lyrical choices into the next generation">🔥 Edge: <span class="qf-state">Off</span></button>
-          <button type="button" class="qf-pill" id="qf-freestyle" data-on="false" onclick="qfToggleFreestyle()" title="Freestyle mode — looser structure, improvised feel">🎤 Freestyle</button>
-          <button type="button" class="qf-pill" id="qf-sample" onclick="openSamplePanel()" title="Pick a standout line from the current song as the seed for the next">⚡ Sample This</button>
-          <button type="button" class="qf-pill" id="qf-analyze" onclick="qfAnalyzeUrl()" title="Analyze a song URL and extract its style cues">🔍 Analyze URL</button>
-          <button type="button" class="qf-pill" id="qf-break-rule" data-on="false" onclick="qfToggleBreakRule()" title="Pick one famous rule-breaker from this genre and take permission to break the same rule">🎲 Break One Rule</button>
+          <button type="button" class="qf-pill toggle" id="qf-edge" data-on="false" onclick="qfToggleEdge()" title="Inject edgier lyrical choices into the next generation">🔥 Edge: <span class="qf-state">Off</span></button>
+          <button type="button" class="qf-pill toggle" id="qf-freestyle" data-on="false" onclick="qfToggleFreestyle()" title="Freestyle mode — looser structure, improvised feel">🎤 Freestyle</button>
+          <button type="button" class="qf-pill toggle" id="qf-break-rule" data-on="false" onclick="qfToggleBreakRule()" title="Pick one famous rule-breaker from this genre and take permission to break the same rule">🎲 Break One Rule</button>
+          <span class="qf-sep" aria-hidden="true"></span>
+          <button type="button" class="qf-pill action" id="qf-sample" onclick="openSamplePanel()" title="Pick a standout line from the current song as the seed for the next">⚡ Sample This</button>
+          <button type="button" class="qf-pill action" id="qf-analyze" onclick="qfAnalyzeUrl()" title="Analyze a song URL and extract its style cues">🔍 Analyze URL</button>
         </div>
         <button class="gen-btn" id="gen-btn" onclick="generateSong()">
           <span class="gen-btn-icon">🎵</span>

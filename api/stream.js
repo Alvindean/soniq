@@ -289,7 +289,9 @@ async function pipeSSE(r, res, extractText) {
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
   const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
-  const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
+  // Scope preview CORS to this project's preview subdomains only.
+  const isPreview = /^https:\/\/soniq-[a-z0-9\-]+-alvindean\.vercel\.app$/i.test(origin)
+                 || /^https:\/\/soniq-[a-z0-9\-]+\.vercel\.app$/i.test(origin);
   const cors = allowed.includes(origin) || isPreview ? origin : 'https://www.mysoniq.com';
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
@@ -302,10 +304,12 @@ module.exports = async function handler(req, res) {
   const adminTokenHeader = req.headers['x-admin-token'] || '';
   if (adminTokenHeader) {
     const { createHmac } = require('crypto');
-    const secret = process.env.ADMIN_TOKEN_SECRET || 'soniq-default-secret';
+    const secret = process.env.ADMIN_TOKEN_SECRET;
     const adminPw = process.env.ADMIN_PASSWORD || '';
-    const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
-    if (adminTokenHeader === expected) {
+    const expected = (secret && secret.length >= 16 && adminPw)
+      ? createHmac('sha256', secret).update(adminPw).digest('hex')
+      : null;
+    if (expected && adminTokenHeader === expected) {
       // Valid admin — skip auth, grant unlimited access
       req._adminBypass = true;
       req._adminPlan = 'studio';

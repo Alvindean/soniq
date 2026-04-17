@@ -130,7 +130,11 @@ async function callOpenRouter(apiKey, messages, system, max_tokens) {
 module.exports = async function handler(req, res) {
   const origin = req.headers.origin || '';
   const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
-  const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
+  // Scope preview CORS to this project's preview subdomains only (was
+  // echoing any *.vercel.app — i.e. every Vercel deploy on the planet
+  // could call our paid endpoint).
+  const isPreview = /^https:\/\/soniq-[a-z0-9\-]+-alvindean\.vercel\.app$/i.test(origin)
+                 || /^https:\/\/soniq-[a-z0-9\-]+\.vercel\.app$/i.test(origin);
   const cors = allowed.includes(origin) || isPreview ? origin : 'https://www.mysoniq.com';
   res.setHeader('Access-Control-Allow-Origin', cors);
   res.setHeader('Vary', 'Origin');
@@ -144,10 +148,12 @@ module.exports = async function handler(req, res) {
   const adminTokenHeader = req.headers['x-admin-token'] || '';
   let isAdmin = false;
   if (adminTokenHeader) {
-    const secret = process.env.ADMIN_TOKEN_SECRET || 'soniq-default-secret';
+    const secret = process.env.ADMIN_TOKEN_SECRET;
     const adminPw = process.env.ADMIN_PASSWORD || '';
-    const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
-    isAdmin = (adminTokenHeader === expected);
+    if (secret && secret.length >= 16 && adminPw) {
+      const expected = createHmac('sha256', secret).update(adminPw).digest('hex');
+      isAdmin = (adminTokenHeader === expected);
+    }
   }
 
   // ── Auth check ──────────────────────────────────────────────────
@@ -206,8 +212,14 @@ module.exports = async function handler(req, res) {
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).json({error:'Invalid JSON'}); }
 
-  // Treat 'server-side' sentinel as no user key
-  const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
+  // Treat 'server-side' sentinel as no user key. Also validate that a
+  // submitted key is actually an Anthropic key format — refuse to forward
+  // arbitrary strings to anthropic.com on the user's behalf.
+  const _rawKey = (body?.userKey && body.userKey !== 'server-side') ? String(body.userKey).trim() : null;
+  const userKey = (_rawKey && /^sk-ant-[A-Za-z0-9_\-]{20,}$/.test(_rawKey)) ? _rawKey : null;
+  if (_rawKey && !userKey) {
+    return res.status(400).json({ error: 'invalid_api_key_format' });
+  }
 
   if (userKey) {
     // User-supplied key: use their key directly
