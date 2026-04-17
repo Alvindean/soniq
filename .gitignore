@@ -6,3 +6,9 @@ node_modules/
 *.log
 # Proprietary IP documentation — local only, never push
 ip-docs/
+
+# Sibling projects — never include
+nuwav/
+sparqiq/
+endpoint-monitor-report-*.md
+soniq-endpoint-monitor-*.md
