@@ -2439,7 +2439,7 @@ function buildSongPrompt(params) {
   const structStr = freestyleMode
     ? '[Intro | optional, beat only] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
     : (STRUCTURES[structure] || STRUCTURES.standard);
-  const freestyleMode = false; const freestyleSongLock = freestyleMode ? `
+  const freestyleSongLock = freestyleMode ? `
 
 🎤 FREESTYLE MODE — HARD STRUCTURAL OVERRIDE (non-negotiable, supersedes the genre's default structure):
 - This is a freestyle. NO hook. NO chorus. NO pre-chorus. NO bridge. NO post-chorus. NO refrain. NO sung melodic hook of any kind.
@@ -3915,4 +3915,5 @@ function buildProductionData(genre) {
 }
 
 module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote };
+
 
