@@ -2669,7 +2669,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   // ── Seed line injection ─────────────────────────────────────────────────
   const _cleanSeed = seedLine ? sanitizeInput(seedLine, 120) : '';
   const seedLineNote = _cleanSeed
-    ? `\n\nSEED LINE (build the entire song around this line): "${_cleanSeed}" — This is the anchor. Every chorus, every verse must orbit this line. It should appear verbatim in the chorus and be the emotional thesis of the song.`
+    ? `\n\nSEED LINE (build the entire song around this line): "${_cleanSeed}" — This is the anchor. Every chorus, every verse must orbit this line. It MUST appear verbatim, word-for-word, unedited, as the opening or closing line of the chorus. This is non-negotiable. Do not paraphrase, do not alter a single word.`
     : '';
 
   // ── Syllable budget ─────────────────────────────────────────────────────
@@ -2758,7 +2758,7 @@ HOOK ISOLATION:
 [Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
 
 LYRICS:
-[Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
+${_cleanSeed ? '\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\n' : ''}[Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
 
 SONG PROMPT:
 Genre: [core genre + sub-genre]
