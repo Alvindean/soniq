@@ -3357,7 +3357,7 @@ ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}${barSwitchLo
 BRACKET REQUIREMENTS:
 ${freestyleMode
   ? 'Use ONLY: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (optional), [Outro] (optional). Inline ad-libs in (parentheses) on the same line as bars are allowed. NO hook/chorus/bridge/pre-chorus brackets of any kind.'
-  : bracketInstructionServer('hiphop', bracketMode, style.label)}
+  : bracketInstructionServer('hiphop', 'suno', style.label)}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
