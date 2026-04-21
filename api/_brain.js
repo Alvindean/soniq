@@ -3246,7 +3246,12 @@ function buildRapLabPrompt(params) {
     'analog-melodic':    'trap-soul',
     'conscious-trap':    'trap-soul',
     'afro-boom-bap':     'neo-boom-bap',
-    'jazz-rap-revival':  'jazz-rap'
+    'jazz-rap-revival':  'jazz-rap',
+    'phonk':             'phonk-rap',
+    'anthem-rap':        'conscious',
+    'hustle-grind':      'trap',
+    'hyphy-rap':         'g-funk',
+    'latin-rap':         'boom-bap'
   };
   const normalizedId = (rapStyle || 'trap').replace(/_/g, '-');
   const backendId    = RAP_STYLE_MAP[normalizedId] || normalizedId;
