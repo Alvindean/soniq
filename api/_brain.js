@@ -2712,6 +2712,13 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const adlibNote = buildAdlibNote(genre);
   const vocalStackNote = buildVocalStackNote(genre);
 
+  const _aggrMap = {
+    mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
+    heat:   'Heat — elevated intensity, confrontational urgency in every bar. The verse should feel like it is building toward something that could explode. Think Kendrick "HUMBLE." / Future menace / City Girls unapologetic. Every line has a point to prove.',
+    rage:   'Rage — maximum aggression throughout. Every line hits like a threat or a demand. No softness, no hesitation — pure unfiltered force. Think Eminem "Till I Collapse," DMX bark, early Chief Keef cold menace, NF uncontained fury.'
+  };
+  const aggressionNote = _aggrMap[aggression] ? `\n\nAGGRESSION LEVEL — ${_aggrMap[aggression]}` : '';
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 🚫 CRAFT VOCABULARY FIREWALL — ABSOLUTE RULE:
@@ -2740,7 +2747,7 @@ SONGWRITING RULES:
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
-- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
+- GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
 - LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
 - NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
@@ -2758,7 +2765,21 @@ HOOK ISOLATION:
 [Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
 
 LYRICS:
-${_cleanSeed ? '\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\n' : ''}[Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
+${_cleanSeed ? '\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\n' : ''}[Write the complete song lyrics using this exact bracket system — three types, each with a distinct job:
+
+TYPE 1 — STRUCTURE (own line, opens every section — required):
+[Intro] · [Verse 1] · [Pre-Chorus] · [Chorus] · [Bridge] · [Hook] · [Breakdown] · [Outro]
+
+TYPE 2 — DELIVERY (own line immediately BEFORE the specific lyric line it affects):
+[Whispered] · [Spoken] · [Falsetto] · [Screamed] · [Harmony] · [Ad-libs]
+
+TYPE 3 — PRODUCTION DNA (placed inline inside the section body, ≥1 required per Chorus):
+[808 Bass] · [Build] · [Drop] · [Trap Hi-Hat] · [Steel Guitar] · [Choir] · [Beat Switch] · [Breakdown]
+
+PARENTHESES () = ad-libs and background vocal layers ONLY — never use () for structural or delivery purposes.
+  Same line as a lyric = rhythmic pocket filler. Standalone line = spotlight ad-lib moment.
+
+Every word must earn its place. No bracket tag = that section does not exist.]
 
 SONG PROMPT:
 Genre: [core genre + sub-genre]
@@ -2910,10 +2931,15 @@ HOOK ISOLATION:
 [Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
 
 LYRICS:
-[Write the complete song lyrics. EVERY SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE.]
+[Write the complete song lyrics using this exact bracket system:
+
+TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [Bridge] · [Outro]
+TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]
+TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [808 Bass] · [Build] · [Drop] · [Choir]
+PARENTHESES () = ad-libs only — never structural. Every word must earn its place.]
 
 SONG PROMPT:
-[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]
+[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3331,7 +3357,7 @@ ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}${barSwitchLo
 BRACKET REQUIREMENTS:
 ${freestyleMode
   ? 'Use ONLY: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (optional), [Outro] (optional). Inline ad-libs in (parentheses) on the same line as bars are allowed. NO hook/chorus/bridge/pre-chorus brackets of any kind.'
-  : bracketInstructionServer('hiphop', 'full', style.label)}
+  : bracketInstructionServer('hiphop', bracketMode, style.label)}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
@@ -3350,7 +3376,11 @@ TITLE: [song title — if the title is in any language other than English, appen
 VERDICT: [one sentence on why this song will connect]
 
 LYRICS:
-[Complete song lyrics only. EVERY SECTION starts with its bracket tag. Clean lyrics — no annotations, no notes, no commentary embedded in the lyrics.]
+[Complete song lyrics. Bracket system:
+TYPE 1 STRUCTURE (own line): [16-bar Verse | Rap Verse] · [8-bar Hook] · [Bridge] · [Outro]
+TYPE 2 DELIVERY (own line before lyric): [Whispered] · [Spoken] · [Ad-libs]
+TYPE 3 PRODUCTION DNA (inline, ≥1 per Hook/Chorus): [808 Bass] · [Trap Hi-Hat] · [Beat Switch] · [Drop]
+PARENTHESES () = ad-libs and background vocals only. No annotations in lyrics.]
 
 SONG PROMPT:
 [${rapSubSunoTag ? `MUST lead with: "${rapSubSunoTag}" — ` : ''}Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
