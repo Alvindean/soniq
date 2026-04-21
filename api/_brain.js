@@ -1109,6 +1109,14 @@ INLINE DELIVERY TAGS (place on their own line immediately before any lyric line 
 [Ad-libs] — free vocal riffs and fills (mark with parentheses inline too)
 [Screamed] — maximum intensity lines (rock/metal/gospel)
 [Harmony] — layered vocal harmony section
+[Half-Time] — sudden weight, tempo halves under the same vocal
+[Chanted] — collective power, group cadence, anthem energy
+[Wail] — raw extended emotional release
+[A Cappella] — stripped truth, voice alone, instruments drop out
+
+BRIDGE DELIVERY RULE — never default to [Spoken]. The bridge is the emotional peak or sharpest contrast in the song. Choose deliberately:
+[Falsetto] = soaring vulnerability · [Whispered] = intimate confession · [Harmony] = layered depth · [Screamed] = cathartic release · [Chanted] = collective power · [A Cappella] = stripped truth · [Half-Time] = sudden weight · [Wail] = raw emotion
+Use [Spoken] ONLY when the lyric is literally spoken dialogue — not sung, not felt, literally said aloud.
 
 ${gb.delivery}
 
