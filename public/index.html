@@ -3376,6 +3376,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
           <div id="graft-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:14px"></div>
 
+          <!-- AGGRESSION -->
+          <label class="topic-label">Aggression</label>
+          <div class="quality-row" id="aggression-pills">
+            <span class="qpill" onclick="setAggression(this,'mellow')">🌊 Mellow</span>
+            <span class="qpill on" onclick="setAggression(this,'mid')">◼ Mid</span>
+            <span class="qpill" onclick="setAggression(this,'heat')">🔥 Heat</span>
+            <span class="qpill" onclick="setAggression(this,'rage')">💢 Rage</span>
+          </div>
+          <div id="aggression-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px"></div>
+
           <!-- BRACKET FORMATTING -->
           <label class="bracket-label">Suno Bracket Formatting</label>
           <div class="bracket-pills" id="bracket-pills">
@@ -12611,6 +12621,20 @@ function setEra(el, val) {
   S.selectedEra = val;
   const desc = document.getElementById('era-desc');
   if (desc) desc.textContent = ERA_DESCS[val] || '';
+}
+
+const AGGRESSION_DESCS = {
+  mellow: 'Laid-back, conversational, introspective — emotion through restraint.',
+  mid:    'Balanced energy — default feel for most genres.',
+  heat:   'Elevated intensity, confrontational urgency — every bar has a point to prove.',
+  rage:   'Maximum force — no softness, no hesitation, pure unfiltered aggression.',
+};
+function setAggression(el, val) {
+  document.querySelectorAll('#aggression-pills .qpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.selectedAggression = val;
+  const desc = document.getElementById('aggression-desc');
+  if (desc) desc.textContent = AGGRESSION_DESCS[val] || '';
 }
 
 const AGE_DESCS = {
