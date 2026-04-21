@@ -507,6 +507,18 @@ const SUBSTYLE_SUNO = {
   'East Coast':         'east coast hip-hop, boom bap, jazz sample, vinyl crackle, 90 BPM, new york lyrical',
   'Midwest':            'midwest rap, chipmunk soul sample, chicago hip-hop, 95 BPM, emotional vulnerability',
   'Cloud Rap':          'cloud rap, ethereal haze, lo-fi drum machine, deep reverb, atmospheric synth pads, 80 BPM',
+  // Country
+  'Outlaw Country':     'outlaw country, acoustic guitar, raw telecaster, honky-tonk, rebel attitude, 95 BPM, minimal production, twang',
+  'Bakersfield':        'bakersfield country, fender telecaster, shuffle rhythm, california honky-tonk, 100 BPM, bright twang',
+  'Nashville Pop':      'country pop, polished production, electric guitar, pedal steel, 120 BPM, radio-ready, modern country, anthemic',
+  'Americana':          'americana, acoustic guitar, upright bass, subtle pedal steel, warm, honest, 85 BPM, literary, adult album',
+  'Bluegrass':          'bluegrass, banjo, mandolin, fiddle, upright bass, no drums, tight three-part harmony, 140 BPM, Appalachian',
+  'Bro-Country':        'bro-country, electric guitar, 115 BPM, party energy, summer, modern country, stadium singalong, upbeat',
+  'Alt-Country':        'alt-country, acoustic guitar, indie-inflected, honest, 90 BPM, defiant, warm, genre-fluid',
+  'Texas / Red Dirt':   'texas country, red dirt, acoustic guitar, warm, honest, 100 BPM, road song, Lone Star, organic band',
+  'Classic Honky-Tonk': 'classic honky-tonk, pedal steel guitar, fiddle, shuffle beat, 105 BPM, heartbreak, bar room, Hank Williams style',
+  'Country Gospel':     'country gospel, acoustic guitar, pedal steel, warm vocal harmony, 85 BPM, hymn, faith, southern testimony',
+  // Neo-Soul
   'Classic Neo-Soul':   'neo-soul, Rhodes electric piano, live drums with swing, upright bass, warm vinyl warmth, head-nod groove, 90 BPM',
   'Hip-Hop Neo-Soul':   'neo-soul, J Dilla off-beat hip-hop drums, soul vocals, vinyl warmth, 85 BPM',
   'Neo-Soul Ballad':    'neo-soul ballad, piano, intimate close-mic vocal, vulnerable, warm, 70 BPM',
