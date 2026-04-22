@@ -774,11 +774,23 @@ const RAP_STYLE_ADLIBS = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
-// LYRIC CRAFT TOOLKIT — universal techniques, genre-filtered per song.
+// LYRIC CRAFT TOOLKIT — universal techniques, genre + mode filtered per song.
 // Each technique has a short-form instruction used in the live prompt.
-// buildLyricCraftNote(genre) selects and formats the relevant set.
-// applicable. buildLyricCraftNote(genre) selects and formats the relevant set.
+// buildLyricCraftNote(genre, mood, topic) selects the relevant set based on
+// BOTH genre match AND mood-signal match (for cross-cutting frameworks like
+// the comedy / parody craft below, which apply to any genre when mood signals
+// funny / playful / absurd / etc.).
 // ─────────────────────────────────────────────────────────────────────────────
+
+// Shared mood keyword list for all 4 comedy-framework techniques. A comedy
+// technique fires when the mood matches ANY keyword here (word-boundary,
+// case-insensitive, hyphen-or-space tolerant). Matched against MOOD ONLY
+// (not topic) — topic is narrative content and contains words like "funny
+// story" on serious songs, which would cause false comedy injection.
+const COMEDY_MODES = [
+  'playful','funny','silly','absurd','humorous','comedic','ironic','satirical',
+  'tongue in cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty'
+];
 const LYRIC_CRAFT_UNIVERSAL = {
 
   // ── FIGURATIVE LANGUAGE ────────────────────────────────────────────────────
@@ -870,38 +882,41 @@ const LYRIC_CRAFT_UNIVERSAL = {
   },
 
   // ── COMEDY / PARODY CRAFT (Ian Edwards "running the game" framework) ───────
-  // These 4 techniques activate on BOTH genre-match (comedy/parody/tvmusical)
-  // AND mood/topic-match (playful, funny, silly, absurd, humorous, etc.) —
-  // because comedic craft isn't a genre, it's a mode. A rap song about an
-  // absurd flex, a country novelty track, a pop tongue-in-cheek banger, a
-  // gospel comedy-praise song — all benefit from this framework when the
-  // song is meant to land as funny.
+  // These 4 techniques activate on EITHER:
+  //   • genre match (comedy / parody / tvmusical), OR
+  //   • mood match (any word in COMEDY_MODES — word-boundary, case-insensitive)
+  // Comedic craft isn't a genre, it's a mode. A rap song about an absurd
+  // flex, a country novelty track, a pop tongue-in-cheek banger — all
+  // benefit from this framework whenever the MOOD signals funny. Mood is
+  // a short emotional label; topic is narrative content and is NOT used
+  // for mode gating (would cause false-positives on serious songs whose
+  // topic happens to use words like "funny story").
   runTheGame: {
     label: 'RUN THE GAME (5-STEP HEIGHTENING)',
     short: `The framework behind every great comedic song (Lonely Island "I'm On A Boat", Weird Al originals, Bo Burnham, Flight of the Conchords, hip-hop's best punchline tracks, country novelty hits). 5 steps, executed across the song: (1) NOTICE: pick one unusual anchor — a word, behavior, or belief — and react to it honestly in the hook. (2) POV: give your comedic opinion on why it's unusual. This is your point of view for the entire song — commit to it. (3) HEIGHTEN: "if this is true, what else is true?" Each verse imagines a funnier scenario where the anchor is even more real. (4) GATHER: introduce new characters, settings, or info in verse 2 — new setups your anchor can land on. (5) CONNECT: every new setup punchlines back to the original anchor word or behavior. Final hook collapses everything into the same joke. Rule: you are not making 4 different jokes — you are making ONE joke 4 different ways.`,
     genres: ['comedy','parody','tvmusical'],
-    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty']
+    modes: COMEDY_MODES
   },
 
   heightenTheAnchor: {
     label: 'HEIGHTEN THE ANCHOR',
     short: `Pick ONE anchor word or behavior in the song (e.g. "peninsula", "boat", "kitchen"). Every verse stacks a more absurd scenario where the anchor is MORE true, more committed, more literal than before. Verse 1 is "I own a peninsula." Verse 2 is "I send girls pictures of my peninsula." Verse 3 is "the woman I'm marrying is a peninsula bride." Rule: scenarios must get WEIRDER and MORE SPECIFIC each time, not just repeat the premise. If verse 3 feels like verse 1, you haven't heightened.`,
     genres: ['comedy','parody','tvmusical'],
-    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty']
+    modes: COMEDY_MODES
   },
 
   remixTheAnchor: {
     label: 'REMIX THE ANCHOR (TWO BECOMING ONE)',
     short: `Take your anchor word and fuse it with OTHER nouns in the song to create nonsense-phrases that commit 100% to the joke. Ian Edwards: instead of "I'll send pictures of my penis," it becomes "I'll send pictures of my PENINSULA." The remix should land in a place the listener didn't expect but can perfectly understand in retrospect. Works in hook lines (maximum impact) or as a recurring punchline through verses. The word you pick for the anchor must be phonetically rich enough to absorb other nouns plausibly.`,
-    genres: ['comedy','parody','tvmusical','hiphop'],
-    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty']
+    genres: ['comedy','parody','tvmusical'],
+    modes: COMEDY_MODES
   },
 
   crowdWorkFeel: {
     label: 'CROWD-WORK FEEL (REACTIVE COMEDY)',
     short: `Write the song as if it's being discovered in real time — reactions, asides, observations to unseen "audience" responses built into the lyric. "So you live in San Fran? I kinda know what that means but I really don't" IS the first line. The comedic voice notices things and updates its theory mid-song. Use: (1) direct address to listener/character ("Don't have kids? That one's my niece."), (2) self-correction mid-verse ("Wait — it's a peninsula, not an island"), (3) interjections as bars ("Oh REALLY?"). Makes the song feel improvised, human, and alive — even though it's structured.`,
-    genres: ['comedy','parody','tvmusical','hiphop'],
-    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty','conversational']
+    genres: ['comedy','parody','tvmusical'],
+    modes: COMEDY_MODES
   },
 
   // ── HIP-HOP / RAP CRAFT ────────────────────────────────────────────────────
@@ -938,21 +953,36 @@ const LYRIC_CRAFT_UNIVERSAL = {
 
 // Returns a compact lyric craft instruction block for a given genre.
 // Uses short-form instructions to stay within prompt size budget (~2000 chars max).
-// Select lyric craft techniques by genre AND by mode (mood/topic keywords).
-// A technique activates if:
+// Select lyric craft techniques by genre AND by mode (mood keyword).
+// A technique activates if ANY of:
 //   - genres === 'all'                                              (universal)
 //   - genres array contains the current genre                       (genre-gated)
-//   - modes array contains a word present in mood/topic text        (mode-gated)
-// Mode-gating is how cross-cutting crafts (comedy "run-the-game" framework,
-// future additions) light up on a rap/country/pop/whatever song whenever the
-// mood or topic signals the song is meant to be funny/playful/ironic — not
-// only when the genre itself is "comedy".
+//   - modes array contains a word that appears in `mood` as a       (mode-gated)
+//     whole token (word-boundary match, case-insensitive,
+//     hyphens/underscores normalized to spaces so "tongue-in-cheek"
+//     and "tongue in cheek" both match).
+// Mode gating is intentionally against `mood` only (not `topic`). Topic is
+// free-form narrative content — on a serious song the user might write
+// "funny story my grandma told me" and that phrase must NOT trigger comedy
+// craft injection. Mood is a short emotional label and a reliable signal.
+// `topic` is accepted in the signature for future extensibility.
 function buildLyricCraftNote(genre, mood, topic) {
-  const contextText = ((mood || '') + ' ' + (topic || '')).toLowerCase();
+  // Normalize mood: lowercase, turn hyphens/underscores into spaces, collapse
+  // internal whitespace, pad with single spaces for word-boundary matching
+  // (so `' funny '` never matches inside `'funnymoney'`, `' ironic '` never
+  // matches inside `'sardonic'`/`'chronic'`/`'byronic'`, etc.).
+  const moodNorm = ' ' + (mood || '').toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+  const matchesMode = (modes) => {
+    if (!Array.isArray(modes) || !modes.length) return false;
+    for (const m of modes) {
+      if (moodNorm.includes(' ' + m + ' ')) return true;
+    }
+    return false;
+  };
   const applicable = Object.values(LYRIC_CRAFT_UNIVERSAL).filter(t => {
     if (t.genres === 'all') return true;
     if (Array.isArray(t.genres) && t.genres.includes(genre)) return true;
-    if (Array.isArray(t.modes) && t.modes.some(m => contextText.includes(m))) return true;
+    if (t.modes && matchesMode(t.modes)) return true;
     return false;
   });
   if (!applicable.length) return '';
