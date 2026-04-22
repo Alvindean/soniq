@@ -515,6 +515,31 @@ a{color:var(--amber);text-decoration:none}
 .opane-hint{font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;font-weight:700;margin-bottom:10px}
 .lyrics-box{font-family:var(--mono);font-size:13.5px;line-height:2.3;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:22px;position:relative}
 .lyrics-box .tag{color:var(--amber);font-weight:700}
+/* ── ALT TAKE PANEL (inline below result) + MODAL GRID ── */
+.alt-take-panel{margin-top:22px;padding:18px;background:linear-gradient(135deg,rgba(245,192,0,0.04),rgba(168,146,255,0.04));border:1px solid var(--amberline);border-radius:var(--r3);animation:pgIn .3s ease}
+.alt-take-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.alt-take-header>div:last-child{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+@media (max-width:480px){.alt-take-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))!important}.alt-take-card-precedent{display:none}}
+.alt-take-card:focus-visible{outline:2px solid var(--amber);outline-offset:2px;background:var(--amberbg)}
+.alt-take-eyebrow{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px}
+.alt-take-label{font-size:15px;font-weight:800;color:var(--tx1);line-height:1.3}
+.alt-take-title{font-size:20px;font-weight:800;color:var(--tx1);line-height:1.3;margin-bottom:6px}
+.alt-take-note{font-size:12px;color:var(--tx2);line-height:1.6;font-style:italic;margin-bottom:14px;padding:8px 12px;background:var(--s2);border-radius:var(--r1);border-left:3px solid var(--amber)}
+.alt-take-note:empty{display:none}
+.alt-take-lyrics{font-family:var(--mono);font-size:13px;line-height:2.2;color:#c8c8e8;white-space:pre-wrap;word-break:break-word;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:20px;position:relative;max-height:480px;overflow-y:auto}
+.alt-take-lyrics .tag{color:var(--amber);font-weight:700}
+.alt-take-suno-wrap{margin-top:14px}
+.alt-take-suno-label{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.alt-take-suno-prompt{width:100%;min-height:60px;padding:10px 12px;background:var(--s1);border:1px solid var(--b2);border-radius:var(--r1);color:var(--tx2);font-family:var(--mono);font-size:11.5px;line-height:1.6;resize:vertical;box-sizing:border-box}
+.alt-take-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.alt-take-card{padding:14px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:6px}
+.alt-take-card:hover{border-color:var(--amber);background:var(--amberbg);transform:translateY(-1px)}
+.alt-take-card-emoji{font-size:22px;line-height:1}
+.alt-take-card-label{font-size:13px;font-weight:800;color:var(--tx1);line-height:1.3}
+.alt-take-card-cat{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.1em}
+.alt-take-card-desc{font-size:11px;color:var(--tx2);line-height:1.55}
+.alt-take-card-precedent{font-size:10px;color:var(--tx3);line-height:1.5;padding-top:6px;border-top:1px dashed var(--b1);margin-top:2px}
+.alt-take-card-precedent b{color:var(--tx2);font-weight:700}
 /* Collapsible lyrics */
 /* Hidden by default — only a "Reveal lyrics" button remains visible.
    Prevents the entire generation scaffolding from being on-screen unsolicited. */
@@ -3855,6 +3880,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')" title="Copy song lyrics for pasting into Suno/Udio">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')" title="Copy the style/genre prompt for AI music platforms">📋 Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
+        <button class="btn btn-cyan btn-sm" onclick="openAlternateTakeModal('res')" title="Reimagine this song in a completely different style — regional rap swap, genre hybrid, etc.">🎭 Alt Take</button>
         <button class="btn btn-sm" onclick="batchGenerate()">⚡ Batch x3</button>
         <button class="btn btn-sm" onclick="openAudioModal('res')" id="audio-btn" style="display:none">🎵 Audio</button>
         <button class="btn btn-sm" onclick="openShareModal('res')" id="comm-share-res-btn" style="display:none">🌐 Share</button>
@@ -4027,6 +4053,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="res-opane-moodboard" class="opane"><div id="res-moodboard-content" class="moodboard"></div></div>
     <div id="res-opane-visual" class="opane"><div id="res-visual-content"></div></div>
     <div id="res-opane-sync" class="opane"><div id="res-sync-content"></div></div>
+
+    <!-- ALT TAKE PANEL (res) — reimagined song appears here -->
+    <div id="res-alt-take-panel" class="alt-take-panel" style="display:none">
+      <div class="alt-take-header">
+        <div>
+          <div class="alt-take-eyebrow">🎭 Alternate Take</div>
+          <div class="alt-take-label" id="res-alt-take-label">—</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn btn-sm" onclick="copyAltTakeLyrics('res')" title="Copy alt take lyrics">📋 Copy Lyrics</button>
+          <button class="btn btn-sm" onclick="copyAltTakeSunoPrompt('res')" title="Copy Suno production prompt">🎛 Copy Prompt</button>
+          <button class="btn btn-sm" onclick="closeAltTakePanel('res')" title="Close alternate take">✕</button>
+        </div>
+      </div>
+      <div class="alt-take-title" id="res-alt-take-title">—</div>
+      <div class="alt-take-note" id="res-alt-take-note"></div>
+      <div class="alt-take-lyrics" id="res-alt-take-lyrics"></div>
+      <div class="alt-take-suno-wrap">
+        <div class="alt-take-suno-label">🎛 Suno production prompt (alt version):</div>
+        <textarea id="res-alt-take-suno-prompt" class="alt-take-suno-prompt" readonly></textarea>
+      </div>
+    </div>
   </div>
 
   <!-- BATCH RESULTS MODAL -->
@@ -4189,6 +4237,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')" title="Copy song lyrics for pasting into Suno/Udio">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('lres')" title="Copy the style/genre prompt for AI music platforms">📋 Copy Prompt</button>
+        <button class="btn btn-cyan btn-sm" onclick="openAlternateTakeModal('lres')" title="Reimagine this song in a completely different style — regional rap swap, genre hybrid, etc.">🎭 Alt Take</button>
         <div class="song-card-overflow">
           <button class="btn btn-sm" onclick="toggleLresOverflow()" title="More options">⋯ More</button>
           <div class="song-card-overflow-menu" id="lres-overflow-menu">
@@ -4286,6 +4335,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="lres-opane-titles" class="opane"><div id="lres-titles-content"></div></div>
     <div id="lres-opane-visual" class="opane"><div id="lres-visual-content"></div></div>
     <div id="lres-opane-sync" class="opane"><div id="lres-sync-content"></div></div>
+
+    <!-- ALT TAKE PANEL (lres) — reimagined song appears here -->
+    <div id="lres-alt-take-panel" class="alt-take-panel" style="display:none">
+      <div class="alt-take-header">
+        <div>
+          <div class="alt-take-eyebrow">🎭 Alternate Take</div>
+          <div class="alt-take-label" id="lres-alt-take-label">—</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <button class="btn btn-sm" onclick="copyAltTakeLyrics('lres')" title="Copy alt take lyrics">📋 Copy Lyrics</button>
+          <button class="btn btn-sm" onclick="copyAltTakeSunoPrompt('lres')" title="Copy Suno production prompt">🎛 Copy Prompt</button>
+          <button class="btn btn-sm" onclick="closeAltTakePanel('lres')" title="Close alternate take">✕</button>
+        </div>
+      </div>
+      <div class="alt-take-title" id="lres-alt-take-title">—</div>
+      <div class="alt-take-note" id="lres-alt-take-note"></div>
+      <div class="alt-take-lyrics" id="lres-alt-take-lyrics"></div>
+      <div class="alt-take-suno-wrap">
+        <div class="alt-take-suno-label">🎛 Suno production prompt (alt version):</div>
+        <textarea id="lres-alt-take-suno-prompt" class="alt-take-suno-prompt" readonly></textarea>
+      </div>
+    </div>
   </div>
 
   <div id="lucky-history" class="lucky-hist-section" style="display:none">
@@ -4380,6 +4451,26 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="btn-row">
       <button class="btn btn-gold" onclick="loadPasted()">Load into Editor</button>
       <button class="btn" onclick="document.getElementById('paste-modal').style.display='none'">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     ALTERNATE TAKE MODAL — cross-style reimagining
+══════════════════════════════════════════════════════ -->
+<div id="alt-take-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:905;overflow-y:auto;padding:20px;box-sizing:border-box" onclick="if(event.target===this)closeAlternateTakeModal()">
+  <div class="card" style="max-width:920px;margin:24px auto;position:relative">
+    <button onclick="closeAlternateTakeModal()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:var(--tx3);font-size:18px;cursor:pointer;line-height:1">✕</button>
+    <div class="ctitle">🎭 Alternate Take</div>
+    <p style="font-size:12px;color:var(--tx2);margin-bottom:6px;line-height:1.6">
+      Reimagine this song through a completely different stylistic lens. Same topic and emotional arc — different production, flow, ad-libs, and regional vocabulary.
+    </p>
+    <p style="font-size:11px;color:var(--tx3);margin-bottom:18px;line-height:1.6">
+      Pick a pairing below. Examples: a Southern rapper on a G-Funk beat, a New York lyricist on Dr. Dre production, or a cross-genre hybrid like Linkin Park's rap-rock formula.
+    </p>
+    <div id="alt-take-grid" class="alt-take-grid"></div>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--b1);font-size:10px;color:var(--tx4);text-align:center">
+      Tip: Alt Takes use your current song as source material — the original stays intact. Each generation is a separate AI call.
     </div>
   </div>
 </div>
@@ -13709,6 +13800,7 @@ function closeAuth() {
     {id:'pl-picker-modal', close:()=>typeof closePlPicker==='function'&&closePlPicker(), z:902},
     {id:'vh-modal', close:()=>typeof closeVH==='function'&&closeVH(), z:901},
     {id:'variants-modal', close:()=>typeof closeVariants==='function'&&closeVariants(), z:900},
+    {id:'alt-take-modal', close:()=>typeof closeAlternateTakeModal==='function'&&closeAlternateTakeModal(), z:905},
     {id:'pwd-reset-modal', close:()=>{const m=document.getElementById('pwd-reset-modal');if(m)m.style.display='none';document.body.style.overflow='';}, z:960}
   ];
   document.addEventListener('keydown', function(e){
@@ -17485,6 +17577,259 @@ function checkShareLink() {
     // Clear hash
     history.replaceState(null,'',window.location.pathname);
   } catch(e) { /* invalid share link — ignore */ }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// ALTERNATE TAKE — reimagine a generated song through a different stylistic
+// lens. 12 curated pairings: 5 regional rap swaps + 7 cross-genre hybrids.
+// Each pairing carries specific production lock + ad-lib vocabulary + flow
+// instructions so the alt take doesn't collapse to "the same song again."
+// ═══════════════════════════════════════════════════════════════════════════
+const ALT_TAKE_PAIRINGS = [
+  // ── Regional rap swaps ─────────────────────────────────────────────
+  { id: 'southern-on-gfunk', emoji: '🌴', category: 'regional', label: 'Southern voice on G-Funk',
+    description: 'UGK / Scarface drawl over Warren G / Nate Dogg-era G-Funk — fluid Moog, hand-claps, sung hook.',
+    precedent: 'Scarface over "Regulate"-era production; UGK on Nate Dogg hooks',
+    altInstructions: 'Reimagine as a Southern rapper (Texas / ATL / Memphis drawl, elongated vowels, storytelling cadence, codeine-slow delivery). Over REGULATE-era G-Funk specifically (Warren G fluid Moog whine, walking funk bass, hand-claps, sung Nate Dogg-style hook invitation, 95 BPM slow roll, sun-drenched Pacific Coast texture). Production lock: "G-funk Regulate-era production with southern drawl vocal, fluid moog, walking funk bass, hand claps, sung melodic hook, 95 BPM, sun-drenched Pacific Coast". Ad-libs: Southern drawl ("slatt", "fasho", "huh", "yeah hoe") placed into West Coast laid-back pocket ("hol up", "smooth"). Hook should feature a sung melodic phrase (Nate Dogg tradition) — this is different from the NY-on-Dre pairing which stays rapped.' },
+  { id: 'ny-on-dre', emoji: '🗽', category: 'regional', label: 'NY lyricist on Dr. Dre beat',
+    description: '2001-era Dr. Dre polish — talkbox, tight piano stabs, snappy snares — with NYC lyrical density.',
+    precedent: 'Nas flow over a "Still D.R.E." instrumental; Mobb Deep on Compton production',
+    altInstructions: 'Reimagine as an East Coast lyricist (dense multi-syllabic rhyme schemes, jazz-sample-era vocabulary, NYC references like Queensbridge / Marcy / uptown, boom-bap flow discipline) rapping over 2001-era Dr. Dre production specifically (talkbox accents, tight piano stabs, snappy crisp snares, polished West Coast sheen, 95 BPM). Production lock: "Dr Dre 2001-era production with NY lyrical delivery, talkbox, piano stabs, crisp snappy snares, 95 BPM, polished west coast sheen under dense NY rhyme". Ad-libs: East Coast ad-libs ("yo", "word up", "ayo", "c\'mon son") — stay RAPPED throughout (no sung hook). The contrast: crisp Compton polish vs relentless NY lyrical density.' },
+  { id: 'bay-on-phonk', emoji: '🌉', category: 'regional', label: 'Bay Area on Memphis Phonk',
+    description: 'Hyphy movement energy and Bay vocabulary over dark slowed-down Memphis Phonk production.',
+    precedent: 'E-40 or Mistah F.A.B. on a Three 6 Mafia instrumental; scraper bass meets cowbell',
+    altInstructions: 'Reimagine as a Bay Area Hyphy rapper (hella energy, Oakland/Vallejo references, E-40 / Mac Dre ad-lib palette). KEEP the Hyphy hyperactivity — do NOT slow the vocal delivery to match the Memphis pocket. Instead, have the Bay Area rapper deliver Mac Dre-style triplet stutters and breathless ad-lib bursts OVER the slow 75 BPM Memphis Phonk beat (tape hiss, cowbell kick, distorted 808, slowed pitch-shifted sample). The contrast of frenetic Hyphy vocals on drowsy Memphis drums IS the art. Production lock: "phonk production with hyperactive Bay Area vocal, Memphis tape hiss, cowbell kick, slowed 808, 75 BPM, triplet stutter flow over drowsy drums". Ad-libs: full-volume "YEE!", "WHOOP WHOOP!", "HELLA!", "YADADAMEAN?" bursting through the slow mix.' },
+  { id: 'uk-drill-on-atl-trap', emoji: '🇬🇧', category: 'regional', label: 'UK Drill voice on Atlanta Trap',
+    description: 'London drill flow + vocab over Atlanta trap — sliding 808 glide, snare on 3, British slang.',
+    precedent: 'Central Cee on a Metro Boomin type beat; Headie One over Future production',
+    altInstructions: 'Reimagine as a UK Drill artist (London / Tottenham / Peckham references, British slang: "bruv", "fam", "innit", "oi", "gang", sliding flow on 8th notes) rapping over an Atlanta trap beat infused with drill signatures: the characteristic sliding 808 glissando (pitched 808 sliding between notes — THIS is the drill signature), rolling hi-hats, snare on beat 3 giving a half-time feel, 140 BPM. Production lock: "trap production with UK drill vocal, sliding 808 glissando, rolling hi-hats, snare on 3 half-time feel, 140 BPM, London vocab over Atlanta drums". Ad-libs: UK Drill exclusively ("oi", "bruv", "brrap", "gang", "splash", "innit") — the accent and slang are the differentiators. NEVER drop into Atlanta trap ad-libs like "skrrt" or "yah".' },
+  { id: 'memphis-on-boombap', emoji: '📻', category: 'regional', label: 'Memphis rapper over Boom Bap',
+    description: 'Three 6 Mafia dark Memphis delivery over 90s NY boom-bap jazz samples.',
+    precedent: 'Juicy J / Project Pat on a Pete Rock beat; Memphis drawl over Nas-era production',
+    altInstructions: 'Reimagine as a Memphis rapper (dark drawl, horror imagery, Three 6 Mafia lineage, slow deliberate cadence) rapping over 90s NY boom-bap production (jazz sample, vinyl crackle, hard kick-snare, 90 BPM). Production lock: "boom bap production with Memphis vocal, jazz sample, vinyl crackle, 90 BPM, Three 6 drawl over Pete Rock drums". Ad-libs: Memphis palette ("triple six", "yea hoe", "pimp", "grim") delivered in boom-bap pocket, not trap pocket.' },
+  // ── Cross-genre hybrids ───────────────────────────────────────────
+  { id: 'rap-plus-rock', emoji: '🎸', category: 'cross-genre', label: 'Hip-Hop + Rock (Linkin Park)',
+    description: 'Rap verses, sung alt-rock chorus, guitar crunch drops. Mike Shinoda / Chester Bennington formula.',
+    precedent: 'Linkin Park "In the End"; Rage Against the Machine; RUN-DMC × Aerosmith "Walk This Way"',
+    altInstructions: 'Reimagine as a rap/rock hybrid (Linkin Park / Rage Against the Machine territory). Verses stay rapped but push angrier and more cathartic. Chorus becomes SUNG by a rock vocalist — melodic, anthemic, distorted guitar backing. Bridge is a guitar solo or a breakdown. Production lock: "rap-rock fusion, distorted guitars, rapped verse with sung rock chorus, 100-120 BPM, Linkin Park aesthetic, gang vocals on chorus". Ad-libs: verse gets rap ad-libs, chorus has rock gang vocals and crowd shouts.' },
+  { id: 'rap-plus-country', emoji: '🤠', category: 'cross-genre', label: 'Hip-Hop + Country (Country-Trap)',
+    description: 'Rap verses with country instrumentation — banjo, pedal steel, twang. Lil Nas X territory.',
+    precedent: 'Lil Nas X "Old Town Road"; Jelly Roll genre-fluid work; Nelly + Tim McGraw',
+    altInstructions: 'Reimagine as country-trap hybrid. Keep rapped verses but BEND THE RAP VOCAL WITH COUNTRY TWANG — Jelly Roll style, where rap lines are inflected with elongated country vowels ("road" becomes "rooad", "home" becomes "hooome") instead of standard rap diction. Weave in country imagery (truck, small town, dirt road, honky-tonk, pedal steel crying between phrases). Chorus can be sung twangy or rapped with twang. Production lock: "country trap fusion, trap 808s with banjo and pedal steel, 120 BPM, Lil Nas X aesthetic, twang-inflected rap vocal". Ad-libs: mix trap ("ay", "yah") with country ("yeehaw", "fasho", "mmhmm").' },
+  { id: 'rap-plus-edm', emoji: '⚡', category: 'cross-genre', label: 'Hip-Hop + EDM (Drop Rap)',
+    description: 'Rap verses building to EDM drops instead of traditional choruses. Festival-ready.',
+    precedent: 'Flosstradamus + Waka Flocka; DJ Snake + hip-hop vocalists; Travis Scott stadium production',
+    altInstructions: 'Reimagine with EDM structural bones. Verses are rapped over building synth production. Pre-chorus is a classic EDM build-up (snare roll, filter sweep, riser). Chorus is replaced by an instrumental DROP — the rapper says a 2-bar trigger phrase, then the drop hits with maximum bass and synth chaos. 128 BPM. Production lock: "EDM + hip-hop hybrid, festival drop, sidechained bass, synth chaos, rap verses with instrumental drop chorus, 128 BPM". Ad-libs: EDM crowd triggers ("LET\'S GO!", "DROP IT!") alongside rap ad-libs.' },
+  { id: 'rock-plus-soul', emoji: '🎙', category: 'cross-genre', label: 'Rock + Soul (Alabama Shakes)',
+    description: 'Raw soul vocal delivery over bluesy southern rock instrumentation. Brittany Howard energy.',
+    precedent: 'Alabama Shakes; Black Keys; early Gary Clark Jr.',
+    altInstructions: 'Reimagine with rock + soul fusion. Dirty fuzz-tone guitar and Hammond organ underneath a powerful gospel-trained vocal. Dynamic contrast between whispered verses and belted choruses. Production lock: "southern rock + soul fusion, Hammond organ, raw fuzz guitar, 85-100 BPM, Alabama Shakes aesthetic, gospel-trained vocal". Ad-libs: soul ad-libs ("oh Lord", "mercy", melismatic runs) over rock instrumentation.' },
+  { id: 'pop-plus-punk', emoji: '💥', category: 'cross-genre', label: 'Pop + Punk Energy',
+    description: 'Pop hook discipline fused with punk aggression. Olivia Rodrigo / MGK direction.',
+    precedent: 'Olivia Rodrigo "Brutal" / "Good 4 U"; Avril Lavigne "Complicated" era; Machine Gun Kelly pop-punk-ish',
+    altInstructions: 'Reimagine with pop structural craft (memorable hook within 30s, precise verse-chorus dynamics) but punk energy (distorted guitars, faster tempo 150+ BPM, shouted emotional peaks, angsty register). Production lock: "pop-punk fusion, distorted guitars, big pop hook, 160 BPM, gang vocals on chorus, angsty register". Ad-libs: punk shouts ("hey hey!", "oi!") mixed with pop vocal runs.' },
+  { id: 'rap-plus-gospel', emoji: '🕊', category: 'cross-genre', label: 'Hip-Hop + Gospel',
+    description: 'Rap verses with gospel choir on hooks. Chance the Rapper "Coloring Book" direction.',
+    precedent: 'Chance the Rapper "How Great"; Kanye "Jesus Walks"; Lecrae',
+    altInstructions: 'Reimagine with hip-hop + gospel fusion. Keep rapped verses but replace hook with a mass choir + Hammond B3 organ lift. Bridge is a shout moment with call-and-response. Thematic reframe toward testimony / grace / redemption if the topic allows. Production lock: "gospel rap fusion, Hammond B3, mass choir on hook, 85-100 BPM, Chance the Rapper aesthetic, testimony arc". Ad-libs: gospel exclamations ("hallelujah", "yes Lord") on the hook, rap ad-libs on verses.' },
+  { id: 'country-plus-rnb', emoji: '🌾', category: 'cross-genre', label: 'Country + R&B',
+    description: 'Slow country storytelling with R&B vocal runs. Chris Stapleton meets PJ Morton.',
+    precedent: 'Chris Stapleton "Tennessee Whiskey"; Kane Brown; Beyoncé "Daddy Lessons"',
+    altInstructions: 'Reimagine as country + R&B. Acoustic country instrumentation (pedal steel, acoustic guitar, brushed drums) under a soul-trained vocal doing melismatic runs. Verses storytelling-conversational, chorus is emotional peak with vocal acrobatics. Production lock: "country + soul fusion, pedal steel, warm acoustic, R&B vocal runs, 85 BPM, Chris Stapleton aesthetic". Ad-libs: soul ("mmm", "oh yeah") over country warmth, no heavy ad-lib density.' }
+];
+
+function openAlternateTakeModal(contextKey) {
+  const song = contextKey === 'res' ? S.currentSong : S.luckyCurrentSong;
+  if (!song || !song.lyrics) {
+    if (typeof toast === 'function') toast('⚠ Generate a song first', 2500);
+    return;
+  }
+  S._altTakeContext = contextKey;
+  S._altTakeSourceSong = song;
+  renderAltTakePairings();
+  document.getElementById('alt-take-modal').style.display = 'block';
+}
+
+function closeAlternateTakeModal() {
+  const m = document.getElementById('alt-take-modal');
+  if (m) m.style.display = 'none';
+}
+
+function renderAltTakePairings() {
+  const grid = document.getElementById('alt-take-grid');
+  if (!grid) return;
+  const escHtml = s => String(s || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+  grid.innerHTML = ALT_TAKE_PAIRINGS.map(p => `
+    <div class="alt-take-card" tabindex="0" role="button" aria-label="Generate alternate take: ${escHtml(p.label)}" data-pairing-id="${escHtml(p.id)}" onclick="runAlternateTake('${escHtml(p.id)}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();runAlternateTake('${escHtml(p.id)}')}">
+      <div class="alt-take-card-emoji">${escHtml(p.emoji)}</div>
+      <div class="alt-take-card-label">${escHtml(p.label)}</div>
+      <div class="alt-take-card-cat">${p.category === 'regional' ? 'Regional swap' : 'Cross-genre hybrid'}</div>
+      <div class="alt-take-card-desc">${escHtml(p.description)}</div>
+      <div class="alt-take-card-precedent"><b>Precedent:</b> ${escHtml(p.precedent)}</div>
+    </div>
+  `).join('');
+}
+
+async function runAlternateTake(pairingId) {
+  const pairing = ALT_TAKE_PAIRINGS.find(p => p.id === pairingId);
+  if (!pairing || !S._altTakeSourceSong) return;
+  const src = S._altTakeSourceSong;
+  const ctx = S._altTakeContext;  // 'res' or 'lres'
+
+  closeAlternateTakeModal();
+
+  const panel = document.getElementById(ctx + '-alt-take-panel');
+  const lyricsEl = document.getElementById(ctx + '-alt-take-lyrics');
+  const titleEl = document.getElementById(ctx + '-alt-take-title');
+  const labelEl = document.getElementById(ctx + '-alt-take-label');
+  const noteEl = document.getElementById(ctx + '-alt-take-note');
+  const sunoEl = document.getElementById(ctx + '-alt-take-suno-prompt');
+  if (!panel || !lyricsEl) return;
+
+  panel.style.display = 'block';
+  labelEl.textContent = `${pairing.emoji} ${pairing.label}`;
+  titleEl.textContent = 'Writing alternate take…';
+  if (noteEl) noteEl.textContent = '';
+  if (sunoEl) sunoEl.value = '';
+  lyricsEl.innerHTML = '<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Reimagining…</div></div>';
+
+  setTimeout(() => panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 200);
+
+  const lyricsExcerpt = (src.lyrics || '').split('\n').slice(0, 20).join('\n').slice(0, 1200);
+  const system = 'You are a producer-songwriter hybrid running cross-style reimaginings. Your default instinct is to transform AGGRESSIVELY — if in doubt, change more, not less. A successful alt take should make a listener say "this is a different song" on first listen, then "oh, same core" on the second. You are not remixing — you are rewriting through a new stylistic lens. Preserve the topic and emotional arc; transform everything else.';
+
+  const prompt = `Rewrite the following song as an ALTERNATE TAKE — same song, different stylistic lens.
+
+ORIGINAL SONG:
+Title: ${src.title || '(untitled)'}
+Topic: ${src.topic || 'unspecified'}
+Original genre/style: ${src.genre || 'unspecified'}
+Original lyrics (reference for imagery anchors ONLY — not a rewrite target):
+${lyricsExcerpt}
+
+ALTERNATE TAKE BRIEF:
+${pairing.label} (${pairing.category === 'regional' ? 'Regional swap' : 'Cross-genre hybrid'})
+Precedent reference: ${pairing.precedent}
+
+Specific reimagine instructions:
+${pairing.altInstructions}
+
+WRITING RULES:
+- PRESERVE: the topic, the emotional arc, the song's core message. Any one memorable imagery anchor may be kept — but must appear in a new syntactic frame, not verbatim.
+- TRANSFORM: flow pattern, rhyme scheme, production tags, ad-libs, regional vocabulary, vocal delivery, cadence, line breaks.
+- Rewrite AT LEAST 70% of the lines. Do NOT copy the original lyrics verbatim — use them only to stay faithful to the topic.
+- The HOOK can be kept in concept but must be rewritten in the new style's vocabulary. If original hook was rapped, new hook may be sung (or vice versa).
+- Use the specific ad-libs and production vocabulary from the alternate style — NEVER generic "(yeah)" / "(hey)".
+- This is a complete song, not a remix snippet — write full verses, hook, and bridge.
+- If the echo feels too close to the original after your first pass, rewrite harder.
+
+OUTPUT FORMAT (exactly this, no extra commentary):
+
+TITLE: [same title or adjusted for the new style]
+
+ALT TAKE NOTE: [one sentence explaining what makes this version feel different from the original]
+
+LYRICS:
+[Complete alternate take with section tags — [Verse 1], [Hook], [Verse 2], [Bridge], [Final Hook], etc. Include ad-libs in parentheses on the same line as bars. 4-8 lines per verse, 2-4 per hook.]
+
+SONG PROMPT:
+[Under 440 chars. Suno-ready production tag matching the NEW alternate style — NOT the original style. Must reflect the specific production fusion requested above.]`;
+
+  try {
+    if (S.altTakeController) { try { S.altTakeController.abort(); } catch(_) {} }
+    S.altTakeController = new AbortController();
+
+    let lastFull = '';
+    await callClaudeStream(prompt, system, (chunk, full) => {
+      lastFull = full;
+      const lyricsMatch = full.match(/LYRICS:\s*([\s\S]*?)(?=SONG PROMPT:|$)/i);
+      const preview = lyricsMatch ? lyricsMatch[1].trim() : full;
+      lyricsEl.innerHTML = String(preview || full).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+    }, S.altTakeController.signal);
+
+    const titleMatch = lastFull.match(/^TITLE:\s*(.+?)\s*$/im);
+    const noteMatch = lastFull.match(/^ALT TAKE NOTE:\s*([\s\S]*?)(?=\n\s*LYRICS:)/im);
+    const lyricsMatch = lastFull.match(/^LYRICS:\s*([\s\S]*?)(?=\n\s*SONG PROMPT:)/im);
+    const sunoPromptMatch = lastFull.match(/^SONG PROMPT:\s*([\s\S]*?)$/im);
+
+    // Title: strip surrounding quotes or brackets if model added them
+    let finalTitle = titleMatch ? titleMatch[1].trim().replace(/^["'\[\(]+|["'\]\)]+$/g, '').trim() : (src.title || 'Alt Take');
+    if (!finalTitle) finalTitle = src.title || 'Alt Take';
+    // Lyrics: if regex misses, strip known headers from raw fallback so user doesn't see protocol
+    let finalLyrics = lyricsMatch ? lyricsMatch[1].trim() : String(lastFull)
+      .replace(/^TITLE:.+$/im, '')
+      .replace(/^ALT TAKE NOTE:[\s\S]*?(?=\n\s*LYRICS:|\n\n|$)/im, '')
+      .replace(/^SONG PROMPT:[\s\S]*$/im, '')
+      .trim();
+    // Suno prompt: if missing, derive fallback from pairing's "Production lock:" text
+    let finalSunoPrompt = sunoPromptMatch ? sunoPromptMatch[1].trim() : '';
+    if (!finalSunoPrompt) {
+      const lockMatch = (pairing.altInstructions || '').match(/Production lock:\s*"([^"]+)"/i);
+      if (lockMatch) finalSunoPrompt = lockMatch[1];
+    }
+    const finalNote = noteMatch ? noteMatch[1].trim() : '';
+
+    if (titleEl) titleEl.textContent = finalTitle;
+    if (noteEl) noteEl.textContent = finalNote;
+    if (lyricsEl) lyricsEl.innerHTML = String(finalLyrics).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+    if (sunoEl) sunoEl.value = finalSunoPrompt;
+
+    // Stash on the original song for later save/export
+    if (!src.alternateTakes) src.alternateTakes = [];
+    src.alternateTakes.push({
+      pairingId: pairing.id,
+      pairingLabel: pairing.label,
+      title: finalTitle,
+      lyrics: finalLyrics,
+      sunoPrompt: finalSunoPrompt,
+      note: finalNote,
+      ts: Date.now()
+    });
+
+    if (typeof toast === 'function') toast(`✓ Alternate take: ${pairing.label}`, 3000);
+  } catch (e) {
+    if (e && e.name === 'AbortError') return;
+    console.error('Alt take error:', e);
+    if (titleEl) titleEl.textContent = 'Error generating alternate take';
+    const msg = String((e && e.message) || e).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c]));
+    if (lyricsEl) lyricsEl.innerHTML = `<div class="error-msg" style="padding:20px">⚠ ${msg}</div>`;
+  }
+}
+
+function copyAltTakeLyrics(contextKey) {
+  const el = document.getElementById(contextKey + '-alt-take-lyrics');
+  if (!el) return;
+  const text = el.innerText || el.textContent || '';
+  if (!text.trim()) {
+    if (typeof toast === 'function') toast('⚠ No alt take lyrics to copy', 2000);
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    if (typeof toast === 'function') toast('✓ Alt take lyrics copied', 2000);
+  }).catch(() => {
+    if (typeof toast === 'function') toast('⚠ Could not copy — select manually', 2500);
+  });
+}
+
+function copyAltTakeSunoPrompt(contextKey) {
+  const el = document.getElementById(contextKey + '-alt-take-suno-prompt');
+  if (!el || !el.value) {
+    if (typeof toast === 'function') toast('⚠ No alt take prompt yet', 2000);
+    return;
+  }
+  navigator.clipboard.writeText(el.value).then(() => {
+    if (typeof toast === 'function') toast('✓ Alt take Suno prompt copied', 2000);
+  }).catch(() => {
+    if (typeof toast === 'function') toast('⚠ Could not copy — select manually', 2500);
+  });
+}
+
+function closeAltTakePanel(contextKey) {
+  // Abort any in-flight alt-take stream so we don't keep mutating the DOM
+  // after the user dismissed the panel.
+  if (S.altTakeController) { try { S.altTakeController.abort(); } catch(_) {} S.altTakeController = null; }
+  const panel = document.getElementById(contextKey + '-alt-take-panel');
+  if (panel) panel.style.display = 'none';
 }
 
 // ═══════════════════════════════════════════════════════
