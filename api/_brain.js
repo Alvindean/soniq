@@ -524,6 +524,13 @@ const SUBSTYLE_NOTES={
   'Texas Blues':         'Texas Blues DNA: Fiery single-note guitar-driven blues. Extended guitar solos are central — the guitar speaks in sentences. Jazz-chord voicings, swing feel, hot tube-amp tone. 100-130 BPM. Suno style: "texas blues, fiery lead guitar, extended solo, swing feel, 115 BPM, SRV, hot tube amp". Artists: Stevie Ray Vaughan, T-Bone Walker, Albert Collins, Lightnin\' Hopkins, Johnny Winter, ZZ Top.',
   'Jump Blues':          'Jump Blues DNA: Uptempo swing blues, proto-R&B. 1940s era. Small horn section (tenor sax lead, trumpet, trombone), boogie-woogie piano, shuffle drums, upright bass. 140-180 BPM. Party-oriented — drinking, dancing, romance. Suno style: "jump blues, boogie piano, horn section, shuffle swing, 160 BPM, Louis Jordan, party blues, proto-R&B". Artists: Louis Jordan, Big Joe Turner, Wynonie Harris, Amos Milburn, Louis Prima.',
   'Soul Blues':          'Soul Blues DNA: Blues lyric and 12-bar bones with 60s-70s soul production. Hammond organ, horn stabs, full rhythm section. Gospel-trained vocal phrasing — melismatic, church-rooted. 75-100 BPM. Suno style: "soul blues, Hammond organ, horn stabs, full rhythm section, melismatic vocal, 90 BPM, BB King style". Artists: B.B. King, Bobby "Blue" Bland, Little Milton, O.V. Wright, Albert King, Z.Z. Hill.',
+  // Reggae substyles
+  'Roots Reggae':        'Roots Reggae DNA: One-drop drum pattern (kick and snare on beat 3 only), heavy bass-as-melody, offbeat skank guitar on beats 2 and 4, Hammond organ bubble. Rastafarian themes — Jah, Zion, Babylon, repatriation, social justice. 70-85 BPM. Suno style: "roots reggae, one-drop drums, offbeat skank guitar, heavy bass, Hammond bubble, 78 BPM, Rastafarian, spiritual". Artists: Bob Marley, Burning Spear, Black Uhuru, Culture, Steel Pulse, Israel Vibration.',
+  'Dancehall':           'Dancehall DNA: Digital riddims, syncopated kick drum patterns (NOT one-drop), toasting and chatting vocal style over rhythmic grooves. 90-110 BPM. Themes: partying, sexuality, swagger, street reality. Patois-heavy vocal delivery. Suno style: "dancehall, digital riddim, syncopated kick, toasting vocal, 100 BPM, patois, Kingston, party". Artists: Shabba Ranks, Sean Paul, Vybz Kartel, Buju Banton, Beenie Man, Spice.',
+  'Ska':                 'Ska DNA: Upstroke guitar on beats 2 and 4, walking bass line, brass-section driven (trumpet, trombone, sax). 140-180 BPM. Jamaica 1960s — the predecessor of rocksteady and reggae. Dance-floor-first energy. Suno style: "ska, offbeat upstroke guitar, walking bass, brass section, 160 BPM, Jamaica 60s, danceable, skatalites". Artists: The Skatalites, Prince Buster, Toots and the Maytals, Desmond Dekker, Laurel Aitken.',
+  'Rocksteady':          'Rocksteady DNA: 1966-68 bridge between ska and reggae. Slowed ska tempo (80-100 BPM), electric bass becomes central, Hammond organ, tight two-part vocal harmonies. Romantic and reflective lyrics replace ska dance-floor urgency. Suno style: "rocksteady, electric bass forward, Hammond organ, two-part harmony, 90 BPM, romantic, 1967 Jamaica". Artists: Alton Ellis, Ken Boothe, The Heptones, Delroy Wilson, The Paragons.',
+  'Dub':                 'Dub DNA: Instrumental remix culture. Studio as instrument — spring reverb, tape echo, drop-outs and fade-ins, bass and drums pushed to the foreground, vocals ghost in and out. 70-85 BPM. Mostly instrumental with sparse vocal fragments. Suno style: "dub reggae, spring reverb, tape echo, foregrounded bass and drums, ghostly vocals, 75 BPM, King Tubby style". Artists: King Tubby, Lee "Scratch" Perry, Scientist, Augustus Pablo, Mad Professor.',
+  'Lovers Rock':         'Lovers Rock DNA: UK Jamaican community 1970s-80s. Reggae groove with romantic soul-inflected production. Silky, female-forward vocal tradition, close-harmony backing. Themes: love, devotion, heartbreak — never political. 70-80 BPM. Suno style: "lovers rock, reggae groove, silky female vocal, soul production, close harmony, 75 BPM, romantic, UK reggae". Artists: Gregory Isaacs, Janet Kay, Maxi Priest, Carroll Thompson, Sugar Minott.',
 };
 
 const SUBSTYLE_SUNO = {
@@ -580,6 +587,13 @@ const SUBSTYLE_SUNO = {
   'Texas Blues':        'texas blues, fiery lead guitar, extended solo, swing feel, 115 BPM, SRV, hot tube amp',
   'Jump Blues':         'jump blues, boogie piano, horn section, shuffle swing, 160 BPM, Louis Jordan, party blues, proto-R&B',
   'Soul Blues':         'soul blues, Hammond organ, horn stabs, full rhythm section, melismatic vocal, 90 BPM, BB King style',
+  // Reggae
+  'Roots Reggae':       'roots reggae, one-drop drums, offbeat skank guitar, heavy bass, Hammond bubble, 78 BPM, Rastafarian, spiritual',
+  'Dancehall':          'dancehall, digital riddim, syncopated kick, toasting vocal, 100 BPM, patois, Kingston, party',
+  'Ska':                'ska, offbeat upstroke guitar, walking bass, brass section, 160 BPM, Jamaica 60s, danceable',
+  'Rocksteady':         'rocksteady, electric bass forward, Hammond organ, two-part harmony, 90 BPM, romantic, 1967 Jamaica',
+  'Dub':                'dub reggae, spring reverb, tape echo, foregrounded bass and drums, ghostly vocals, 75 BPM, King Tubby style',
+  'Lovers Rock':        'lovers rock, reggae groove, silky female vocal, soul production, close harmony, 75 BPM, romantic, UK reggae',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
