@@ -284,8 +284,8 @@ module.exports = async function handler(req, res) {
     const total_published  = parseInt(totalPublishedRaw)     || 0;
     const total_users      = totalUsersResult.count           ?? 0;
     // Community counts: prefer Supabase exact counts; Redis used for breakdown by post type
-    const total_posts      = commPostsResult.count            ?? parseInt(commPostsTotalRaw) || 0;
-    const total_reactions  = commReactionsResult.count        ?? parseInt(commReactionsTotalRaw) || 0;
+    const total_posts      = (commPostsResult.count           ?? parseInt(commPostsTotalRaw))     || 0;
+    const total_reactions  = (commReactionsResult.count       ?? parseInt(commReactionsTotalRaw)) || 0;
     const total_comments   = parseInt(commCommentsTotalRaw)   || 0;
 
     const posts_by_type = {
@@ -368,7 +368,13 @@ module.exports = async function handler(req, res) {
     });
 
   } catch (e) {
-    console.error('Analytics fetch error:', e.message);
-    return res.status(500).json({ error: 'Failed to fetch analytics' });
+    console.error('Analytics fetch error:', e.message, e.stack);
+    // Endpoint is admin-auth-gated (checked above), so surfacing detail is safe
+    // and necessary for debugging production 500s from the admin dashboard.
+    return res.status(500).json({
+      error: 'Failed to fetch analytics',
+      detail: e.message || String(e),
+      stack: e.stack ? e.stack.split('\n').slice(0, 6).join('\n') : null
+    });
   }
 };
