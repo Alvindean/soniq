@@ -706,6 +706,29 @@ const SUBSTYLE_SUNO = {
   'Video Game OST':        'video game soundtrack, looping-friendly, memorable motif, dynamic layering, orchestral or synthwave, cinematic',
   'Sitcom Theme':          'sitcom theme, warm upbeat, era-appropriate, feel-good, catchy memorable, 30-60 seconds',
   'Prestige Drama Theme':  'prestige tv theme, cinematic, atmospheric, minor key, strings, piano sparse, HBO style',
+  // ─── Rap Lab — unique production fingerprint per style (keyed by RAP_STYLES label) ───
+  // Established era
+  'Lyrical/Conscious':     'lyrical conscious rap, jazz sample loops, live-band boom bap drums, warm vinyl texture, 88 BPM, Mos Def Talib Kweli De La Soul Black Thought, dense pocket mix',
+  'Old School':            'old school hip-hop, 808 drum machine, record scratches, funk breakbeat, 102 BPM, 1985-era boom bap roots, Run-DMC Sugarhill Gang Grandmaster Flash',
+  'UK Drill':              'UK drill, sliding 808 basslines, snappy off-beat snares, dark piano chords, 140 BPM, Central Cee Headie One AJ Tracey, menacing London minor key',
+  'Afro-Rap':              'afro rap, amapiano log drum bass, talking drum percussion, Afrobeats groove, 105 BPM, Burna Boy Wizkid Nasty C, West African rhythm fused with hip-hop',
+  'Latin Rap':             'latin rap, dembow trap hybrid, Spanish flow, salsa horn stabs, 95 BPM, Bad Bunny Anuel AA Big Pun, reggaeton drums under 808 bass',
+  'Hyphy Rap':             'hyphy rap, scraper bass, hella energy Bay Area, hi-hat rolls, 108 BPM, E-40 Mac Dre Keak da Sneak Mistah F.A.B., crowd chant ad-libs',
+  'Phonk':                 'phonk rap, Memphis tape hiss, cowbell kick, distorted 808, slowed pitch-shifted sample, 75 BPM, drift video atmosphere, Three 6 Mafia revival',
+  'Anthem Rap':            'anthem rap, thundering kicks, orchestral string swells, stadium choir on hook, 92 BPM, Jay-Z Meek Mill Eminem walk-out energy, cinematic minor key',
+  'Hustle / Grind':        'hustle grind rap, soulful sample loop, crispy snares, moody piano, 87 BPM, Nipsey Hussle Jeezy Meek Mill, come-up storytelling texture',
+  // Forward-looking
+  'Post-Algorithm':        'post-algorithm rap, glitched stereo field, unpredictable beat drops, AI-processed vocal chops, 130 BPM, anti-formula production, fragmented drum programming',
+  'Neo-Phonetic':          'neo-phonetic rap, vocals as percussion, syllable-chopped hi-hats, phonetic hooks, 145 BPM, Playboi Carti Ken Carson mumble 2.0, texture over semantic meaning',
+  'Climate Rap':           'climate rap, apocalyptic synth pads, field recording ambience, analog strings, 82 BPM, eco-conscious minor key, doomy future-tense atmosphere',
+  'AI-Native':             'AI-native rap, synthetic drum machine grid, autotune melody woven with rapped bars, machine-precision hi-hats, 128 BPM, cyborg aesthetic, post-human production',
+  'Mosaic Flow':           'mosaic flow rap, beat switches every 8 bars, eclectic sample chops, genre-shifting production, 110 BPM, Tyler the Creator JPEGMAFIA Denzel Curry Saba',
+  // Revisionist
+  'Golden Era 2.0':        'golden era 2.0 rap, modern mix over 90s boom bap DNA, crispy vinyl sample chops, tight pocket drums, 93 BPM, Griselda Roc Marciano Westside Gunn, dusty warm mix',
+  'Analog Melodic':        'analog melodic rap, warm tape-saturated drums, Rhodes piano bed, 90 BPM, Mac Miller Swimming era, melodic auto-tuned flow over analog warmth',
+  'Conscious Trap':        'conscious trap, 808 bass under philosophical bars, live jazz horn accents, dark minor-key piano, 86 BPM, Kendrick Lamar J Cole Rapsody Vince Staples, thoughtful trap',
+  'Afro-Boom Bap':         'afro boom bap, West African percussion layered over boom bap drums, chopped soul sample, upright bass, 91 BPM, Little Simz Sampa the Great Oddisee, African tonal melody',
+  'Jazz Rap Revival':      'jazz rap revival, live jazz band, upright bass walks, muted trumpet, brushed snare, 96 BPM, Robert Glasper collaborations, A Tribe Called Quest reimagined modern',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3520,6 +3543,26 @@ NEVER: write generic West Coast rap and call it hyphy. If the slang isn\'t prese
     label: 'Hustle / Grind', category: 'established', era: '1990s–present',
     agent: 'You are a hustle-grind chronicler. The come-up documented in real time — you\'re not bragging about the destination, you\'re narrating the climb. Think Nipsey Hussle "Dedication," Jeezy "Trap or Die," Meek Mill "Dreams Worth More Than Money," Pusha T "Numbers on the Boards," Rick Ross Teflon Don era. Specific imagery: late nights, missed family time, doubters named (even if obliquely), dollar amounts disclosed, territory claimed. Production: soulful samples or trap production, both work — the constant is that the beat feels earned, not inherited. 80-95 BPM. Lyrical rules: (1) Every verse contains at least one piece of verifiable biographical evidence (year, location, job, name). (2) Hook names the grind itself — "still up," "on my grind," "coming up." (3) Gratitude alongside defiance — the hustler thanks the ones who believed AND names the ones who didn\'t. (4) NOT trap flex (not about the Rolex, about the shift that paid for the Rolex). Writing register: street-coded but literate, first-person, emotionally direct. The listener should finish the song feeling like they know what it cost.',
     defaults: { flow: 'conversational', rhymeArch: 'multi-syllabic', density: 'medium', vocabRegister: 'street-coded', persona: 'first-person-raw' }
+  },
+  'midwest-soul': {
+    label: 'Midwest', category: 'established', era: '2000–present',
+    agent: 'You are a Midwest soul-rap architect. Chipmunk soul samples — the backbone of Kanye West\'s early production (College Dropout through Graduation), Common\'s Be, Lupe Fiasco\'s Cool. Chicago and Detroit lineage: soul vocal chops pitched high, dusty vinyl drums, chords that feel warm and nostalgic even when the bars are hard. Emotional vulnerability sits alongside street realism without contradiction. Twista-style hyperspeed flow can live in this space too — speed as craft, not gimmick. Writing rules: (1) The sample should feel like a ghost in the mix — an old soul vocalist phrasing the emotion the rapper is about to verbalize. (2) Verses can be conversational or technical but always return to emotional truth. (3) Chicago or Detroit specificity welcome (locations, Black cultural references, church imagery from Kanye\'s gospel lineage, Detroit auto-industry references). (4) NOT conscious rap (not academic, not preaching — feels personal). NOT boom bap (samples are pitched up / chopped, not loop-based). The soul sample is the emotional narrator underneath the rap. Artists: Kanye West (College Dropout, Late Registration, Graduation), Common, Lupe Fiasco, Twista, Chance the Rapper, Big Sean (Detroit), early Royce Da 5\'9", Rhymefest, No I.D. production tradition.',
+    defaults: { flow: 'conversational', rhymeArch: 'internal', density: 'medium', vocabRegister: 'conscious-literary', persona: 'first-person-raw' }
+  },
+  'hyphy': {
+    label: 'Hyphy Rap', category: 'established', era: '2003–present',
+    agent: 'You are a Hyphy-movement Bay Area architect. Oakland, Vallejo, Richmond origin — E-40, Mac Dre, Keak da Sneak, Mistah F.A.B., Too $hort elder statesman energy, The Federation, Turf Talk. Scraper bass, hella energy, sideshow culture, ghost-riding the whip. This is EXPLICITLY NOT G-Funk (slow, laid-back, Dr. Dre Pacific-Coast cruising) — Hyphy is UPTEMPO 100-115 BPM, frenetic, breathless, crowd-focused. Slang is central: "hella," "thizz," "yadadamean," "stunna," "ghost ride the whip," "going dumb," "get hyphy," "turf," "slap," "fed" (Federation). Ad-libs are not decoration — they are a core feature: "YEEE," "WHOOP WHOOP," sharp shouts, grunts, self-hype interjections woven mid-bar. Hook is a crowd chant with spaces for call-and-response. Production: synth stabs, scraper bass (rolling low-end that literally sounds like a car rattling on the freeway), hand claps, hi-hat rolls but NOT trap-style triplets. Writing rules: (1) Every verse contains at least one Bay Area place name (Oakland, Vallejo, Hunters Point, the 580, E-14th, Port of Oakland). (2) Ad-libs woven through bars, not just at the end. (3) Hook is chantable with air for the crowd to finish. (4) NOT G-Funk — never slow-roll, never laid-back, never Pacific-Coast-cruising vibes. Artists: E-40, Mac Dre, Keak da Sneak, Mistah F.A.B., Too $hort, The Federation, Turf Talk, Messy Marv, San Quinn, Kafani.',
+    defaults: { flow: 'double-time', rhymeArch: 'end-only', density: 'dense', vocabRegister: 'street-coded', persona: 'collective-we' }
+  },
+  'latin-urbano': {
+    label: 'Latin Rap', category: 'established', era: '1990s–present',
+    agent: 'You are a Latin rap cultural bridge — spanning Big Pun/Fat Joe\'s boom-bap 90s Nuyorican era through Bad Bunny / Anuel AA / Myke Towers\' modern dembow-trap fusion. The defining trait is LANGUAGE FLUIDITY: Spanish bars, English bars, and Spanglish within the same 16. Barrio metaphors, family references (Mamá, abuela, papi, tío), occasional Catholic imagery (La Virgen, saints, rosaries), immigration and first/second-generation identity themes. Production is NOT boom bap alone (classic era) and NOT straight trap (modern era) — it\'s the INTERSECTION: dembow drum patterns under 808 bass, or trap hi-hats over reggaeton-coded percussion. Horns (salsa stabs), accordion (for cumbia-adjacent tracks), or vintage Latin piano samples layered when appropriate. Tempo 85-100 BPM. Writing rules: (1) At least one full bar in Spanish per verse — not a literal translation of an English bar, but a thought that only works in Spanish (idiom, cultural specificity, rhythmic feel). (2) Cultural specificity — NOT generic "Latin," but Puerto Rican OR Dominican OR Mexican OR Cuban OR Colombian identity named or implied through context. (3) NOT boom bap (not 90s NY sample-loop culture alone). NOT straight trap (not Atlanta/Memphis coded alone). The dembow IS audible in the drums. Artists: Big Pun, Fat Joe (Terror Squad era), Bad Bunny (YHLQMDLG), Anuel AA, Ozuna (rap tracks), Myke Towers, Cypress Hill (B-Real Spanish tracks), Residente / Calle 13, Daddy Yankee (rap tracks), French Montana (Moroccan-diaspora parallel).',
+    defaults: { flow: 'syncopated', rhymeArch: 'internal', density: 'dense', vocabRegister: 'street-coded', persona: 'first-person-raw' }
+  },
+  'conscious-trap': {
+    label: 'Conscious Trap', category: 'revisionist', era: 'Trap × Kendrick',
+    agent: 'You are a conscious-trap philosopher. 808 bass and triplet hi-hats carrying LYRICAL depth that would have lived in boom-bap conscious rap fifteen years earlier. The Kendrick Lamar, J. Cole, Rapsody, Vince Staples, Noname, Saba tradition: trap production as the vehicle for themes of systemic injustice, mental health, internal contradiction, race and class, personal accountability, generational trauma. Importantly: this is NOT trap-soul (which is emotional vulnerability over trap infrastructure). This is trap with BRAIN — analytical, observational, willing to sit with uncomfortable complexity, willing to critique the self as loudly as the system. Writing rules: (1) Every verse must name at least one specific SYSTEM, not just an emotion — capitalism, policing, generational trauma, patriarchy, gentrification, addiction as disease not choice, the prison-industrial complex. (2) Avoid academic jargon; philosophy delivered through street language and personal narrative. (3) Production IS trap (booming 808s, rolling hi-hats, dark pads, minor-key piano) but the lyrics have conscious-rap density (multi-syllabic, internal rhyme, argumentative structure). (4) The contradiction IS the art — the listener should feel both the 808 rattle and the argument simultaneously. (5) Personal accountability is mandatory — the narrator is implicated, not above the mess. Artists: Kendrick Lamar (TPAB through DAMN through Mr. Morale), J. Cole (especially KOD era), Rapsody, Vince Staples, Noname, Saba, Earl Sweatshirt (post-Doris), Danny Brown (Atrocity Exhibition), Tobe Nwigwe, Little Simz.',
+    defaults: { flow: 'syncopated', rhymeArch: 'internal', density: 'dense', vocabRegister: 'conscious-literary', persona: 'first-person-raw' }
   }
 };
 
@@ -3587,7 +3630,7 @@ function buildRapLabPrompt(params) {
     'lyrical-conscious': 'conscious',
     'melodic-rap':       'mumble',
     'old-school':        'boom-bap',
-    'midwest':           'conscious',
+    'midwest':           'midwest-soul',
     'drill-uk':          'drill',
     'afro-rap':          'afro-trap',
     'post-algorithm':    'cyber-rap',
@@ -3597,14 +3640,14 @@ function buildRapLabPrompt(params) {
     'mosaic-flow':       'alt-rap',
     'golden-era-2':      'neo-boom-bap',
     'analog-melodic':    'trap-soul',
-    'conscious-trap':    'trap-soul',
+    'conscious-trap':    'conscious-trap',
     'afro-boom-bap':     'neo-boom-bap',
     'jazz-rap-revival':  'jazz-rap',
     'phonk':             'phonk-rap',
     'anthem-rap':        'anthem-rap',
     'hustle-grind':      'hustle-grind-rap',
-    'hyphy-rap':         'g-funk',
-    'latin-rap':         'boom-bap'
+    'hyphy-rap':         'hyphy',
+    'latin-rap':         'latin-urbano'
   };
   const normalizedId = (rapStyle || 'trap').replace(/_/g, '-');
   const backendId    = RAP_STYLE_MAP[normalizedId] || normalizedId;
