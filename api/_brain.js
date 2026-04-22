@@ -732,6 +732,48 @@ const SUBSTYLE_SUNO = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// RAP_STYLE_ADLIBS — authentic regional/era vernacular ad-libs per Rap Lab style.
+// Keyed by style.label (matches RAP_STYLES[].label). Used by buildRapLabPrompt
+// AND by the Lucky feature on the frontend (mirrored as RAP_STYLE_ADLIBS_CLIENT).
+// Intent: stop every rap output from defaulting to generic "(yeah)" / "(hey)" —
+// a Hyphy song should say "YEE!" and "whoop whoop", a UK Drill song says "oi"
+// and "bruv", a Conscious Trap song uses sparse intentional ad-libs, etc.
+// ─────────────────────────────────────────────────────────────────────────────
+const RAP_STYLE_ADLIBS = {
+  'Trap':                 ['skrrt','yah','ay','woo','let\'s go','bands','ooh','lil'],
+  'Boom Bap':             ['yo','uh','check it','word','yessir','uh-huh','one-two','aiyyo'],
+  'Lyrical/Conscious':    ['(knowledge)','peace god','word is bond','represent','true indeed','wisdom','uh-huh','check'],
+  'Drill':                ['gang','slide','brr','demon time','splash','opps','no cap','grrah'],
+  'Melodic Rap':          ['(melodic)','oh','yeah yeah','mmm','(auto-tune)','whoa','ayy','let me tell ya'],
+  'Old School':           ['yo ho','throw your hands up','in the place to be','dj spin it','fresh','def','word up','uh huh'],
+  'G-Funk':               ['(smooth)','ya don\'t stop','hol up','(cruisin)','west side','smoke somethin','yeaahh','(laid back)'],
+  'East Coast':           ['yo','word up','ayo','c\'mon son','true indeed','check it','nawmean','that\'s real'],
+  'Midwest':              ['(chipmunk soul)','uh','yep','you know','c\'mon','(soul chop)','mmm','check it'],
+  'Cloud Rap':            ['(whispered)','(echo)','(mumbled)','(ethereal)','yeahh','uhh','(hazy)','(reverb)'],
+  'UK Drill':             ['oi','bruv','fam','gang','straight up','innit','splash','brrap'],
+  'Afro-Rap':             ['O YO!','EHEN!','NA WETIN!','MAKE I TELL YOU','(laughter)','ODESHI!','BROKE WASH','(drum break)'],
+  'Latin Rap':            ['¡DALE!','¡WEPA!','¡ESO!','BRR','JEJE','QUE LO QUE','¡FUEGO!','¡VAMOS!'],
+  'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
+  'Phonk':                ['(ominous)','yea hoe','pimp','triple six','(drawl)','smokin','grim','(slowed)'],
+  'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
+  'Hustle / Grind':       ['still up','on my grind','the marathon','(grinding)','no sleep','up first','the mix','get it'],
+  'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
+  'Neo-Phonetic':         ['(stutter)','brr brr','kah','tata','(chopped syllable)','boof','ah ah','(phonetic)'],
+  'Climate Rap':          ['(breath)','(sigh)','look around','real talk','(urgent)','(grim)','time\'s up','(sobering)'],
+  'AI-Native':            ['(processed)','(synth)','(vocoded)','(robotic)','one-oh-one','(binary)','(digital)','(rendered)'],
+  'Mosaic Flow':          ['(switch)','(beat change)','wait','aight','shift','(pivot)','new angle','(reset)'],
+  'Golden Era 2.0':       ['yo','real hip-hop','check it','one two','yessir','fam','(shotgun click)','hittas'],
+  'Analog Melodic':       ['(tape warmth)','mm','oh','(soft auto-tune)','yeah yeah','(hazy)','(rhodes)','whoa'],
+  'Conscious Trap':       ['(mm)','(pause)','(check it)','(listen)','(word)','(truth)','(real)','(breath)'],
+  'Afro-Boom Bap':        ['(African chant)','sankofa','true','word','(tonal)','uh-huh','real','(djembe)'],
+  'Jazz Rap Revival':     ['(scat)','doo bop','yeah yeah','(horn)','true that','mm','peace','(brush snare)'],
+  'Bay Area':             ['(hyphy)','hella','ghost ride','slap','yadada','beyotch','(Too Short)','yay area'],
+  'Down South':           ['(drawl)','slatt','bussin','huh','what it do','fasho','trill','errybody'],
+  'Crunk':                ['YEAH!','OKAY!','WHAT!','(SHOUTED)','TURN UP!','CRUNK!','SKEET!','OOOWWWW!'],
+  'Chopped & Screwed':    ['(screwed)','(chopped)','(slowed)','sippin','leanin','(syrupy)','(pitch-down)','slow it down']
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 // LYRIC CRAFT TOOLKIT — universal techniques, genre-filtered per song.
 // Each technique has a short-form instruction used in the live prompt.
 // buildLyricCraftNote(genre) selects and formats the relevant set.
@@ -3686,6 +3728,8 @@ function buildRapLabPrompt(params) {
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
+  const rapAdlibs = RAP_STYLE_ADLIBS[style.label] || null;
+  const rapAdlibLock = rapAdlibs ? `\n\n🎤 AUTHENTIC AD-LIBS — ${style.label} (regional/era vernacular; use THESE, not generic "(yeah)" or "(hey)"):\n  ${rapAdlibs.join('  ·  ')}\n\nAd-lib placement rules:\n- Weave 2-4 of these per verse in parentheses on the same line as rap bars.\n- Hook gets 1-2 prominent/chanted ad-libs from the list above.\n- Do NOT invent new ad-libs OR use generic hip-hop ad-libs ("yeah", "uh", "hey") — those sound AI-written.\n- The above ad-libs are specific to ${style.label}'s regional vernacular, era, and artist lineage. Stay inside this vocabulary.` : '';
   // Break One Rule for Rap Lab (uses hip-hop outliers)
   let breakRuleLock = '';
   if (breakRule && GENRE_BIBLE && GENRE_BIBLE.hiphop && GENRE_BIBLE.hiphop.outliers && GENRE_BIBLE.hiphop.outliers.length) {
@@ -3753,7 +3797,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${freestyleLock}${barSwitchLock}${breakRuleLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${barSwitchLock}${breakRuleLock}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
