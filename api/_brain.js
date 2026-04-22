@@ -518,6 +518,12 @@ const SUBSTYLE_NOTES={
   'Hardcore':            'Hardcore DNA: Faster, angrier, more compressed than classic punk. 180-250 BPM. Shouted group vocals (often in unison). Mosh-pit breakdown sections at half-time. Political, straight-edge, or anti-political themes. Songs under 90 seconds common. Suno style: "hardcore punk, blast beats, shouted group vocals, 220 BPM, mosh breakdown, compressed, aggressive". Artists: Minor Threat, Black Flag, Bad Brains, Gorilla Biscuits, Turnstile, Fugazi.',
   'Ska-Punk':            'Ska-Punk DNA: Offbeat upstroke guitar skank + horn section (trumpet, trombone, sax) + punk energy. 130-170 BPM. Genre skips between ska verse (bouncy upstroke feel) and punk chorus (distorted power chords). Jamaica meets London meets LA. Suno style: "ska-punk, offbeat upstroke guitar, horn section, 150 BPM, ska verse punk chorus, energetic, Orange County". Artists: Rancid, Operation Ivy, Sublime, Less Than Jake, Reel Big Fish, Streetlight Manifesto.',
   'Anti-Folk':           'Anti-Folk DNA: Acoustic folk instrumentation (acoustic guitar, ukulele, kazoo, shaker) + punk attitude and DIY ethos. Deliberately lo-fi home recording. Confessional, absurdist, or deadpan lyrics — sometimes within one song. Sounds unfinished on purpose. 90-130 BPM. Suno style: "anti-folk, acoustic guitar, lo-fi home recording, deadpan vocals, 110 BPM, unfinished feel, DIY, confessional absurdist". Artists: Jeffrey Lewis, The Moldy Peaches, Kimya Dawson, Regina Spektor (early), Beck (Mellow Gold era), Daniel Johnston.',
+  // Blues substyles
+  'Chicago Blues':       'Chicago Blues DNA: Electrified Mississippi blues, 1950s Chess Records era. 12-bar form standard. Electric slide guitar, blues harp (harmonica), electric bass, drums shuffle, piano. 90-110 BPM. Themes: the Great Migration, loss, mojo, lust, whiskey. Suno style: "chicago blues, electric slide guitar, blues harp, shuffle beat, 100 BPM, Chess Records, Muddy Waters style". Artists: Muddy Waters, Howlin\' Wolf, Buddy Guy, Little Walter, Willie Dixon, Junior Wells.',
+  'Delta Blues':         'Delta Blues DNA: Acoustic Mississippi Delta origin, 1920s-30s. Bottleneck slide on open-tuned guitar, percussive strumming, foot-stomp as bass drum. Single vocal with guitar only — no band. 75-100 BPM. Raw, haunted, spiritual-adjacent. Crossroads mythology. Suno style: "delta blues, acoustic slide guitar, open tuning, foot stomp, single vocal, 85 BPM, haunted, raw". Artists: Robert Johnson, Son House, Charley Patton, Skip James, Mississippi John Hurt, Bukka White.',
+  'Texas Blues':         'Texas Blues DNA: Fiery single-note guitar-driven blues. Extended guitar solos are central — the guitar speaks in sentences. Jazz-chord voicings, swing feel, hot tube-amp tone. 100-130 BPM. Suno style: "texas blues, fiery lead guitar, extended solo, swing feel, 115 BPM, SRV, hot tube amp". Artists: Stevie Ray Vaughan, T-Bone Walker, Albert Collins, Lightnin\' Hopkins, Johnny Winter, ZZ Top.',
+  'Jump Blues':          'Jump Blues DNA: Uptempo swing blues, proto-R&B. 1940s era. Small horn section (tenor sax lead, trumpet, trombone), boogie-woogie piano, shuffle drums, upright bass. 140-180 BPM. Party-oriented — drinking, dancing, romance. Suno style: "jump blues, boogie piano, horn section, shuffle swing, 160 BPM, Louis Jordan, party blues, proto-R&B". Artists: Louis Jordan, Big Joe Turner, Wynonie Harris, Amos Milburn, Louis Prima.',
+  'Soul Blues':          'Soul Blues DNA: Blues lyric and 12-bar bones with 60s-70s soul production. Hammond organ, horn stabs, full rhythm section. Gospel-trained vocal phrasing — melismatic, church-rooted. 75-100 BPM. Suno style: "soul blues, Hammond organ, horn stabs, full rhythm section, melismatic vocal, 90 BPM, BB King style". Artists: B.B. King, Bobby "Blue" Bland, Little Milton, O.V. Wright, Albert King, Z.Z. Hill.',
 };
 
 const SUBSTYLE_SUNO = {
@@ -568,6 +574,12 @@ const SUBSTYLE_SUNO = {
   'Hardcore':           'hardcore punk, blast beats, shouted group vocals, 220 BPM, mosh breakdown, compressed, aggressive',
   'Ska-Punk':           'ska-punk, offbeat upstroke guitar, horn section, 150 BPM, ska verse punk chorus, energetic, Orange County',
   'Anti-Folk':          'anti-folk, acoustic guitar, lo-fi home recording, deadpan vocals, 110 BPM, unfinished feel, DIY, confessional absurdist',
+  // Blues
+  'Chicago Blues':      'chicago blues, electric slide guitar, blues harp, shuffle beat, 100 BPM, Chess Records, Muddy Waters style',
+  'Delta Blues':        'delta blues, acoustic slide guitar, open tuning, foot stomp, single vocal, 85 BPM, haunted, raw',
+  'Texas Blues':        'texas blues, fiery lead guitar, extended solo, swing feel, 115 BPM, SRV, hot tube amp',
+  'Jump Blues':         'jump blues, boogie piano, horn section, shuffle swing, 160 BPM, Louis Jordan, party blues, proto-R&B',
+  'Soul Blues':         'soul blues, Hammond organ, horn stabs, full rhythm section, melismatic vocal, 90 BPM, BB King style',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
