@@ -5681,6 +5681,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="adm-tab on" onclick="switchAdmTab('analytics',this)">📊 Analytics</div>
       <div class="adm-tab" onclick="switchAdmTab('content',this)">✍ Content</div>
       <div class="adm-tab" onclick="switchAdmTab('seotraffic',this)">🔍 SEO & Traffic</div>
+      <div class="adm-tab" onclick="switchAdmTab('growth',this)">🚀 Growth</div>
     </div>
 
     <!-- TAB: Analytics (existing content wrapped) -->
@@ -6085,6 +6086,173 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
 
     </div><!-- end adm-panel-seotraffic -->
+
+    <!-- TAB: Growth -->
+    <div id="adm-panel-growth" class="adm-tab-panel">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+        <div>
+          <div style="font-size:20px;font-weight:800;color:var(--tx1)">🚀 Growth Engine</div>
+          <div style="font-size:11px;color:var(--tx3);margin-top:2px">Backlink outreach, directory submissions, launch drafts — all in one place</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-teal" onclick="exportGrowthTargetsCSV()">⬇ Export CSV</button>
+          <button class="btn btn-sm" onclick="resetGrowthStatuses()" style="color:var(--red);border-color:var(--redline)">🔄 Reset All</button>
+        </div>
+      </div>
+
+      <!-- Growth Stats -->
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="gr-total-targets" style="font-size:22px;font-weight:900;color:var(--tx1)">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Total Targets</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="gr-not-contacted" style="font-size:22px;font-weight:900;color:var(--tx3)">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Not Contacted</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="gr-contacted" style="font-size:22px;font-weight:900;color:var(--amber)">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Contacted</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="gr-responded" style="font-size:22px;font-weight:900;color:#60a5fa">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">Responded</div>
+        </div>
+        <div class="card" style="padding:12px;text-align:center">
+          <div id="gr-linked" style="font-size:22px;font-weight:900;color:#34d399">—</div>
+          <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">🔗 Linked</div>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center">
+        <select id="gr-filter-category" onchange="renderGrowthTargets()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px">
+          <option value="">All categories</option>
+          <option value="directory">📁 Directories</option>
+          <option value="publication">📰 Publications</option>
+          <option value="listicle">📋 Listicles</option>
+          <option value="newsletter">✉ Newsletters</option>
+          <option value="podcast">🎙 Podcasts</option>
+          <option value="community">👥 Communities</option>
+        </select>
+        <select id="gr-filter-status" onchange="renderGrowthTargets()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px">
+          <option value="">All statuses</option>
+          <option value="todo">Not contacted</option>
+          <option value="contacted">Contacted</option>
+          <option value="responded">Responded</option>
+          <option value="linked">Linked</option>
+          <option value="declined">Declined</option>
+        </select>
+        <select id="gr-filter-priority" onchange="renderGrowthTargets()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px">
+          <option value="">All priorities</option>
+          <option value="P0">P0 — Do this week</option>
+          <option value="P1">P1 — This month</option>
+          <option value="P2">P2 — Nice to have</option>
+        </select>
+        <input id="gr-search" placeholder="Search targets…" onkeyup="renderGrowthTargets()" style="padding:6px 10px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:11px;flex:1;min-width:140px">
+      </div>
+
+      <!-- Targets Table -->
+      <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎯 Outreach Targets</div>
+          <div style="font-size:10px;color:var(--tx3)">Click a row to expand pitch angle & notes. Statuses save automatically.</div>
+        </div>
+        <div style="overflow-x:auto;max-height:520px">
+          <table style="width:100%;border-collapse:collapse;font-size:11px">
+            <thead style="position:sticky;top:0;background:var(--s1);z-index:1">
+              <tr style="color:var(--tx3);text-transform:uppercase;font-size:9px;letter-spacing:.06em;border-bottom:1px solid var(--b1)">
+                <th style="padding:8px 12px;text-align:left;width:28px">#</th>
+                <th style="padding:8px;text-align:left;width:32px">Cat</th>
+                <th style="padding:8px;text-align:left">Target</th>
+                <th style="padding:8px;text-align:center;width:50px">Pri</th>
+                <th style="padding:8px;text-align:center;width:76px">Template</th>
+                <th style="padding:8px;text-align:center;width:120px">Status</th>
+                <th style="padding:8px;text-align:center;width:60px">Link</th>
+              </tr>
+            </thead>
+            <tbody id="gr-targets-body">
+              <tr><td colspan="7" style="padding:40px;text-align:center;color:var(--tx4)">Loading targets…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pitch Templates -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">📝 Pitch Templates</div>
+          <div style="font-size:10px;color:var(--tx3)">Click any template to copy. Replace [brackets] before sending.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:12px">
+          <div class="card" style="padding:0;background:var(--s2);cursor:pointer;overflow:hidden" onclick="copyTemplate('warm')">
+            <div style="padding:10px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:11px;font-weight:700;color:var(--amber)">1 — Warm / storytelling</div>
+              <div style="font-size:9px;color:var(--tx3)">Editorial features</div>
+            </div>
+            <div id="gr-tpl-preview-warm" style="padding:10px 12px;font-size:10px;color:var(--tx3);line-height:1.6;max-height:120px;overflow:hidden;font-family:var(--mono);white-space:pre-wrap"></div>
+            <div style="padding:6px 12px;border-top:1px solid var(--b1);font-size:10px;color:var(--amber);text-align:center">📋 Click to copy full template</div>
+          </div>
+          <div class="card" style="padding:0;background:var(--s2);cursor:pointer;overflow:hidden" onclick="copyTemplate('direct')">
+            <div style="padding:10px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:11px;font-weight:700;color:#60a5fa">2 — Direct / value</div>
+              <div style="font-size:9px;color:var(--tx3)">Listicle inclusions</div>
+            </div>
+            <div id="gr-tpl-preview-direct" style="padding:10px 12px;font-size:10px;color:var(--tx3);line-height:1.6;max-height:120px;overflow:hidden;font-family:var(--mono);white-space:pre-wrap"></div>
+            <div style="padding:6px 12px;border-top:1px solid var(--b1);font-size:10px;color:#60a5fa;text-align:center">📋 Click to copy full template</div>
+          </div>
+          <div class="card" style="padding:0;background:var(--s2);cursor:pointer;overflow:hidden" onclick="copyTemplate('punchy')">
+            <div style="padding:10px 12px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+              <div style="font-size:11px;font-weight:700;color:#34d399">3 — Punchy / brief</div>
+              <div style="font-size:9px;color:var(--tx3)">HARO / Qwoted</div>
+            </div>
+            <div id="gr-tpl-preview-punchy" style="padding:10px 12px;font-size:10px;color:var(--tx3);line-height:1.6;max-height:120px;overflow:hidden;font-family:var(--mono);white-space:pre-wrap"></div>
+            <div style="padding:6px 12px;border-top:1px solid var(--b1);font-size:10px;color:#34d399;text-align:center">📋 Click to copy full template</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Hunt Launch -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">🏹 Product Hunt Launch Pack</div>
+          <div style="font-size:10px;color:var(--tx3)">Ready-to-paste copy for launch day. Recommended: Tuesday 12:01am PT.</div>
+        </div>
+        <div style="padding:14px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+            <div class="card" style="padding:10px 12px;background:var(--s2);cursor:pointer" onclick="copyPHField('tagline')">
+              <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:4px">Tagline (60 char)</div>
+              <div id="gr-ph-tagline" style="font-size:12px;color:var(--tx1);font-weight:500;line-height:1.4"></div>
+              <div style="font-size:9px;color:var(--tx3);margin-top:6px">📋 Click to copy</div>
+            </div>
+            <div class="card" style="padding:10px 12px;background:var(--s2);cursor:pointer" onclick="copyPHField('title')">
+              <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:4px">Product Title</div>
+              <div id="gr-ph-title" style="font-size:12px;color:var(--tx1);font-weight:500;line-height:1.4"></div>
+              <div style="font-size:9px;color:var(--tx3);margin-top:6px">📋 Click to copy</div>
+            </div>
+          </div>
+          <div class="card" style="padding:10px 12px;background:var(--s2);cursor:pointer;margin-bottom:10px" onclick="copyPHField('description')">
+            <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;margin-bottom:4px">Description (260 char max)</div>
+            <div id="gr-ph-description" style="font-size:12px;color:var(--tx2);line-height:1.6"></div>
+            <div style="font-size:9px;color:var(--tx3);margin-top:6px">📋 Click to copy</div>
+          </div>
+          <div class="card" style="padding:10px 12px;background:var(--s2);cursor:pointer" onclick="copyPHField('makerComment')">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+              <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase">Maker's First Comment (pin this)</div>
+              <div style="font-size:9px;color:var(--tx3)">📋 Click to copy</div>
+            </div>
+            <div id="gr-ph-maker-comment" style="font-size:11px;color:var(--tx2);line-height:1.65;max-height:260px;overflow-y:auto;white-space:pre-wrap;font-family:var(--mono)"></div>
+          </div>
+          <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div style="font-size:10px;color:var(--tx3)"><b style="color:var(--tx2)">Topics:</b> AI, Music, Songwriting, Productivity, Creator Tools</div>
+            <div style="font-size:10px;color:var(--tx3)"><b style="color:var(--tx2)">Launch time:</b> Tuesday, 12:01am PT</div>
+            <div style="font-size:10px;color:var(--tx3)"><b style="color:var(--tx2)">Gallery:</b> 5-7 screenshots (genre → substyle → output)</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end adm-panel-growth -->
 
   </div>
 </div>
@@ -18843,6 +19011,315 @@ function switchAdmTab(tabName, el) {
   // Load content if needed
   if(tabName === 'content') loadCMSPosts();
   if(tabName === 'seotraffic') loadSEODashboard();
+  if(tabName === 'growth') loadGrowthEngine();
+}
+
+// ═══════════════════════════════════════════════════
+// GROWTH ENGINE — outreach backlinks + PH launch + templates
+// All data is static in-page. Status tracked in localStorage.
+// ═══════════════════════════════════════════════════
+
+const GROWTH_TARGETS = [
+  // ── P0 — AI tool directories (easy submissions) ───────────────────────
+  { id:1,  cat:'directory', name:'Product Hunt', url:'https://www.producthunt.com/', pitchUrl:'https://www.producthunt.com/posts/new', priority:'P0', template:'submit', ease:'medium', pitch:'Launch post. Tuesday 12:01am PT for best organic visibility. Use the PH pack below.' },
+  { id:2,  cat:'directory', name:"There's An AI For That", url:'https://theresanaiforthat.com/', pitchUrl:'https://theresanaiforthat.com/submit/', priority:'P0', template:'submit', ease:'easy', pitch:'Free submission, ~3-day approval. Category: Songwriting / Music.' },
+  { id:3,  cat:'directory', name:'Futurepedia', url:'https://www.futurepedia.io/', pitchUrl:'https://www.futurepedia.io/submit-tool', priority:'P0', template:'submit', ease:'easy', pitch:'High-traffic AI directory. Category: Music / Audio.' },
+  { id:4,  cat:'directory', name:'BetaList', url:'https://betalist.com/', pitchUrl:'https://betalist.com/submit', priority:'P0', template:'submit', ease:'easy', pitch:'Early-stage SaaS discovery. Good for email list growth.' },
+  { id:5,  cat:'directory', name:'Tool Finder', url:'https://www.toolfinder.co/', pitchUrl:'https://www.toolfinder.co/submit', priority:'P0', template:'submit', ease:'easy', pitch:'Curated AI tool library.' },
+  { id:6,  cat:'directory', name:'AIToolKit.org', url:'https://aitoolkit.org/', pitchUrl:'https://aitoolkit.org/submit', priority:'P0', template:'submit', ease:'easy', pitch:'AI tools directory, decent DA.' },
+  { id:7,  cat:'directory', name:'Insidr.ai', url:'https://www.insidr.ai/', pitchUrl:'https://www.insidr.ai/submit/', priority:'P0', template:'submit', ease:'easy', pitch:'Newer AI directory = faster approval (low submission volume).' },
+  { id:8,  cat:'directory', name:'AI Top Tools', url:'https://ai-toptools.com/', pitchUrl:'https://ai-toptools.com/submit/', priority:'P0', template:'submit', ease:'easy', pitch:'Category: Music & Audio.' },
+  { id:9,  cat:'directory', name:'Easy With AI', url:'https://easywithai.com/', pitchUrl:'https://easywithai.com/submit-ai-tool/', priority:'P0', template:'submit', ease:'easy', pitch:'Free submissions, curated listings.' },
+  { id:10, cat:'directory', name:'Open Tools', url:'https://opentools.ai/', pitchUrl:'https://opentools.ai/submit', priority:'P0', template:'submit', ease:'easy', pitch:'AI tools aggregator.' },
+  // ── P1 — Music-tech publications (guest post or feature) ──────────────
+  { id:11, cat:'publication', name:'DIY Musician (CD Baby)', url:'https://diymusician.cdbaby.com/', priority:'P1', template:'warm', ease:'medium', pitch:'High-authority. Pitch: "How AI co-writing fits into a modern indie songwriter workflow."' },
+  { id:12, cat:'publication', name:'Bandzoogle Blog', url:'https://bandzoogle.com/blog/', priority:'P1', template:'warm', ease:'medium', pitch:'Indie musician audience. Pitch: "Sync licensing metadata — what supervisors actually want."' },
+  { id:13, cat:'publication', name:'DistroKid Blog', url:'https://distrokid.com/hearthis/', priority:'P1', template:'warm', ease:'medium', pitch:'Indie distribution audience. Angle: copyright registration + ISRC automation.' },
+  { id:14, cat:'publication', name:'Ditto Music Blog', url:'https://www.dittomusic.com/en/blog/', priority:'P1', template:'warm', ease:'medium', pitch:'UK/Euro indie focus. Angle: AI tools that empower songwriters, not replace them.' },
+  { id:15, cat:'publication', name:'Songwriting Pro', url:'https://www.songwritingpro.com/', priority:'P1', template:'warm', ease:'medium', pitch:'Pure songwriter audience. Pitch: "AI as a lyric-craft sparring partner, not a ghost writer."' },
+  { id:16, cat:'publication', name:'American Songwriter', url:'https://americansongwriter.com/', priority:'P1', template:'warm', ease:'hard', pitch:'Legacy songwriter pub. Harder to break in, but high authority. Pitch a guest column on AI + craft.' },
+  { id:17, cat:'publication', name:'MusicRadar (features)', url:'https://www.musicradar.com/news', priority:'P1', template:'warm', ease:'hard', pitch:'Mass-market music tech. Pitch: "AI songwriting tools ranked — the honest differences."' },
+  { id:18, cat:'publication', name:'Sonic Scoop', url:'https://sonicscoop.com/', priority:'P1', template:'warm', ease:'medium', pitch:'Producer audience. Pitch: "Production briefs from AI — what to trust, what to ignore."' },
+  { id:19, cat:'publication', name:'Sound on Sound', url:'https://www.soundonsound.com/', priority:'P1', template:'warm', ease:'hard', pitch:'Pro audio audience. High authority. Angle: AI in the pre-production workflow.' },
+  { id:20, cat:'publication', name:'Musician on a Mission', url:'https://musicianonamission.com/', priority:'P1', template:'warm', ease:'medium', pitch:'Home-studio / solo producer audience. Angle: AI songwriting co-pilot.' },
+  { id:21, cat:'publication', name:'Music Business Worldwide', url:'https://www.musicbusinessworldwide.com/', priority:'P1', template:'warm', ease:'hard', pitch:'Industry decision-maker audience. Op-ed: AI and songwriter rights.' },
+  { id:22, cat:'publication', name:'Hypebot', url:'https://www.hypebot.com/', priority:'P1', template:'warm', ease:'medium', pitch:'Music industry news + opinion. Pitch op-ed on AI earning songwriter trust.' },
+  { id:23, cat:'publication', name:'The Hub by Sweetwater', url:'https://www.sweetwater.com/insync/', priority:'P1', template:'warm', ease:'medium', pitch:'Massive producer audience via Sweetwater.' },
+  { id:24, cat:'publication', name:'Ari Herstand — Ari Takes Off', url:'https://aristake.com/', priority:'P1', template:'warm', ease:'medium', pitch:'Respected DIY artist voice. Thoughtful about AI — good guest post target.' },
+  { id:25, cat:'publication', name:'Songtrust Blog', url:'https://blog.songtrust.com/', priority:'P1', template:'warm', ease:'medium', pitch:'Publishing-focused audience. Angle: AI songwriting and pub rights.' },
+  // ── P1 — AI / tech publications ──────────────────────────────────────
+  { id:26, cat:'newsletter', name:"Ben's Bites", url:'https://www.bensbites.co/', priority:'P1', template:'punchy', ease:'medium', pitch:'Daily AI newsletter. Pitch for "tool of the day" feature.' },
+  { id:27, cat:'newsletter', name:'TLDR AI', url:'https://tldr.tech/ai', priority:'P1', template:'punchy', ease:'hard', pitch:'Competitive but huge reach. Pitch news-worthy milestone.' },
+  { id:28, cat:'newsletter', name:'The Rundown AI', url:'https://www.therundown.ai/', priority:'P1', template:'punchy', ease:'medium', pitch:'Large AI newsletter. Pitch AI + music angle.' },
+  { id:29, cat:'publication', name:'Unite.AI', url:'https://www.unite.ai/', priority:'P1', template:'warm', ease:'medium', pitch:'AI publication, regularly features creative AI tools.' },
+  { id:30, cat:'publication', name:'AI Business', url:'https://aibusiness.com/', priority:'P1', template:'warm', ease:'medium', pitch:'B2B AI audience. "AI for creative workflows — songwriter co-pilot case study."' },
+  { id:31, cat:'newsletter', name:'The Neuron', url:'https://www.theneurondaily.com/', priority:'P1', template:'punchy', ease:'medium', pitch:'Accessible AI newsletter.' },
+  { id:32, cat:'publication', name:'Fast Company (Tech)', url:'https://www.fastcompany.com/section/tech', priority:'P2', template:'warm', ease:'hard', pitch:'Mainstream tech + creator culture. Story: AI songwriting that respects the craft.' },
+  { id:33, cat:'publication', name:'VentureBeat AI', url:'https://venturebeat.com/category/ai/', priority:'P2', template:'warm', ease:'hard', pitch:'Enterprise AI audience. Pitch: creator-economy AI + licensing.' },
+  // ── P0 — Listicle targets already ranking ────────────────────────────
+  { id:34, cat:'listicle', name:'"Best AI songwriting tools 2026" — Cyberlink', url:'https://www.cyberlink.com/blog/ai-music/', priority:'P0', template:'direct', ease:'medium', pitch:'Currently ranks for the primary keyword. Ask to be added — we\'re positioned differently from the audio generators they already list.' },
+  { id:35, cat:'listicle', name:'"AI songwriting tools" — Staccato', url:'https://staccato.ai/blog/', priority:'P0', template:'direct', ease:'medium', pitch:'Adjacent tool, likely partner-friendly since we don\'t compete on audio gen.' },
+  { id:36, cat:'listicle', name:'"Best AI music generators" — Feedough', url:'https://www.feedough.com/', priority:'P0', template:'direct', ease:'medium', pitch:'Search "AI music generators Feedough" and pitch for inclusion.' },
+  { id:37, cat:'listicle', name:'"Best AI songwriting tools" — Mureka', url:'https://www.mureka.ai/blog/', priority:'P0', template:'direct', ease:'medium', pitch:'Positioning: SONIQ = pre-production, they = generation.' },
+  { id:38, cat:'listicle', name:'"Suno alternatives" — various SERP', url:'https://www.google.com/search?q=suno+alternatives+for+songwriters', priority:'P0', template:'direct', ease:'medium', pitch:'Run the search, pitch each ranking listicle. High-intent query.' },
+  { id:39, cat:'listicle', name:'"Best AI tools for musicians" — Soundverse', url:'https://www.soundverse.ai/blog', priority:'P1', template:'direct', ease:'medium', pitch:'Adjacent tool with content marketing arm.' },
+  { id:40, cat:'listicle', name:'"AI lyric generators" roundups', url:'https://www.google.com/search?q=best+AI+lyric+generators', priority:'P1', template:'direct', ease:'medium', pitch:'Pitch SONIQ as "lyric + full musical context" vs standalone lyric tools.' },
+  { id:41, cat:'listicle', name:'"How to write a song with AI" guides', url:'https://www.google.com/search?q=how+to+write+a+song+with+AI', priority:'P1', template:'direct', ease:'medium', pitch:'Tutorial context. Offer to be the "songwriter-focused" recommended tool.' },
+  { id:42, cat:'listicle', name:'Freshbots — AI lyric roundups', url:'https://freshbots.ai/', priority:'P2', template:'direct', ease:'medium', pitch:'Lyric-specific competitor but includes tools beyond lyrics in listicles.' },
+  { id:43, cat:'listicle', name:'Trickle — AI songwriting posts', url:'https://trickle.so/blog', priority:'P2', template:'direct', ease:'medium', pitch:'AI content creation tools, pitch for category crossover.' },
+  // ── P2 — Podcasts ────────────────────────────────────────────────────
+  { id:44, cat:'podcast', name:'And The Writer Is... (Ross Golan)', url:'https://andthewriteris.com/', priority:'P2', template:'warm', ease:'hard', pitch:'Top songwriter podcast. Hard to book but huge credibility boost.' },
+  { id:45, cat:'podcast', name:'Song Exploder', url:'https://songexploder.net/', priority:'P2', template:'warm', ease:'hard', pitch:'Story-driven songwriting show. Pitch: a SONIQ-assisted song breakdown.' },
+  { id:46, cat:'podcast', name:'Switched on Pop', url:'https://switchedonpop.com/', priority:'P2', template:'warm', ease:'hard', pitch:'Music analysis podcast. Pitch: genre DNA framework discussion.' },
+  { id:47, cat:'podcast', name:'The Guitar Knobs', url:'https://www.theguitarknobs.com/', priority:'P2', template:'warm', ease:'medium', pitch:'Producer-leaning audience. Casual conversation format.' },
+  { id:48, cat:'podcast', name:'Creator Science (Jay Clouse)', url:'https://creatorscience.com/podcast/', priority:'P2', template:'warm', ease:'medium', pitch:'Creator economy podcast. Pitch: AI tools that respect creative identity.' },
+  // ── P1 — Communities ─────────────────────────────────────────────────
+  { id:49, cat:'community', name:'r/WeAreTheMusicMakers', url:'https://www.reddit.com/r/WeAreTheMusicMakers/', priority:'P1', template:'punchy', ease:'medium', pitch:'Don\'t promote — answer questions genuinely. Reddit rewards value over pitch. Ask mods about AMA.' },
+  { id:50, cat:'community', name:'IndieHackers (AI + Music)', url:'https://www.indiehackers.com/', priority:'P1', template:'warm', ease:'easy', pitch:'Write a build-in-public post about SONIQ\'s tech + business model. IH loves transparency.' }
+];
+
+const PITCH_TEMPLATES = {
+  warm: `Subject: Quick intro — SONIQ (AI songwriting studio for real music people)
+
+Hi [name],
+
+I've been reading [publication] for a while — your piece on [specific article] particularly stuck with me.
+
+I'm Alvin, founder of SONIQ. We're an AI songwriting studio, but positioned differently from Suno/Udio — instead of generating finished audio, we generate the complete song concept: lyrics, music theory analysis, a Suno-ready production brief, sync licensing metadata, and copyright registration. 24 genre DNA frameworks. Pitched at real songwriters and producers, not TikTok creators.
+
+Why I'm writing: I think there's an honest piece to be written about the difference between AI audio generators (Suno/Udio/ElevenLabs Music) and AI songwriting co-pilots (us). It's the kind of nuance your readers actually care about — not "best 10 AI tools" fluff.
+
+Happy to give you a free Studio account, a walkthrough, or just answer specific questions for a reference. Whatever's useful.
+
+Either way, keep doing what you do.
+
+— Alvin Dean
+Founder, SONIQ | Nu Wav Media LLC
+https://www.mysoniq.com`,
+
+  direct: `Subject: Adding SONIQ to [article title] — 2 min ask
+
+Hi [name],
+
+Quick one — saw your piece "[article title]" ranking well on [query]. Noticed [competitor 1] and [competitor 2] are on the list, but SONIQ isn't.
+
+We'd earn the spot on honest merit: we're the only tool that generates a complete song concept (lyrics + theory + production brief + sync metadata + copyright registration) across 24 genre DNA frameworks. We don't generate audio — we're the pre-production layer that feeds Suno/Udio.
+
+If you'd consider adding us, I'll send you:
+1. A 2-sentence description you can copy
+2. Screenshots + logo
+3. A free Studio account for testing
+
+If you'd rather decline, no worries — zero pressure.
+
+— Alvin Dean
+Founder, SONIQ
+https://www.mysoniq.com`,
+
+  punchy: `Subject: Re: [their query headline]
+
+[Name] — 4-sentence response:
+
+SONIQ (https://www.mysoniq.com) is an AI songwriting studio built for real songwriters and producers, not TikTok creators. Unlike Suno and Udio (which generate finished audio), SONIQ generates the complete song concept — lyrics, music theory analysis, production brief, sync licensing metadata — across 24 genre DNA frameworks. Songwriters use it to co-write; producers use it to build sync-ready briefs. Quote-worthy angle: "The AI tool category is splitting between audio generators and songwriting co-pilots, and songwriters want the latter."
+
+Happy to expand on any of this.
+
+— Alvin Dean, Founder, SONIQ
+thealvindean@gmail.com`
+};
+
+const PH_LAUNCH = {
+  title: 'SONIQ — AI songwriting studio for real music people',
+  tagline: 'Complete song concepts — lyrics, theory, brief, sync meta',
+  description: 'SONIQ turns an idea into a full song concept in seconds: lyrics, music theory analysis, Suno-ready production brief, sync licensing metadata, and copyright registration. 24 genre DNAs. For songwriters and producers — not TikTok creators.',
+  makerComment: `Hey Product Hunt 👋
+
+I'm Alvin, founder of SONIQ. Quick context on why we exist:
+
+Suno and Udio solve the "I want to hear music that doesn't exist yet" problem. They're audio generators. Amazing for casual creators.
+
+But as a songwriter, that's not what I needed. I needed a tool that:
+— Writes a proper lyric with internal structure, not just rhyming couplets
+— Understands genre DNA: what makes a Dub song sound like Dub (spring reverb, tape echo, King Tubby's mixing philosophy) vs generic reggae
+— Gives me a Suno-ready production brief so when I DO use Suno/Udio, I get what I actually imagined
+— Hands me sync licensing metadata the way a music supervisor expects it
+— Handles ISRC, BMI/ASCAP/SESAC registration (through our parent co. Nu Wav Media LLC)
+
+So we built it. 24 genre DNA frameworks. This week we added coverage for 13 more substyles — alt-rock, punk, blues, reggae, K-Pop, Latin, reggaeton, neo-soul, gospel, children's music, parody, comedy, and TV/musical.
+
+Free tier: 1 song/day. Paid from $9/mo. Feedback welcome — especially the harsh kind.
+
+Try it: https://www.mysoniq.com
+
+— Alvin`
+};
+
+function loadGrowthEngine() {
+  renderGrowthStats();
+  renderGrowthTargets();
+  renderPitchPreviews();
+  renderPHLaunch();
+}
+
+function _growthStatus() {
+  try { return JSON.parse(localStorage.getItem('soniq_growth_status') || '{}'); } catch { return {}; }
+}
+function _saveGrowthStatus(s) {
+  try { localStorage.setItem('soniq_growth_status', JSON.stringify(s)); } catch {}
+}
+
+function renderGrowthStats() {
+  const statuses = _growthStatus();
+  const total = GROWTH_TARGETS.length;
+  let contacted = 0, responded = 0, linked = 0;
+  for (const t of GROWTH_TARGETS) {
+    const s = statuses[t.id];
+    if (s === 'contacted' || s === 'responded' || s === 'linked') contacted++;
+    if (s === 'responded' || s === 'linked') responded++;
+    if (s === 'linked') linked++;
+  }
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('gr-total-targets', total);
+  set('gr-not-contacted', total - contacted);
+  set('gr-contacted', contacted);
+  set('gr-responded', responded);
+  set('gr-linked', linked);
+}
+
+function renderGrowthTargets() {
+  const body = document.getElementById('gr-targets-body');
+  if (!body) return;
+  const statuses = _growthStatus();
+  const catFilter = (document.getElementById('gr-filter-category')?.value || '').toLowerCase();
+  const statFilter = (document.getElementById('gr-filter-status')?.value || '').toLowerCase();
+  const priFilter = (document.getElementById('gr-filter-priority')?.value || '').toUpperCase();
+  const search = (document.getElementById('gr-search')?.value || '').toLowerCase();
+
+  const catIcons = {directory:'📁',publication:'📰',listicle:'📋',newsletter:'✉',podcast:'🎙',community:'👥'};
+  const priColors = {P0:'#f47292',P1:'#f5c000',P2:'#a0a0c4'};
+  const escHtml = s => String(s||'').replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+
+  const rows = GROWTH_TARGETS.filter(t => {
+    const s = statuses[t.id] || 'todo';
+    if (catFilter && t.cat !== catFilter) return false;
+    if (statFilter && s !== statFilter) return false;
+    if (priFilter && t.priority !== priFilter) return false;
+    if (search && !`${t.name} ${t.pitch}`.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  if (rows.length === 0) {
+    body.innerHTML = '<tr><td colspan="7" style="padding:30px;text-align:center;color:var(--tx4)">No targets match your filters.</td></tr>';
+    return;
+  }
+
+  body.innerHTML = rows.map(t => {
+    const s = statuses[t.id] || 'todo';
+    return `
+      <tr style="border-bottom:1px solid var(--b1)">
+        <td style="padding:8px 12px;color:var(--tx4);font-family:var(--mono);font-size:10px">${t.id}</td>
+        <td style="padding:8px;text-align:center;font-size:14px" title="${t.cat}">${catIcons[t.cat]||''}</td>
+        <td style="padding:8px">
+          <div style="font-weight:600;color:var(--tx1);font-size:12px">${escHtml(t.name)}</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:2px;line-height:1.4">${escHtml(t.pitch)}</div>
+        </td>
+        <td style="padding:8px;text-align:center">
+          <span style="font-size:10px;font-weight:800;color:${priColors[t.priority]||'var(--tx3)'}">${t.priority}</span>
+        </td>
+        <td style="padding:8px;text-align:center">
+          <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:var(--s3);color:var(--tx2);text-transform:capitalize">${t.template}</span>
+        </td>
+        <td style="padding:8px;text-align:center">
+          <select onchange="setGrowthStatus(${t.id}, this.value)" style="padding:4px 6px;border-radius:4px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:10px;width:110px">
+            <option value="todo" ${s==='todo'?'selected':''}>Not contacted</option>
+            <option value="contacted" ${s==='contacted'?'selected':''}>✓ Contacted</option>
+            <option value="responded" ${s==='responded'?'selected':''}>💬 Responded</option>
+            <option value="linked" ${s==='linked'?'selected':''}>🔗 Linked</option>
+            <option value="declined" ${s==='declined'?'selected':''}>✕ Declined</option>
+          </select>
+        </td>
+        <td style="padding:8px;text-align:center">
+          <a href="${escHtml(t.pitchUrl || t.url)}" target="_blank" rel="noopener" style="font-size:16px;text-decoration:none" title="Open in new tab">↗</a>
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+function setGrowthStatus(id, status) {
+  const statuses = _growthStatus();
+  if (status === 'todo') delete statuses[id];
+  else statuses[id] = status;
+  _saveGrowthStatus(statuses);
+  renderGrowthStats();
+  const statFilter = document.getElementById('gr-filter-status')?.value;
+  if (statFilter) renderGrowthTargets();
+}
+
+function renderPitchPreviews() {
+  const truncate = (s, n) => s.length > n ? s.slice(0, n) + '…' : s;
+  for (const key of Object.keys(PITCH_TEMPLATES)) {
+    const el = document.getElementById('gr-tpl-preview-' + key);
+    if (el) el.textContent = truncate(PITCH_TEMPLATES[key], 220);
+  }
+}
+
+function renderPHLaunch() {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('gr-ph-title', PH_LAUNCH.title);
+  set('gr-ph-tagline', PH_LAUNCH.tagline);
+  set('gr-ph-description', PH_LAUNCH.description);
+  set('gr-ph-maker-comment', PH_LAUNCH.makerComment);
+}
+
+async function copyTemplate(key) {
+  const text = PITCH_TEMPLATES[key];
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    if (typeof toast === 'function') toast('✓ Template copied to clipboard', 2000);
+  } catch {
+    if (typeof toast === 'function') toast('⚠ Could not copy — select manually', 3000);
+  }
+}
+
+async function copyPHField(field) {
+  const text = PH_LAUNCH[field];
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+    if (typeof toast === 'function') toast(`✓ ${field} copied`, 2000);
+  } catch {
+    if (typeof toast === 'function') toast('⚠ Could not copy — select manually', 3000);
+  }
+}
+
+function exportGrowthTargetsCSV() {
+  const statuses = _growthStatus();
+  const header = 'ID,Category,Name,URL,PitchURL,Priority,Template,Ease,Status,PitchAngle';
+  const esc = v => {
+    v = String(v || '');
+    return v.includes(',') || v.includes('"') || v.includes('\n') ? '"' + v.replace(/"/g, '""') + '"' : v;
+  };
+  const rows = GROWTH_TARGETS.map(t => {
+    const s = statuses[t.id] || 'todo';
+    return [t.id, t.cat, esc(t.name), esc(t.url), esc(t.pitchUrl || t.url), t.priority, t.template, t.ease, s, esc(t.pitch)].join(',');
+  });
+  const csv = [header, ...rows].join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `soniq-growth-targets-${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function resetGrowthStatuses() {
+  if (!confirm('Reset all outreach statuses? This cannot be undone.')) return;
+  _saveGrowthStatus({});
+  renderGrowthStats();
+  renderGrowthTargets();
+  if (typeof toast === 'function') toast('✓ All statuses reset', 2000);
 }
 
 // ── BLOG CMS (Supabase-powered + AI Content Engine) ──
