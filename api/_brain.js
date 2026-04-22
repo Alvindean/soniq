@@ -519,6 +519,8 @@ const SUBSTYLE_NOTES={
   'Jingle / Ad':    'Jingle DNA: Product name minimum 3× in 30-60 seconds. Problem in verse (pain point), product = solution in chorus. Benefit not feature. Melody sticky enough to remember after one listen. Suno style: "upbeat commercial jingle, major key, catchy, corporate, polished, radio-ready".',
   'Sitcom Theme':   'Sitcom Theme DNA: 30-60 seconds. Warm, inviting, tells you this is a safe fun place. Often summarizes the show\'s premise. Major key, upbeat tempo, memorable chorus. Era-appropriate production. Suno style: "sitcom theme, warm, upbeat, [era: 90s/2000s/modern], feel-good, catchy melody".',
   'Prestige Drama Theme': 'Prestige Drama Theme DNA: Atmospheric, sparse, foreboding or melancholic. Establishes stakes and tone. Minor key or modal. Often instrumental or near-instrumental. Suno style: "prestige TV theme, cinematic, atmospheric, [mood: dark/cold/intense], strings, piano, sparse, HBO-style".',
+  'Film Score Ballad':    'Film Score Ballad DNA: Cinematic orchestral ballad designed to underscore a specific emotional moment — loss, revelation, triumph. Piano-led verse building to full orchestra on chorus. Often diegetic in concept (character sings this moment). 60-80 BPM. Suno style: "film score ballad, orchestral, piano verse, strings swell, full orchestra chorus, 72 BPM, cinematic emotional climax, Hans Zimmer style vocal feature".',
+  'Video Game OST':       'Video Game OST DNA: Looping-friendly structures (8-bar or 16-bar loops that sit under gameplay indefinitely). Memorable melodic motif that becomes the game\'s sonic identity. Genre varies by setting (orchestral for fantasy, synthwave for cyberpunk, chiptune for retro). Dynamic layering — verses add/remove instruments to match gameplay intensity. Suno style: "video game soundtrack, looping-friendly, memorable melodic motif, dynamic layering, orchestral or synthwave or chiptune by setting, cinematic".',
   // Alt-Rock substyles
   'Shoegaze':            'Shoegaze DNA: Wall-of-sound guitars drenched in reverb, chorus, and flange. Vocals buried deep in the mix as another texture — sung into the effect chain, not over it. Drowsy mid-tempo 90-120 BPM. Emotional fog over specific words — felt more than understood. Dynamic shifts are textural (more layers, more feedback), not quiet-loud. Suno style: "shoegaze, wall of reverb guitars, chorus pedal, buried dreamy vocals, 100 BPM, hazy textures, atmospheric". Artists: My Bloody Valentine, Slowdive, Ride, Cocteau Twins, DIIV, Beach House.',
   'Post-Punk':           'Post-Punk DNA: Angular jagged guitars, driving melodic bass (bass IS the melody), tight mechanical drums. Detached declamatory vocals — half-spoken, emotionally controlled. Cold urban atmosphere, alienation and anxiety themes. 120-140 BPM. Minor key tonality. Suno style: "post-punk, driving melodic bass, angular guitars, tight mechanical drums, 130 BPM, cold detached vocals, Joy Division feel". Artists: Joy Division, The Cure, Interpol, Gang of Four, Wire, Siouxsie and the Banshees.',
@@ -695,6 +697,15 @@ const SUBSTYLE_SUNO = {
   'Romantic Comedy':    'romantic comedy song, acoustic singer-songwriter, warm melodic, 105 BPM, awkward specificity, earnest',
   'Storytelling Comedy':'storytelling comedy, narrative verses escalating, 115 BPM, Flight of the Conchords style, detonating bridge',
   'Musical Roast':      'musical roast, upbeat, target-focused, 110 BPM, verse 1 praise verse 2 demolish, bridge killing blow',
+  // TV / Musical
+  'TV Theme':              'tv theme, catchy memorable, era-appropriate production, 30-90 seconds, defining hook, genre-matches show',
+  'Broadway / Show Tune':  'broadway show tune, orchestral pit band, belted theatrical vocals, 110 BPM, dramatic, I want song',
+  'Film Score Ballad':     'film score ballad, orchestral, piano verse, strings swell, full orchestra chorus, 72 BPM, cinematic emotional climax',
+  'Disney-Style':          'disney animated film song, orchestral, magical, warm, major key, soaring melody, 120 BPM, I want song',
+  'Jingle / Ad':           'upbeat commercial jingle, major key, catchy, corporate polished, radio-ready, product name repeated',
+  'Video Game OST':        'video game soundtrack, looping-friendly, memorable motif, dynamic layering, orchestral or synthwave, cinematic',
+  'Sitcom Theme':          'sitcom theme, warm upbeat, era-appropriate, feel-good, catchy memorable, 30-60 seconds',
+  'Prestige Drama Theme':  'prestige tv theme, cinematic, atmospheric, minor key, strings, piano sparse, HBO style',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
