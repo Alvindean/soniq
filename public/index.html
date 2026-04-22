@@ -18392,7 +18392,12 @@ async function loadAdminDashboard() {
     if (token)    headers['Authorization'] = 'Bearer ' + token;
 
     const res = await fetch('/api/analytics', { headers });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) {
+      const errBody = await res.json().catch(() => ({}));
+      const msg = errBody.detail || errBody.error || ('HTTP ' + res.status);
+      if (errBody.stack) console.error('Analytics server stack:\n' + errBody.stack);
+      throw new Error(msg);
+    }
     _adminData = await res.json();
     _adminUsersAll = _adminData.users || [];
     renderAdminDashboard(_adminData);
