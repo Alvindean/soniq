@@ -499,6 +499,10 @@ const SUBSTYLE_NOTES={
   'Pop Parody':     'Pop Parody DNA: Rewrite a mainstream pop song with mundane or absurdist subject matter. Use the original song\'s structure, melody cues, and production style. Subject could be: grocery shopping, Wi-Fi passwords, IKEA assembly. Suno style: "upbeat pop, polished production, major key, 120 BPM" — same as a real pop song.',
   'Rap Parody':     'Rap Parody DNA: Rap verse structure with comedic/absurdist bars. Can parody a specific rap song or rap in general about a non-rap subject. Use real rap flow patterns (16-bar verse, 8-bar hook) with completely deflating subject matter. Suno style: match specific rap era/substyle being parodied.',
   'Ballad Parody':  'Ballad Parody DNA: Soaring dramatic ballad delivery applied to something trivial. The bigger the emotional production, the funnier the trivial subject. Verse builds with restraint, pre-chorus adds tension, chorus erupts in full dramatic glory — all about something like losing your phone charger. Suno style: "epic power ballad, piano, strings, dramatic, emotional, stadium".',
+  'Country Parody': 'Country Parody DNA: Rewrite in authentic country voice with absurd or mundane subject (riding a Roomba, losing at Monopoly, inventing a seventh sense). Steel guitar, shuffle rhythm, full country commitment. Lyric flags as parody but music never does. Suno style: "country parody, pedal steel, shuffle rhythm, committed country instrumentation, 110 BPM, earnest delivery, mundane absurd topic".',
+  'Rock Parody':    'Rock Parody DNA: Power chords, anthemic rock chorus, absurd or trivial lyrical content. Arena-rock belted vocal about something ridiculous — the commitment of the rock performance amplifies the absurdity. Suno style: "rock parody, distorted power chords, anthemic chorus, belted vocal, 130 BPM, earnest arena rock production, absurd lyrics".',
+  'EDM Parody':     'EDM Parody DNA: Full EDM drop production (sidechained bass, build-up riser, snare roll) applied to deflating lyrics. The bigger the drop, the more trivial the topic IS the joke. 128 BPM. Suno style: "EDM parody, massive drop, sidechained bass, build-up riser, 128 BPM, full EDM production, committed, trivial absurd subject".',
+  'Folk Parody':    'Folk Parody DNA: Fingerpicked acoustic guitar, warm harmony, conversational melody — applied to ridiculous subject matter. The sincerity of the folk delivery contrasts with the absurdity. Suno style: "folk parody, fingerpicked acoustic guitar, warm two-part harmony, conversational melody, 90 BPM, sincere delivery, absurd topic".',
   // Comedy substyles
   'Absurdist':      'Absurdist Comedy DNA: Internal dream-logic. The premise is established early and followed to its extreme conclusion without apology. The world of the song has rules, and those rules are insane. Suno style: match the emotional sincerity of the genre — the music never acknowledges the absurdity.',
   'Dark Comedy':    'Dark Comedy DNA: Finding humor in genuinely dark or uncomfortable situations. The delivery is always casual and upbeat — the contrast between tone and content IS the comedy. Tim Minchin territory. Suno style: "upbeat, cheerful, major key" applied to dark subject matter for maximum tonal contrast.',
@@ -670,6 +674,15 @@ const SUBSTYLE_SUNO = {
   'Nature & Animals':       'children nature song, bright ukulele, onomatopoeia sounds, 115 BPM, animal noises, warm acoustic',
   'Friendship & Kindness':  'children kindness song, warm acoustic guitar, gentle singable chorus, 105 BPM, social emotional',
   'Holiday / Seasonal':     'children holiday song, seasonal imagery, sleigh bells, 110 BPM, warm festive, family-friendly',
+  // Parody
+  'Genre Parody':       'genre parody, mirror original genre exactly, sincere production, committed performance, comedy in lyrics only',
+  'Pop Parody':         'upbeat pop parody, polished major key production, 120 BPM, committed pop delivery, absurd mundane topic',
+  'Rap Parody':         'rap parody, rap flow 16-bar verse, boom bap or trap production, deflating topic, earnest flow',
+  'Ballad Parody':      'ballad parody, epic power ballad, piano, strings, dramatic, stadium, 75 BPM, trivial subject maximum emotion',
+  'Country Parody':     'country parody, pedal steel, shuffle rhythm, earnest country instrumentation, 110 BPM, mundane absurd topic',
+  'Rock Parody':        'rock parody, distorted power chords, anthemic chorus, belted vocal, 130 BPM, earnest arena rock, absurd lyrics',
+  'EDM Parody':         'edm parody, massive drop, sidechained bass, 128 BPM, full edm production, committed, trivial absurd subject',
+  'Folk Parody':        'folk parody, fingerpicked acoustic guitar, warm harmony, 90 BPM, sincere delivery, absurd topic',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
