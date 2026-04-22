@@ -869,6 +869,41 @@ const LYRIC_CRAFT_UNIVERSAL = {
     genres: ['gospel','hiphop','folk','rnb','country','neosoul','pop','blues']
   },
 
+  // ── COMEDY / PARODY CRAFT (Ian Edwards "running the game" framework) ───────
+  // These 4 techniques activate on BOTH genre-match (comedy/parody/tvmusical)
+  // AND mood/topic-match (playful, funny, silly, absurd, humorous, etc.) —
+  // because comedic craft isn't a genre, it's a mode. A rap song about an
+  // absurd flex, a country novelty track, a pop tongue-in-cheek banger, a
+  // gospel comedy-praise song — all benefit from this framework when the
+  // song is meant to land as funny.
+  runTheGame: {
+    label: 'RUN THE GAME (5-STEP HEIGHTENING)',
+    short: `The framework behind every great comedic song (Lonely Island "I'm On A Boat", Weird Al originals, Bo Burnham, Flight of the Conchords, hip-hop's best punchline tracks, country novelty hits). 5 steps, executed across the song: (1) NOTICE: pick one unusual anchor — a word, behavior, or belief — and react to it honestly in the hook. (2) POV: give your comedic opinion on why it's unusual. This is your point of view for the entire song — commit to it. (3) HEIGHTEN: "if this is true, what else is true?" Each verse imagines a funnier scenario where the anchor is even more real. (4) GATHER: introduce new characters, settings, or info in verse 2 — new setups your anchor can land on. (5) CONNECT: every new setup punchlines back to the original anchor word or behavior. Final hook collapses everything into the same joke. Rule: you are not making 4 different jokes — you are making ONE joke 4 different ways.`,
+    genres: ['comedy','parody','tvmusical'],
+    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty']
+  },
+
+  heightenTheAnchor: {
+    label: 'HEIGHTEN THE ANCHOR',
+    short: `Pick ONE anchor word or behavior in the song (e.g. "peninsula", "boat", "kitchen"). Every verse stacks a more absurd scenario where the anchor is MORE true, more committed, more literal than before. Verse 1 is "I own a peninsula." Verse 2 is "I send girls pictures of my peninsula." Verse 3 is "the woman I'm marrying is a peninsula bride." Rule: scenarios must get WEIRDER and MORE SPECIFIC each time, not just repeat the premise. If verse 3 feels like verse 1, you haven't heightened.`,
+    genres: ['comedy','parody','tvmusical'],
+    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty']
+  },
+
+  remixTheAnchor: {
+    label: 'REMIX THE ANCHOR (TWO BECOMING ONE)',
+    short: `Take your anchor word and fuse it with OTHER nouns in the song to create nonsense-phrases that commit 100% to the joke. Ian Edwards: instead of "I'll send pictures of my penis," it becomes "I'll send pictures of my PENINSULA." The remix should land in a place the listener didn't expect but can perfectly understand in retrospect. Works in hook lines (maximum impact) or as a recurring punchline through verses. The word you pick for the anchor must be phonetically rich enough to absorb other nouns plausibly.`,
+    genres: ['comedy','parody','tvmusical','hiphop'],
+    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty']
+  },
+
+  crowdWorkFeel: {
+    label: 'CROWD-WORK FEEL (REACTIVE COMEDY)',
+    short: `Write the song as if it's being discovered in real time — reactions, asides, observations to unseen "audience" responses built into the lyric. "So you live in San Fran? I kinda know what that means but I really don't" IS the first line. The comedic voice notices things and updates its theory mid-song. Use: (1) direct address to listener/character ("Don't have kids? That one's my niece."), (2) self-correction mid-verse ("Wait — it's a peninsula, not an island"), (3) interjections as bars ("Oh REALLY?"). Makes the song feel improvised, human, and alive — even though it's structured.`,
+    genres: ['comedy','parody','tvmusical','hiphop'],
+    modes: ['playful','funny','silly','absurd','humorous','comedic','ironic','satirical','tongue-in-cheek','witty','goofy','cheeky','lighthearted','whimsical','novelty','conversational']
+  },
+
   // ── HIP-HOP / RAP CRAFT ────────────────────────────────────────────────────
   multisyllabicScheme: {
     label: 'MULTISYLLABIC (MULTI) SCHEME',
@@ -903,10 +938,23 @@ const LYRIC_CRAFT_UNIVERSAL = {
 
 // Returns a compact lyric craft instruction block for a given genre.
 // Uses short-form instructions to stay within prompt size budget (~2000 chars max).
-function buildLyricCraftNote(genre) {
-  const applicable = Object.values(LYRIC_CRAFT_UNIVERSAL).filter(t =>
-    t.genres === 'all' || (Array.isArray(t.genres) && t.genres.includes(genre))
-  );
+// Select lyric craft techniques by genre AND by mode (mood/topic keywords).
+// A technique activates if:
+//   - genres === 'all'                                              (universal)
+//   - genres array contains the current genre                       (genre-gated)
+//   - modes array contains a word present in mood/topic text        (mode-gated)
+// Mode-gating is how cross-cutting crafts (comedy "run-the-game" framework,
+// future additions) light up on a rap/country/pop/whatever song whenever the
+// mood or topic signals the song is meant to be funny/playful/ironic — not
+// only when the genre itself is "comedy".
+function buildLyricCraftNote(genre, mood, topic) {
+  const contextText = ((mood || '') + ' ' + (topic || '')).toLowerCase();
+  const applicable = Object.values(LYRIC_CRAFT_UNIVERSAL).filter(t => {
+    if (t.genres === 'all') return true;
+    if (Array.isArray(t.genres) && t.genres.includes(genre)) return true;
+    if (Array.isArray(t.modes) && t.modes.some(m => contextText.includes(m))) return true;
+    return false;
+  });
   if (!applicable.length) return '';
 
   const lines = applicable.map(t => `• ${t.label}: ${t.short}`).join('\n');
@@ -3114,7 +3162,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   // ── Specificity self-check instruction ─────────────────────────────────
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
 
-  const lyricCraftNote = buildLyricCraftNote(genre);
+  const lyricCraftNote = buildLyricCraftNote(genre, mood, topic);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -3814,7 +3862,7 @@ SONGWRITING RULES:
 - LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildAdlibNote('hiphop')}
 
-${buildLyricCraftNote('hiphop')}
+${buildLyricCraftNote('hiphop', mood, topic)}
 
 Respond with EXACTLY this format:
 
