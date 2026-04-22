@@ -490,6 +490,10 @@ const SUBSTYLE_NOTES={
   'Educational':         'Educational Children\'s DNA: The lesson is hidden inside the fun. Count, alphabet, animals, colors, shapes — but approached with wonder not drill. Repetition that teaches. Suno style: "educational children\'s song, acoustic guitar, glockenspiel, clear vocals, 105 BPM, friendly, warm".',
   'Lullaby / Bedtime':   'Lullaby DNA: Descending melody (literally descending — falling intervals calm the nervous system). Slowing tempo verse to verse. Safety and love in every image. Minimal instrumentation. Suno style: "lullaby, soft acoustic guitar, gentle, 60 BPM, warm, soothing, hushed vocals, night, stars".',
   'Silly / Nonsense':    'Silly/Nonsense Children\'s DNA: Pure absurdist fun. Made-up words, tongue twisters, impossible scenarios played completely straight. The laugh IS the lesson — joy is educational. Suno style: "silly children\'s song, bouncy, 115 BPM, playful, bright, ukulele, fun".',
+  'Adventure Story':     'Adventure Story Children\'s DNA: A journey in song form — the verses travel (into the woods, across the sea, up the mountain). Big imaginative imagery. Chorus names the destination or the adventurer. 100-120 BPM. Invites the listener to come along. Suno style: "children\'s adventure song, cinematic, orchestral children\'s music, 110 BPM, warm, imaginative, journey".',
+  'Nature & Animals':    'Nature & Animals Children\'s DNA: Songs ABOUT specific creatures, ecosystems, weather, plants. Names the animal by its real name — not "the bird," but "the robin." Educational within the wonder. Bright major keys, lots of onomatopoeia (splash, swoosh, roar, chirp). 110-125 BPM. Suno style: "children\'s nature song, bright ukulele, onomatopoeia sounds, 115 BPM, animal noises, warm acoustic, educational wonder".',
+  'Friendship & Kindness':'Friendship & Kindness Children\'s DNA: Social-emotional lesson songs — sharing, helping, including, apologizing, saying "I\'m sorry." Warm conversational verses, chorus lands the value lesson simply. 100-115 BPM. Suno style: "children\'s kindness song, warm acoustic guitar, gentle singable chorus, 105 BPM, conversational verses, social emotional learning".',
+  'Holiday / Seasonal':  'Holiday/Seasonal Children\'s DNA: Christmas, Hanukkah, Diwali, birthdays, Valentine\'s, Halloween, seasonal (autumn leaves, snow day, spring garden). Imagery is sensory and specific — the smell, the sight, the sound of the season. 100-120 BPM typically, slower for reverent holidays. Suno style: "children\'s holiday song, seasonal imagery, sleigh bells or seasonal percussion, 110 BPM, warm festive, family-friendly".',
   // Parody substyles
   'Genre Parody':   'Genre Parody DNA: Rewrite a specific song in a specific genre with absurdist/comedic new lyrics. The production must sound 100% authentic to the source genre — the comedy is purely in the lyrical content. Suno style: mirror the original genre exactly. Key rule: commit fully to the genre performance while the lyrics are completely ridiculous.',
   'Pop Parody':     'Pop Parody DNA: Rewrite a mainstream pop song with mundane or absurdist subject matter. Use the original song\'s structure, melody cues, and production style. Subject could be: grocery shopping, Wi-Fi passwords, IKEA assembly. Suno style: "upbeat pop, polished production, major key, 120 BPM" — same as a real pop song.',
@@ -657,6 +661,15 @@ const SUBSTYLE_SUNO = {
   'Urbano Latino':      'urbano latino, modern polished production, dembow meets pop and afrobeats, bilingual, 98 BPM, J Balvin style',
   'Dembow Puro':        'dembow dominicano, faster harder dembow, 120 BPM, raw digital production, rapid fire Spanish, El Alfa style',
   'Reggaeton Pop':      'reggaeton pop, softened dembow, sung pop hook, polished, 98 BPM, Despacito style, crossover, radio ready',
+  // Children
+  'Singalong / Playful':    'children singalong, ukulele, clapping, bright, joyful, 110 BPM, playful, motion cues',
+  'Educational':            'educational children song, acoustic guitar, glockenspiel, clear vocals, 105 BPM, friendly, warm',
+  'Lullaby / Bedtime':      'lullaby, soft acoustic guitar, gentle, 60 BPM, warm soothing, hushed vocals, night, stars',
+  'Adventure Story':        'children adventure song, cinematic, orchestral children music, 110 BPM, warm, imaginative, journey',
+  'Silly / Nonsense':       'silly children song, bouncy, 115 BPM, playful, bright, ukulele, absurd fun',
+  'Nature & Animals':       'children nature song, bright ukulele, onomatopoeia sounds, 115 BPM, animal noises, warm acoustic',
+  'Friendship & Kindness':  'children kindness song, warm acoustic guitar, gentle singable chorus, 105 BPM, social emotional',
+  'Holiday / Seasonal':     'children holiday song, seasonal imagery, sleigh bells, 110 BPM, warm festive, family-friendly',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
