@@ -8953,6 +8953,116 @@ const RAP_DIM_DEFAULTS = {
   jazz_rap_revival: { flow:'behind-beat',   rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'omniscient' },
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// RAP_STYLE_ADLIBS_CLIENT — mirrors backend RAP_STYLE_ADLIBS (keyed by label).
+// Used by the Lucky feature to inject authentic, style-specific ad-libs into
+// the generated prompt, so a Hyphy-Lucky song gets "YEE!" / "WHOOP WHOOP!"
+// and a UK-Drill-Lucky song gets "oi" / "bruv" / "gang" instead of generic
+// "(yeah)" hip-hop ad-libs across the board.
+// ═══════════════════════════════════════════════════════════════════════════
+const RAP_STYLE_ADLIBS_CLIENT = {
+  'Trap':                 ['skrrt','yah','ay','woo','let\'s go','bands','ooh','lil'],
+  'Boom Bap':             ['yo','uh','check it','word','yessir','uh-huh','one-two','aiyyo'],
+  'Lyrical/Conscious':    ['(knowledge)','peace god','word is bond','represent','true indeed','wisdom','uh-huh','check'],
+  'Drill':                ['gang','slide','brr','demon time','splash','opps','no cap','grrah'],
+  'Melodic Rap':          ['(melodic)','oh','yeah yeah','mmm','(auto-tune)','whoa','ayy','let me tell ya'],
+  'Old School':           ['yo ho','throw your hands up','in the place to be','dj spin it','fresh','def','word up','uh huh'],
+  'G-Funk':               ['(smooth)','ya don\'t stop','hol up','(cruisin)','west side','smoke somethin','yeaahh','(laid back)'],
+  'East Coast':           ['yo','word up','ayo','c\'mon son','true indeed','check it','nawmean','that\'s real'],
+  'Midwest':              ['(chipmunk soul)','uh','yep','you know','c\'mon','(soul chop)','mmm','check it'],
+  'Cloud Rap':            ['(whispered)','(echo)','(mumbled)','(ethereal)','yeahh','uhh','(hazy)','(reverb)'],
+  'UK Drill':             ['oi','bruv','fam','gang','straight up','innit','splash','brrap'],
+  'Afro-Rap':             ['O YO!','EHEN!','NA WETIN!','MAKE I TELL YOU','(laughter)','ODESHI!','BROKE WASH','(drum break)'],
+  'Latin Rap':            ['¡DALE!','¡WEPA!','¡ESO!','BRR','JEJE','QUE LO QUE','¡FUEGO!','¡VAMOS!'],
+  'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
+  'Phonk':                ['(ominous)','yea hoe','pimp','triple six','(drawl)','smokin','grim','(slowed)'],
+  'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
+  'Hustle / Grind':       ['still up','on my grind','the marathon','(grinding)','no sleep','up first','the mix','get it'],
+  'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
+  'Neo-Phonetic':         ['(stutter)','brr brr','kah','tata','(chopped syllable)','boof','ah ah','(phonetic)'],
+  'Climate Rap':          ['(breath)','(sigh)','look around','real talk','(urgent)','(grim)','time\'s up','(sobering)'],
+  'AI-Native':            ['(processed)','(synth)','(vocoded)','(robotic)','one-oh-one','(binary)','(digital)','(rendered)'],
+  'Mosaic Flow':          ['(switch)','(beat change)','wait','aight','shift','(pivot)','new angle','(reset)'],
+  'Golden Era 2.0':       ['yo','real hip-hop','check it','one two','yessir','fam','(shotgun click)','hittas'],
+  'Analog Melodic':       ['(tape warmth)','mm','oh','(soft auto-tune)','yeah yeah','(hazy)','(rhodes)','whoa'],
+  'Conscious Trap':       ['(mm)','(pause)','(check it)','(listen)','(word)','(truth)','(real)','(breath)'],
+  'Afro-Boom Bap':        ['(African chant)','sankofa','true','word','(tonal)','uh-huh','real','(djembe)'],
+  'Jazz Rap Revival':     ['(scat)','doo bop','yeah yeah','(horn)','true that','mm','peace','(brush snare)'],
+  'Bay Area':             ['(hyphy)','hella','ghost ride','slap','yadada','beyotch','(Too Short)','yay area'],
+  'Down South':           ['(drawl)','slatt','bussin','huh','what it do','fasho','trill','errybody'],
+  'Crunk':                ['YEAH!','OKAY!','WHAT!','(SHOUTED)','TURN UP!','CRUNK!','SKEET!','OOOWWWW!'],
+  'Chopped & Screwed':    ['(screwed)','(chopped)','(slowed)','sippin','leanin','(syrupy)','(pitch-down)','slow it down']
+};
+
+// Client-side mirror of SUBSTYLE_SUNO rap-lab entries (27 rap styles).
+// Used to inject style-specific Suno production tags into the Lucky prompt.
+const RAP_STYLE_SUNO_CLIENT = {
+  'Trap':                 'trap, 808 bass, hard snare, rolling hi-hats, 140 BPM, dark atmospheric',
+  'Boom Bap':             'boom bap, vinyl crackle, jazz sample, hard kick, 90 BPM, new york classic',
+  'Lyrical/Conscious':    'lyrical conscious rap, jazz sample loops, live-band boom bap drums, warm vinyl texture, 88 BPM, Mos Def Talib Kweli De La Soul Black Thought, dense pocket mix',
+  'Drill':                'uk drill, sliding 808 bass, off-beat hi-hats, dark minimal production, 140 BPM, menacing',
+  'Melodic Rap':          'melodic rap, lush atmospheric production, auto-tune vocals, 120 BPM, emotional',
+  'Old School':           'old school hip-hop, 808 drum machine, record scratches, funk breakbeat, 102 BPM, 1985-era boom bap roots, Run-DMC Sugarhill Gang Grandmaster Flash',
+  'G-Funk':               'g-funk, moog synth whine, west coast hip-hop, slow rolling 808, 95 BPM, smooth melodic hook',
+  'East Coast':           'east coast hip-hop, boom bap, jazz sample, vinyl crackle, 90 BPM, new york lyrical',
+  'Midwest':              'midwest rap, chipmunk soul sample, chicago hip-hop, 95 BPM, emotional vulnerability',
+  'Cloud Rap':            'cloud rap, ethereal haze, lo-fi drum machine, deep reverb, atmospheric synth pads, 80 BPM',
+  'UK Drill':             'UK drill, sliding 808 basslines, snappy off-beat snares, dark piano chords, 140 BPM, Central Cee Headie One AJ Tracey, menacing London minor key',
+  'Afro-Rap':             'afro rap, amapiano log drum bass, talking drum percussion, Afrobeats groove, 105 BPM, Burna Boy Wizkid Nasty C, West African rhythm fused with hip-hop',
+  'Latin Rap':            'latin rap, dembow trap hybrid, Spanish flow, salsa horn stabs, 95 BPM, Bad Bunny Anuel AA Big Pun, reggaeton drums under 808 bass',
+  'Hyphy Rap':            'hyphy rap, scraper bass, hella energy Bay Area, hi-hat rolls, 108 BPM, E-40 Mac Dre Keak da Sneak Mistah F.A.B., crowd chant ad-libs',
+  'Phonk':                'phonk rap, Memphis tape hiss, cowbell kick, distorted 808, slowed pitch-shifted sample, 75 BPM, drift video atmosphere, Three 6 Mafia revival',
+  'Anthem Rap':           'anthem rap, thundering kicks, orchestral string swells, stadium choir on hook, 92 BPM, Jay-Z Meek Mill Eminem walk-out energy, cinematic minor key',
+  'Hustle / Grind':       'hustle grind rap, soulful sample loop, crispy snares, moody piano, 87 BPM, Nipsey Hussle Jeezy Meek Mill, come-up storytelling texture',
+  'Post-Algorithm':       'post-algorithm rap, glitched stereo field, unpredictable beat drops, AI-processed vocal chops, 130 BPM, anti-formula production, fragmented drum programming',
+  'Neo-Phonetic':         'neo-phonetic rap, vocals as percussion, syllable-chopped hi-hats, phonetic hooks, 145 BPM, Playboi Carti Ken Carson mumble 2.0, texture over semantic meaning',
+  'Climate Rap':          'climate rap, apocalyptic synth pads, field recording ambience, analog strings, 82 BPM, eco-conscious minor key, doomy future-tense atmosphere',
+  'AI-Native':            'AI-native rap, synthetic drum machine grid, autotune melody woven with rapped bars, machine-precision hi-hats, 128 BPM, cyborg aesthetic, post-human production',
+  'Mosaic Flow':          'mosaic flow rap, beat switches every 8 bars, eclectic sample chops, genre-shifting production, 110 BPM, Tyler the Creator JPEGMAFIA Denzel Curry Saba',
+  'Golden Era 2.0':       'golden era 2.0 rap, modern mix over 90s boom bap DNA, crispy vinyl sample chops, tight pocket drums, 93 BPM, Griselda Roc Marciano Westside Gunn, dusty warm mix',
+  'Analog Melodic':       'analog melodic rap, warm tape-saturated drums, Rhodes piano bed, 90 BPM, Mac Miller Swimming era, melodic auto-tuned flow over analog warmth',
+  'Conscious Trap':       'conscious trap, 808 bass under philosophical bars, live jazz horn accents, dark minor-key piano, 86 BPM, Kendrick Lamar J Cole Rapsody Vince Staples, thoughtful trap',
+  'Afro-Boom Bap':        'afro boom bap, West African percussion layered over boom bap drums, chopped soul sample, upright bass, 91 BPM, Little Simz Sampa the Great Oddisee, African tonal melody',
+  'Jazz Rap Revival':     'jazz rap revival, live jazz band, upright bass walks, muted trumpet, brushed snare, 96 BPM, Robert Glasper collaborations, A Tribe Called Quest reimagined modern',
+  'Bay Area':             'bay area hip-hop, hyphy, trunk music, 808 bass, hi-energy, Oakland rap, 100 BPM',
+  'Down South':           'dirty south, slow rolling 808 bass, southern rap, deep drawl, 85 BPM',
+  'Crunk':                'crunk, distorted synth stabs, 808 bass, 145 BPM, club energy, screamed call and response',
+  'Chopped & Screwed':    'chopped and screwed, slowed houston rap, syrupy 65 BPM, pitch-lowered baritone, deep 808'
+};
+
+// Helper: pick a random Rap Lab style for the Lucky feature.
+// Avoids repeating any of the last 5 picks (tracked in localStorage).
+// Resets the pool once all 27 styles have been used recently.
+function pickLuckyRapStyle() {
+  const ALL_IDS = Object.keys(RAP_STYLES_CLIENT);
+  let recent = [];
+  try { recent = JSON.parse(localStorage.getItem('soniq_lucky_rap_history') || '[]'); } catch {}
+  let pool = ALL_IDS.filter(id => !recent.includes(id));
+  if (pool.length === 0) pool = ALL_IDS; // full cycle exhausted — restart rotation
+  const pickedId = pool[Math.floor(Math.random() * pool.length)];
+  recent.unshift(pickedId);
+  recent = recent.slice(0, 5);
+  try { localStorage.setItem('soniq_lucky_rap_history', JSON.stringify(recent)); } catch {}
+  const styleMeta = RAP_STYLES_CLIENT[pickedId];
+  return { id: pickedId, label: styleMeta.label, era: styleMeta.era, teaser: styleMeta.teaser, category: styleMeta.category };
+}
+
+// Helper: build the Lucky rap-flavor prompt block (Suno lock + authentic ad-libs).
+// Called from feelLucky() when hiphop is one of the fusion genres.
+function getLuckyRapFlavorBlock(pickedStyle) {
+  if (!pickedStyle) return '';
+  const { label, era, teaser } = pickedStyle;
+  const sunoTag = RAP_STYLE_SUNO_CLIENT[label] || null;
+  const adlibs = RAP_STYLE_ADLIBS_CLIENT[label] || null;
+  const sunoLock = sunoTag
+    ? `\n\n⚠️ PRODUCTION LOCK — ${label}: SONG PROMPT MUST contain: "${sunoTag}" — do NOT use generic trap production tags.`
+    : '';
+  const adlibBlock = adlibs
+    ? `\n\n🎤 AUTHENTIC AD-LIBS — ${label} (regional/era vernacular; use THESE, not generic "(yeah)" or "(hey)"):\n  ${adlibs.join('  ·  ')}\n\nAd-lib placement rules:\n- Weave 2-4 of these per verse in parentheses on the same line as rap bars.\n- Hook gets 1-2 prominent/chanted ad-libs from the list above.\n- Do NOT invent new ad-libs OR use generic hip-hop ad-libs — they sound AI-written.\n- These ad-libs are specific to ${label}'s regional vernacular, era, and artist lineage.`
+    : '';
+  return `\n\n🎤 RAP STYLE SELECTED — ${label} (${era})\nStyle DNA: ${teaser}${sunoLock}${adlibBlock}`;
+}
+
 function initRapLab() {
   const grid = document.getElementById('rl-style-grid');
   if (!grid) return;
@@ -9425,12 +9535,20 @@ function feelLucky(){
   const vocal=pickRandom(LUCKY_VOCALS);
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
 
+  // If hip-hop is in the fusion pair, pick a random Rap Lab style so every
+  // Lucky feels distinct instead of collapsing to generic trap every time.
+  // pickLuckyRapStyle() tracks last 5 picks in localStorage to force rotation.
+  const hipHopInPair = (g1==='hiphop' || g2==='hiphop');
+  const luckyRapStyle = hipHopInPair ? pickLuckyRapStyle() : null;
+  const rapFlavorBlock = luckyRapStyle ? getLuckyRapFlavorBlock(luckyRapStyle) : '';
+
   // Show reveal
   const reveal=document.getElementById('lucky-reveal');
   reveal.style.display='block';
   document.getElementById('lr-fusion').textContent=fd?fd.name:`${g1} × ${g2}`;
   document.getElementById('lr-meta').textContent=`${g1} × ${g2} fusion`;
   document.getElementById('lr-params').innerHTML=[
+    ...(luckyRapStyle?[{l:'🎤 '+luckyRapStyle.label,c:'bdg-gold'}]:[]),
     {l:topic,c:'bdg-gold'},{l:mood,c:'bdg-teal'},{l:vocal,c:'bdg-v'},
     {l:structure.charAt(0).toUpperCase()+structure.slice(1),c:'bdg-green'},
     ...(fd?[{l:'Score: '+fd.q?.overall,c:'bdg-rose'}]:[])
@@ -9465,7 +9583,7 @@ ${fd?.name?'Fusion style: '+fd.name:'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}${getEraGenreDNA(g1)}${getAcademicFrameworkPrompt(g1)}${getFlowDirective(g1)}
+Structure: ${structStr}${rapFlavorBlock}${luckyOutlierNote?`\n\nRULE-BREAKING INSPIRATION — Songs that broke these genres' rules and still hit:\n${luckyOutlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.`:''}${getSelectedTechniquePrompt()}${getProductionCuePrompt(g1)}${getEraGenreDNA(g1)}${getAcademicFrameworkPrompt(g1)}${getFlowDirective(g1)}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
