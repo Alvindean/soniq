@@ -509,6 +509,9 @@ const SUBSTYLE_NOTES={
   'Satirical':      'Satirical Comedy DNA: Exaggerated social/political commentary through music. The target (institution, behavior, attitude) must be crystal clear. Satire punches at power, not down. Uses genre conventions of the target demographic to increase impact. Suno style: mirror the genre of the demographic being satirized.',
   'Observational':  'Observational Comedy DNA: The universal shared experience of mundane modern life — the frustration of tech support, the anxiety of small talk, the tragedy of dying phone batteries. Relatable specificity is everything. Suno style: "singer-songwriter, acoustic, intimate, conversational" — feels like a friend venting.',
   'Musical Roast':  'Musical Roast DNA: A song specifically aimed at a target (person, brand, idea) written to roast them. Format: verse 1 establishes the target\'s positive self-image, verse 2 demolishes it, bridge is the killing blow, chorus is the repeated accusation. Never cruel — always funny.',
+  'Nerd Comedy':    'Nerd Comedy DNA: Comedy about tech, gaming, science, internet culture — insider references that reward the in-the-know listener. 100-130 BPM. Tone is earnestly enthusiastic about the niche. Jonathan Coulton / MC Frontalot / Tom Lehrer tradition. Suno style: "nerd comedy, upbeat melodic, 115 BPM, clever wordplay, earnest enthusiasm, insider references, Jonathan Coulton style".',
+  'Romantic Comedy':'Romantic Comedy DNA: Love songs where the humor comes from awkward specificity — dating app fails, text-read-receipt anxiety, meet-cute misunderstandings. The feelings are genuine; the situations are absurd. 95-115 BPM, singer-songwriter tone. Suno style: "romantic comedy song, acoustic singer-songwriter, warm melodic, 105 BPM, awkward specificity, earnest feelings comedic situations".',
+  'Storytelling Comedy':'Storytelling Comedy DNA: A full narrative with escalating absurdity — something happened, then this happened, then THIS happened. Verses stack the premise, final verse or bridge detonates it. Flight of the Conchords / Bo Burnham narrative-track tradition. 100-130 BPM. Suno style: "storytelling comedy, narrative verses escalating, 115 BPM, acoustic or band, Flight of the Conchords style, detonating bridge".',
   // TV/Musical substyles
   'TV Theme':       'TV Theme DNA: 30-90 seconds to establish the show\'s entire world — genre, tone, era, class level, emotional register. The hook IS the show title or a defining phrase. Suno style: "catchy TV theme, [show genre tone], memorable, [era]". The audience knows what they\'re watching within 5 seconds.',
   'Broadway / Show Tune': 'Broadway DNA: Character sings what cannot be said in dialogue — the emotional eruption. Clear dramatic objective ("I want" / "I need" / "I feel"). Musical theater diction: precise consonants, open vowels, projected. Suno style: "Broadway musical, show tune, theatrical, orchestral pit band, belting vocals".',
@@ -683,6 +686,15 @@ const SUBSTYLE_SUNO = {
   'Rock Parody':        'rock parody, distorted power chords, anthemic chorus, belted vocal, 130 BPM, earnest arena rock, absurd lyrics',
   'EDM Parody':         'edm parody, massive drop, sidechained bass, 128 BPM, full edm production, committed, trivial absurd subject',
   'Folk Parody':        'folk parody, fingerpicked acoustic guitar, warm harmony, 90 BPM, sincere delivery, absurd topic',
+  // Comedy
+  'Absurdist':          'absurdist comedy, match genre sincerity, never acknowledge absurdity, committed performance',
+  'Dark Comedy':        'dark comedy, upbeat cheerful major key, 120 BPM, applied to dark subject, tonal contrast',
+  'Satirical':          'satirical comedy, mirror demographic genre, exaggerated commentary, punch at power',
+  'Observational':      'observational comedy, singer-songwriter, acoustic intimate, conversational, 100 BPM, relatable specificity',
+  'Nerd Comedy':        'nerd comedy, upbeat melodic, 115 BPM, clever wordplay, Jonathan Coulton style, insider references',
+  'Romantic Comedy':    'romantic comedy song, acoustic singer-songwriter, warm melodic, 105 BPM, awkward specificity, earnest',
+  'Storytelling Comedy':'storytelling comedy, narrative verses escalating, 115 BPM, Flight of the Conchords style, detonating bridge',
+  'Musical Roast':      'musical roast, upbeat, target-focused, 110 BPM, verse 1 praise verse 2 demolish, bridge killing blow',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
