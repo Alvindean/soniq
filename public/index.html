@@ -13737,8 +13737,14 @@ async function loadFoundingStatus() {
       }
     } catch (e) {}
 
-    // Fetch plan from profiles table so Studio feature gating works client-side
-    if (S.supabase) {
+    // Fetch plan from profiles table so Studio feature gating works client-side.
+    // ⚠️ Admin override takes precedence: if the email-whitelist set
+    // S.plan='studio' + window.__soniqAdmin=true during sign-in (_initSupabase,
+    // lines ~13465-13470 / ~13498-13503), a null/missing profile.plan row
+    // must NOT overwrite studio back to 'free'. Previously a bug where admin
+    // users got briefly granted studio then silently demoted to free a second
+    // later because their profiles row had no plan set.
+    if (S.supabase && !window.__soniqAdmin) {
       try {
         const { data: profile } = await S.supabase
           .from('profiles')
@@ -13747,6 +13753,8 @@ async function loadFoundingStatus() {
           .single();
         S.plan = profile?.plan || 'free';
       } catch (e) { S.plan = 'free'; }
+    } else if (window.__soniqAdmin) {
+      S.plan = 'studio'; // re-assert admin studio access after any async drift
     }
     if (typeof initPlatinumToggle === 'function') initPlatinumToggle();
   }
