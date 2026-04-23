@@ -597,27 +597,27 @@ const SUBSTYLE_SUNO = {
   'Bro-Country':        'bro-country, electric guitar, 115 BPM, party energy, summer, modern country, stadium singalong, upbeat',
   'Alt-Country':        'alt-country, acoustic guitar, indie-inflected, honest, 90 BPM, defiant, warm, genre-fluid',
   'Texas / Red Dirt':   'texas country, red dirt, acoustic guitar, warm, honest, 100 BPM, road song, Lone Star, organic band',
-  'Classic Honky-Tonk': 'classic honky-tonk, pedal steel guitar, fiddle, shuffle beat, 105 BPM, heartbreak, bar room, Hank Williams style',
+  'Classic Honky-Tonk': 'classic honky-tonk, pedal steel guitar, fiddle, shuffle beat, 105 BPM, heartbreak, bar-room country, 1950s traditional vocal',
   'Country Gospel':     'country gospel, acoustic guitar, pedal steel, warm vocal harmony, 85 BPM, hymn, faith, southern testimony',
   'Country Rap':        'country rap, 808 bass, banjo, trap hi-hats, country twang, genre fusion, 120 BPM, storytelling, authentic, country trap',
-  'Country Blues':      'country blues, heavy blues guitar, raw tube amp, southern soul, powerful vocals, live band, 85 BPM, Chris Stapleton style, emotional, Americana, guitar bends',
+  'Country Blues':      'country blues, heavy blues guitar, raw tube amp, southern soul, powerful melismatic vocals, live band, 85 BPM, emotional country-soul, guitar bends',
   // Neo-Soul
   'Classic Neo-Soul':   'neo-soul, Rhodes electric piano, live drums with swing, upright bass, warm vinyl warmth, head-nod groove, 90 BPM',
-  'Hip-Hop Neo-Soul':   'neo-soul, J Dilla off-beat hip-hop drums, soul vocals, vinyl warmth, 85 BPM',
+  'Hip-Hop Neo-Soul':   'neo-soul, off-beat hip-hop drums, soul vocals, vinyl warmth, 85 BPM, behind-the-beat pocket',
   'Neo-Soul Ballad':    'neo-soul ballad, piano, intimate close-mic vocal, vulnerable, warm, 70 BPM',
   'Afro-Soul':          'afro-soul, talking drum, Rhodes, warm, 95 BPM, Lagos spiritual, Afrobeats groove underneath neo-soul',
-  'Jazz-Soul':          'jazz-soul, jazz harmony, upright bass, Rhodes electric piano, live drums, horn section, 95 BPM, Glasper style',
+  'Jazz-Soul':          'jazz-soul, jazz harmony, upright bass, Rhodes electric piano, live drums, horn section, 95 BPM, modern live-jazz-band soul, improv solos',
   'Lo-Fi Soul':         'lo-fi soul, vinyl crackle, dusty drums, muffled warmth, 80 BPM, bedroom production, introspective chopped soul',
-  'Psychedelic Soul':   'psychedelic soul, funky bass, cosmic reverb, layered textures, 95 BPM, Sly Stone, Voodoo era D\'Angelo',
-  'Gospel Soul':        'gospel soul, Hammond B3, mass choir, testimonial, call and response, 85 BPM, PJ Morton style',
+  'Psychedelic Soul':   'psychedelic soul, funky bass, cosmic reverb, layered textures, 95 BPM, late-60s psychedelic funk, soulful multi-tracked vocal',
+  'Gospel Soul':        'gospel soul, Hammond B3, mass choir, testimonial, call and response, 85 BPM, neo-soul-meets-gospel, choir-swell arc',
   'Traditional Gospel': 'traditional gospel, Hammond B3 organ, mass choir, hand claps, call and response, powerful soul',
-  'Contemporary Gospel':'contemporary gospel, Kirk Franklin style, 808 bass, mass choir, celebratory, hip-hop gospel production',
+  'Contemporary Gospel':'contemporary gospel, celebratory hip-hop gospel production, 808 bass, mass choir, modern-full-production celebration',
   'Worship / CCM':      'worship music, piano, electric guitar, congregational singalong, soaring emotional, 75 BPM',
   'Southern Gospel':    'southern gospel, acoustic quartet harmonies, banjo or acoustic guitar, country-gospel, 95 BPM, warm testimony',
-  'Gospel Hip-Hop':     'gospel hip-hop, trap beat, 808 bass, conscious faith lyrics, 130 BPM, Lecrae style, street testimony',
-  'Gospel Ballad':      'gospel ballad, piano, intimate testimony vocal, choir swells on final chorus, 65 BPM, Yolanda Adams style',
-  'Praise & Worship':   'praise and worship, congregational, extended vamp, declaration lyrics, 80 BPM, Maverick City style',
-  'Mass Choir':         'mass choir gospel, 40+ voices SATB stacked, Hammond B3, lead vocalist call response, 95 BPM, Hezekiah Walker style',
+  'Gospel Hip-Hop':     'gospel hip-hop, trap beat, 808 bass, conscious faith lyrics, 130 BPM, street-testimony rap, gospel-content trap production',
+  'Gospel Ballad':      'gospel ballad, piano, intimate testimony vocal, choir swells on final chorus, 65 BPM, gospel ballad vocalist, emotional climax arc',
+  'Praise & Worship':   'praise and worship, congregational, extended vamp, declaration lyrics, 80 BPM, modern praise music, builds from intimate to full-band shout',
+  'Mass Choir':         'mass choir gospel, 40+ voices SATB stacked, Hammond B3, lead vocalist call response, 95 BPM, traditional mass-choir celebration, SATB stacked arrangement',
   // Alt-Rock
   'Shoegaze':           'shoegaze, wall of reverb guitars, chorus pedal, buried dreamy vocals, 100 BPM, hazy textures, atmospheric',
   'Post-Punk':          'post-punk, driving melodic bass, angular guitars, tight mechanical drums, 130 BPM, cold detached vocals',
@@ -634,42 +634,42 @@ const SUBSTYLE_SUNO = {
   'Ska-Punk':           'ska-punk, offbeat upstroke guitar, horn section, 150 BPM, ska verse punk chorus, energetic, Orange County',
   'Anti-Folk':          'anti-folk, acoustic guitar, lo-fi home recording, deadpan vocals, 110 BPM, unfinished feel, DIY, confessional absurdist',
   // Blues
-  'Chicago Blues':      'chicago blues, electric slide guitar, blues harp, shuffle beat, 100 BPM, Chess Records, Muddy Waters style',
+  'Chicago Blues':      'chicago blues, electric slide guitar, blues harp, shuffle beat, 100 BPM, 1950s electrified Mississippi blues, urban shuffle',
   'Delta Blues':        'delta blues, acoustic slide guitar, open tuning, foot stomp, single vocal, 85 BPM, haunted, raw',
-  'Texas Blues':        'texas blues, fiery lead guitar, extended solo, swing feel, 115 BPM, SRV, hot tube amp',
-  'Jump Blues':         'jump blues, boogie piano, horn section, shuffle swing, 160 BPM, Louis Jordan, party blues, proto-R&B',
-  'Soul Blues':         'soul blues, Hammond organ, horn stabs, full rhythm section, melismatic vocal, 90 BPM, BB King style',
+  'Texas Blues':        'texas blues, fiery lead guitar, extended solo, swing feel, 115 BPM, hot tube amp, Gulf-coast shuffle',
+  'Jump Blues':         'jump blues, boogie piano, horn section, shuffle swing, 160 BPM, 1940s proto-R&B, uptempo party blues',
+  'Soul Blues':         'soul blues, Hammond organ, horn stabs, full rhythm section, melismatic vocal, 90 BPM, 60s-70s gospel-trained blues vocal',
   // Reggae
   'Roots Reggae':       'roots reggae, one-drop drums, offbeat skank guitar, heavy bass, Hammond bubble, 78 BPM, Rastafarian, spiritual',
   'Dancehall':          'dancehall, digital riddim, syncopated kick, toasting vocal, 100 BPM, patois, Kingston, party',
   'Ska':                'ska, offbeat upstroke guitar, walking bass, brass section, 160 BPM, Jamaica 60s, danceable',
   'Rocksteady':         'rocksteady, electric bass forward, Hammond organ, two-part harmony, 90 BPM, romantic, 1967 Jamaica',
-  'Dub':                'dub reggae, spring reverb, tape echo, foregrounded bass and drums, ghostly vocals, 75 BPM, King Tubby style',
+  'Dub':                'dub reggae, spring reverb, tape echo, foregrounded bass and drums, ghostly vocals, 75 BPM, Jamaican studio-as-instrument, 70s dub engineering',
   'Lovers Rock':        'lovers rock, reggae groove, silky female vocal, soul production, close harmony, 75 BPM, romantic, UK reggae',
   // K-Pop
   'Girl Group':         'k-pop girl group, polished production, explosive chorus, rap break, vocal bridge, 120 BPM, choreography-ready',
   'Boy Group':          'k-pop boy group, rap verses, vocal line harmonies, hard-hitting production, 125 BPM, concept-driven, dance break',
-  'K-Pop Ballad':       'k-pop ballad, piano, sweeping strings, emotional vocal, key change, 72 BPM, Korean ballad, Taeyeon style',
+  'K-Pop Ballad':       'k-pop ballad, piano, sweeping strings, emotional vocal, key change, 72 BPM, Korean ballad, power-vocal showcase',
   'Dance Pop':          'k-pop dance pop, EDM production, drop-style chorus, sidechain pump, 128 BPM, crystal clear, club-ready',
   'Dark Concept':       'k-pop dark concept, minor key, orchestral and industrial elements, aggressive vocals, 120 BPM, gothic, dystopian',
   'Bubblegum':          'k-pop bubblegum, bright saturated synths, chant-along hook, high vocal layering, 125 BPM, cute, candy-colored',
   'Hip-Hop K-Pop':      'korean hip-hop, boom bap or trap production, rap verses, English-Korean code switching, 110 BPM, underground Seoul',
-  'R&B K-Pop':          'korean r&b, trap-soul production, smooth groove, intimate vocal, 85 BPM, Dean style, modern Korean R&B',
+  'R&B K-Pop':          'korean r&b, trap-soul production, smooth groove, intimate vocal, 85 BPM, modern Korean R&B, late-night aesthetic',
   // Latin
   'Salsa':              'salsa, clave rhythm, piano montuno, timbales congas bongos, horn section, 180 BPM, sonero coro, Nuyorican',
-  'Bachata':            'bachata, requinto lead guitar, güira, bongos, 130 BPM, Dominican, romantic amargue, Romeo Santos style',
+  'Bachata':            'bachata, requinto lead guitar, güira, bongos, 130 BPM, Dominican, romantic amargue, modern bachata vocal',
   'Cumbia':             'cumbia, accordion lead, gaita flute, vallenato caja drum, syncopated 4/4, 100 BPM, Colombian, danceable',
   'Bossa Nova':         'bossa nova, nylon guitar bossa pattern, cool jazz harmony, whispered Portuguese vocal, 95 BPM, Brazilian, understated',
-  'Latin Pop':          'latin pop, polished mainstream production, Latin percussion, Spanish vocal, 115 BPM, Shakira style, radio-ready',
+  'Latin Pop':          'latin pop, polished mainstream production, Latin percussion, Spanish vocal, 115 BPM, crossover mainstream Latin, radio-ready',
   'Latin Jazz':         'latin jazz, Afro-Cuban rhythms, jazz harmony, piano, horn section, full percussion, 160 BPM, mambo cha-cha',
   'Mariachi':           'mariachi, violins trumpets, vihuela, guitarrón, acoustic guitar, 110 BPM, ranchera bolero, Mexican',
   // Reggaeton
-  'Perreo Clásico':     'perreo clasico, dembow riddim, 93 BPM, Puerto Rico 2000s, synth stabs, perreo dance floor, Daddy Yankee style',
-  'Trap Latino':        'trap latino, trap 808s, dembow hybrid, auto-tune, triplet hi-hats, 95 BPM, dark minor pads, Bad Bunny style',
-  'Reggaeton Romántico':'reggaeton romantico, softer dembow, melodic sung hook, acoustic guitar layer, 95 BPM, romantic, Nicky Jam style',
-  'Urbano Latino':      'urbano latino, modern polished production, dembow meets pop and afrobeats, bilingual, 98 BPM, J Balvin style',
-  'Dembow Puro':        'dembow dominicano, faster harder dembow, 120 BPM, raw digital production, rapid fire Spanish, El Alfa style',
-  'Reggaeton Pop':      'reggaeton pop, softened dembow, sung pop hook, polished, 98 BPM, Despacito style, crossover, radio ready',
+  'Perreo Clásico':     'perreo clasico, dembow riddim, 93 BPM, Puerto Rico 2000s, synth stabs, perreo dance floor, early-2000s reggaeton',
+  'Trap Latino':        'trap latino, trap 808s, dembow hybrid, auto-tune, triplet hi-hats, 95 BPM, dark minor pads, modern urbano-trap',
+  'Reggaeton Romántico':'reggaeton romantico, softer dembow, melodic sung hook, acoustic guitar layer, 95 BPM, romantic, softer-crossover reggaeton',
+  'Urbano Latino':      'urbano latino, modern polished production, dembow meets pop and afrobeats, bilingual, 98 BPM, modern crossover urbano',
+  'Dembow Puro':        'dembow dominicano, faster harder dembow, 120 BPM, raw digital production, rapid fire Spanish, Dominican dembow pioneer aesthetic',
+  'Reggaeton Pop':      'reggaeton pop, softened dembow, sung pop hook, polished, 98 BPM, Spotify-optimized crossover, radio ready',
   // Children
   'Singalong / Playful':    'children singalong, ukulele, clapping, bright, joyful, 110 BPM, playful, motion cues',
   'Educational':            'educational children song, acoustic guitar, glockenspiel, clear vocals, 105 BPM, friendly, warm',
@@ -705,30 +705,33 @@ const SUBSTYLE_SUNO = {
   'Jingle / Ad':           'upbeat commercial jingle, major key, catchy, corporate polished, radio-ready, product name repeated',
   'Video Game OST':        'video game soundtrack, looping-friendly, memorable motif, dynamic layering, orchestral or synthwave, cinematic',
   'Sitcom Theme':          'sitcom theme, warm upbeat, era-appropriate, feel-good, catchy memorable, 30-60 seconds',
-  'Prestige Drama Theme':  'prestige tv theme, cinematic, atmospheric, minor key, strings, piano sparse, HBO style',
+  'Prestige Drama Theme':  'prestige tv theme, cinematic, atmospheric, minor key, strings, piano sparse, premium-drama aesthetic',
   // ─── Rap Lab — unique production fingerprint per style (keyed by RAP_STYLES label) ───
+  // All entries are artist-name-free for Suno compliance. Descriptive era /
+  // region / production language only — the LLM gets artist context via
+  // style.agent text (system prompt), which never leaks to the SONG PROMPT.
   // Established era
-  'Lyrical/Conscious':     'lyrical conscious rap, jazz sample loops, live-band boom bap drums, warm vinyl texture, 88 BPM, Mos Def Talib Kweli De La Soul Black Thought, dense pocket mix',
-  'Old School':            'old school hip-hop, 808 drum machine, record scratches, funk breakbeat, 102 BPM, 1985-era boom bap roots, Run-DMC Sugarhill Gang Grandmaster Flash',
-  'UK Drill':              'UK drill, sliding 808 basslines, snappy off-beat snares, dark piano chords, 140 BPM, Central Cee Headie One AJ Tracey, menacing London minor key',
-  'Afro-Rap':              'afro rap, amapiano log drum bass, talking drum percussion, Afrobeats groove, 105 BPM, Burna Boy Wizkid Nasty C, West African rhythm fused with hip-hop',
-  'Latin Rap':             'latin rap, dembow trap hybrid, Spanish flow, salsa horn stabs, 95 BPM, Bad Bunny Anuel AA Big Pun, reggaeton drums under 808 bass',
-  'Hyphy Rap':             'hyphy rap, scraper bass, hella energy Bay Area, hi-hat rolls, 108 BPM, E-40 Mac Dre Keak da Sneak Mistah F.A.B., crowd chant ad-libs',
-  'Phonk':                 'phonk rap, Memphis tape hiss, cowbell kick, distorted 808, slowed pitch-shifted sample, 75 BPM, drift video atmosphere, Three 6 Mafia revival',
-  'Anthem Rap':            'anthem rap, thundering kicks, orchestral string swells, stadium choir on hook, 92 BPM, Jay-Z Meek Mill Eminem walk-out energy, cinematic minor key',
-  'Hustle / Grind':        'hustle grind rap, soulful sample loop, crispy snares, moody piano, 87 BPM, Nipsey Hussle Jeezy Meek Mill, come-up storytelling texture',
+  'Lyrical/Conscious':     'lyrical conscious rap, jazz sample loops, live-band boom bap drums, warm vinyl texture, 88 BPM, conscious rap tradition, dense pocket mix, literary bars',
+  'Old School':            'old school hip-hop, 808 drum machine, record scratches, funk breakbeat, 102 BPM, 1985-era boom bap roots, golden-age block-party aesthetic',
+  'UK Drill':              'UK drill, sliding 808 basslines, snappy off-beat snares, dark piano chords, 140 BPM, London drill flow, Tottenham/Peckham vocabulary, menacing minor key',
+  'Afro-Rap':              'afro rap, amapiano log drum bass, talking drum percussion, Afrobeats groove, 105 BPM, modern West African hip-hop crossover, pidgin/Yoruba inflected',
+  'Latin Rap':             'latin rap, dembow trap hybrid, Spanish flow, salsa horn stabs, 95 BPM, modern barrio-trap, reggaeton drums under 808 bass',
+  'Hyphy Rap':             'hyphy rap, scraper bass, hella energy Bay Area, hi-hat rolls, 108 BPM, Oakland hyphy-movement slang, crowd-chant ad-libs, breathless delivery',
+  'Phonk':                 'phonk rap, Memphis tape hiss, cowbell kick, distorted 808, slowed pitch-shifted sample, 75 BPM, drift-video atmosphere, dark cinematic menace',
+  'Anthem Rap':            'anthem rap, thundering kicks, orchestral string swells, stadium choir on hook, 92 BPM, walk-out energy, championship-moment vocal, cinematic minor key',
+  'Hustle / Grind':        'hustle grind rap, soulful sample loop, crispy snares, moody piano, 87 BPM, come-up storytelling texture, late-night mixtape feel',
   // Forward-looking
   'Post-Algorithm':        'post-algorithm rap, glitched stereo field, unpredictable beat drops, AI-processed vocal chops, 130 BPM, anti-formula production, fragmented drum programming',
-  'Neo-Phonetic':          'neo-phonetic rap, vocals as percussion, syllable-chopped hi-hats, phonetic hooks, 145 BPM, Playboi Carti Ken Carson mumble 2.0, texture over semantic meaning',
+  'Neo-Phonetic':          'neo-phonetic rap, vocals as percussion, syllable-chopped hi-hats, phonetic hooks, 145 BPM, post-mumble rap, texture over semantic meaning',
   'Climate Rap':           'climate rap, apocalyptic synth pads, field recording ambience, analog strings, 82 BPM, eco-conscious minor key, doomy future-tense atmosphere',
   'AI-Native':             'AI-native rap, synthetic drum machine grid, autotune melody woven with rapped bars, machine-precision hi-hats, 128 BPM, cyborg aesthetic, post-human production',
-  'Mosaic Flow':           'mosaic flow rap, beat switches every 8 bars, eclectic sample chops, genre-shifting production, 110 BPM, Tyler the Creator JPEGMAFIA Denzel Curry Saba',
+  'Mosaic Flow':           'mosaic flow rap, beat switches every 8 bars, eclectic sample chops, genre-shifting production, 110 BPM, eclectic post-genre hip-hop, unpredictable structure',
   // Revisionist
-  'Golden Era 2.0':        'golden era 2.0 rap, modern mix over 90s boom bap DNA, crispy vinyl sample chops, tight pocket drums, 93 BPM, Griselda Roc Marciano Westside Gunn, dusty warm mix',
-  'Analog Melodic':        'analog melodic rap, warm tape-saturated drums, Rhodes piano bed, 90 BPM, Mac Miller Swimming era, melodic auto-tuned flow over analog warmth',
-  'Conscious Trap':        'conscious trap, 808 bass under philosophical bars, live jazz horn accents, dark minor-key piano, 86 BPM, Kendrick Lamar J Cole Rapsody Vince Staples, thoughtful trap',
-  'Afro-Boom Bap':         'afro boom bap, West African percussion layered over boom bap drums, chopped soul sample, upright bass, 91 BPM, Little Simz Sampa the Great Oddisee, African tonal melody',
-  'Jazz Rap Revival':      'jazz rap revival, live jazz band, upright bass walks, muted trumpet, brushed snare, 96 BPM, Robert Glasper collaborations, A Tribe Called Quest reimagined modern',
+  'Golden Era 2.0':        'golden era 2.0 rap, modern mix over 90s boom bap DNA, crispy vinyl sample chops, tight pocket drums, 93 BPM, modern-mixed east-coast revival, dusty warm pocket',
+  'Analog Melodic':        'analog melodic rap, warm tape-saturated drums, Rhodes piano bed, 90 BPM, melodic auto-tuned flow over analog warmth, lo-fi pocket',
+  'Conscious Trap':        'conscious trap, 808 bass under philosophical bars, live jazz horn accents, dark minor-key piano, 86 BPM, thoughtful literary trap, systemic-critique lyric register',
+  'Afro-Boom Bap':         'afro boom bap, West African percussion layered over boom bap drums, chopped soul sample, upright bass, 91 BPM, modern UK/African conscious hip-hop, African tonal melody',
+  'Jazz Rap Revival':      'jazz rap revival, live jazz band, upright bass walks, muted trumpet, brushed snare, 96 BPM, modern live-instrumentation hip-hop, 90s jazz-rap reimagined',
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -3342,13 +3345,20 @@ PARENTHESES () = ad-libs and background vocal layers ONLY — never use () for s
 Every word must earn its place. No bracket tag = that section does not exist.]
 
 SONG PROMPT:
-Genre: [core genre + sub-genre]
+⚠️ SUNO COMPLIANCE — MANDATORY: Every field below AND the Full prompt must contain ZERO artist names, band names, or "[Name] style" references. Suno's policy rejects prompts that name specific artists as potential impersonation. If the PRODUCTION LOCK above contains any artist name, STRIP IT OUT and replace with an equivalent descriptive phrase (era, region, production technique, vocal quality, genre lineage). Examples:
+  BAD: "Drake style, Taylor Swift melodic vocal"
+  GOOD: "intimate melodic pop vocal, auto-tuned conversational delivery"
+  BAD: "Kendrick Lamar conscious trap, J Cole philosophical"
+  GOOD: "philosophical trap, 808s under literary bars, dark minor-key piano"
+  BAD: "E-40 Mac Dre Keak da Sneak vocabulary"
+  GOOD: "Bay Area hyphy slang, Oakland scraper-bass vocabulary, hella-energy ad-libs"
+Genre: [core genre + sub-genre, no artist names]
 Instruments: [4-5 key instruments, comma-separated]
 BPM: [range, e.g. 95-100]
-Vocal: [vocal descriptor]
-Texture: [production texture in 5-8 words]
+Vocal: [vocal descriptor — no artist names]
+Texture: [production texture in 5-8 words — no artist names]
 Counter-melody: [counter-melody device]
-Full prompt: [assemble all of the above into one ready-to-paste string under 440 characters — NO artist names]
+Full prompt: [assemble all of the above into one ready-to-paste string under 440 characters — ABSOLUTELY NO artist names, band names, or "[Name] style" references]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3503,7 +3513,10 @@ TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [808 Bass] 
 PARENTHESES () = ad-libs only — never structural. Every word must earn its place.]
 
 SONG PROMPT:
-[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
+⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. Suno rejects prompts that name artists. If a PRODUCTION LOCK above contains any artist name, STRIP IT and replace with era/region/technique/vocal-quality descriptors.
+  BAD: "Drake style, Taylor Swift vocal", "E-40 energy", "Kirk Franklin choir"
+  GOOD: "auto-tuned intimate pop vocal", "Bay Area hyphy slang", "celebratory hip-hop gospel choir"
+[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3986,7 +3999,10 @@ TYPE 3 PRODUCTION DNA (inline, ≥1 per Hook/Chorus): [808 Bass] · [Trap Hi-Hat
 PARENTHESES () = ad-libs and background vocals only. No annotations in lyrics.]
 
 SONG PROMPT:
-[${rapSubSunoTag ? `MUST lead with: "${rapSubSunoTag}" — ` : ''}Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
+⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, rapper names, or "[Name] style" references anywhere in the SONG PROMPT. Suno rejects prompts naming artists. If the PRODUCTION LOCK above contains any artist names (e.g. "E-40", "Jay-Z", "Kendrick Lamar"), STRIP THEM and replace with region/era/technique descriptors.
+  BAD: "E-40 Mac Dre vocabulary, Keak da Sneak energy"
+  GOOD: "Bay Area hyphy slang, Oakland scraper-bass vocabulary, hella-energy ad-libs"
+[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}Under 440 chars. ${style.label} style descriptors, specific production elements, BPM range, vocal texture, key sonic signatures.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
