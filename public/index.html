@@ -13457,16 +13457,23 @@ function _initSupabase() {
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
   const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com', 'rainfiremusic@gmail.com', 'eric@warkershall.com']);
+  // Case-insensitive email check. Supabase sometimes preserves the case the
+  // user registered with (e.g. "TheAlvinDean@gmail.com") while the whitelist
+  // above is all lowercase — a strict Set.has() would silently miss those.
+  const _isAdminEmail = (email) => !!email && _ADMIN_EMAILS.has(String(email).trim().toLowerCase());
   S.supabase.auth.onAuthStateChange((event, session) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
     // Email whitelist — grant full studio access automatically
-    if (S.user && _ADMIN_EMAILS.has(S.user.email)) {
+    if (S.user && _isAdminEmail(S.user.email)) {
       window.__soniqAdmin = true;
       S.plan = 'studio';
       S.isAdmin = true;
       if (typeof initGenreGrid === 'function') initGenreGrid();
+      console.log('%c[SONIQ] Admin detected via email whitelist: ' + S.user.email + ' → plan=studio', 'color:#f5c000;font-weight:bold');
+    } else if (S.user) {
+      console.log('[SONIQ] Signed in as: ' + S.user.email + ' (not in admin whitelist)');
     }
     updateAuthUI();
     if (event === 'SIGNED_IN') {
@@ -13494,16 +13501,41 @@ function _initSupabase() {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
     S.session = session;
     S.user = session?.user || null;
-    // Email whitelist — grant full studio access automatically
-    if (S.user && _ADMIN_EMAILS.has(S.user.email)) {
+    // Email whitelist — grant full studio access automatically (case-insensitive)
+    if (S.user && _isAdminEmail(S.user.email)) {
       window.__soniqAdmin = true;
       S.plan = 'studio';
       S.isAdmin = true;
       if (typeof initGenreGrid === 'function') initGenreGrid();
+      console.log('%c[SONIQ] Admin session restored: ' + S.user.email + ' → plan=studio', 'color:#f5c000;font-weight:bold');
     }
     updateAuthUI();
     loadFoundingStatus();
   });
+
+  // Diagnostic helper — call `debugAdmin()` in the browser console to see
+  // exactly what the admin-override subsystem thinks. Useful when a user
+  // reports "I'm not getting full access" — one call reveals whether the
+  // email check matched, the profile.plan value, and the final S.plan.
+  window.debugAdmin = function() {
+    const u = S.user;
+    const email = u?.email;
+    const emailLower = String(email || '').trim().toLowerCase();
+    const whitelist = Array.from(_ADMIN_EMAILS);
+    const inWhitelist = whitelist.includes(emailLower);
+    console.group('%c🔍 SONIQ Admin Debug', 'color:#f5c000;font-weight:bold;font-size:14px');
+    console.log('S.user.email (raw):     ', email);
+    console.log('S.user.email (lower):   ', emailLower);
+    console.log('Whitelist emails:       ', whitelist);
+    console.log('In whitelist?           ', inWhitelist);
+    console.log('window.__soniqAdmin:    ', window.__soniqAdmin);
+    console.log('S.isAdmin:              ', S.isAdmin);
+    console.log('S.plan:                 ', S.plan);
+    console.log('S.session?             ', !!S.session);
+    console.log('Has admin token?        ', !!localStorage.getItem('soniq_admin_token'));
+    console.groupEnd();
+    return { email, emailLower, inWhitelist, isAdmin: window.__soniqAdmin, plan: S.plan };
+  };
   // Handle password reset redirect
   if (new URLSearchParams(location.search).get('reset') === '1') {
     openPasswordResetModal();
