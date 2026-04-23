@@ -3224,7 +3224,20 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <option value="hiphop_trap">Trap (hook-first, 12-bar verses)</option>
               <option value="hiphop_beatswitch">Beat Switch (SICKO MODE style)</option>
               <option value="hiphop_storytelling">Storytelling Rap (3×24-bar, no hook)</option>
+              <option value="hiphop_storytelling_24">Rap Narrative (Slick Rick / Nas, full story arc)</option>
               <option value="hiphop_melodic">Melodic Rap / R&amp;B Crossover</option>
+            </optgroup>
+            <optgroup label="— Storytelling / Narrative Architectures —">
+              <option value="story_classic_3act">Classic 3-Act (setup → conflict → resolution)</option>
+              <option value="story_in_medias_res">In Medias Res (start mid-action, flashback in V2)</option>
+              <option value="story_flashback">Flashback Bridge (present → past reveal → present)</option>
+              <option value="story_reveal_twist">Reveal Twist (bridge reframes V1-V2)</option>
+              <option value="story_murder_ballad">Murder Ballad (menace → act → aftermath)</option>
+              <option value="story_origin">Origin Story (formative moment → growth → present)</option>
+              <option value="story_revenge">Revenge Narrative (wound → plotting → act)</option>
+              <option value="story_conversation">Conversation / Duet (A voice → B voice → together)</option>
+              <option value="story_diary">Diary Entries (dated entries across time)</option>
+              <option value="story_reverse_chrono">Reverse Chronology (ending → middle → beginning)</option>
             </optgroup>
             <optgroup label="— Genre-Specific —">
               <option value="riddim">Riddim Loop (reggae)</option>
@@ -8035,6 +8048,18 @@ const STRUCTURES={
   hookfirst:    '[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
   chorusfirst:  '[Chorus] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Final Chorus]',
   storytelling: '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
+  // ── Extended narrative architectures — character-driven story songs ──
+  story_classic_3act:    '[Verse 1 — Setup: establish character, place, time] → [Chorus] → [Verse 2 — Conflict: something changes or breaks] → [Chorus] → [Verse 3 — Resolution or consequence] → [Final Chorus]',
+  story_in_medias_res:   '[Verse 1 — START MID-ACTION: listener drops into the middle of the scene] → [Chorus] → [Verse 2 — BACKSTORY: how we got here] → [Chorus] → [Verse 3 — Continue from where V1 ended] → [Final Chorus]',
+  story_flashback:       '[Verse 1 — Present day scene] → [Chorus] → [Verse 2 — Present day, escalating] → [Bridge — FLASHBACK: backstory reveal that reframes V1-V2] → [Verse 3 — Return to present, transformed by the reveal] → [Final Chorus]',
+  story_reveal_twist:    '[Verse 1 — Narrator POV, apparent story] → [Chorus] → [Verse 2 — Same POV, more detail, building trust] → [Bridge — THE REVEAL: one line that reframes everything] → [Final Chorus — same words as opening chorus, now with new meaning]',
+  story_murder_ballad:   '[Verse 1 — Innocent-seeming scene with quiet menace] → [Chorus — warning disguised as refrain] → [Verse 2 — Tension rises, characters interact] → [Chorus] → [Verse 3 — The act happens] → [Bridge — Aftermath / reveal of who died or who did it] → [Outro — The image that stays]',
+  story_origin:          '[Verse 1 — Formative moment in the past, age/era specific] → [Chorus] → [Verse 2 — Growth, leaving, threshold crossing] → [Chorus] → [Verse 3 — Present-day consequence or return to origin place] → [Final Chorus]',
+  story_revenge:         '[Verse 1 — The wound: what happened to narrator] → [Pre-Chorus — marking the moment] → [Chorus — declaration of intent] → [Verse 2 — The plotting, the waiting] → [Chorus] → [Bridge — The act / the confrontation] → [Final Chorus — aftermath, what the narrator has become]',
+  story_conversation:    '[Verse 1 — Speaker A voice] → [Chorus — shared truth both voices reach for] → [Verse 2 — Speaker B responds, different POV on same events] → [Chorus] → [Verse 3 — Both voices together OR unresolved exchange] → [Outro]',
+  story_diary:           '[Verse 1 — Dated entry #1: early in timeline] → [Chorus] → [Verse 2 — Dated entry #2: weeks or months later, same situation evolved] → [Chorus] → [Verse 3 — Final entry, present-day or closure] → [Outro]',
+  story_reverse_chrono:  '[Verse 1 — The ending of the story] → [Chorus] → [Verse 2 — The middle: how it unravelled] → [Chorus] → [Verse 3 — The beginning: how it started] → [Final Chorus — returns to V1 imagery in new light]',
+  hiphop_storytelling_24: '[8-bar Intro | Spoken Word OR beat only] → [24-bar Verse 1 | Scene establishment, characters, place, time] → [24-bar Verse 2 | Conflict, escalation, stakes rising] → [24-bar Verse 3 | Climax, reveal, or consequence] → [8-bar Outro | Image that stays]',
   minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
   epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
   doublechorus: '[Verse 1] → [Pre-Chorus] → [Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Chorus] → [Bridge] → [Final Chorus] → [Final Chorus]',
@@ -17764,6 +17789,13 @@ WRITING RULES:
 - Use the specific ad-libs and production vocabulary from the alternate style — NEVER generic "(yeah)" / "(hey)".
 - This is a complete song, not a remix snippet — write full verses, hook, and bridge.
 - If the echo feels too close to the original after your first pass, rewrite harder.
+
+LYRIC CRAFT RULES (universal — apply these at the same level as the original):
+- MONEY LINE: Engineer 1-3 quotable lines people could screenshot — compressed truth in specific imagery (name, number, place, sensory detail), not abstract emotion words. Place at bar 8 or 16 of a verse, or the line before the chorus breaks.
+- HOOK KERNEL: The hook must collapse to ONE tweetable thesis in 6-10 words. Declarative, works printed on a t-shirt.
+- OPENING LINE GRAVITY: First line names a place, person, object, or specific moment. Specificity over abstraction, image over state-of-being. Avoid "I used to...", "Baby...", "Once upon a time".
+- CLOSING LINE WEIGHT: Final line (before outro vamp) must either reframe the opening, reveal a truth, leave a specific sensory image, or land an acceptance. Never end on a cliché or summary.
+- SHOW NOT TELL: In verses, no abstract emotion words (sad, angry, lonely). Show emotion through action, object, or sensory detail.
 
 OUTPUT FORMAT (exactly this, no extra commentary):
 

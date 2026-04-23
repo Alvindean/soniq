@@ -881,6 +881,68 @@ const LYRIC_CRAFT_UNIVERSAL = {
     genres: ['gospel','hiphop','folk','rnb','country','neosoul','pop','blues']
   },
 
+  // ── QUOTABLE-LINE CRAFT (money bars / hook kernels / opening + closing gravity) ──
+  moneyLine: {
+    label: 'MONEY LINE (THE QUOTABLE BAR)',
+    short: `Every great song has 1-3 lines people screenshot, quote, tattoo — NOT punchlines but compressed truth in specific imagery. Hip-hop: "I ain't passed the bar but I know a little bit" (Jay-Z, double meaning). Country: "She thinks my tractor's sexy" (title IS the money line). Rock: "I can't get no satisfaction" (thesis in 4 words). R&B: "I'd wait a million years, walk a million miles" (compression via repetition). Folk: "How many roads must a man walk down" (rhetorical that IS the argument). RULES: (1) Specificity — name, number, place, sensory image, not abstract. (2) Syntactic compression or inversion. (3) Double meaning OR universal truth uniquely expressed. (4) Place at bar 8 or 16 of a verse, OR the line immediately before the chorus breaks. Aim for 1-3 per song. The test: could this line stand alone as a tweet?`,
+    genres: 'all'
+  },
+
+  hookKernel: {
+    label: 'HOOK KERNEL (ONE TWEETABLE THESIS)',
+    short: `Every great hook collapses to ONE quotable idea in 6-10 words — the song's entire thesis compressed to a phrase. "All you need is love" (Beatles). "Born in the USA" (Springsteen). "I will always love you" (Whitney). "Shake it off" (Swift). "Old Town Road" (Lil Nas X). The hook can have multiple lines, but ONE line inside it MUST be the extractable thesis that works standalone. RULES: (1) Declarative or imperative — never a question or qualification. (2) Under 11 words, ideally 6-8. (3) States the song's entire argument. (4) Works printed on a t-shirt. (5) The rest of the hook supports this one line; this line can carry the hook alone.`,
+    genres: 'all'
+  },
+
+  openingLineGravity: {
+    label: 'OPENING LINE GRAVITY',
+    short: `First line earns attention or loses it. RULES: (1) SPECIFICITY over abstraction — "She called me up from behind her locked door" beats "I was sad when she left." (2) IMAGE or ACTION over state-of-being — "It was the heat of the summer" beats "I remember feeling young." (3) AVOID cliché openings: "I used to...", "Baby...", "Once upon a time", "Remember when...". (4) Name a place, person, object, OR specific moment inside the first 7-10 words. GREAT OPENINGS: "Hello darkness my old friend" (Simon), "I was born in a crossfire hurricane" (Stones), "It was a rainy night when he came into sight" (Johnny Cash), "I found a love for me" (Sheeran), "Yeah, I think about the end just way too much" (Swift "Anti-Hero"). The opening line is the single most-heard line in the entire song — engineer it last after the hook lands.`,
+    genres: 'all'
+  },
+
+  closingLineWeight: {
+    label: 'CLOSING LINE WEIGHT',
+    short: `The final line of the song (before any outro vamp/fade) must land ONE of four moves: (1) REFRAME the opening — identical words, transformed meaning. (2) REVELATION — the truth the song has been building toward. (3) IMAGE THAT STAYS — a single sensory detail that outlasts the song. (4) ACCEPTANCE or RESOLUTION — what the narrator now knows or has accepted. EXAMPLES: "But still haven't found what I'm looking for" (U2 — acceptance). "You can check out any time you like but you can never leave" (Eagles — revelation). "And the only way to see her was to kill her" (country murder ballad — image). "I'm still here, and that's enough" (quiet resolution). RULE: never end on cliché or summary. End on a specific — a named image, a concrete action, a declarative truth.`,
+    genres: 'all'
+  },
+
+  // ── STORYTELLING CRAFT (narrative songwriting, character-driven genres) ────
+  characterEstablishment: {
+    label: 'CHARACTER ESTABLISHMENT',
+    short: `Name the character in 4-8 words with a defining trait — not just a description. "Small-town girl, big-city dreams" beats "she was a nice girl." Country masters this: "Jolene, Jolene, Jolene, Jolene — your beauty is beyond compare, with flaming locks of auburn hair" (Dolly — name + sensory detail + threat). Hip-hop: "Richie Rich from Oakland, caps on, suburban" (not "a friend of mine"). Folk: "Hazel Eyes she called herself though they were actually green." RULES: (1) At least one proper noun or signature detail. (2) Trait that implies a whole history. (3) Anchor them in place or era. (4) Never describe with abstract adjectives ("kind", "smart", "troubled") — always with specific objects, actions, or speech. Character-driven songs live or die on this.`,
+    genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','gospel','tvmusical','jazz','indie']
+  },
+
+  sceneAnchor: {
+    label: 'SCENE ANCHOR (WHERE + WHEN)',
+    short: `Ground the song in a specific place AND time within the first 4 lines. "August heat wave, my Chevy on the side of 441" beats "It was summer." Country: "Route 19, sundown, radio on static, coffee cold." Hip-hop: "Second floor of the Marcy Projects, '94, Timbs wet from the rain." Folk: "The morning of my twenty-third year, the ice thawed late." Singer-songwriter: "Brooklyn January, the deli bag in my hand was splitting." RULES: (1) Name a location — street, city, landmark, interior room. (2) Name a time — hour, season, year, specific event. (3) Include at least one sensory detail — sound, smell, light quality, temperature. A story without a scene is just an opinion.`,
+    genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','gospel','tvmusical','jazz','indie']
+  },
+
+  showNotTell: {
+    label: 'SHOW NOT TELL',
+    short: `Never STATE the emotion. Show it through action, object, or sensory detail. "Her hand shook as she poured the third glass" beats "She was sad." "I broke the frame because I couldn't look at him" beats "I was angry." "He left the porch light on for six months" beats "He was hopeful." This is the single hardest discipline in lyric writing AND the single biggest gap between amateur and pro. RULES: (1) In storytelling verses, NO abstract emotion words (sad, angry, lonely, scared, happy, hopeful) — replace each with an image. (2) The listener should be able to draw the scene from the words alone. (3) The emotion lives in the implication, not the statement. (4) Hooks can still state emotion directly — the show-not-tell discipline is for verses.`,
+    genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','pop','rnb','gospel','jazz','indie','neosoul','tvmusical']
+  },
+
+  narrativeReveal: {
+    label: 'NARRATIVE REVEAL',
+    short: `Hold back ONE key piece of information until verse 3 or the bridge. The audience thinks the song is about X; a single line reveals it's actually about Y, and verses 1-2 now read differently in retrospect. Taylor Swift "Dear John" — the age gap reveal. Kendrick "Sing About Me, I'm Dying of Thirst" — the narrator identity shifts. Country murder ballads — the victim identity. Bo Burnham "That Funny Feeling" — the "funny feeling" IS the dread. RULES: (1) The reveal line must be screenshot-worthy on its own. (2) Verses 1-2 must READ differently after you know the reveal. (3) Don't telegraph early — the reveal works because it's surprising in the moment, inevitable in retrospect. (4) Usually lives on the bridge or bar 1 of verse 3.`,
+    genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','tvmusical','jazz','indie','pop']
+  },
+
+  dialogueAsLyric: {
+    label: 'DIALOGUE AS LYRIC',
+    short: `Use quoted speech as lyric instead of paraphrased attribution. "She said 'I can't do this anymore' and closed the door" beats "She told me she was leaving." Country masters this (Hank Williams "Your Cheatin' Heart", Miranda Lambert "The House That Built Me", Tyler Childers). Hip-hop's best storytelling tracks quote characters directly (Slick Rick "Children's Story", Nas "I Gave You Power"). RULES: (1) Quote full phrases, not paraphrased summary. (2) Use speech patterns — contractions, dialect, regionalism — that reveal the speaker's character. (3) Dialogue lines can break the song's dominant meter; treat that as a feature, not a bug. (4) Tag the speaker when needed: "she said", "Daddy told me", "the preacher asked". Three or more speakers in one song turns lyric into scene.`,
+    genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','tvmusical','rnb','gospel']
+  },
+
+  timeCompression: {
+    label: 'TIME COMPRESSION',
+    short: `Compress months or years into 2-4 lines, usually on the bridge or between verses. "Then the leaves came down / Then the snow covered everything she owned / Then I didn't see her for a year" = a full year in three lines via seasonal imagery. Country: "One long summer, one hard winter, one morning she was gone." Folk: "Ten years later I was standing at the same door." RULES: (1) Use seasonal markers, life events (funerals, moves, graduations, births), or calendar events to jump. (2) Compression lines should be SHORTER than scene-setting lines — the rhythm of time passing. (3) Usually a bridge move to set up the final verse. (4) Don't skip all the middle — choose 2-3 specific markers that imply the rest.`,
+    genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','tvmusical','indie','gospel','pop']
+  },
+
   // ── COMEDY / PARODY CRAFT (Ian Edwards "running the game" framework) ───────
   // These 4 techniques activate on EITHER:
   //   • genre match (comedy / parody / tvmusical), OR
@@ -997,6 +1059,18 @@ const STRUCTURES={
   hookfirst:    '[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
   chorusfirst:  '[Chorus] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Final Chorus]',
   storytelling: '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
+  // ── Extended narrative architectures (character-driven story songs) ──
+  story_classic_3act:    '[Verse 1 — Setup: establish character, place, time] → [Chorus] → [Verse 2 — Conflict: something changes or breaks] → [Chorus] → [Verse 3 — Resolution or consequence] → [Final Chorus]',
+  story_in_medias_res:   '[Verse 1 — START MID-ACTION: listener drops into the middle of the scene] → [Chorus] → [Verse 2 — BACKSTORY: how we got here] → [Chorus] → [Verse 3 — Continue from where V1 ended] → [Final Chorus]',
+  story_flashback:       '[Verse 1 — Present day scene] → [Chorus] → [Verse 2 — Present day, escalating] → [Bridge — FLASHBACK: backstory reveal that reframes V1-V2] → [Verse 3 — Return to present, transformed by the reveal] → [Final Chorus]',
+  story_reveal_twist:    '[Verse 1 — Narrator POV, apparent story] → [Chorus] → [Verse 2 — Same POV, more detail, building trust] → [Bridge — THE REVEAL: one line that reframes everything] → [Final Chorus — same words as opening chorus, now with new meaning]',
+  story_murder_ballad:   '[Verse 1 — Innocent-seeming scene with quiet menace] → [Chorus — warning disguised as refrain] → [Verse 2 — Tension rises, characters interact] → [Chorus] → [Verse 3 — The act happens] → [Bridge — Aftermath / reveal of who died or who did it] → [Outro — The image that stays]',
+  story_origin:          '[Verse 1 — Formative moment in the past, age/era specific] → [Chorus] → [Verse 2 — Growth, leaving, threshold crossing] → [Chorus] → [Verse 3 — Present-day consequence or return to origin place] → [Final Chorus]',
+  story_revenge:         '[Verse 1 — The wound: what happened to narrator] → [Pre-Chorus — marking the moment] → [Chorus — declaration of intent] → [Verse 2 — The plotting, the waiting] → [Chorus] → [Bridge — The act / the confrontation] → [Final Chorus — aftermath, what the narrator has become]',
+  story_conversation:    '[Verse 1 — Speaker A voice] → [Chorus — shared truth both voices reach for] → [Verse 2 — Speaker B responds, different POV on same events] → [Chorus] → [Verse 3 — Both voices together OR unresolved exchange] → [Outro]',
+  story_diary:           '[Verse 1 — Dated entry #1: early in timeline] → [Chorus] → [Verse 2 — Dated entry #2: weeks or months later, same situation evolved] → [Chorus] → [Verse 3 — Final entry, present-day or closure] → [Outro]',
+  story_reverse_chrono:  '[Verse 1 — The ending of the story] → [Chorus] → [Verse 2 — The middle: how it unravelled] → [Chorus] → [Verse 3 — The beginning: how it started] → [Final Chorus — returns to V1 imagery in new light]',
+  hiphop_storytelling_24: '[8-bar Intro | Spoken Word OR beat only] → [24-bar Verse 1 | Scene establishment, characters, place, time] → [24-bar Verse 2 | Conflict, escalation, stakes rising] → [24-bar Verse 3 | Climax, reveal, or consequence] → [8-bar Outro | Image that stays]',
   minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
   epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
   doublechorus: '[Verse 1] → [Pre-Chorus] → [Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Chorus] → [Bridge] → [Final Chorus] → [Final Chorus]',
@@ -3362,6 +3436,10 @@ function buildLuckyPrompt(params) {
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const adlibNote = buildAdlibNote(g1);
   const vocalStackNote = buildVocalStackNote(g1);
+  // Lucky gets the full lyric craft toolkit — money lines, hook kernels, opening/
+  // closing gravity, storytelling craft, comedy craft (mood-gated). Same builder
+  // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
+  const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -3396,7 +3474,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4156,7 +4234,12 @@ function buildVariantPrompt(variant, song) {
     genre2: sanitizeInput(song.genre2 || '', 50),
     topic: sanitizeInput(song.topic || '', 300)
   };
-  return builder(safeSong);
+  // Variants generate new lyrics (acoustic rewrite, radio cut, cinematic
+  // sync rewrite, etc.) so they need the same craft toolkit as Writer/Lucky/
+  // Rap Lab — money lines, hook kernels, opening/closing gravity,
+  // storytelling craft, comedy craft if the original was comedic.
+  const craftNote = buildLyricCraftNote(safeSong.genre, '', safeSong.topic);
+  return builder(safeSong) + craftNote;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4284,13 +4367,19 @@ ${outliers || 'None documented'}
 
 YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the song's voice, theme, and emotional arc. Return ONLY the complete revised lyrics with [Section] tags — no commentary, no explanation.`;
 
+  // Lyric craft toolkit — applies to revise/edit flow too. If the edit
+  // instruction is a craft-level rewrite (make hook punchier, deeper verse,
+  // new bridge), the editor benefits from the same money-line / storytelling
+  // / comedy-mode rules as the original generate.
+  const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
+
   const prompt = `SONG CONTEXT:
 ${ctx}
 
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}`;
+${p.lyrics}${craftNote}`;
 
   return { prompt, system };
 }
