@@ -9924,7 +9924,12 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
               ||'';
   const verdict=(_vRaw.split(/\n\s*\n/)[0]||'').replace(/\s+/g,' ').trim().slice(0,320);
   const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
-  const lyrics=parseSection(raw,'LYRICS','SONG PROMPT');
+  const lyricsRaw=parseSection(raw,'LYRICS','SONG PROMPT');
+  const _lyricsTrim=trimLyricsToSunoLimit(lyricsRaw);
+  const lyrics=_lyricsTrim.lyrics;
+  if (_lyricsTrim.trimmed) {
+    try { toast(`✂ Lyrics trimmed to fit Suno's 5000-char limit (was ${lyricsRaw.length}, now ${lyrics.length})`); } catch {}
+  }
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
@@ -10540,6 +10545,93 @@ function copyCopyrightClaim(ns) {
   }
 }
 
+// Suno has a hard 5000-character limit on its lyrics field. If the model
+// overshoots (common on Sicko-Mode-style extended structures or dense rap
+// verses), we trim intelligently without losing narrative integrity:
+//   1. ≤4900 chars → untouched (100-char safety margin under Suno's 5000)
+//   2. Drop duplicate chorus/hook repetitions (keep first two + final)
+//   3. Drop optional sections from END: post-chorus, outro-extensions,
+//      bridge-repeats, 4th+ verse
+//   4. Last resort: hard-truncate at last complete line before 4900
+// Returns the trimmed lyrics + a `.trimmed` flag for toast feedback.
+const SUNO_LYRIC_HARD_LIMIT = 5000;
+const SUNO_LYRIC_SOFT_CEILING = 4900; // safety margin
+
+function trimLyricsToSunoLimit(lyrics) {
+  if (!lyrics || lyrics.length <= SUNO_LYRIC_SOFT_CEILING) return { lyrics: lyrics || '', trimmed: false };
+  let out = lyrics;
+
+  // Split into blocks at [Section] tags — preserve tag with its body
+  const splitBlocks = (text) => {
+    const blocks = [];
+    const re = /(\[[^\]]+\])([\s\S]*?)(?=\n\[|$)/g;
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      blocks.push({ tag: m[1], body: m[2], full: m[1] + m[2] });
+    }
+    return blocks.length ? blocks : [{ tag: '', body: text, full: text }];
+  };
+
+  // Strategy 1: remove duplicate repeated sections (same tag + same body).
+  // Keep first occurrence + final occurrence of repeats.
+  const dedupe = (blocks) => {
+    const seen = {};
+    blocks.forEach((b, i) => {
+      const key = (b.tag + '|' + b.body.trim()).toLowerCase();
+      seen[key] = seen[key] || [];
+      seen[key].push(i);
+    });
+    const drop = new Set();
+    Object.values(seen).forEach(indexes => {
+      if (indexes.length > 2) {
+        // Keep first + last, drop middle duplicates
+        for (let j = 1; j < indexes.length - 1; j++) drop.add(indexes[j]);
+      }
+    });
+    return blocks.filter((_, i) => !drop.has(i));
+  };
+
+  let blocks = splitBlocks(out);
+  if (blocks.length > 1) {
+    const deduped = dedupe(blocks);
+    const rebuilt = deduped.map(b => b.full).join('\n').trim();
+    if (rebuilt.length < out.length) out = rebuilt;
+    if (out.length <= SUNO_LYRIC_SOFT_CEILING) return { lyrics: out, trimmed: true };
+  }
+
+  // Strategy 2: drop non-essential sections from END. Priority to drop:
+  // outro, post-chorus, bridge, then extra verses beyond the 3rd.
+  const DROPPABLE = /^\[(outro|post.?chorus|bridge\s*\d*|extended|coda|tag|reprise|vamp|ad.?libs|break|interlude)/i;
+  blocks = splitBlocks(out);
+  for (let i = blocks.length - 1; i >= 0 && out.length > SUNO_LYRIC_SOFT_CEILING; i--) {
+    if (DROPPABLE.test(blocks[i].tag)) {
+      const candidate = blocks.filter((_, j) => j !== i).map(b => b.full).join('\n').trim();
+      if (candidate.length > 200) { // never reduce to a stub
+        out = candidate;
+        blocks = splitBlocks(out);
+      }
+    }
+  }
+  if (out.length <= SUNO_LYRIC_SOFT_CEILING) return { lyrics: out, trimmed: true };
+
+  // Strategy 3: drop extra verses beyond Verse 3 from END
+  blocks = splitBlocks(out);
+  const verseIdx = [];
+  blocks.forEach((b, i) => { if (/^\[verse\s*(\d+)/i.test(b.tag)) verseIdx.push(i); });
+  while (verseIdx.length > 3 && out.length > SUNO_LYRIC_SOFT_CEILING) {
+    const dropIdx = verseIdx.pop();
+    blocks = blocks.filter((_, j) => j !== dropIdx);
+    out = blocks.map(b => b.full).join('\n').trim();
+  }
+  if (out.length <= SUNO_LYRIC_SOFT_CEILING) return { lyrics: out, trimmed: true };
+
+  // Strategy 4: hard truncate at last complete line before the soft ceiling
+  const cut = out.slice(0, SUNO_LYRIC_SOFT_CEILING);
+  const lastNewline = cut.lastIndexOf('\n');
+  out = (lastNewline > 0 ? cut.slice(0, lastNewline) : cut).trim();
+  return { lyrics: out, trimmed: true };
+}
+
 function parseSongResult(raw,genre,topic,prodData){
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
   // Defensive verdict parse: try multiple downstream markers so we never
@@ -10553,7 +10645,12 @@ function parseSongResult(raw,genre,topic,prodData){
               ||'';
   const verdict=(_vRaw.split(/\n\s*\n/)[0]||'').replace(/\s+/g,' ').trim().slice(0,320);
   const hookIsolation=parseSection(raw,'HOOK ISOLATION','LYRICS')||'';
-  const lyrics=parseSection(raw,'LYRICS','SONG PROMPT');
+  const lyricsRaw=parseSection(raw,'LYRICS','SONG PROMPT');
+  const _lyricsTrim=trimLyricsToSunoLimit(lyricsRaw);
+  const lyrics=_lyricsTrim.lyrics;
+  if (_lyricsTrim.trimmed) {
+    try { toast(`✂ Lyrics trimmed to fit Suno's 5000-char limit (was ${lyricsRaw.length}, now ${lyrics.length})`); } catch {}
+  }
   const songPrompt=parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
   const briefRaw=parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
   const structure=parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');

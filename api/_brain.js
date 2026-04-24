@@ -3724,7 +3724,16 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
+- ⚠️ HARD LIMIT — SUNO 5000-CHAR CAP (NON-NEGOTIABLE):
+  The total lyrics you output MUST stay under 4900 characters. 5000 is Suno's literal wall; treat 4900 as the ceiling to leave a 100-char safety margin.
+  Count EVERY character including [Section] tags, newlines, parentheses, ad-libs — everything between the LYRICS: header and the SONG PROMPT: header.
+  BUDGET GUIDE (pick the row matching your song length):
+    Short  (≈2 min, indie/acoustic/comedy):                         aim 1800–2500 chars
+    Medium (≈3 min, most pop/country/rock):                         aim 2800–3600 chars
+    Long   (≈4 min, standard hip-hop/full-band):                    aim 3600–4400 chars
+    Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
+  If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
+  COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
 - NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${sunoSettingsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
@@ -3908,7 +3917,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
-- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags. Complete song, within the limit.
+- ⚠️ HARD LIMIT: Total lyrics under 4900 chars (Suno caps at 5000, 100-char safety margin). Count every character including [Section] tags, newlines, ad-libs. If over, cut repeated chorus/hook repeats (keep first two + final), shorten bridge, drop extra verses. Going over SILENTLY LOSES bars in Suno — the song gets truncated.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
 
 Respond with EXACTLY this format:
@@ -4403,7 +4412,7 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
-- LYRICS LENGTH RULE: Total lyrics under 5000 characters — Suno's maximum. Includes all section tags.
+- ⚠️ HARD LIMIT: Total lyrics under 4900 chars (Suno caps at 5000, 100-char safety margin). Count every character including [Section] tags, newlines, ad-libs. Epic / beatswitch / Sicko-Mode-style songs STILL must fit — cut repeated hook occurrences, trim bridge/outro, drop extra verses if over. Going over truncates the end of the song in Suno.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildAdlibNote('hiphop')}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
