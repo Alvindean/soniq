@@ -1061,6 +1061,69 @@ RULES: (1) Hook passes a casual listen as positive/neutral. (2) At least one wor
     genres: ['pop','rock','altrock','indie','hiphop','rnb','country','neosoul']
   },
 
+  sarcasm: {
+    label: 'SARCASM (INVERSE MEANING WITH BITE)',
+    short: `Say the OPPOSITE of what you mean, and the listener knows it. Distinct from tongue-in-cheek (gentle wink) and from double entendre (both meanings true). Sarcasm is UNILATERAL inverse — "Oh, that's GREAT" when it obviously isn't. The gap between what's said and what's meant IS the content.
+
+Examples:
+  • Alanis Morissette "You Oughta Know" — "I hope you feel it" (meaning: I hope it destroys you)
+  • Pink "So What" — "I'm still a rock star, I got my rock moves" (sung with mocking bravado to cover heartbreak)
+  • Lily Allen "F*** You" — saccharine melody over vicious content; sweet delivery IS the knife
+  • Randy Newman "Short People" — performs bigotry straight-faced to expose its stupidity
+  • Country: Brad Paisley "Alcohol" — the song's narrator IS alcohol personified, arguing for its own virtue
+  • Eminem "My Name Is" — mocks tabloid attention BY taking it further than tabloids ever would
+  • Fiona Apple "Limp" — "You fondle my trigger" (romantic diction deployed as accusation)
+
+RULES:
+(1) The listener MUST catch the inversion — if the listener thinks the narrator is sincere, the sarcasm failed. Plant an unmissable tell (a lyric detail, a tonal shift, a too-perfect cliché).
+(2) Delivery tone does half the work — sarcasm SUNG sincerely over content that's obviously wrong is the purest form.
+(3) Sarcasm should land BOTH as a joke AND as a wound — funny first, then "oh, this is actually bitter."
+(4) NOT the same as tongue-in-cheek: sarcasm has a target. Tongue-in-cheek has a shared smirk.
+(5) Best placed on the chorus (the inversion becomes the earworm) or on a single pivot line mid-verse.`,
+    genres: ['pop','rock','altrock','indie','hiphop','country','rnb','comedy','parody','neosoul']
+  },
+
+  perspectiveRotation: {
+    label: 'PERSPECTIVE ROTATION (SAME SUBJECT, DIFFERENT LOOKS)',
+    short: `Take ONE subject (event, relationship, place, feeling) and rotate through multiple angles or POVs across the song. Each verse is a different look at the same thing. The song accumulates into a prismatic portrait instead of a linear narrative.
+
+Patterns:
+  • MULTIPLE CHARACTERS, SAME EVENT: "Eleanor Rigby" (3 lonely people), "The Chain" Fleetwood Mac (verses from different band members on the shared breakup), "Jackie and Wilson" Hozier
+  • SAME PERSON, DIFFERENT TIMES: Taylor Swift "The Story of Us" (early / middle / present of one relationship), Jason Isbell "Elephant" (same event across time)
+  • SAME SCENE, DIFFERENT EYES: Joni Mitchell "Both Sides Now" (clouds from above vs below, love from inside vs outside, life young vs old), Kendrick "Sing About Me" (3 voices speaking about the same street)
+  • SAME TRUTH, DIFFERENT GENRES: Dolly Parton "I Will Always Love You" (country original → R&B cover by Whitney) — same lyric, two whole meanings
+  • NARRATOR VS. SUBJECT: Jay-Z "4:44" (narrator addresses wife / son / himself / industry — all about one act)
+
+RULES:
+(1) Commit to ONE subject. If each verse is about a different thing, you lost the technique.
+(2) Each verse's LOOK must be genuinely different — not just different words describing the same thing, but a different ANGLE (different eyes, different time, different role, different scale).
+(3) Chorus binds the rotation — the chorus is the invariant truth all the different looks circle.
+(4) Final verse or bridge often reconciles — shows how the different looks add up.
+(5) Pairs naturally with narrativeReveal (a reveal that recontextualizes all prior perspectives).`,
+    genres: ['pop','rock','altrock','indie','country','folk','ss','americana','hiphop','rnb','neosoul','jazz','gospel','tvmusical']
+  },
+
+  unreliableNarrator: {
+    label: 'UNRELIABLE NARRATOR (NARRATOR\'S STORY ≠ THE TRUTH)',
+    short: `The narrator tells one version of events — specific details in the lyric reveal they're lying, self-deceiving, or missing the obvious truth. Listener assembles the REAL story from the gap between what the narrator says and what the song shows.
+
+Examples:
+  • "You're So Vain" (Carly Simon) — narrator insists the ex is vain; the whole song is about the ex, proving she's still thinking about him (point-blank target of the accusation lands on the narrator too).
+  • "Every Breath You Take" (Police) — narrator presents himself as a devoted lover; every verb reveals he's a stalker.
+  • "Delilah" (Tom Jones) — narrator confesses violence he calls love; the listener sees a murderer convincing himself.
+  • "Stan" verse 4 (Eminem) — Stan writes from a position of calm composure while the details show he's driving drunk with his pregnant girlfriend in the trunk.
+  • "Suzanne" (Leonard Cohen) — narrator frames Suzanne as a mystic savior; the specifics reveal it's his projection onto a tea-serving woman.
+  • "Luka" (Suzanne Vega) — the narrator-as-victim denies the abuse the lyric clearly depicts ("I think it's because I'm clumsy").
+
+RULES:
+(1) The narrator's SELF-IMAGE must be clear from line one. They're presenting themselves as X.
+(2) At least 3 details in the song must contradict the self-image if the listener is paying attention.
+(3) Never the narrator's voice admit the gap — the lyric maintains the cover to the end. The listener discovers.
+(4) Works best in first-person storytelling songs (country, folk, R&B, hip-hop narrative tracks).
+(5) Different from narrativeReveal (which is a plot twist); this is a CHARACTER twist — the narrator is less truthful than they know.`,
+    genres: ['country','folk','ss','americana','rock','altrock','indie','hiphop','rnb','pop','neosoul','tvmusical']
+  },
+
   covertNarrative: {
     label: 'COVERT NARRATIVE (HIDDEN STORY UNDER APPARENT STORY)',
     short: `A second, complete narrative runs underneath the apparent one — different characters, different events, different stakes — and only reveals through specific verses or bridge. Different from thematic double meaning (which is meaning-level): this is a full second STORY. Examples:
