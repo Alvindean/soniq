@@ -3254,6 +3254,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <option value="story_conversation">Conversation / Duet (A voice → B voice → together)</option>
               <option value="story_diary">Diary Entries (dated entries across time)</option>
               <option value="story_reverse_chrono">Reverse Chronology (ending → middle → beginning)</option>
+              <option value="gear_shift_escalation">Gear Shift Escalation (Garth Brooks / Dylan / Hamilton — speed-cadence as story device)</option>
             </optgroup>
             <optgroup label="— Genre-Specific —">
               <option value="riddim">Riddim Loop (reggae)</option>
@@ -3295,6 +3296,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <span class="rl-dpill" onclick="setRapDim(this,'flow','on-beat')">On-Beat</span>
               <span class="rl-dpill" onclick="setRapDim(this,'flow','triplet')">Triplet</span>
               <span class="rl-dpill" onclick="setRapDim(this,'flow','double-time')">Double-Time</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'flow','speed-rap')" title="Gear 4 chopper flow — Twista / Busta / Eminem Rap God / Royce. Sixteenth-note + quintuplet cascades. Used as spotlight, not sustained.">Speed-Rap ✦</span>
               <span class="rl-dpill" onclick="setRapDim(this,'flow','conversational')">Conversational</span>
               <span class="rl-dpill" onclick="setRapDim(this,'flow','behind-beat')">Behind-Beat</span>
             </div>
@@ -8126,6 +8128,7 @@ const STRUCTURES={
   story_conversation:    '[Verse 1 — Speaker A voice] → [Chorus — shared truth both voices reach for] → [Verse 2 — Speaker B responds, different POV on same events] → [Chorus] → [Verse 3 — Both voices together OR unresolved exchange] → [Outro]',
   story_diary:           '[Verse 1 — Dated entry #1: early in timeline] → [Chorus] → [Verse 2 — Dated entry #2: weeks or months later, same situation evolved] → [Chorus] → [Verse 3 — Final entry, present-day or closure] → [Outro]',
   story_reverse_chrono:  '[Verse 1 — The ending of the story] → [Chorus] → [Verse 2 — The middle: how it unravelled] → [Chorus] → [Verse 3 — The beginning: how it started] → [Final Chorus — returns to V1 imagery in new light]',
+  gear_shift_escalation: '[Verse 1 — Gear 1 baseline conversational cadence, establish scene] → [Pre-Chorus — [Gear Up] to Gear 2, stakes tighten] → [Chorus — Gear 1 hook lands wide] → [Verse 2 — Gear 2 pocket, density rising] → [Pre-Chorus — [Cascade] through Gears 2→3→4 as timeline compresses or panic builds] → [Chorus — [Breakdown] to Gear 0, the line lands naked] → [Bridge — Gear 4 spotlight cascade max 4 bars, then [Breath Reset]] → [Final Chorus — Gear 1 resolution, the air comes back]',
   hiphop_storytelling_24: '[8-bar Intro | Spoken Word OR beat only] → [24-bar Verse 1 | Scene establishment, characters, place, time] → [24-bar Verse 2 | Conflict, escalation, stakes rising] → [24-bar Verse 3 | Climax, reveal, or consequence] → [8-bar Outro | Image that stays]',
   minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
   epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
