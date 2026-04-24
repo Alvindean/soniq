@@ -5087,6 +5087,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
       </div>
       <div style="font-size:11px;color:var(--tx4);margin-bottom:10px">Select techniques to inject into your next Generate or Remake. The AI will actively use these craft devices.</div>
+      <!-- WINNING FORMULAS — curated one-click preset combinations proven to produce great songs per genre -->
+      <div id="a-tech-formulas" style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(245,192,0,0.06),rgba(139,92,246,0.04));border:1px solid var(--amberline);border-radius:var(--r1)">
+        <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">🎯 Winning Formulas</div>
+        <div style="font-size:10px;color:var(--tx3);margin-bottom:8px;line-height:1.5">One-click presets — combinations of craft techniques proven to produce great songs for your genre. Click a formula to auto-select its pills.</div>
+        <div id="a-tech-formula-buttons" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
       <div id="a-tech-grid" style="display:grid;grid-template-columns:1fr;gap:6px"></div>
       <div id="a-tech-cross" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)">
         <div style="font-size:11px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">🔀 Cross-Genre Techniques</div>
@@ -6530,7 +6536,9 @@ const GENRE_TECHNIQUES={
     {id:'prefix_suffix',name:'Prefix/Suffix Rhyme',desc:'Anchor the rhyme on word BEGINNINGS or ENDINGS instead of whole-word rhymes. The ear hears recurrence before the syntactic word completes — locked-in percussive feel',example:'Prefix: "UNDERwater / UNDERfire / UNDERpressure" — or suffix: "agGRESSION / deDRESSION / proGRESSION"',difficulty:3,impact:4},
     {id:'phoneme_target',name:'Phonetic Targeting',desc:'Rhyme at PHONEME level, not word level — find the target sound at ANY syllable position of ANY word. Expands rhyme vocabulary 10× over word-level matching',example:'/ɛk/ target: "reflEction" + "sEction" + "nEcklace" — same phoneme at bar-end, first syllable, and middle respectively',difficulty:4,impact:5},
     {id:'thematic_double_meaning',name:'Thematic Double Meaning (Surface + Depth)',desc:'Song has a surface reading + a hidden reading. Casual listeners hear the surface; attentive listeners discover the real subject. Classic hip-hop: Jay-Z "99 Problems" verse 2 sounds like bragging, is actually a forensic account of racial profiling',example:'"99 Problems" V2 = traffic-stop civil-rights narrative wearing bragging-rap clothes. Kendrick "Alright" anthem + institutional-racism subtext',difficulty:5,impact:5},
-    {id:'covert_narrative',name:'Covert Narrative (Second Story)',desc:'A complete second narrative runs underneath the apparent one — revealed through specific bars or bridge. The listener re-hears the whole track and sees the second story was there from bar 1',example:'Eminem "Stan" — apparent: a fan writing letters. Covert: escalating instability → murder-suicide → Eminem\'s belated reply. Re-read any verse, the covert story was always there',difficulty:5,impact:5}
+    {id:'covert_narrative',name:'Covert Narrative (Second Story)',desc:'A complete second narrative runs underneath the apparent one — revealed through specific bars or bridge. The listener re-hears the whole track and sees the second story was there from bar 1',example:'Eminem "Stan" — apparent: a fan writing letters. Covert: escalating instability → murder-suicide → Eminem\'s belated reply. Re-read any verse, the covert story was always there',difficulty:5,impact:5},
+    {id:'sarcasm',name:'Sarcasm (Inverse Meaning)',desc:'Rap bars that say the OPPOSITE of what they mean, with a target. Delivery stays sincere; content reveals the knife. Different from straight punchline — sarcasm WEARS sincerity',example:'Eminem "My Name Is" — mocks tabloid attention BY taking it further than tabloids would. Randy Newman "Short People" — performs bigotry straight-faced to expose it',difficulty:4,impact:5},
+    {id:'unreliable_narrator',name:'Unreliable Narrator (Narrator ≠ Truth)',desc:'Rap narrator tells one version; specific bars reveal they\'re self-deceiving or missing the obvious. Listener pieces the real story together from the gap',example:'Eminem "Stan" verse 4 — Stan presents himself as calm and composed while the bars reveal he\'s driving drunk with his pregnant girlfriend in the trunk. The gap IS the horror',difficulty:5,impact:5}
   ],
   rnb:[
     {id:'melismatic',name:'Melismatic Run Notation',desc:'Mark vocal runs where one syllable stretches across 3+ notes',example:'"I nee~ee~eed you" — the tilde marks a melismatic run',difficulty:2,impact:4},
@@ -6548,7 +6556,10 @@ const GENRE_TECHNIQUES={
     {id:'money_line',name:'Money Line (Quotable Bar)',desc:'Engineer 1-3 screenshot-worthy lines per song — compressed truth in specific imagery, not a punchline',example:'"I ain\'t passed the bar but I know a little bit" — double meaning in 10 syllables. Place at bar 8 or 16 of a verse, or right before the chorus breaks',difficulty:3,impact:5},
     {id:'hook_kernel',name:'Hook Kernel (Tweetable Thesis)',desc:'The hook must collapse to ONE quotable idea in 6-10 words. Declarative, works on a t-shirt, states the song\'s whole argument',example:'"All you need is love" / "Born in the USA" / "Shake it off" — kernels that are the song',difficulty:3,impact:5},
     {id:'thematic_double_meaning',name:'Thematic Double Meaning (Surface + Depth)',desc:'Song has a surface meaning + a deeper hidden meaning. Casual listeners hear the surface; attentive listeners discover the real subject on repeat plays',example:'"Every Breath You Take" sounds romantic but is a stalker\'s confession. "Born in the USA" sounds patriotic but is about Vietnam-vet abandonment. "Pumped Up Kicks" sounds upbeat but is a school-shooter POV',difficulty:5,impact:5},
-    {id:'false_friend_hook',name:'False-Friend Hook (Catchy-But-Dark)',desc:'Hook sounds positive or anthemic but reveals something dark or tragic in context. Listener sings along happily, then "wait — what does this actually say?"',example:'"Semi-Charmed Life" bouncy "doo doo doos" over meth addiction. "Hey Ya!" dance hit where the hook literally says "separate for a while"',difficulty:4,impact:5}
+    {id:'false_friend_hook',name:'False-Friend Hook (Catchy-But-Dark)',desc:'Hook sounds positive or anthemic but reveals something dark or tragic in context. Listener sings along happily, then "wait — what does this actually say?"',example:'"Semi-Charmed Life" bouncy "doo doo doos" over meth addiction. "Hey Ya!" dance hit where the hook literally says "separate for a while"',difficulty:4,impact:5},
+    {id:'sarcasm',name:'Sarcasm (Inverse Meaning with Bite)',desc:'Say the OPPOSITE of what you mean, with a target. The gap between said and meant IS the content. Delivery stays sincere; content reveals the knife',example:'Pink "So What" — sung with mocking rock-star bravado to cover heartbreak. Lily Allen "F*** You" — saccharine melody over vicious content. Different from tongue-in-cheek (gentle wink) — sarcasm has a target',difficulty:4,impact:5},
+    {id:'perspective_rotation',name:'Perspective Rotation (Different Looks, Same Subject)',desc:'Take ONE subject and rotate through multiple angles across verses — different eyes, different times, different roles. Prismatic portrait instead of linear narrative',example:'"Eleanor Rigby" — 3 lonely people. "Both Sides Now" — clouds from above vs below, love from inside vs outside. Taylor Swift "The Story of Us" — 3 phases of one relationship',difficulty:4,impact:5},
+    {id:'unreliable_narrator',name:'Unreliable Narrator (Story ≠ Truth)',desc:'Narrator tells one version of events while specific details reveal they\'re self-deceiving, lying, or missing the truth. Listener assembles the real story from the gap',example:'"You\'re So Vain" — narrator insists ex is vain; whole song reveals she\'s still thinking about him. "Delilah" Tom Jones — narrator calls murder "love." "Luka" — narrator denies the abuse the lyric depicts',difficulty:5,impact:5}
   ],
   country:[
     {id:'story_song',name:'Story-Song Narrative Arc',desc:'Each verse advances a story with specific characters, settings, and timeline',example:'V1: "June of \'98, her daddy\'s porch..." V2: "That December, she called..." V3: "Now it\'s ten years gone..."',difficulty:2,impact:5},
@@ -6562,7 +6573,9 @@ const GENRE_TECHNIQUES={
     {id:'narrative_reveal',name:'Narrative Reveal (Bridge Twist)',desc:'Hold back ONE key info piece until verse 3 or the bridge — it reframes verses 1-2 retroactively',example:'V1-V2 feel like a love song → bridge reveals she died before V1 — same words, new meaning. Listener re-hears the song',difficulty:4,impact:5},
     {id:'dialogue_lyric',name:'Dialogue as Lyric',desc:'Use quoted speech as lyric instead of paraphrased attribution. Speech patterns reveal character faster than description',example:'"She said \'I can\'t do this anymore\' and closed the door" beats "she told me she was leaving"',difficulty:2,impact:4},
     {id:'thematic_double_meaning',name:'Thematic Double Meaning (Surface + Depth)',desc:'Song has a surface meaning + a hidden meaning. Surface is a complete song a casual listener enjoys; attentive listeners discover the real subject',example:'"Closing Time" reads as a bar last-call but is actually a childbirth metaphor. "The One I Love" plays at weddings but is about "a simple prop to occupy my time"',difficulty:5,impact:5},
-    {id:'covert_narrative',name:'Covert Narrative (Hidden Story)',desc:'A complete second story runs underneath the apparent one — different stakes, revealed through specific verses or bridge. On re-listen, the covert story was there from line 1',example:'"Fast Car" (Tracy Chapman): every hopeful line is contradicted later, revealing the escape cycle never breaks. "Luka" (Suzanne Vega): upbeat song denying child abuse the lyric clearly depicts',difficulty:5,impact:5}
+    {id:'covert_narrative',name:'Covert Narrative (Hidden Story)',desc:'A complete second story runs underneath the apparent one — different stakes, revealed through specific verses or bridge. On re-listen, the covert story was there from line 1',example:'"Fast Car" (Tracy Chapman): every hopeful line is contradicted later, revealing the escape cycle never breaks. "Luka" (Suzanne Vega): upbeat song denying child abuse the lyric clearly depicts',difficulty:5,impact:5},
+    {id:'perspective_rotation',name:'Perspective Rotation (Different Looks, Same Subject)',desc:'Take ONE subject and rotate through multiple angles — different eyes, different times, different roles. Prismatic portrait built across verses',example:'Jason Isbell "Elephant" — same event across time. "The Chain" Fleetwood Mac — verses from different band members on the same breakup. Chorus binds what the rotation circles',difficulty:4,impact:5},
+    {id:'unreliable_narrator',name:'Unreliable Narrator (Story ≠ Truth)',desc:'First-person narrator\'s version contradicts what the lyric details reveal. Listener pieces together the real truth from the gap between what\'s said vs shown',example:'"Delilah" Tom Jones — narrator calls murder "love." "Suzanne" Leonard Cohen — narrator projects mystic sainthood onto a woman making tea. Works especially well in country storytelling',difficulty:5,impact:5}
   ],
   altrock:[
     {id:'quiet_loud',name:'Quiet-Loud-Quiet Dynamic',desc:'Verse whispered/subdued → Chorus explodes → next verse drops back down',example:'Pixies/Nirvana template: mumbled verse → screamed chorus → silence → repeat',difficulty:1,impact:5},
@@ -11678,6 +11691,121 @@ function unlockAnalyzer(){
 // ═══════════════════════════════════════════════════════
 // TECHNIQUE TOOLKIT — select genre-specific craft devices
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// WINNING FORMULAS — curated preset combinations of technique pills that are
+// proven to produce great songs per genre. Lets users one-click apply a
+// battle-tested craft recipe instead of guessing at combinations.
+// Each entry: { id, name (evocative label), techs (array of pill IDs), why }
+// ═══════════════════════════════════════════════════════════════════════════
+const CRAFT_FORMULAS = {
+  hiphop: [
+    { id:'eminem_technical', name:'Eminem-Level Technical',
+      techs:['multisyllabic','internal_chain','syllable_atoms','phoneme_target','vowel_chain'],
+      why:'Dense internal phonetic chains + syllable atoms = the MF DOOM / Eminem ceiling for rap technicality' },
+    { id:'lyrical_masterwork', name:'Lyrical Masterwork',
+      techs:['multisyllabic','entendre','setup_punchline','thematic_double_meaning','money_line'],
+      why:'Multisyllabic + double entendre + song-level double meaning — Kendrick / Nas territory' },
+    { id:'punchline_heavy', name:'Punchline Heavy',
+      techs:['setup_punchline','wordplay_flip','entendre','flow_switch','money_line'],
+      why:'Dense punchline architecture with flow variety — Lil Wayne / Drake-adjacent mainstream rap' },
+    { id:'narrative_rap', name:'Narrative Rap (Stan-tier)',
+      techs:['setup_punchline','unreliable_narrator','covert_narrative','dialogue_lyric','entendre'],
+      why:'Story-rap with unreliable narrator — Eminem "Stan" / Slick Rick "Children\'s Story" territory' }
+  ],
+  country: [
+    { id:'classic_story', name:'Classic Story Song',
+      techs:['story_song','character_est','scene_anchor','show_not_tell','payoff_line'],
+      why:'Dolly Parton / Miranda Lambert formula — character + scene + emotional payoff + title drop' },
+    { id:'narrative_reveal_ballad', name:'Reveal Ballad',
+      techs:['narrative_reveal','character_est','show_not_tell','dialogue_lyric','payoff_line'],
+      why:'Taylor Swift "Dear John" / Kacey Musgraves pattern — bridge reveal reframes V1-V2' },
+    { id:'unreliable_ballad', name:'Unreliable Tragic Ballad',
+      techs:['unreliable_narrator','scene_anchor','show_not_tell','talk_sing','covert_narrative'],
+      why:'"Every Breath You Take" in country clothes — narrator reveals self through specifics' },
+    { id:'country_heartbreak', name:'Money-Line Heartbreak',
+      techs:['money_line','hook_kernel','scene_anchor','show_not_tell','character_est'],
+      why:'Chris Stapleton / Zach Bryan — one quotable line, one tweetable hook, anchored in a specific scene' }
+  ],
+  pop: [
+    { id:'earworm_hit', name:'Earworm Hit Formula',
+      techs:['topline_lock','earworm_rep','pre_chorus_lift','post_chorus','hook_kernel'],
+      why:'Max Martin formula — melodic lock + title repetition + pre-chorus lift + tweetable kernel' },
+    { id:'dark_pop', name:'Dark Pop (Pumped Up Kicks)',
+      techs:['false_friend_hook','thematic_double_meaning','topline_lock','unreliable_narrator','show_not_tell'],
+      why:'Catchy-but-dark hook + surface/depth duality — Foster the People / Third Eye Blind / MGMT' },
+    { id:'sarcastic_pop', name:'Sarcastic Pop Anthem',
+      techs:['sarcasm','hook_kernel','money_line','pre_chorus_lift','earworm_rep'],
+      why:'Pink "So What" / Lily Allen — melody sweet, content sharp' },
+    { id:'prismatic_pop', name:'Prismatic Pop',
+      techs:['perspective_rotation','money_line','hook_kernel','thematic_double_meaning','topline_lock'],
+      why:'Taylor Swift "The Story of Us" / Billie Eilish — one subject, multiple angles, layered meaning' }
+  ],
+  comedy: [
+    { id:'ian_edwards', name:'Ian Edwards Heightening',
+      techs:['run_the_game','heighten_anchor','remix_anchor','crowd_work','callback'],
+      why:'Full 5-step framework — anchor + heighten + remix + crowd-work + callback at song\'s end' },
+    { id:'deadpan_absurdist', name:'Deadpan Absurdist',
+      techs:['deadpan_commit','escalation_absurd','specificity_engine','subverted_cliche','run_the_game'],
+      why:'Lonely Island / Flight of the Conchords — sincere delivery + escalating specifics + subverted cliché' }
+  ],
+  parody: [
+    { id:'ian_edwards', name:'Ian Edwards Heightening',
+      techs:['run_the_game','heighten_anchor','remix_anchor','crowd_work','callback'],
+      why:'5-step framework adapted for parody — anchor heightens + remixes + callbacks' },
+    { id:'weird_al', name:'Weird Al Precision Parody',
+      techs:['genre_straight_man','specificity_engine','subverted_cliche','callback','punchline_architecture'],
+      why:'100% sincere musical performance + razor-specific lyric inversions — Weird Al canonical formula' }
+  ],
+  altrock: [
+    { id:'quiet_loud_masterpiece', name:'Quiet-Loud Masterpiece',
+      techs:['quiet_loud','dissonant_resolve','thematic_double_meaning','money_line','covert_narrative'],
+      why:'Pixies / Nirvana / Radiohead — dynamic contrast + surface/depth + hidden story layered' }
+  ],
+  rnb: [
+    { id:'vulnerable_ballad', name:'Vulnerable R&B Ballad',
+      techs:['whisper_belt','melismatic','vamp_outro','adlib_harmony','conversational'],
+      why:'SZA / Jhené Aiko / Daniel Caesar — whisper verses, belted chorus, escalating ad-libs' }
+  ]
+};
+
+// Render the genre-appropriate formula buttons into the techniques panel
+function renderCraftFormulas() {
+  const container = document.getElementById('a-tech-formula-buttons');
+  if (!container) return;
+  const genre = (S.genre || 'pop').toLowerCase();
+  const formulas = CRAFT_FORMULAS[genre] || CRAFT_FORMULAS.pop || [];
+  if (!formulas.length) {
+    container.innerHTML = '<div style="font-size:10px;color:var(--tx4);font-style:italic">No curated formulas for this genre yet — hand-pick techniques below.</div>';
+    return;
+  }
+  const escHtml = s => String(s || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+  container.innerHTML = formulas.map(f => {
+    const tooltip = escHtml(f.why);
+    return `<button class="btn btn-sm" onclick="applyCraftFormula('${escHtml(f.id)}')" title="${tooltip}" style="font-size:10px;background:rgba(245,192,0,0.08);border:1px solid var(--amberline);color:var(--tx1);font-weight:600">🎯 ${escHtml(f.name)}</button>`;
+  }).join('');
+}
+
+// Apply a preset formula — replaces current-genre selections with the formula's pills
+function applyCraftFormula(formulaId) {
+  const genre = (S.genre || 'pop').toLowerCase();
+  const formulas = CRAFT_FORMULAS[genre] || [];
+  const formula = formulas.find(f => f.id === formulaId);
+  if (!formula) return;
+  // Replace any existing selections for THIS genre with the formula's techniques
+  S.selectedTechniques = (S.selectedTechniques || []).filter(t => t.genre !== genre);
+  formula.techs.forEach(techId => {
+    S.selectedTechniques.push({ id: techId, genre });
+  });
+  try { localStorage.setItem('soniq_techs', JSON.stringify(S.selectedTechniques)); } catch (e) {}
+  // Refresh the grid so the selected pills visually update
+  document.querySelectorAll('#a-tech-grid .tech-chip, #a-tech-cross-grid .tech-chip').forEach(el => {
+    const id = el.dataset?.techId || el.getAttribute('data-tech-id') || '';
+    if (formula.techs.includes(id)) el.classList.add('selected');
+    else el.classList.remove('selected');
+  });
+  if (typeof toast === 'function') toast(`🎯 Applied formula: ${formula.name} (${formula.techs.length} techniques selected)`, 3200);
+}
+
 S.selectedTechniques=JSON.parse(localStorage.getItem('soniq_techs')||'[]').filter(sel=>{
   const techs=GENRE_TECHNIQUES[sel.genre]||[];
   return techs.some(t=>t.id===sel.id);
@@ -11690,6 +11818,10 @@ function showTechniquePanel(genre){
   const crossPanel=document.getElementById('a-tech-cross');
   const crossGrid=document.getElementById('a-tech-cross-grid');
   if(!panel||!grid)return;
+  // Render Winning Formula preset buttons for this genre (must run AFTER S.genre
+  // is set but BEFORE the user interacts — keeps the formula row in sync with
+  // whichever genre is currently selected).
+  if (typeof renderCraftFormulas === 'function') { try { renderCraftFormulas(); } catch(_) {} }
   // Normalize genre key
   // Normalize free-text genre labels to GENRE_TECHNIQUES keys
   const _g=genre.toLowerCase().replace(/[^a-z0-9 /\-]/g,'').trim();
@@ -17738,7 +17870,11 @@ const ALT_TAKE_PAIRINGS = [
   { id: 'country-plus-rnb', emoji: '🌾', category: 'cross-genre', label: 'Country + R&B',
     description: 'Slow country storytelling with R&B vocal runs. Chris Stapleton meets PJ Morton.',
     precedent: 'Chris Stapleton "Tennessee Whiskey"; Kane Brown; Beyoncé "Daddy Lessons"',
-    altInstructions: 'Reimagine as country + R&B. Acoustic country instrumentation (pedal steel, acoustic guitar, brushed drums) under a soul-trained vocal doing melismatic runs. Verses storytelling-conversational, chorus is emotional peak with vocal acrobatics. Production lock: "country + soul fusion, pedal steel, warm acoustic, R&B vocal runs, 85 BPM, modern country-soul aesthetic". Ad-libs: soul ("mmm", "oh yeah") over country warmth, no heavy ad-lib density.' }
+    altInstructions: 'Reimagine as country + R&B. Acoustic country instrumentation (pedal steel, acoustic guitar, brushed drums) under a soul-trained vocal doing melismatic runs. Verses storytelling-conversational, chorus is emotional peak with vocal acrobatics. Production lock: "country + soul fusion, pedal steel, warm acoustic, R&B vocal runs, 85 BPM, modern country-soul aesthetic". Ad-libs: soul ("mmm", "oh yeah") over country warmth, no heavy ad-lib density.' },
+  { id: 'rap-plus-jazz', emoji: '🎷', category: 'cross-genre', label: 'Hip-Hop + Jazz',
+    description: 'Rap verses over live jazz — upright bass walking, muted trumpet, brushed snares. Tribe Called Quest / To Pimp a Butterfly lineage.',
+    precedent: 'A Tribe Called Quest "Electric Relaxation"; Kendrick Lamar "To Pimp a Butterfly"; Robert Glasper Experiment "Black Radio"; Digable Planets',
+    altInstructions: 'Reimagine as hip-hop + jazz fusion. Rap verses delivered over LIVE jazz instrumentation — upright bass walks, muted trumpet fills, brushed snares, Rhodes electric piano, horn-section accents. 90-100 BPM. The rap stays rapped (no singing) but the flow LOOSENS to match the swing feel — breathe with the bass walk. Production lock: "live jazz band under rap verses, upright bass walking, muted trumpet fills, brushed snare, Rhodes piano, horn section, 95 BPM, jazz-rap fusion, swinging pocket, conscious register". Ad-libs: subtle and conversational ("mm", "uh-huh", "yeah yeah") — the jazz band is in conversation with the rapper, not competing. Never aggressive trap ad-libs. The lyric register pushes toward conscious/literary to match the jazz intellectualism.' }
 ];
 
 function openAlternateTakeModal(contextKey) {
