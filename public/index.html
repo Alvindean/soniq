@@ -1623,15 +1623,18 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── STREAMING RAW DISPLAY ── */
 .stream-raw{font-family:var(--mono);font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow-y:auto;padding:4px 0;background:transparent;border:none;margin:0}
 /* ── SONG PROGRESS BAR — sits directly under song title, fills 0→100% during generation ── */
-.song-progress-bar{display:none;align-items:center;gap:12px;margin:10px 0 6px;animation:pgIn .25s ease}
+.song-progress-bar{display:none;flex-direction:column;gap:7px;margin:14px 0 12px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,192,0,0.06),rgba(100,220,255,0.04));border:1px solid var(--amberline);border-radius:var(--r2);animation:pgIn .3s cubic-bezier(.2,.8,.3,1)}
 .song-progress-bar.active{display:flex}
-.spb-track{flex:1;height:6px;background:var(--s3);border:1px solid var(--b1);border-radius:99px;overflow:hidden;position:relative}
-.spb-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--cyan));border-radius:99px;transition:width .35s cubic-bezier(.2,.8,.3,1);width:0%;box-shadow:0 0 12px rgba(245,192,0,0.35)}
-.spb-fill.done{background:linear-gradient(90deg,#3ee896,#34d399);box-shadow:0 0 12px rgba(62,232,150,0.45)}
-.spb-label{font-size:11px;color:var(--tx2);font-weight:700;min-width:76px;text-align:right;font-variant-numeric:tabular-nums}
-.spb-label .spb-pct{color:var(--amber);font-weight:800}
+.spb-track{width:100%;height:14px;background:var(--s3);border:1px solid var(--b1);border-radius:99px;overflow:hidden;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,0.25)}
+.spb-fill{height:100%;background:linear-gradient(90deg,var(--amber) 0%,#ffb347 40%,var(--cyan) 100%);border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.3,1);width:0%;box-shadow:0 0 18px rgba(245,192,0,0.55),inset 0 1px 0 rgba(255,255,255,0.3);position:relative;overflow:hidden}
+.spb-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);animation:spbShimmer 1.8s linear infinite;transform:translateX(-100%)}
+.spb-fill.done{background:linear-gradient(90deg,#3ee896 0%,#34d399 100%);box-shadow:0 0 18px rgba(62,232,150,0.6),inset 0 1px 0 rgba(255,255,255,0.3)}
+.spb-fill.done::after{animation:none}
+.spb-label{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--tx2);font-weight:600;font-variant-numeric:tabular-nums}
+.spb-pct{color:var(--amber);font-weight:800;font-size:14px;letter-spacing:-.02em}
 .spb-label.done .spb-pct{color:#3ee896}
-.spb-stage{font-size:10px;color:var(--tx3);font-weight:500;margin-left:4px}
+.spb-stage{font-size:11px;color:var(--tx3);font-weight:500;text-transform:uppercase;letter-spacing:.06em;flex:1;text-align:right}
+@keyframes spbShimmer{0%{transform:translateX(-100%)}100%{transform:translateX(200%)}}
 .stream-raw::-webkit-scrollbar{width:6px}.stream-raw::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--amber2),var(--s5));border-radius:3px}
 
 /* ── CHORD PROGRESSION ── */
@@ -3329,11 +3332,19 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="rl-dim-row">
             <span class="rl-dim-label">Vocab</span>
             <div class="rl-dim-pills" id="rld-vocab">
-              <span class="rl-dpill on" onclick="setRapDim(this,'vocabRegister','street-coded')">Street-Coded</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','conscious-literary')">Conscious</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','abstract-surreal')">Abstract</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','minimal-phonetic')">Minimal</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','academic')">Academic</span>
+              <span class="rl-dpill on" onclick="setRapDim(this,'vocabRegister','street-coded')" title="Slang + regional vernacular. Jeezy / Gucci / Freddie Gibbs / Young Thug.">Street-Coded</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','conscious-literary')" title="Elevated diction + intertextual references. Nas / Black Thought / Rapsody / Kendrick.">Conscious</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','abstract-surreal')" title="Non-linear dream-logic images. MF DOOM / Earl Sweatshirt / MIKE / Aesop Rock.">Abstract</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','minimal-phonetic')" title="Syllable-as-percussion, sound over meaning. Playboi Carti / Lil Yachty / Thug (late).">Minimal</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','academic')" title="Rap as essay, bars as theses. Killer Mike / El-P / Saul Williams / Talib Kweli.">Academic</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','braggadocio')" title="Flex / luxury / receipt-rap. Specificity is the flex (Patek 10:47, Gulfstream Teterboro). Jay-Z / Rick Ross / Pusha T / Travis Scott.">Braggadocio ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','confessional')" title="Therapy-voice / diary-coded. Interiority without euphemism. Kid Cudi / early Drake / NF / Juice WRLD / Noname.">Confessional ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','sardonic')" title="Dry wit, deadpan irony, the wink you almost miss. Mach-Hommy / Ka / MIKE / Earl / Boldy James / Action Bronson.">Sardonic ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','finance-hustle')" title="Business / wire / cap-table / publishing-split vocab. Jay-Z (later) / Nipsey Hussle / Meek Mill / Master P.">Finance-Hustle ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','mythic-biblical')" title="Scripture / prophets / 5%er numerology / cosmic. Nas / Lauryn Hill / RZA / Jay Electronica / Ab-Soul / Killah Priest.">Mythic-Biblical ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','cinematic-storyteller')" title="Scenes structured like film: establishing shot, dialogue-in-bars. Slick Rick / Nas (One Love) / Ghostface / Raekwon / Biggie.">Cinematic ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','chess-strategy')" title="Chess / war-room / positional-play metaphors. RZA / GZA (Liquid Swords) / Wu-Tang / Killer Mike / Ka.">Chess-Strategy ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'vocabRegister','sports-combat')" title="Boxing rounds / pickup-court rules / football down-distance. Kendrick / J. Cole / Drake / Lil Wayne.">Sports-Combat ✦</span>
             </div>
           </div>
           <div class="rl-dim-row">
@@ -4109,6 +4120,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
       </div>
       <div class="alt-take-title" id="res-alt-take-title">—</div>
+      <div class="song-progress-bar" id="res-alt-progress-bar">
+        <div class="spb-track"><div class="spb-fill" id="res-alt-progress-fill"></div></div>
+        <div class="spb-label"><span class="spb-pct" id="res-alt-progress-pct">0%</span><span class="spb-stage" id="res-alt-progress-stage"> · starting…</span></div>
+      </div>
       <div class="alt-take-note" id="res-alt-take-note"></div>
       <div class="alt-take-lyrics" id="res-alt-take-lyrics"></div>
       <div class="alt-take-suno-wrap">
@@ -4395,6 +4410,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
       </div>
       <div class="alt-take-title" id="lres-alt-take-title">—</div>
+      <div class="song-progress-bar" id="lres-alt-progress-bar">
+        <div class="spb-track"><div class="spb-fill" id="lres-alt-progress-fill"></div></div>
+        <div class="spb-label"><span class="spb-pct" id="lres-alt-progress-pct">0%</span><span class="spb-stage" id="lres-alt-progress-stage"> · starting…</span></div>
+      </div>
       <div class="alt-take-note" id="lres-alt-take-note"></div>
       <div class="alt-take-lyrics" id="lres-alt-take-lyrics"></div>
       <div class="alt-take-suno-wrap">
@@ -17694,6 +17713,13 @@ ${song._originalLyrics || song.lyrics}
 
 Return ONLY the translated lyrics with [Section] tags. No explanation, no markdown.`;
 
+  // Translate reuses the main song bar (same song, same card). Tuned for
+  // shorter translation workload: ~2000 chars, ~12s typical.
+  startSongProgress(prefix);
+  if (S._spbState?.[prefix]) {
+    S._spbState[prefix].expectedChars = 2000;
+    S._spbState[prefix].expectedMs = 12000;
+  }
   try {
     const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
     let result = '';
@@ -17711,10 +17737,11 @@ Return ONLY the translated lyrics with [Section] tags. No explanation, no markdo
         theoryAnalysis: song.theoryAnalysis || '',
         verdict: song.verdict || '',
         _translationPrompt: prompt,
-      }, (chunk, text) => { result = text; });
+      }, (chunk, text) => { result = text; updateSongProgress(prefix, result); });
     } else {
       result = await callClaude(prompt, 'You are a professional music translator. Return only translated lyrics with section tags.');
     }
+    finishSongProgress(prefix);
     const translated = result.trim();
     song.lyrics = translated;
     song._currentLang = lang;
@@ -17729,6 +17756,7 @@ Return ONLY the translated lyrics with [Section] tags. No explanation, no markdo
     toast('✓ Translated to ' + lang);
     trackEvent('song_translated', { lang, genre: song.genre });
   } catch(e) {
+    finishSongProgress(prefix, true);
     // Restore original on failure
     const orig = song._originalLyrics || song.lyrics;
     const clean = stripLyricsDashes(orig);
@@ -17766,6 +17794,13 @@ async function revise(prefix, instruction) {
 
   const lyricsEl = document.getElementById(prefix + '-lyrics-text');
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+  // Revise reuses the main song progress bar (it edits the same song, same card).
+  // Shorter than a full generation — expect ~2000 chars / ~15s.
+  startSongProgress(prefix);
+  if (S._spbState?.[prefix]) {
+    S._spbState[prefix].expectedChars = 2000;
+    S._spbState[prefix].expectedMs = 15000;
+  }
   try {
     let full = '';
     const editParams = {
@@ -17782,14 +17817,15 @@ async function revise(prefix, instruction) {
       verdict:        song.verdict       || '',
     };
     if (isVercel) {
-      await callServerStream('edit', editParams, (chunk, text) => { full = text; });
+      await callServerStream('edit', editParams, (chunk, text) => { full = text; updateSongProgress(prefix, full); });
     } else {
       await callClaudeStream(
         `Revise this ${song.genre||'pop'} song: ${instruction}.\n\nTitle: ${song.title||''}\nGenre: ${song.genre||'pop'}\n\nCurrent Lyrics:\n${song.lyrics}\n\nReturn ONLY the complete revised lyrics with [Section] tags.`,
         'You are a professional lyric editor. Apply only the specific instruction. Return ONLY the complete lyrics with [Section] tags, no commentary.',
-        (chunk, text) => { full = text; }
+        (chunk, text) => { full = text; updateSongProgress(prefix, full); }
       );
     }
+    finishSongProgress(prefix);
     const newLyrics = full.trim();
     if (prefix === 'res') S.currentSong.lyrics = newLyrics;
     else S.luckyCurrentSong.lyrics = newLyrics;
@@ -17799,6 +17835,7 @@ async function revise(prefix, instruction) {
     calcHookScore(prefix);
     toast('✓ Revised!');
   } catch(e) {
+    finishSongProgress(prefix, true);
     toast('⚠️ ' + e.message, 4000);
   }
   if (activePill) { activePill.classList.remove('loading'); activePill.textContent = activePill.dataset.orig || activePill.textContent; }
@@ -18110,13 +18147,26 @@ SONG PROMPT:
     if (S.altTakeController) { try { S.altTakeController.abort(); } catch(_) {} }
     S.altTakeController = new AbortController();
 
+    // Alt Take uses a SEPARATE progress bar under its own panel title —
+    // prefix '{res|lres}-alt' so it doesn't collide with the main song bar.
+    // Expected output shorter than a full song (~2500 chars) so tuning
+    // expectedChars accordingly for accurate fill rate.
+    const altProgressPrefix = ctx + '-alt';
+    startSongProgress(altProgressPrefix);
+    if (S._spbState?.[altProgressPrefix]) {
+      S._spbState[altProgressPrefix].expectedChars = 2500;
+      S._spbState[altProgressPrefix].expectedMs = 18000;
+    }
+
     let lastFull = '';
     await callClaudeStream(prompt, system, (chunk, full) => {
       lastFull = full;
+      updateSongProgress(altProgressPrefix, full);
       const lyricsMatch = full.match(/LYRICS:\s*([\s\S]*?)(?=SONG PROMPT:|$)/i);
       const preview = lyricsMatch ? lyricsMatch[1].trim() : full;
       lyricsEl.innerHTML = String(preview || full).replace(/[<>&]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[c])).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
     }, S.altTakeController.signal);
+    finishSongProgress(altProgressPrefix);
 
     const titleMatch = lastFull.match(/^TITLE:\s*(.+?)\s*$/im);
     const noteMatch = lastFull.match(/^ALT TAKE NOTE:\s*([\s\S]*?)(?=\n\s*LYRICS:)/im);
@@ -18159,6 +18209,7 @@ SONG PROMPT:
 
     if (typeof toast === 'function') toast(`✓ Alternate take: ${pairing.label}`, 3000);
   } catch (e) {
+    finishSongProgress(ctx + '-alt', true);
     if (e && e.name === 'AbortError') return;
     console.error('Alt take error:', e);
     if (titleEl) titleEl.textContent = 'Error generating alternate take';
