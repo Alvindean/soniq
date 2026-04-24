@@ -5087,6 +5087,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
       </div>
       <div style="font-size:11px;color:var(--tx4);margin-bottom:10px">Select techniques to inject into your next Generate or Remake. The AI will actively use these craft devices.</div>
+      <!-- WINNING FORMULAS — curated one-click preset combinations proven to produce great songs per genre -->
+      <div id="a-tech-formulas" style="margin-bottom:12px;padding:10px 12px;background:linear-gradient(135deg,rgba(245,192,0,0.06),rgba(139,92,246,0.04));border:1px solid var(--amberline);border-radius:var(--r1)">
+        <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px">🎯 Winning Formulas</div>
+        <div style="font-size:10px;color:var(--tx3);margin-bottom:8px;line-height:1.5">One-click presets — combinations of craft techniques proven to produce great songs for your genre. Click a formula to auto-select its pills.</div>
+        <div id="a-tech-formula-buttons" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      </div>
       <div id="a-tech-grid" style="display:grid;grid-template-columns:1fr;gap:6px"></div>
       <div id="a-tech-cross" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid var(--b1)">
         <div style="font-size:11px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">🔀 Cross-Genre Techniques</div>
@@ -11685,6 +11691,121 @@ function unlockAnalyzer(){
 // ═══════════════════════════════════════════════════════
 // TECHNIQUE TOOLKIT — select genre-specific craft devices
 // ═══════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════════
+// WINNING FORMULAS — curated preset combinations of technique pills that are
+// proven to produce great songs per genre. Lets users one-click apply a
+// battle-tested craft recipe instead of guessing at combinations.
+// Each entry: { id, name (evocative label), techs (array of pill IDs), why }
+// ═══════════════════════════════════════════════════════════════════════════
+const CRAFT_FORMULAS = {
+  hiphop: [
+    { id:'eminem_technical', name:'Eminem-Level Technical',
+      techs:['multisyllabic','internal_chain','syllable_atoms','phoneme_target','vowel_chain'],
+      why:'Dense internal phonetic chains + syllable atoms = the MF DOOM / Eminem ceiling for rap technicality' },
+    { id:'lyrical_masterwork', name:'Lyrical Masterwork',
+      techs:['multisyllabic','entendre','setup_punchline','thematic_double_meaning','money_line'],
+      why:'Multisyllabic + double entendre + song-level double meaning — Kendrick / Nas territory' },
+    { id:'punchline_heavy', name:'Punchline Heavy',
+      techs:['setup_punchline','wordplay_flip','entendre','flow_switch','money_line'],
+      why:'Dense punchline architecture with flow variety — Lil Wayne / Drake-adjacent mainstream rap' },
+    { id:'narrative_rap', name:'Narrative Rap (Stan-tier)',
+      techs:['setup_punchline','unreliable_narrator','covert_narrative','dialogue_lyric','entendre'],
+      why:'Story-rap with unreliable narrator — Eminem "Stan" / Slick Rick "Children\'s Story" territory' }
+  ],
+  country: [
+    { id:'classic_story', name:'Classic Story Song',
+      techs:['story_song','character_est','scene_anchor','show_not_tell','payoff_line'],
+      why:'Dolly Parton / Miranda Lambert formula — character + scene + emotional payoff + title drop' },
+    { id:'narrative_reveal_ballad', name:'Reveal Ballad',
+      techs:['narrative_reveal','character_est','show_not_tell','dialogue_lyric','payoff_line'],
+      why:'Taylor Swift "Dear John" / Kacey Musgraves pattern — bridge reveal reframes V1-V2' },
+    { id:'unreliable_ballad', name:'Unreliable Tragic Ballad',
+      techs:['unreliable_narrator','scene_anchor','show_not_tell','talk_sing','covert_narrative'],
+      why:'"Every Breath You Take" in country clothes — narrator reveals self through specifics' },
+    { id:'country_heartbreak', name:'Money-Line Heartbreak',
+      techs:['money_line','hook_kernel','scene_anchor','show_not_tell','character_est'],
+      why:'Chris Stapleton / Zach Bryan — one quotable line, one tweetable hook, anchored in a specific scene' }
+  ],
+  pop: [
+    { id:'earworm_hit', name:'Earworm Hit Formula',
+      techs:['topline_lock','earworm_rep','pre_chorus_lift','post_chorus','hook_kernel'],
+      why:'Max Martin formula — melodic lock + title repetition + pre-chorus lift + tweetable kernel' },
+    { id:'dark_pop', name:'Dark Pop (Pumped Up Kicks)',
+      techs:['false_friend_hook','thematic_double_meaning','topline_lock','unreliable_narrator','show_not_tell'],
+      why:'Catchy-but-dark hook + surface/depth duality — Foster the People / Third Eye Blind / MGMT' },
+    { id:'sarcastic_pop', name:'Sarcastic Pop Anthem',
+      techs:['sarcasm','hook_kernel','money_line','pre_chorus_lift','earworm_rep'],
+      why:'Pink "So What" / Lily Allen — melody sweet, content sharp' },
+    { id:'prismatic_pop', name:'Prismatic Pop',
+      techs:['perspective_rotation','money_line','hook_kernel','thematic_double_meaning','topline_lock'],
+      why:'Taylor Swift "The Story of Us" / Billie Eilish — one subject, multiple angles, layered meaning' }
+  ],
+  comedy: [
+    { id:'ian_edwards', name:'Ian Edwards Heightening',
+      techs:['run_the_game','heighten_anchor','remix_anchor','crowd_work','callback'],
+      why:'Full 5-step framework — anchor + heighten + remix + crowd-work + callback at song\'s end' },
+    { id:'deadpan_absurdist', name:'Deadpan Absurdist',
+      techs:['deadpan_commit','escalation_absurd','specificity_engine','subverted_cliche','run_the_game'],
+      why:'Lonely Island / Flight of the Conchords — sincere delivery + escalating specifics + subverted cliché' }
+  ],
+  parody: [
+    { id:'ian_edwards', name:'Ian Edwards Heightening',
+      techs:['run_the_game','heighten_anchor','remix_anchor','crowd_work','callback'],
+      why:'5-step framework adapted for parody — anchor heightens + remixes + callbacks' },
+    { id:'weird_al', name:'Weird Al Precision Parody',
+      techs:['genre_straight_man','specificity_engine','subverted_cliche','callback','punchline_architecture'],
+      why:'100% sincere musical performance + razor-specific lyric inversions — Weird Al canonical formula' }
+  ],
+  altrock: [
+    { id:'quiet_loud_masterpiece', name:'Quiet-Loud Masterpiece',
+      techs:['quiet_loud','dissonant_resolve','thematic_double_meaning','money_line','covert_narrative'],
+      why:'Pixies / Nirvana / Radiohead — dynamic contrast + surface/depth + hidden story layered' }
+  ],
+  rnb: [
+    { id:'vulnerable_ballad', name:'Vulnerable R&B Ballad',
+      techs:['whisper_belt','melismatic','vamp_outro','adlib_harmony','conversational'],
+      why:'SZA / Jhené Aiko / Daniel Caesar — whisper verses, belted chorus, escalating ad-libs' }
+  ]
+};
+
+// Render the genre-appropriate formula buttons into the techniques panel
+function renderCraftFormulas() {
+  const container = document.getElementById('a-tech-formula-buttons');
+  if (!container) return;
+  const genre = (S.genre || 'pop').toLowerCase();
+  const formulas = CRAFT_FORMULAS[genre] || CRAFT_FORMULAS.pop || [];
+  if (!formulas.length) {
+    container.innerHTML = '<div style="font-size:10px;color:var(--tx4);font-style:italic">No curated formulas for this genre yet — hand-pick techniques below.</div>';
+    return;
+  }
+  const escHtml = s => String(s || '').replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c]));
+  container.innerHTML = formulas.map(f => {
+    const tooltip = escHtml(f.why);
+    return `<button class="btn btn-sm" onclick="applyCraftFormula('${escHtml(f.id)}')" title="${tooltip}" style="font-size:10px;background:rgba(245,192,0,0.08);border:1px solid var(--amberline);color:var(--tx1);font-weight:600">🎯 ${escHtml(f.name)}</button>`;
+  }).join('');
+}
+
+// Apply a preset formula — replaces current-genre selections with the formula's pills
+function applyCraftFormula(formulaId) {
+  const genre = (S.genre || 'pop').toLowerCase();
+  const formulas = CRAFT_FORMULAS[genre] || [];
+  const formula = formulas.find(f => f.id === formulaId);
+  if (!formula) return;
+  // Replace any existing selections for THIS genre with the formula's techniques
+  S.selectedTechniques = (S.selectedTechniques || []).filter(t => t.genre !== genre);
+  formula.techs.forEach(techId => {
+    S.selectedTechniques.push({ id: techId, genre });
+  });
+  try { localStorage.setItem('soniq_techs', JSON.stringify(S.selectedTechniques)); } catch (e) {}
+  // Refresh the grid so the selected pills visually update
+  document.querySelectorAll('#a-tech-grid .tech-chip, #a-tech-cross-grid .tech-chip').forEach(el => {
+    const id = el.dataset?.techId || el.getAttribute('data-tech-id') || '';
+    if (formula.techs.includes(id)) el.classList.add('selected');
+    else el.classList.remove('selected');
+  });
+  if (typeof toast === 'function') toast(`🎯 Applied formula: ${formula.name} (${formula.techs.length} techniques selected)`, 3200);
+}
+
 S.selectedTechniques=JSON.parse(localStorage.getItem('soniq_techs')||'[]').filter(sel=>{
   const techs=GENRE_TECHNIQUES[sel.genre]||[];
   return techs.some(t=>t.id===sel.id);
@@ -11697,6 +11818,10 @@ function showTechniquePanel(genre){
   const crossPanel=document.getElementById('a-tech-cross');
   const crossGrid=document.getElementById('a-tech-cross-grid');
   if(!panel||!grid)return;
+  // Render Winning Formula preset buttons for this genre (must run AFTER S.genre
+  // is set but BEFORE the user interacts — keeps the formula row in sync with
+  // whichever genre is currently selected).
+  if (typeof renderCraftFormulas === 'function') { try { renderCraftFormulas(); } catch(_) {} }
   // Normalize genre key
   // Normalize free-text genre labels to GENRE_TECHNIQUES keys
   const _g=genre.toLowerCase().replace(/[^a-z0-9 /\-]/g,'').trim();
