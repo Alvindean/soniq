@@ -1201,10 +1201,137 @@ function buildLyricCraftNote(genre, mood, topic) {
     if (t.modes && matchesMode(t.modes)) return true;
     return false;
   });
-  if (!applicable.length) return '';
+  const craftBlock = applicable.length
+    ? `\n\nLYRIC CRAFT TOOLKIT — use these where they serve the song, never forced:\n${applicable.map(t => `• ${t.label}: ${t.short}`).join('\n')}`
+    : '';
+  // Anti-cliche rules always apply, regardless of genre or mood.
+  return craftBlock + buildAntiClicheNote();
+}
 
-  const lines = applicable.map(t => `• ${t.label}: ${t.short}`).join('\n');
-  return `\n\nLYRIC CRAFT TOOLKIT — use these where they serve the song, never forced:\n${lines}`;
+// ============ ANTI-CLICHE RHYME SYSTEM ============
+// Banned cliche rhyme chains. The LLM must never chain two words from the same
+// chain in the same song. Using ONE word from a chain is fine — it's the
+// chaining (rhyming one against another from the same family) that marks the
+// lyric as derivative. Each chain is the SURFACE PATTERN, not the concept —
+// you can still write about love, fire, the spiritual, etc., just don't rhyme
+// them with the obvious partner.
+const CLICHE_RHYME_CHAINS = [
+  ['lyrical', 'spiritual', 'miracle', 'biblical', 'physical'],
+  ['fire', 'desire', 'higher', 'tire', 'wire', 'entire'],
+  ['love', 'above', 'dove', 'of', 'shove'],
+  ['heart', 'apart', 'start', 'part', 'smart', 'chart'],
+  ['night', 'light', 'right', 'fight', 'sight', 'tight', 'bright', 'might'],
+  ['pain', 'rain', 'brain', 'again', 'insane', 'chain', 'vein', 'main'],
+  ['time', 'rhyme', 'climb', 'prime', 'mime', 'grime'],
+  ['feel', 'real', 'steal', 'heal', 'deal', 'reveal'],
+  ['play', 'day', 'way', 'say', 'stay', 'away', 'pray', 'today'],
+  ['crown', 'down', 'town', 'frown', 'clown', 'around'],
+  ['money', 'honey', 'funny', 'sunny', 'bunny'],
+  ['streets', 'beats', 'sheets', 'heats', 'feet', 'repeat', 'seats'],
+  ['grind', 'mind', 'find', 'behind', 'shine', 'nine', 'blind', 'kind'],
+  ['sky', 'high', 'fly', 'cry', 'die', 'lie', 'eye', 'why', 'goodbye'],
+  ['dream', 'scheme', 'team', 'scream', 'beam', 'gleam'],
+  ['soul', 'goal', 'role', 'whole', 'control', 'roll'],
+  ['game', 'fame', 'name', 'same', 'flame', 'shame'],
+  ['young', 'tongue', 'lungs', 'hung', 'sung', 'rung'],
+  ['world', 'girl', 'curl', 'pearl', 'swirl', 'twirl']
+];
+
+function buildAntiClicheNote() {
+  const chains = CLICHE_RHYME_CHAINS.map(c => c.map(w => `"${w}"`).join('/')).join(' · ');
+  return `
+
+⚠️ ANTI-CLICHE SYSTEM (MANDATORY — THIS IS WHAT SEPARATES AMATEUR AI LYRICS FROM REAL SONGWRITING):
+
+═══════════════════════════════════════════════════
+PART A — FORBIDDEN RHYME CHAINS
+═══════════════════════════════════════════════════
+Do NOT chain any two words from the same cliche family inside the same song:
+${chains}
+
+WHY: Every AI lyric generator defaults to these chains. "Lyrical/spiritual/miracle", "fire/desire/higher", "heart/apart/start", "night/light/fight", "grind/mind/shine" — these appear in 10,000+ existing songs. Picking two partners from the same chain marks the song as derivative before the second bar lands.
+
+EXAMPLES:
+✗ WRONG: "my flow is lyrical / touched by the spiritual / every bar's a miracle"
+✓ RIGHT: "my flow is lyrical / pen bleeds the literal / stanzas stay pivotal"
+  (kept "lyrical", rhymed on -iteral/-ivotal — same meaning, fresh chain)
+
+✗ WRONG: "this love is fire / burning with desire / taking me higher"
+✓ RIGHT: "this love's a live wire / a want I can't retire / a charge nothing acquires"
+  (kept the heat, fresh rhyme family)
+
+✗ WRONG: "broken heart / torn apart / falling start"
+✓ RIGHT: "broken compass / torn from honest / falling off the promise"
+  (kept the wound image, slant rhyme beats cliche)
+
+RHYME CHAIN RULES:
+1. If the word appears in any chain above, NONE of the other chain members may rhyme with it in this song.
+2. Prefer multisyllabic, internal, and consonance rhymes (see LYRIC CRAFT toolkit above).
+3. Slant rhymes, vowel echoes, assonance beat a perfect rhyme used 10,000 times.
+4. If the song's concept legitimately requires the word, put it in a non-rhyming line.
+5. ONE chain word per verse max. NEVER two from the same chain in the same song.
+
+═══════════════════════════════════════════════════
+PART B — CLICHE PHRASES: FLIP OR HOMAGE-AND-SUBVERT
+═══════════════════════════════════════════════════
+Beyond rhyme chains, common lyrical cliches include whole phrases and images:
+"heart on my sleeve", "dancing in the rain", "shooting star", "ride or die",
+"through thick and thin", "the one that got away", "against all odds",
+"like a moth to a flame", "butterflies in my stomach", "head over heels",
+"written in the stars", "time stood still", "take my breath away",
+"fell to my knees", "burn it to the ground", "rise from the ashes",
+"out of the blue", "walk the line", "end of the line", "edge of the world",
+"tears like rain", "cold as ice", "heart of stone", "fire in my veins",
+"chasing a dream", "living on a prayer", "king of the world", "only human",
+"broken wings", "borrowed time", "second chance", "no strings attached".
+
+RULE: Never use one of these cliches at face value. You have TWO legal options:
+
+OPTION 1 — FLIP THE CLICHE
+Take the cliche and invert its meaning, image, or conclusion. Keep enough of the
+original so the listener catches the reference, then twist the finish.
+
+✗ CLICHE: "I wear my heart on my sleeve"
+✓ FLIP:   "I wear my heart on my sleeve / but the sleeve is kevlar"
+✓ FLIP:   "keep my heart off my sleeve / she can't read what I don't print"
+
+✗ CLICHE: "dancing in the rain"
+✓ FLIP:   "dancing in the rain ain't romance, it's hypothermia"
+✓ FLIP:   "I stopped dancing in the rain when I got a roof"
+
+✗ CLICHE: "time heals all wounds"
+✓ FLIP:   "time doesn't heal, it just buries"
+✓ FLIP:   "time heals all wounds, but leaves every scar"
+
+✗ CLICHE: "against all odds"
+✓ FLIP:   "the odds weren't against me, I just bet them down to nothing"
+
+OPTION 2 — HOMAGE-AND-SUBVERT (call out the cliche, then break it)
+Name the cliche out loud inside the lyric — signal to the listener that YOU
+know it's a cliche — then immediately subvert it. This works because the
+listener feels included in the joke instead of patronized by it.
+
+✗ CLICHE (used straight): "she took my breath away"
+✓ HOMAGE-AND-SUBVERT: "they say she took my breath away / nah — she gave me asthma, and the bill"
+✓ HOMAGE-AND-SUBVERT: "'took my breath away' — that's what the poets say / I'd say she punched me in the diaphragm / same thing, less ceremony"
+
+✗ CLICHE (used straight): "living on a prayer"
+✓ HOMAGE-AND-SUBVERT: "Bon Jovi said we're livin' on a prayer / I'm out here livin' on a billing cycle"
+
+✗ CLICHE (used straight): "love is a battlefield"
+✓ HOMAGE-AND-SUBVERT: "Pat Benatar called it a battlefield / I call it an HR complaint with better lighting"
+
+✗ CLICHE (used straight): "broken wings, learn to fly"
+✓ HOMAGE-AND-SUBVERT: "everybody wanna talk about broken wings / nobody talk about the bird that walked / and made it further"
+
+THE RULES (PART B):
+1. Scan your draft line-by-line. If a line could appear in 100 other songs as-is, it's a cliche — flip it or homage-and-subvert it.
+2. The flip has to make the line MORE specific, not less. A flip that stays generic just swaps one cliche for another.
+3. Homage works best when the original cliche is famous enough that the listener recognizes it on first pass. Obscure cliches should just be flipped, not named.
+4. Never explain the subversion. The listener catches it or they don't — if you explain it, you killed it.
+5. ONE homage-and-subvert per song max (it's a spotlight move, not a pattern). Flips can appear anywhere.
+
+THE TEST: After writing a line, ask "could this line appear unchanged in any other song in this genre written in the last 20 years?" If yes, flip it or cut it.`;
 }
 
 const STRUCTURES={
