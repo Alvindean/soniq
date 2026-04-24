@@ -1334,6 +1334,92 @@ THE RULES (PART B):
 THE TEST: After writing a line, ask "could this line appear unchanged in any other song in this genre written in the last 20 years?" If yes, flip it or cut it.`;
 }
 
+// ============ SPEED GEARS SYSTEM ============
+// Cadence modulation as a cross-genre storytelling device. Speed is a lever
+// the narrator pulls — acceleration = escalation/panic/list-cascade, pullback
+// = weight/reveal/reflection. The contrast between gears is where the impact
+// lives. This is NOT rap-exclusive — country (Garth Brooks "Ain't Going Down"),
+// folk (Dylan "Subterranean Homesick Blues"), broadway (Hamilton "Guns & Ships",
+// Gilbert & Sullivan patter songs), rock (R.E.M. "End of the World"), punk,
+// gospel-rap-preach all have their own speed-cadence traditions.
+
+const SPEED_GEARS_LINEAGE = {
+  hiphop:    'Twista (Midwest hyperspeed, Adrenaline Rush), Busta Rhymes (multisyllabic barrage, "Break Ya Neck"), Eminem ("Rap God" sixteenth-note cascade, "Godzilla" outro), Royce da 5\'9" (internal-rhyme density, technical precision), Tech N9ne (chopper flow, "Midwest Choppers"), Tonedeff, Crooked I, Bone Thugs-N-Harmony (melodic triplet chaining), Kendrick Lamar ("Rigamortis" sixteenth-note stretches, "HiiiPoWeR"), Chino XL, R.A. the Rugged Man, Big Pun (breath-control legend).',
+  country:   'Garth Brooks "Ain\'t Going Down (\'Til the Sun Comes Up)" — the prototype: rapid-fire couplets timeline-marching through Friday night→Saturday night→Sunday morning. "Copperhead Road" (Steve Earle) — speed-narrative through 3 generations. Tim McGraw "Where the Green Grass Grows" bridge sections. Chris LeDoux fast-narrative tradition. Brad Paisley "Online" verse gallop. Country-rap crossover: Colt Ford, Big & Rich "Save a Horse" bridge. Bluegrass lineage: "Rocky Top" cascades, Alison Krauss speed-picking patter.',
+  pop:       'Billy Joel "We Didn\'t Start the Fire" (rapid-inventory cascade), R.E.M. "It\'s the End of the World as We Know It" (the pop patter ceiling), Fall Out Boy "Sugar, We\'re Goin Down" bridge, Panic! at the Disco fast-patter choruses ("I Write Sins Not Tragedies"), Lin-Manuel-era pop-rap crossover.',
+  rock:      'R.E.M. "End of the World" verse gallop, Rage Against the Machine verse cascades ("Killing in the Name", "Bulls on Parade"), System of a Down rapid-switch ("Chop Suey", "B.Y.O.B."), Bad Religion double-time punk-patter, Muse "Knights of Cydonia" verse drive, Queen "Bohemian Rhapsody" operatic section, Meat Loaf "Paradise by the Dashboard Light" narrative cascades.',
+  altrock:   'Modest Mouse "Float On" verse cadence, Cake "The Distance" speak-sung cascade, Cage the Elephant patter verses, Arctic Monkeys ("I Bet You Look Good on the Dancefloor" rapid-syllable verse), The Killers "Jenny Was a Friend of Mine" story-gallop, Fall Out Boy lineage.',
+  punk:      'Minor Threat (straight-edge cascade), Bad Brains (sixteenth-note hardcore-reggae hybrid), Dead Kennedys ("Holiday in Cambodia" accelerating delivery), NOFX speed-patter, Descendents "Suburban Home", The Clash "Police on My Back" gallop, Green Day "Basket Case" verse compression.',
+  folk:      'Bob Dylan "Subterranean Homesick Blues" — the prototype speed-folk, 20 syllables per bar with image-inventory cascade. Arlo Guthrie "Alice\'s Restaurant" (talking-blues long-form narrative). Woody Guthrie talking-blues lineage ("Talking Dust Bowl Blues"). Dave Van Ronk. Loudon Wainwright III talking narrative tradition. Modern: The Decemberists "Mariner\'s Revenge Song" story-cascade, Mumford "The Cave" verse gallop.',
+  blues:     'Talking blues tradition (Woody Guthrie → Bob Dylan lineage): speak-sung rapid delivery over shuffle groove. Chris Thomas King modern speed-blues. Gary Clark Jr. verse-gallop sections. "Subterranean Homesick Blues" is officially blues-cadence on folk instrumentation.',
+  reggae:    'Toasting tradition: U-Roy, Big Youth, I-Roy — dancehall DJ speed-chat. Modern: Sean Paul rapid-fire patois, Shaggy verse cadences, Busy Signal. Ragga/dancehall speed-toasting is the reggae-family version of rap cascades.',
+  rnb:       'Missy Elliott rap-sung verse cascades, Mary J. Blige emotional double-time bridges, Usher "Yeah!" verse gallop with Lil Jon, modern trap-R&B triplet-riding (Bryson Tiller, Summer Walker).',
+  neosoul:   'Lauryn Hill "Doo Wop (That Thing)" verse-rap cascades, Erykah Badu "Tyrone" speak-sung fast sections, Anderson .Paak rapid verse-hybrid, D\'Angelo fast conversational passages.',
+  latin:     'Celia Cruz "La Vida Es Un Carnaval" verse patter, Rubén Blades narrative-salsa speed-sections, Juan Luis Guerra bachata-merengue speed-verses, Marc Anthony salsa cascades.',
+  reggaeton: 'Daddy Yankee "Gasolina" verse velocity, Tego Calderón rapid Spanish-rap cascades, Don Omar verse drives, Bad Bunny fast-section builds, Anuel AA/Ozuna trap-latino triplet runs.',
+  kpop:      'BTS rap-line cascades (Suga "Agust D" sixteenth-note runs, RM technical speed, J-Hope verse-gallop), Stray Kids 3racha speed sections, Epik High verse cadences, KARD rap-line bursts. K-pop rap-line is systematically trained on speed-rap technique.',
+  afrobeats: 'Burna Boy verse-pidgin cascades, Wizkid rapid afrobeats-riding, Rema verse drives, Davido fast-section builds. Afrobeats speed lives in the pocket between reggae toasting and hip-hop cadence.',
+  gospel:    'Kirk Franklin rap-preach break-ins ("Stomp", "Revolution"), Fred Hammond rapid call-and-response, gospel-rap lineage (Lecrae, Andy Mineo). Black preacher tradition: Rev. Jasper Williams, T.D. Jakes rhythmic crescendo-speed sections.',
+  tvmusical: 'Hamilton "Guns and Ships" (Lafayette\'s verse is literal speed-rap on Broadway — 19 words per 3 seconds), "The Reynolds Pamphlet", "Non-Stop" finale, "Satisfied" reverse-chronology. Gilbert & Sullivan patter songs: "Modern Major-General", "Nightmare Song", "Matter Matter Matter". Sondheim: "Getting Married Today" (Company) — still a record-holding speed-patter. "Not Getting Married". Meredith Willson "Trouble" (The Music Man).',
+  country_comedy: 'Ray Stevens fast-patter novelty songs ("The Streak", "Harry the Hairy Ape"), Roger Miller rapid-delivery verse humor. Hee Haw cornpone speed-sections.',
+  parody:    'Weird Al fast-patter parodies ("Hardware Store" pure cascade, "Jurassic Park" rapid-bridge, "White & Nerdy" rap-parody speed ceiling). Flight of the Conchords rapid-switch.',
+  comedy:    'Bo Burnham rapid-list comedy songs, Stephen Lynch fast-patter, Tim Minchin cascade-verses. The comedy tradition uses speed for density of jokes per bar — each line must land a beat.',
+  children:  'Schoolhouse Rock! rapid-education cadences ("Just a Bill", "Conjunction Junction"), VeggieTales "Lord of the Beans" rapid-patter, The Wiggles speed-sections. Kids songs use speed to hold attention.',
+  indie:     'Kate Nash rapid-verse narrative, The Streets (Mike Skinner) — British speak-sung speed-narrative, Arctic Monkeys speed-verses, Car Seat Headrest cascades.',
+  edm:       'Drum & bass MC tradition (Stevie Hyper D, Skibadee — UK DnB speed-chat 200+ BPM), jungle toasting, dubstep rap-breaks (Skrillex "Bangarang" vocal chops, modern DnB vocal cascades).'
+};
+
+const SPEED_GEARS_FRAMEWORK = `SPEED GEARS SYSTEM — cadence modulation as a storytelling device.
+
+Speed is a lever the narrator pulls — it is not a stunt or a flex. The CONTRAST between gears is where the impact lives. Every gear shift must serve the story: acceleration = escalation / panic / list-cascade / timeline-marching / physiological rush (drunk, wired, in love, being chased). Deceleration = reveal / weight / reflection / consequence landing. Never stay at max speed for a whole verse — that flattens the dynamic. Always enter and exit gears.
+
+THE FIVE GEARS (syllables per beat):
+• Gear 0 — Quarter-note (≈1 syl/beat). Weighted, declarative, anthemic. The line lands like a hammer. Use for reveals, final choruses, the breath-after-a-cascade.
+• Gear 1 — Eighth-note (≈2 syl/beat). Conversational baseline. Most of a song lives here. Natural speech cadence.
+• Gear 2 — Triplet (≈3 syl/beat). Rolling, hypnotic, rapping-while-dancing feel. Bone Thugs, modern trap, country-song hook-leads.
+• Gear 3 — Sixteenth-note (≈4 syl/beat = "double-time"). Tight, technical, overdrive. The ceiling for most pop-adjacent styles.
+• Gear 4 — Thirty-second / quintuplet / speed-rap (6–8+ syl/beat). Twista / Busta / Eminem "Rap God" / Royce / Hamilton "Guns & Ships" / Dylan "Subterranean Homesick Blues" zone. Breath-control territory.
+
+GEAR-SHIFT BRACKET TAGS (place on own line BEFORE the affected lyric, like any delivery tag):
+[Gear Up]        → shift one level faster starting here
+[Gear Down]      → shift one level slower starting here
+[Breakdown]      → drop to Gear 0. Full pullback — the lyric lands naked.
+[Cascade]        → climb through gears in sequence (e.g. 1→2→3→4 over 4 bars)
+[Double Time]    → explicit jump to Gear 3
+[Triplet Flow]   → explicit jump to Gear 2
+[Speed-Rap]      → explicit jump to Gear 4 (rap-family genres only)
+[Breath Reset]   → one-bar pullback to Gear 1 after a cascade, then resume
+[Patter]         → sustained Gear 3-4 rapid delivery (broadway / pop-patter term for the same move)
+[Talking Blues]  → folk/blues rapid-speak-sung over baseline groove (Dylan/Woody lineage)
+
+THE SEVEN USAGE RULES:
+1. Gear shifts must have a NARRATIVE REASON. Before writing a shift, name the reason: escalation / reveal / list-cascade / chase-panic / physiological rush / time-compression / emotional overwhelm. If you can't name a reason, don't shift.
+2. Shift at narrative joints — end of a line, beat change, section boundary. NEVER shift mid-word.
+3. Maximum gear distance in one jump: 2 gears. Going 0→4 is a stunt; 1→3 is a shift. Use [Cascade] for multi-step climbs.
+4. Maximum consecutive bars at Gear 4 (speed-rap / patter): 4 bars. Longer = breath-dead, listener exhausted, story lost in technique. Exception: Hamilton-style patter songs and Gilbert & Sullivan can sustain 8 bars because the genre is built for it.
+5. Always exit the shift. A [Gear Up] without a matching [Gear Down] or [Breath Reset] is a one-way trip — the section won't feel like a gear, it'll feel like a new mode.
+6. Gear shifts are a CROSS-GENRE tool. This is not rap-exclusive. Every genre has its own speed-cadence tradition — see GENRE LINEAGE below.
+7. Speed density goes with rhyme-scheme density. Gear 3-4 verses should use internal rhymes, multisyllabic landings, consonance chains. Speed without rhyme-architecture is just rushing.`;
+
+function buildSpeedGearsNote(genre, mood, topic, explicit) {
+  // Mood-based auto-inject when the song signals escalation/urgency/cascade.
+  const ESCALATION_MOODS = ['urgent','frantic','chaotic','racing','panicked','hype','celebratory','adrenaline','wired','energetic','manic','frenetic','escalating','rushed','pressured','hyped','amped','electric','breathless'];
+  const moodNorm = ' ' + (mood || '').toLowerCase().replace(/[-_]/g,' ').replace(/\s+/g,' ').trim() + ' ';
+  const moodSignal = ESCALATION_MOODS.some(m => moodNorm.includes(' ' + m + ' '));
+  const isHipHop = genre === 'hiphop';
+  // Rap genres always get the framework (they live in gears 2-3 baseline and
+  // should know the full vocabulary). Other genres get it only when the user
+  // explicitly picks a gear-shift structure or the mood signals escalation.
+  if (!explicit && !moodSignal && !isHipHop) return '';
+  const lineage = SPEED_GEARS_LINEAGE[genre] || SPEED_GEARS_LINEAGE.pop;
+  const directive = explicit
+    ? 'SPEED GEARS: ENABLED EXPLICITLY — this song MUST use gear-shifting. Build at least one multi-bar cascade (use [Cascade] or sequential [Gear Up] → [Gear Down] tags), then resolve back to baseline. The gear shift carries story weight — pick the moment carefully.'
+    : (isHipHop
+        ? 'SPEED GEARS: RAP BASELINE — you may shift freely between Gears 1-3 inside verses. Use Gear 4 ([Speed-Rap]) as a spotlight cascade max 4 bars, then [Breath Reset] or [Gear Down] back to baseline.'
+        : 'SPEED GEARS: MOOD-TRIGGERED — the mood signals escalation. Consider ONE gear-shift cascade at the dramatic peak (pre-chorus lift, bridge climax, or outro build), then exit back to the genre baseline. Do not sustain max gear across the whole song.');
+  return `\n\n${SPEED_GEARS_FRAMEWORK}\n\nGENRE LINEAGE FOR ${genre.toUpperCase()}:\n${lineage}\n\nAPPLICATION: ${directive}`;
+}
+
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
@@ -1351,6 +1437,7 @@ const STRUCTURES={
   story_conversation:    '[Verse 1 — Speaker A voice] → [Chorus — shared truth both voices reach for] → [Verse 2 — Speaker B responds, different POV on same events] → [Chorus] → [Verse 3 — Both voices together OR unresolved exchange] → [Outro]',
   story_diary:           '[Verse 1 — Dated entry #1: early in timeline] → [Chorus] → [Verse 2 — Dated entry #2: weeks or months later, same situation evolved] → [Chorus] → [Verse 3 — Final entry, present-day or closure] → [Outro]',
   story_reverse_chrono:  '[Verse 1 — The ending of the story] → [Chorus] → [Verse 2 — The middle: how it unravelled] → [Chorus] → [Verse 3 — The beginning: how it started] → [Final Chorus — returns to V1 imagery in new light]',
+  gear_shift_escalation: '[Verse 1 — Gear 1 baseline conversational cadence, establish scene] → [Pre-Chorus — [Gear Up] to Gear 2, stakes tighten] → [Chorus — Gear 1 hook lands wide] → [Verse 2 — Gear 2 pocket, density rising] → [Pre-Chorus — [Cascade] through Gears 2→3→4 as timeline compresses or panic builds] → [Chorus — [Breakdown] to Gear 0, the line lands naked] → [Bridge — Gear 4 spotlight cascade max 4 bars, then [Breath Reset]] → [Final Chorus — Gear 1 resolution, the air comes back]',
   hiphop_storytelling_24: '[8-bar Intro | Spoken Word OR beat only] → [24-bar Verse 1 | Scene establishment, characters, place, time] → [24-bar Verse 2 | Conflict, escalation, stakes rising] → [24-bar Verse 3 | Climax, reveal, or consequence] → [8-bar Outro | Image that stays]',
   minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
   epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
@@ -3548,6 +3635,10 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
 
   const lyricCraftNote = buildLyricCraftNote(genre, mood, topic);
+  // Speed-gears auto-triggers when the user picks the gear-shift structure
+  // or the mood signals escalation; hip-hop always gets the framework.
+  const speedGearsExplicit = structure === 'gear_shift_escalation';
+  const speedGearsNote = buildSpeedGearsNote(genre, mood, topic, speedGearsExplicit);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -3590,7 +3681,7 @@ SONGWRITING RULES:
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
 - LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -3728,6 +3819,7 @@ function buildLuckyPrompt(params) {
   // closing gravity, storytelling craft, comedy craft (mood-gated). Same builder
   // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
+  const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -3762,7 +3854,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4062,7 +4154,8 @@ const FLOW_NOTES = {
   'triplet':      'Flow uses triplet subdivisions — three syllables per beat creating a rolling, tumbling sensation. Drake, Future, and the modern trap tradition.',
   'double-time':  'Flow doubles the perceived tempo — twice as many syllables per bar as the beat implies. Technical display, urgency, compression.',
   'conversational':'Flow is natural speech rhythm dropped over the beat — unhurried, intimate, as if thinking out loud.',
-  'behind-beat':  'Flow drags slightly behind the grid — creating a heavy, weighted, languid feel. Southern rap, drill, certain trap styles.'
+  'behind-beat':  'Flow drags slightly behind the grid — creating a heavy, weighted, languid feel. Southern rap, drill, certain trap styles.',
+  'speed-rap':    'Speed-rap / chopper flow — Gear 4 sixteenth-note or quintuplet cascades (6–8+ syllables per beat). Twista / Busta Rhymes / Eminem "Rap God" / Royce da 5\'9" / Tech N9ne / Bone Thugs-N-Harmony. MUST be used as spotlight cascade max 4 bars at a time, then [Breath Reset] or [Gear Down] back to baseline. Always entered with [Speed-Rap] or [Cascade] tag and exited with matching pullback tag — never sustained as a whole verse.'
 };
 const RHYME_NOTES = {
   'end-only':       'End rhyme only — the last word of each bar rhymes. Clean, accessible, singable.',
@@ -4267,6 +4360,7 @@ SONGWRITING RULES:
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildAdlibNote('hiphop')}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
+${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
 
 Respond with EXACTLY this format:
 
@@ -4538,7 +4632,10 @@ function buildVariantPrompt(variant, song) {
   // Rap Lab — money lines, hook kernels, opening/closing gravity,
   // storytelling craft, comedy craft if the original was comedic.
   const craftNote = buildLyricCraftNote(safeSong.genre, '', safeSong.topic);
-  return builder(safeSong) + craftNote;
+  // Variants inherit speed-gears for rap genres (baseline applies) but can't
+  // tell if the original used gear-shifting — safe default: no explicit flag.
+  const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
+  return builder(safeSong) + craftNote + speedGearsNote;
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4671,6 +4768,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   // new bridge), the editor benefits from the same money-line / storytelling
   // / comedy-mode rules as the original generate.
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
+  const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -4678,7 +4776,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}`;
+${p.lyrics}${craftNote}${speedGearsNote}`;
 
   return { prompt, system };
 }
