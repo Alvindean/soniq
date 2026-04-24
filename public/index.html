@@ -1622,6 +1622,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .export-btn:hover{background:var(--violet);color:#fff}
 /* ── STREAMING RAW DISPLAY ── */
 .stream-raw{font-family:var(--mono);font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow-y:auto;padding:4px 0;background:transparent;border:none;margin:0}
+/* ── SONG PROGRESS BAR — sits directly under song title, fills 0→100% during generation ── */
+.song-progress-bar{display:none;align-items:center;gap:12px;margin:10px 0 6px;animation:pgIn .25s ease}
+.song-progress-bar.active{display:flex}
+.spb-track{flex:1;height:6px;background:var(--s3);border:1px solid var(--b1);border-radius:99px;overflow:hidden;position:relative}
+.spb-fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--cyan));border-radius:99px;transition:width .35s cubic-bezier(.2,.8,.3,1);width:0%;box-shadow:0 0 12px rgba(245,192,0,0.35)}
+.spb-fill.done{background:linear-gradient(90deg,#3ee896,#34d399);box-shadow:0 0 12px rgba(62,232,150,0.45)}
+.spb-label{font-size:11px;color:var(--tx2);font-weight:700;min-width:76px;text-align:right;font-variant-numeric:tabular-nums}
+.spb-label .spb-pct{color:var(--amber);font-weight:800}
+.spb-label.done .spb-pct{color:#3ee896}
+.spb-stage{font-size:10px;color:var(--tx3);font-weight:500;margin-left:4px}
 .stream-raw::-webkit-scrollbar{width:6px}.stream-raw::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--amber2),var(--s5));border-radius:3px}
 
 /* ── CHORD PROGRESSION ── */
@@ -3894,8 +3904,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="loaded-banner" id="loaded-banner">✦ Loaded from library — changes won't overwrite the saved version</div>
     <div id="print-meta"></div>
     <div class="result-header">
-      <div>
+      <div style="flex:1;min-width:0">
         <div class="result-song-title" id="res-title">—</div>
+        <div class="song-progress-bar" id="res-progress-bar">
+          <div class="spb-track"><div class="spb-fill" id="res-progress-fill"></div></div>
+          <div class="spb-label"><span class="spb-pct" id="res-progress-pct">0%</span><span class="spb-stage" id="res-progress-stage"> · starting…</span></div>
+        </div>
         <div class="result-song-verdict" id="res-verdict"></div>
       </div>
       <div class="result-acts">
@@ -4252,8 +4266,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <div class="result-card" id="lucky-out" style="display:none">
     <div class="result-header">
-      <div>
+      <div style="flex:1;min-width:0">
         <div class="result-song-title" id="lres-title">—</div>
+        <div class="song-progress-bar" id="lres-progress-bar">
+          <div class="spb-track"><div class="spb-fill" id="lres-progress-fill"></div></div>
+          <div class="spb-label"><span class="spb-pct" id="lres-progress-pct">0%</span><span class="spb-stage" id="lres-progress-stage"> · starting…</span></div>
+        </div>
         <div class="result-song-verdict" id="lres-verdict"></div>
       </div>
       <div class="result-acts">
@@ -9826,10 +9844,12 @@ VIDEO PROMPT:
 
   let firstChunk=true;
   const lyricsEl=document.getElementById('lres-lyrics-text');
+  startSongProgress('lres');
   const luckyStreamCb = (chunk,full) => {
     if(firstChunk){firstChunk=false;lyricsEl.innerHTML='<pre class="stream-raw" id="lstream-display"></pre>';}
     const el=document.getElementById('lstream-display');
     if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
+    updateSongProgress('lres', full);
   };
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
@@ -9837,6 +9857,7 @@ VIDEO PROMPT:
     ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData})=>{
+    finishSongProgress('lres');
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd},luckyProdData);
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
@@ -9845,6 +9866,7 @@ VIDEO PROMPT:
     // Refresh global counter after a successful generation
     setTimeout(loadGlobalCounter, 1500);
   }).catch(e=>{
+    finishSongProgress('lres', true);
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('lucky-btn');return;}
     if(e.code==='auth_required'){btnDone('lucky-btn');return;}
     if(e.code==='limit_reached'){
@@ -9987,6 +10009,97 @@ function loadLuckyHistItem(i){
 }
 
 const GENRE_LABELS={'pop':'Pop','hiphop':'Rap / Hip-Hop','rnb':'R&B / Soul','rock':'Rock','country':'Country','edm':'EDM / Electronic','latin':'Latin','reggaeton':'Reggaeton','folk':'Folk','metal':'Metal','jazz':'Jazz','ss':'Singer-Songwriter','altrock':'Alt-Rock','reggae':'Reggae','afrobeats':'Afrobeats','blues':'Blues','punk':'Punk','kpop':'K-Pop','neosoul':'Neo-Soul','gospel':'Gospel','parody':'Parody','comedy':'Comedy','children':"Children's",'tvmusical':'TV / Musical'};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SONG PROGRESS BAR — 0→100% bar that sits directly under the song title
+// during generation. Driven by streamed-chars + elapsed-time floor so it
+// always moves forward even if the server pauses mid-stream.
+//
+//   prefix = 'res' | 'lres'    (writer vs lucky vs alt-take shared with res)
+//
+// Expected output length: ~4500 chars for a full song (lyrics + production
+// brief + visual + video prompts). Target duration ~25s. Progress is
+// max(char-based, time-based) so stalls still inch forward.
+// ═══════════════════════════════════════════════════════════════════════════
+function _spbEl(prefix, suffix) { return document.getElementById(prefix + '-' + suffix); }
+
+function startSongProgress(prefix) {
+  const bar = _spbEl(prefix, 'progress-bar');
+  const fill = _spbEl(prefix, 'progress-fill');
+  const pct = _spbEl(prefix, 'progress-pct');
+  const stage = _spbEl(prefix, 'progress-stage');
+  if (!bar || !fill) return;
+  bar.classList.add('active');
+  fill.classList.remove('done');
+  fill.style.width = '0%';
+  if (pct) { pct.textContent = '0%'; pct.parentElement?.classList.remove('done'); }
+  if (stage) stage.textContent = ' · starting…';
+  // Remember start time + expected total on the prefix key for updateSongProgress
+  S._spbState = S._spbState || {};
+  S._spbState[prefix] = { startedAt: Date.now(), lastPct: 0, expectedChars: 4500, expectedMs: 25000 };
+}
+
+function updateSongProgress(prefix, fullText) {
+  const fill = _spbEl(prefix, 'progress-fill');
+  const pct = _spbEl(prefix, 'progress-pct');
+  const stage = _spbEl(prefix, 'progress-stage');
+  const state = S._spbState?.[prefix];
+  if (!fill || !state) return;
+  const chars = (fullText || '').length;
+  const elapsed = Date.now() - state.startedAt;
+  // Char-based: 0-95 based on chars received (cap 95 so we don't hit 100 before done)
+  const charPct = Math.min(95, (chars / state.expectedChars) * 100);
+  // Time-based floor: 0-90 based on elapsed ms vs expected duration
+  const timePct = Math.min(90, (elapsed / state.expectedMs) * 100);
+  const target = Math.max(charPct, timePct, state.lastPct); // monotonic — never goes backward
+  state.lastPct = target;
+  const intPct = Math.round(target);
+  fill.style.width = intPct + '%';
+  if (pct) pct.textContent = intPct + '%';
+  // Stage hints based on content detection (what section is the model currently writing)
+  if (stage) {
+    let label = ' · writing lyrics…';
+    const t = (fullText || '').toUpperCase();
+    if (t.includes('VIDEO PROMPT:')) label = ' · video prompt…';
+    else if (t.includes('VISUAL PROMPT:')) label = ' · visual prompt…';
+    else if (t.includes('DIRECTOR NOTES:')) label = ' · director notes…';
+    else if (t.includes('DOPAMINE MAP:')) label = ' · dopamine map…';
+    else if (t.includes('STRUCTURE MAP:')) label = ' · structure map…';
+    else if (t.includes('COUNTERMELODY:')) label = ' · counter-melody…';
+    else if (t.includes('SONIC REFERENCES:')) label = ' · sonic refs…';
+    else if (t.includes('VOCAL DIRECTION:')) label = ' · vocal direction…';
+    else if (t.includes('ARRANGEMENT BLUEPRINT:')) label = ' · arrangement…';
+    else if (t.includes('TEMPO & KEY:')) label = ' · tempo + key…';
+    else if (t.includes('PRODUCTION BRIEF:')) label = ' · production brief…';
+    else if (t.includes('SONG PROMPT:')) label = ' · Suno prompt…';
+    else if (t.includes('LYRICS:')) label = ' · writing lyrics…';
+    else if (t.includes('VERDICT:')) label = ' · shaping verdict…';
+    else if (t.includes('TITLE:')) label = ' · finding title…';
+    stage.textContent = label;
+  }
+}
+
+function finishSongProgress(prefix, errored) {
+  const bar = _spbEl(prefix, 'progress-bar');
+  const fill = _spbEl(prefix, 'progress-fill');
+  const pct = _spbEl(prefix, 'progress-pct');
+  const stage = _spbEl(prefix, 'progress-stage');
+  if (!bar || !fill) return;
+  if (errored) {
+    bar.classList.remove('active');
+    if (S._spbState) delete S._spbState[prefix];
+    return;
+  }
+  // Snap to 100% with the "done" green gradient, then fade out after 1.2s
+  fill.style.width = '100%';
+  fill.classList.add('done');
+  if (pct) { pct.textContent = '100%'; pct.parentElement?.classList.add('done'); }
+  if (stage) stage.textContent = ' · complete';
+  setTimeout(() => {
+    bar.classList.remove('active');
+  }, 1200);
+  if (S._spbState) delete S._spbState[prefix];
+}
 
 async function generateSong(){
   if (!S.user && !window.__soniqAdmin) {
@@ -10264,6 +10377,7 @@ VIDEO PROMPT:
     let firstChunk=true;
     const lyricsEl=document.getElementById('res-lyrics-text');
     const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+    startSongProgress('res');
     const streamCb = (chunk,full) => {
       if(firstChunk){
         firstChunk=false;
@@ -10271,6 +10385,7 @@ VIDEO PROMPT:
       }
       const el=document.getElementById('stream-display');
       if(el){el.textContent=full;el.scrollTop=el.scrollHeight;}
+      updateSongProgress('res', full);
     };
     let raw, genProdData;
     if (isVercel) {
@@ -10283,8 +10398,10 @@ VIDEO PROMPT:
       raw = await callClaudeStream(prompt, system, streamCb, genSignal);
     }
     S.genController = null;
+    finishSongProgress('res');
     parseSongResult(raw, genreLabel, topic, genProdData);
   }catch(e){
+    finishSongProgress('res', true);
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
     if(e.code==='auth_required'){btnDone('gen-btn');return;}
     if(e.code==='limit_reached'){
