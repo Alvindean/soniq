@@ -9878,11 +9878,13 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData }))
-    : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null }));
-  luckyPromise.then(({text: raw, prodData: luckyProdData})=>{
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null, sunoSettings: null }));
+  luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd},luckyProdData);
+    if (S.luckyCurrentSong && luckySuno) S.luckyCurrentSong.sunoSettings = luckySuno;
+    if (S.currentSong && luckySuno && !S.currentSong.sunoSettings) S.currentSong.sunoSettings = luckySuno;
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
     trackEvent('feel_lucky_used', { genre: g1, genre2: g2, fusion_key: key, topic });
@@ -10417,6 +10419,8 @@ VIDEO PROMPT:
       const result = await callServerStream('generate', songParams, streamCb, genSignal);
       raw = result.text;
       genProdData = result.meta?.prodData;
+      // Stash computed Suno settings so save/like can feed the learning loop
+      if (result.meta?.sunoSettings) S._pendingSunoSettings = result.meta.sunoSettings;
     } else {
       // Local dev fallback — client builds prompt
       raw = await callClaudeStream(prompt, system, streamCb, genSignal);
@@ -10424,6 +10428,7 @@ VIDEO PROMPT:
     S.genController = null;
     finishSongProgress('res');
     parseSongResult(raw, genreLabel, topic, genProdData);
+    if (S.currentSong && S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
   }catch(e){
     finishSongProgress('res', true);
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
@@ -17020,7 +17025,10 @@ function autoSaveSongToServer(song, extraParams) {
         era:            S.selectedEra || 'modern',
         theoryLevel:    S.theoryLevel || 'standard',
         plan:           S.plan || 'free',
-      }
+      },
+      // Suno learning-loop: persist the computed settings so /api/track like
+      // action can read them back and update aggregates without a re-compute.
+      sunoSettings:   song.sunoSettings || null
     }
   };
   fetch('/api/track', { method: 'POST', headers: _trackHeaders(), body: JSON.stringify(payload) })
@@ -17053,11 +17061,20 @@ function setLike(prefix, isLike) {
   trackEvent(evName, { genre: song?.genre, topic: song?.topic });
   if (isLike) checkAchievements('song_liked');
   // Server-side like tracking (fire-and-forget)
+  // Pass genre/mood/sunoSettings so Suno-learning aggregates can update without
+  // re-reading the row from Supabase. If the client doesn't have them (old
+  // cached song), backend falls back to fetching from the songs table.
   if (S.session?.access_token && song.id && isLike) {
     fetch('/api/track', {
       method: 'POST',
       headers: _trackHeaders(),
-      body: JSON.stringify({ action: 'like', songId: song._serverId || song.id })
+      body: JSON.stringify({
+        action: 'like',
+        songId: song._serverId || song.id,
+        genre: song.genre || null,
+        mood: song.mood || null,
+        sunoSettings: song.sunoSettings || null
+      })
     }).catch(() => {});
   }
 }

@@ -104,7 +104,9 @@ module.exports = async function handler(req, res) {
       countermelody:   (song.countermelody || '').slice(0, 500),
       verdict:         (song.verdict || '').slice(0, 400),
       quality_score:   typeof song.score === 'number' ? Math.min(100, Math.max(0, song.score)) : null,
-      generation_params: song.params ? JSON.stringify(song.params) : null,
+      generation_params: (song.params || song.sunoSettings)
+        ? JSON.stringify(Object.assign({}, song.params || {}, song.sunoSettings ? { sunoSettings: song.sunoSettings } : {}))
+        : null,
       like_count:      0,
       play_count:      0,
       created_at:      new Date().toISOString(),
@@ -141,6 +143,10 @@ module.exports = async function handler(req, res) {
 
   // ─────────────────────────────────────────────────────────────
   // ACTION: like — toggle like (idempotent per user per song)
+  // On new like: also update Suno-settings learning aggregates
+  // (Redis hashes per genre×mood, both user-scoped and global) so
+  // future generations can bias toward what this user — and the
+  // community — actually keeps.
   // ─────────────────────────────────────────────────────────────
   if (action === 'like') {
     const { songId } = body;
@@ -166,6 +172,56 @@ module.exports = async function handler(req, res) {
         ['HINCRBY', `soniq:song:${songId}`, 'like_count', '1'],
       ]);
       delta = 1;
+
+      // ── Suno Settings learning feedback ──
+      // Accepts song metadata directly in the like payload (client passes from
+      // currentSong state) so we don't need a Supabase read on every like.
+      // Falls back to fetching from songs table if payload is sparse.
+      try {
+        let sunoSettings = body.sunoSettings;
+        let genre = body.genre;
+        let mood  = body.mood;
+        if ((!sunoSettings || !genre) && supabase && songId) {
+          const { data: songRow } = await supabase
+            .from('songs')
+            .select('genre,mood,generation_params')
+            .eq('id', songId)
+            .eq('user_id', user.id)
+            .maybeSingle();
+          if (songRow) {
+            genre = genre || songRow.genre;
+            mood  = mood  || songRow.mood;
+            if (!sunoSettings && songRow.generation_params) {
+              try {
+                const gp = typeof songRow.generation_params === 'string'
+                  ? JSON.parse(songRow.generation_params)
+                  : songRow.generation_params;
+                if (gp && gp.sunoSettings) sunoSettings = gp.sunoSettings;
+              } catch {}
+            }
+          }
+        }
+        if (genre && sunoSettings && typeof sunoSettings.weirdness === 'number' && typeof sunoSettings.styleInfluence === 'number') {
+          const mkey = ((mood || '').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 20)) || 'any';
+          const userKey   = `soniq:sunolearn:u:${user.id}:g:${genre}:m:${mkey}`;
+          const globalKey = `soniq:sunolearn:g:${genre}:m:${mkey}`;
+          const TTL = 180 * 24 * 3600; // 6-month rolling window
+          const w = Math.max(0, Math.min(100, Math.round(sunoSettings.weirdness)));
+          const s = Math.max(0, Math.min(100, Math.round(sunoSettings.styleInfluence)));
+          await redisPipeline([
+            ['HINCRBY', userKey, 'w_sum', String(w)],
+            ['HINCRBY', userKey, 's_sum', String(s)],
+            ['HINCRBY', userKey, 'count', '1'],
+            ['EXPIRE', userKey, String(TTL)],
+            ['HINCRBY', globalKey, 'w_sum', String(w)],
+            ['HINCRBY', globalKey, 's_sum', String(s)],
+            ['HINCRBY', globalKey, 'count', '1'],
+            ['EXPIRE', globalKey, String(TTL)]
+          ]);
+        }
+      } catch (e) {
+        console.error('Suno learning update failed:', e.message);
+      }
     }
 
     // Also update Supabase if song row exists

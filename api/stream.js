@@ -51,6 +51,65 @@ async function redisIncrExpire(key, ttl) {
   }
 }
 
+async function redisHGetAll(key) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/hgetall/${encodeURIComponent(key)}`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const d = await r.json();
+    if (!d.result || !Array.isArray(d.result) || d.result.length === 0) return null;
+    // Upstash returns [field1, val1, field2, val2, ...]
+    const obj = {};
+    for (let i = 0; i < d.result.length; i += 2) {
+      obj[d.result[i]] = d.result[i + 1];
+    }
+    return obj;
+  } catch (e) {
+    console.error('Redis HGETALL error:', e.message);
+    return null;
+  }
+}
+
+// Normalize mood for Redis key (lowercase, first word only, fallback 'any')
+function sunoMoodKey(mood) {
+  const m = (mood || '').toLowerCase().replace(/[^a-z0-9]+/g, '').slice(0, 20);
+  return m || 'any';
+}
+
+// Fetch learned Suno settings from Redis for this (user, genre, mood).
+// Returns { sampleSize, avgWeirdness, avgStyleInfluence } or null.
+// Tries user-specific first (>=3 samples), falls back to global (>=5).
+async function getSunoLearning(userId, genre, mood) {
+  if (!genre) return null;
+  const mkey = sunoMoodKey(mood);
+  const userKey   = `soniq:sunolearn:u:${userId}:g:${genre}:m:${mkey}`;
+  const globalKey = `soniq:sunolearn:g:${genre}:m:${mkey}`;
+  // Try user-scoped first
+  const userAgg = await redisHGetAll(userKey);
+  if (userAgg && parseInt(userAgg.count || '0', 10) >= 3) {
+    const c = parseInt(userAgg.count, 10);
+    return {
+      sampleSize: c,
+      avgWeirdness: Math.round(parseInt(userAgg.w_sum || '0', 10) / c),
+      avgStyleInfluence: Math.round(parseInt(userAgg.s_sum || '0', 10) / c),
+      source: 'user'
+    };
+  }
+  // Fall back to global
+  const globalAgg = await redisHGetAll(globalKey);
+  if (globalAgg && parseInt(globalAgg.count || '0', 10) >= 5) {
+    const c = parseInt(globalAgg.count, 10);
+    return {
+      sampleSize: c,
+      avgWeirdness: Math.round(parseInt(globalAgg.w_sum || '0', 10) / c),
+      avgStyleInfluence: Math.round(parseInt(globalAgg.s_sum || '0', 10) / c),
+      source: 'global'
+    };
+  }
+  return null;
+}
+
 function getTodayDate() {
   return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
 }
@@ -476,6 +535,12 @@ module.exports = async function handler(req, res) {
         // Plumb plan + admin flag through to prompt builders for Suno Settings paywall gate
         p.plan = plan;
         p.isAdmin = !!req._adminBypass;
+        // Suno learning overlay — only fetched for Studio-tier users since only
+        // they see the values; skip the Redis hit otherwise.
+        const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+        if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
+          p.sunoLearning = await getSunoLearning(user.id, p.genre, p.mood);
+        }
         if (p.genre === 'hiphop' && p.rapLabActive) {
           built = brain.buildRapLabPrompt(p);
         } else {
@@ -488,15 +553,32 @@ module.exports = async function handler(req, res) {
         if (lp.platinum && !req._adminBypass && !PLATINUM_PLANS.has(plan)) lp.platinum = false;
         lp.plan = plan;
         lp.isAdmin = !!req._adminBypass;
+        const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+        if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
+          lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);
+        }
         built = brain.buildLuckyPrompt(lp);
       }
       messages = [{role: 'user', content: built.prompt}];
       system = built.system;
       max_tokens = 4096;
-      // Attach production data + lucky meta to response header (read by client parsers)
+      // Attach production data + lucky meta + suno settings to response header (read by client parsers)
       const metaGenre = (body.params?.genre) || (built.meta?.g1) || 'pop';
       const prodData = brain.buildProductionData(metaGenre);
-      const metaObj = { ...(built.meta || {}), prodData };
+      // Compute the raw Suno settings alongside the prompt build so the
+      // client can stash them for later (save → library → like feedback loop).
+      // Resolution matches buildSunoSettingsNote's logic; paywall-masked
+      // plans just get the base values (client won't render them to user).
+      const sunoParams = body.params || {};
+      const sunoSettings = brain.buildSunoSettings({
+        genre: sunoParams.genre || metaGenre,
+        substyle: sunoParams.substyle,
+        mood: sunoParams.mood,
+        structure: sunoParams.structure,
+        rapStyle: sunoParams.rapStyle,
+        userLearning: sunoParams.sunoLearning
+      });
+      const metaObj = { ...(built.meta || {}), prodData, sunoSettings };
       res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(metaObj)).toString('base64'));
     } catch (err) {
       console.error('Brain prompt build failed:', err.message);
