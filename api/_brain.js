@@ -1018,6 +1018,61 @@ const LYRIC_CRAFT_UNIVERSAL = {
     genres: ['hiphop']
   },
 
+  // ── DOUBLE MEANING CRAFT — surface + depth at bar / line / theme levels ────
+  thematicDoubleMeaning: {
+    label: 'THEMATIC DOUBLE MEANING (SURFACE + DEPTH / WHOLE-SONG HIDDEN READING)',
+    short: `Write a song that has a SURFACE meaning AND a DEEPER hidden meaning — both complete, both believable on their own. Most listeners hear the surface; attentive listeners discover the second reading on repeat plays. This is song-level double entendre (the whole song), distinct from bar-level or line-level double entendre. Legendary examples where listeners thought the song meant one thing but it really meant another:
+
+  • "Every Breath You Take" (The Police) — SURFACE: love song played at weddings. REAL: a stalker's confession. Sting has publicly regretted how often it's played at weddings.
+  • "Hotel California" (Eagles) — SURFACE: strange hotel experience. REAL: music industry trap / addiction / spiritual crisis.
+  • "Pumped Up Kicks" (Foster the People) — SURFACE: upbeat indie pop. REAL: school shooting from the shooter's POV.
+  • "Semi-Charmed Life" (Third Eye Blind) — SURFACE: summer radio hit. REAL: methamphetamine addiction cycle — the "doo doo doos" replacing edited-out drug references.
+  • "Slide" (Goo Goo Dolls) — SURFACE: sweet romance. REAL: Catholic teenager considering abortion.
+  • "Born in the USA" (Springsteen) — SURFACE: patriotic anthem (often misused politically). REAL: Vietnam veteran abandonment by the country.
+  • "The One I Love" (R.E.M.) — SURFACE: wedding-ready love song. REAL: "a simple prop to occupy my time" — using someone.
+  • "99 Luftballons" (Nena) — SURFACE: colorful pop novelty. REAL: 99 balloons trigger accidental nuclear war.
+  • "Closing Time" (Semisonic) — SURFACE: last call at a bar. REAL: childbirth metaphor — "you don't have to go home but you can't stay here" = being born out of the womb.
+  • "Waterfalls" (TLC) — SURFACE: upbeat pop. REAL: cautionary tale about AIDS and drug dealing.
+  • "Kids" (MGMT) — SURFACE: bright synth-pop. REAL: melancholy on loss of childhood innocence.
+  • "99 Problems" (Jay-Z, verse 2) — SURFACE: bragging rap. REAL: a forensic account of racial profiling at a traffic stop.
+  • "Pompeii" (Bastille) — SURFACE: anthemic shout-along. REAL: volcanic-destruction metaphor for personal paralysis.
+  • "Tears of a Clown" (Smokey Robinson) — SURFACE: circus imagery. REAL: depression masked by public performance.
+  • "Hey Ya!" (OutKast) — SURFACE: dance hit. REAL: the narrator begs for honesty in a failing relationship — "separate for a while."
+
+RULES:
+(1) The SURFACE reading must be COMPLETE — a casual listener could enjoy the song end-to-end without discovering the deeper meaning. No lines that only make sense through the hidden reading.
+(2) The DEEP reading must be ACCESSIBLE — there must be at least 2-3 specific lyrical details that unlock it on attentive listen. These are the breadcrumbs.
+(3) Don't telegraph. Never explicitly announce "this is actually about X." Let the listener catch it.
+(4) Let the title be the camouflage. "Every Breath You Take" sounds romantic. "Born in the USA" sounds patriotic. The title sells the surface.
+(5) The deeper reading should enhance, not betray — when the listener discovers it, they feel smart, not tricked.`,
+    genres: 'all'
+  },
+
+  falseFriendHook: {
+    label: 'FALSE-FRIEND HOOK (CATCHY-BUT-DARK)',
+    short: `The hook sounds positive, anthemic, or celebratory — but in context reveals something dark, ironic, or tragic. Listener sings along happily for 2-3 plays, then "wait — what does this actually say?" This is a specific flavor of thematic double meaning focused on the hook itself. Examples:
+  • "Pumped Up Kicks" — catchy hook, school-shooter lyric.
+  • "Semi-Charmed Life" — bouncy "doo doo doos" over meth addiction.
+  • "Hey Ya!" — dance hit, literally "separate for a while."
+  • "Last Friday Night" (Katy Perry) — party anthem listing a full alcoholic blackout.
+  • "Chop Suey!" (System of a Down) — mosh-pit hook quotes Jesus on the cross ("Father, into your hands I commend my spirit").
+  • "Foster the People" and "Imagine Dragons" routinely deploy this.
+RULES: (1) Hook passes a casual listen as positive/neutral. (2) At least one word or phrase in the hook contains the dark reading in plain sight. (3) Verses tilt the listener toward the dark reading on closer listen. (4) Never explicitly explain the trick — the unguarded hook is the point.`,
+    genres: ['pop','rock','altrock','indie','hiphop','rnb','country','neosoul']
+  },
+
+  covertNarrative: {
+    label: 'COVERT NARRATIVE (HIDDEN STORY UNDER APPARENT STORY)',
+    short: `A second, complete narrative runs underneath the apparent one — different characters, different events, different stakes — and only reveals through specific verses or bridge. Different from thematic double meaning (which is meaning-level): this is a full second STORY. Examples:
+  • "Stan" (Eminem) — apparent narrative: letters from a fan. Covert: Stan's escalating instability → murder-suicide → Eminem's belated reply.
+  • "The Devil Went Down to Georgia" (Charlie Daniels) — apparent: fiddle contest. Covert: the devil loses because pride blinds him.
+  • "American Pie" (Don McLean) — apparent: nostalgia. Covert: full history of rock music with coded references for each era.
+  • "Fast Car" (Tracy Chapman) — apparent: a hopeful escape. Covert: every hopeful line is contradicted later, revealing the cycle never breaks.
+  • "Luka" (Suzanne Vega) — apparent: cheerful acoustic song. Covert: child abuse from the victim's POV, denying it to the listener.
+RULES: (1) Both narratives must be internally consistent. (2) Specific details are shared between the narratives but mean different things in each. (3) The covert narrative usually reveals on the bridge or final verse. (4) A listener must be able to re-read the whole song and see the covert story was there from line 1.`,
+    genres: ['country','folk','ss','hiphop','rock','altrock','indie','pop','rnb','americana','tvmusical']
+  },
+
   multisyllabicScheme: {
     label: 'MULTISYLLABIC (MULTI) SCHEME',
     short: `Chain 3-5 syllable rhyming clusters across 4-8 bars — not "day/way" but "breaking away / taking the stage / making them pay." Pick a 3-syllable sound cluster; every line's LAST 3 syllables must match it. Must feel natural — filler words to complete the rhyme destroy credibility instantly.`,
@@ -3825,7 +3880,12 @@ const RHYME_NOTES = {
   'multi-syllabic': 'Multi-syllabic rhymes — multiple syllables rhyme simultaneously (e.g., "motivate" / "innovate"). Technical showcase.',
   'chain':          'Chain rhyming — each bar\'s last word or sound becomes the first sound of the next internal rhyme. Continuous forward pull.',
   'mosaic':         'Mosaic rhyme — complex interlocking rhyme scheme where multiple words throughout the verse form a web. Every word load-bearing.',
-  'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.'
+  'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.',
+  'deferred':       'Deferred rhyme — the rhyme scheme lands 2-4 bars later than the ear expects it. Creates tension-and-release across a whole verse rather than bar-to-bar.',
+  'vowel-chain':    'Vowel chain — pick ONE specific vowel phoneme (long A, short I, schwa) and thread it through 8-16 bars. Hit the vowel at every 2-4 syllables in each bar. Eminem "Till I Collapse" runs the "at" sound this way. Bright vowels for triumph, dark vowels for menace.',
+  'syllable-atoms': 'Syllable decomposition — take a keyword, break it into phonetic atoms (e.g. "California" → CAL + FORN + IA), use EACH atom as a separate rhyme anchor across the next 6-12 bars. Three parallel rhyme threads instead of one end-rhyme. MF DOOM / Big Pun signature.',
+  'prefix-suffix':  'Prefix/suffix rhyme — anchor the scheme on word BEGINNINGS (UNDERwater / UNDERfire / UNDERpressure) or ENDINGS (agGRESSION / deDRESSION / proGRESSION) instead of whole-word rhymes. The partial-word anchor carries the scheme; word tails vary. The anchor must carry the stressed syllable to land.',
+  'phoneme-target': 'Phoneme-level targeting — do NOT think "word that rhymes with X." Think "the phoneme /ɛk/" and plant it at ANY syllable position of ANY word: first syllable, middle, end. "rEflection" + "sEction" + "nEcklace" all hit /ɛk/. Expands rhyme vocabulary 10× over word-level matching.'
 };
 const DENSITY_NOTES = {
   'sparse':      'Sparse delivery — few syllables per bar, heavy use of space and silence. Each word carries more weight.',

@@ -3137,6 +3137,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="step-content">
           <div class="mood-grid" id="mood-grid"></div>
           <div class="mood-hint" id="mood-hint">Select a mood to see how it shapes your song</div>
+          <div style="font-size:10px;color:var(--tx3);margin-top:8px;padding:10px 12px;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r1);line-height:1.6">
+            <span style="color:var(--amber);font-weight:700">💡 Mood tip:</span>
+            Picking moods like <b>Playful</b>, <b>Funny</b>, <b>Silly</b>, <b>Ironic</b>, or <b>Whimsical</b> — OR typing those words into your topic — auto-activates the comedy craft framework
+            (<span style="color:var(--tx2)">Run the Game · Heighten the Anchor · Remix the Anchor · Crowd-Work Feel</span>)
+            on ANY genre, not just comedy. A funny country song or playful hip-hop track gets the Ian Edwards 5-step heightening structure built in automatically.
+          </div>
         </div>
         <div class="step-summary" id="step-3-summary"></div>
       </div>
@@ -3286,13 +3292,17 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="rl-dim-row">
             <span class="rl-dim-label">Rhyme</span>
             <div class="rl-dim-pills" id="rld-rhyme">
-              <span class="rl-dpill on" onclick="setRapDim(this,'rhymeArch','end-only')">End Only</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','internal')">Internal</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','multi-syllabic')">Multi-Syl</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','chain')">Chain</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','mosaic')">Mosaic</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','slant')">Slant</span>
-              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','deferred')">Deferred ✦</span>
+              <span class="rl-dpill on" onclick="setRapDim(this,'rhymeArch','end-only')" title="Bar ends rhyme; no internal scheme">End Only</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','internal')" title="Rhymes inside the bar, not just at the end">Internal</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','multi-syllabic')" title="Chain 3+ syllable rhyme clusters across 4-8 bars">Multi-Syl</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','chain')" title="Continuous rhyme thread across the whole verse">Chain</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','mosaic')" title="Multi-word rhyme — several words fuse into one rhyme unit">Mosaic</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','slant')" title="Near-rhyme — same vowel, different consonant">Slant</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','deferred')" title="Rhyme scheme lands 2-4 bars later than expected">Deferred ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','vowel-chain')" title="Thread ONE specific vowel phoneme through 8-16 bars — Eminem 'Till I Collapse' signature">Vowel Chain ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','syllable-atoms')" title="Break keyword into phonetic atoms — each becomes a separate rhyme thread (CAL-FORN-IA)">Syllable Atoms ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','prefix-suffix')" title="Rhyme on word BEGINNINGS or ENDINGS — UNDERwater / UNDERfire / UNDERpressure">Prefix/Suffix ✦</span>
+              <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','phoneme-target')" title="Rhyme at phoneme level, not word level — find the target sound at any syllable position">Phoneme Target ✦</span>
             </div>
           </div>
           <div class="rl-dim-row">
@@ -6518,7 +6528,9 @@ const GENRE_TECHNIQUES={
     {id:'syllable_atoms',name:'Syllable Decomposition',desc:'Break a keyword into its phonetic atoms — each atom becomes a separate rhyme anchor for subsequent bars. Three parallel rhyme threads instead of one end-rhyme',example:'"California" → CAL (gal, pal, shall) + FORN (warn, torn, storm) + IA (hear-ya, steer-ya) — three threads running through 6-12 bars',difficulty:5,impact:5},
     {id:'internal_chain',name:'Internal Rhyme Chain',desc:'Rhymes INSIDE the bar at syllables 2, 4, 6, 8 — 3-6 dopamine hits per bar, not just at the end. Density IS the craft',example:'"at" phoneme planted 4+ times per bar: "at the stAt / At the crAck / grab the bAt / matter of fAct"',difficulty:5,impact:5},
     {id:'prefix_suffix',name:'Prefix/Suffix Rhyme',desc:'Anchor the rhyme on word BEGINNINGS or ENDINGS instead of whole-word rhymes. The ear hears recurrence before the syntactic word completes — locked-in percussive feel',example:'Prefix: "UNDERwater / UNDERfire / UNDERpressure" — or suffix: "agGRESSION / deDRESSION / proGRESSION"',difficulty:3,impact:4},
-    {id:'phoneme_target',name:'Phonetic Targeting',desc:'Rhyme at PHONEME level, not word level — find the target sound at ANY syllable position of ANY word. Expands rhyme vocabulary 10× over word-level matching',example:'/ɛk/ target: "reflEction" + "sEction" + "nEcklace" — same phoneme at bar-end, first syllable, and middle respectively',difficulty:4,impact:5}
+    {id:'phoneme_target',name:'Phonetic Targeting',desc:'Rhyme at PHONEME level, not word level — find the target sound at ANY syllable position of ANY word. Expands rhyme vocabulary 10× over word-level matching',example:'/ɛk/ target: "reflEction" + "sEction" + "nEcklace" — same phoneme at bar-end, first syllable, and middle respectively',difficulty:4,impact:5},
+    {id:'thematic_double_meaning',name:'Thematic Double Meaning (Surface + Depth)',desc:'Song has a surface reading + a hidden reading. Casual listeners hear the surface; attentive listeners discover the real subject. Classic hip-hop: Jay-Z "99 Problems" verse 2 sounds like bragging, is actually a forensic account of racial profiling',example:'"99 Problems" V2 = traffic-stop civil-rights narrative wearing bragging-rap clothes. Kendrick "Alright" anthem + institutional-racism subtext',difficulty:5,impact:5},
+    {id:'covert_narrative',name:'Covert Narrative (Second Story)',desc:'A complete second narrative runs underneath the apparent one — revealed through specific bars or bridge. The listener re-hears the whole track and sees the second story was there from bar 1',example:'Eminem "Stan" — apparent: a fan writing letters. Covert: escalating instability → murder-suicide → Eminem\'s belated reply. Re-read any verse, the covert story was always there',difficulty:5,impact:5}
   ],
   rnb:[
     {id:'melismatic',name:'Melismatic Run Notation',desc:'Mark vocal runs where one syllable stretches across 3+ notes',example:'"I nee~ee~eed you" — the tilde marks a melismatic run',difficulty:2,impact:4},
@@ -6534,7 +6546,9 @@ const GENRE_TECHNIQUES={
     {id:'earworm_rep',name:'Title Repetition Embedding',desc:'Repeat the song title 3-5 times in the chorus using different rhythmic placements',example:'"Shake It Off" appears at start, middle, and end of chorus with varied rhythm',difficulty:1,impact:4},
     {id:'post_chorus',name:'Post-Chorus Drop',desc:'Add a wordless or minimal-word section after the chorus for the "stuck in your head" moment',example:'"na-na-na-na" or instrumental drop that IS the earworm',difficulty:1,impact:4},
     {id:'money_line',name:'Money Line (Quotable Bar)',desc:'Engineer 1-3 screenshot-worthy lines per song — compressed truth in specific imagery, not a punchline',example:'"I ain\'t passed the bar but I know a little bit" — double meaning in 10 syllables. Place at bar 8 or 16 of a verse, or right before the chorus breaks',difficulty:3,impact:5},
-    {id:'hook_kernel',name:'Hook Kernel (Tweetable Thesis)',desc:'The hook must collapse to ONE quotable idea in 6-10 words. Declarative, works on a t-shirt, states the song\'s whole argument',example:'"All you need is love" / "Born in the USA" / "Shake it off" — kernels that are the song',difficulty:3,impact:5}
+    {id:'hook_kernel',name:'Hook Kernel (Tweetable Thesis)',desc:'The hook must collapse to ONE quotable idea in 6-10 words. Declarative, works on a t-shirt, states the song\'s whole argument',example:'"All you need is love" / "Born in the USA" / "Shake it off" — kernels that are the song',difficulty:3,impact:5},
+    {id:'thematic_double_meaning',name:'Thematic Double Meaning (Surface + Depth)',desc:'Song has a surface meaning + a deeper hidden meaning. Casual listeners hear the surface; attentive listeners discover the real subject on repeat plays',example:'"Every Breath You Take" sounds romantic but is a stalker\'s confession. "Born in the USA" sounds patriotic but is about Vietnam-vet abandonment. "Pumped Up Kicks" sounds upbeat but is a school-shooter POV',difficulty:5,impact:5},
+    {id:'false_friend_hook',name:'False-Friend Hook (Catchy-But-Dark)',desc:'Hook sounds positive or anthemic but reveals something dark or tragic in context. Listener sings along happily, then "wait — what does this actually say?"',example:'"Semi-Charmed Life" bouncy "doo doo doos" over meth addiction. "Hey Ya!" dance hit where the hook literally says "separate for a while"',difficulty:4,impact:5}
   ],
   country:[
     {id:'story_song',name:'Story-Song Narrative Arc',desc:'Each verse advances a story with specific characters, settings, and timeline',example:'V1: "June of \'98, her daddy\'s porch..." V2: "That December, she called..." V3: "Now it\'s ten years gone..."',difficulty:2,impact:5},
@@ -6546,7 +6560,9 @@ const GENRE_TECHNIQUES={
     {id:'scene_anchor',name:'Scene Anchor (Where + When)',desc:'Ground the song in specific place AND time inside the first 4 lines — never "it was summer." Location + time + one sensory detail',example:'"August heat wave, my Chevy on the side of 441, radio on static, coffee gone cold"',difficulty:2,impact:4},
     {id:'show_not_tell',name:'Show Not Tell',desc:'Never STATE the emotion — show through action, object, or sensory detail. The single hardest discipline in lyric writing',example:'"Her hand shook as she poured the third glass" beats "she was sad." "He left the porch light on for six months" beats "he was hopeful"',difficulty:3,impact:5},
     {id:'narrative_reveal',name:'Narrative Reveal (Bridge Twist)',desc:'Hold back ONE key info piece until verse 3 or the bridge — it reframes verses 1-2 retroactively',example:'V1-V2 feel like a love song → bridge reveals she died before V1 — same words, new meaning. Listener re-hears the song',difficulty:4,impact:5},
-    {id:'dialogue_lyric',name:'Dialogue as Lyric',desc:'Use quoted speech as lyric instead of paraphrased attribution. Speech patterns reveal character faster than description',example:'"She said \'I can\'t do this anymore\' and closed the door" beats "she told me she was leaving"',difficulty:2,impact:4}
+    {id:'dialogue_lyric',name:'Dialogue as Lyric',desc:'Use quoted speech as lyric instead of paraphrased attribution. Speech patterns reveal character faster than description',example:'"She said \'I can\'t do this anymore\' and closed the door" beats "she told me she was leaving"',difficulty:2,impact:4},
+    {id:'thematic_double_meaning',name:'Thematic Double Meaning (Surface + Depth)',desc:'Song has a surface meaning + a hidden meaning. Surface is a complete song a casual listener enjoys; attentive listeners discover the real subject',example:'"Closing Time" reads as a bar last-call but is actually a childbirth metaphor. "The One I Love" plays at weddings but is about "a simple prop to occupy my time"',difficulty:5,impact:5},
+    {id:'covert_narrative',name:'Covert Narrative (Hidden Story)',desc:'A complete second story runs underneath the apparent one — different stakes, revealed through specific verses or bridge. On re-listen, the covert story was there from line 1',example:'"Fast Car" (Tracy Chapman): every hopeful line is contradicted later, revealing the escape cycle never breaks. "Luka" (Suzanne Vega): upbeat song denying child abuse the lyric clearly depicts',difficulty:5,impact:5}
   ],
   altrock:[
     {id:'quiet_loud',name:'Quiet-Loud-Quiet Dynamic',desc:'Verse whispered/subdued → Chorus explodes → next verse drops back down',example:'Pixies/Nirvana template: mumbled verse → screamed chorus → silence → repeat',difficulty:1,impact:5},
