@@ -438,6 +438,8 @@ module.exports = async function handler(req, res) {
       const p = body.params || {};
       if (!p.lyrics)      { res.status(400).json({ error: 'lyrics required' }); return; }
       if (!p.instruction) { res.status(400).json({ error: 'instruction required' }); return; }
+      p.plan = plan;
+      p.isAdmin = !!req._adminBypass;
       const built = brain.buildEditPrompt(p);
       messages   = [{ role: 'user', content: built.prompt }];
       system     = built.system;
@@ -471,6 +473,9 @@ module.exports = async function handler(req, res) {
           p.platinum = false;
         }
 
+        // Plumb plan + admin flag through to prompt builders for Suno Settings paywall gate
+        p.plan = plan;
+        p.isAdmin = !!req._adminBypass;
         if (p.genre === 'hiphop' && p.rapLabActive) {
           built = brain.buildRapLabPrompt(p);
         } else {
@@ -481,6 +486,8 @@ module.exports = async function handler(req, res) {
         // Gate platinum for lucky too
         const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (lp.platinum && !req._adminBypass && !PLATINUM_PLANS.has(plan)) lp.platinum = false;
+        lp.plan = plan;
+        lp.isAdmin = !!req._adminBypass;
         built = brain.buildLuckyPrompt(lp);
       }
       messages = [{role: 'user', content: built.prompt}];

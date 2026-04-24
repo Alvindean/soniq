@@ -254,7 +254,10 @@ module.exports = async function handler(req, res) {
       lyrics: body.lyrics || '',
       genre: body.genre || '',
       genre2: body.genre2 || '',
-      topic: body.topic || ''
+      topic: body.topic || '',
+      mood: body.mood || '',
+      plan: plan,
+      isAdmin: !!isAdmin
     };
     try {
       const variantPrompt = buildVariantPrompt(body.variant, song);

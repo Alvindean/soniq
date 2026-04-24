@@ -3689,6 +3689,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   // or the mood signals escalation; hip-hop always gets the framework.
   const speedGearsExplicit = structure === 'gear_shift_escalation';
   const speedGearsNote = buildSpeedGearsNote(genre, mood, topic, speedGearsExplicit);
+  const sunoSettingsNote = buildSunoSettingsNote({ genre, substyle, mood, structure, rapStyle: params.rapStyle, plan: params.plan, isAdmin: params.isAdmin, userLearning: params.sunoLearning });
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -3724,7 +3725,7 @@ SONGWRITING RULES:
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
 - LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${sunoSettingsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -3863,6 +3864,7 @@ function buildLuckyPrompt(params) {
   // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
+  const sunoSettingsNote = buildSunoSettingsNote({ genre: g1, mood, structure, plan: params.plan, isAdmin: params.isAdmin, userLearning: params.sunoLearning });
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -3898,7 +3900,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${sunoSettingsNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4406,6 +4408,7 @@ SONGWRITING RULES:
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
+${buildSunoSettingsNote({ genre: 'hiphop', mood, rapStyle: style.key || params.rapStyle, plan: params.plan, isAdmin: params.isAdmin, userLearning: params.sunoLearning })}
 
 Respond with EXACTLY this format:
 
@@ -4680,7 +4683,8 @@ function buildVariantPrompt(variant, song) {
   // Variants inherit speed-gears for rap genres (baseline applies) but can't
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
-  return builder(safeSong) + craftNote + speedGearsNote + buildCraftFirewallNote();
+  const sunoSettingsNote = buildSunoSettingsNote({ genre: safeSong.genre, mood: safeSong.mood, plan: song.plan, isAdmin: song.isAdmin, userLearning: song.sunoLearning });
+  return builder(safeSong) + craftNote + speedGearsNote + sunoSettingsNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4814,6 +4818,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   // / comedy-mode rules as the original generate.
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
+  const sunoSettingsNote = buildSunoSettingsNote({ genre, mood: p.mood, structure: p.structure, plan: p.plan, isAdmin: p.isAdmin, userLearning: p.sunoLearning });
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -4821,7 +4826,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${sunoSettingsNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5037,7 +5042,193 @@ function buildSingerNotesInstruction(genre, isRap) {
 }
 
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };
+// ============ SUNO GENERATION SETTINGS SYSTEM ============
+// Per-song recommended values for Suno's three generation knobs:
+//   • Weirdness  (0-100%) — experimental / safe balance
+//   • Style Influence (0-100%) — genre lock / drift balance
+//   • Exclude Styles — negative prompt, what to keep out
+// Studio-plan only. Free users see a masked placeholder with upgrade CTA.
+// Phase 2 (learning loop) blends community + user-specific signals in via
+// the optional `userLearning` parameter — see api/suno-feedback.js.
+
+const SUNO_GEN_SETTINGS_BASE = {
+  pop:       { weirdness: 25, styleInfluence: 70, exclude: ['auto-tune distortion','trap hi-hats unless noted','screamo vocals','excessive 808s','low-fi noise'] },
+  rock:      { weirdness: 35, styleInfluence: 75, exclude: ['auto-tune pop vocal','trap hi-hats','modern pop production','EDM drops','country steel'] },
+  altrock:   { weirdness: 50, styleInfluence: 70, exclude: ['auto-tune pop vocal','country twang','trap hi-hats','gospel choir','orchestral bombast'] },
+  country:   { weirdness: 20, styleInfluence: 85, exclude: ['auto-tune distortion','trap hi-hats','drill drums','electronic dance drops','screamo'] },
+  hiphop:    { weirdness: 45, styleInfluence: 75, exclude: ['rock guitar solos','country steel','orchestral lead','musical theater vocal','folk acoustic'] },
+  rap:       { weirdness: 45, styleInfluence: 75, exclude: ['rock guitar solos','country steel','orchestral lead','musical theater vocal','folk acoustic'] },
+  rnb:       { weirdness: 30, styleInfluence: 80, exclude: ['trap hi-hats unless specified','rock distortion','country twang','screamo'] },
+  neosoul:   { weirdness: 40, styleInfluence: 75, exclude: ['auto-tune distortion','trap hi-hats','country twang','rock distortion','EDM drops'] },
+  gospel:    { weirdness: 20, styleInfluence: 85, exclude: ['profanity','sexual content','trap hi-hats','rock distortion','secular slang','drill drums'] },
+  kpop:      { weirdness: 40, styleInfluence: 90, exclude: ['country instrumentation','blues harmonica','americana','folk acoustic','gospel choir unless specified'] },
+  reggaeton: { weirdness: 35, styleInfluence: 90, exclude: ['country steel','rock distortion','gospel choir','indie folk','orchestral ballad'] },
+  afrobeats: { weirdness: 40, styleInfluence: 85, exclude: ['country twang','rock distortion','drill drums','orchestral bombast','screamo'] },
+  edm:       { weirdness: 50, styleInfluence: 75, exclude: ['country instrumentation','acoustic ballad','gospel choir unless specified','rap hi-hats unless specified'] },
+  latin:     { weirdness: 35, styleInfluence: 85, exclude: ['country steel','rock distortion','drill drums','gospel choir','EDM drops'] },
+  blues:     { weirdness: 30, styleInfluence: 80, exclude: ['auto-tune','trap hi-hats','modern pop production','EDM drops','orchestral bombast'] },
+  jazz:      { weirdness: 45, styleInfluence: 75, exclude: ['auto-tune','trap hi-hats','modern pop production','EDM drops','rock distortion','screamo'] },
+  folk:      { weirdness: 30, styleInfluence: 75, exclude: ['auto-tune','trap hi-hats','EDM drops','modern pop production','orchestral bombast','screamo'] },
+  indie:     { weirdness: 55, styleInfluence: 65, exclude: ['auto-tune pop vocal','trap hi-hats','drill drums','country twang','orchestral bombast'] },
+  punk:      { weirdness: 45, styleInfluence: 80, exclude: ['auto-tune','trap hi-hats','gospel choir','EDM drops','orchestral bombast','country twang'] },
+  reggae:    { weirdness: 30, styleInfluence: 85, exclude: ['country steel','rock distortion','EDM drops','drill drums','screamo'] },
+  comedy:    { weirdness: 70, styleInfluence: 55, exclude: ['generic pop production','radio-polish mix','overly serious production'] },
+  parody:    { weirdness: 65, styleInfluence: 50, exclude: ['generic pop production','derivative production'] },
+  tvmusical: { weirdness: 35, styleInfluence: 80, exclude: ['auto-tune','trap hi-hats','rap verses unless in-character','EDM drops','screamo'] },
+  children:  { weirdness: 20, styleInfluence: 75, exclude: ['profanity','sexual content','drugs','violence','dark themes','trap hi-hats','screamo','menacing tone'] }
+};
+
+// Mood / mode modifiers — applied on top of base via word-boundary match.
+// Positive weirdness = more experimental. Positive styleInfluence = more genre-lock.
+const MOOD_SUNO_MODIFIERS = {
+  experimental:{ weirdness:+15, styleInfluence:-10 },
+  surreal:     { weirdness:+25, styleInfluence:-15 },
+  absurd:      { weirdness:+20, styleInfluence:-15 },
+  playful:     { weirdness:+10, styleInfluence:-5  },
+  ironic:      { weirdness:+15, styleInfluence:-5  },
+  sardonic:    { weirdness:+15, styleInfluence:0   },
+  chaotic:     { weirdness:+20, styleInfluence:-10 },
+  frantic:     { weirdness:+15, styleInfluence:-5  },
+  urgent:      { weirdness:+10, styleInfluence:+5  },
+  manic:       { weirdness:+20, styleInfluence:-10 },
+  cinematic:   { weirdness:+10, styleInfluence:+5  },
+  epic:        { weirdness:+5,  styleInfluence:+10 },
+  anthemic:    { weirdness:-5,  styleInfluence:+10 },
+  radio:       { weirdness:-15, styleInfluence:+10 },
+  commercial:  { weirdness:-20, styleInfluence:+10 },
+  intimate:    { weirdness:-5,  styleInfluence:0   },
+  vulnerable:  { weirdness:-5,  styleInfluence:0   },
+  confessional:{ weirdness:-5,  styleInfluence:0   },
+  nostalgic:   { weirdness:0,   styleInfluence:+5  },
+  romantic:    { weirdness:-5,  styleInfluence:+5  },
+  melancholic: { weirdness:+5,  styleInfluence:0   },
+  sad:         { weirdness:0,   styleInfluence:0   },
+  hopeful:     { weirdness:-5,  styleInfluence:+5  },
+  defiant:     { weirdness:+5,  styleInfluence:0   },
+  angry:       { weirdness:+10, styleInfluence:+5  },
+  aggressive:  { weirdness:+10, styleInfluence:+5  },
+  dark:        { weirdness:+10, styleInfluence:0   },
+  dreamy:      { weirdness:+15, styleInfluence:-5  },
+  ethereal:    { weirdness:+15, styleInfluence:-5  },
+  hype:        { weirdness:+5,  styleInfluence:+10 },
+  celebratory: { weirdness:+5,  styleInfluence:+5  }
+};
+
+// Structure modifiers — certain architectures want more sonic experimentation
+const STRUCTURE_SUNO_MODIFIERS = {
+  gear_shift_escalation: { weirdness:+10, styleInfluence:0 },
+  hiphop_storytelling_24:{ weirdness:+5,  styleInfluence:0 },
+  hiphop_beatswitch:     { weirdness:+15, styleInfluence:-5 },
+  story_in_medias_res:   { weirdness:+5,  styleInfluence:0 },
+  story_flashback:       { weirdness:+5,  styleInfluence:0 },
+  story_reverse_chrono:  { weirdness:+10, styleInfluence:0 },
+  viral:                 { weirdness:-10, styleInfluence:+5 }
+};
+
+// Core formula. Blends base + mood + structure + optional learning overlay.
+// `userLearning` shape: { sampleSize, avgWeirdness, avgStyleInfluence, excludeHits }
+// When sampleSize >= 3, learning overlays with weight = min(0.5, sampleSize/20).
+function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning }) {
+  const base = SUNO_GEN_SETTINGS_BASE[genre] || SUNO_GEN_SETTINGS_BASE.pop;
+  let weirdness = base.weirdness;
+  let styleInfluence = base.styleInfluence;
+  const excludes = new Set(base.exclude);
+
+  // Word-boundary mood match (same pattern as anti-cliche / speed-gears)
+  const moodNorm = ' ' + (mood || '').toLowerCase().replace(/[-_]/g,' ').replace(/\s+/g,' ').trim() + ' ';
+  for (const [key, mod] of Object.entries(MOOD_SUNO_MODIFIERS)) {
+    if (moodNorm.includes(' ' + key + ' ')) {
+      weirdness += mod.weirdness;
+      styleInfluence += mod.styleInfluence;
+    }
+  }
+
+  // Structure modifier
+  const structMod = STRUCTURE_SUNO_MODIFIERS[structure];
+  if (structMod) {
+    weirdness += structMod.weirdness;
+    styleInfluence += structMod.styleInfluence;
+  }
+
+  // Rap substyle modifier (hip-hop only — some styles are more experimental)
+  if (genre === 'hiphop' && rapStyle) {
+    const experimentalStyles = new Set(['cloud-rap','abstract-rap','jazz-rap','mosaic-flow','analog-melodic']);
+    const lockedStyles = new Set(['drill','uk-drill','trap','anthem-rap','hyphy-rap']);
+    if (experimentalStyles.has(rapStyle)) { weirdness += 10; styleInfluence -= 5; }
+    if (lockedStyles.has(rapStyle)) { weirdness -= 5; styleInfluence += 5; }
+  }
+
+  // Learning overlay — Phase 2
+  let learningApplied = false;
+  if (userLearning && typeof userLearning.sampleSize === 'number' && userLearning.sampleSize >= 3) {
+    const w = Math.min(0.5, userLearning.sampleSize / 20);
+    if (typeof userLearning.avgWeirdness === 'number') {
+      weirdness = Math.round(weirdness * (1 - w) + userLearning.avgWeirdness * w);
+    }
+    if (typeof userLearning.avgStyleInfluence === 'number') {
+      styleInfluence = Math.round(styleInfluence * (1 - w) + userLearning.avgStyleInfluence * w);
+    }
+    if (Array.isArray(userLearning.excludeHits)) {
+      userLearning.excludeHits.forEach(e => excludes.add(e));
+    }
+    learningApplied = true;
+  }
+
+  // Clamp + cap exclude list
+  weirdness = Math.max(0, Math.min(100, Math.round(weirdness)));
+  styleInfluence = Math.max(0, Math.min(100, Math.round(styleInfluence)));
+
+  return {
+    weirdness,
+    styleInfluence,
+    excludeStyles: Array.from(excludes).slice(0, 10),
+    learningApplied,
+    sampleSize: userLearning?.sampleSize || 0
+  };
+}
+
+// Renders the SUNO SETTINGS block for insertion into the LLM prompt.
+// LLM is told to emit this block VERBATIM in the PRODUCTION BRIEF output
+// so users can copy-paste into Suno directly.
+// Paywall: non-Studio users get a masked placeholder; Studio users get
+// live values (plus learning hint if enough samples).
+function buildSunoSettingsNote(params) {
+  const { genre, plan, isAdmin } = params || {};
+  const PAID = new Set(['studio','studio_annual','pro','pro_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','starter','starter_annual']);
+  const STUDIO = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+  const isStudioTier = isAdmin || STUDIO.has(plan);
+
+  if (!isStudioTier) {
+    // Non-Studio: include the block with placeholder values + upgrade CTA.
+    // LLM MUST include this block verbatim in the PRODUCTION BRIEF.
+    return `
+
+🎛 SUNO GENERATION SETTINGS (for PRODUCTION BRIEF — INCLUDE VERBATIM, DO NOT ALTER):
+
+SUNO SETTINGS:
+Weirdness: ⭐ Studio only
+Style Influence: ⭐ Studio only
+Exclude Styles: ⭐ Studio only
+→ Upgrade to Studio at mysoniq.com/app to unlock auto-computed Suno knob values personalized to this song.`;
+  }
+
+  const s = buildSunoSettings(params);
+  const learningTag = s.learningApplied
+    ? ` (tuned from your ${s.sampleSize} liked ${genre} songs)`
+    : '';
+  // Tell LLM to include this block VERBATIM in the PRODUCTION BRIEF output.
+  return `
+
+🎛 SUNO GENERATION SETTINGS (for PRODUCTION BRIEF — INCLUDE VERBATIM, DO NOT ALTER THE NUMBERS):
+
+SUNO SETTINGS${learningTag}:
+Weirdness: ${s.weirdness}%
+Style Influence: ${s.styleInfluence}%
+Exclude Styles: ${s.excludeStyles.join(', ')}
+→ Copy-paste these into Suno's generation panel for best results on this specific song.`;
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, buildSunoSettingsNote, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS };
 
 
 
