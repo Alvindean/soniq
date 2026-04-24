@@ -985,6 +985,39 @@ const LYRIC_CRAFT_UNIVERSAL = {
   },
 
   // ── HIP-HOP / RAP CRAFT ────────────────────────────────────────────────────
+  // Phonetic-decomposition craft (Eminem / MF DOOM / Big Pun level technique —
+  // treating words as a sequence of rhymeable phonemes instead of indivisible
+  // rhyme units). This is the layer above surface multi-rhyme schemes.
+  syllableDecomposition: {
+    label: 'SYLLABLE DECOMPOSITION (WORD-AS-RHYME-ATOMS)',
+    short: `Break a keyword into its phonetic atoms — each atom becomes a SEPARATE rhyme anchor for a subsequent bar. "California" → "CAL" (matches: gal, pal, shall) + "FORN" (matches: warn, torn, storm) + "NIA" (matches: hear-ya, steer-ya). Now you have THREE rhyme threads running through the next 6-12 bars instead of one end-rhyme. Plant each atom at varied positions (not always bar-end) through bars 2-12. Eminem, MF DOOM, Big Pun build entire verses this way. RULES: (1) Atoms must be real phonetic units — consult the word's actual syllable boundaries (vowel + following consonant), not arbitrary letter splits. (2) Each atom's rhymes must be real words doing syntactic work — never filler. (3) All 3 atom-threads can run simultaneously through one verse; each listener discovers a different one on repeat plays.`,
+    genres: ['hiphop']
+  },
+
+  internalRhymeChain: {
+    label: 'INTERNAL RHYME CHAIN (RHYMES INSIDE BARS, NOT JUST AT ENDS)',
+    short: `Rhymes live INSIDE the bar, not only at the end. Every 2-4 syllables within a bar contains a hit on the scheme — listener gets a dopamine reward 3-6 times per bar instead of once at the line-break. Eminem "Till I Collapse" runs the "at" sound every 2 syllables through whole verses. Big Pun "Twinz" runs internal chains so dense the rhyme count doubles the syllable count. RULES: (1) Pick ONE phonetic target (a vowel + following consonant). (2) Plant the target at syllables 2, 4, 6, 8 of each bar — not just at bar-end. (3) Each planted hit must be a real word doing syntactic work — never filler to complete the scheme. (4) The end-rhyme can also hit the target, but it's one of five hits, not the only one. The density IS the craft.`,
+    genres: ['hiphop']
+  },
+
+  prefixSuffixRhyme: {
+    label: 'PREFIX / SUFFIX RHYME (PARTIAL-WORD ANCHORS)',
+    short: `Rhyme on word BEGINNINGS (prefix) or ENDINGS (suffix) instead of whole-word rhymes. Prefix: "UNDERwater / UNDERfire / UNDERpressure" — the "UNDER-" IS the scheme anchor; the word-tails vary. Suffix: "agGRESSION / deDRESSION / proGRESSION" — the "-ESSION" is the anchor. The ear hears recurrence before the syntactic word completes, giving a locked-in percussive feel. Best placement: 3-5 consecutive bars using the same prefix or suffix. RULE: the scheme anchor must carry the stressed syllable — unstressed prefix/suffix rhymes don't land.`,
+    genres: ['hiphop','pop']
+  },
+
+  vowelChain: {
+    label: 'VOWEL CHAIN (LONG-FORM ASSONANCE THREAD)',
+    short: `Pick ONE specific vowel phoneme (not a general vowel category — the exact sound: long A as in "cake", short I as in "bit", schwa "uh", long E as in "beat") and run it through 8-16 bars as a through-line. The vowel must appear at every 2-4 syllables, planted in words chosen for that exact sound. Eminem "Sing for the Moment" threads the "ay" sound (say, way, day, make, break, fate, hate) through verse 1. MF DOOM "One Beer" threads "ee" through the whole verse. RULES: (1) Pick one exact vowel — don't drift to neighboring sounds. (2) Minimum density: one hit per bar, usually 2-4. (3) Can stack with end-rhyme scheme. (4) Vowel choice matches emotional register — bright vowels (ee, ay) for triumph, dark vowels (oh, oo, uh) for menace or loss. This is different from generic assonance: assonance is occasional vowel repetition; vowel chain is a structural through-line.`,
+    genres: ['hiphop']
+  },
+
+  phoneticTargeting: {
+    label: 'PHONETIC TARGETING (RHYME AS PHONEME, NOT WORD)',
+    short: `Meta-technique underneath all the above. When building a rhyme scheme, DO NOT think "I need a word that rhymes with X." Think "I need the phoneme /ɛkʃən/" (or whatever the exact vowel+consonant target is). Then search for that phoneme at ANY syllable position of ANY word — first syllable, middle, end. "Reflection" + "section" + "necklace" all hit /ɛk/ — at bar-end, mid-word, first-syllable respectively. Searching at the phoneme level expands vocabulary 10× over word-level. RULES: (1) Isolate the exact phoneme sequence the scheme runs on (consonant + vowel + consonant, usually 3 phonemes). (2) Never sacrifice meaning for phoneme match — if no meaning-respecting match exists, pick a different target. (3) Between a perfect word-level end-rhyme vs a phoneme hit planted mid-word elsewhere, pick the phoneme hit — it sounds more sophisticated and less "Hallmark card." (4) This is the technique behind the sensation of "wait, how did that rhyme?" that elite rappers create.`,
+    genres: ['hiphop']
+  },
+
   multisyllabicScheme: {
     label: 'MULTISYLLABIC (MULTI) SCHEME',
     short: `Chain 3-5 syllable rhyming clusters across 4-8 bars — not "day/way" but "breaking away / taking the stage / making them pay." Pick a 3-syllable sound cluster; every line's LAST 3 syllables must match it. Must feel natural — filler words to complete the rhyme destroy credibility instantly.`,
