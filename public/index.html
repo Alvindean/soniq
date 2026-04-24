@@ -1623,8 +1623,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 /* ── STREAMING RAW DISPLAY ── */
 .stream-raw{font-family:var(--mono);font-size:11px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;word-break:break-word;max-height:340px;overflow-y:auto;padding:4px 0;background:transparent;border:none;margin:0}
 /* ── SONG PROGRESS BAR — sits directly under song title, fills 0→100% during generation ── */
-.song-progress-bar{display:none;flex-direction:column;gap:7px;margin:14px 0 12px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,192,0,0.06),rgba(100,220,255,0.04));border:1px solid var(--amberline);border-radius:var(--r2);animation:pgIn .3s cubic-bezier(.2,.8,.3,1)}
+.song-progress-bar{display:none;flex-direction:column;gap:7px;margin:14px 0 4px;padding:12px 14px;background:linear-gradient(135deg,rgba(245,192,0,0.06),rgba(100,220,255,0.04));border:1px solid var(--amberline);border-radius:var(--r2);animation:pgIn .3s cubic-bezier(.2,.8,.3,1);box-sizing:border-box}
 .song-progress-bar.active{display:flex}
+/* When bar sits inside a flex .result-header, wrap it to its own row so it spans full width */
+.result-header .song-progress-bar{flex-basis:100%;width:100%;order:99;margin:16px 0 0}
 .spb-track{width:100%;height:14px;background:var(--s3);border:1px solid var(--b1);border-radius:99px;overflow:hidden;position:relative;box-shadow:inset 0 1px 2px rgba(0,0,0,0.25)}
 .spb-fill{height:100%;background:linear-gradient(90deg,var(--amber) 0%,#ffb347 40%,var(--cyan) 100%);border-radius:99px;transition:width .45s cubic-bezier(.2,.8,.3,1);width:0%;box-shadow:0 0 18px rgba(245,192,0,0.55),inset 0 1px 0 rgba(255,255,255,0.3);position:relative;overflow:hidden}
 .spb-fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);animation:spbShimmer 1.8s linear infinite;transform:translateX(-100%)}
@@ -3919,10 +3921,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="result-header">
       <div style="flex:1;min-width:0">
         <div class="result-song-title" id="res-title">—</div>
-        <div class="song-progress-bar" id="res-progress-bar">
-          <div class="spb-track"><div class="spb-fill" id="res-progress-fill"></div></div>
-          <div class="spb-label"><span class="spb-pct" id="res-progress-pct">0%</span><span class="spb-stage" id="res-progress-stage"> · starting…</span></div>
-        </div>
         <div class="result-song-verdict" id="res-verdict"></div>
       </div>
       <div class="result-acts">
@@ -3950,6 +3948,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <button class="song-card-overflow-item" onclick="openVariants()" id="variants-btn" style="display:none">🎛️ Variants</button>
           </div>
         </div>
+      </div>
+      <div class="song-progress-bar" id="res-progress-bar">
+        <div class="spb-track"><div class="spb-fill" id="res-progress-fill"></div></div>
+        <div class="spb-label"><span class="spb-pct" id="res-progress-pct">0%</span><span class="spb-stage" id="res-progress-stage"> · starting…</span></div>
       </div>
     </div>
 
@@ -4285,10 +4287,6 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="result-header">
       <div style="flex:1;min-width:0">
         <div class="result-song-title" id="lres-title">—</div>
-        <div class="song-progress-bar" id="lres-progress-bar">
-          <div class="spb-track"><div class="spb-fill" id="lres-progress-fill"></div></div>
-          <div class="spb-label"><span class="spb-pct" id="lres-progress-pct">0%</span><span class="spb-stage" id="lres-progress-stage"> · starting…</span></div>
-        </div>
         <div class="result-song-verdict" id="lres-verdict"></div>
       </div>
       <div class="result-acts">
@@ -4308,6 +4306,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <button class="song-card-overflow-item" onclick="shareOnX('lres')">𝕏 Post</button>
           </div>
         </div>
+      </div>
+      <div class="song-progress-bar" id="lres-progress-bar">
+        <div class="spb-track"><div class="spb-fill" id="lres-progress-fill"></div></div>
+        <div class="spb-label"><span class="spb-pct" id="lres-progress-pct">0%</span><span class="spb-stage" id="lres-progress-stage"> · starting…</span></div>
       </div>
     </div>
     <!-- COPYRIGHT STRIP -->
