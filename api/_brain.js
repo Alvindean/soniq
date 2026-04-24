@@ -1334,6 +1334,56 @@ THE RULES (PART B):
 THE TEST: After writing a line, ask "could this line appear unchanged in any other song in this genre written in the last 20 years?" If yes, flip it or cut it.`;
 }
 
+// ============ CRAFT VOCABULARY FIREWALL ============
+// Prevents technique names used in the prompt from bleeding into the actual
+// lyrics. This is a single source of truth wired into all 5 prompt builders
+// (song, lucky, rap lab, variant, edit). Expand the BANNED_WORDS list any
+// time a new dimension or pill is added.
+function buildCraftFirewallNote() {
+  const BANNED = [
+    // Rhyme architecture
+    '"internal"','"multi-syllabic"','"multisyllabic"','"end-only"','"end rhyme"','"chain rhyme"','"mosaic rhyme"','"slant rhyme"','"rhyme scheme"','"rhyme architecture"',
+    // Flow / cadence
+    '"triplet"','"triplet flow"','"syncopated"','"on-beat"','"off-beat"','"double-time"','"double time"','"conversational"','"behind-beat"','"behind the beat"','"flow pattern"','"cadence"',
+    // Speed gears system
+    '"gear"','"gear up"','"gear down"','"gear shift"','"cascade"','"breakdown"','"breath reset"','"patter"','"speed-rap"','"speed rap"','"chopper flow"','"talking blues"',
+    // Density
+    '"sparse"','"medium density"','"dense"','"ultra-dense"','"syllable density"',
+    // Vocab registers (all 13 pill labels)
+    '"street-coded"','"street coded"','"conscious-literary"','"abstract-surreal"','"minimal-phonetic"','"academic"','"braggadocio"','"confessional"','"sardonic"','"finance-hustle"','"mythic-biblical"','"cinematic-storyteller"','"chess-strategy"','"sports-combat"','"vocab register"','"vocabulary register"',
+    // Persona
+    '"first-person-raw"','"second-person"','"third-person"','"omniscient"','"character-voice"','"collective-we"','"persona"',
+    // Structure / section names used as lyric content (allowed as [brackets] only)
+    '"internal rhyme scheme"','"rhyme pattern"','"bar structure"','"16-bar"','"8-bar"','"bar count"',
+    // Craft concepts from lyric craft toolkit
+    '"money line"','"hook kernel"','"opening gravity"','"closing gravity"','"homage and subvert"','"cliche flip"','"rule break"','"era anchor"','"counter-melody"','"undertone"','"primary"','"secondary"','"blend"','"graft"','"invert"','"freestyle"',
+    // Anti-cliche system itself
+    '"anti-cliche"','"cliche rhyme"','"rhyme chain"','"flip the cliche"'
+  ];
+  return `
+
+🚫 CRAFT VOCABULARY FIREWALL — ABSOLUTE RULE (ENFORCE ON EVERY LINE):
+
+The words below are INSTRUCTION VOCABULARY — the labels we use to TELL YOU how to write. They are NOT song vocabulary and MUST NEVER appear inside the lyrics you generate:
+
+${BANNED.join(', ')}
+
+THREE USES FORBIDDEN:
+1. As a RHYME WORD — never rhyme on "internal", "triplet", "cascade", "braggadocio", "cinematic", etc.
+2. As LYRIC CONTENT — never write a bar like "my flow is triplet", "my rhyme scheme is internal", "now I gear up", "this is that braggadocio mode", "watch me cascade".
+3. SNEAKED MID-BAR — don't hide them inside otherwise-normal lines either ("I'm in my confessional bag" is forbidden).
+
+BRACKET TAGS ARE EXEMPT. Delivery/section tags like [Verse 1], [Chorus], [Triplet Flow], [Gear Up], [Cascade], [Breakdown] belong OUTSIDE the lyric line — on their own line before the affected bars. Those are the stage directions. The bars themselves never name the directions.
+
+THE TEST: After writing each line, scan it for any of the banned words above. If the line uses one, rewrite that line with DIFFERENT words that demonstrate the same technique.
+
+NATURAL-SPEECH EXCEPTION: If a banned word is also a common English word used in natural speech ("chain", "bridge", "verse", "pattern", "break", "fire", "cold"), it MAY appear in a bar when used for its everyday meaning — but NEVER as a technique self-reference. "Chain on my neck" = fine. "My rhyme chain's tight" = forbidden.
+
+META-RAP EXCEPTION: Some rap lineages (Eminem, J. Cole, Lupe Fiasco) genuinely reference their own craft in-bar. If and only if the topic is EXPLICITLY about rapping or writing, a SINGLE meta-reference per song is allowed — but still never using the exact pill labels from the UI. Write "I bend syllables", not "I use multi-syllabic rhyme".
+
+DEMONSTRATE the technique. NEVER NAME it. If the listener could hear the verse and identify the technique without you labeling it, you executed it correctly. If you had to SAY the label, you failed to execute.`;
+}
+
 // ============ SPEED GEARS SYSTEM ============
 // Cadence modulation as a cross-genre storytelling device. Speed is a lever
 // the narrator pulls — acceleration = escalation/panic/list-cascade, pullback
@@ -3652,14 +3702,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const aggressionNote = genre === 'hiphop' && _aggrMap[aggression] ? `\n\nAGGRESSION LEVEL — ${_aggrMap[aggression]}` : '';
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
-
-🚫 CRAFT VOCABULARY FIREWALL — ABSOLUTE RULE:
-Any technique name that appears in the instructions below — including but not limited to "undertone", "primary", "secondary", "blend", "graft", "invert", "counter-melody", "internal rhyme", "multi-syllabic", "triplet", "syncopated", "freestyle", "hook", "chorus", "verse", "bridge", "rule-break", "era anchor" — is INSTRUCTION VOCABULARY. It tells YOU how to execute the craft.
-It is NOT song vocabulary. DO NOT use any of those words as:
-  • Rhyme words
-  • Lyric content ("this chorus hits different" is fine as natural speech; "my rhyme is internal" is forbidden)
-  • Titles
-DEMONSTRATE the technique in the writing. NEVER NAME IT in the writing. If a line would rhyme on or showcase a technique name, rewrite with different words.
+${buildCraftFirewallNote()}
 
 Genre: ${genreLabel}
 Topic: ${topic}
@@ -3848,6 +3891,7 @@ PLUGINS (paid): ${(_plPL.paid||[]).slice(0,3).join(', ')}
 MASTERING: ${_mstPL.lufs||'-14 LUFS'} · ${_mstPL.dynamicRange||'DR 8–10'} · ${_mstPL.brightness||'natural'} · ${_mstPL.notes||''}` : '';
 
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
+${buildCraftFirewallNote()}
 
 Fusion style: ${fd?.name || g1 + ' × ' + g2}
 ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
@@ -4323,14 +4367,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 
-🚫 CRAFT VOCABULARY FIREWALL — ABSOLUTE RULE:
-The technique names used below to control your craft — specifically: "internal", "multi-syllabic", "end-only", "chain", "mosaic", "slant", "triplet", "syncopated", "on-beat", "double-time", "conversational", "behind-beat", "sparse", "medium", "dense", "ultra-dense", "street-coded", "conscious-literary", "abstract-surreal", "minimal-phonetic", "academic", "first-person-raw", "character", "omniscient", "second-person", "collective-we", "undertone", "primary", "secondary", "blend", "freestyle", "hook", "chorus", "verse", "bridge" — are INSTRUCTION VOCABULARY for YOU. They tell you HOW to execute the craft.
-They are NOT song vocabulary. DO NOT use any of them as:
-  • Rhyme words (never rhyme on "internal", "triplet", "undertone", etc.)
-  • Lyric content (never write a line like "my flow is triplet")
-  • Bar-internal words (don't sneak them mid-line either)
-DEMONSTRATE the technique in the writing. NEVER NAME IT in the writing.
-If a line would use one of these words, rewrite that line with different vocabulary.
+${buildCraftFirewallNote()}
 
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dims.vocabRegister.length>1 || dims.persona.length>1) ? `
@@ -4643,7 +4680,7 @@ function buildVariantPrompt(variant, song) {
   // Variants inherit speed-gears for rap genres (baseline applies) but can't
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
-  return builder(safeSong) + craftNote + speedGearsNote;
+  return builder(safeSong) + craftNote + speedGearsNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4784,7 +4821,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}`;
+${p.lyrics}${craftNote}${speedGearsNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
