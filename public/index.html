@@ -3200,6 +3200,21 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div id="age-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:8px;min-height:14px"></div>
 
+      <!-- LYRIC TIER — craft demand-on-listener dial (cross-genre).
+           Radio = immediate, no demand. Street = conversational (default).
+           Conscious = layered, rewards rereads. Archival = Black Thought /
+           Joni Mitchell / Sondheim ceiling. Affects vocab, rhyme density,
+           reference density, and conceit depth. -->
+      <div class="param" style="margin-bottom:12px">
+        <div class="param-label">Lyric Tier <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how much craft to write at (cross-genre)</span></div>
+        <select id="g-lyric-tier">
+          <option value="radio">📻 Radio — immediate, universal, no demand on listener</option>
+          <option value="street" selected>🗣️ Street — conversational, direct (default baseline)</option>
+          <option value="conscious">🧠 Conscious — layered, rewards a second listen</option>
+          <option value="archival">📚 Archival — peak craft (Black Thought / Joni Mitchell / Sondheim ceiling)</option>
+        </select>
+      </div>
+
       <!-- PARAMS ROW (Vocal + Structure only) -->
       <div class="params" style="grid-template-columns:1fr 1fr">
         <div class="param">
@@ -10218,6 +10233,7 @@ async function generateSong(){
   const mood=(S.selectedMoods&&S.selectedMoods.length)?S.selectedMoods.join(' + '):'Emotional';
   const vocal=document.getElementById('g-vocal').value;
   const structure=document.getElementById('g-structure').value;
+  const lyricTier=document.getElementById('g-lyric-tier')?.value||'street';
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
 
   if(!topic){
@@ -10229,7 +10245,7 @@ async function generateSong(){
 
   // Build params for server-side prompt construction
   const songParams = {
-    genre, topic, mood, vocal, structure,
+    genre, topic, mood, vocal, structure, lyricTier,
     era: S.selectedEra || 'modern',
     length: S.selectedLength || 'medium',
     quality: S.quality || 'high',
@@ -10501,6 +10517,7 @@ VIDEO PROMPT:
     if (S.currentSong) {
       if (S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
       if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
+      if (lyricTier) S.currentSong.lyricTier = lyricTier;
     }
     renderSunoChips('res', S.currentSong);
   }catch(e){
@@ -10975,6 +10992,7 @@ function renderSunoChips(prefix, song) {
   const isStudio = window.__soniqAdmin || SUNO_CHIP_STUDIO.has(S.plan);
   const s = song.sunoSettings || null;
   const vocal = (song.vocal || '').trim();
+  const tier = (song.lyricTier || '').trim();
   const parts = [];
 
   // Weirdness chip
@@ -11021,6 +11039,24 @@ function renderSunoChips(prefix, song) {
       <span class="suno-chip-label">Vocal</span>
       <span class="suno-chip-value">${escHtml(vocalShort)}</span>
     </span>`);
+  }
+
+  // Lyric Tier chip — shown to everyone, suppress 'street' baseline (it's the default
+  // and showing it adds noise to every chip row).
+  if (tier && tier !== 'street') {
+    const TIER_META = {
+      radio:     { icon: '📻', label: 'Radio',     tip: 'Immediate, universal — no demand on the listener' },
+      conscious: { icon: '🧠', label: 'Conscious', tip: 'Layered, rewards a second listen — multi-syl rhymes, named refs, layered conceits' },
+      archival:  { icon: '📚', label: 'Archival',  tip: 'Peak-craft density (Black Thought / Joni Mitchell / Sondheim ceiling)' }
+    };
+    const meta = TIER_META[tier];
+    if (meta) {
+      parts.push(`<span class="suno-chip" title="${escHtml(meta.tip)}">
+        <span class="suno-chip-icon">${meta.icon}</span>
+        <span class="suno-chip-label">Tier</span>
+        <span class="suno-chip-value">${meta.label}</span>
+      </span>`);
+    }
   }
 
   host.innerHTML = parts.join('');
