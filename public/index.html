@@ -1037,8 +1037,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .ie-hdr-title{font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em}
 .ie-body{padding:14px 16px}
 .ie-chips{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px}
-.ie-chip{font-size:10px;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;user-select:none}
+.ie-chip{font-size:10px;font-weight:600;padding:4px 11px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all .12s;user-select:none;position:relative}
 .ie-chip:hover{background:var(--s4);color:var(--tx2);border-color:var(--b3)}
+/* Selected (compounding) state — multi-select up to 5. The numeric badge
+   shows the order the chip was added so the user can sequence their edits. */
+.ie-chip.on{background:var(--amberbg);color:var(--amber);border-color:var(--amber);padding-right:22px}
+.ie-chip.on::after{content:attr(data-idx);position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:9px;font-weight:800;background:var(--amber);color:#08080a;border-radius:99px;min-width:14px;height:14px;padding:0 4px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.ie-counter{font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:-4px 0 8px}
+.ie-counter.full{color:var(--amber)}
 .ie-textarea{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:56px;line-height:1.6;transition:border-color .15s;font-family:var(--font)}
 .ie-textarea:focus{border-color:var(--amberline);box-shadow:0 0 0 3px var(--amberbg)}
 .ie-textarea::placeholder{color:var(--tx4)}
@@ -4214,7 +4220,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <span class="ie-hdr-title">⚡ Instant Edit — quick changes, no full rebuild</span>
     </div>
     <div class="ie-body">
-      <div class="ie-chips">
+      <div class="ie-chips" id="ie-chips">
         <span class="ie-chip" onclick="ieChip(this,'Make the chorus more anthemic and uplifting')">More anthemic chorus</span>
         <span class="ie-chip" onclick="ieChip(this,'Shift perspective from third person to first person')">First person POV</span>
         <span class="ie-chip" onclick="ieChip(this,'Darken the mood and emotional tone')">Darker mood</span>
@@ -4223,9 +4229,12 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="ie-chip" onclick="ieChip(this,'Increase the energy and tempo feel throughout')">Higher energy</span>
         <span class="ie-chip" onclick="ieChip(this,'Tighten the lyrics — remove filler, increase specificity')">Tighten lyrics</span>
         <span class="ie-chip" onclick="ieChip(this,'Blend in more genre-specific vocabulary and phrasing')">Genre-authentic phrasing</span>
+        <span class="ie-chip" onclick="ieChip(this,'Strengthen the opening line — drop the listener into a specific image, action, or confession in the first bar')">Punchier opening</span>
+        <span class="ie-chip" onclick="ieChip(this,'Engineer a memorable closing line — reframe, reveal, or leave a haunting sensory image. Avoid clichés or summary')">Memorable closer</span>
       </div>
+      <div class="ie-counter" id="ie-counter" style="display:none">0/5 selected</div>
       <div style="position:relative">
-        <textarea class="ie-textarea" id="ie-input" placeholder="Describe your quick edit… e.g. 'Make the pre-chorus build more tension' or 'Change the title direction to something more mysterious'"></textarea>
+        <textarea class="ie-textarea" id="ie-input" placeholder="Pick chips above (up to 5 stack), and/or describe your own edit here — they compound. e.g. 'Make the pre-chorus build more tension'"></textarea>
         <button class="mic-btn" style="position:absolute;bottom:8px;right:8px;font-size:13px;padding:3px 7px;opacity:.8" onclick="toggleMicFor('ie-mic-btn','ie-input','inline')" id="ie-mic-btn" title="Speak your edit instruction">🎤</button>
       </div>
       <div class="ie-actions">
@@ -17421,17 +17430,80 @@ async function generateSynopsis() {
   btnDone('synopsis-btn');
 }
 
+// Instant Edit — multi-select up to 5 chips, compounded with optional custom
+// textarea text. Each chip click toggles its selected state and assigns a
+// numeric order badge so the user can sequence the edits.
+const _ieMaxChips = 5;
+const _ieSelected = []; // ordered list of chip text strings
+
+function _ieRefreshOrderBadges() {
+  document.querySelectorAll('.ie-chip.on').forEach(el => {
+    const text = el.dataset.ieText || '';
+    const idx = _ieSelected.indexOf(text);
+    if (idx >= 0) el.setAttribute('data-idx', String(idx + 1));
+  });
+}
+
+function _ieUpdateCounter() {
+  const c = document.getElementById('ie-counter');
+  if (!c) return;
+  const n = _ieSelected.length;
+  if (n === 0) { c.style.display = 'none'; c.classList.remove('full'); return; }
+  c.style.display = '';
+  c.textContent = (n === _ieMaxChips)
+    ? `${n}/${_ieMaxChips} selected — max reached, deselect one to add another`
+    : `${n}/${_ieMaxChips} selected — chips compound, add custom text below for extra fixes`;
+  c.classList.toggle('full', n === _ieMaxChips);
+}
+
+function _ieResetChips() {
+  _ieSelected.length = 0;
+  document.querySelectorAll('.ie-chip').forEach(c => {
+    c.classList.remove('on');
+    c.removeAttribute('data-idx');
+    c.style.borderColor = ''; // legacy clear
+  });
+  _ieUpdateCounter();
+}
+
 function ieChip(el, text) {
+  // Stash full text on the element so we can read it back without re-parsing
+  if (!el.dataset.ieText) el.dataset.ieText = text;
+  const i = _ieSelected.indexOf(text);
+  if (i >= 0) {
+    // Toggle off — remove from selection and re-number remaining chips
+    _ieSelected.splice(i, 1);
+    el.classList.remove('on');
+    el.removeAttribute('data-idx');
+    _ieRefreshOrderBadges();
+  } else {
+    if (_ieSelected.length >= _ieMaxChips) {
+      toast(`Max ${_ieMaxChips} compound chips — deselect one first`);
+      return;
+    }
+    _ieSelected.push(text);
+    el.classList.add('on');
+    el.setAttribute('data-idx', String(_ieSelected.length));
+  }
+  _ieUpdateCounter();
+  // Focus the textarea so user can immediately add custom text on top of chips
   const inp = document.getElementById('ie-input');
-  if (inp) { inp.value = text; inp.focus(); }
-  document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
-  el.style.borderColor = 'var(--amber)';
+  if (inp) inp.focus();
 }
 
 async function instantEdit() {
   const inp = document.getElementById('ie-input');
-  const instruction = inp?.value?.trim();
-  if (!instruction) { toast('Describe your edit first'); return; }
+  const customText = (inp?.value || '').trim();
+  // Compound: numbered chip instructions on top, custom text appended below
+  let instruction = '';
+  if (_ieSelected.length > 0) {
+    const numbered = _ieSelected.map((t, i) => `${i + 1}) ${t}`).join('\n');
+    instruction = numbered;
+    if (customText) instruction += `\n\nADDITIONAL: ${customText}`;
+  } else {
+    instruction = customText;
+  }
+  if (!instruction) { toast('Pick a chip or describe your edit first'); return; }
   if (!S.currentSong?.lyrics) { toast('Generate a song first'); return; }
   btnLoad('ie-btn', '⚡ Editing…');
   const lyricsEl = document.getElementById('res-lyrics-text');
@@ -17468,7 +17540,7 @@ async function instantEdit() {
     ssPopulateSections(); // refresh section switcher
     toast('⚡ Edit applied!');
     inp.value = '';
-    document.querySelectorAll('.ie-chip').forEach(c => c.style.borderColor = '');
+    _ieResetChips();
   } catch(e) { lyricsEl.innerHTML = apiErrHtml(e.message); }
   btnDone('ie-btn');
 }
