@@ -544,6 +544,9 @@ module.exports = async function handler(req, res) {
         // Region whitelist — invalid → no region overlay (silent fallback)
         const VALID_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (p.region && !VALID_REGIONS.has(p.region)) p.region = '';
+        // Emotional velocity whitelist — invalid → 'auto' (server resolves to genre default)
+        const VALID_VELOCITY = new Set(['auto','slow_burn','standard_arc','cycling','whiplash','plateau_drift']);
+        if (p.emotionalVelocity && !VALID_VELOCITY.has(p.emotionalVelocity)) p.emotionalVelocity = 'auto';
         // Coach-driven rewrite payload — capped to keep prompt bounded
         if (typeof p.coachInstruction === 'string') p.coachInstruction = p.coachInstruction.trim().slice(0, 4000);
         if (typeof p.originalLyrics === 'string') p.originalLyrics = p.originalLyrics.trim().slice(0, 6000);
@@ -568,6 +571,8 @@ module.exports = async function handler(req, res) {
         const VALID_LUCKY_TIERS = new Set(['radio','street','conscious','archival']);
         if (lp.lyricTier && !VALID_LUCKY_TIERS.has(lp.lyricTier)) lp.lyricTier = 'street';
         lp.edgeMode = lp.edgeMode === true;
+        const VALID_LUCKY_VELOCITY = new Set(['auto','slow_burn','standard_arc','cycling','whiplash','plateau_drift']);
+        if (lp.emotionalVelocity && !VALID_LUCKY_VELOCITY.has(lp.emotionalVelocity)) lp.emotionalVelocity = 'auto';
         const VALID_LUCKY_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (lp.region && !VALID_LUCKY_REGIONS.has(lp.region)) lp.region = '';
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
