@@ -2355,7 +2355,7 @@ INTEGRATION: ${bible.integration}`);
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
-  hookfirst:    '[Hook] → [Verse 1] → [Hook] → [Verse 2] → [Bridge] → [Hook] → [Outro]',
+  hookfirst:    '[Chorus] → [Verse 1] → [Chorus] → [Verse 2] → [Bridge] → [Chorus] → [Outro]',
   chorusfirst:  '[Chorus] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Final Chorus]',
   storytelling: '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Verse 3] → [Chorus] → [Outro]',
   // ── Extended narrative architectures (character-driven story songs) ──
@@ -2371,14 +2371,14 @@ const STRUCTURES={
   story_reverse_chrono:  '[Verse 1 — The ending of the story] → [Chorus] → [Verse 2 — The middle: how it unravelled] → [Chorus] → [Verse 3 — The beginning: how it started] → [Final Chorus — returns to V1 imagery in new light]',
   gear_shift_escalation: '[Verse 1 — Gear 1 baseline conversational cadence, establish scene] → [Pre-Chorus — [Gear Up] to Gear 2, stakes tighten] → [Chorus — Gear 1 hook lands wide] → [Verse 2 — Gear 2 pocket, density rising] → [Pre-Chorus — [Cascade] through Gears 2→3→4 as timeline compresses or panic builds] → [Chorus — [Breakdown] to Gear 0, the line lands naked] → [Bridge — Gear 4 spotlight cascade max 4 bars, then [Breath Reset]] → [Final Chorus — Gear 1 resolution, the air comes back]',
   hiphop_storytelling_24: '[8-bar Intro | Spoken Word OR beat only] → [24-bar Verse 1 | Scene establishment, characters, place, time] → [24-bar Verse 2 | Conflict, escalation, stakes rising] → [24-bar Verse 3 | Climax, reveal, or consequence] → [8-bar Outro | Image that stays]',
-  minimal:      '[Intro] → [Verse] → [Hook] → [Verse] → [Hook] → [Hook] → [Outro]',
+  minimal:      '[Intro] → [Verse] → [Chorus] → [Verse] → [Chorus] → [Chorus] → [Outro]',
   epic:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Break] → [Chorus] → [Outro]',
   doublechorus: '[Verse 1] → [Pre-Chorus] → [Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Chorus] → [Bridge] → [Final Chorus] → [Final Chorus]',
   verseonly:    '[Intro] → [Verse 1] → [Verse 2] → [Verse 3] → [Verse 4] → [Outro]',
   aaba:         '[A Section] → [A Section] → [B Bridge] → [A Section]',
   ballad:       '[Intro] → [Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Breakdown] → [Key Change] → [Final Chorus]',
   edm:          '[Intro] → [Build] → [Drop] → [Breakdown] → [Build] → [Drop] → [Outro]',
-  viral:        '[Hook (0:00)] → [Verse] → [Pre-Chorus] → [Hook] → [Bridge] → [Final Hook]',
+  viral:        '[Chorus (0:00)] → [Verse] → [Pre-Chorus] → [Chorus] → [Bridge] → [Final Chorus]',
   // ── Genre-specific ───────────────────────────────────────────────────────
   hiphop_classic:      '[4-bar Intro | Beat Only] → [16-bar Verse 1 | Rap Verse] → [8-bar Hook] → [16-bar Verse 2 | Rap Verse] → [8-bar Hook] → [16-bar Verse 3 | Rap Verse] → [8-bar Hook] → [4-bar Outro]',
   hiphop_trap:         '[4-bar Intro | Beat Only] → [8-bar Hook] → [12-bar Verse 1 | Rap Verse] → [8-bar Hook] → [12-bar Verse 2 | Rap Verse] → [8-bar Hook] → [8-bar Hook] → [4-bar Outro | Ad-libs]',
@@ -2389,6 +2389,25 @@ const STRUCTURES={
   afrobeats:    '[Intro] → [Verse 1] → [Hook] → [Verse 2] → [Hook] → [Ad-lib Break] → [Hook] → [Outro Vamp]',
   gospel:       '[Verse 1] → [Chorus] → [Verse 2] → [Chorus] → [Bridge] → [Vamp] → [Outro Ad-lib]',
   kpop:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Rap Break] → [Bridge] → [Key Change +1] → [Final Chorus] → [Outro]',
+};
+
+// Structure-opening hints — when a non-standard structure is picked, give the
+// model an EXPLICIT directive about which section opens the song. Without this,
+// the model's training prior pulls it back to verse-first standard order even
+// when the structure map clearly says "[Chorus] first". The directive overrides
+// the prior. Keys that aren't here use the default (model infers from the map).
+const STRUCTURE_OPENING_HINTS = {
+  hookfirst:           'OPENING SECTION: this song starts with the [Chorus] at 0:00. NO intro, NO verse first. The hook lands immediately — the listener should be inside the chorus before they decide whether to keep listening. Modern streaming / TikTok strategy.',
+  chorusfirst:         'OPENING SECTION: this song opens with the [Chorus]. The verse comes second. Pop-radio formula: lead with the catchy refrain, earn the verse with momentum already established.',
+  viral:               'OPENING SECTION: this song starts with the [Chorus] at the 0:00 mark — designed for the first 5-7 seconds to be hookable on TikTok / Reels / Shorts. Hook lands instantly, no preamble.',
+  story_in_medias_res: 'OPENING SECTION: drop the listener into the MIDDLE of the action in line 1 of [Verse 1]. No scene-setting, no establishing context — they should feel like the song is already 30 seconds into a movie when it starts. Backstory comes in V2.',
+  story_reverse_chrono:'OPENING SECTION: [Verse 1] is the END of the story (the resolution / aftermath / final image). The song moves BACKWARD chronologically. Final chorus returns to V1 imagery in new light.',
+  story_murder_ballad: 'OPENING SECTION: [Verse 1] is innocent-seeming with quiet menace. Do NOT telegraph the act. The listener should feel something is wrong without knowing why.',
+  hiphop_storytelling: 'OPENING SECTION: skip the hook. Open with [Verse 1] — 24-32 bars of pure narrative, no chorus interruption. Slick Rick / Nas / Kendrick storytelling tradition.',
+  hiphop_storytelling_24: 'OPENING SECTION: 8-bar [Intro] (spoken word OR beat only), then 24-bar [Verse 1] establishing scene/characters/place/time. Hook does NOT appear in this song.',
+  verseonly:           'OPENING SECTION: [Intro] then verses only — NO chorus, NO hook, NO bridge. Folk / SS storytelling form. Each verse develops the same emotional thread.',
+  edm:                 'OPENING SECTION: instrumental [Intro] builds into the [Build] section, then [Drop] is the song\'s peak moment. Lyrics may be sparse — the production carries the emotional arc.',
+  aaba:                'OPENING SECTION: [A Section] is the main theme — verse + chorus combined into a single 8-bar unit. Repeats. The [B Bridge] is the only contrast.'
 };
 
 const FUSION_DATA={
@@ -4624,7 +4643,7 @@ Genre: ${genreLabel}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
 Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
@@ -4828,7 +4847,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -5294,7 +5313,7 @@ Style: ${style.label} (${style.era})
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 
 ${buildCraftFirewallNote()}
