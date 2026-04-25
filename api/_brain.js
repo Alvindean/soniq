@@ -2067,6 +2067,62 @@ function buildEdgeNote(edgeMode, lyricTier) {
 This song must feel risked, not safe.`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// CRAFT MECHANICS — universal rules (always on) + optional per-song dials.
+// Always-on: V1 ≠ V2 differentiation rule, sensory diversity mandate.
+// Optional dials: tempo, time signature, motif, POV, addressee.
+// ═══════════════════════════════════════════════════════════════════════════
+const TIME_SIG_GUIDANCE = {
+  '3/4':  'Waltz feel — three beats per bar, strong-weak-weak emphasis. Phrase lyrics in groups of 3 syllables or 6-syllable arcs. Country waltzes, musical theater ballads, classical-leaning pop.',
+  '6/8':  'Compound triple — feels like fast 2 with triplet subdivision. Phrase lyrics in 6-syllable arcs with stress on 1 and 4. Folk ballads, slow blues, Celtic, classic doo-wop.',
+  '5/4':  'Asymmetric quintuple — phrase pattern 3+2 or 2+3. Listener feels the off-meter as tension. Used by Take Five, Tool, prog rock, modern indie.',
+  '7/8':  'Asymmetric septuple — phrase pattern 4+3 or 3+4. Disrupts the body\'s 4/4 expectation; rewards a careful listener. Common in Balkan, prog, math-rock.',
+  '12/8': 'Compound quadruple — feels like 4 with triplet subdivision. Slow blues, gospel ballads, classic R&B ballads — anything that swings hard.',
+  '4/4':  ''
+};
+
+const POV_GUIDANCE = {
+  '1st-direct':       'FIRST PERSON DIRECT — "I" speaks in real-time, present-tense honest. The narrator IS the writer\'s vantage. No frame, no distance, no character mask.',
+  '1st-narrator':     'FIRST PERSON NARRATOR — "I" speaks but is a CHARACTER, not necessarily the writer. The narrator may be unreliable, distant from the events, or older/younger than the writer.',
+  '2nd-confessional': 'SECOND PERSON — "you" is the addressee. Half the song is what the speaker can\'t say to them face-to-face. The "you" is specific and present.',
+  '3rd-omniscient':   'THIRD PERSON — story-mode. Characters are external. Use names, ages, places. Pull the camera back; the narrator sees what no character can see.',
+  'unreliable':       'UNRELIABLE NARRATOR — the speaker is missing something, lying to themselves, or hiding the truth. The listener gradually catches what the narrator won\'t say. The gap between what\'s sung and what\'s real is the song.',
+  'auto':             ''
+};
+
+function buildCraftMechanicsNote(genre, params) {
+  const p = params || {};
+  let note = `
+
+🎯 CRAFT MECHANICS — universal craft rules:
+- V1 ≠ V2 RULE: Verse 2 MUST differ from Verse 1 along at least one axis — exterior↔interior, present↔memory, hope↔doubt, public↔private, abstract↔specific, narrator↔addressee, broad↔intimate. NEVER make V2 a synonym-rewrite of V1. When the listener hears V2, the song must FEEL like it has moved forward, not restated.
+- SENSORY DIVERSITY MANDATE: Every song must include AT LEAST one non-visual, non-auditory sensory image — tactile (his shirt smelled like the bar), olfactory (the kitchen still has your soap), gustatory (salt on the rim of an empty glass), kinesthetic (my hand still cramps the way it did when I held yours). Visual + audio is the AI default; this rule breaks the model out of it.`;
+
+  if (p.tempo && /^\d{2,3}(\s*-\s*\d{2,3})?$/.test(String(p.tempo).trim())) {
+    note += `\n- TEMPO TARGET: ${p.tempo} BPM. Write line lengths + section pacing FOR this tempo. Slower = more syllables per line, more space between phrases. Faster = fewer + sharper, breath windows tighter.`;
+  }
+
+  if (p.timeSig && TIME_SIG_GUIDANCE[p.timeSig]) {
+    note += `\n- TIME SIGNATURE: ${p.timeSig}. ${TIME_SIG_GUIDANCE[p.timeSig]}`;
+  }
+
+  if (p.motif && typeof p.motif === 'string' && p.motif.trim()) {
+    const motif = p.motif.trim().slice(0, 40);
+    note += `\n- MOTIF: "${motif}" — this image/word returns 2-3 times across the song without being the chorus refrain itself. Plant it in V1 (line 3 or later), call back in V2 or bridge, reappear once more before the song ends. The motif accumulates meaning each time it returns. Lana = roses + summertime; Springsteen = highways + working hands; Frank Ocean = waves + cars. Find this song's "${motif}" beat by beat.`;
+  }
+
+  if (p.pov && POV_GUIDANCE[p.pov]) {
+    note += `\n- POV: ${POV_GUIDANCE[p.pov]}`;
+  }
+
+  if (p.addressee && typeof p.addressee === 'string' && p.addressee.trim()) {
+    const addressee = p.addressee.trim().slice(0, 80);
+    note += `\n- ADDRESSEE: "${addressee}" — this song is sung TO this person/entity. Every line passes the test: "would the speaker actually say this to ${addressee}?" If no, rewrite. The geometry of the conversation grounds every line.`;
+  }
+
+  return note;
+}
+
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
@@ -4299,6 +4355,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const academicNote = buildAcademicFrameworkNote(genre, era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(genre, params.region);
+  const craftMechanicsNote = buildCraftMechanicsNote(genre, params);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -4343,7 +4400,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${craftMechanicsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4486,6 +4543,7 @@ function buildLuckyPrompt(params) {
   const academicNote = buildAcademicFrameworkNote(g1, params.era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
+  const craftMechanicsNote = buildCraftMechanicsNote(g1, params);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -4521,7 +4579,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${craftMechanicsNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -5033,6 +5091,7 @@ ${buildLyricTierNote('hiphop', params.lyricTier)}
 ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
+${buildCraftMechanicsNote('hiphop', params)}
 
 Respond with EXACTLY this format:
 
@@ -5311,7 +5370,8 @@ function buildVariantPrompt(variant, song) {
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
+  const craftMechanicsNote = buildCraftMechanicsNote(safeSong.genre, song);
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + craftMechanicsNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5449,6 +5509,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   const academicNote = buildAcademicFrameworkNote(genre, p.era);
   const edgeNote = buildEdgeNote(p.edgeMode, p.lyricTier);
   const regionNote = buildRegionNote(genre, p.region);
+  const craftMechanicsNote = buildCraftMechanicsNote(genre, p);
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -5456,7 +5517,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${craftMechanicsNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5817,7 +5878,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, buildCraftMechanicsNote, TIME_SIG_GUIDANCE, POV_GUIDANCE };
 
 
 
