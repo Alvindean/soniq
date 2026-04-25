@@ -4175,7 +4175,8 @@ function buildSongPrompt(params) {
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
     freestyleMode = false, breakRule = false, eraUndertone = '',
-    graftGenre = '', graftSection = 'chorus', invertCounter = false
+    graftGenre = '', graftSection = 'chorus', invertCounter = false,
+    coachInstruction = '', originalLyrics = ''
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -4470,8 +4471,34 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   };
   const aggressionNote = genre === 'hiphop' && _aggrMap[aggression] ? `\n\nAGGRESSION LEVEL — ${_aggrMap[aggression]}` : '';
 
+  // Coach-driven rewrite directive — injected at the TOP of the prompt so the
+  // model treats this as a fix-and-improve job, not a fresh-page generation.
+  // The original lyrics + coach feedback are passed in; the model is told to
+  // address every weakness identified, while preserving topic + intent.
+  const _coachI = (coachInstruction && typeof coachInstruction === 'string') ? coachInstruction.trim().slice(0, 4000) : '';
+  const _origL  = (originalLyrics && typeof originalLyrics === 'string') ? originalLyrics.trim().slice(0, 6000) : '';
+  const coachRewriteNote = (_coachI && _origL) ? `
+
+🎓 COACH-DRIVEN REWRITE — this is NOT a fresh-page generation. You are rewriting an existing song to address specific weaknesses identified by an AI feedback coach. Preserve the topic + emotional intent; transform craft.
+
+ORIGINAL LYRICS (the version that was analyzed):
+${_origL}
+
+COACH FEEDBACK (every weakness identified MUST be addressed in your rewrite):
+${_coachI}
+
+REWRITE RULES:
+- Address EVERY weakness the coach identified — do not cherry-pick.
+- Preserve the topic, emotional arc, and any imagery anchors that worked.
+- The rewrite should feel like the SAME song made better, not a different song. A listener who knew the original should recognize the bones and feel the upgrade.
+- If the coach identified a weak hook, rewrite the hook. If the coach said V2 = V1 in synonyms, rewrite V2 along a new axis. If the coach said the opening was weak, replace it.
+- The full Soniq craft system below ALSO applies — lyric tier, region, edge, academic frameworks, craft mechanics. Apply them on top of the coach fixes.
+- Do NOT include the coach feedback or the original lyrics in your output. Only emit the rewritten song in the standard format.
+
+` : '';
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
-${buildCraftFirewallNote()}
+${coachRewriteNote}${buildCraftFirewallNote()}
 
 Genre: ${genreLabel}
 Topic: ${topic}

@@ -4709,7 +4709,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <div id="coach-results" style="display:none">
       <div id="coach-output" style="font-size:13px;color:var(--tx2);line-height:1.7;white-space:pre-wrap"></div>
-      <div style="margin-top:16px;display:flex;gap:8px">
+      <!-- ✨ Apply & Regenerate — sends current song lyrics + coach feedback through
+           the full generation brain (lyric tier, region, edge, academic frameworks,
+           craft mechanics) for an improved version that addresses every weakness. -->
+      <div style="margin-top:18px;padding:14px;background:linear-gradient(135deg,rgba(245,192,0,.08),rgba(34,211,238,.05));border:1px solid var(--amberline);border-radius:var(--r2)">
+        <div style="font-size:12px;color:var(--tx2);line-height:1.5;margin-bottom:10px">
+          <strong style="color:var(--amber)">✨ Want Soniq to apply these fixes?</strong> Click below to regenerate the song through the full Soniq brain — lyric tier, region, edge mode, academic frameworks, craft mechanics, the works. The coach's feedback is layered in as an explicit rewrite directive.
+        </div>
+        <button class="btn btn-gold" id="coach-apply-btn" onclick="applyCoachAndRegenerate()" style="width:100%;font-size:13px;padding:10px 16px;font-weight:700">✨ Apply Suggestions &amp; Regenerate</button>
+      </div>
+      <div style="margin-top:12px;display:flex;gap:8px">
         <button class="btn" onclick="copyCoachFeedback()" style="flex:1">📋 Copy Feedback</button>
         <button class="btn" onclick="resetCoach()">← New Analysis</button>
       </div>
@@ -14005,6 +14014,137 @@ function resetCoach() {
   _coachFeedback = '';
 }
 
+// ─── Apply Coach Suggestions & Regenerate ─────────────────────────────────
+// Takes the current song's lyrics + the coach's feedback text and runs both
+// through the FULL generation brain — same path as a normal generate, with
+// every premium system applied (lyric tier, region, edge, academic, craft
+// mechanics, suno settings, learning loop). The new fields coachInstruction
+// + originalLyrics are read by buildSongPrompt() to inject a top-priority
+// "rewrite this song to fix the identified weaknesses" directive at the head
+// of the prompt, before any other note-builders run.
+async function applyCoachAndRegenerate() {
+  if (!_coachFeedback || !_coachFeedback.trim()) {
+    toast('Run the analysis first');
+    return;
+  }
+  const song = S.currentSong;
+  if (!song || !song.lyrics) {
+    toast('No song loaded');
+    return;
+  }
+  const btn = document.getElementById('coach-apply-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '✨ Regenerating…'; }
+
+  try {
+    // Close coach modal so the user sees the result card during streaming
+    closeCoach();
+
+    // Build params from the loaded song + Soniq's full craft system. The user
+    // never re-enters topic/genre/mood — those carry from the import or the
+    // previous generation. Form fields layer on top (lyric tier, region, etc.)
+    // exactly as they would for a fresh generate.
+    const genre = song.genre || 'pop';
+    const topic = song.topic || song.title || 'reflection';
+    const mood = song.mood || 'Emotional';
+    const vocal = song.vocal || (document.getElementById('g-vocal')?.value) || 'any';
+    const structure = song.structure || (document.getElementById('g-structure')?.value) || 'standard';
+    const lyricTier = (document.getElementById('g-lyric-tier')?.value) || song.lyricTier || 'street';
+    const region = (document.getElementById('g-region')?.value) || song.region || '';
+    const sectionRegionsText = (document.getElementById('g-section-regions')?.value || '').trim();
+    const tempo = (document.getElementById('g-tempo')?.value || '').trim() || song.tempo || '';
+    const timeSig = (document.getElementById('g-time-sig')?.value) || song.timeSig || '4/4';
+    const motif = (document.getElementById('g-motif')?.value || '').trim() || song.motif || '';
+    const pov = (document.getElementById('g-pov')?.value) || song.pov || 'auto';
+    const addressee = (document.getElementById('g-addressee')?.value || '').trim() || song.addressee || '';
+
+    const songParams = {
+      genre, topic, mood, vocal, structure,
+      lyricTier, region, sectionRegionsText,
+      tempo, timeSig, motif, pov, addressee,
+      era: S.selectedEra || song.era || 'modern',
+      length: S.selectedLength || song.length || 'medium',
+      quality: S.quality || 'high',
+      theoryLevel: S.theoryLevel || 'standard',
+      mode: 'auto',
+      substyle: S.substyle || song.substyle || '',
+      hookStyle: S.hookStyle || 'auto',
+      bracketMode: S.bracketMode || 'suno',
+      voice: {
+        name: localStorage.getItem('soniq_voice_name') || '',
+        influences: localStorage.getItem('soniq_voice_influences') || '',
+        forbidden: localStorage.getItem('soniq_voice_forbidden') || ''
+      },
+      blend: {
+        genre2: '',
+        style2: '',
+        ratio: 70
+      },
+      avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
+      edgeMode: window.__qfEdge === true,
+      platinum: _platinumOn && isPlatinumEligible(),
+      // The two new fields that turn this into a coach-driven rewrite:
+      coachInstruction: _coachFeedback,
+      originalLyrics: song.lyrics
+    };
+
+    // Show the result card + progress bar so streaming is visible
+    const out = document.getElementById('gen-out');
+    if (out) { out.style.display = ''; out.classList.add('visible'); }
+    document.getElementById('res-title').textContent = 'Rewriting from coach feedback…';
+    document.getElementById('res-verdict').textContent = '';
+    const lyricsEl = document.getElementById('res-lyrics-text');
+    if (lyricsEl) lyricsEl.innerHTML = '<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Applying coach fixes through the full brain…</div></div>';
+    if (typeof renderSunoChips === 'function') renderSunoChips('res', null);
+    if (typeof startSongProgress === 'function') startSongProgress('res');
+
+    let firstChunk = true;
+    const streamCb = (chunk, full) => {
+      if (firstChunk) {
+        firstChunk = false;
+        if (lyricsEl) lyricsEl.innerHTML = '<pre class="stream-raw" id="stream-display"></pre>';
+      }
+      const el = document.getElementById('stream-display');
+      if (el) { el.textContent = full; el.scrollTop = el.scrollHeight; }
+      if (typeof updateSongProgress === 'function') updateSongProgress('res', full);
+    };
+
+    const result = await callServerStream('generate', songParams, streamCb);
+    if (typeof finishSongProgress === 'function') finishSongProgress('res');
+    const raw = result.text;
+    const genProdData = result.meta?.prodData;
+
+    // parseSongResult populates S.currentSong with the new improved song,
+    // including all the brain's structured output (verdict, brief, structure,
+    // chords, dopamine map, etc.). The chip renderer + library save inherit
+    // automatically via the existing post-stream wiring.
+    parseSongResult(raw, GENRE_LABELS[genre] || genre, topic, genProdData);
+    if (S.currentSong) {
+      if (result.meta?.sunoSettings) S.currentSong.sunoSettings = result.meta.sunoSettings;
+      if (lyricTier) S.currentSong.lyricTier = lyricTier;
+      if (region) S.currentSong.region = region;
+      if (sectionRegionsText) S.currentSong.sectionRegionsText = sectionRegionsText;
+      S.currentSong.edgeMode = window.__qfEdge === true;
+      if (vocal) S.currentSong.vocal = vocal;
+      if (tempo) S.currentSong.tempo = tempo;
+      if (timeSig && timeSig !== '4/4') S.currentSong.timeSig = timeSig;
+      if (motif) S.currentSong.motif = motif;
+      if (pov && pov !== 'auto') S.currentSong.pov = pov;
+      if (addressee) S.currentSong.addressee = addressee;
+      // Mark this song as a coach-rewrite so we can analytics-track + show in UI
+      S.currentSong.coachRewriteOf = song.id || null;
+    }
+    if (typeof renderSunoChips === 'function') renderSunoChips('res', S.currentSong);
+
+    if (typeof toast === 'function') toast('✨ Coach fixes applied — new version ready');
+    if (typeof trackEvent === 'function') trackEvent('coach_apply_regenerate', { genre, topic });
+  } catch (e) {
+    if (typeof finishSongProgress === 'function') finishSongProgress('res', true);
+    if (typeof toast === 'function') toast('Regenerate failed: ' + e.message, 4000);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '✨ Apply Suggestions & Regenerate'; }
+  }
+}
+
 async function runCoach() {
   if (!_coachLyrics) return;
   checkAchievements('coach_used');
@@ -16955,7 +17095,18 @@ async function importAndAnalyze() {
     document.querySelectorAll('#gen-out .opane').forEach(p => p.classList.remove('on'));
     document.getElementById('res-opane-lyrics')?.classList.add('on');
 
-    toast('✦ Lyrics imported & analysed: "' + title + '"');
+    toast('✦ Lyrics imported — opening Coach for feedback…', 2400);
+
+    // AUTO-ROUTE: import → coach. Open the Coach modal and kick off the analysis
+    // automatically so the user lands directly on suggestions + the regenerate
+    // button, no extra click required.
+    setTimeout(() => {
+      try {
+        openCoach();
+        // Tiny delay to let the modal mount before triggering analysis
+        setTimeout(() => { try { runCoach(); } catch(_) {} }, 250);
+      } catch(_) {}
+    }, 600);
   } catch(e) {
     toast('⚠️ ' + e.message, 5000);
   }
