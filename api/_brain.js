@@ -2007,15 +2007,16 @@ const GENRE_ACADEMIA_MAP = (function() {
 // Returns up to 2 academic principles per song, rotated by a (genre+era) hash so
 // the same song doesn't always get the same two principles. Tells the model these
 // are guidelines, not rigid rules — apply where they elevate the song.
-function buildAcademicFrameworkNote(genre, era) {
+function buildAcademicFrameworkNote(genre, era, expanded) {
   if (!genre) return '';
   const _g = String(genre).toLowerCase().replace(/[\s\-\/]+/g, '_');
   const gKey = GENRE_ACADEMIA_ALIAS[_g] || GENRE_ACADEMIA_ALIAS[String(genre).toLowerCase()] || _g;
   const courseKeys = GENRE_ACADEMIA_MAP[gKey] || GENRE_ACADEMIA_MAP['pop'] || [];
   if (!courseKeys.length) return '';
 
-  // Pick up to 2 courses (preferring the first match — usually the most genre-specific)
-  const selected = courseKeys.slice(0, Math.min(2, courseKeys.length));
+  // Standard: 2 courses × 2 principles. Expanded (Platinum): 3 courses × 2 principles.
+  const courseCount = expanded ? 3 : 2;
+  const selected = courseKeys.slice(0, Math.min(courseCount, courseKeys.length));
   const _era = era || 'modern';
   const hash = (gKey + _era).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
 
@@ -3702,12 +3703,47 @@ const GENRE_HIT_REFERENCES = {
 function buildTopTierNote(genre, crossGenre) {
   const ref = GENRE_HIT_REFERENCES[genre];
   if (!ref) return '';
-  const picks = ref.hits.slice(0, 2);
+  // Pull 3 hit references in Platinum (was 2) so the model gets more concrete targets
+  const picks = ref.hits.slice(0, 3);
   const refLines = picks.map(h => `  • "${h.title}" (${h.artist}): ${h.technique}`).join('\n');
   const xKey    = crossGenre || ref.crossFrom;
   const xLabel  = GENRE_LABELS[xKey] || xKey;
   const xNote   = ref.crossTechnique ? `\nCROSS-TRAIN from ${xLabel}: ${ref.crossTechnique}` : '';
-  return `\n\nPLATINUM MODE — TOP 5% TARGET:\nWrite at the level of the best ${GENRE_LABELS[genre] || genre} songs ever made.\nReference:\n${refLines}\nDEFINING TECHNIQUE: ${ref.defining}${xNote}\nEvery line must justify its existence. The hook must be undeniable.`;
+  return `\n\n✦ PLATINUM MODE — TOP 5% TARGET (full premium stack engaged):
+Write at the level of the best ${GENRE_LABELS[genre] || genre} songs ever made.
+
+REFERENCE HITS (the bar):
+${refLines}
+
+DEFINING TECHNIQUE FOR THIS GENRE: ${ref.defining}${xNote}
+
+PLATINUM-LEVEL EXPECTATIONS:
+- Every line must justify its existence. Cut what doesn't earn its place.
+- The hook must be UNDENIABLE — singable on first listen, haunting on the second.
+- Lyric craft tier auto-elevated to ARCHIVAL — peak vocab, sustained multi-syllable rhymes, conceit depth that rewards the third listen.
+- EDGE mode auto-engaged — write with teeth, no radio reflex, profanity allowed when it lands.
+- 3 academic frameworks active (instead of standard 2) — stack more principles from the songwriters / producers who taught at MIT, Harvard, NYU, Rice.
+- If Suno learning data exists for this genre/mood, it's been blended into the production guidance.
+- Every section must move the song forward — V2 ≠ V1, bridge reframes, last chorus bigger than first, sensory diversity mandatory.
+
+Platinum is not just "harder" — it's "every premium system on at once." Treat this like the album cut, not the single.`;
+}
+
+// PLATINUM STACK — when the platinum flag is set, auto-engage every premium
+// system: archival lyric tier, Edge mode, expanded academic framework (3 principles
+// instead of 2), and the beefier hit-references. This mutates params so all
+// downstream note-builders see the elevated state.
+function applyPlatinumStack(params) {
+  if (!params || !params.platinum) return params;
+  // Auto-bump lyric tier to archival unless user explicitly picked something stronger
+  if (!params.lyricTier || params.lyricTier === 'street' || params.lyricTier === 'radio') {
+    params.lyricTier = 'archival';
+  }
+  // Force Edge on — Edge × archival = peak craft + permission to bleed
+  params.edgeMode = true;
+  // Flag for buildAcademicFrameworkNote to emit 3 principles instead of 2
+  params._platinumExpanded = true;
+  return params;
 }
 
 const PRODUCTION_ARCHETYPES = {
@@ -4000,6 +4036,9 @@ function pickWeightedArchetype(fullPool, preferredNames) {
 }
 
 function buildSongPrompt(params) {
+  // Platinum stack: when on, auto-bumps lyric tier to archival, forces Edge mode,
+  // and signals expanded academic framework. Mutates params before destructure.
+  applyPlatinumStack(params);
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
     structure = 'standard', era = 'modern', length = 'medium',
@@ -4296,7 +4335,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const speedGearsExplicit = structure === 'gear_shift_escalation';
   const speedGearsNote = buildSpeedGearsNote(genre, mood, topic, speedGearsExplicit);
   const lyricTierNote = buildLyricTierNote(genre, params.lyricTier);
-  const academicNote = buildAcademicFrameworkNote(genre, era);
+  const academicNote = buildAcademicFrameworkNote(genre, era, params._platinumExpanded);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(genre, params.region);
 
@@ -4455,6 +4494,7 @@ VIDEO PROMPT:
 }
 
 function buildLuckyPrompt(params) {
+  applyPlatinumStack(params);
   const keys = Object.keys(FUSION_DATA);
   const rawG1 = params && params.g1 ? sanitizeInput(params.g1, 50) : null;
   const rawG2 = params && params.g2 ? sanitizeInput(params.g2, 50) : null;
@@ -4483,7 +4523,7 @@ function buildLuckyPrompt(params) {
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(g1, params.lyricTier);
-  const academicNote = buildAcademicFrameworkNote(g1, params.era);
+  const academicNote = buildAcademicFrameworkNote(g1, params.era, params._platinumExpanded);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
 
@@ -4867,6 +4907,7 @@ const PERSONA_NOTES = {
 };
 
 function buildRapLabPrompt(params) {
+  applyPlatinumStack(params);
   const {
     genre = 'hiphop',
     topic: rawTopic = 'the streets',
@@ -5030,7 +5071,7 @@ SONGWRITING RULES:
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
 ${buildLyricTierNote('hiphop', params.lyricTier)}
-${buildAcademicFrameworkNote('hiphop', params.era)}
+${buildAcademicFrameworkNote('hiphop', params.era, params._platinumExpanded)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
 
@@ -5290,6 +5331,7 @@ YOUR TASK — Create a Cinematic/Sync-Ready Version:
 
 // Main variant prompt assembler
 function buildVariantPrompt(variant, song) {
+  applyPlatinumStack(song);
   const builder = VARIANT_PROMPTS[variant];
   if (!builder) throw new Error(`Unknown variant: ${variant}`);
   const safeSong = {
@@ -5308,7 +5350,7 @@ function buildVariantPrompt(variant, song) {
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
   const lyricTierNote = buildLyricTierNote(safeSong.genre, song.lyricTier);
-  const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
+  const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era, song._platinumExpanded);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
   return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
@@ -5383,6 +5425,7 @@ FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific.
 // Builds a context-rich edit prompt using GENRE_BIBLE DNA + full song metadata.
 // Called by stream.js action='edit' — gives the editor access to the full bible.
 function buildEditPrompt(p) {
+  applyPlatinumStack(p);
   const genre  = p.genre  || 'pop';
   const gb     = GENRE_BIBLE[genre] || GENRE_BIBLE.pop || {};
   const mtb    = MUSIC_THEORY_BIBLE || {};
@@ -5446,7 +5489,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(genre, p.lyricTier);
-  const academicNote = buildAcademicFrameworkNote(genre, p.era);
+  const academicNote = buildAcademicFrameworkNote(genre, p.era, p._platinumExpanded);
   const edgeNote = buildEdgeNote(p.edgeMode, p.lyricTier);
   const regionNote = buildRegionNote(genre, p.region);
 
@@ -5817,7 +5860,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, applyPlatinumStack };
 
 
 
