@@ -678,6 +678,23 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);z-index:9999;background:var(--s5);border:1px solid var(--b3);border-radius:var(--r4);padding:12px 24px;font-size:13px;font-weight:600;color:var(--tx1);opacity:0;transition:all 0.3s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;white-space:normal;max-width:min(92vw,460px);text-align:center;line-height:1.45;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 @media(max-width:600px){.toast{bottom:80px;}}
+
+/* ── ADVANCED CRAFT TIER GATING ──
+   Body gets .craft-basic (free / creator) or .craft-advanced (pro+ / admin)
+   from applyCraftTierClass(). Advanced UI surfaces are marked with
+   .craft-advanced-only and hidden in basic-tier. The .craft-basic-only
+   upsell shows in their place — promotes upgrading by previewing the
+   value of advanced controls without exposing them. */
+body.craft-basic .craft-advanced-only{display:none !important}
+body.craft-advanced .craft-basic-only{display:none !important}
+.craft-basic-only{display:block}
+.craft-upsell{display:flex;align-items:center;gap:10px;margin:12px 0;padding:11px 14px;background:linear-gradient(135deg,rgba(245,192,0,.08),rgba(34,211,238,.04));border:1px dashed var(--amberline);border-radius:var(--r2);font-size:11.5px;color:var(--tx2);line-height:1.5}
+.craft-upsell-icon{font-size:18px;line-height:1;flex-shrink:0}
+.craft-upsell-body{flex:1}
+.craft-upsell strong{color:var(--amber);font-weight:700}
+.craft-upsell-cta{padding:6px 12px;background:var(--amber);color:#08080a;border:none;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;transition:background .15s}
+.craft-upsell-cta:hover{background:#ffc820}
+
 .tipbox{background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r2);padding:12px 16px;font-size:13px;color:var(--tx2);line-height:1.7;margin-top:12px}
 
 /* ── FEEL LUCKY ── */
@@ -3245,6 +3262,32 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <option value="conscious">🧠 Conscious — layered, rewards a second listen</option>
           <option value="archival">📚 Archival — peak craft (Black Thought / Joni Mitchell / Sondheim ceiling)</option>
         </select>
+      </div>
+
+      <!-- ⚡ EMOTIONAL VELOCITY — pacing dial. How fast emotion changes per
+           section. Advanced craft feature, gated to Pro+ tier.
+           Free / Creator users see the basic-only upsell card below this dial. -->
+      <div class="param craft-advanced-only" style="margin-bottom:12px">
+        <div class="param-label">Emotional Velocity <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— how fast the emotion changes (cross-genre)</span></div>
+        <select id="g-emotional-velocity">
+          <option value="auto" selected>🤖 Auto — match the genre's natural pacing</option>
+          <option value="slow_burn">🕯️ Slow Burn — one peak, patient build (Adele "Hello", Frank Ocean)</option>
+          <option value="standard_arc">⛰️ Standard Arc — verse↔chorus shifts (default radio pacing)</option>
+          <option value="cycling">🌀 Cycling — emotion rotates every 4-8 bars (Phoebe Bridgers, Sufjan)</option>
+          <option value="whiplash">⚡ Whiplash — multiple states per verse (Eminem "Stan", Bo Burnham)</option>
+          <option value="plateau_drift">🌊 Plateau Drift — atmosphere over story (Sigur Rós, Bon Iver "22")</option>
+        </select>
+      </div>
+
+      <!-- BASIC-TIER UPSELL — visible to free / creator users. Previews the
+           value of the advanced craft features without exposing the controls.
+           Clicking opens the upgrade modal. -->
+      <div class="craft-upsell craft-basic-only">
+        <div class="craft-upsell-icon">✦</div>
+        <div class="craft-upsell-body">
+          <strong>Pro unlocks advanced craft tools</strong> — emotional velocity, regional overlay, lyric tier, and per-section dials. Songs ship at the same level as Pro user output, just without manual control.
+        </div>
+        <button class="craft-upsell-cta" type="button" onclick="if(typeof openUpgradeModal==='function'){openUpgradeModal();}else{toast('Upgrade to Pro for advanced craft tools')}">Upgrade</button>
       </div>
 
       <!-- PARAMS ROW (Vocal + Structure only) -->
@@ -9980,7 +10023,7 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null, sunoSettings: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
@@ -10295,6 +10338,12 @@ async function generateSong(){
   const structure=document.getElementById('g-structure').value;
   const lyricTier=document.getElementById('g-lyric-tier')?.value||'street';
   const region=document.getElementById('g-region')?.value||'';
+  // Emotional velocity is gated to advanced-tier users. Basic-tier users hit
+  // 'auto' which the brain resolves to GENRE_DEFAULT_VELOCITY server-side.
+  // Same default applies if the dropdown isn't on the page (older deploys).
+  const emotionalVelocity = isAdvancedCraftAllowed()
+    ? (document.getElementById('g-emotional-velocity')?.value || 'auto')
+    : 'auto';
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
 
   if(!topic){
@@ -10306,7 +10355,7 @@ async function generateSong(){
 
   // Build params for server-side prompt construction
   const songParams = {
-    genre, topic, mood, vocal, structure, lyricTier, region,
+    genre, topic, mood, vocal, structure, lyricTier, region, emotionalVelocity,
     era: S.selectedEra || 'modern',
     length: S.selectedLength || 'medium',
     quality: S.quality || 'high',
@@ -10581,6 +10630,7 @@ VIDEO PROMPT:
       if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
       if (lyricTier) S.currentSong.lyricTier = lyricTier;
       if (region) S.currentSong.region = region;
+      if (emotionalVelocity && emotionalVelocity !== 'auto') S.currentSong.emotionalVelocity = emotionalVelocity;
       S.currentSong.edgeMode = window.__qfEdge === true;
       // Persist Rap Lab dimensions so a later coach-rewrite of a hip-hop song
       // routes through buildRapLabPrompt (instead of silently degrading to
@@ -11068,6 +11118,7 @@ function renderSunoChips(prefix, song) {
   const vocal = (song.vocal || '').trim();
   const tier = (song.lyricTier || '').trim();
   const region = (song.region || '').trim();
+  const velocity = (song.emotionalVelocity || '').trim();
   const isCoachRewrite = !!song.coachRewriteOf;
   const parts = [];
 
@@ -11164,6 +11215,27 @@ function renderSunoChips(prefix, song) {
         <span class="suno-chip-icon">${meta.icon}</span>
         <span class="suno-chip-label">Tier</span>
         <span class="suno-chip-value">${meta.label}</span>
+      </span>`);
+    }
+  }
+
+  // Emotional Velocity chip — shown to everyone when set (excluding 'auto' /
+  // 'standard_arc' since those are the silent defaults). Visible signal that
+  // the song was paced with intent. Free-tier users may see this if a song
+  // imported/loaded from library carries a non-default velocity.
+  if (velocity && velocity !== 'auto' && velocity !== 'standard_arc') {
+    const VELOCITY_META = {
+      slow_burn:     { icon: '🕯️', label: 'Slow Burn',     tip: 'One emotional state per minute — patient build to a single peak' },
+      cycling:       { icon: '🌀', label: 'Cycling',       tip: 'Emotion rotates every 4-8 bars within each section' },
+      whiplash:      { icon: '⚡', label: 'Whiplash',      tip: 'Multiple emotional states per verse — 4-bar pivots' },
+      plateau_drift: { icon: '🌊', label: 'Plateau Drift', tip: 'Atmosphere over story — sonic textures evolve, emotion holds' }
+    };
+    const vmeta = VELOCITY_META[velocity];
+    if (vmeta) {
+      parts.push(`<span class="suno-chip" title="${escHtml(vmeta.tip)}">
+        <span class="suno-chip-icon">${vmeta.icon}</span>
+        <span class="suno-chip-label">Velocity</span>
+        <span class="suno-chip-value">${vmeta.label}</span>
       </span>`);
     }
   }
@@ -12795,6 +12867,12 @@ Emotion: X/10
 Lyrics: X/10
 Commercial: X/10
 
+EMOTIONAL VELOCITY:
+[ONE of: Slow Burn (one peak, patient build) / Standard Arc (verse↔chorus shifts) / Cycling (emotion rotates every 4-8 bars) / Whiplash (multiple states per verse) / Plateau Drift (atmosphere over story). Pick the closest match and explain in one sentence why this song fits that velocity.]
+
+SONIQ BRAIN TAGS:
+[Use Soniq's craft vocabulary: lyric tier (radio / street / conscious / archival), academic framework (Lupe MIT / 9th Wonder Harvard / Questlove NYU / Swizz NYU / GZA Harvard / Bun B Rice — pick whichever fits this song's craft). Optionally: regional flavor (Ireland / UK / Australia / Japan / India-Punjab / France / Mexico / Jamaica) if the song is regionally rooted.]
+
 SONGWRITER TAKEAWAYS:
 [3 immediately actionable insights a songwriter can steal from this song]`;
   try{
@@ -14230,6 +14308,9 @@ function isPlatinumEligible() {
 function initPlatinumToggle() {
   const wrap = document.getElementById('platinum-toggle-wrap');
   if (wrap) wrap.style.display = isPlatinumEligible() ? 'flex' : 'none';
+  // Also refresh the craft-tier body class — same trigger points as platinum
+  // toggle (auth, plan change). Drives basic vs advanced UI surfaces.
+  if (typeof applyCraftTierClass === 'function') applyCraftTierClass();
 }
 
 function togglePlatinum() {
@@ -17083,7 +17164,7 @@ async function importAndAnalyze() {
     const genreLabel = GENRE_LABELS[genre] || genre;
     const topicLine  = topic ? `Topic/Concept: ${topic}` : '';
     const raw = await callClaude(
-      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 440 chars. Core genre, sub-genre feel, instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
+      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 440 chars. Core genre, sub-genre feel, instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]\n\nDETECTED VELOCITY:\n[ONE word from this list — slow_burn, standard_arc, cycling, whiplash, plateau_drift — picking the emotional pacing that best fits these lyrics]\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
       'You are a world-class songwriter, music producer, and AI music specialist. Analyse the provided lyrics and return only the requested format with no extra commentary.',
       900
     );
@@ -17104,6 +17185,12 @@ async function importAndAnalyze() {
     const dopamine   = extract('DOPAMINE MAP', raw);
     const chords     = extract('CHORD SUGGESTIONS', raw);
     const notes      = extract('DIRECTOR NOTES', raw);
+    // Detect emotional velocity from imported lyrics — whitelist + lowercase.
+    // Falls through to undefined if AI returned an unknown value; the chip
+    // render hides 'auto'/'standard_arc' anyway so a missed detect = silent default.
+    const _detectedV = (extract('DETECTED VELOCITY', raw) || '').replace(/\n.*$/s,'').trim().toLowerCase().replace(/\s+/g,'_');
+    const _validV = new Set(['slow_burn','standard_arc','cycling','whiplash','plateau_drift']);
+    const detectedVelocity = _validV.has(_detectedV) ? _detectedV : undefined;
 
     // Populate output card (same as generateSong)
     document.getElementById('res-title').textContent   = title;
@@ -17115,7 +17202,7 @@ async function importAndAnalyze() {
     renderChords('res', chords);
     renderBrief('res', songPrompt, briefRaw);
 
-    S.currentSong = { id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), title, verdict, lyrics, style: songPrompt, brief: briefRaw, structure, dopamine, chords, notes, genre, topic, ts: Date.now() };
+    S.currentSong = { id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), title, verdict, lyrics, style: songPrompt, brief: briefRaw, structure, dopamine, chords, notes, genre, topic, ts: Date.now(), emotionalVelocity: detectedVelocity };
     addToHistory(S.currentSong);
     showSaveBar('res');
     const varBtn = document.getElementById('res-var-btn');
@@ -18093,8 +18180,34 @@ async function loadPromptIntelligence(prefix) {
 // ═══════════════════════════════════════════════════════
 const STUDIO_PLANS = new Set(['studio', 'studio_annual']);
 const PAID_PLANS   = new Set(['creator','creator_annual','pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+// Advanced craft tier — Pro and above. These users see the full Craft Dials
+// panel (Emotional Velocity, Lyric Tier, Region, Tempo/Time-Sig/Motif/POV).
+// Free + Creator users see a simplified UI with a "✦ Unlock advanced craft
+// tools" upsell where the advanced controls would otherwise live.
+const ADVANCED_CRAFT_PLANS = new Set(['pro','pro_annual','studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
 // Genres available on free (Playground) plan — Creator+ gets all genres
 const FREE_GENRES  = new Set(['pop','hiphop','rnb','rock','country','edm','trap','lofi']);
+
+// Returns true when the user is allowed to see / use advanced craft features
+// (Emotional Velocity, Region overlay, fine-grain Craft Dials). Admins always
+// get advanced. Free + Creator tiers see simplified UI + upsell.
+function isAdvancedCraftAllowed() {
+  return !!window.__soniqAdmin || ADVANCED_CRAFT_PLANS.has(S.plan);
+}
+
+// Stamp the body with a class so CSS can show/hide advanced UI without
+// per-element JS. Called on auth + plan changes.
+function applyCraftTierClass() {
+  try {
+    if (isAdvancedCraftAllowed()) {
+      document.body.classList.add('craft-advanced');
+      document.body.classList.remove('craft-basic');
+    } else {
+      document.body.classList.add('craft-basic');
+      document.body.classList.remove('craft-advanced');
+    }
+  } catch(_) {}
+}
 
 function requireStudio(featureName) {
   if (window.__soniqAdmin || STUDIO_PLANS.has(S.plan)) return true;

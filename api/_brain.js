@@ -1689,6 +1689,125 @@ This tier is a craft floor, not a ceiling — exceed it where the song earns it,
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// EMOTIONAL_VELOCITY — how fast the song's emotional state changes.
+// Distinct from emotional ARC (the shape of the journey). Velocity is the RATE.
+//
+// Example: Adele "Hello" and Bo Burnham "Welcome to the Internet" have similar
+// arcs (intro → revelation → climax) but radically different velocities —
+// Adele takes 4:55 to climb one hill, Bo cycles through 12 emotional registers
+// in 4:44.
+//
+// 5 levels:
+//   slow_burn      — one emotional state per minute, single peak
+//   standard_arc   — one shift per section (default radio pacing)
+//   cycling        — emotion rotates every 4-8 bars within a section
+//   whiplash       — multiple emotional states per verse (4-bar pivots)
+//   plateau_drift  — almost no change; sonic textures evolve instead
+//
+// Cross-genre by design — universal pacing dial. Each level has natural
+// genres where it sits comfortably, plus an "intentional contrast" mode
+// when the user picks an unusual velocity for a genre.
+// ═══════════════════════════════════════════════════════════════════════════
+const EMOTIONAL_VELOCITY = {
+  slow_burn: {
+    label: 'Slow Burn',
+    icon: '🕯️',
+    description: 'One emotional state per minute. Cathartic single peak. Patience IS the payoff.',
+    sectionBehavior: 'V1+V2 same emotional state; bridge is the only meaningful shift; final chorus pays off the build. Resist mid-section pivots. The listener should feel like they\'re sinking deeper, not turning corners.',
+    rule: 'EMOTIONAL VELOCITY = SLOW BURN: do NOT change emotional state every section. Hold the same feeling for 1-2 minutes before any meaningful shift. The song earns its peak through restraint, not through cycling. Bridge is the ONLY mid-song emotional pivot.',
+    anchors: ['Adele "Hello"', 'Frank Ocean "Pyramids"', 'Phoebe Bridgers "Funeral"', 'Bon Iver "Holocene"', 'James Blake "Retrograde"', 'Sufjan Stevens "John Wayne Gacy, Jr."'],
+    avoid: 'Multiple emotional pivots per verse, tonal contrast between every section, quick cycling between joy and sadness',
+    naturalGenres: new Set(['ss','folk','rnb','neosoul','gospel','jazz','blues','country','tvmusical'])
+  },
+  standard_arc: {
+    label: 'Standard Arc',
+    icon: '⛰️',
+    description: 'One shift per section — verse↔chorus tonal contrast. Default radio pacing.',
+    sectionBehavior: 'Verse establishes one feeling, chorus shifts to its complement, bridge inverts both. Each section has ONE clear emotional job. No mid-section pivots, no held emotions across sections.',
+    rule: 'EMOTIONAL VELOCITY = STANDARD ARC: maintain ONE clear emotional shift per section boundary. Verse contrasts chorus, bridge inverts. Don\'t hold emotions across sections; don\'t pivot mid-section. This is the default radio-friendly pacing.',
+    anchors: ['Taylor Swift "Anti-Hero"', 'The Weeknd "Blinding Lights"', 'Olivia Rodrigo "Drivers License"', 'Kendrick Lamar "HUMBLE."', 'Maggie Rogers "Light On"', 'Doja Cat "Paint The Town Red"'],
+    avoid: 'Holding the same emotion across V→C→V→C, skipping the bridge inversion',
+    naturalGenres: new Set(['pop','rock','altrock','kpop','mandopop','latin','reggaeton','afrobeats','rnb','metal','punk','edm','country','dancehall','amapiano','brazilian','bollywood'])
+  },
+  cycling: {
+    label: 'Cycling',
+    icon: '🌀',
+    description: 'Emotion rotates every 4-8 bars. Each verse moves the camera; bridge inverts.',
+    sectionBehavior: 'Within each section, emotional register shifts every 4-8 bars. V1 might cycle [hopeful → doubt → resolve]. V2 cycles a different triad. Chorus can hold a single emotion as contrast. Bridge breaks the cycle entirely.',
+    rule: 'EMOTIONAL VELOCITY = CYCLING: shift emotional register every 4-8 bars within each section. Each cycle is a small turn of the camera. Use specific image-anchors at each pivot. The listener feels active engagement, not passive arrival.',
+    anchors: ['Phoebe Bridgers "Punisher"', 'Sufjan Stevens "Casimir Pulaski Day"', 'Big Thief "Not"', 'Bon Iver "33 \\"GOD\\""', 'Mountain Goats "No Children"', 'Mitski "Nobody"'],
+    avoid: 'Holding a single emotional state for >8 bars, generic verse-to-chorus arc with no internal shifts',
+    naturalGenres: new Set(['ss','altrock','folk','rnb','neosoul','tvmusical','arabesque'])
+  },
+  whiplash: {
+    label: 'Whiplash',
+    icon: '⚡',
+    description: 'Multiple emotional states per verse. 4-bar pivots. Rewards close listening.',
+    sectionBehavior: 'Every 4-bar block is a different emotional register. A verse might travel: nostalgic → angry → confused → resolved. Demands listener attention; rewards close listening with density.',
+    rule: 'EMOTIONAL VELOCITY = WHIPLASH: each 4-bar block must occupy a DIFFERENT emotional register. Maximum 4 bars on one feeling before pivoting. Use specific image-anchors to ground each pivot so it doesn\'t feel chaotic. The whiplash is the art — the listener shouldn\'t be able to predict the next emotional turn.',
+    anchors: ['Eminem "Stan"', 'Kendrick Lamar "u"', 'Bo Burnham "Welcome to the Internet"', 'Childish Gambino "This Is America"', 'Drake "Marvins Room"', 'Tyler, the Creator "EARFQUAKE"'],
+    avoid: 'Holding any one emotion for more than 4 bars, vague pivots without concrete image anchors, tonal whiplash without lyrical justification',
+    naturalGenres: new Set(['hiphop','comedy','parody','tvmusical','altrock','metal','punk'])
+  },
+  plateau_drift: {
+    label: 'Plateau Drift',
+    icon: '🌊',
+    description: 'Almost no emotional change. Atmosphere over story. Sonic textures evolve instead.',
+    sectionBehavior: 'The song holds ONE emotional state from start to finish. Sonic textures (instrumentation, ambience, layer additions) evolve to maintain interest, but the emotional baseline doesn\'t move. Lyrics reinforce the held state from different angles.',
+    rule: 'EMOTIONAL VELOCITY = PLATEAU DRIFT: hold a SINGLE emotional state across the entire song. NO emotional shifts. Variation comes from PRODUCTION (added layers, ambient texture changes, dynamic swells), not from lyric pivots. The chorus is the same emotion as the verse. The listener floats in the held state.',
+    anchors: ['Sigur Rós "Hoppípolla"', 'Bon Iver "22 (OVER S∞∞N)"', 'Frank Ocean "White Ferrari"', 'Cocteau Twins "Cherry-Coloured Funk"', 'Slowdive "Sugar for the Pill"', 'Beach House "Space Song"'],
+    avoid: 'Verse-to-chorus emotional contrast, bridge that "reveals" or shifts, narrative arc, story progression',
+    naturalGenres: new Set(['edm','altrock','rnb','jazz','neosoul','reggae','folk'])
+  }
+};
+
+// Genre → recommended default velocity (used when params.emotionalVelocity is
+// 'auto' — server picks the genre's natural pacing). Free-tier users always hit
+// this path since they don't get the explicit dropdown.
+const GENRE_DEFAULT_VELOCITY = {
+  pop:'standard_arc', rock:'standard_arc', country:'standard_arc',
+  hiphop:'whiplash', rap:'whiplash',
+  rnb:'slow_burn', neosoul:'slow_burn', gospel:'slow_burn',
+  edm:'plateau_drift', afrobeats:'standard_arc', amapiano:'plateau_drift',
+  latin:'standard_arc', reggaeton:'standard_arc', dancehall:'standard_arc',
+  folk:'cycling', ss:'cycling', jazz:'slow_burn', blues:'slow_burn',
+  altrock:'cycling', punk:'standard_arc', metal:'standard_arc',
+  reggae:'plateau_drift', kpop:'standard_arc', mandopop:'standard_arc',
+  brazilian:'standard_arc', bollywood:'standard_arc', arabesque:'cycling',
+  parody:'whiplash', comedy:'whiplash', children:'standard_arc', tvmusical:'cycling'
+};
+
+// Returns the velocity overlay block for the prompt. Resolves 'auto' to the
+// genre's natural default, then emits the directive + anchor songs +
+// natural-vs-contrast framing.
+function buildEmotionalVelocityNote(genre, velocity) {
+  // 'auto' resolves to genre default. Free-tier users always hit this path.
+  let key = velocity;
+  if (!key || key === 'auto') {
+    key = GENRE_DEFAULT_VELOCITY[genre] || 'standard_arc';
+  }
+  const v = EMOTIONAL_VELOCITY[key];
+  if (!v) return '';
+  const isNatural = v.naturalGenres && v.naturalGenres.has(genre);
+  const naturalNote = isNatural
+    ? `This velocity is NATURAL for ${genre} — lean into the genre's normal pacing.`
+    : `Note: ${v.label.toLowerCase()} is unusual for ${genre}. The contrast is intentional — keep the genre's instrumentation native while the emotional pacing breaks expectation.`;
+  return `
+
+⚡ EMOTIONAL VELOCITY: ${v.icon} ${v.label.toUpperCase()} — ${v.description}
+
+SECTION BEHAVIOR: ${v.sectionBehavior}
+
+${v.rule}
+
+${naturalNote}
+
+AVOID: ${v.avoid}.
+
+ANCHOR SONGS at this velocity (use as PACING reference, not lyrical reference): ${v.anchors.slice(0, 5).join(', ')}.`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // REGION_BIBLE — cross-cutting region overlay. Combines with any genre to
 // produce a regional flavor (e.g. country × Australia = bush ballad, folk ×
 // Ireland = Celtic trad, hiphop × Australia = Hilltop Hoods drill).
@@ -4459,6 +4578,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const academicNote = buildAcademicFrameworkNote(genre, era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(genre, params.region);
+  const velocityNote = buildEmotionalVelocityNote(genre, params.emotionalVelocity);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -4529,7 +4649,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4669,6 +4789,7 @@ function buildLuckyPrompt(params) {
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(g1, params.lyricTier);
+  const velocityNote = buildEmotionalVelocityNote(g1, params.emotionalVelocity);
   const academicNote = buildAcademicFrameworkNote(g1, params.era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
@@ -4707,7 +4828,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -5219,6 +5340,7 @@ ${buildLyricTierNote('hiphop', params.lyricTier)}
 ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
+${buildEmotionalVelocityNote('hiphop', params.emotionalVelocity)}
 
 Respond with EXACTLY this format:
 
@@ -5494,10 +5616,11 @@ function buildVariantPrompt(variant, song) {
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
   const lyricTierNote = buildLyricTierNote(safeSong.genre, song.lyricTier);
+  const velocityNote = buildEmotionalVelocityNote(safeSong.genre, song.emotionalVelocity);
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5632,6 +5755,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(genre, p.lyricTier);
+  const velocityNote = buildEmotionalVelocityNote(genre, p.emotionalVelocity);
   const academicNote = buildAcademicFrameworkNote(genre, p.era);
   const edgeNote = buildEdgeNote(p.edgeMode, p.lyricTier);
   const regionNote = buildRegionNote(genre, p.region);
@@ -5642,7 +5766,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -6003,7 +6127,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote };
 
 
 
