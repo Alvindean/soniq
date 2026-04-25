@@ -3200,6 +3200,25 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div id="age-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:8px;min-height:14px"></div>
 
+      <!-- REGIONAL OVERLAY — cross-cutting region dimension. Combines with any
+           genre to produce a regional flavor (e.g. country × Australia = bush
+           ballad, folk × Ireland = Celtic trad). Each region carries its own
+           anti-stereotype guard so flavor stays authentic. -->
+      <div class="param" style="margin-bottom:12px">
+        <div class="param-label">Region <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— optional regional flavor (cross-genre)</span></div>
+        <select id="g-region">
+          <option value="" selected>🌐 None — no regional overlay</option>
+          <option value="ireland">🇮🇪 Ireland — Celtic / Irish trad</option>
+          <option value="uk">🇬🇧 United Kingdom — British accent + sound</option>
+          <option value="australia">🇦🇺 Australia — Aussie indie / pub rock / rap</option>
+          <option value="japan">🇯🇵 Japan — J-Pop / J-Rock / city pop</option>
+          <option value="india_punjab">🇮🇳 India / Punjab — Bhangra / Bollywood / Punjabi pop</option>
+          <option value="france">🇫🇷 France — Chanson / French pop</option>
+          <option value="mexico">🇲🇽 Mexico — Ranchera / Norteño / Latin pop</option>
+          <option value="jamaica">🇯🇲 Jamaica — Reggae / Dancehall</option>
+        </select>
+      </div>
+
       <!-- LYRIC TIER — craft demand-on-listener dial (cross-genre).
            Radio = immediate, no demand. Street = conversational (default).
            Conscious = layered, rewards rereads. Archival = Black Thought /
@@ -10253,6 +10272,7 @@ async function generateSong(){
   const vocal=document.getElementById('g-vocal').value;
   const structure=document.getElementById('g-structure').value;
   const lyricTier=document.getElementById('g-lyric-tier')?.value||'street';
+  const region=document.getElementById('g-region')?.value||'';
   const structStr=STRUCTURES[structure]||STRUCTURES.standard;
 
   if(!topic){
@@ -10264,7 +10284,7 @@ async function generateSong(){
 
   // Build params for server-side prompt construction
   const songParams = {
-    genre, topic, mood, vocal, structure, lyricTier,
+    genre, topic, mood, vocal, structure, lyricTier, region,
     era: S.selectedEra || 'modern',
     length: S.selectedLength || 'medium',
     quality: S.quality || 'high',
@@ -10538,6 +10558,7 @@ VIDEO PROMPT:
       if (S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
       if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
       if (lyricTier) S.currentSong.lyricTier = lyricTier;
+      if (region) S.currentSong.region = region;
       S.currentSong.edgeMode = window.__qfEdge === true;
     }
     renderSunoChips('res', S.currentSong);
@@ -11014,6 +11035,7 @@ function renderSunoChips(prefix, song) {
   const s = song.sunoSettings || null;
   const vocal = (song.vocal || '').trim();
   const tier = (song.lyricTier || '').trim();
+  const region = (song.region || '').trim();
   const parts = [];
 
   // Weirdness chip
@@ -11060,6 +11082,28 @@ function renderSunoChips(prefix, song) {
       <span class="suno-chip-label">Vocal</span>
       <span class="suno-chip-value">${escHtml(vocalShort)}</span>
     </span>`);
+  }
+
+  // Region chip — shown to everyone when set
+  if (region) {
+    const REGION_META = {
+      ireland:      { flag: '🇮🇪', label: 'Ireland' },
+      uk:           { flag: '🇬🇧', label: 'UK' },
+      australia:    { flag: '🇦🇺', label: 'Australia' },
+      japan:        { flag: '🇯🇵', label: 'Japan' },
+      india_punjab: { flag: '🇮🇳', label: 'India/Punjab' },
+      france:       { flag: '🇫🇷', label: 'France' },
+      mexico:       { flag: '🇲🇽', label: 'Mexico' },
+      jamaica:      { flag: '🇯🇲', label: 'Jamaica' }
+    };
+    const rmeta = REGION_META[region];
+    if (rmeta) {
+      parts.push(`<span class="suno-chip" title="Regional overlay — ${escHtml(rmeta.label)} sound, themes, vernacular (with anti-stereotype guard)">
+        <span class="suno-chip-icon">${rmeta.flag}</span>
+        <span class="suno-chip-label">Region</span>
+        <span class="suno-chip-value">${escHtml(rmeta.label)}</span>
+      </span>`);
+    }
   }
 
   // Lyric Tier chip — shown to everyone, suppress 'street' baseline (it's the default

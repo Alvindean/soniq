@@ -541,6 +541,9 @@ module.exports = async function handler(req, res) {
         if (p.lyricTier && !VALID_TIERS.has(p.lyricTier)) p.lyricTier = 'street';
         // Edge mode — strict boolean coercion. Edge stays inside the lyric tier ceiling.
         p.edgeMode = p.edgeMode === true;
+        // Region whitelist — invalid → no region overlay (silent fallback)
+        const VALID_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
+        if (p.region && !VALID_REGIONS.has(p.region)) p.region = '';
         // Suno learning overlay — only fetched for Studio-tier users since only
         // they see the values; skip the Redis hit otherwise.
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
@@ -562,6 +565,8 @@ module.exports = async function handler(req, res) {
         const VALID_LUCKY_TIERS = new Set(['radio','street','conscious','archival']);
         if (lp.lyricTier && !VALID_LUCKY_TIERS.has(lp.lyricTier)) lp.lyricTier = 'street';
         lp.edgeMode = lp.edgeMode === true;
+        const VALID_LUCKY_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
+        if (lp.region && !VALID_LUCKY_REGIONS.has(lp.region)) lp.region = '';
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);
