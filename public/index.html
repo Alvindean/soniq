@@ -486,9 +486,13 @@ a{color:var(--amber);text-decoration:none}
 /* ── RESULT ── */
 .result-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);margin-bottom:16px;overflow:hidden;display:none}
 .result-card.visible{display:block;animation:pgIn 0.25s ease;border-top:3px solid var(--genre-accent);transition:border-color 0.3s}
-.result-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 20px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:12px}
-.result-song-title{font-size:26px;font-weight:700;color:var(--tx1);letter-spacing:-0.5px;line-height:1.2}
-.result-song-verdict{font-size:13px;color:var(--tx3);margin-top:6px;font-style:italic;line-height:1.5}
+/* Result header — title hero on top, action bar in its own row below.
+   Spotify/Apple Music pattern: title gets full breathing room, actions get
+   their own clean horizontal strip. The progress bar (order:99) drops to
+   the bottom of the column. */
+.result-header{display:flex;flex-direction:column;align-items:stretch;padding:24px 24px 16px;border-bottom:1px solid var(--b1);gap:14px}
+.result-song-title{font-size:28px;font-weight:700;color:var(--tx1);letter-spacing:-0.6px;line-height:1.15;word-break:break-word}
+.result-song-verdict{font-size:13px;color:var(--tx3);margin-top:6px;font-style:italic;line-height:1.5;max-width:880px}
 
 /* ── SUNO CHIPS — Weirdness / Style Influence / Vocal ── */
 .suno-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
@@ -505,7 +509,9 @@ a{color:var(--amber);text-decoration:none}
 .suno-chip--lock .suno-chip-value{color:var(--tx3);font-weight:600}
 .suno-chip--lock .suno-chip-bar{display:none}
 @media(max-width:600px){.suno-chips{margin-top:8px}.suno-chip{font-size:10.5px;padding:5px 10px 6px}}
-.result-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
+/* Action bar sits in its own row beneath the title block. Wraps naturally
+   on narrow screens. Subtle top border separates it from the title hero. */
+.result-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding-top:8px;border-top:1px solid var(--b1)}
 .song-card-overflow{position:relative}
 .song-card-overflow-menu{display:none;position:absolute;right:0;top:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:4px 0;min-width:160px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .song-card-overflow-menu.open{display:block}
@@ -3971,7 +3977,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div class="loaded-banner" id="loaded-banner">✦ Loaded from library — changes won't overwrite the saved version</div>
     <div id="print-meta"></div>
     <div class="result-header">
-      <div style="flex:1;min-width:0">
+      <div class="result-title-block">
         <div class="result-song-title" id="res-title">—</div>
         <div class="result-song-verdict" id="res-verdict"></div>
         <div class="suno-chips" id="res-suno-chips"></div>
@@ -4341,7 +4347,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
   <div class="result-card" id="lucky-out" style="display:none">
     <div class="result-header">
-      <div style="flex:1;min-width:0">
+      <div class="result-title-block">
         <div class="result-song-title" id="lres-title">—</div>
         <div class="result-song-verdict" id="lres-verdict"></div>
         <div class="suno-chips" id="lres-suno-chips"></div>
