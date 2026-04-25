@@ -14045,29 +14045,42 @@ async function applyCoachAndRegenerate() {
     // exactly as they would for a fresh generate.
     const genre = song.genre || 'pop';
     const topic = song.topic || song.title || 'reflection';
-    const mood = song.mood || 'Emotional';
-    const vocal = song.vocal || (document.getElementById('g-vocal')?.value) || 'any';
-    const structure = song.structure || (document.getElementById('g-structure')?.value) || 'standard';
+    // Prefer rich captured fields (set by importAndAnalyze or a prior generate);
+    // fall back to live form fields, then to safe baseline defaults.
+    const mood = song.mood || (document.getElementById('g-mood-input')?.value || '').trim() || 'Emotional';
+    const vocal = song.vocal || (document.getElementById('g-vocal')?.value) || 'Male vocals';
+    // structureKey is the brain-recognized key (e.g. "standard"); song.structure
+    // is the rendered structure-map text from a previous parse — DON'T pass that
+    // as the structure param. Prefer the explicit key if present.
+    const structure = song.structureKey || (document.getElementById('g-structure')?.value) || 'standard';
     const lyricTier = (document.getElementById('g-lyric-tier')?.value) || song.lyricTier || 'street';
     const region = (document.getElementById('g-region')?.value) || song.region || '';
-    const sectionRegionsText = (document.getElementById('g-section-regions')?.value || '').trim();
+    const sectionRegionsText = (document.getElementById('g-section-regions')?.value || '').trim() || song.sectionRegionsText || '';
     const tempo = (document.getElementById('g-tempo')?.value || '').trim() || song.tempo || '';
     const timeSig = (document.getElementById('g-time-sig')?.value) || song.timeSig || '4/4';
     const motif = (document.getElementById('g-motif')?.value || '').trim() || song.motif || '';
     const pov = (document.getElementById('g-pov')?.value) || song.pov || 'auto';
     const addressee = (document.getElementById('g-addressee')?.value || '').trim() || song.addressee || '';
 
+    // Rap-specific dials — propagate when this is a hip-hop song generated in
+    // Rap Lab mode. For imported songs these stay undefined and the brain falls
+    // through to safe hip-hop defaults. NEVER cross-pollute non-rap genres.
+    const rapLabActive = (genre === 'hiphop') && (song.rapLabActive === true || S.rapLabActive === true);
+    const rapStyle = rapLabActive ? (song.rapStyle || S.rapStyle || undefined) : undefined;
+    const rapDimensions = rapLabActive ? (song.rapDimensions || S.rapDimensions || undefined) : undefined;
+    const aggression = (genre === 'hiphop') ? (song.aggression || S.selectedAggression || 'mid') : undefined;
+
     const songParams = {
       genre, topic, mood, vocal, structure,
       lyricTier, region, sectionRegionsText,
       tempo, timeSig, motif, pov, addressee,
-      era: S.selectedEra || song.era || 'modern',
-      length: S.selectedLength || song.length || 'medium',
+      era: song.era || S.selectedEra || 'modern',
+      length: song.length || S.selectedLength || 'medium',
       quality: S.quality || 'high',
       theoryLevel: S.theoryLevel || 'standard',
       mode: 'auto',
-      substyle: S.substyle || song.substyle || '',
-      hookStyle: S.hookStyle || 'auto',
+      substyle: song.substyle || S.substyle || '',
+      hookStyle: song.hookStyle || S.hookStyle || 'auto',
       bracketMode: S.bracketMode || 'suno',
       voice: {
         name: localStorage.getItem('soniq_voice_name') || '',
@@ -14075,13 +14088,17 @@ async function applyCoachAndRegenerate() {
         forbidden: localStorage.getItem('soniq_voice_forbidden') || ''
       },
       blend: {
-        genre2: '',
-        style2: '',
-        ratio: 70
+        genre2: song.genre2 || '',
+        style2: song.style2 || '',
+        ratio: typeof song.blendRatio === 'number' ? song.blendRatio : 70
       },
       avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
-      edgeMode: window.__qfEdge === true,
+      edgeMode: (window.__qfEdge === true) || (song.edgeMode === true),
       platinum: _platinumOn && isPlatinumEligible(),
+      // Rap Lab dimensions — only sent for hip-hop (otherwise undefined which
+      // the brain treats as "skip Rap Lab path, use buildSongPrompt").
+      rapStyle, rapDimensions, rapLabActive,
+      aggression,
       // The two new fields that turn this into a coach-driven rewrite:
       coachInstruction: _coachFeedback,
       originalLyrics: song.lyrics
@@ -17052,6 +17069,10 @@ async function importAndAnalyze() {
   const genre   = document.getElementById('imp-genre').value || 'pop';
   const topic   = document.getElementById('imp-topic').value.trim();
   const lyrics  = document.getElementById('imp-lyrics').value.trim();
+  // Optional details — user-supplied or "" when blank (AI will detect on the analyze pass)
+  const userMood       = (document.getElementById('imp-mood')?.value || '').trim();
+  const userVocal      = (document.getElementById('imp-vocal')?.value || '').trim();
+  const userStructure  = (document.getElementById('imp-structure')?.value || '').trim();
   if (!lyrics || lyrics.length < 20) { toast('Paste some lyrics first'); return; }
 
   const btn = document.getElementById('imp-btn');
@@ -17061,8 +17082,14 @@ async function importAndAnalyze() {
   try {
     const genreLabel = GENRE_LABELS[genre] || genre;
     const topicLine  = topic ? `Topic/Concept: ${topic}` : '';
+    // Ask the AI to also detect mood/vocal/structure when the user left them
+    // blank. These flow into S.currentSong so the coach-driven regen has rich
+    // params instead of falling back to "Emotional / any / standard" defaults.
+    const detectInstructions = (!userMood || !userVocal || !userStructure)
+      ? `\n\nADDITIONALLY, on a single line each, output:\nDETECTED MOOD: [3-4 word mood/emotional register, e.g. "Bittersweet, defiant, late-night confession"]\nDETECTED VOCAL: [vocal-style descriptor — e.g. "Male vocals", "Female vocals", "Whispered / Intimate", "Country twang"]\nDETECTED STRUCTURE: [structure key — one of: standard, hookfirst, chorusfirst, storytelling, minimal, epic, verseonly, aaba, ballad, hiphop_classic, hiphop_trap, hiphop_storytelling, story_classic_3act, story_reveal_twist]`
+      : '';
     const raw = await callClaude(
-      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 440 chars. Core genre, sub-genre feel, instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
+      `Analyse these ${genreLabel} song lyrics and generate a complete production package in EXACTLY this format — no extra text before or after:\n\nVERDICT: [one sentence on why this song connects]\n\nSONG PROMPT:\n[Under 440 chars. Core genre, sub-genre feel, instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]\n\nPRODUCTION BRIEF:\nCORE PROMPT:\n[Exact copy of SONG PROMPT]\n\nTEMPO & KEY:\n[BPM range · Key · Time sig · Feel]\n\nARRANGEMENT BLUEPRINT:\n[Section by section: instrument/energy breakdown]\n\nVOCAL DIRECTION:\n[Delivery style per section]\n\nSONIC REFERENCES:\n[3 production reference points — no artist names]\n\nPLATFORM TIPS:\n[3 actionable tips for AI music platforms]\n\nSTRUCTURE MAP:\n[Section: bar count · energy 1-10 · emotional job]\n\nDOPAMINE MAP:\n[Key emotional/musical payoff moments and why they land]\n\nCHORD SUGGESTIONS:\n[Main progression · Key · Suggest 2 variations]\n\nDIRECTOR NOTES:\n[3 production decisions that will make this track memorable]${detectInstructions}\n\n---\nGenre: ${genreLabel}\n${topicLine}\n\nLYRICS:\n${lyrics}`,
       'You are a world-class songwriter, music producer, and AI music specialist. Analyse the provided lyrics and return only the requested format with no extra commentary.',
       900
     );
@@ -17083,6 +17110,15 @@ async function importAndAnalyze() {
     const dopamine   = extract('DOPAMINE MAP', raw);
     const chords     = extract('CHORD SUGGESTIONS', raw);
     const notes      = extract('DIRECTOR NOTES', raw);
+    // Pull AI-detected mood/vocal/structure when the user didn't supply them.
+    // Whitelist the structure key against known values; mood + vocal flow as-is.
+    const VALID_STRUCTURE_KEYS = new Set(['standard','hookfirst','chorusfirst','storytelling','minimal','epic','verseonly','aaba','ballad','hiphop_classic','hiphop_trap','hiphop_beatswitch','hiphop_storytelling','hiphop_storytelling_24','hiphop_melodic','story_classic_3act','story_in_medias_res','story_flashback','story_reveal_twist','story_murder_ballad','story_origin','story_revenge','story_conversation','story_diary','story_reverse_chrono','gear_shift_escalation','viral','doublechorus','riddim','afrobeats','gospel','kpop']);
+    const detectedMood      = (extract('DETECTED MOOD', raw) || '').replace(/\n.*$/s,'').trim();
+    const detectedVocal     = (extract('DETECTED VOCAL', raw) || '').replace(/\n.*$/s,'').trim();
+    const detectedStructKey = (extract('DETECTED STRUCTURE', raw) || '').replace(/\n.*$/s,'').trim().toLowerCase();
+    const finalMood      = userMood       || detectedMood       || 'Emotional';
+    const finalVocal     = userVocal      || detectedVocal      || 'Male vocals';
+    const finalStructKey = userStructure  || (VALID_STRUCTURE_KEYS.has(detectedStructKey) ? detectedStructKey : 'standard');
 
     // Populate output card (same as generateSong)
     document.getElementById('res-title').textContent   = title;
@@ -17094,7 +17130,21 @@ async function importAndAnalyze() {
     renderChords('res', chords);
     renderBrief('res', songPrompt, briefRaw);
 
-    S.currentSong = { id: Date.now().toString(36)+Math.random().toString(36).slice(2,6), title, verdict, lyrics, style: songPrompt, brief: briefRaw, structure, dopamine, chords, notes, genre, topic, ts: Date.now() };
+    S.currentSong = {
+      id: Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+      title, verdict, lyrics,
+      style: songPrompt, brief: briefRaw,
+      structure, dopamine, chords, notes,
+      genre, topic, ts: Date.now(),
+      // Rich-param fields used by the coach-driven regen flow. Without these
+      // an imported song's coach rewrite would fall back to "Emotional / any /
+      // standard" defaults, losing intent. AI-detected when user leaves them
+      // blank in the import modal; user-supplied values override.
+      mood: finalMood,
+      vocal: finalVocal,
+      structureKey: finalStructKey,
+      imported: true
+    };
     addToHistory(S.currentSong);
     showSaveBar('res');
     const varBtn = document.getElementById('res-var-btn');
@@ -21636,6 +21686,67 @@ function updateBlogAdminUI() {
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><label style="margin:0">Lyrics</label><button class="mic-btn" id="imp-lyrics-mic-btn" onclick="toggleMicFor('imp-lyrics-mic-btn','imp-lyrics','lines')" title="Dictate lyrics by voice" style="font-size:15px;padding:3px 8px">🎤</button></div>
       <textarea id="imp-lyrics" placeholder="[Verse 1]&#10;Paste your lyrics here…&#10;&#10;[Chorus]&#10;Your chorus lines…"></textarea>
     </div>
+    <!-- Optional details — surfaces the params the regen flow needs (mood, vocal,
+         structure) so the coach-driven rewrite uses real intent instead of hard
+         defaults. Fields auto-detect from the lyrics if left blank — see
+         importAndAnalyze. Collapsible to keep the modal sleek. -->
+    <details class="import-optional" style="margin-top:14px;background:var(--s2);border:1px solid var(--b1);border-radius:8px;padding:10px 12px">
+      <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.06em;list-style:none;display:flex;align-items:center;gap:8px">
+        <span>🎚 Optional details</span>
+        <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--tx4);font-size:10px">mood, vocal, structure — auto-detected if blank</span>
+      </summary>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px">
+        <div>
+          <label style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px">Mood</label>
+          <input id="imp-mood" type="text" placeholder="e.g. Bittersweet, Defiant" maxlength="60" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:6px 8px;outline:none;box-sizing:border-box">
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px">Vocal Style</label>
+          <select id="imp-vocal" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:6px 8px;outline:none;box-sizing:border-box">
+            <option value="">— Auto-detect —</option>
+            <option value="Male vocals">Male vocals</option>
+            <option value="Female vocals">Female vocals</option>
+            <option value="Duet M/F">Duet M/F</option>
+            <option value="Group / Choir">Group / Choir</option>
+            <option value="Raspy / Gritty male">Raspy / Gritty male</option>
+            <option value="Soulful female">Soulful female</option>
+            <option value="Whispered / Intimate">Whispered / Intimate</option>
+            <option value="Falsetto male">Falsetto male</option>
+            <option value="Deep baritone">Deep baritone</option>
+            <option value="Breathy / Airy female">Breathy / Airy female</option>
+            <option value="Husky / Smoky female">Husky / Smoky female</option>
+            <option value="Gospel belter">Gospel belter</option>
+            <option value="Auto-Tune / Melodic trap">Auto-Tune / Melodic trap</option>
+            <option value="Spoken word / Talk-sing">Spoken word / Talk-sing</option>
+            <option value="Operatic / Classical">Operatic / Classical</option>
+            <option value="Country twang">Country twang</option>
+            <option value="Blues growl">Blues growl</option>
+            <option value="Jazz crooner">Jazz crooner</option>
+            <option value="Neo-soul runs">Neo-soul runs</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px">Structure</label>
+          <select id="imp-structure" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:6px 8px;outline:none;box-sizing:border-box">
+            <option value="">— Auto-detect —</option>
+            <option value="standard">Standard V-PC-C-V-PC-C-B-C</option>
+            <option value="hookfirst">Hook-First</option>
+            <option value="chorusfirst">Chorus-First</option>
+            <option value="storytelling">Storytelling Arc</option>
+            <option value="minimal">Minimal / Loop</option>
+            <option value="epic">Epic (8 sections)</option>
+            <option value="verseonly">Verse-Only</option>
+            <option value="aaba">AABA 32-bar</option>
+            <option value="ballad">Ballad / Cinematic</option>
+            <option value="hiphop_classic">Classic Hip-Hop (3×16)</option>
+            <option value="hiphop_trap">Trap (hook-first)</option>
+            <option value="hiphop_storytelling">Storytelling Rap (3×24)</option>
+            <option value="story_classic_3act">Classic 3-Act Story</option>
+            <option value="story_reveal_twist">Reveal Twist (bridge reframes)</option>
+          </select>
+        </div>
+      </div>
+    </details>
     <div class="import-actions">
       <button class="import-submit-btn" id="imp-btn" onclick="importAndAnalyze()">✦ Import &amp; Analyze</button>
       <button class="import-cancel-btn" onclick="closeImportModal()">Cancel</button>
