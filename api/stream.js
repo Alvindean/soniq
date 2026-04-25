@@ -544,6 +544,9 @@ module.exports = async function handler(req, res) {
         // Region whitelist — invalid → no region overlay (silent fallback)
         const VALID_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (p.region && !VALID_REGIONS.has(p.region)) p.region = '';
+        // Coach-driven rewrite payload — capped to keep prompt bounded
+        if (typeof p.coachInstruction === 'string') p.coachInstruction = p.coachInstruction.trim().slice(0, 4000);
+        if (typeof p.originalLyrics === 'string') p.originalLyrics = p.originalLyrics.trim().slice(0, 6000);
         // Suno learning overlay — only fetched for Studio-tier users since only
         // they see the values; skip the Redis hit otherwise.
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
