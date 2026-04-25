@@ -1891,6 +1891,177 @@ const STRUCTURES={
   kpop:         '[Intro] → [Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Rap Break] → [Bridge] → [Key Change +1] → [Final Chorus] → [Outro]',
 };
 
+// ═══════════════════════════════════════════════════════════════════════════
+// GENRE_LENGTH_BUDGET — per-(genre × length) section layout, character cap,
+// runtime estimate, and BPM range. Replaces the old genre-agnostic lengthMap
+// where "short=2min" meant the same thing for hip-hop, jazz, EDM and country
+// — which it doesn't. Each profile gives the model concrete section sequence
+// + char budget, so the model writes to the actual genre's standard length.
+// ═══════════════════════════════════════════════════════════════════════════
+const GENRE_LENGTH_BUDGET = {
+  pop: { bpm: '90-120',
+    short:    { sections: 'V1, C, V2, C',                            charBudget: 1500, minutes: '~2:00' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, B, C',              charBudget: 2400, minutes: '~3:15' },
+    long:     { sections: 'V1, PC, C, V2, PC, C, B, C, C',           charBudget: 3000, minutes: '~3:45' },
+    extended: { sections: 'V1, PC, C, V2, PC, C, V3, B, C, C',       charBudget: 3800, minutes: '~4:30' } },
+  hiphop: { bpm: '70-145',
+    short:    { sections: 'V1[16 bars], H[8], V2[16], H[8]',                                 charBudget: 2000, minutes: '~2:30' },
+    medium:   { sections: 'I[4], V1[16], H[8], V2[16], H[8], H[8]',                          charBudget: 3000, minutes: '~3:15' },
+    long:     { sections: 'I[4], V1[16], H[8], V2[16], H[8], V3[16], H[8]',                  charBudget: 4000, minutes: '~4:00' },
+    extended: { sections: 'I[4], V1[24], H[8], V2[24], H[8], BeatSwitch+V3[16-24], H[8]',    charBudget: 4800, minutes: '~5:30' } },
+  rnb: { bpm: '60-100',
+    short:    { sections: 'V1, C, V2, C',                                  charBudget: 1600, minutes: '~2:30' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, B, C',                    charBudget: 2500, minutes: '~3:30' },
+    long:     { sections: 'V1, PC, C, V2, PC, C, B, C, C-vamp',            charBudget: 3200, minutes: '~4:00' },
+    extended: { sections: 'V1, PC, C, V2, PC, C, B, C-vamp, ad-lib outro', charBudget: 4000, minutes: '~5:00' } },
+  rock: { bpm: '100-150',
+    short:    { sections: 'V1, C, V2, C, Outro',                              charBudget: 1500, minutes: '~2:30' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, B/Solo, C',                  charBudget: 2400, minutes: '~3:30' },
+    long:     { sections: 'I, V1, PC, C, V2, PC, C, B, Solo, C, Outro',       charBudget: 3300, minutes: '~4:30' },
+    extended: { sections: 'I, V1, PC, C, V2, PC, C, B, Solo, Breakdown, C, Outro', charBudget: 4200, minutes: '~5:30' } },
+  country: { bpm: '70-120',
+    short:    { sections: 'V1, C, V2, C',                       charBudget: 1600, minutes: '~2:30' },
+    medium:   { sections: 'V1, C, V2, C, B, C',                 charBudget: 2400, minutes: '~3:15' },
+    long:     { sections: 'V1, C, V2, C, B, V3, C',             charBudget: 3200, minutes: '~3:45' },
+    extended: { sections: 'V1, C, V2, C, B, V3, C, Outro',      charBudget: 4000, minutes: '~4:30' } },
+  edm: { bpm: '120-145',
+    short:    { sections: 'I, V, Build, Drop, Outro',                                              charBudget: 1200, minutes: '~2:30' },
+    medium:   { sections: 'I, V1, Build, Drop, Breakdown, Build, Drop, Outro',                     charBudget: 1800, minutes: '~3:30' },
+    long:     { sections: 'I, V1, PC, Build, Drop1, Breakdown, V2, PC, Build, Drop2, Outro',       charBudget: 2400, minutes: '~4:30' },
+    extended: { sections: 'I, V1, PC, Build, Drop1, Breakdown, V2, PC, Build, Drop2, B, Drop3, Outro', charBudget: 3000, minutes: '~5:30' } },
+  latin: { bpm: '90-130',
+    short:    { sections: 'V1, C, V2, C',                                                     charBudget: 1700, minutes: '~2:30' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, Bridge-rap, C',                              charBudget: 2600, minutes: '~3:30' },
+    long:     { sections: 'I, V1, PC, C, V2, PC, C, Bridge-rap, C, C-vamp',                   charBudget: 3400, minutes: '~4:00' },
+    extended: { sections: 'I, V1, PC, C, V2, PC, C, Bridge-rap, V3/Feature, C, Outro',        charBudget: 4200, minutes: '~5:00' } },
+  reggaeton: { bpm: '88-105',
+    short:    { sections: 'I, H, V1, H, V2, H',                                          charBudget: 1500, minutes: '~2:30' },
+    medium:   { sections: 'I, H, V1, H, V2, H, H',                                       charBudget: 2300, minutes: '~3:00' },
+    long:     { sections: 'I, H, V1, PC, H, V2, PC, H, B, H, H',                         charBudget: 3000, minutes: '~3:30' },
+    extended: { sections: 'I, H, V1, PC, H, V2, PC, H, V3, B, H, H, Outro',              charBudget: 3800, minutes: '~4:30' } },
+  folk: { bpm: '60-110',
+    short:    { sections: 'V1, C, V2, C',                          charBudget: 1400, minutes: '~2:30' },
+    medium:   { sections: 'V1, C, V2, C, B, C',                    charBudget: 2200, minutes: '~3:15' },
+    long:     { sections: 'V1, C, V2, C, V3, B, C',                charBudget: 3000, minutes: '~4:00' },
+    extended: { sections: 'V1, C, V2, C, V3, C, B, V4, C, Outro',  charBudget: 3800, minutes: '~5:00' } },
+  metal: { bpm: '110-200',
+    short:    { sections: 'V1, C, V2, C, Solo, C',                                            charBudget: 1500, minutes: '~2:30' },
+    medium:   { sections: 'I, V1, PC, C, V2, PC, C, Solo, B, C',                              charBudget: 2400, minutes: '~3:30' },
+    long:     { sections: 'I, V1, PC, C, V2, PC, C, B, Solo, Breakdown, C, Outro',            charBudget: 3200, minutes: '~4:30' },
+    extended: { sections: 'I, V1, PC, C, V2, PC, C, B, Solo1, Breakdown, V3, Solo2, C, Outro', charBudget: 4200, minutes: '~6:00' } },
+  jazz: { bpm: '70-160',
+    short:    { sections: 'Head, Solo, Head',                                charBudget: 1200, minutes: '~3:00' },
+    medium:   { sections: 'Head, Solo1, Solo2, Head',                        charBudget: 1800, minutes: '~4:30' },
+    long:     { sections: 'Head, Solo1, Solo2, Solo3, Trade-4s, Head',       charBudget: 2400, minutes: '~6:00' },
+    extended: { sections: 'I, Head, Solo1, Solo2, Solo3, Trade-4s, Head, Outro', charBudget: 3000, minutes: '~8:00' } },
+  ss: { bpm: '60-110',
+    short:    { sections: 'V1, C, V2, C',                              charBudget: 1400, minutes: '~2:30' },
+    medium:   { sections: 'V1, C, V2, C, B, C',                        charBudget: 2200, minutes: '~3:15' },
+    long:     { sections: 'V1, C, V2, C, V3, B, C',                    charBudget: 3000, minutes: '~4:00' },
+    extended: { sections: 'V1, V2, V3, V4, V5 (verse-only diary form)', charBudget: 3800, minutes: '~5:00' } },
+  altrock: { bpm: '90-160',
+    short:    { sections: 'V1, C, V2, C',                                                charBudget: 1500, minutes: '~2:45' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, B, C',                                  charBudget: 2400, minutes: '~3:45' },
+    long:     { sections: 'V1, PC, C, V2, PC, C, B, Solo, C',                            charBudget: 3200, minutes: '~4:30' },
+    extended: { sections: 'V1, PC, C, V2, PC, C, B, Solo, Breakdown, C, Outro',          charBudget: 4000, minutes: '~5:30' } },
+  reggae: { bpm: '60-95',
+    short:    { sections: 'V1, C, V2, C',                                       charBudget: 1500, minutes: '~2:45' },
+    medium:   { sections: 'I, V1, C, V2, C, Dub-break, C',                      charBudget: 2400, minutes: '~3:30' },
+    long:     { sections: 'I, V1, C, V2, C, Dub-break, V3, C, Outro-vamp',      charBudget: 3200, minutes: '~4:30' },
+    extended: { sections: 'I, V1, C, V2, C, Dub-break, V3, C, Toasting, Outro-vamp', charBudget: 4000, minutes: '~5:30' } },
+  afrobeats: { bpm: '95-115',
+    short:    { sections: 'I, H, V1, H, V2, H',                                       charBudget: 1600, minutes: '~2:30' },
+    medium:   { sections: 'I, H, V1, H, V2, H, Adlib-break, H',                       charBudget: 2400, minutes: '~3:15' },
+    long:     { sections: 'I, H, V1, H, V2, Pre-bridge, B, H, Outro-vamp',            charBudget: 3200, minutes: '~4:00' },
+    extended: { sections: 'I, H, V1, H, V2, B, V3/Feature, H, Outro-vamp',            charBudget: 4000, minutes: '~5:00' } },
+  blues: { bpm: '60-130',
+    short:    { sections: '12-bar V1, C, 12-bar V2, C',                          charBudget: 1400, minutes: '~3:00' },
+    medium:   { sections: '12-bar V1, V2, Solo, V3',                             charBudget: 2200, minutes: '~4:00' },
+    long:     { sections: '12-bar V1, V2, Solo, V3, Solo-out',                   charBudget: 3000, minutes: '~5:00' },
+    extended: { sections: '12-bar V1, V2, Solo, V3, Solo, V4, Solo-out',         charBudget: 3800, minutes: '~6:00' } },
+  punk: { bpm: '140-200',
+    short:    { sections: 'V1, C, V2, C',                       charBudget: 1200, minutes: '~1:45' },
+    medium:   { sections: 'V1, C, V2, C, B, C',                 charBudget: 1800, minutes: '~2:30' },
+    long:     { sections: 'V1, C, V2, C, V3, C, Outro',         charBudget: 2400, minutes: '~3:00' },
+    extended: { sections: 'V1, C, V2, C, B, V3, C, Outro',      charBudget: 3000, minutes: '~3:30' } },
+  kpop: { bpm: '95-130',
+    short:    { sections: 'V1, PC, C, V2, PC, C',                                            charBudget: 1800, minutes: '~2:45' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, Rap-break, B, C',                           charBudget: 2700, minutes: '~3:15' },
+    long:     { sections: 'I, V1, PC, C, V2, PC, C, Rap-break, B, KeyChange, FinalC',        charBudget: 3500, minutes: '~3:45' },
+    extended: { sections: 'I, V1, PC, C, V2, PC, C, Rap-break, B, KeyChange, FinalC, Outro', charBudget: 4300, minutes: '~4:30' } },
+  neosoul: { bpm: '70-95',
+    short:    { sections: 'V1, C, V2, C',                                charBudget: 1500, minutes: '~3:00' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, B, C',                  charBudget: 2400, minutes: '~3:45' },
+    long:     { sections: 'V1, PC, C, V2, PC, C, B, C, Vamp',            charBudget: 3200, minutes: '~4:30' },
+    extended: { sections: 'V1, PC, C, V2, PC, C, B, C, Vamp, Adlib-out', charBudget: 4000, minutes: '~5:30' } },
+  gospel: { bpm: '70-110',
+    short:    { sections: 'V1, C, V2, C',                                  charBudget: 1500, minutes: '~3:00' },
+    medium:   { sections: 'V1, C, V2, C, B, Vamp',                         charBudget: 2400, minutes: '~4:00' },
+    long:     { sections: 'V1, C, V2, C, B, Vamp, Adlib-Out',              charBudget: 3200, minutes: '~5:00' },
+    extended: { sections: 'V1, C, V2, C, B, Vamp, Modulation, Adlib-Out',  charBudget: 4000, minutes: '~6:00' } },
+  parody: { bpm: '80-130',
+    short:    { sections: 'V1, C, V2, C',                       charBudget: 1500, minutes: '~2:30' },
+    medium:   { sections: 'V1, C, V2, C, B, C',                 charBudget: 2400, minutes: '~3:15' },
+    long:     { sections: 'V1, C, V2, C, B, V3, C',             charBudget: 3200, minutes: '~3:45' },
+    extended: { sections: 'V1, C, V2, C, B, V3, C, Outro',      charBudget: 4000, minutes: '~4:30' } },
+  comedy: { bpm: '80-130',
+    short:    { sections: 'V1, C',                                     charBudget: 1000, minutes: '~1:45' },
+    medium:   { sections: 'V1, C, V2, C',                              charBudget: 1800, minutes: '~2:30' },
+    long:     { sections: 'V1, C, V2, C, B, C',                        charBudget: 2600, minutes: '~3:15' },
+    extended: { sections: 'V1, C, V2, C, V3, B, C, Outro-button',      charBudget: 3400, minutes: '~4:00' } },
+  children: { bpm: '90-130',
+    short:    { sections: 'V1, C, V2, C',                              charBudget: 1000, minutes: '~1:45' },
+    medium:   { sections: 'V1, C, V2, C, V3, C',                       charBudget: 1500, minutes: '~2:15' },
+    long:     { sections: 'V1, C, V2, C, V3, C, B, C',                 charBudget: 2000, minutes: '~2:45' },
+    extended: { sections: 'V1, C, V2, C, V3, C, V4, B, C, Outro',      charBudget: 2500, minutes: '~3:30' } },
+  tvmusical: { bpm: '70-140',
+    short:    { sections: 'V1, C',                                                charBudget: 1300, minutes: '~2:15' },
+    medium:   { sections: 'V1, C, V2, C, B, C',                                   charBudget: 2200, minutes: '~3:15' },
+    long:     { sections: 'I (spoken), V1, C, V2, B, C, Reprise',                 charBudget: 3000, minutes: '~4:00' },
+    extended: { sections: 'I (spoken), V1, V2, C, V3, B, Counterpoint, Final-C, Outro', charBudget: 4000, minutes: '~5:00' } },
+  brazilian: { bpm: '80-115',
+    short:    { sections: 'V1, C, V2, C',                              charBudget: 1500, minutes: '~2:30' },
+    medium:   { sections: 'V1, C, V2, C, B/Samba-break, C',            charBudget: 2400, minutes: '~3:15' },
+    long:     { sections: 'V1, C, V2, C, V3, B, C',                    charBudget: 3200, minutes: '~4:00' },
+    extended: { sections: 'V1, C, V2, C, V3, B, V4, C, Vamp',          charBudget: 4000, minutes: '~5:00' } },
+  amapiano: { bpm: '108-118',
+    short:    { sections: 'I, H, V, H',                                              charBudget: 1300, minutes: '~3:30' },
+    medium:   { sections: 'I, H, V1, H, V2, H, Log-drum-break',                      charBudget: 2000, minutes: '~4:30' },
+    long:     { sections: 'I, H, V1, H, V2, H, Log-drum-break, V3, H, Outro',        charBudget: 2700, minutes: '~5:30' },
+    extended: { sections: 'I, H, V1, H, V2, H, Log-drum-break, V3, H, Vamp-out',     charBudget: 3400, minutes: '~6:30' } },
+  dancehall: { bpm: '90-110',
+    short:    { sections: 'I, H, V1, H, V2, H',                                                  charBudget: 1400, minutes: '~2:30' },
+    medium:   { sections: 'I, H, V1, H, V2, H, Riddim-break, H',                                 charBudget: 2200, minutes: '~3:15' },
+    long:     { sections: 'I, H, V1, H, V2, Pre-bridge, B, H, V3, H, Outro-toast',               charBudget: 3000, minutes: '~4:00' },
+    extended: { sections: 'I, H, V1, H, V2, B, V3, Riddim-break, V4/Feature, H, Outro-toast',    charBudget: 3800, minutes: '~5:00' } },
+  bollywood: { bpm: '85-130',
+    short:    { sections: 'I (instrumental), V1, C, V2, C',                                     charBudget: 1700, minutes: '~3:00' },
+    medium:   { sections: 'I, V1, C, V2, C, B (instrumental dance break), C',                   charBudget: 2700, minutes: '~4:00' },
+    long:     { sections: 'I, V1, C, V2, C, Bridge-dance, V3, C, Vamp',                         charBudget: 3500, minutes: '~5:00' },
+    extended: { sections: 'I, V1, C, V2, C, Bridge-dance, V3, C, Reprise, Vamp',                charBudget: 4500, minutes: '~6:00' } },
+  arabesque: { bpm: '75-110',
+    short:    { sections: 'V1, C, V2, C',                                            charBudget: 1500, minutes: '~3:00' },
+    medium:   { sections: 'I (oud taqsim), V1, C, V2, C, B, C',                      charBudget: 2400, minutes: '~4:00' },
+    long:     { sections: 'I, V1, C, V2, C, Improvised-vamp, V3, C, Outro',          charBudget: 3200, minutes: '~5:00' },
+    extended: { sections: 'I, V1, C, V2, C, Improvised-vamp, V3, C, Modulation, Final-C', charBudget: 4000, minutes: '~6:00' } },
+  mandopop: { bpm: '70-120',
+    short:    { sections: 'V1, PC, C, V2, PC, C',                                  charBudget: 1700, minutes: '~3:00' },
+    medium:   { sections: 'V1, PC, C, V2, PC, C, B, C',                            charBudget: 2600, minutes: '~3:45' },
+    long:     { sections: 'V1, PC, C, V2, PC, C, B, KeyChange, Final-C',           charBudget: 3400, minutes: '~4:30' },
+    extended: { sections: 'V1, PC, C, V2, PC, C, B, KeyChange, Final-C, Outro',    charBudget: 4200, minutes: '~5:30' } }
+};
+
+// Returns the prompt-ready length directive: section sequence, char budget,
+// runtime estimate, BPM range. Replaces the old genre-agnostic lengthMap.
+function buildSongLengthDirective(genre, length) {
+  const profile = GENRE_LENGTH_BUDGET[genre] || GENRE_LENGTH_BUDGET.pop;
+  const p = profile[length] || profile.medium;
+  const lenLabel = (length || 'medium').toUpperCase();
+  return `${lenLabel} (${p.minutes}, ${profile.bpm} BPM range)
+- Target sections: ${p.sections}
+- Character budget: ~${p.charBudget} chars (NEVER exceed 4900 — Suno's lyric cap)`;
+}
+
 const FUSION_DATA={
   'Pop+Hip-Hop':{name:'Pop-Rap',tip:'Never rap the chorus. Contrast between rapped verse and sung hook IS the formula.',q:{overall:95,compat:95,structural:90,commercial:96}},
   'Pop+R&B':{name:'Neo-Soul Pop',tip:'Add ad-libs under chorus and melismatic bridge.',q:{overall:93,compat:92,structural:88,commercial:94}},
@@ -3907,12 +4078,7 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
     contemporary: 'Contemporary (2016–2022) — lo-fi textures, trap hi-hats, streaming dynamics',
     current: 'Current (2023–Now) — hyperpop edges, AI-era production, ultra-compressed'
   };
-  const lengthMap = {
-    short: 'Short (~2 min, ~2 verses + chorus)',
-    medium: 'Medium (~3 min, standard structure)',
-    long: 'Long (~4 min, full structure with bridge)',
-    extended: 'Extended (~5+ min, full epic structure)'
-  };
+  const lengthDirective = buildSongLengthDirective(genre, length);
 
   const system = buildGenreAgentSystem(genre);
 
@@ -4105,7 +4271,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthDirective}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -5597,7 +5763,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, GENRE_LENGTH_BUDGET, buildSongLengthDirective };
 
 
 
