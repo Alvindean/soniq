@@ -544,6 +544,14 @@ module.exports = async function handler(req, res) {
         // Region whitelist — invalid → no region overlay (silent fallback)
         const VALID_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (p.region && !VALID_REGIONS.has(p.region)) p.region = '';
+        // Craft mechanics dials — sanitize each (the brain note handles missing/empty fields)
+        const VALID_TIME_SIGS = new Set(['4/4','3/4','6/8','5/4','7/8','12/8']);
+        const VALID_POVS      = new Set(['auto','1st-direct','1st-narrator','2nd-confessional','3rd-omniscient','unreliable']);
+        if (p.timeSig && !VALID_TIME_SIGS.has(p.timeSig)) p.timeSig = '4/4';
+        if (p.pov && !VALID_POVS.has(p.pov)) p.pov = 'auto';
+        if (typeof p.tempo === 'string') p.tempo = p.tempo.trim().slice(0, 16);
+        if (typeof p.motif === 'string') p.motif = p.motif.trim().slice(0, 40);
+        if (typeof p.addressee === 'string') p.addressee = p.addressee.trim().slice(0, 80);
         // Suno learning overlay — only fetched for Studio-tier users since only
         // they see the values; skip the Redis hit otherwise.
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
