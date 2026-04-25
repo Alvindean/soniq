@@ -1874,6 +1874,65 @@ const REGION_BIBLE = {
   }
 };
 
+// Parses a free-text section-region map like "verse 1: ireland, hook: australia"
+// into a normalized object { 'verse 1': 'ireland', hook: 'australia' }.
+function parseSectionRegions(raw) {
+  if (!raw || typeof raw !== 'string') return {};
+  const valid = new Set(Object.keys(REGION_BIBLE));
+  const result = {};
+  raw.split(/[,;\n]/).forEach(part => {
+    const m = part.match(/^\s*([a-z0-9 _-]+?)\s*[:=]\s*([a-z_]+)\s*$/i);
+    if (!m) return;
+    const sectionKey = m[1].trim().toLowerCase();
+    const regionKey = m[2].trim().toLowerCase().replace(/[\s-]+/g, '_');
+    if (sectionKey && valid.has(regionKey)) {
+      result[sectionKey] = regionKey;
+    }
+  });
+  return result;
+}
+
+// Builds the section-level region overlay block. Used when a song wants
+// different regional flavors in different sections (e.g. Aussie hook on a
+// Singer-Songwriter base, with an Irish-trad bridge). Each section's region
+// brings its OWN pejorative guard — preventing cross-contamination.
+function buildSectionRegionNote(genre, sectionRegions) {
+  if (!sectionRegions || typeof sectionRegions !== 'object') return '';
+  const entries = Object.entries(sectionRegions).filter(([, rk]) => REGION_BIBLE[rk]);
+  if (!entries.length) return '';
+
+  const sectionBlocks = entries.map(([sectionName, regionKey]) => {
+    const r = REGION_BIBLE[regionKey];
+    const anchorList = (r.anchorsByGenre && r.anchorsByGenre[genre])
+                    || (r.anchorsByGenre && r.anchorsByGenre.pop)
+                    || [];
+    const anchors = anchorList.length
+      ? `\n    Anchor artists: ${anchorList.slice(0, 3).join(', ')}`
+      : '';
+    const guardShort = r.pejorativeGuard.split('NEVER invoke:')[1]
+      ? 'avoid ' + r.pejorativeGuard.split('NEVER invoke:')[1].split('.')[0] + '.'
+      : 'see region bible.';
+    return `  [${sectionName.toUpperCase()}] → ${r.flag} ${r.label}
+    Vocal markers: ${r.vocalMarkers.split('.')[0]}.
+    Instruments to lean into: ${r.instruments.split('.')[0]}.
+    PEJORATIVE GUARD: ${guardShort}${anchors}`;
+  }).join('\n\n');
+
+  return `
+
+🌍🌍 MULTI-REGION SONG — different sections carry different regional flavors. Each section MUST honor its own region's pejorative guard. DO NOT let one region's tropes leak into another's section.
+
+PER-SECTION REGION MAP:
+${sectionBlocks}
+
+INTEGRATION RULES:
+- Each section stays TRUE to its own region — Aussie indie hook stays Aussie, Irish-trad bridge stays Irish, French chanson verse stays French. The transitions between sections are where the song's identity is forged.
+- The PRIMARY genre's structure still holds the song together — only the regional flavor shifts per section.
+- Vernacular: each section's vernacular bank is exclusive to that section.
+- Pejorative guards STACK — the song must avoid stereotypes from EVERY region it uses.
+- When a section transitions, the LAST line of the previous section can hint at the next section's region — a smooth handoff feels intentional.`;
+}
+
 // Returns the region overlay block for the prompt. Combines with any genre.
 // CRITICAL: includes the pejorativeGuard list — these are stereotype tropes
 // the model must avoid. Without this, regional overlays slide into caricature.
@@ -4299,6 +4358,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const academicNote = buildAcademicFrameworkNote(genre, era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(genre, params.region);
+  const sectionRegionNote = buildSectionRegionNote(genre, params.sectionRegions);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -4343,7 +4403,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${sectionRegionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4486,6 +4546,7 @@ function buildLuckyPrompt(params) {
   const academicNote = buildAcademicFrameworkNote(g1, params.era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
+  const sectionRegionNote = buildSectionRegionNote(g1, params.sectionRegions);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -4521,7 +4582,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${sectionRegionNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -5033,6 +5094,7 @@ ${buildLyricTierNote('hiphop', params.lyricTier)}
 ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
+${buildSectionRegionNote('hiphop', params.sectionRegions)}
 
 Respond with EXACTLY this format:
 
@@ -5311,7 +5373,8 @@ function buildVariantPrompt(variant, song) {
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
+  const sectionRegionNote = buildSectionRegionNote(safeSong.genre, song.sectionRegions);
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + sectionRegionNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5449,6 +5512,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   const academicNote = buildAcademicFrameworkNote(genre, p.era);
   const edgeNote = buildEdgeNote(p.edgeMode, p.lyricTier);
   const regionNote = buildRegionNote(genre, p.region);
+  const sectionRegionNote = buildSectionRegionNote(genre, p.sectionRegions);
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -5456,7 +5520,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${sectionRegionNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5817,7 +5881,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, parseSectionRegions, buildSectionRegionNote };
 
 
 
