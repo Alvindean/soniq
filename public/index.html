@@ -468,6 +468,13 @@ a{color:var(--amber);text-decoration:none}
   .import-modal{max-height:85vh}
   .import-modal,.batch-modal,.vp-modal{max-height:80vh}
 }
+/* Optional details (Mood / Vocal / Structure) — 3-column grid on desktop,
+   collapses to 1 column on phones so the inputs aren't squeezed into ~95px
+   columns where vocal-style options like "Auto-Tune / Melodic trap" truncate
+   into illegible "Auto-Tu…" stubs. */
+@media(max-width:560px){
+  .import-optional-grid{grid-template-columns:1fr !important;gap:8px !important}
+}
 .gen-btn{display:inline-flex;align-items:center;gap:10px;padding:15px 34px;border-radius:var(--r4);border:none;background:var(--amber);color:#08080a;font-family:var(--font);font-size:15px;font-weight:700;letter-spacing:0.02em;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 10px rgba(245,184,0,0.14);animation:genBreathe 2.4s ease-in-out infinite}
 @keyframes genBreathe{0%,100%{box-shadow:0 2px 10px rgba(245,184,0,0.14)}50%{box-shadow:0 3px 18px rgba(245,184,0,0.28)}}
 .gen-btn.platinum-on{background:linear-gradient(135deg,#f5b800 0%,#c084fc 100%);box-shadow:0 2px 20px rgba(192,132,252,0.35)}
@@ -4714,7 +4721,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
            craft mechanics) for an improved version that addresses every weakness. -->
       <div style="margin-top:18px;padding:14px;background:linear-gradient(135deg,rgba(245,192,0,.08),rgba(34,211,238,.05));border:1px solid var(--amberline);border-radius:var(--r2)">
         <div style="font-size:12px;color:var(--tx2);line-height:1.5;margin-bottom:10px">
-          <strong style="color:var(--amber)">✨ Want Soniq to apply these fixes?</strong> Click below to regenerate the song through the full Soniq brain — lyric tier, region, edge mode, academic frameworks, craft mechanics, the works. The coach's feedback is layered in as an explicit rewrite directive.
+          <strong style="color:var(--amber)">✨ Want Soniq to apply these fixes?</strong> Soniq will rewrite the song addressing every point above, using its full songwriting engine to elevate the result.
+          <details style="margin-top:6px"><summary style="cursor:pointer;font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.04em;list-style:none">What's the engine?</summary><div style="font-size:11px;color:var(--tx3);line-height:1.5;margin-top:6px;padding-top:6px;border-top:1px dashed var(--b2)">Lyric tier (radio → archival craft level), regional overlay (8 regions with anti-stereotype guards), edge mode, academic frameworks (Lupe MIT, GZA Harvard, Questlove NYU, etc.), craft mechanics (V1≠V2 differentiation, motif planting, sensory diversity, POV control), and the Suno Weirdness/Style Influence learning loop.</div></details>
         </div>
         <button class="btn btn-gold" id="coach-apply-btn" onclick="applyCoachAndRegenerate()" style="width:100%;font-size:13px;padding:10px 16px;font-weight:700">✨ Apply Suggestions &amp; Regenerate</button>
       </div>
@@ -17171,18 +17179,28 @@ async function importAndAnalyze() {
     document.querySelectorAll('#gen-out .opane').forEach(p => p.classList.remove('on'));
     document.getElementById('res-opane-lyrics')?.classList.add('on');
 
-    toast('✦ Lyrics imported — opening Coach for feedback…', 2400);
+    toast('✦ Lyrics imported — Coach opens in a moment for feedback (or browse first)', 3000);
 
     // AUTO-ROUTE: import → coach. Open the Coach modal and kick off the analysis
     // automatically so the user lands directly on suggestions + the regenerate
-    // button, no extra click required.
+    // button, no extra click required. Delay is generous (1500ms) so the user
+    // can see + briefly read the imported song's result card before the modal
+    // opens — addresses audit feedback that the prior 600ms felt hijacked.
+    // User can navigate away during this window to skip auto-coach entirely;
+    // the timeout fires open against the same currentSong so it still works
+    // if they come back.
     setTimeout(() => {
+      // Bail if the user navigated away from the write page or replaced the
+      // currentSong via another generate during the wait — don't spring a
+      // surprise modal on a different context.
+      if (!S.currentSong || !S.currentSong.imported) return;
+      const onWrite = !!document.querySelector('#pg-write.on, [id="pg-write"].on');
+      if (!onWrite) return;
       try {
         openCoach();
-        // Tiny delay to let the modal mount before triggering analysis
         setTimeout(() => { try { runCoach(); } catch(_) {} }, 250);
       } catch(_) {}
-    }, 600);
+    }, 1500);
   } catch(e) {
     toast('⚠️ ' + e.message, 5000);
   }
@@ -21695,7 +21713,7 @@ function updateBlogAdminUI() {
         <span>🎚 Optional details</span>
         <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--tx4);font-size:10px">mood, vocal, structure — auto-detected if blank</span>
       </summary>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px">
+      <div class="import-optional-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px">
         <div>
           <label style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:0.05em;display:block;margin-bottom:4px">Mood</label>
           <input id="imp-mood" type="text" placeholder="e.g. Bittersweet, Defiant" maxlength="60" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:6px 8px;outline:none;box-sizing:border-box">
