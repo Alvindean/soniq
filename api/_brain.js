@@ -2067,6 +2067,172 @@ function buildEdgeNote(edgeMode, lyricTier) {
 This song must feel risked, not safe.`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// BLEND_STYLE_BIBLE — per-(writing-style) bible for the Secondary Style Blend
+// system. Each entry gives the model anchor artists, signature techniques to
+// reach for, an explicit "do not" list (anti-stereotype/cliché), and an
+// integration rule that explains how the style overlays on a primary genre
+// at any blend ratio.
+//
+// Replaces the old anemic blend instruction ("apply X as a secondary layer")
+// which gave the model nothing concrete to anchor on. Mirrors the architecture
+// of TIER_ANCHORS / LYRIC_TIERS so the blend overlay is just as specific.
+// ═══════════════════════════════════════════════════════════════════════════
+const BLEND_STYLE_BIBLE = {
+  soul: {
+    label: 'Soul',
+    description: 'Classic warmth, raw emotion, Motown DNA',
+    anchors:    ['Aretha Franklin', 'Otis Redding', 'Marvin Gaye (What\'s Going On)', 'Sam Cooke', 'Stevie Wonder (Talking Book)'],
+    techniques: ['Vocal melisma on the emotional peak — bend the note before resolving', 'Call-and-response between lead and backing vocals', 'Horn stabs answering vocal phrases', 'Hammond B3 organ swells under the chorus'],
+    doNot:      ['Don\'t mistake "soul" for "loud"; restraint is the genre — Otis whispered as often as he wailed', 'Avoid generic "I feel it deep inside" tropes — soul is specific feeling about specific people'],
+    integration:'Soul flavors the VOCAL DELIVERY and LYRIC EMOTIONAL CORE. The primary genre keeps its production architecture; soul rewrites how the singer carries the words.'
+  },
+  funk: {
+    label: 'Funk',
+    description: 'Groove-first, syncopated, James Brown DNA',
+    anchors:    ['James Brown', 'Sly & The Family Stone', 'Parliament-Funkadelic', 'Tower of Power', 'Prince (1999-era)'],
+    techniques: ['One on the one — the downbeat is sacred', 'Slap bass as melodic instrument, not just rhythm', 'Horn punches landing OFF-beat against the groove', 'Vocal ad-libs that ride the pocket without overcrowding it'],
+    doNot:      ['Don\'t over-arrange — funk is space + repetition, not density', 'Don\'t intellectualize — funk is body music, lyrics serve the groove'],
+    integration:'Funk flavors the RHYTHM POCKET and INSTRUMENTAL ARRANGEMENT. The primary genre keeps its lyrical content; funk rewrites how the band locks into the groove.'
+  },
+  lofi: {
+    label: 'Lo-Fi',
+    description: 'Vinyl crackle, dusty, bedroom warmth',
+    anchors:    ['J Dilla (Donuts)', 'Madlib', 'Nujabes', 'Mac DeMarco (Salad Days)', 'Clairo (Diary 001)'],
+    techniques: ['Vinyl crackle and tape hiss as production texture', 'Drums slightly behind the beat — Dilla swing', 'Sampled vocal chops or warm Rhodes/Wurli pads', 'Single-mic recording aesthetic; preserve "imperfections"'],
+    doNot:      ['Don\'t literally write "lofi" or "bedroom" into the lyrics', 'Avoid the "study beats with rain" meme cliché'],
+    integration:'Lo-fi flavors the PRODUCTION TEXTURE and DRUM POCKET. The primary genre\'s structure stays intact; lo-fi softens the edges and warms the room.'
+  },
+  folkworld: {
+    label: 'Folk World',
+    description: 'Celtic, West African, Appalachian roots',
+    anchors:    ['Lankum', 'Tinariwen', 'Carolina Chocolate Drops', 'Ry Cooder (Buena Vista era)', 'Gillian Welch'],
+    techniques: ['Modal harmony (Mixolydian, Dorian) instead of major/minor', 'Drone bass — open strings or sustained pedal tones', 'Region-specific instruments (uilleann pipes, kora, banjo, oud)', 'Story-ballad lyric tradition — character-driven verses'],
+    doNot:      ['NEVER invoke region stereotypes — no "leprechauns", no "mystic East", no "tribal" anything', 'Don\'t namedrop world-music tropes; let the harmonic and rhythmic DNA do the work'],
+    integration:'Folk World flavors the HARMONIC LANGUAGE and INSTRUMENTAL PALETTE. Pick one regional tradition — don\'t muddle three at once.'
+  },
+  psychedelic: {
+    label: 'Psychedelic',
+    description: 'Cosmic layers, woozy, exploratory',
+    anchors:    ['Tame Impala', 'Pink Floyd (Dark Side era)', 'The Flaming Lips', 'King Gizzard & The Lizard Wizard', 'MGMT'],
+    techniques: ['Phaser, flanger, tape echo on vocals and guitars', 'Modal interchange — chords that should not work but do', 'Lyrics that float between literal and dream-logic without committing to either', 'Sectional shifts — tempo or key change mid-song'],
+    doNot:      ['Don\'t confuse "psychedelic" with "vague" — the imagery is specific, just non-linear', 'Avoid 60s pastiche unless explicitly requested — modern psych has its own vocabulary'],
+    integration:'Psychedelic flavors the PRODUCTION TEXTURE and LYRICAL POV. The primary genre\'s structure can stay; psych warps it through effects and dream logic.'
+  },
+  gospel: {
+    label: 'Gospel / Spiritual',
+    description: 'Testimony, transcendence, call-response',
+    anchors:    ['Mahalia Jackson', 'Kirk Franklin', 'Andraé Crouch', 'Marvin Sapp', 'Sister Rosetta Tharpe'],
+    techniques: ['Testimony lyric structure: I was → God moved → I am free', 'Vocal runs that climb in stepwise increments before landing', 'Call-and-response between lead and choir', 'Modulation up a half-step on the final chorus'],
+    doNot:      ['Avoid generic "lift me up" filler — gospel is specific about what was broken', 'Don\'t use gospel form to deliver secular content unless the irony is the point (and even then, be careful)'],
+    integration:'Gospel flavors the VOCAL ARRANGEMENT (call-response, choir stacks) and LYRIC EMOTIONAL ARC (testimony shape). Works powerfully on R&B, soul, country.'
+  },
+  spoken_word: {
+    label: 'Spoken Word / Slam',
+    description: 'Rhythm over melody',
+    anchors:    ['Saul Williams', 'Gil Scott-Heron', 'The Last Poets', 'Patti Smith', 'Kae Tempest'],
+    techniques: ['Cadence is the melody — meter does the work melody usually does', 'Long lines that breathe across multiple bars', 'Internal rhyme + assonance carrying the listener forward', 'Build to one devastating image rather than a sung hook'],
+    doNot:      ['Don\'t default to slam-poetry "powerful! truth!" cliché tone — specificity over rhetoric', 'Avoid forced rhyme that breaks the cadence'],
+    integration:'Spoken Word flavors the VERSE DELIVERY. The primary genre still gets a sung hook (unless it\'s rap); verses tilt toward declamation.'
+  },
+  cinematic: {
+    label: 'Cinematic / Narrative',
+    description: 'Scene-setting, story arc',
+    anchors:    ['Florence + The Machine', 'Hozier', 'Lana Del Rey', 'Mitski', 'Springsteen (Nebraska)'],
+    techniques: ['Open with a SHOT — visual, kinetic, specific (camera enters a room or a scene)', 'Each verse advances the story; nothing is decorative', 'Bridge zooms out or reveals — the moment that reframes everything', 'Strings or piano underscore the emotional climaxes'],
+    doNot:      ['Don\'t over-narrate — show, don\'t tell. "She closed the door" beats "she felt rejected"', 'Avoid generic Hollywood-cliché images (rain on windows etc.) unless used ironically'],
+    integration:'Cinematic flavors the LYRIC STRUCTURE (scene → conflict → reveal) and PRODUCTION DYNAMIC (build → climax). Pairs well with rock, pop, country, indie.'
+  },
+  confessional: {
+    label: 'Confessional',
+    description: 'First-person, diary-honest, exposed',
+    anchors:    ['Phoebe Bridgers', 'Elliott Smith', 'Adrianne Lenker', 'Sufjan Stevens (Carrie & Lowell)', 'Lucy Dacus'],
+    techniques: ['Specific real-world details — house numbers, names, dates, weather', 'Whispered or barely-projected vocal — listener leans in', 'No metaphor unless it earns its keep — most images are literal', 'Vulnerability admitted plainly: "I\'m not okay" is allowed if surrounded by specifics'],
+    doNot:      ['Avoid performance-confessional ("look how raw I am!") — real confession is quiet', 'Don\'t blanket-swap "you" for any addressee — the specific person matters'],
+    integration:'Confessional flavors the LYRIC POV and VOCAL DELIVERY. Production stays in the primary genre; the singer pulls the mic close.'
+  },
+  political: {
+    label: 'Political / Protest',
+    description: 'Social commentary, rallying',
+    anchors:    ['Bob Dylan (early)', 'Public Enemy', 'Rage Against The Machine', 'Kendrick Lamar (To Pimp a Butterfly)', 'Run The Jewels'],
+    techniques: ['Name the structure, not just the symptom — protest songs name banks, presidents, laws by name', 'Specific examples ground the rage — "they shut the plant on Tuesday" beats "the system is broken"', 'Hook is a chant: short, repeatable, crowd-ready', 'End on action or commitment, not despair'],
+    doNot:      ['Avoid vague "wake up sheeple" tone — specificity is what separates protest from venting', 'Don\'t punch down — protest punches at power, not at fellow workers'],
+    integration:'Political flavors the LYRIC CONTENT and HOOK SHAPE (chant-able). Production keeps the primary genre\'s sonic identity.'
+  },
+  street: {
+    label: 'Street Narrative',
+    description: 'Vivid realism, community voice',
+    anchors:    ['Nas (Illmatic)', 'Tupac (Me Against the World)', 'Mobb Deep', 'Killer Mike', 'Kendrick Lamar (Section.80, GKMC)'],
+    techniques: ['Block-level specificity — name street, name corner, name year', 'Community voice — neighbors, family, the scene as character', 'Action verbs over interpretation — "he counted twenties" not "he made money"', 'Refuse the easy moral — let the listener feel the weight'],
+    doNot:      ['Don\'t stereotype — real street narrative is specific and humane, not cartoonish', 'Avoid romanticizing pain without naming the cost'],
+    integration:'Street flavors the LYRIC CONTENT and IMAGERY DENSITY. Pairs strongly with hip-hop, R&B, soul, country, and folk.'
+  },
+  surreal: {
+    label: 'Surreal / Abstract',
+    description: 'Dream logic, image over meaning',
+    anchors:    ['Björk', 'Kate Bush', 'Caroline Polachek', 'Sufjan Stevens (Age of Adz)', 'David Bowie (Berlin trilogy)'],
+    techniques: ['Images that should not connect, do', 'The literal subject is hidden until the last bar (or never revealed)', 'Sensory crossings — sound becomes color, taste becomes sound', 'Specific concrete objects placed in impossible scenes'],
+    doNot:      ['Don\'t mistake "surreal" for "vague" — surreal is hyper-specific about impossible things', 'Avoid clichéd dream-imagery (clocks melting, doors to nowhere) unless reframed entirely'],
+    integration:'Surreal flavors the LYRIC IMAGERY. The model writes verses that operate on dream logic while the primary genre\'s structure holds the song together.'
+  },
+  romantic_classic: {
+    label: 'Classic Romance',
+    description: 'Timeless love, poetic, elegant',
+    anchors:    ['Frank Sinatra', 'Nat King Cole', 'Adele (album cuts)', 'Norah Jones', 'Sade'],
+    techniques: ['Whole-song commitment to one beloved (no audience, no third party)', 'Restraint — the song earns "I love you" by saying it once, not seven times', 'Imagery from the body and the senses, not abstract emotion', 'Resolved chord movement — the love arrives'],
+    doNot:      ['Avoid Hallmark-card filler ("you complete me" etc.)', 'Don\'t age-mismatch the diction — classic romance speaks like an adult, not a teenager'],
+    integration:'Classic Romance flavors the LYRIC EMOTIONAL POSTURE and CHORD CHOICES (movement toward resolution). Pairs strongly with jazz, R&B, ballad-mode pop.'
+  },
+  minimalist: {
+    label: 'Minimalist',
+    description: 'Fewer words, more space, restraint',
+    anchors:    ['Billie Eilish (When We All Fall Asleep)', 'James Blake', 'Frank Ocean (channel ORANGE deep cuts)', 'Bon Iver (22, A Million)', 'The xx'],
+    techniques: ['Short lines — 4-6 syllables max in many cases', 'Single image per stanza, repeated or refracted', 'Production almost-empty — the silences are the song', 'Trust the listener to fill in what you don\'t say'],
+    doNot:      ['Don\'t use minimalism as cover for vagueness — every word still has to earn its place', 'Avoid the "trap of profundity" — short doesn\'t mean meaningful by default'],
+    integration:'Minimalist flavors the LYRIC LINE LENGTH and PRODUCTION DENSITY. Forces the primary genre to breathe.'
+  }
+};
+
+// Builds the blend overlay block. Handles the 3 cases:
+//   1. Genre-only blend (no writing style): describe genre fusion
+//   2. Style-only blend: inject BLEND_STYLE_BIBLE entry
+//   3. Both: layered overlay with explicit primary/secondary ratios
+function buildBlendNote(primaryGenre, blend) {
+  if (!blend || (!blend.genre2 && !blend.style2)) return '';
+  const ratio = Math.max(10, Math.min(90, parseInt(blend.ratio || 70, 10)));
+  const secondaryPct = 100 - ratio;
+  const blocks = [];
+
+  if (blend.genre2) {
+    const g2Label = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[blend.genre2]) || blend.genre2;
+    blocks.push(`SECONDARY GENRE: ${g2Label} (${secondaryPct}% influence)
+- Borrow ${g2Label}'s rhythmic feel, instrument palette, and production texture
+- The primary genre (${ratio}%) keeps its structural backbone (verse/chorus shape, hook placement, length)
+- Where the two genres conflict (e.g. tempo), the primary wins; where they can layer (e.g. instrumentation), let ${g2Label} color the mix`);
+  }
+
+  if (blend.style2) {
+    const bible = BLEND_STYLE_BIBLE[blend.style2];
+    if (bible) {
+      const anchors = bible.anchors.slice(0, 5).join(', ');
+      const techs   = bible.techniques.map(t => '  • ' + t).join('\n');
+      const donts   = bible.doNot.map(d => '  ✗ ' + d).join('\n');
+      blocks.push(`WRITING STYLE INFLUENCE: ${bible.label} (${secondaryPct}% influence) — ${bible.description}
+ANCHOR ARTISTS (style targets, do not imitate verbatim): ${anchors}
+SIGNATURE MOVES TO REACH FOR:
+${techs}
+DO NOT:
+${donts}
+INTEGRATION: ${bible.integration}`);
+    } else {
+      // Unknown style key — fall back to a thin label-only blend
+      blocks.push(`WRITING STYLE INFLUENCE: ${blend.style2} (${secondaryPct}% influence) — apply as secondary layer over the primary genre.`);
+    }
+  }
+
+  return `\n\n🎨 SECONDARY STYLE BLEND — primary ${ratio}% / secondary ${secondaryPct}%:\n\n${blocks.join('\n\n')}\n\nThe blend ratio is approximate — the primary genre always wins on structure and length; the secondary leaks into vocal delivery, lyric texture, and production color.`;
+}
+
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
@@ -4103,16 +4269,9 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   const resolvedHookStyle = (hookStyle && hookStyle !== 'auto') ? hookStyle : null;
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle] ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}` : '';
 
-  // Blend
-  let blendNote = '';
-  if (blend.genre2 || blend.style2) {
-    const g2Label = GENRE_LABELS[blend.genre2] || blend.genre2;
-    const parts = [];
-    if (blend.genre2) parts.push(g2Label + ' genre elements');
-    if (blend.style2) parts.push(blend.style2 + ' writing style');
-    const ratio = blend.ratio || 70;
-    blendNote = `\n\nSECONDARY STYLE BLEND (${100-ratio}% influence):\nApply ${parts.join(' and ')} as a secondary layer.\nPrimary genre (${ratio}%): core structure, rhythm, production.\nSecondary (${100-ratio}%): lyric approach, vocal delivery, thematic texture.`;
-  }
+  // Blend — secondary genre + writing style influence (rewritten to inject the
+  // BLEND_STYLE_BIBLE for writing styles + concrete sonic guidance).
+  const blendNote = buildBlendNote(genre, blend);
 
   // Era map
   const eraMap = {
@@ -5817,7 +5976,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote };
 
 
 
