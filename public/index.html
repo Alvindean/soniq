@@ -384,12 +384,16 @@ a{color:var(--amber);text-decoration:none}
 .param select optgroup{background:#1a1a24;color:#6060a0}
 .param select option:checked{background:#2a2a40;color:#fff}
 
-/* ── SUBSTYLE ── */
-.substyle-wrap{margin-bottom:var(--sp-xl);display:none}
-.substyle-label-txt{font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;display:block}
+/* ── SUBSTYLE ──
+   Substyle picker — appears below the genre/blend area. Bumped visual
+   prominence so users always see it after picking a genre that has styles
+   (was getting overlooked below the fold). Now has a subtle amber-line
+   left border, slightly larger text, and clearer label. */
+.substyle-wrap{margin-bottom:var(--sp-xl);display:none;padding:14px 16px;background:var(--s2);border:1px solid var(--amberline);border-left:3px solid var(--amber);border-radius:var(--r2);animation:pgIn .25s ease}
+.substyle-label-txt{font-size:12px;font-weight:800;color:var(--amber);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;display:block}
 .spills{display:flex;flex-wrap:wrap;gap:var(--gap-sm)}
-.spill{font-size:12px;font-weight:600;padding:6px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.12s}
-.spill:hover{color:var(--tx2);border-color:var(--b3)}
+.spill{font-size:12px;font-weight:600;padding:7px 14px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx2);cursor:pointer;transition:all 0.12s}
+.spill:hover{color:var(--tx1);border-color:var(--amberline);background:var(--s4,#1f1f2e)}
 .spill.on{background:var(--amberbg);border-color:var(--amberline);color:var(--amber)}
 
 /* ── QUALITY ── */
@@ -9214,7 +9218,11 @@ function onGenreChange(g){
   if(!row||!pills)return;
   const rapLabPanel = document.getElementById('rap-lab-panel');
   if(styles){
-    lbl.textContent=g==='hiphop'?'Rap Style':g==='reggaeton'?'Reggaeton Style':g==='latin'?'Latin Style':'Sub-Genre Style';
+    // Label now includes the count so users see "Pick a style (8 available):"
+    // and can't miss that there's a list to choose from. Loudness up so the
+    // substyle row stops getting overlooked below the fold.
+    const _gLabel = g==='hiphop'?'Rap Style':g==='reggaeton'?'Reggaeton Style':g==='latin'?'Latin Style':g==='ss'?'Singer-Songwriter Style':'Sub-Genre Style';
+    lbl.textContent = _gLabel + ' — pick one (' + styles.length + ' available)';
     pills.innerHTML='';
     S.substyle=styles[0];
     styles.forEach((s,i)=>{
@@ -9235,6 +9243,14 @@ function onGenreChange(g){
       row.style.display='block';
       if(rapLabPanel) rapLabPanel.style.display='none';
       S.rapLabActive=false;
+      // Scroll the substyle row into view so users always see the available
+      // styles immediately after picking a genre. Without this, the row
+      // sometimes sits below the fold on shorter viewports and gets missed.
+      try {
+        setTimeout(() => {
+          if (row.scrollIntoView) row.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 80);
+      } catch(_) {}
     }
   }else{
     row.style.display='none';
