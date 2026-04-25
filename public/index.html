@@ -489,6 +489,22 @@ a{color:var(--amber);text-decoration:none}
 .result-header{display:flex;align-items:flex-start;justify-content:space-between;padding:22px 24px 20px;border-bottom:1px solid var(--b1);flex-wrap:wrap;gap:12px}
 .result-song-title{font-size:26px;font-weight:700;color:var(--tx1);letter-spacing:-0.5px;line-height:1.2}
 .result-song-verdict{font-size:13px;color:var(--tx3);margin-top:6px;font-style:italic;line-height:1.5}
+
+/* ── SUNO CHIPS — Weirdness / Style Influence / Vocal ── */
+.suno-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.suno-chips:empty{display:none}
+.suno-chip{position:relative;display:inline-flex;align-items:center;gap:7px;padding:6px 12px 7px;background:var(--s3);border:1px solid var(--b2);border-radius:18px;font-size:11px;font-weight:600;color:var(--tx2);line-height:1;overflow:hidden;transition:border-color .15s,background .15s}
+.suno-chip:hover{border-color:var(--b3,#3a3a52);background:var(--s4,#1f1f2e)}
+.suno-chip-icon{font-size:13px;line-height:1}
+.suno-chip-label{color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;font-size:9.5px;font-weight:700}
+.suno-chip-value{color:var(--tx1);font-variant-numeric:tabular-nums;font-weight:700}
+.suno-chip-bar{position:absolute;bottom:0;left:0;height:2px;background:linear-gradient(90deg,var(--cyan,#22d3ee),var(--amber,#fbbf24));transition:width .5s cubic-bezier(.4,0,.2,1);border-radius:0 2px 0 0}
+.suno-chip--learned{border-color:rgba(34,211,238,.35)}
+.suno-chip--learned::after{content:'✦';position:absolute;top:3px;right:5px;font-size:8px;color:var(--cyan,#22d3ee);opacity:.7}
+.suno-chip--lock{opacity:.7;cursor:help}
+.suno-chip--lock .suno-chip-value{color:var(--tx3);font-weight:600}
+.suno-chip--lock .suno-chip-bar{display:none}
+@media(max-width:600px){.suno-chips{margin-top:8px}.suno-chip{font-size:10.5px;padding:5px 10px 6px}}
 .result-acts{display:flex;gap:6px;flex-wrap:wrap;align-items:flex-start}
 .song-card-overflow{position:relative}
 .song-card-overflow-menu{display:none;position:absolute;right:0;top:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:4px 0;min-width:160px;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.3)}
@@ -3924,6 +3940,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="flex:1;min-width:0">
         <div class="result-song-title" id="res-title">—</div>
         <div class="result-song-verdict" id="res-verdict"></div>
+        <div class="suno-chips" id="res-suno-chips"></div>
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
@@ -4293,6 +4310,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div style="flex:1;min-width:0">
         <div class="result-song-title" id="lres-title">—</div>
         <div class="result-song-verdict" id="lres-verdict"></div>
+        <div class="suno-chips" id="lres-suno-chips"></div>
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
@@ -9871,6 +9889,7 @@ VIDEO PROMPT:
   luckyOut.style.display='block';
   luckyOut.classList.add('visible');
   document.getElementById('lres-title').textContent='Writing song…';
+  renderSunoChips('lres', null);
   document.getElementById('lres-verdict').textContent='';
   document.getElementById('lres-lyrics-text').innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Writing your lucky song…</div></div>';
 
@@ -9893,6 +9912,7 @@ VIDEO PROMPT:
     parseLuckyResult(raw,fd?.name||`${g1} × ${g2}`,{g1,g2,topic,mood,vocal,structure,fd},luckyProdData);
     if (S.luckyCurrentSong && luckySuno) S.luckyCurrentSong.sunoSettings = luckySuno;
     if (S.currentSong && luckySuno && !S.currentSong.sunoSettings) S.currentSong.sunoSettings = luckySuno;
+    renderSunoChips('lres', S.luckyCurrentSong);
     btnDone('lucky-btn');
     document.getElementById('lucky-hint').textContent='Hit Surprise Me again for a completely different song!';
     trackEvent('feel_lucky_used', { genre: g1, genre2: g2, fusion_key: key, topic });
@@ -10435,6 +10455,7 @@ VIDEO PROMPT:
   document.getElementById('output-placeholder')?.classList.add('hide');
   document.getElementById('loaded-banner').style.display='none';
   document.getElementById('res-title').textContent='Crafting your song…';
+  renderSunoChips('res', null);
   document.getElementById('res-verdict').textContent='';
   document.getElementById('res-lyrics-text').innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Writing your song…</div><div class="craft-sublabel">Lyrics · Chords · Production Brief · Structure · Dopamine</div></div>';
   const briefEl=document.getElementById('res-brief-content');if(briefEl)briefEl.innerHTML='';
@@ -10477,7 +10498,11 @@ VIDEO PROMPT:
     S.genController = null;
     finishSongProgress('res');
     parseSongResult(raw, genreLabel, topic, genProdData);
-    if (S.currentSong && S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
+    if (S.currentSong) {
+      if (S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
+      if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
+    }
+    renderSunoChips('res', S.currentSong);
   }catch(e){
     finishSongProgress('res', true);
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
@@ -10936,6 +10961,69 @@ function updateLyricsCount(prefix, rawText) {
   if (!len) { cc.textContent = ''; return; }
   cc.textContent = len.toLocaleString() + ' / 5,000 characters (Suno lyrics limit)';
   cc.style.color = len > 5000 ? 'var(--red)' : len > 4000 ? 'var(--amber)' : 'var(--green)';
+}
+
+// ── SUNO CHIPS — render Weirdness / Style Influence / Vocal next to the title.
+// Studio-tier (or admin) sees live %s with a fill bar; everyone else sees a
+// locked chip that links to upgrade. Vocal chip shows for everyone.
+const SUNO_CHIP_STUDIO = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+function renderSunoChips(prefix, song) {
+  const host = document.getElementById(prefix + '-suno-chips');
+  if (!host) return;
+  if (!song) { host.innerHTML = ''; return; }
+
+  const isStudio = window.__soniqAdmin || SUNO_CHIP_STUDIO.has(S.plan);
+  const s = song.sunoSettings || null;
+  const vocal = (song.vocal || '').trim();
+  const parts = [];
+
+  // Weirdness chip
+  if (s && typeof s.weirdness === 'number' && isStudio) {
+    const learned = s.learningApplied ? ' suno-chip--learned' : '';
+    const learnTip = s.learningApplied ? ` (tuned from your ${s.sampleSize} liked songs)` : '';
+    parts.push(`<span class="suno-chip${learned}" title="How experimental Suno gets vs. sticking to genre conventions${learnTip}">
+      <span class="suno-chip-icon">🎲</span>
+      <span class="suno-chip-label">Weirdness</span>
+      <span class="suno-chip-value">${s.weirdness}%</span>
+      <span class="suno-chip-bar" style="width:${s.weirdness}%"></span>
+    </span>`);
+  } else if (s && typeof s.weirdness === 'number') {
+    parts.push(`<span class="suno-chip suno-chip--lock" title="Studio-only: auto-tuned per song" onclick="openUpgradeModal&&openUpgradeModal()">
+      <span class="suno-chip-icon">🔒</span>
+      <span class="suno-chip-label">Weirdness</span>
+      <span class="suno-chip-value">Studio</span>
+    </span>`);
+  }
+
+  // Style Influence chip
+  if (s && typeof s.styleInfluence === 'number' && isStudio) {
+    const learned = s.learningApplied ? ' suno-chip--learned' : '';
+    const learnTip = s.learningApplied ? ` (tuned from your ${s.sampleSize} liked songs)` : '';
+    parts.push(`<span class="suno-chip${learned}" title="How tightly Suno locks to the genre vs. drifts into other styles${learnTip}">
+      <span class="suno-chip-icon">🎯</span>
+      <span class="suno-chip-label">Style Influence</span>
+      <span class="suno-chip-value">${s.styleInfluence}%</span>
+      <span class="suno-chip-bar" style="width:${s.styleInfluence}%"></span>
+    </span>`);
+  } else if (s && typeof s.styleInfluence === 'number') {
+    parts.push(`<span class="suno-chip suno-chip--lock" title="Studio-only: auto-tuned per song" onclick="openUpgradeModal&&openUpgradeModal()">
+      <span class="suno-chip-icon">🔒</span>
+      <span class="suno-chip-label">Style Influence</span>
+      <span class="suno-chip-value">Studio</span>
+    </span>`);
+  }
+
+  // Vocal chip — shown to everyone (free signal, no paywall)
+  if (vocal) {
+    const vocalShort = vocal.length > 28 ? vocal.slice(0, 26) + '…' : vocal;
+    parts.push(`<span class="suno-chip" title="${escHtml(vocal)}">
+      <span class="suno-chip-icon">🎤</span>
+      <span class="suno-chip-label">Vocal</span>
+      <span class="suno-chip-value">${escHtml(vocalShort)}</span>
+    </span>`);
+  }
+
+  host.innerHTML = parts.join('');
 }
 
 function renderBrief(prefix, songPrompt, briefRaw, extras) {
@@ -11400,6 +11488,7 @@ function loadSongIntoOutput(song){
   document.getElementById('loaded-banner').style.display = 'flex';
   document.getElementById('res-title').textContent = song.title || 'Untitled';
   document.getElementById('res-verdict').textContent = song.verdict || '';
+  renderSunoChips('res', song);
   const _rlClean=stripLyricsDashes(song.lyrics||'');
   document.getElementById('res-lyrics-text').innerHTML = escHtml(_rlClean).replace(/\[([^\]]+)\]/g,'<span class="tag">[$1]</span>');
   updateLyricsCount('res', _rlClean);

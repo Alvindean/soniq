@@ -566,9 +566,8 @@ module.exports = async function handler(req, res) {
       const metaGenre = (body.params?.genre) || (built.meta?.g1) || 'pop';
       const prodData = brain.buildProductionData(metaGenre);
       // Compute the raw Suno settings alongside the prompt build so the
-      // client can stash them for later (save → library → like feedback loop).
-      // Resolution matches buildSunoSettingsNote's logic; paywall-masked
-      // plans just get the base values (client won't render them to user).
+      // client can render them as chips next to the title and feed them
+      // into the like-feedback learning loop.
       const sunoParams = body.params || {};
       const sunoSettings = brain.buildSunoSettings({
         genre: sunoParams.genre || metaGenre,
