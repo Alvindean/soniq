@@ -1689,6 +1689,221 @@ This tier is a craft floor, not a ceiling — exceed it where the song earns it,
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// REGION_BIBLE — cross-cutting region overlay. Combines with any genre to
+// produce a regional flavor (e.g. country × Australia = bush ballad, folk ×
+// Ireland = Celtic trad, hiphop × Australia = Hilltop Hoods drill).
+//
+// Each region carries 8 fields, with the PEJORATIVE GUARD being the most
+// critical — it's the stereotype-blocking firewall that keeps regional
+// flavor authentic instead of cartoonish.
+//
+// Coverage in this initial drop: Ireland, UK, Australia, Japan, India-Punjab,
+// France, Mexico, Jamaica. Additional regions added in follow-up PRs.
+// ═══════════════════════════════════════════════════════════════════════════
+const REGION_BIBLE = {
+  ireland: {
+    label: 'Ireland',
+    flag: '🇮🇪',
+    vocalMarkers: 'Distinctive vowel rounding (the Irish "you" stretches into "ye", "the" softens to "deh"), "th" sometimes flattens to "t" or "d" (think → tink), gentle melodic cadence, "yeah" lengthens to "yeh-eh". Glottal stops between vowels.',
+    instruments: 'Uilleann pipes, tin whistle, fiddle, bodhrán (frame drum), bouzouki, button accordion, low whistle, harp. Modern Irish: layered with rock kit / synths but the trad instruments stay audible.',
+    scalarTendency: 'Mixolydian and Dorian dominate (♭7 in major; ♭3 + natural 6 in minor). Drone bass pedal tones common. Rarely uses fully-resolved V-I cadences — modal vamps preferred.',
+    themes: 'Emigration and exile, the sea, drink + community, faith and doubt, family across distance, the Troubles and political memory, weather (rain as character), tracks and roads, names of specific places (Cork, Donegal, Sligo, Belfast, Dublin\'s Liberties).',
+    vernacularBank: 'craic (fun/scene/news), grand (fine/good), deadly (excellent), sound (kind/decent), "fair play to ye" (well done), eejit (fool, affectionate), feck (mild expletive, non-vulgar), savage (intense/great), gas (funny), arse (used freely), the pictures (cinema), messages (groceries), now (sentence-starter, non-temporal), "would ye ever" (mild rebuke), "go away" (expressing disbelief).',
+    pejorativeGuard: 'NEVER invoke: leprechauns, pots of gold, four-leaf clovers, "top o\' the morning", thatched cottages with ivy, cartoon Dublin "Oirish" accent, drunken-Irish stereotype as the JOKE (drinking can appear; the joke can\'t be that they\'re Irish AND drinking), green everything, St. Patrick\'s Day kitsch, "luck of the Irish", banshees as decorative, "diddly-eye" mockery of trad music.',
+    anchorsByGenre: {
+      folk:     ['Lankum', 'Lisa Hannigan', 'Glen Hansard', 'Christy Moore', 'The Dubliners', 'Mary Black', 'Damien Rice'],
+      ss:       ['Glen Hansard', 'Hozier', 'Damien Rice', 'Lisa Hannigan', 'Imelda May', 'Aoife O\'Donovan'],
+      rock:     ['U2', 'The Pogues', 'Thin Lizzy', 'My Bloody Valentine', 'Fontaines D.C.', 'The Cranberries'],
+      altrock:  ['Fontaines D.C.', 'The Murder Capital', 'Just Mustard', 'The Frames', 'My Bloody Valentine'],
+      punk:     ['The Pogues', 'Stiff Little Fingers', 'The Undertones'],
+      hiphop:   ['Kojaque', 'Versatile', 'Rejjie Snow', 'Denise Chaila'],
+      pop:      ['Westlife', 'CMAT', 'Soak', 'Saint Sister', 'Niall Horan']
+    },
+    visualCues: 'Modern Dublin terrace pubs (NOT thatched cottages), Atlantic coastal weather (greys and sea-spray, not stage-Irish green), suburban estates, Cork city streetscape, Donegal hills in winter light, kitchen tables in real homes, GAA pitches, ferries to England, Belfast murals (treated soberly, not as decoration). AVOID: shamrocks, leprechaun statues, Riverdance posters.'
+  },
+  uk: {
+    label: 'United Kingdom',
+    flag: '🇬🇧',
+    vocalMarkers: 'Regional varies enormously — Cockney/East-End ("nuffink", "innit"), Northern (Manchester/Liverpool stretched vowels), RP (clipped consonants, "T"s pronounced), Welsh lilt (rising-falling phrasing), Scottish (rolled R, glottal Ts: "wa\'er" for water). Singers often sing in their natural accent (Adele, Lily Allen, Arctic Monkeys) not American-stylized.',
+    instruments: 'Genre-led, but UK-coded: New-wave synths, Britpop guitar tone (jangly, mid-forward, Marshall amps), Northern brass band, drum-machine post-punk, dubstep wobble bass (UK invention), garage 2-step shuffle, grime metallic sub.',
+    scalarTendency: 'Pop modal interchange common (Beatles → Radiohead lineage). Britpop = major-key swagger. Post-punk = minor + chromaticism. Folk-leaning UK = modal (Mixolydian/Dorian), parallel to Irish.',
+    themes: 'Class consciousness, weather, council estates, the high street, Sunday roasts, the pub, dole queues / working life, regional identity (North vs South vs Wales vs Scotland), nostalgia for specific decades (the 70s, the 90s), motorways (M1, M62), rain.',
+    vernacularBank: 'innit, mate, lad, lass, gutted, knackered, brilliant, proper (intensifier — "proper good"), mental (crazy), chuffed (pleased), bevvy (drink — Northern), the lads, on the lash (drinking), kip (sleep), naff (bad), lush (excellent — Welsh/Northern), tea (the meal — Northern), bairn (child — Northeast/Scottish), pure (intensifier — Scottish "pure dead brilliant").',
+    pejorativeGuard: 'NEVER invoke: bowler hats, Big Ben as the only image, Mary Poppins, the Queen as cartoon, "cheerio", "pip pip", "spot of tea" mocking, redcoats, "stiff upper lip" as the joke, fake Cockney ("guvnor", "blimey" used unironically), Scotland reduced to bagpipes/kilts/whisky/Loch Ness, Wales reduced to dragons/sheep/coal mines.',
+    anchorsByGenre: {
+      pop:      ['Adele', 'Dua Lipa', 'Harry Styles', 'Sam Smith', 'Charli XCX', 'Robbie Williams'],
+      rock:     ['The Beatles', 'Oasis', 'Radiohead', 'Arctic Monkeys', 'Stone Roses', 'Blur', 'The Smiths'],
+      altrock:  ['Radiohead', 'The Smiths', 'Bloc Party', 'Wolf Alice', 'Black Country New Road', 'IDLES'],
+      punk:     ['The Clash', 'Sex Pistols', 'IDLES', 'Sleaford Mods'],
+      hiphop:   ['Stormzy', 'Skepta', 'Dave', 'Little Simz', 'Slowthai', 'Loyle Carner', 'Headie One'],
+      rnb:      ['Sade', 'Jorja Smith', 'FKA Twigs', 'Sampha', 'Cleo Sol', 'Mahalia'],
+      edm:      ['The Prodigy', 'Massive Attack', 'Underworld', 'Burial', 'Disclosure', 'Four Tet'],
+      folk:     ['Nick Drake', 'Fairport Convention', 'Pentangle', 'Laura Marling'],
+      ss:       ['Ed Sheeran', 'Sam Fender', 'Lewis Capaldi', 'Laura Marling']
+    },
+    visualCues: 'Rainy bus stops, terraced housing (Coronation Street feel), the Tube, motorway service stations at night, Sunday market stalls, modern London skyline + East-End pubs, Manchester canal-side, Welsh valleys in real weather. AVOID: red phone boxes as the only icon, Tower Bridge postcard shots, Beefeaters.'
+  },
+  australia: {
+    label: 'Australia',
+    flag: '🇦🇺',
+    vocalMarkers: 'Flattened diphthongs ("g\'day" stretches the "a"), high rising terminal (statements end like questions), nasal forward placement, casual final consonant drop ("nothin\'"). Singers tend to KEEP the accent (Tame Impala, Courtney Barnett, Hilltop Hoods) — Americanized vocal is a giveaway of inauthenticity.',
+    instruments: 'Genre-led, but Aussie pub-rock has a specific guitar tone (overdriven, Marshall, mid-heavy à la AC/DC), psych-Aussie indie (Tame Impala) leans heavy phaser/flanger + tight snare. Aboriginal traditional context: didgeridoo, clapsticks (yidaki) — handle ONLY with clear cultural context, never decoratively.',
+    scalarTendency: 'Pop-major dominance for radio. Indie/psych Aussie leans modal (Tame Impala = Mixolydian + Phrygian). Pub rock = blues-pentatonic anchored. Aboriginal music doesn\'t use Western scale framework — don\'t pretend it does.',
+    themes: 'Suburban paradox (sun + boredom), beach + surf culture (real, not postcard), larrikin distance (laconic understatement), heat as character, road trips through inland, working-class pride, the bush vs the city tension, multicultural Melbourne / Sydney, the cost of distance from the world.',
+    vernacularBank: 'mate, no worries, arvo (afternoon), reckon, heaps (a lot), bloody (intensifier — "bloody good"), too easy, fair dinkum (genuine — used sparingly), straya (Australia, slang), servo (gas station), bottle-o (liquor store), brekkie (breakfast), maccas (McDonald\'s), thongs (flip-flops), esky (cooler).',
+    pejorativeGuard: 'NEVER invoke: Crocodile Dundee, kangaroos as the only image, "g\'day mate" as the joke, Steve Irwin caricature, dingoes-eat-babies references, Aboriginal culture as decorative or generic ("tribal", "didgeridoo for atmosphere"), outback as the only landscape (most Australians live in coastal cities), "throw another shrimp on the barbie" (Australians say "prawn"), "Sheila" as casual term for woman.',
+    anchorsByGenre: {
+      altrock:  ['Tame Impala', 'King Gizzard & The Lizard Wizard', 'Courtney Barnett', 'Pond', 'Stella Donnelly', 'Methyl Ethel'],
+      rock:     ['AC/DC', 'Cold Chisel', 'Midnight Oil', 'INXS', 'Crowded House', 'You Am I'],
+      hiphop:   ['Hilltop Hoods', 'OneFour', 'The Kid LAROI', 'Drapht', 'Briggs', 'Sampa the Great'],
+      pop:      ['Kylie Minogue', 'Sia', 'Troye Sivan', 'The Kid LAROI', 'Empire of the Sun'],
+      country:  ['Slim Dusty', 'Keith Urban', 'Lee Kernaghan', 'Kasey Chambers', 'Troy Cassar-Daley'],
+      ss:       ['Paul Kelly', 'Missy Higgins', 'Pete Murray', 'Vance Joy', 'Lior'],
+      edm:      ['Flume', 'Rüfüs Du Sol', 'Empire of the Sun', 'Pendulum'],
+      punk:     ['The Saints', 'Radio Birdman', 'Amyl and the Sniffers'],
+      folk:     ['Paul Kelly', 'The Waifs', 'John Butler Trio', 'Kasey Chambers']
+    },
+    visualCues: 'Suburban Melbourne streets (Brunswick / Fitzroy aesthetic), Sydney harbor at non-postcard angles, sun-bleached petrol stations on inland highways, beach culture as worked-in routine (not posed), multicultural cafés, terrace housing, eucalyptus trees, Brisbane heat haze, surf carparks. AVOID: outback red-rock as the only landscape, Sydney Opera House postcard shots, kangaroos as decoration.'
+  },
+  japan: {
+    label: 'Japan',
+    flag: '🇯🇵',
+    vocalMarkers: 'Distinct phonetic shapes — final consonants soften, vowels are pure (no diphthongs), pitch accent rather than stress accent. Code-switching with English is common in J-Pop and city pop — and STYLISTIC, not awkward. Anime-OST vocal style: precise, slightly theatrical, emotionally uninhibited. Japanese language sung lyrics work — don\'t default to all-English.',
+    instruments: 'Genre-led for J-Pop / J-Rock / city-pop. Traditional context: shamisen, koto, taiko, shakuhachi (handle with cultural respect, not as flavor sprinkles). Modern J-Rock = tight Marshall guitars, fast double-kick drums, soaring vocal melodies. City pop = jazz-funk fusion synths, fretless bass, glossy production.',
+    scalarTendency: 'J-Pop heavy on key changes (final-chorus modulation up a half/whole step is near-mandatory in 90s/2000s J-Pop). Frequent borrowed chords from parallel minor in major-key songs. Anime-OST chord progressions often use ♭VI - ♭VII - I uplift cadence.',
+    themes: 'Youth and ephemerality (mono no aware — "the pathos of things"), school-life specificity (uniforms, festivals, end-of-year rituals), seasons as emotional markers, Tokyo / Osaka as living cities (not exotic backdrops), small shrines in suburbs, bullet trains, vending-machine bedrooms, anime/manga reference culture.',
+    vernacularBank: 'KEEP code-switching natural — sprinkling of Japanese phrases inside English-anchored lyrics is fine when the song genuinely sits in J-Pop tradition (e.g. yappari, wakaranai, arigatou, konban wa). DO NOT stuff random Japanese words for exotic flavor — mishandling is worse than not using them.',
+    pejorativeGuard: 'NEVER invoke: cherry blossoms as the only image, geisha as decoration, samurai as decoration, "konnichiwa" as a punchline, anime-girl tropes used sexually or mockingly, "exotic Tokyo" frame (Tokyo is a working city like London or NYC, not a wonderland), Yakuza/martial-arts as cultural shorthand, "kawaii" as a sneer, samurai swords as decorative.',
+    anchorsByGenre: {
+      pop:      ['Utada Hikaru', 'Kenshi Yonezu', 'Aimer', 'King Gnu', 'YOASOBI', 'Mrs. GREEN APPLE'],
+      rock:     ['B\'z', 'L\'Arc-en-Ciel', 'X Japan', 'ONE OK ROCK', 'Mr. Children', 'BUMP OF CHICKEN'],
+      altrock:  ['Number Girl', 'toe', 'Fishmans', 'Cornelius', 'Boris', 'Mono'],
+      hiphop:   ['Nujabes', 'KOHH', 'Awich', 'Daichi Yamamoto', 'JJJ', 'BIM'],
+      rnb:      ['Crystal Kay', 'Toshi Kubota', 'Suchmos', 'Yogee New Waves'],
+      jazz:     ['Hiromi Uehara', 'Sadao Watanabe', 'Yamashita Tatsuro (city-pop edge)'],
+      edm:      ['Yellow Magic Orchestra', 'Cornelius', 'Susumu Hirasawa', 'Towa Tei'],
+      ss:       ['Yumi Matsutoya', 'Akiko Yano', 'Chitose Hajime'],
+      metal:    ['X Japan', 'Dir En Grey', 'Loudness', 'BABYMETAL']
+    },
+    visualCues: 'Tokyo at night (Shinjuku/Shibuya neon, but DAILY use, not tourist), suburban train stations at dusk, school festival corridors, Osaka covered shopping streets, vending machines glowing in summer, small neighborhood shrines, Hokkaido snow. AVOID: Mount Fuji + cherry blossom + geisha postcard combo, samurai decor, anime-girl maid-cafe stereotype.'
+  },
+  india_punjab: {
+    label: 'India / Punjab',
+    flag: '🇮🇳',
+    vocalMarkers: 'Vocal melisma (alankar) and microtonal slides (gamak) are signatures. Punjabi-specific: forward-placed nasal resonance, rhythmic emphasis on stressed syllables, hard "K"s and "T"s. Bilingual code-switching between Punjabi/Hindi/English is natural in modern Punjabi pop.',
+    instruments: 'Punjabi/Bhangra: dhol, tumbi, dholki, sarangi, harmonium. Bollywood: layered orchestral arrangement, tabla, bansuri, sitar — wide palette per song. Modern Punjabi pop blends 808s + dhol — that fusion is the genre.',
+    scalarTendency: 'Indian classical raga system. Quarter-tones (microtones smaller than Western half-step) appear in vocal slides. Punjabi pop tends pentatonic-heavy with raga-influenced melodic decisions. Modern fusions stay diatonic-friendly while preserving signature melodic ornaments.',
+    themes: 'Punjabi: the village (pind), prosperity and hard work, pride in family/heritage, weddings and dance, tractors and fields, diaspora longing. Bollywood: love (across class, distance, religion), family duty, dance as celebration, monsoon as romantic backdrop, modern urban India alongside rural roots.',
+    vernacularBank: 'Punjabi: yaar (friend), oye (hey — affectionate), bhangra (dance), pindwale (village folk), saadi (our), tere (your). Hindi: pyaar (love), dil (heart), zindagi (life), yaadein (memories), sapne (dreams). Use sparingly and only where natural.',
+    pejorativeGuard: 'NEVER invoke: snake charmers, exoticized "Bombay/Mumbai", Slumdog-Millionaire-style poverty tourism, generic "Bollywood dance number" played for laughs, "namaste" as punchline, accent-mockery (the "Apu" voice is a hate symbol), Punjabi farmers reduced to caricature, religious imagery (Sikh turbans, Hindu deities) as decoration, Taj Mahal as the only image, India reduced to spice/yoga/curry.',
+    anchorsByGenre: {
+      pop:      ['Diljit Dosanjh', 'AP Dhillon', 'Sidhu Moose Wala', 'Karan Aujla', 'Ritviz', 'Prateek Kuhad'],
+      hiphop:   ['Divine', 'Naezy', 'Raftaar', 'Seedhe Maut', 'KR$NA'],
+      bollywood:['A.R. Rahman', 'Pritam', 'Vishal-Shekhar', 'Amit Trivedi', 'Shankar-Ehsaan-Loy'],
+      rnb:      ['Ritviz', 'Tejas'],
+      folk:     ['Gurdas Maan', 'Surinder Kaur', 'Reshma'],
+      edm:      ['Nucleya', 'Ritviz', 'Lost Stories', 'Anish Sood'],
+      rock:     ['Indian Ocean', 'Parikrama', 'Pentagram (India)'],
+      ss:       ['Prateek Kuhad', 'Anuv Jain', 'Tejas', 'Karsh Kale']
+    },
+    visualCues: 'Modern Mumbai high-rises, Punjab fields with tractors at golden hour (real working farms), Delhi metro, family-wedding celebrations, village roads in Punjab, suburban Delhi/Bangalore homes. AVOID: Taj Mahal as default backdrop, "magical India" mysticism, slum poverty tourism.'
+  },
+  france: {
+    label: 'France',
+    flag: '🇫🇷',
+    vocalMarkers: 'Distinct French phonetics — nasalized vowels, soft "R"s rolled in throat, intonation rises at phrase ends. French chanson tradition: parlé-chanté (half-spoken, half-sung) is a real technique. Singers often sing in French (or French-accented English).',
+    instruments: 'Chanson tradition: accordion, piano, double bass, brushed drums, sometimes string quartet. French house/Eurodance: filtered-disco loops, four-on-the-floor, vocoder. Yé-yé (60s French pop): jangly guitars + breathy vocals. Modern French pop is hybridized.',
+    scalarTendency: 'Major-key chanson with frequent modal interchange. French jazz (Django, Reinhardt) + gypsy-jazz harmony available. French house = filtered disco extracts, often pentatonic / blues-derived loops.',
+    themes: 'Cities (Paris specifically — but real Paris, not postcard), unrequited love, philosophical melancholy, café-table observation of street life, the nuit (the night), train stations, social class commentary (gilets jaunes, banlieue tension), the South (Marseille, Provence).',
+    vernacularBank: 'Bilingual code-switching feels natural in modern French pop. Common: oui, non, mon amour, ma chérie, c\'est la vie, à plus. Use only where natural.',
+    pejorativeGuard: 'NEVER invoke: berets + striped shirts + baguettes combo, "ooh la la" as punchline, Eiffel Tower as the only image, Pepé Le Pew style cartoon flirtation, "snooty waiter" cliché, banlieue caricature, "smelly cheese" jokes, the Pink Panther aesthetic, mime tropes.',
+    anchorsByGenre: {
+      pop:      ['Stromae', 'Indila', 'Christine and the Queens', 'Angèle', 'Louane', 'Aya Nakamura'],
+      hiphop:   ['Booba', 'PNL', 'Orelsan', 'Damso', 'Jul', 'IAM', 'NTM'],
+      rnb:      ['Aya Nakamura', 'Dadju', 'Christine and the Queens'],
+      edm:      ['Daft Punk', 'Justice', 'Cassius', 'M83', 'Phoenix', 'Air'],
+      rock:     ['Phoenix', 'Indochine', 'Téléphone', 'Noir Désir'],
+      jazz:     ['Django Reinhardt', 'Stéphane Grappelli', 'Henri Texier'],
+      ss:       ['Jacques Brel', 'Georges Brassens', 'Léo Ferré', 'Vianney', 'Pomme'],
+      folk:     ['Pomme', 'Clara Luciani', 'Eddy de Pretto']
+    },
+    visualCues: 'Modern Paris (Belleville, the 19th, working-class quartiers), the métro, cafés as workplaces (not tourist scenes), banlieue tower blocks (treated soberly), the South of France in real working light, cigarette breaks in winter coats, Lyon old-town, Marseille port. AVOID: Eiffel Tower postcard frame, accordion-busker stereotype, "Amelie"-aesthetic kitsch.'
+  },
+  mexico: {
+    label: 'Mexico',
+    flag: '🇲🇽',
+    vocalMarkers: 'Spanish (Mexican variant) — sharp consonants, rolled R, distinct Latin-American Spanish. Vocal melisma in ranchera/banda traditions. Norteño polka feel in vocal phrasing for working-class regional music.',
+    instruments: 'Mariachi: violins (2+), trumpets (2), vihuela, guitarrón, guitar. Banda: tuba, clarinet, trumpet, tambora. Norteño: accordion, bajo sexto. Modern Mexican pop blends regional with electronic + trap. Corridos tumbados (Peso Pluma era) = trap drums + acoustic guitar + tuba bass.',
+    scalarTendency: 'Major-key dominance for ranchera/mariachi. Triple meter (3/4) common — rancheras and waltzes. Boleros use jazz-influenced minor key with extended chords. Modern corridos blend trap minor-pentatonic with traditional melodic ornaments.',
+    themes: 'Heartbreak (la pena), pride and dignity (orgullo), family across borders, geography (specific cities — Tijuana, Monterrey, CDMX, Sinaloa), the migrant experience, faith (Virgen de Guadalupe — handle with respect), working-class hustle, fiestas, the corrido tradition (narrative ballad about real events/people).',
+    vernacularBank: 'Mexican Spanish: chido (cool), neta (truth, "for real"), órale (alright/wow), wey (dude — informal), no manches (no way), padre (cool — different meaning than "father"), chamba (work), cuate (close friend), ahorita (right now).',
+    pejorativeGuard: 'NEVER invoke: sombreros + cactus + serape combo, "speedy gonzales" accent mockery, mariachi as comic decoration, drug-cartel tropes as default Mexican narrative (corridos can address it but with respect for real lives), "fiesta" as the joke, día de los muertos as Halloween costume, "border-crossing" as a joke, frijoles/tacos/tequila as the only references.',
+    anchorsByGenre: {
+      latin:    ['Vicente Fernández', 'Pedro Infante', 'Alejandro Fernández', 'Lila Downs', 'Café Tacvba'],
+      reggaeton:['Becky G', 'Karol G (collab era)'],
+      hiphop:   ['Cuco', 'Santa Fe Klan', 'Cartel de Santa', 'Akwid', 'Peso Pluma (corridos tumbados)'],
+      pop:      ['Thalía', 'Paulina Rubio', 'Belinda', 'Sofía Reyes', 'Danna Paola'],
+      rock:     ['Café Tacvba', 'Maná', 'Caifanes', 'Jaguares', 'Los Tigres del Norte'],
+      country:  ['Norteño-pop crossovers — Los Tigres del Norte, Intocable'],
+      folk:     ['Lila Downs', 'Eugenia León', 'Natalia Lafourcade'],
+      ss:       ['Natalia Lafourcade', 'Carla Morrison', 'Julieta Venegas'],
+      jazz:     ['Magos Herrera', 'Eugenio Toussaint']
+    },
+    visualCues: 'Mexico City rooftops at golden hour, Monterrey industrial skyline, Tijuana border traffic, Oaxaca markets (real, daily, not staged), suburban Guadalajara streets, family kitchens with real food, Sinaloa highways, beach towns out of season. AVOID: sombrero-cactus-serape postcard, day-of-the-dead costume kitsch.'
+  },
+  jamaica: {
+    label: 'Jamaica',
+    flag: '🇯🇲',
+    vocalMarkers: 'Jamaican Patois — distinct vowel system (Jamaican "ah" vs English "a"), syllabic timing (every syllable carries equal weight), specific intonation patterns. Toasting (rhythmic spoken delivery) is its own technique — predates rap.',
+    instruments: 'Reggae: bass + drums first (the "riddim"), one-drop drum pattern, skanking guitar (off-beat upstrokes), Hammond organ. Dancehall: digital riddims (synth bass, programmed drums), heavier 808s in modern. Roots reggae adds horns + percussion (nyabinghi drums for Rasta context).',
+    scalarTendency: 'Major-key dominance with bluesy ♭3 in vocals. Reggae chord progressions tend simple (I-IV-V or I-V-IV) — the groove and bass do the heavy lifting. The rhythmic identity is the genre.',
+    themes: 'Roots and ancestry (especially Africa as spiritual homeland in Rasta context), social justice and oppression, ganja (used reverently in Rasta context, not as the joke), love and "ones-ness", island life with real working-class detail, neighborhood rivalries, dance and body, music as community.',
+    vernacularBank: 'Patois: irie (good/peaceful), bredda (brother), wagwan (what\'s going on), seen (understood), bless up (farewell/blessing), "one love" (NOT a joke phrase — a Rasta affirmation), big up (respect/shout-out), bredren and sistren (community terms).',
+    pejorativeGuard: 'NEVER invoke: dreadlocks as decorative (they\'re Rasta sacred), ganja/weed as the punchline, "yeah mon" as casual joke, beach-paradise stereotype only (Jamaicans live working lives), Bob Marley as cartoon, "irie" as filler, fake patois (mockery), reducing Jamaica to ganja + reggae + beach. Rasta imagery (red-gold-green flags, lion of Judah) used decoratively without context — these are religious symbols.',
+    anchorsByGenre: {
+      reggae:   ['Bob Marley', 'Peter Tosh', 'Burning Spear', 'Toots and the Maytals', 'Damian Marley', 'Chronixx', 'Protoje'],
+      dancehall:['Vybz Kartel', 'Popcaan', 'Sean Paul', 'Buju Banton', 'Beenie Man', 'Spice', 'Shenseea'],
+      hiphop:   ['Damian Marley', 'Chronixx', 'Koffee'],
+      pop:      ['Sean Paul', 'Shaggy', 'Koffee', 'Shenseea'],
+      rnb:      ['Lila Iké', 'Jah9', 'Etana'],
+      jazz:     ['Monty Alexander'],
+      folk:     ['Mento tradition (Stanley Beckford, Jolly Boys)'],
+      ss:       ['Koffee (acoustic-reggae crossover)', 'Lila Iké']
+    },
+    visualCues: 'Kingston neighborhoods (Trench Town treated with respect, not poverty tourism), modern Jamaica (Kingston skyline, not just beaches), recording studios (Tuff Gong, dub plate culture), ganja fields treated soberly when they appear, Jamaican family life. AVOID: postcard-beach-only frame, Bob Marley merch shots, dreadlock decoration without Rasta context.'
+  }
+};
+
+// Returns the region overlay block for the prompt. Combines with any genre.
+// CRITICAL: includes the pejorativeGuard list — these are stereotype tropes
+// the model must avoid. Without this, regional overlays slide into caricature.
+function buildRegionNote(genre, region) {
+  if (!region || region === 'auto' || region === 'none') return '';
+  const r = REGION_BIBLE[region];
+  if (!r) return '';
+  const anchorList = (r.anchorsByGenre && r.anchorsByGenre[genre])
+                  || (r.anchorsByGenre && r.anchorsByGenre.pop)
+                  || [];
+  const anchorLine = anchorList.length
+    ? `\nANCHOR ARTISTS (${r.label} × ${genre}): ${anchorList.slice(0, 5).join(', ')}`
+    : '';
+  return `
+
+🌍 REGIONAL OVERLAY: ${r.flag} ${r.label} — write this song authentically rooted in ${r.label}'s sound, themes, and vernacular.
+
+VOCAL MARKERS: ${r.vocalMarkers}
+INSTRUMENTS: ${r.instruments}
+HARMONIC/SCALE TENDENCY: ${r.scalarTendency}
+THEMES (${r.label}): ${r.themes}
+VERNACULAR (use sparingly, only where natural): ${r.vernacularBank}${anchorLine}
+
+⚠️ PEJORATIVE GUARD — DO NOT WRITE STEREOTYPES.
+${r.pejorativeGuard}
+
+This regional overlay does not override the primary genre — it FLAVORS it. A "${r.label} × ${genre}" song still follows the genre's structural rules; the region adds vocabulary, instruments, themes, and authentic voice.`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // MUSIC_ACADEMIA — Songwriting frameworks from real university courses
 // taught by legendary artists & producers. Each framework maps to genres
 // where its principles apply. Server-side mirror of the client constant.
@@ -4083,6 +4298,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const lyricTierNote = buildLyricTierNote(genre, params.lyricTier);
   const academicNote = buildAcademicFrameworkNote(genre, era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
+  const regionNote = buildRegionNote(genre, params.region);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -4127,7 +4343,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4269,6 +4485,7 @@ function buildLuckyPrompt(params) {
   const lyricTierNote = buildLyricTierNote(g1, params.lyricTier);
   const academicNote = buildAcademicFrameworkNote(g1, params.era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
+  const regionNote = buildRegionNote(g1, params.region);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -4304,7 +4521,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4815,6 +5032,7 @@ ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ?
 ${buildLyricTierNote('hiphop', params.lyricTier)}
 ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
+${buildRegionNote('hiphop', params.region)}
 
 Respond with EXACTLY this format:
 
@@ -5092,7 +5310,8 @@ function buildVariantPrompt(variant, song) {
   const lyricTierNote = buildLyricTierNote(safeSong.genre, song.lyricTier);
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + buildCraftFirewallNote();
+  const regionNote = buildRegionNote(safeSong.genre, song.region);
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5229,6 +5448,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   const lyricTierNote = buildLyricTierNote(genre, p.lyricTier);
   const academicNote = buildAcademicFrameworkNote(genre, p.era);
   const edgeNote = buildEdgeNote(p.edgeMode, p.lyricTier);
+  const regionNote = buildRegionNote(genre, p.region);
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -5236,7 +5456,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5597,7 +5817,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote };
 
 
 
