@@ -535,6 +535,10 @@ module.exports = async function handler(req, res) {
         // Plumb plan + admin flag through to prompt builders for Suno Settings paywall gate
         p.plan = plan;
         p.isAdmin = !!req._adminBypass;
+        // Whitelist lyric_tier — invalid values fall back to the 'street' baseline.
+        // No paywall on tier itself; craft is part of core output, not a gated feature.
+        const VALID_TIERS = new Set(['radio','street','conscious','archival']);
+        if (p.lyricTier && !VALID_TIERS.has(p.lyricTier)) p.lyricTier = 'street';
         // Suno learning overlay — only fetched for Studio-tier users since only
         // they see the values; skip the Redis hit otherwise.
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
@@ -553,6 +557,8 @@ module.exports = async function handler(req, res) {
         if (lp.platinum && !req._adminBypass && !PLATINUM_PLANS.has(plan)) lp.platinum = false;
         lp.plan = plan;
         lp.isAdmin = !!req._adminBypass;
+        const VALID_LUCKY_TIERS = new Set(['radio','street','conscious','archival']);
+        if (lp.lyricTier && !VALID_LUCKY_TIERS.has(lp.lyricTier)) lp.lyricTier = 'street';
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);
@@ -577,7 +583,8 @@ module.exports = async function handler(req, res) {
         rapStyle: sunoParams.rapStyle,
         userLearning: sunoParams.sunoLearning
       });
-      const metaObj = { ...(built.meta || {}), prodData, sunoSettings };
+      const lyricTier = sunoParams.lyricTier || 'street';
+      const metaObj = { ...(built.meta || {}), prodData, sunoSettings, lyricTier };
       res.setHeader('X-Soniq-Meta', Buffer.from(JSON.stringify(metaObj)).toString('base64'));
     } catch (err) {
       console.error('Brain prompt build failed:', err.message);

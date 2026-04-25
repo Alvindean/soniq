@@ -1470,6 +1470,215 @@ function buildSpeedGearsNote(genre, mood, topic, explicit) {
   return `\n\n${SPEED_GEARS_FRAMEWORK}\n\nGENRE LINEAGE FOR ${genre.toUpperCase()}:\n${lineage}\n\nAPPLICATION: ${directive}`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// LYRIC TIER SYSTEM — universal demand-on-listener dial (cross-genre).
+// Four tiers scale four dials together: vocabulary register, rhyme density,
+// reference density, conceit depth. Each (genre × tier) gets concrete anchor
+// artists so the abstract dials become specific style direction.
+// Default tier is 'street' — emits no extra instruction (current baseline).
+// 'archival' is the Black Thought / Joni Mitchell / Sondheim ceiling — peak
+// craft density, never dumb down, rare-words permitted.
+// ═══════════════════════════════════════════════════════════════════════════
+const LYRIC_TIERS = {
+  radio: {
+    label: 'Radio',
+    description: 'Immediate, universal, no demand on the listener — every line lands first listen',
+    vocabulary: 'Common words only. No word the listener might pause on. Avoid archaic, academic, or rare-register words.',
+    rhyme: 'Single-syllable end-rhymes are fine. No requirement for internal or multi-syllable rhymes.',
+    references: 'Minimal, universal. Avoid specific cultural/historical/literary references unless they are mass-known (Sunday, Coca-Cola, summer).',
+    conceit: 'Literal mostly. One controlling metaphor max, and it should be obvious. Never make the listener decode.'
+  },
+  street: {
+    label: 'Street',
+    description: 'Conversational, direct — talks to the listener like they are in the room',
+    vocabulary: 'Conversational + genre slang where it fits. Mix register naturally but stay accessible.',
+    rhyme: 'Two-syllable end rhymes preferred. Internal rhymes welcome but not required. End-rhymes can chain across two lines.',
+    references: 'About one specific reference per 8 bars — a street name, a brand, a year, a person — to anchor the song in a real world.',
+    conceit: 'One controlling conceit per song. The metaphor is clear; the listener knows what the song is about.'
+  },
+  conscious: {
+    label: 'Conscious',
+    description: 'Layered, purposeful — asks something of the listener and rewards a second listen',
+    vocabulary: 'Mix registers freely. Plain language can sit next to elevated word choice when it earns its place. Code-switch when it lands.',
+    rhyme: 'Three-syllable multis where natural. Internal rhymes inside the bar. Rhyme placement should reinforce meaning, not just close lines.',
+    references: 'About two specific references per 8 bars — historical, literary, religious, political, named details. Each reference does work; nothing is decoration.',
+    conceit: 'Two layered conceits or a controlling conceit + a counter-image. The song should have an emotional arc, not just a feeling.'
+  },
+  archival: {
+    label: 'Archival',
+    description: 'Peak-craft density — the kind of writing that gets re-listened to and quoted years later',
+    vocabulary: 'Rare or elevated words are PERMITTED when they are the right word. DO NOT DUMB DOWN. Use words the genre\'s best writers would use without flinching.',
+    rhyme: 'Sustained 3-4 syllable multis. Internal rhymes inside every bar. Line-spanning rhyme schemes (not just couplets). Rhyme is structural, not ornamental.',
+    references: 'One or more specific references per 4 bars — named places, dated events, named figures, literary/religious/cultural allusions. Density that rewards study.',
+    conceit: 'Extended conceits welcome. Hidden-subject reveal allowed — the literal answer to "what is this song about" can land in the final bar. Triple entendres should appear without flexing.'
+  }
+};
+
+// Per-(genre × tier) anchor artists. The model uses these as concrete style
+// targets — not subjects to imitate verbatim, but writers who operate at
+// this density. Genres without a tier-specific list fall back to pop.
+// Comedy/parody/children operate on a different axis (joke density) and are
+// handled elsewhere — they get a minimal entry here just for safe lookup.
+const TIER_ANCHORS = {
+  hiphop: {
+    radio:     ['Drake hits-era', 'Post Malone', 'Lil Baby radio cuts'],
+    street:    ['Drake mixtape-era', 'J. Cole', 'Future'],
+    conscious: ['Kendrick Lamar', 'J. Cole conscious cuts', 'Common', 'Nas (Illmatic)'],
+    archival:  ['Black Thought (Funk Flex freestyle, Streams of Thought)', 'Lupe Fiasco (The Cool, Mural)', 'Talib Kweli (Quality, Train of Thought)', 'MF DOOM', 'Ka', 'Earl Sweatshirt']
+  },
+  pop: {
+    radio:     ['Max Martin-era', 'Dua Lipa', 'Olivia Rodrigo singles'],
+    street:    ['Charli XCX', 'Lana Del Rey early', 'Olivia Rodrigo album cuts'],
+    conscious: ['Lorde (Melodrama)', 'Mitski', 'Phoebe Bridgers'],
+    archival:  ['Kate Bush', 'Florence Welch (Lungs, Ceremonials)', 'Caroline Polachek', 'Joni Mitchell (Hejira)']
+  },
+  country: {
+    radio:     ['Luke Combs', 'Morgan Wallen radio', 'Kane Brown'],
+    street:    ['Tyler Childers', 'Zach Bryan', 'Chris Stapleton'],
+    conscious: ['Kacey Musgraves', 'Sturgill Simpson', 'Brandy Clark'],
+    archival:  ['John Prine', 'Jason Isbell', 'Lori McKenna', 'Townes Van Zandt', 'Guy Clark']
+  },
+  rnb: {
+    radio:     ['Bruno Mars', 'The Weeknd hits', 'Khalid'],
+    street:    ['Brent Faiyaz', 'Summer Walker', 'PartyNextDoor'],
+    conscious: ['Jorja Smith', 'H.E.R.', 'SZA (Ctrl)'],
+    archival:  ['Stevie Wonder (Innervisions, Songs in the Key of Life)', 'Lauryn Hill (Miseducation)', 'D\'Angelo (Voodoo)', 'Solange (A Seat at the Table)', 'Frank Ocean (Blonde)']
+  },
+  neosoul: {
+    radio:     ['H.E.R. crossover', 'Daniel Caesar singles'],
+    street:    ['Jhené Aiko', 'Bryson Tiller'],
+    conscious: ['Jorja Smith', 'Cleo Sol', 'Sault'],
+    archival:  ['Lauryn Hill', 'D\'Angelo', 'Erykah Badu (Mama\'s Gun, New Amerykah)', 'Bilal']
+  },
+  rock: {
+    radio:     ['Imagine Dragons', 'Twenty One Pilots', 'Foo Fighters'],
+    street:    ['Arctic Monkeys', 'The Strokes early'],
+    conscious: ['Radiohead (In Rainbows)', 'Arcade Fire (Funeral)'],
+    archival:  ['Bruce Springsteen (Nebraska, Born to Run)', 'Patti Smith (Horses)', 'Nick Cave', 'The Mountain Goats (John Darnielle)', 'Leonard Cohen']
+  },
+  altrock: {
+    radio:     ['The Killers radio', 'Coldplay'],
+    street:    ['Phoebe Bridgers', 'boygenius'],
+    conscious: ['Radiohead', 'Arcade Fire', 'The National'],
+    archival:  ['The Mountain Goats', 'Bright Eyes (Conor Oberst)', 'Sufjan Stevens', 'Nick Cave']
+  },
+  folk: {
+    radio:     ['Mumford & Sons hits', 'The Lumineers'],
+    street:    ['Noah Kahan', 'Hozier album cuts'],
+    conscious: ['Hozier', 'Brandi Carlile', 'First Aid Kit'],
+    archival:  ['Joni Mitchell (Hejira, Blue)', 'Bob Dylan (Blonde on Blonde, Blood on the Tracks)', 'Sufjan Stevens (Carrie & Lowell, Illinois)', 'Phoebe Bridgers (Punisher)', 'Joanna Newsom']
+  },
+  ss: {
+    radio:     ['Ed Sheeran', 'Shawn Mendes'],
+    street:    ['Noah Kahan', 'Gracie Abrams'],
+    conscious: ['Brandi Carlile', 'Lori McKenna'],
+    archival:  ['Joni Mitchell', 'Leonard Cohen', 'Paul Simon (Graceland, Hearts and Bones)', 'Aimee Mann']
+  },
+  latin: {
+    radio:     ['J Balvin hits', 'Maluma', 'Karol G singles'],
+    street:    ['Bad Bunny (YHLQMDLG-era)', 'Anuel'],
+    conscious: ['Bad Bunny (Un Verano Sin Ti)', 'Rosalía'],
+    archival:  ['Rosalía (El Mal Querer)', 'Residente (Calle 13)', 'Natalia Lafourcade', 'Juan Luis Guerra', 'Silvio Rodríguez']
+  },
+  reggaeton: {
+    radio:     ['J Balvin', 'Karol G', 'Daddy Yankee hits'],
+    street:    ['Bad Bunny early', 'Ozuna'],
+    conscious: ['Bad Bunny album cuts', 'Rauw Alejandro (Saturno)'],
+    archival:  ['Bad Bunny (Un Verano Sin Ti deep cuts)', 'Tego Calderón']
+  },
+  afrobeats: {
+    radio:     ['Davido hits', 'Wizkid (Made in Lagos singles)'],
+    street:    ['Burna Boy (African Giant)', 'Asake'],
+    conscious: ['Burna Boy', 'Tems', 'Mr Eazi'],
+    archival:  ['Burna Boy (Twice as Tall, African Giant deep cuts)', 'Fela Kuti', 'Asa']
+  },
+  edm: {
+    radio:     ['Calvin Harris', 'David Guetta hits'],
+    street:    ['Disclosure', 'Skrillex'],
+    conscious: ['Bonobo', 'Caribou (Daphni)'],
+    archival:  ['Four Tet', 'Burial', 'Aphex Twin', 'Jamie xx (lyrical work — Romy)']
+  },
+  blues: {
+    radio:     ['Gary Clark Jr crossover'],
+    street:    ['Black Keys', 'Gary Clark Jr'],
+    conscious: ['Robert Cray', 'Keb\' Mo\''],
+    archival:  ['Robert Johnson', 'Howlin\' Wolf', 'Muddy Waters', 'Skip James', 'Mississippi John Hurt']
+  },
+  jazz: {
+    radio:     ['Norah Jones', 'Michael Bublé'],
+    street:    ['Gregory Porter', 'José James'],
+    conscious: ['Cécile McLorin Salvant', 'Kurt Elling'],
+    archival:  ['Joni Mitchell (Mingus, Hejira)', 'Mose Allison', 'Tom Waits (Closing Time-era)', 'Leonard Cohen (jazz-adjacent late work)']
+  },
+  gospel: {
+    radio:     ['Tasha Cobbs Leonard radio', 'CeCe Winans'],
+    street:    ['Maverick City Music', 'Lecrae'],
+    conscious: ['Kirk Franklin', 'Donnie McClurkin'],
+    archival:  ['Mahalia Jackson', 'James Cleveland', 'Andraé Crouch', 'Marvin Sapp (lyric craft)', 'Fred Hammond']
+  },
+  punk: {
+    radio:     ['Green Day', 'Blink-182 hits'],
+    street:    ['IDLES', 'Fontaines D.C.'],
+    conscious: ['IDLES (Joy as an Act of Resistance)', 'Fontaines D.C.', 'Patti Smith'],
+    archival:  ['Patti Smith (Horses, Easter)', 'The Clash (London Calling, Sandinista!)', 'Fugazi', 'X (Exene Cervenka)']
+  },
+  metal: {
+    radio:     ['Metallica radio', 'Disturbed'],
+    street:    ['Slipknot', 'Lamb of God'],
+    conscious: ['Tool', 'Mastodon'],
+    archival:  ['Tool (Lateralus, Ænima)', 'Mastodon (Crack the Skye)', 'Opeth', 'Deafheaven (lyrical density)']
+  },
+  reggae: {
+    radio:     ['UB40-style crossover'],
+    street:    ['Chronixx', 'Protoje'],
+    conscious: ['Chronixx', 'Damian Marley', 'Protoje'],
+    archival:  ['Bob Marley (Exodus, Survival)', 'Burning Spear', 'Peter Tosh']
+  },
+  kpop: {
+    radio:     ['BTS (Dynamite-era)', 'BLACKPINK singles'],
+    street:    ['NewJeans', 'IVE'],
+    conscious: ['BTS (Wings, MOTS:7)', 'Agust D'],
+    archival:  ['Agust D (D-2, D-Day)', 'Epik High (Tablo)', 'Tablo (Fever\'s End)']
+  },
+  tvmusical: {
+    radio:     ['Disney radio cuts'],
+    street:    ['Hamilton popular tracks'],
+    conscious: ['Hamilton', 'Hadestown'],
+    archival:  ['Stephen Sondheim (Sweeney Todd, Sunday in the Park, Into the Woods)', 'Lin-Manuel Miranda (Hamilton density)', 'Anaïs Mitchell (Hadestown)', 'Jason Robert Brown']
+  },
+  children: {
+    radio:     ['Disney sing-along style'],
+    street:    ['Raffi', 'Laurie Berkner'],
+    conscious: ['Sandra Boynton style — clever, kid-AND-parent funny'],
+    archival:  ['They Might Be Giants (kids albums)', 'Andrew & Polly']
+  }
+};
+
+// Returns the lyric-tier instruction block for the prompt. Default 'street'
+// tier emits empty string (matches the current baseline). Higher tiers scale
+// the four dials AND give the model concrete anchor artists for the
+// (genre × tier) combo. Genres without a tier-specific entry fall back to pop.
+function buildLyricTierNote(genre, tier) {
+  if (!tier || tier === 'street') return '';
+  const t = LYRIC_TIERS[tier];
+  if (!t) return '';
+  const anchors = (TIER_ANCHORS[genre] && TIER_ANCHORS[genre][tier])
+                || (TIER_ANCHORS.pop && TIER_ANCHORS.pop[tier])
+                || [];
+  const anchorLine = anchors.length
+    ? `\nANCHOR ARTISTS at this tier (style targets — write at this density, do not imitate verbatim): ${anchors.join(', ')}`
+    : '';
+  return `
+
+🎚 LYRIC TIER: ${t.label.toUpperCase()} — ${t.description}
+- VOCABULARY: ${t.vocabulary}
+- RHYME / CADENCE: ${t.rhyme}
+- REFERENCE DENSITY: ${t.references}
+- CONCEIT DEPTH: ${t.conceit}${anchorLine}
+
+This tier is a craft floor, not a ceiling — exceed it where the song earns it, but never write below it. If the topic is light, the tier still applies — let craft carry the weight that the subject does not.`;
+}
+
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
@@ -3689,6 +3898,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   // or the mood signals escalation; hip-hop always gets the framework.
   const speedGearsExplicit = structure === 'gear_shift_escalation';
   const speedGearsNote = buildSpeedGearsNote(genre, mood, topic, speedGearsExplicit);
+  const lyricTierNote = buildLyricTierNote(genre, params.lyricTier);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -3733,7 +3943,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -3872,6 +4082,7 @@ function buildLuckyPrompt(params) {
   // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
+  const lyricTierNote = buildLyricTierNote(g1, params.lyricTier);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -3907,7 +4118,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4415,6 +4626,7 @@ SONGWRITING RULES:
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
+${buildLyricTierNote('hiphop', params.lyricTier)}
 
 Respond with EXACTLY this format:
 
@@ -4689,7 +4901,8 @@ function buildVariantPrompt(variant, song) {
   // Variants inherit speed-gears for rap genres (baseline applies) but can't
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
-  return builder(safeSong) + craftNote + speedGearsNote + buildCraftFirewallNote();
+  const lyricTierNote = buildLyricTierNote(safeSong.genre, song.lyricTier);
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4823,6 +5036,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   // / comedy-mode rules as the original generate.
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
+  const lyricTierNote = buildLyricTierNote(genre, p.lyricTier);
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -4830,7 +5044,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5191,7 +5405,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote };
 
 
 
