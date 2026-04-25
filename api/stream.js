@@ -539,6 +539,8 @@ module.exports = async function handler(req, res) {
         // No paywall on tier itself; craft is part of core output, not a gated feature.
         const VALID_TIERS = new Set(['radio','street','conscious','archival']);
         if (p.lyricTier && !VALID_TIERS.has(p.lyricTier)) p.lyricTier = 'street';
+        // Edge mode — strict boolean coercion. Edge stays inside the lyric tier ceiling.
+        p.edgeMode = p.edgeMode === true;
         // Suno learning overlay — only fetched for Studio-tier users since only
         // they see the values; skip the Redis hit otherwise.
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
@@ -559,6 +561,7 @@ module.exports = async function handler(req, res) {
         lp.isAdmin = !!req._adminBypass;
         const VALID_LUCKY_TIERS = new Set(['radio','street','conscious','archival']);
         if (lp.lyricTier && !VALID_LUCKY_TIERS.has(lp.lyricTier)) lp.lyricTier = 'street';
+        lp.edgeMode = lp.edgeMode === true;
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);

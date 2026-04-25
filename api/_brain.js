@@ -1679,6 +1679,170 @@ function buildLyricTierNote(genre, tier) {
 This tier is a craft floor, not a ceiling — exceed it where the song earns it, but never write below it. If the topic is light, the tier still applies — let craft carry the weight that the subject does not.`;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// MUSIC_ACADEMIA — Songwriting frameworks from real university courses
+// taught by legendary artists & producers. Each framework maps to genres
+// where its principles apply. Server-side mirror of the client constant.
+// (Previously the client built this into local-dev prompts only — production
+// went out missing all of it. This wiring fixes that.)
+// ═══════════════════════════════════════════════════════════════════════════
+const MUSIC_ACADEMIA = {
+  lupe_fiasco_mit: {
+    name: 'Lupe Fiasco — MIT "Rap Theory & Practice"',
+    principles: [
+      'BAR ARCHITECTURE: Every bar is a micro-composition. Count syllables per bar — density creates intensity. Sparse bars = emphasis. Dense bars = urgency.',
+      'WORDPLAY LAYERING: Stack meanings — surface narrative + metaphorical subtext + phonetic wordplay in every line. Best lyrics reward 3rd listen.',
+      'CONCEPTUAL COMMITMENT: Choose a central conceit and NEVER break character. "Kick Push" = skateboarding as life metaphor. Every image must serve the concept.',
+      'INTERNAL RHYME DENSITY: Rhyming at end-of-line is amateur. Place rhymes mid-bar, across bars, in unexpected positions. This creates flow.',
+      'NARRATIVE PERSPECTIVE: Use specific POV — not "people struggle" but "she counts the change from the vending machine". Specificity IS universality.'
+    ],
+    genres: ['hiphop','rap','trap','drill','conscious','spoken_word','experimental','alternative']
+  },
+  ninth_wonder_harvard: {
+    name: '9th Wonder — Harvard "Hip-Hop Sampling" & Duke "History of Hip-Hop"',
+    principles: [
+      'SAMPLING AS ARCHAEOLOGY: Every beat contains a conversation with the past. Production should reference, honor, and transform its source material.',
+      'DRUM POCKET THEORY: The space BETWEEN hits matters more than the hits themselves. Swing, pocket, and micro-timing create the feeling people call "groove".',
+      'ARRANGEMENT AS NARRATIVE: A beat should evolve like a story — intro sets mood, verse provides context, hook delivers the thesis, bridge pivots, outro resolves.',
+      'SONIC TEXTURE PALETTE: Limit your sonic palette intentionally. Soulquarians used 5-7 textures max. Too many sounds = too many characters = no story.',
+      'EMOTIONAL FREQUENCY: Every key and BPM combo triggers a specific emotional frequency. Minor + slow = introspection. Major + uptempo = triumph. Know the science.'
+    ],
+    genres: ['hiphop','rnb','soul','neo_soul','jazz','lo_fi','boom_bap','alternative','neosoul']
+  },
+  questlove_nyu: {
+    name: 'Questlove — NYU "Classic Albums"',
+    principles: [
+      'ALBUM ARC AS EMOTIONAL JOURNEY: Even a single song exists on an emotional arc. Open with tension, build expectation, deliver catharsis, leave an aftertaste.',
+      'THE 3-SECOND TEST: A hit song declares itself in the first 3 seconds. An intro sound, a vocal texture, a rhythmic hook — something that says "stop and listen."',
+      'IMPERFECTION AS SIGNATURE: The "mistakes" that define classics — the breath before a note, the off-grid snare, the cracked voice — these are features, not bugs.',
+      'GROOVE OVER PERFECTION: Music that is mathematically perfect is emotionally dead. Leave room for human timing, for the push-pull between instruments.',
+      'REFERENCE POINT THEORY: Great songs exist in conversation with 2-3 older songs. The listener may not know the references, but they feel the depth.'
+    ],
+    genres: ['pop','rock','rnb','soul','funk','jazz','alternative','indie','blues','country','altrock','ss','folk']
+  },
+  swizz_beatz_nyu: {
+    name: 'Swizz Beatz — NYU "Producer as Entrepreneur/Creative"',
+    principles: [
+      'THE DROP PHILOSOPHY: Build tension for 4-8 bars, then REMOVE elements to create the drop. Silence is the most powerful instrument.',
+      'ENERGY ARCHITECTURE: Map energy 1-10 across the entire song. Verse = 5, pre-chorus = 7, chorus = 9, bridge = 4, final chorus = 10. Never flatline.',
+      'SONIC BRANDING: Every song needs ONE signature sound that makes it instantly identifiable in 2 seconds of a TikTok scroll.',
+      'SIMPLICITY DOCTRINE: The best hooks are 4-6 words. The best melodies are 5-7 notes. Complexity is easy — simplicity that hits is craft.',
+      'COLLISION THEORY: Put two things together that should NOT work. Classical piano + 808 bass. Gospel choir + trap hi-hats. The friction creates heat.'
+    ],
+    genres: ['hiphop','pop','edm','trap','dance','electropop','experimental','hyperpop','latin_trap','reggaeton','afrobeats']
+  },
+  gza_harvard: {
+    name: 'GZA — Harvard "Science of Hip-Hop"',
+    principles: [
+      'LYRICAL PRECISION: Every word must earn its place. If a word can be cut without losing meaning, cut it. Dense writing = respect for the listener.',
+      'CONCEPTUAL ARCHITECTURE: Structure lyrics like a chess game — opening establishes position, middle develops strategy, end delivers checkmate.',
+      'VOCABULARY AS PAINT: Technical language from ANY field (science, philosophy, street, cuisine) creates unique imagery. "Liquid swords" > "sharp words".',
+      'STORYTELLING THROUGH SPECIFICS: Replace every adjective with a concrete detail. Not "the hard streets" but "the stairwell where the lightbulb\'s been out since June."',
+      'RHYTHM MATHEMATICS: Syllable patterns follow mathematical progressions. 8-8-8-12 creates anticipation. 12-12-8-4 creates compression. Map your syllable counts.'
+    ],
+    genres: ['hiphop','rap','conscious','spoken_word','experimental','alternative','drill','trap']
+  },
+  bun_b_rice: {
+    name: 'Bun B — Rice University "Religion & Hip-Hop in America"',
+    principles: [
+      'CULTURAL GROUNDING: Music that endures comes from a specific place, community, and experience. Root every song in geography and lived truth.',
+      'ORAL TRADITION TECHNIQUE: Rap is the latest form of oral storytelling — use techniques of repetition, call-and-response, and rhythmic emphasis from that lineage.',
+      'AUTHENTICITY OVER TECHNIQUE: A perfectly delivered lie loses to a raw truth every time. Write from what you know, then learn to say it with skill.',
+      'COMMUNAL RESONANCE: The best songs say something one person feels but a million people recognize. Write the specific, deliver the universal.',
+      'NARRATIVE PATIENCE: Let a story breathe. Not every bar needs a punchline. Build scenes, establish characters, THEN deliver the turn.'
+    ],
+    genres: ['hiphop','rap','country','gospel','blues','soul','rnb','southern_rap','conscious','spoken_word','folk','ss']
+  }
+};
+
+// Genre alias map — normalizes inbound genre keys to MUSIC_ACADEMIA's vocabulary
+const GENRE_ACADEMIA_ALIAS = {
+  'hip-hop':'hiphop', 'hiphop':'hiphop', 'rap':'hiphop',
+  'r&b':'rnb', 'rnb':'rnb', 'soul':'soul',
+  'neo-soul':'neosoul', 'neosoul':'neosoul', 'neo_soul':'neosoul',
+  'alt-rock':'altrock', 'altrock':'altrock', 'alternative':'alternative',
+  'singer-songwriter':'ss', 'ss':'ss',
+  'tv/musical':'tvmusical', 'tvmusical':'tvmusical',
+  "children's":'children', 'children':'children',
+  'electronic':'edm', 'edm':'edm',
+  'k-pop':'kpop', 'kpop':'kpop'
+};
+
+// Genre → applicable course-keys, computed once at module load
+const GENRE_ACADEMIA_MAP = (function() {
+  const map = {};
+  Object.entries(MUSIC_ACADEMIA).forEach(([key, course]) => {
+    course.genres.forEach(g => {
+      if (!map[g]) map[g] = [];
+      map[g].push(key);
+    });
+  });
+  return map;
+})();
+
+// Returns up to 2 academic principles per song, rotated by a (genre+era) hash so
+// the same song doesn't always get the same two principles. Tells the model these
+// are guidelines, not rigid rules — apply where they elevate the song.
+function buildAcademicFrameworkNote(genre, era) {
+  if (!genre) return '';
+  const _g = String(genre).toLowerCase().replace(/[\s\-\/]+/g, '_');
+  const gKey = GENRE_ACADEMIA_ALIAS[_g] || GENRE_ACADEMIA_ALIAS[String(genre).toLowerCase()] || _g;
+  const courseKeys = GENRE_ACADEMIA_MAP[gKey] || GENRE_ACADEMIA_MAP['pop'] || [];
+  if (!courseKeys.length) return '';
+
+  // Pick up to 2 courses (preferring the first match — usually the most genre-specific)
+  const selected = courseKeys.slice(0, Math.min(2, courseKeys.length));
+  const _era = era || 'modern';
+  const hash = (gKey + _era).split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+
+  const blocks = selected.map((courseKey, ci) => {
+    const course = MUSIC_ACADEMIA[courseKey];
+    if (!course) return null;
+    const pList = course.principles;
+    const startIdx = (hash + ci * 7) % pList.length;
+    const p1 = pList[startIdx % pList.length];
+    const p2 = pList[(startIdx + 1) % pList.length];
+    const sourceShort = course.name.split('—')[0].trim();
+    return `[${sourceShort}]\n- ${p1}\n- ${p2}`;
+  }).filter(Boolean);
+
+  if (!blocks.length) return '';
+
+  return `
+
+🎓 ACADEMIC SONGWRITING FRAMEWORK — apply these university-level principles (from real courses taught by legendary artists/producers):
+
+${blocks.join('\n\n')}
+
+INTEGRATION RULES:
+- These are GUIDELINES, not rigid rules — apply them where they elevate the song
+- Do not name-drop the courses or instructors in the lyrics themselves
+- The principles should be visible in CRAFT, not in commentary about the craft`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// EDGE MODE — when toggled on, the model writes with sharper teeth.
+// Rawer subject matter, harder language, no radio-edit reflex. Stays inside
+// the song's lyric_tier ceiling — Edge does not override an 'archival' tier
+// downward into shock-value gimmickry. Edge × archival = peak craft with
+// permission to bleed; Edge × radio = nothing (Radio is by definition smooth).
+// ═══════════════════════════════════════════════════════════════════════════
+function buildEdgeNote(edgeMode, lyricTier) {
+  if (!edgeMode) return '';
+  // Edge has no effect on the radio tier — radio is by definition listener-frictionless
+  if (lyricTier === 'radio') return '';
+  return `
+
+🔥 EDGE MODE — write with teeth:
+- PERMISSION: Profanity is allowed when it lands. Sexual frankness is allowed when it serves. Violence/menace is allowed when it earns. Do not soften for radio reflex.
+- RAW SUBJECT MATTER: If the topic touches addiction, abuse, breakup mess, intrusive thought, ambition, jealousy, lust, money, faith doubt — go to the hard part of it, not the safe paraphrase.
+- DICTION: Replace every hedge ("kind of", "a little", "sort of") with the actual feeling. Replace abstract emotions with concrete physical reactions ("shaking" not "nervous", "couldn't breathe" not "upset").
+- NO RADIO INSTINCT: Do not self-censor mid-line. Do not reach for the family-friendly synonym. The line "I'd burn this house down for you" beats "I'd do anything for you" every time.
+- TIER RESPECT: Edge is INTENSITY, not laziness. Stay inside the lyric tier's craft floor — Edge × archival means peak craft + permission to bleed; Edge × street means honest street language, not edgelord nihilism.
+
+This song must feel risked, not safe.`;
+}
+
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
@@ -3899,6 +4063,8 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const speedGearsExplicit = structure === 'gear_shift_escalation';
   const speedGearsNote = buildSpeedGearsNote(genre, mood, topic, speedGearsExplicit);
   const lyricTierNote = buildLyricTierNote(genre, params.lyricTier);
+  const academicNote = buildAcademicFrameworkNote(genre, era);
+  const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -3943,7 +4109,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4083,6 +4249,8 @@ function buildLuckyPrompt(params) {
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(g1, params.lyricTier);
+  const academicNote = buildAcademicFrameworkNote(g1, params.era);
+  const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -4118,7 +4286,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4627,6 +4795,8 @@ SONGWRITING RULES:
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
 ${buildLyricTierNote('hiphop', params.lyricTier)}
+${buildAcademicFrameworkNote('hiphop', params.era)}
+${buildEdgeNote(params.edgeMode, params.lyricTier)}
 
 Respond with EXACTLY this format:
 
@@ -4902,7 +5072,9 @@ function buildVariantPrompt(variant, song) {
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
   const lyricTierNote = buildLyricTierNote(safeSong.genre, song.lyricTier);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + buildCraftFirewallNote();
+  const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
+  const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier);
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + academicNote + edgeNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -5037,6 +5209,8 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(genre, p.lyricTier);
+  const academicNote = buildAcademicFrameworkNote(genre, p.era);
+  const edgeNote = buildEdgeNote(p.edgeMode, p.lyricTier);
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -5044,7 +5218,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5405,7 +5579,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote };
 
 
 
