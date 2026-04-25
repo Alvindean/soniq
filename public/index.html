@@ -14097,6 +14097,14 @@ async function applyCoachAndRegenerate() {
     if (typeof renderSunoChips === 'function') renderSunoChips('res', null);
     if (typeof startSongProgress === 'function') startSongProgress('res');
 
+    // Register with S.genController so a subsequent Generate Song click can
+    // abort this stream and reuse the same result-card DOM (#stream-display)
+    // without two streams writing to the same element. Mirrors generateSong's
+    // pattern at line 10539-10540.
+    if (S.genController) { try { S.genController.abort(); } catch(_) {} S.genController = null; }
+    S.genController = new AbortController();
+    const regenSignal = S.genController.signal;
+
     let firstChunk = true;
     const streamCb = (chunk, full) => {
       if (firstChunk) {
@@ -14108,10 +14116,17 @@ async function applyCoachAndRegenerate() {
       if (typeof updateSongProgress === 'function') updateSongProgress('res', full);
     };
 
-    const result = await callServerStream('generate', songParams, streamCb);
+    const result = await callServerStream('generate', songParams, streamCb, regenSignal);
+    S.genController = null;
     if (typeof finishSongProgress === 'function') finishSongProgress('res');
     const raw = result.text;
     const genProdData = result.meta?.prodData;
+
+    // Defensive: if the server returned empty/garbage, do NOT clobber the
+    // imported song with a broken parsed result. Surface the error instead.
+    if (!raw || !/LYRICS\s*:/i.test(raw)) {
+      throw new Error('Coach rewrite returned an unexpected response — keeping your original lyrics intact.');
+    }
 
     // parseSongResult populates S.currentSong with the new improved song,
     // including all the brain's structured output (verdict, brief, structure,
@@ -14139,8 +14154,14 @@ async function applyCoachAndRegenerate() {
     if (typeof trackEvent === 'function') trackEvent('coach_apply_regenerate', { genre, topic });
   } catch (e) {
     if (typeof finishSongProgress === 'function') finishSongProgress('res', true);
-    if (typeof toast === 'function') toast('Regenerate failed: ' + e.message, 4000);
+    // AbortError is expected when the user clicks Generate Song mid-regen — silent
+    if (e && (e.name === 'AbortError' || /aborted/i.test(e.message || ''))) {
+      // user cancelled; leave currentSong as the original imported version
+    } else if (typeof toast === 'function') {
+      toast('Regenerate failed: ' + e.message, 4000);
+    }
   } finally {
+    S.genController = null;
     if (btn) { btn.disabled = false; btn.textContent = '✨ Apply Suggestions & Regenerate'; }
   }
 }
@@ -14161,6 +14182,11 @@ async function runCoach() {
       (chunk, text) => {
         fullText = text;
         outputEl.textContent = text;
+        // Keep _coachFeedback in sync with streaming text so the Apply button
+        // can never fire against empty state. Without this, the apply panel
+        // appears as soon as text.trim() is truthy below, but _coachFeedback
+        // would only update post-completion — race condition.
+        _coachFeedback = text;
         if (text.trim()) {
           document.getElementById('coach-loading').style.display = 'none';
           document.getElementById('coach-results').style.display = 'block';
