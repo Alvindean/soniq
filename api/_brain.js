@@ -3689,7 +3689,6 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   // or the mood signals escalation; hip-hop always gets the framework.
   const speedGearsExplicit = structure === 'gear_shift_escalation';
   const speedGearsNote = buildSpeedGearsNote(genre, mood, topic, speedGearsExplicit);
-  const sunoSettingsNote = buildSunoSettingsNote({ genre, substyle, mood, structure, rapStyle: params.rapStyle, plan: params.plan, isAdmin: params.isAdmin, userLearning: params.sunoLearning });
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
@@ -3734,7 +3733,7 @@ SONGWRITING RULES:
     Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${sunoSettingsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -3873,7 +3872,6 @@ function buildLuckyPrompt(params) {
   // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
   const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
-  const sunoSettingsNote = buildSunoSettingsNote({ genre: g1, mood, structure, plan: params.plan, isAdmin: params.isAdmin, userLearning: params.sunoLearning });
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -3909,7 +3907,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${sunoSettingsNote}
+Structure: ${structStr}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -4417,7 +4415,6 @@ SONGWRITING RULES:
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
-${buildSunoSettingsNote({ genre: 'hiphop', mood, rapStyle: style.key || params.rapStyle, plan: params.plan, isAdmin: params.isAdmin, userLearning: params.sunoLearning })}
 
 Respond with EXACTLY this format:
 
@@ -4692,8 +4689,7 @@ function buildVariantPrompt(variant, song) {
   // Variants inherit speed-gears for rap genres (baseline applies) but can't
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
-  const sunoSettingsNote = buildSunoSettingsNote({ genre: safeSong.genre, mood: safeSong.mood, plan: song.plan, isAdmin: song.isAdmin, userLearning: song.sunoLearning });
-  return builder(safeSong) + craftNote + speedGearsNote + sunoSettingsNote + buildCraftFirewallNote();
+  return builder(safeSong) + craftNote + speedGearsNote + buildCraftFirewallNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -4827,7 +4823,6 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   // / comedy-mode rules as the original generate.
   const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
-  const sunoSettingsNote = buildSunoSettingsNote({ genre, mood: p.mood, structure: p.structure, plan: p.plan, isAdmin: p.isAdmin, userLearning: p.sunoLearning });
 
   const prompt = `SONG CONTEXT:
 ${ctx}
@@ -4835,7 +4830,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${sunoSettingsNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${buildCraftFirewallNote()}`;
 
   return { prompt, system };
 }
@@ -5196,48 +5191,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-// Renders the SUNO SETTINGS block for insertion into the LLM prompt.
-// LLM is told to emit this block VERBATIM in the PRODUCTION BRIEF output
-// so users can copy-paste into Suno directly.
-// Paywall: non-Studio users get a masked placeholder; Studio users get
-// live values (plus learning hint if enough samples).
-function buildSunoSettingsNote(params) {
-  const { genre, plan, isAdmin } = params || {};
-  const PAID = new Set(['studio','studio_annual','pro','pro_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','starter','starter_annual']);
-  const STUDIO = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
-  const isStudioTier = isAdmin || STUDIO.has(plan);
-
-  if (!isStudioTier) {
-    // Non-Studio: include the block with placeholder values + upgrade CTA.
-    // LLM MUST include this block verbatim in the PRODUCTION BRIEF.
-    return `
-
-🎛 SUNO GENERATION SETTINGS (for PRODUCTION BRIEF — INCLUDE VERBATIM, DO NOT ALTER):
-
-SUNO SETTINGS:
-Weirdness: ⭐ Studio only
-Style Influence: ⭐ Studio only
-Exclude Styles: ⭐ Studio only
-→ Upgrade to Studio at mysoniq.com/app to unlock auto-computed Suno knob values personalized to this song.`;
-  }
-
-  const s = buildSunoSettings(params);
-  const learningTag = s.learningApplied
-    ? ` (tuned from your ${s.sampleSize} liked ${genre} songs)`
-    : '';
-  // Tell LLM to include this block VERBATIM in the PRODUCTION BRIEF output.
-  return `
-
-🎛 SUNO GENERATION SETTINGS (for PRODUCTION BRIEF — INCLUDE VERBATIM, DO NOT ALTER THE NUMBERS):
-
-SUNO SETTINGS${learningTag}:
-Weirdness: ${s.weirdness}%
-Style Influence: ${s.styleInfluence}%
-Exclude Styles: ${s.excludeStyles.join(', ')}
-→ Copy-paste these into Suno's generation panel for best results on this specific song.`;
-}
-
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, buildSunoSettingsNote, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS };
 
 
 
