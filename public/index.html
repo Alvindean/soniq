@@ -9920,7 +9920,7 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null, sunoSettings: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
@@ -10280,6 +10280,7 @@ async function generateSong(){
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
     aggression: S.selectedAggression || 'mid',
     freestyleMode: S.freestyleMode === true,
+    edgeMode: window.__qfEdge === true,
     barSwitch: (typeof S.barSwitch === 'number' && [2,4,8].includes(S.barSwitch)) ? S.barSwitch : 0,
     breakRule: S.breakRule === true,
     eraUndertone: typeof S.eraUndertone === 'string' ? S.eraUndertone : '',
@@ -10518,6 +10519,7 @@ VIDEO PROMPT:
       if (S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
       if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
       if (lyricTier) S.currentSong.lyricTier = lyricTier;
+      S.currentSong.edgeMode = window.__qfEdge === true;
     }
     renderSunoChips('res', S.currentSong);
   }catch(e){
