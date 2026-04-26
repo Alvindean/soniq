@@ -2939,6 +2939,257 @@ const SUBSTYLE_BRACKETS={
 
 
 // ═══════════════════════════════════════════════════════
+// SUNO VOCAL DIRECTION CHEAT SHEET
+// Brackets that direct the PERFORMANCE, not just the
+// section. Stack 1-3 tags before the lyric line that
+// needs them: [whisper][breathy] then "I'm fine" on the
+// next line; [crack in voice] then "but I'm falling..."
+// ═══════════════════════════════════════════════════════
+const SUNO_VOCAL_DIRECTION = {
+  delivery: {
+    'whisper':        'Soft, intimate, close to the mic',
+    'breathy':        'Airy and light, more texture',
+    'spoken':         'Speech-like, natural cadence',
+    'sung':           'Clear, melodic singing',
+    'yell':           'Powerful, open, intense',
+    'scream':         'High intensity, aggressive',
+    'growl':          'Low, gritty, edgy',
+    'raspy':          'Rough texture in the voice',
+    'strained':       'Emotionally or vocally pushed',
+    'crack in voice': 'Emotion, vulnerability',
+    'falsetto':       'Higher pitch, lighter tone',
+    'soulful':        'Rich, heartfelt, full of feeling',
+    'smooth':         'Clean, polished, easy tone',
+    'raw':            'Unfiltered, real, unpolished',
+    'haunting':       'Eerie, ethereal, chilling',
+    'dark':           'Heavy, moody, atmospheric',
+    'soft':           'Gentle, mellow, subdued',
+    'powerful':       'Strong, commanding, impactful',
+    'emotional':      'Full of feeling and depth',
+  },
+  character: {
+    'young':       'Youthful voice',
+    'mature':      'Older, more experienced tone',
+    'female':      'Female vocals',
+    'male':        'Male vocals',
+    'androgynous': 'Neutral / blend',
+    'childlike':   'Innocent, youthful tone',
+    'seductive':   'Sultry, alluring',
+    'confident':   'Assured, bold',
+    'vulnerable':  'Open, exposed, raw',
+    'angry':       'Full of rage or frustration',
+    'sad':         'Heavy, sorrowful',
+    'playful':     'Fun, lighthearted',
+    'desperate':   'Urgent, intense need',
+    'tired':       'Weary, exhausted',
+    'broken':      'Emotionally damaged',
+    'hopeful':     'Uplifting, optimistic',
+    'calm':        'Peaceful, centered',
+    'melancholic': 'Nostalgic, moody',
+    'intense':     'High energy, focused',
+  },
+  effects: {
+    'echo':              'Repeating, airy space',
+    'reverb':            'Spacious, roomy sound',
+    'delay':             'Slight repeat / bounce',
+    'distorted':         'Gritty, edgy, overdriven',
+    'lo-fi':             'Low fidelity, vintage feel',
+    'radio effect':      'Filtered, old school radio',
+    'telephone effect':  'Muffled, phone quality',
+    'autotune':          'Modern, tuned vocal',
+    'vintage':           'Old school, classic tone',
+    'double tracked':    'Layered vocal effect',
+    'harmonized':        'With harmonies',
+    'vocal run':         'Melodic run or ad-lib',
+    'ad-lib':            'Improvised vocal phrases',
+    'background vocals': 'Backing layers',
+    'choir':             'Choral, group vocals',
+    'stutter':           'Chopped, rhythmic repeat',
+    'tremolo':           'Shaky, wavy vocal effect',
+    'filter':            'Tonal filter effect',
+    'widened':           'Wide stereo vocal',
+  },
+  placement: {
+    'close mic':       'Up close, intimate',
+    'far away':        'Distant, in the background',
+    'in your ear':     'ASMR style, super close',
+    'center stage':    'Front and dominant',
+    'background':      'Subtle, behind the mix',
+    'in the distance': 'Faint, far off',
+    'dry':             'No effects, clean and direct',
+    'wide':             'Expansive, full stereo',
+  },
+};
+
+// Genre-bias: tags that fit each genre's tradition.
+// Used to suggest a focused palette. Empty/missing genre = generic palette.
+const GENRE_VOCAL_BIAS = {
+  pop:        { delivery:['breathy','smooth','emotional','soft','powerful','soulful'],   character:['confident','vulnerable','hopeful','playful'],          effects:['reverb','double tracked','harmonized','ad-lib','vocal run'],     placement:['close mic','center stage','wide'] },
+  hiphop:     { delivery:['raspy','raw','powerful','spoken','sung'],                     character:['confident','intense','angry','desperate'],             effects:['ad-lib','autotune','double tracked','stutter','radio effect'],   placement:['close mic','center stage','dry','wide'] },
+  rnb:        { delivery:['breathy','smooth','soulful','falsetto','emotional','sung'],   character:['seductive','vulnerable','confident','melancholic'],    effects:['reverb','harmonized','vocal run','ad-lib','background vocals'],  placement:['close mic','center stage'] },
+  neosoul:    { delivery:['breathy','soulful','smooth','falsetto','emotional','spoken'], character:['vulnerable','melancholic','confident','calm'],         effects:['reverb','vintage','vocal run','ad-lib','harmonized'],            placement:['close mic','center stage'] },
+  jazz:       { delivery:['smooth','soulful','breathy','sung','spoken'],                 character:['mature','seductive','melancholic','confident'],        effects:['vintage','reverb','vocal run'],                                  placement:['close mic','center stage'] },
+  blues:      { delivery:['raspy','raw','soulful','strained','growl','powerful'],        character:['mature','melancholic','tired','broken','desperate'],   effects:['vintage','reverb'],                                              placement:['close mic','center stage','dry'] },
+  gospel:     { delivery:['powerful','soulful','strained','yell','emotional'],           character:['hopeful','intense','desperate','confident'],           effects:['reverb','choir','harmonized','background vocals','vocal run','ad-lib'], placement:['center stage','wide'] },
+  country:    { delivery:['raspy','smooth','emotional','spoken','sung','soulful'],       character:['mature','melancholic','tired','hopeful','vulnerable'], effects:['vintage','reverb','harmonized'],                                 placement:['close mic','center stage','dry'] },
+  rock:       { delivery:['raspy','powerful','strained','yell','raw','emotional'],       character:['intense','angry','confident','desperate'],             effects:['reverb','distorted','double tracked'],                           placement:['center stage','wide'] },
+  altrock:    { delivery:['breathy','strained','soft','raspy','emotional','spoken'],     character:['vulnerable','melancholic','tired','broken'],           effects:['lo-fi','reverb','filter','distorted'],                           placement:['close mic','far away','wide'] },
+  edm:        { delivery:['breathy','smooth','soft','sung','whisper'],                   character:['intense','confident','seductive','playful'],           effects:['reverb','filter','widened','autotune','stutter','delay'],        placement:['wide','center stage','far away'] },
+  funk:       { delivery:['raspy','powerful','soulful','falsetto','sung'],               character:['playful','confident','intense'],                       effects:['ad-lib','vocal run','double tracked','vintage'],                 placement:['center stage','close mic'] },
+  soul:       { delivery:['soulful','powerful','strained','emotional','falsetto'],       character:['mature','desperate','confident','vulnerable'],         effects:['reverb','vintage','harmonized','background vocals','vocal run','ad-lib'], placement:['center stage','close mic'] },
+  reggae:     { delivery:['smooth','spoken','sung','soulful','raspy'],                   character:['confident','mature','calm','hopeful'],                 effects:['reverb','echo','delay','harmonized','vintage'],                  placement:['center stage','close mic'] },
+  afrobeats:  { delivery:['smooth','sung','spoken','soulful'],                           character:['playful','confident','seductive','intense'],           effects:['ad-lib','autotune','reverb','harmonized','double tracked'],      placement:['center stage','wide'] },
+  latin:      { delivery:['powerful','soulful','sung','strained','emotional'],           character:['intense','seductive','confident','desperate'],         effects:['reverb','vocal run','ad-lib','harmonized','double tracked'],     placement:['center stage','wide'] },
+  kpop:       { delivery:['smooth','breathy','sung','falsetto','spoken'],                character:['confident','playful','vulnerable','intense'],          effects:['reverb','autotune','double tracked','harmonized','widened','stutter'], placement:['center stage','wide'] },
+  ss:         { delivery:['whisper','breathy','soft','spoken','crack in voice','emotional'], character:['vulnerable','melancholic','tired','broken','hopeful'], effects:['reverb','vintage'],                                          placement:['close mic','in your ear'] },
+  punk:       { delivery:['yell','scream','raspy','raw','strained'],                     character:['angry','intense','desperate'],                         effects:['distorted','double tracked'],                                    placement:['center stage','dry','wide'] },
+  tvmusical:  { delivery:['powerful','sung','emotional','spoken'],                       character:['confident','vulnerable','desperate','intense','hopeful'], effects:['reverb','harmonized','choir','vocal run','background vocals'], placement:['center stage','wide'] },
+  reggaeton:  { delivery:['powerful','smooth','raspy','sung','spoken'],                  character:['seductive','confident','intense','playful'],           effects:['autotune','ad-lib','reverb','double tracked','stutter'],         placement:['center stage','wide'] },
+  folk:       { delivery:['breathy','soft','sung','spoken','soulful','emotional'],       character:['mature','melancholic','hopeful','vulnerable'],         effects:['reverb','vintage','harmonized'],                                 placement:['close mic','center stage'] },
+  metal:      { delivery:['scream','growl','yell','strained','powerful','raspy'],        character:['angry','intense','desperate','broken'],                effects:['distorted','reverb','double tracked','widened'],                 placement:['center stage','wide'] },
+  parody:     { delivery:['sung','spoken','powerful','emotional'],                       character:['confident','playful','desperate'],                     effects:['reverb','double tracked','vintage'],                             placement:['center stage'] },
+  comedy:     { delivery:['spoken','sung','soft'],                                       character:['playful','confident','desperate','tired'],             effects:['reverb','double tracked'],                                       placement:['center stage','close mic'] },
+  children:   { delivery:['soft','sung','spoken'],                                       character:['young','childlike','playful','hopeful','calm'],        effects:['reverb','harmonized','double tracked'],                          placement:['center stage','close mic'] },
+  brazilian:  { delivery:['breathy','smooth','sung','soulful'],                          character:['mature','playful','melancholic','seductive'],          effects:['reverb','vintage','harmonized'],                                 placement:['close mic','center stage'] },
+  amapiano:   { delivery:['smooth','soft','sung','breathy'],                             character:['calm','confident','seductive','hopeful'],              effects:['reverb','autotune','delay','harmonized','widened'],              placement:['center stage','wide'] },
+  dancehall:  { delivery:['raspy','powerful','spoken','sung'],                           character:['confident','intense','seductive'],                     effects:['reverb','echo','autotune','double tracked'],                     placement:['center stage','wide'] },
+  bollywood:  { delivery:['powerful','sung','soulful','emotional','strained'],           character:['intense','desperate','vulnerable','confident'],        effects:['reverb','harmonized','vocal run','widened'],                     placement:['center stage','wide'] },
+  arabesque:  { delivery:['soulful','strained','emotional','sung'],                      character:['mature','desperate','melancholic','intense'],          effects:['reverb','vocal run','vintage'],                                  placement:['center stage','close mic'] },
+  mandopop:   { delivery:['smooth','breathy','sung','emotional','soft'],                 character:['vulnerable','confident','melancholic','hopeful'],      effects:['reverb','double tracked','harmonized','widened'],                placement:['center stage','close mic'] },
+};
+
+// Mood-bias: layered on top of genre bias to focus the palette toward the song's emotional target.
+// Keys match the lowercase mood values the UI emits — see public/index.html mood pickers.
+const MOOD_VOCAL_BIAS = {
+  sad:          { delivery:['whisper','breathy','strained','crack in voice','soft','soulful'], character:['sad','vulnerable','broken','tired','melancholic'], effects:['reverb','vintage','filter'],                       placement:['close mic','in the distance'] },
+  happy:        { delivery:['smooth','sung','powerful'],                                       character:['playful','hopeful','confident','calm'],            effects:['reverb','harmonized','double tracked','ad-lib'],   placement:['center stage','wide'] },
+  angry:        { delivery:['yell','scream','growl','raspy','strained','raw','powerful'],      character:['angry','intense','desperate'],                     effects:['distorted','double tracked'],                      placement:['center stage','dry'] },
+  romantic:     { delivery:['breathy','smooth','soulful','soft','sung','falsetto'],            character:['seductive','vulnerable','calm','hopeful'],         effects:['reverb','harmonized','vocal run'],                 placement:['close mic','in your ear','center stage'] },
+  hopeful:      { delivery:['emotional','soulful','powerful','sung'],                          character:['hopeful','confident','vulnerable'],                effects:['reverb','harmonized','choir'],                     placement:['center stage','wide'] },
+  reflective:   { delivery:['breathy','soft','spoken','smooth'],                               character:['mature','melancholic','calm','tired'],             effects:['reverb','vintage','filter'],                       placement:['close mic','in the distance'] },
+  energetic:    { delivery:['powerful','yell','sung','raspy'],                                 character:['intense','confident','playful'],                   effects:['ad-lib','double tracked','widened'],               placement:['center stage','wide'] },
+  dark:         { delivery:['dark','haunting','growl','whisper','strained'],                   character:['broken','melancholic','intense','desperate'],      effects:['reverb','distorted','filter','lo-fi'],             placement:['far away','in the distance','close mic'] },
+  emotional:    { delivery:['breathy','strained','crack in voice','soulful','emotional','soft','powerful'], character:['vulnerable','desperate','melancholic','hopeful','broken'], effects:['reverb','harmonized'],          placement:['close mic','center stage'] },
+  nostalgic:    { delivery:['breathy','soft','soulful','smooth'],                              character:['mature','melancholic','tired'],                    effects:['vintage','reverb','filter','lo-fi'],               placement:['close mic','in the distance','far away'] },
+  triumphant:   { delivery:['powerful','yell','soulful','sung'],                               character:['confident','hopeful','intense'],                   effects:['choir','harmonized','reverb','double tracked'],    placement:['center stage','wide'] },
+  anxious:      { delivery:['breathy','strained','whisper','crack in voice'],                  character:['desperate','intense','tired','vulnerable'],        effects:['reverb','filter','tremolo','stutter'],             placement:['close mic','in the distance'] },
+  euphoric:     { delivery:['powerful','yell','sung','soulful'],                               character:['intense','playful','confident','hopeful'],         effects:['reverb','widened','double tracked','ad-lib'],      placement:['center stage','wide'] },
+  defiant:      { delivery:['raspy','powerful','yell','strained','raw'],                       character:['angry','intense','confident'],                     effects:['distorted','double tracked'],                      placement:['center stage','dry'] },
+  rebellious:   { delivery:['raspy','yell','strained','raw','powerful'],                       character:['angry','intense','confident','desperate'],         effects:['distorted','double tracked'],                      placement:['center stage','wide'] },
+  peaceful:     { delivery:['soft','breathy','smooth','sung'],                                 character:['calm','hopeful','mature'],                         effects:['reverb','harmonized'],                             placement:['close mic','in your ear','center stage'] },
+  longing:      { delivery:['breathy','strained','soft','soulful','crack in voice'],           character:['melancholic','vulnerable','desperate','tired'],    effects:['reverb','vintage','filter'],                       placement:['close mic','in the distance'] },
+  bittersweet:  { delivery:['breathy','soft','soulful','smooth','strained'],                   character:['melancholic','hopeful','vulnerable','mature'],     effects:['reverb','vintage','harmonized'],                   placement:['close mic','center stage'] },
+  transcendent: { delivery:['breathy','soulful','soft','sung','falsetto'],                     character:['hopeful','calm','vulnerable','confident'],         effects:['reverb','choir','harmonized','widened'],           placement:['far away','center stage','wide'] },
+  tender:       { delivery:['whisper','breathy','soft','sung'],                                character:['vulnerable','calm','hopeful','mature'],            effects:['reverb','harmonized'],                             placement:['close mic','in your ear'] },
+  devastated:   { delivery:['whisper','breathy','strained','crack in voice','soft'],           character:['broken','sad','desperate','tired'],                effects:['reverb','vintage','filter'],                       placement:['close mic','in the distance'] },
+  'dark brooding': { delivery:['dark','haunting','growl','strained','raspy'],                  character:['broken','melancholic','intense','desperate'],      effects:['reverb','distorted','filter','lo-fi'],             placement:['far away','in the distance'] },
+  melancholic:  { delivery:['breathy','soft','strained','soulful'],                            character:['melancholic','sad','tired','mature'],              effects:['reverb','vintage','filter'],                       placement:['close mic','in the distance'] },
+};
+
+// Per-genre exclusions: tags that break a genre's authenticity.
+// e.g. classical/jazz never use [autotune]; reggae avoids [distorted]; children avoid [growl]/[scream].
+const GENRE_VOCAL_DIRECTION_EXCLUDE = {
+  classical: ['autotune','distorted','radio effect','telephone effect','lo-fi','stutter','growl'],
+  jazz:      ['autotune','distorted','telephone effect','lo-fi','stutter','growl'],
+  blues:     ['autotune','telephone effect','stutter'],
+  gospel:    ['autotune','distorted','telephone effect'],
+  ss:        ['autotune','distorted','radio effect','telephone effect','stutter','growl'],
+  folk:      ['autotune','distorted','radio effect','telephone effect','stutter','growl'],
+  country:   ['autotune','distorted','telephone effect','growl'],
+  reggae:    ['autotune','distorted','telephone effect','radio effect','growl'],
+  arabesque: ['autotune','distorted','radio effect','telephone effect','stutter','growl'],
+  bollywood: ['distorted','telephone effect','growl'],
+  brazilian: ['autotune','distorted','telephone effect','growl'],
+  children:  ['autotune','distorted','growl','scream','telephone effect','radio effect','dark','haunting','seductive'],
+  metal:     ['autotune','telephone effect'],
+  punk:      ['autotune'],
+  tvmusical: ['autotune','distorted','telephone effect','radio effect','growl'],
+  mandopop:  ['distorted','telephone effect','growl'],
+  parody:    ['growl','scream'],
+  comedy:    ['growl','scream'],
+};
+
+// Pairs that contradict each other — listed so the model knows not to stack them.
+// Soft contradictions ([whisper]+[powerful], [confident]+[vulnerable], [hopeful]+[broken])
+// are intentionally NOT listed: they're valid artistic tensions in many genres.
+const VOCAL_DIRECTION_CONFLICTS = [
+  ['whisper','scream'], ['whisper','yell'], ['whisper','growl'],
+  ['breathy','scream'], ['breathy','yell'],
+  ['soft','scream'], ['soft','yell'],
+  ['close mic','far away'], ['close mic','in the distance'],
+  ['in your ear','far away'], ['in your ear','in the distance'],
+  ['background','center stage'], ['far away','center stage'],
+  ['dry','reverb'], ['dry','echo'], ['dry','delay'],
+  ['calm','intense'], ['calm','angry'], ['calm','desperate'],
+  ['young','mature'],
+  ['childlike','seductive'], ['young','seductive'],
+  ['female','male'], ['androgynous','female'], ['androgynous','male'],
+  ['tired','intense'], ['tired','powerful'],
+  ['melancholic','playful'], ['sad','playful'],
+];
+
+// Builds the vocal-direction prompt block. Genre-aware, mood-aware, exclusion-filtered.
+// Returns '' if no bias data (rare — most genres are covered).
+const VOCAL_GENRE_ALIASES = { bossa: 'brazilian', cpop: 'mandopop', electronic: 'edm', indie: 'altrock', classical: 'tvmusical' };
+function buildVocalDirectionNote(genre, mood) {
+  const gKey = VOCAL_GENRE_ALIASES[genre] || genre;
+  const mKey = String(mood || '').trim().toLowerCase();
+  const gBias = gKey ? GENRE_VOCAL_BIAS[gKey] : null;
+  const mBias = mKey && Object.prototype.hasOwnProperty.call(MOOD_VOCAL_BIAS, mKey) ? MOOD_VOCAL_BIAS[mKey] : null;
+  const exclude = new Set(GENRE_VOCAL_DIRECTION_EXCLUDE[gKey] || []);
+
+  if (!gBias && !mBias) return '';
+
+  const merge = (cat, max) => {
+    const seen = new Set();
+    const out = [];
+    const lists = [gBias && gBias[cat], mBias && mBias[cat]].filter(Boolean);
+    for (const list of lists) {
+      for (const tag of list) {
+        if (exclude.has(tag) || seen.has(tag)) continue;
+        seen.add(tag);
+        out.push(tag);
+        if (out.length >= max) return out;
+      }
+    }
+    return out;
+  };
+
+  const delivery  = merge('delivery', 8);
+  const character = merge('character', 6);
+  const effects   = merge('effects', 6);
+  const placement = merge('placement', 4);
+
+  const fmt = (arr) => arr.map(t => `[${t}]`).join(' ');
+  const conflictsExample = VOCAL_DIRECTION_CONFLICTS.slice(0, 4)
+    .map(([a, b]) => `[${a}]+[${b}]`).join(', ');
+
+  const genreLabel = String(gKey || genre || 'song').toUpperCase();
+  const excludeText = exclude.size
+    ? `\n• AVOID for ${gKey || genre}: ${Array.from(exclude).map(t=>`[${t}]`).join(' ')} — these break the genre's authenticity.`
+    : '';
+
+  const moodLabel = mBias ? ` + ${mKey}` : '';
+
+  return `VOCAL DIRECTION (Suno bracket vocabulary — direct the PERFORMANCE, not just the section):
+
+Stack 1-3 vocal direction tags on their OWN LINE immediately before any lyric line that needs special performance, then write the lyric on the next line. Format: "[tag][tag]" then the lyric line. Example: "[whisper][breathy]" then "I'm fine" then "[crack in voice]" then "but I'm falling..." Use these stacks SPARINGLY — 3 to 5 times across the whole song, only on the lines that earn special direction.
+
+PREFERRED PALETTE FOR ${genreLabel}${moodLabel}:
+• Delivery & Style: ${fmt(delivery)}
+• Character & Tone: ${fmt(character)}
+• Effects: ${fmt(effects)}
+• Placement: ${fmt(placement)}${excludeText}
+
+RULES:
+• Do NOT stack contradictory tags (examples: ${conflictsExample}). One delivery + one character is the safest stack.
+• Section brackets like [Verse], [Chorus], [Bridge] come BEFORE these tags on a SEPARATE earlier line — don't merge them with vocal-direction stacks.
+• If the section bracket already carries a directive (e.g. "[Bridge | Stripped | Vulnerable]"), don't repeat the same direction — pick complementary tags.
+• Reserve the most extreme tags ([scream], [growl], [crack in voice], [whisper]) for the song's emotional peaks or contrast moments — never as the default.`;
+}
+
+
+// ═══════════════════════════════════════════════════════
 // PROMPT BUILDERS
 // ═══════════════════════════════════════════════════════
 
@@ -4746,6 +4997,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
   const vocalStackNote = buildVocalStackNote(genre);
+  const vocalDirectionNote = buildVocalDirectionNote(genre, mood);
 
   const _aggrMap = {
     mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
@@ -4813,7 +5065,7 @@ SONGWRITING RULES:
   If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
   COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
 - NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
-- ${bracketInstructionServer(genre, bracketMode, substyle)}
+- ${bracketInstructionServer(genre, bracketMode, substyle)}${vocalDirectionNote ? '\n\n' + vocalDirectionNote : ''}
 - ${platformNote}
 
 HOOK SELF-CHECK: After writing the chorus, verify: (1) Is the title or central phrase present? (2) Could a stranger hum this after one listen? (3) Does it say something specific, not generic? If any answer is no — rewrite the chorus before proceeding.
@@ -4956,6 +5208,7 @@ function buildLuckyPrompt(params) {
   const academicNote = buildAcademicFrameworkNote(g1, params.era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
+  const vocalDirectionNote = buildVocalDirectionNote(g1, mood);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -4991,7 +5244,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${vocalDirectionNote ? '\n\n' + vocalDirectionNote : ''}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -5504,6 +5757,7 @@ ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
 ${buildEmotionalVelocityNote('hiphop', params.emotionalVelocity)}
+${buildVocalDirectionNote('hiphop', mood)}
 
 Respond with EXACTLY this format:
 
