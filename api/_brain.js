@@ -3768,6 +3768,21 @@ Outro: ${a.outro}
 Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line = spotlight moment.`;
 }
 
+// Aggression: rap-specific delivery dial (mellow / mid / heat / rage).
+// Fires for hip-hop in both buildSongPrompt and buildRapLabPrompt — the
+// frontend always sends a value, but only mellow/heat/rage emit guidance;
+// 'mid' is the no-op baseline.
+const AGGRESSION_LEVELS = {
+  mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
+  heat:   'Heat — elevated intensity, confrontational urgency in every bar. The verse should feel like it is building toward something that could explode. Think Kendrick "HUMBLE." / Future menace / City Girls unapologetic. Every line has a point to prove.',
+  rage:   'Rage — maximum aggression throughout. Every line hits like a threat or a demand. No softness, no hesitation — pure unfiltered force. Think Eminem "Till I Collapse," DMX bark, early Chief Keef cold menace, NF uncontained fury.',
+};
+function buildAggressionNote(genre, aggression) {
+  if (genre !== 'hiphop') return '';
+  const lvl = AGGRESSION_LEVELS[aggression];
+  return lvl ? `\n\nAGGRESSION LEVEL — ${lvl}` : '';
+}
+
 function buildVocalStackNote(genre) {
   const v = VOCAL_STACK_PROFILES[_normalizeGenreKey(genre)];
   if (!v) return '';
@@ -4747,12 +4762,7 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const adlibNote = buildAdlibNote(genre);
   const vocalStackNote = buildVocalStackNote(genre);
 
-  const _aggrMap = {
-    mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
-    heat:   'Heat — elevated intensity, confrontational urgency in every bar. The verse should feel like it is building toward something that could explode. Think Kendrick "HUMBLE." / Future menace / City Girls unapologetic. Every line has a point to prove.',
-    rage:   'Rage — maximum aggression throughout. Every line hits like a threat or a demand. No softness, no hesitation — pure unfiltered force. Think Eminem "Till I Collapse," DMX bark, early Chief Keef cold menace, NF uncontained fury.'
-  };
-  const aggressionNote = genre === 'hiphop' && _aggrMap[aggression] ? `\n\nAGGRESSION LEVEL — ${_aggrMap[aggression]}` : '';
+  const aggressionNote = buildAggressionNote(genre, aggression);
 
   // Coach-driven rewrite directive — injected at the TOP of the prompt so the
   // model treats this as a fix-and-improve job, not a fresh-page generation.
@@ -4956,6 +4966,11 @@ function buildLuckyPrompt(params) {
   const academicNote = buildAcademicFrameworkNote(g1, params.era);
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
+  // Lucky fires aggression if either genre in the fusion is hip-hop —
+  // the rap-coded half of the fusion still wants the delivery dial.
+  const aggressionNote = (g1 === 'hiphop' || g2 === 'hiphop')
+    ? buildAggressionNote('hiphop', params && params.aggression)
+    : '';
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -4991,7 +5006,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -5350,7 +5365,8 @@ function buildRapLabPrompt(params) {
     hookStyle = 'auto',
     freestyleMode = false,
     barSwitch = 0,
-    breakRule = false
+    breakRule = false,
+    aggression = ''
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -5504,6 +5520,7 @@ ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
 ${buildEmotionalVelocityNote('hiphop', params.emotionalVelocity)}
+${buildAggressionNote('hiphop', aggression)}
 
 Respond with EXACTLY this format:
 
