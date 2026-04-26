@@ -3776,6 +3776,28 @@ Verse: ${v.verse} | Chorus: ${v.chorus} | Final Chorus: ${v.finalChorus}
 Method: ${v.method}`;
 }
 
+// Length budget — single source of truth for the 4 length tiers the UI emits.
+// Drives BOTH the section count guidance and the character budget shown to the
+// LLM. The 4900-char ceiling is fixed (Suno's hard 5000 cap minus 100-char
+// safety margin); each tier picks a target band BELOW that ceiling so shorter
+// songs come out shorter and longer songs use more of the budget.
+const LENGTH_BUDGETS = {
+  short:    { label: 'Short',    mins: '~2 min',  chars: '1800–2500', sections: '~2 verses + chorus + optional bridge. Trim everything that doesn\'t earn its place.' },
+  medium:   { label: 'Medium',   mins: '~3 min',  chars: '2800–3600', sections: 'standard verse → chorus → verse → chorus → bridge → final chorus.' },
+  long:     { label: 'Long',     mins: '~4 min',  chars: '3600–4400', sections: 'full structure with extended bridge or 3rd verse. Earn the runtime.' },
+  extended: { label: 'Extended', mins: '~5+ min', chars: '4400–4900', sections: 'epic / beat-switch / multi-movement (Sicko Mode-style). NEVER cross 4900.' },
+};
+function buildLengthBudgetNote(length) {
+  const key = LENGTH_BUDGETS[length] ? length : 'medium';
+  const b = LENGTH_BUDGETS[key];
+  return `\n\n📏 LENGTH TARGET — ${b.label.toUpperCase()} (${b.mins}):
+• CHARACTER BUDGET: aim ${b.chars} chars. Count EVERY character including [Section] tags, newlines, parentheses, ad-libs — everything between the LYRICS: header and the SONG PROMPT: header.
+• STRUCTURE FIT: ${b.sections}
+• HARD CEILING: 4900 chars (Suno truncates at 5000; the 100-char margin is non-negotiable). Going over silently LOSES bars — the end of your song gets cut off.
+• OVER-BUDGET FIX: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
+• COUNT your total character output BEFORE you emit the SONG PROMPT section. If over budget, rewrite before submitting.`;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PLATINUM MODE — TOP 5% HIT REFERENCES
 // Per-genre: top defining tracks + the single technique that separates top 5%
@@ -4802,17 +4824,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- ⚠️ HARD LIMIT — SUNO 5000-CHAR CAP (NON-NEGOTIABLE):
-  The total lyrics you output MUST stay under 4900 characters. 5000 is Suno's literal wall; treat 4900 as the ceiling to leave a 100-char safety margin.
-  Count EVERY character including [Section] tags, newlines, parentheses, ad-libs — everything between the LYRICS: header and the SONG PROMPT: header.
-  BUDGET GUIDE (pick the row matching your song length):
-    Short  (≈2 min, indie/acoustic/comedy):                         aim 1800–2500 chars
-    Medium (≈3 min, most pop/country/rock):                         aim 2800–3600 chars
-    Long   (≈4 min, standard hip-hop/full-band):                    aim 3600–4400 chars
-    Epic   (≈5 min+, Sicko Mode / beatswitch / multi-movement):     aim 4400–4900 chars (NEVER cross 4900)
-  If your first draft is over 4900: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
-  COUNT your total character output BEFORE you emit the SONG PROMPT section. If over 4900, rewrite before submitting. Going over silently LOSES bars — the end of your song will be cut off in Suno.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4943,7 +4955,9 @@ function buildLuckyPrompt(params) {
   const structure = (params && params.structure) ? sanitizeInput(params.structure, 50)  : pickRandom(LUCKY_STRUCTURES);
   const vocal     = (params && params.vocal)     ? sanitizeInput(params.vocal, 100)     : pickRandom(LUCKY_VOCALS);
   const platinum  = !!(params && params.platinum);
+  const length    = (params && params.length) ? sanitizeInput(params.length, 20) : 'medium';
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
+  const lengthBudgetNote = buildLengthBudgetNote(length);
   const adlibNote = buildAdlibNote(g1);
   const vocalStackNote = buildVocalStackNote(g1);
   // Lucky gets the full lyric craft toolkit — money lines, hook kernels, opening/
@@ -4999,8 +5013,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
-- ⚠️ HARD LIMIT: Total lyrics under 4900 chars (Suno caps at 5000, 100-char safety margin). Count every character including [Section] tags, newlines, ad-libs. If over, cut repeated chorus/hook repeats (keep first two + final), shorten bridge, drop extra verses. Going over SILENTLY LOSES bars in Suno — the song gets truncated.
-- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
 
 Respond with EXACTLY this format:
 
@@ -5350,7 +5363,8 @@ function buildRapLabPrompt(params) {
     hookStyle = 'auto',
     freestyleMode = false,
     barSwitch = 0,
-    breakRule = false
+    breakRule = false,
+    length = 'medium'
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -5494,8 +5508,7 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
-- ⚠️ HARD LIMIT: Total lyrics under 4900 chars (Suno caps at 5000, 100-char safety margin). Count every character including [Section] tags, newlines, ad-libs. Epic / beatswitch / Sicko-Mode-style songs STILL must fit — cut repeated hook occurrences, trim bridge/outro, drop extra verses if over. Going over truncates the end of the song in Suno.
-- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildAdlibNote('hiphop')}
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop')}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
