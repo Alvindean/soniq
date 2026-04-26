@@ -3488,6 +3488,19 @@ const GENRE_FX_PROFILES = {
   neosoul:   { reverb: 'Warm plate on vocal (2s), room on live drums', delay: 'Analog echo on guitar/keys, subtle on vocal', compression: 'LA-2A optical on vocal, parallel compression on drums', eq: 'Warm 200–400 Hz on keys and vocal, air at 10 kHz', width: 'Live band stereo spread', sidechain: 'Very light' },
   gospel:    { reverb: 'Large hall (3–5s) on choir and lead vocal', delay: 'Long feedback echo on vocal runs', compression: 'Gentle optical on lead, dynamic choir mix', eq: 'Full and rich 100–400 Hz, presence on lead vocal 3–5 kHz', width: 'Wide choir, center lead vocal', sidechain: 'None' },
   ss:        { reverb: 'Small room or hall depending on feel (0.8–2.5s)', delay: 'Tape slap on vocal and guitar', compression: 'Gentle 2–3 dB on vocal, minimal bus', eq: 'Natural — subtle warmth and air only', width: 'Slightly narrow for intimacy', sidechain: 'None' },
+  funk:      { reverb: 'Tight room (0.4s) on horns, plate on vocal', delay: '1/16 slap on guitar chicken-scratch, 1/8 dotted on horn fills', compression: 'Hard FET on bass, parallel on horn section, bus glue', eq: 'Mid-forward 1–3 kHz on horns, scoop 250 Hz to let bass breathe, bright snare', width: 'Horn section wide, rhythm section punchy-mono', sidechain: 'Tight kick→bass for pocket lock' },
+  soul:      { reverb: 'Vintage plate (1.8s) on lead vocal, room on rhythm section', delay: 'Tape slap on lead vocal, subtle on background', compression: 'LA-2A on lead, vintage 1176 on horns, gentle bus', eq: 'Warm 200–300 Hz, presence 3–4 kHz, gentle 10 kHz air', width: 'Wide horn section, mono rhythm section', sidechain: 'None — preserve groove' },
+  indie:     { reverb: 'Lo-fi plate or shoegaze hall (varies wildly)', delay: 'Modulated tape echo on guitar, washy reverbs on vocal', compression: 'Moderate, often saturated/clipped intentionally', eq: 'Mid-scoop or full-range — varies by sub-style', width: 'Wide guitars, sometimes intentionally narrow', sidechain: 'Rare' },
+  tvmusical: { reverb: 'Theatrical hall (2.5–4s) on vocal, ensemble room on band', delay: 'Subtle 1/4 on belted lines, dramatic pre-chorus reverse', compression: 'Optical on lead vocal, light bus, dynamic for theatricality', eq: 'Bright vocal presence 4–5 kHz, full orchestral 100–500 Hz', width: 'Wide pit orchestra, center vocal', sidechain: 'None' },
+  parody:    { reverb: 'Match the source genre being parodied EXACTLY — sincere mimicry', delay: 'Match source genre conventions', compression: 'Match source genre — production must be genuine, not winking', eq: 'Match source genre', width: 'Match source genre', sidechain: 'Match source genre — comedy lives ONLY in lyrics' },
+  comedy:    { reverb: 'Match the source genre, exaggerated slightly for comedic emphasis', delay: 'Standard for source genre', compression: 'Polished, professional — undercuts the joke if production is bad', eq: 'Bright vocal clarity to land every punchline', width: 'Standard', sidechain: 'Light' },
+  children:  { reverb: 'Bright small room (0.6s) on vocal, plate on hand-claps', delay: 'Minimal — clarity over effects', compression: 'Gentle optical on vocal, moderate bus', eq: 'Bright and present, full-range warmth, no harsh frequencies', width: 'Stereo for fun, center vocal', sidechain: 'None' },
+  brazilian: { reverb: 'Warm chamber (1.5–2s) on vocal, room on percussion', delay: 'Subtle tape echo on guitar, plate on vocal', compression: 'Gentle optical on vocal, preserve dynamic finger-style guitar', eq: 'Warm 200–400 Hz on vocal, sparkle on cavaquinho/cuíca', width: 'Wide percussion (samba), intimate (bossa)', sidechain: 'None' },
+  amapiano:  { reverb: 'Lush plate (2–3s) on vocal, deep hall on log drums', delay: '1/4 dotted on lead synth, swung delays on vocal', compression: 'Heavy bus glue, log drums hard-compressed for thump', eq: 'Sub focus 30–60 Hz on log drum, mid-bright lead synth', width: 'Wide pads, mono kick/log drum', sidechain: 'Heavy 4-on-floor pump on pads' },
+  dancehall: { reverb: 'Plate (1.2s) on vocal, dub-style on hi-hats', delay: '1/4 + 3/8 ping-pong, dub feedback effects on transitions', compression: 'Hard bus limiting, vocal upfront and present', eq: 'Sub-heavy, scooped 400 Hz, bright vocal 5–8 kHz', width: 'Wide synth, mono riddim', sidechain: 'Riddim→synth pump' },
+  bollywood: { reverb: 'Cinematic hall (2.5–3s) on vocal, lush strings', delay: 'Dotted 1/4 on vocal melismas, subtle on tabla', compression: 'Optical on lead vocal, dynamic orchestral mix, bus glue', eq: 'Bright vocal presence 4–6 kHz, full strings 100–600 Hz', width: 'Maximum string width, center lead vocal', sidechain: 'Light' },
+  arabesque: { reverb: 'Long plate (3s) on vocal mawwāl passages, room on percussion', delay: 'Tape feedback on oud, atmospheric on ney', compression: 'Light optical on vocal, preserve quarter-tone microtonality', eq: 'Warm vocal 200–400 Hz, oud presence 2–3 kHz, scoop 800 Hz', width: 'Wide oud and ney, center vocal', sidechain: 'None' },
+  mandopop:  { reverb: 'Polished chamber (1.8s) on vocal, bright hall on strings', delay: 'Subtle 1/8 on vocal tails, dotted on string lines', compression: 'Optical on lead vocal, bus glue, gentle limiting', eq: 'Air shelf 12 kHz, presence 3–4 kHz, warm 200 Hz', width: 'Wide strings and synths, center vocal', sidechain: 'Light' },
 };
 
 const GENRE_PLUGIN_CHAINS = {
@@ -3511,6 +3524,19 @@ const GENRE_PLUGIN_CHAINS = {
   neosoul:   { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD LA-2A', 'Waves J37 Tape', 'Soundtoys EchoBoy', 'FabFilter Pro-Q 3'] },
   gospel:    { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'TDR Nova'], paid: ['UAD Ocean Way Studios', 'Waves SSL G-Bus', 'FabFilter Pro-Q 3'] },
   ss:        { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD Studer A800', 'Waves Renaissance Compressor', 'Soundtoys EchoBoy'] },
+  funk:      { free: ['CHOW Tape', 'TDR Nova', 'Valhalla Supermassive'], paid: ['UAD 1176 LN', 'Waves CLA-2A', 'Soundtoys Decapitator', 'FabFilter Pro-Q 3'] },
+  soul:      { free: ['CHOW Tape', 'Analog Obsession LALA', 'Valhalla Supermassive'], paid: ['UAD LA-2A', 'Waves J37 Tape', 'Soundtoys Radiator', 'FabFilter Pro-Q 3'] },
+  indie:     { free: ['CHOW Tape', 'Valhalla Supermassive', 'GVST GClip'], paid: ['Soundtoys Crystallizer', 'FabFilter Saturn 2', 'UAD EMT 140 Plate'] },
+  tvmusical: { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'TDR Nova'], paid: ['UAD Ocean Way Studios', 'Waves Abbey Road TG12345', 'FabFilter Pro-Q 3'] },
+  parody:    { free: ['Match source genre — see relevant entry'], paid: ['Match source genre — see relevant entry'] },
+  comedy:    { free: ['TDR Nova', 'Valhalla Supermassive'], paid: ['FabFilter Pro-Q 3', 'Waves CLA Vocals', 'iZotope Nectar 3'] },
+  children:  { free: ['Valhalla Supermassive', 'TDR Nova', 'TAL-Reverb-4'], paid: ['Waves Renaissance Compressor', 'FabFilter Pro-Q 3'] },
+  brazilian: { free: ['CHOW Tape', 'Valhalla Supermassive', 'TDR Nova'], paid: ['UAD Studer A800', 'Waves J37 Tape', 'Soundtoys EchoBoy'] },
+  amapiano:  { free: ['OTT', 'Valhalla Supermassive', 'LFO Tool'], paid: ['FabFilter Pro-L 2', 'Waves SSL G-Bus', 'Xfer LFO Tool', 'iZotope Ozone 10'] },
+  dancehall: { free: ['Valhalla Supermassive (heavy)', 'OTT', 'CHOW Tape'], paid: ['UAD Roland RE-201', 'FabFilter Pro-L 2', 'Soundtoys EchoBoy'] },
+  bollywood: { free: ['Valhalla Supermassive', 'TAL-Reverb-4', 'TDR Nova'], paid: ['UAD Ocean Way Studios', 'FabFilter Pro-Q 3', 'Waves SSL G-Bus'] },
+  arabesque: { free: ['Valhalla Supermassive', 'CHOW Tape', 'TDR Nova'], paid: ['UAD EMT 140 Plate', 'Waves Renaissance Compressor', 'FabFilter Pro-Q 3'] },
+  mandopop:  { free: ['OTT', 'Valhalla Supermassive', 'TDR Nova'], paid: ['FabFilter Pro-Q 3', 'FabFilter Pro-L 2', 'Waves SSL G-Bus', 'iZotope Nectar 3'] },
 };
 
 const MASTERING_TARGETS = {
@@ -3534,7 +3560,134 @@ const MASTERING_TARGETS = {
   neosoul:   { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 9–12', brightness: 'Warm with air', stereoWidth: 'Moderate', notes: 'Groove and warmth. Preserve dynamics and musical feel.' },
   gospel:    { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 9–12', brightness: 'Full and rich', stereoWidth: 'Wide choir', notes: 'Room to breathe. Choir dynamics and lead vocal must coexist.' },
   ss:        { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 11–14', brightness: 'Natural', stereoWidth: 'Intimate', notes: 'Preserve performance vulnerability. No over-compression.' },
+  funk:      { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 9–11', brightness: 'Mid-bright', stereoWidth: 'Wide horns', notes: 'Pocket and groove over loudness. Horns must cut, bass must thump.' },
+  soul:      { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 10–12', brightness: 'Warm-bright', stereoWidth: 'Moderate-wide', notes: 'Vintage warmth. Dynamics for emotional swells. Avoid brick-walling.' },
+  indie:     { lufs: '-13 to -16 LUFS', dynamicRange: 'DR 9–14', brightness: 'Varies (lo-fi → bright)', stereoWidth: 'Varies', notes: 'Aesthetic-first. Sometimes intentionally lo-fi or saturated. No formula.' },
+  tvmusical: { lufs: '-13 to -16 LUFS', dynamicRange: 'DR 10–14', brightness: 'Theatrical-bright', stereoWidth: 'Wide pit orchestra', notes: 'Theatrical dynamics — quiet to belted. No brickwall. Vocal must sit forward.' },
+  parody:    { lufs: 'Match source genre EXACTLY', dynamicRange: 'Match source genre', brightness: 'Match source genre', stereoWidth: 'Match source genre', notes: 'Production must be sincere. Bad production kills the joke.' },
+  comedy:    { lufs: '-12 to -14 LUFS', dynamicRange: 'DR 8–10', brightness: 'Bright vocal clarity', stereoWidth: 'Standard', notes: 'Clarity is everything — every punchline must land. Production never the joke.' },
+  children:  { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 9–12', brightness: 'Bright and present', stereoWidth: 'Stereo fun', notes: 'Playful and clear. Vocal upfront. Avoid harsh frequencies (kid ears).' },
+  brazilian: { lufs: '-14 to -16 LUFS', dynamicRange: 'DR 11–14', brightness: 'Warm-natural', stereoWidth: 'Moderate-wide', notes: 'Preserve performance — bossa especially needs dynamics and breath.' },
+  amapiano:  { lufs: '-10 to -12 LUFS', dynamicRange: 'DR 6–8', brightness: 'Sub-heavy with air', stereoWidth: 'Wide pads', notes: 'Log drum sub must thump. Vocal upfront. Modern competitive loudness.' },
+  dancehall: { lufs: '-9 to -11 LUFS', dynamicRange: 'DR 5–7', brightness: 'Bright vocal', stereoWidth: 'Wide', notes: 'Loud and punchy like reggaeton. Riddim drives, vocal cuts through.' },
+  bollywood: { lufs: '-11 to -13 LUFS', dynamicRange: 'DR 8–11', brightness: 'Cinematic-bright', stereoWidth: 'Maximum strings', notes: 'Cinematic dynamics — quiet verses to belted antara peaks. Lead vocal forward.' },
+  arabesque: { lufs: '-13 to -15 LUFS', dynamicRange: 'DR 10–13', brightness: 'Warm-natural', stereoWidth: 'Wide oud/ney', notes: 'Preserve microtonal nuance. No aggressive limiting that crushes quarter-tones.' },
+  mandopop:  { lufs: '-10 to -12 LUFS', dynamicRange: 'DR 6–8', brightness: 'Polished bright', stereoWidth: 'Maximum', notes: 'Modern polished loudness. Every element sparkles. Vocal pristine.' },
 };
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PRODUCTION INTENSITY LAYER
+// Aggression / mood / tier modulate the genre's baseline production texture.
+// Mood overlay applies to all genres (sad pop ≠ angry pop in production terms).
+// Aggression overlay is rap-specific (mellow/heat/rage from the UI dial).
+// Tier overlay is universal (radio = max polished, archival = audiophile DR).
+// ═══════════════════════════════════════════════════════════════════════════
+const MOOD_PRODUCTION_OVERLAYS = {
+  sad:          { reverb: 'longer, wetter plate or hall (2.5s+)', dynamics: 'preserve quietness, no over-limiting', notes: 'space and air carry the emotion' },
+  melancholic:  { reverb: 'long washy plate', dynamics: 'preserve dynamics', notes: 'distance and reverb tails over brightness' },
+  angry:        { compression: 'harder bus + parallel', distortion: 'add saturation on drums and bass', dynamics: 'crushed', notes: 'in-your-face, abrasive' },
+  defiant:      { compression: 'harder', distortion: 'subtle', notes: 'aggressive but controlled' },
+  romantic:     { reverb: 'warm chamber', dynamics: 'preserve breath', notes: 'intimate, close, warm' },
+  hopeful:      { reverb: 'bright hall', dynamics: 'standard', notes: 'open, lifted high-end' },
+  dark:         { reverb: 'long dark plate, low-pass tails', dynamics: 'compressed', notes: 'low-mid focus, scoop highs, smoke' },
+  'dark brooding':{ reverb: 'long dark plate, low-pass tails', dynamics: 'compressed', notes: 'low-mid focus, scoop highs, smoke' },
+  euphoric:     { reverb: 'wide hall, long tails', dynamics: 'pumped', notes: 'maximum stereo, heavy sidechain pump' },
+  energetic:    { compression: 'punchy', dynamics: 'tight transient-forward', notes: 'transients must hit hard' },
+  triumphant:   { reverb: 'cathedral hall', dynamics: 'expansive', notes: 'big, open, victorious — choir tails' },
+  nostalgic:    { saturation: 'tape/vinyl simulation', eq: 'rolled-off high end (-3 dB at 12 kHz)', notes: 'lo-fi vintage character, gentle wow & flutter' },
+  intimate:     { reverb: 'short room (0.4s)', dynamics: 'preserve breath', notes: 'close-mic, dry, vulnerable' },
+  reflective:   { reverb: 'medium plate, sustained tails', dynamics: 'gentle', notes: 'breathing room between phrases' },
+  peaceful:     { reverb: 'soft chamber, long tails', dynamics: 'preserved', notes: 'gentle, no harsh transients' },
+  longing:      { reverb: 'distant hall', dynamics: 'preserved', notes: 'reverb tails reach toward something' },
+  bittersweet: { reverb: 'medium plate', dynamics: 'gentle', saturation: 'light tape', notes: 'warmth + sadness coexist' },
+  transcendent:{ reverb: 'cathedral, infinite tails', dynamics: 'breathing', notes: 'huge stereo space, light shimmer' },
+  emotional:    { reverb: 'medium-long plate', dynamics: 'preserved', notes: 'space for the vocal to break' },
+  anxious:      { reverb: 'tight room, slight tremolo', dynamics: 'compressed', notes: 'claustrophobic, tightening' },
+  devastated:   { reverb: 'long distant hall', dynamics: 'preserved with sudden swells', notes: 'space + sudden rises' },
+  rebellious:   { compression: 'harder bus, FET on drums', distortion: 'saturation on guitars/bass', dynamics: 'tight', notes: 'edge and attitude — slight grit' },
+  tender:       { reverb: 'soft warm chamber', dynamics: 'preserve breath, micro-dynamics audible', notes: 'intimate, close-mic, gentle handling' },
+  playful:      { compression: 'punchy on transients', dynamics: 'bouncy', notes: 'bright, airy, lighthearted attack' },
+};
+
+const AGGRESSION_PRODUCTION_OVERLAYS = {
+  mellow: { compression: '1 step softer', reverb: '1 step wetter', distortion: 'none', loudness: '−2 dB vs genre baseline', notes: 'preserve breath, dynamic range, intimate close-mic feel' },
+  heat:   { compression: '1 step harder', reverb: 'baseline', distortion: 'subtle saturation on drums', loudness: '+1 dB vs baseline', notes: 'present and forward, harder transients' },
+  rage:   { compression: 'parallel + bus limiting maxed', reverb: 'drier (1 step less)', distortion: 'aggressive saturation/clipping on drums and lead', loudness: '+3 dB vs baseline', notes: 'in-your-face, distorted, compressed to a wall' },
+};
+
+const TIER_PRODUCTION_OVERLAYS = {
+  radio:     { ceiling: 'maximum loudness within streaming normalization', dynamics: 'compressed for laptop / earbud translation', polish: 'pristine, no rough edges' },
+  street:    { ceiling: 'standard genre loudness', dynamics: 'genre default', polish: 'genre default' },
+  conscious: { ceiling: 'preserve dynamics for craft', dynamics: 'allow more DR than radio', polish: 'natural, instrument character preserved' },
+  archival:  { ceiling: 'audiophile master, preserve full DR', dynamics: 'no brickwalling — DR 11+', polish: 'transparent — every fingertip and breath audible' },
+};
+
+// Aggression and tier also nudge the Suno engine knobs (weirdness / styleInfluence).
+// Heavier aggression = more genre-locked (tighter to the rap genre's production codex).
+// Higher tier = less generic = +weirdness; radio tier = more locked = +styleInfluence.
+const AGGRESSION_SUNO_MODIFIERS = {
+  mellow: { weirdness: -5, styleInfluence: 0   },
+  mid:    { weirdness: 0,  styleInfluence: 0   },
+  heat:   { weirdness: +5, styleInfluence: +5  },
+  rage:   { weirdness: +10, styleInfluence: +10 },
+};
+
+const LYRIC_TIER_SUNO_MODIFIERS = {
+  radio:     { weirdness: -10, styleInfluence: +10 },
+  street:    { weirdness: 0,   styleInfluence: 0   },
+  conscious: { weirdness: +5,  styleInfluence: -5  },
+  archival:  { weirdness: +10, styleInfluence: -10 },
+};
+
+// Compose the production note injected into the LLM prompt. Genre-authentic,
+// mood-overlaid, aggression-overlaid (hip-hop), tier-overlaid. Returns '' if
+// no FX/mastering data exists for the genre (defensive fallback).
+function buildProductionNote(genre, mood, aggression, lyricTier) {
+  const fx = GENRE_FX_PROFILES[genre] || {};
+  const mst = MASTERING_TARGETS[genre] || {};
+  if (!fx.reverb && !mst.lufs) return '';
+
+  // Word-boundary match — handles multi-select moods like "Emotional + Hopeful"
+  // and case variants. Pick first match to keep the overlay block focused.
+  // Two-word keys (e.g. "dark brooding") are checked BEFORE single-word keys so
+  // they don't get pre-empted by their constituent words.
+  const moodNorm = ' ' + String(mood || '').toLowerCase().replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim() + ' ';
+  let moodKey = '';
+  let moodOverlay = null;
+  const moodKeys = Object.keys(MOOD_PRODUCTION_OVERLAYS).sort((a, b) => b.length - a.length);
+  for (const k of moodKeys) {
+    if (moodNorm.includes(' ' + k + ' ')) {
+      moodKey = k;
+      moodOverlay = MOOD_PRODUCTION_OVERLAYS[k];
+      break;
+    }
+  }
+
+  const aggrKey = String(aggression || '').trim().toLowerCase();
+  const aggrOverlay = (genre === 'hiphop' && AGGRESSION_PRODUCTION_OVERLAYS[aggrKey]) ? AGGRESSION_PRODUCTION_OVERLAYS[aggrKey] : null;
+
+  const tierKey = String(lyricTier || '').trim().toLowerCase();
+  const tierOverlay = TIER_PRODUCTION_OVERLAYS[tierKey];
+
+  const fmtOverlay = (label, obj) =>
+    `${label}: ${Object.entries(obj).map(([k, v]) => `${k} = ${v}`).join(' · ')}`;
+
+  const overlays = [];
+  if (moodOverlay) overlays.push(fmtOverlay(`MOOD OVERLAY (${moodKey})`, moodOverlay));
+  if (aggrOverlay) overlays.push(fmtOverlay(`AGGRESSION OVERLAY (${aggrKey})`, aggrOverlay));
+  if (tierOverlay && tierKey !== 'street') overlays.push(fmtOverlay(`TIER OVERLAY (${tierKey})`, tierOverlay));
+
+  return `\n\n🎛️ PRODUCTION DNA — fold this concrete vocabulary into the SONG PROMPT "Texture" line and the PRODUCTION BRIEF blocks. Generic descriptors ("warm production") are not enough — Suno needs specific FX choices to produce the right sound:
+• REVERB: ${fx.reverb || 'medium hall'}
+• DELAY: ${fx.delay || '1/4 note'}
+• COMPRESSION: ${fx.compression || 'standard VCA bus'}
+• EQ: ${fx.eq || 'high-pass + air shelf'}
+• STEREO: ${fx.width || 'standard stereo'}
+• SIDECHAIN: ${fx.sidechain || 'light kick ducking'}
+• MASTERING: ${mst.lufs || '-14 LUFS'} · ${mst.dynamicRange || 'DR 8–10'} · ${mst.brightness || 'natural'}${mst.notes ? ' · ' + mst.notes : ''}${overlays.length ? '\n\nOVERLAYS (apply on top of baseline above):\n• ' + overlays.join('\n• ') : ''}
+
+The SONG PROMPT must reference at least 2 of these specifics in the "Texture" or "Full prompt" line. The PRODUCTION BRIEF "ARRANGEMENT BLUEPRINT" and "SONIC REFERENCES" must also draw from this vocabulary. No artist names — describe the SOUND.`;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // AD-LIB BIBLE + VOCAL STACK PROFILES
@@ -4723,15 +4876,8 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
   const syllableNote = `\n\nSYLLABLE BUDGET:\n- Hook (title/refrain line): ${_sylBudget.hook || '4–7'} syllables — keep it singable and memorable\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
 
-  // ── Production brief data ───────────────────────────────────────────────
-  const _fxProfile  = GENRE_FX_PROFILES[genre]  || {};
-  const _plugins    = GENRE_PLUGIN_CHAINS[genre] || {};
-  const _mastering  = MASTERING_TARGETS[genre]   || {};
-  const productionContextNote = (_fxProfile.reverb || _mastering.lufs) ? `\n\nPRODUCTION REFERENCE DATA (use this to populate the PRODUCTION BRIEF sections below):
-FX: Reverb — ${_fxProfile.reverb||'medium hall'}; Delay — ${_fxProfile.delay||'1/4 note'}; Compression — ${_fxProfile.compression||'standard VCA'}; EQ — ${_fxProfile.eq||'high-pass + air shelf'}; Sidechain — ${_fxProfile.sidechain||'light kick ducking'}
-PLUGINS (free): ${(_plugins.free||[]).slice(0,3).join(', ')}
-PLUGINS (paid): ${(_plugins.paid||[]).slice(0,3).join(', ')}
-MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–10'} · ${_mastering.brightness||'natural'} · ${_mastering.notes||''}` : '';
+  // ── Production DNA — genre FX + mood overlay + aggression overlay + tier overlay ─
+  const productionNote = buildProductionNote(genre, mood, aggression, params.lyricTier);
 
   // ── Dual perspective (antagonist POV in Verse 2) ────────────────────────
   const dualPerspNote = dualPerspective
@@ -4824,7 +4970,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -4988,14 +5134,13 @@ function buildLuckyPrompt(params) {
     : 'You are an expert songwriter, neuroscientist of music, and AI music production specialist. Write complete, emotionally authentic, production-ready songs. Respond with the exact format requested. No extra commentary.';
 
   // ── Production brief data for Lucky (primary genre) ────────────────────
-  const _fxPL  = GENRE_FX_PROFILES[g1]  || GENRE_FX_PROFILES[g2]  || {};
-  const _plPL  = GENRE_PLUGIN_CHAINS[g1] || GENRE_PLUGIN_CHAINS[g2] || {};
-  const _mstPL = MASTERING_TARGETS[g1]  || MASTERING_TARGETS[g2]  || {};
-  const luckyProductionNote = (_fxPL.reverb || _mstPL.lufs) ? `\n\nPRODUCTION REFERENCE DATA (use to populate PRODUCTION BRIEF sections):
-FX: Reverb — ${_fxPL.reverb||'medium hall'}; Delay — ${_fxPL.delay||'1/4 note'}; Compression — ${_fxPL.compression||'standard VCA'}; EQ — ${_fxPL.eq||'high-pass + air shelf'}; Sidechain — ${_fxPL.sidechain||'light kick ducking'}
-PLUGINS (free): ${(_plPL.free||[]).slice(0,3).join(', ')}
-PLUGINS (paid): ${(_plPL.paid||[]).slice(0,3).join(', ')}
-MASTERING: ${_mstPL.lufs||'-14 LUFS'} · ${_mstPL.dynamicRange||'DR 8–10'} · ${_mstPL.brightness||'natural'} · ${_mstPL.notes||''}` : '';
+  // Lucky uses the primary genre's production DNA — falls back to secondary if
+  // primary lacks data. FUSION_DATA keys are Title-Case display names ("Pop",
+  // "Hip-Hop") so we MUST normalize via _normalizeGenreKey before the lookup.
+  const _g1Norm = _normalizeGenreKey(g1);
+  const _g2Norm = _normalizeGenreKey(g2);
+  const _luckyProdGenre = GENRE_FX_PROFILES[_g1Norm] ? _g1Norm : (GENRE_FX_PROFILES[_g2Norm] ? _g2Norm : _g1Norm);
+  const luckyProductionNote = buildProductionNote(_luckyProdGenre, mood, params && params.aggression, params && params.lyricTier);
 
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
 ${buildCraftFirewallNote()}
@@ -5013,7 +5158,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
-- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}${luckyProductionNote}
 
 Respond with EXACTLY this format:
 
@@ -5508,7 +5653,7 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
-- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop')}
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop')}${buildProductionNote('hiphop', mood, params && params.aggression, params && params.lyricTier)}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
@@ -6191,7 +6336,15 @@ const SUNO_GEN_SETTINGS_BASE = {
   comedy:    { weirdness: 70, styleInfluence: 55, exclude: ['generic pop production','radio-polish mix','overly serious production'] },
   parody:    { weirdness: 65, styleInfluence: 50, exclude: ['generic pop production','derivative production'] },
   tvmusical: { weirdness: 35, styleInfluence: 80, exclude: ['auto-tune','trap hi-hats','rap verses unless in-character','EDM drops','screamo'] },
-  children:  { weirdness: 20, styleInfluence: 75, exclude: ['profanity','sexual content','drugs','violence','dark themes','trap hi-hats','screamo','menacing tone'] }
+  children:  { weirdness: 20, styleInfluence: 75, exclude: ['profanity','sexual content','drugs','violence','dark themes','trap hi-hats','screamo','menacing tone'] },
+  funk:      { weirdness: 35, styleInfluence: 80, exclude: ['auto-tune distortion','trap hi-hats','EDM drops','screamo','country twang'] },
+  soul:      { weirdness: 30, styleInfluence: 80, exclude: ['auto-tune distortion','trap hi-hats','EDM drops','screamo','country twang'] },
+  brazilian: { weirdness: 35, styleInfluence: 85, exclude: ['auto-tune distortion','trap hi-hats','EDM drops','rock distortion','screamo'] },
+  amapiano:  { weirdness: 40, styleInfluence: 85, exclude: ['country steel','rock distortion','drill drums','screamo','orchestral bombast'] },
+  dancehall: { weirdness: 35, styleInfluence: 85, exclude: ['country steel','rock distortion','EDM drops','drill drums','screamo'] },
+  bollywood: { weirdness: 35, styleInfluence: 85, exclude: ['auto-tune distortion','trap hi-hats','rock distortion','drill drums','screamo'] },
+  arabesque: { weirdness: 35, styleInfluence: 85, exclude: ['auto-tune distortion','trap hi-hats','EDM drops','rock distortion','screamo'] },
+  mandopop:  { weirdness: 35, styleInfluence: 90, exclude: ['country instrumentation','blues harmonica','folk acoustic','rock distortion','screamo'] },
 };
 
 // Mood / mode modifiers — applied on top of base via word-boundary match.
@@ -6244,7 +6397,7 @@ const STRUCTURE_SUNO_MODIFIERS = {
 // Core formula. Blends base + mood + structure + optional learning overlay.
 // `userLearning` shape: { sampleSize, avgWeirdness, avgStyleInfluence, excludeHits }
 // When sampleSize >= 3, learning overlays with weight = min(0.5, sampleSize/20).
-function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning }) {
+function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier }) {
   const base = SUNO_GEN_SETTINGS_BASE[genre] || SUNO_GEN_SETTINGS_BASE.pop;
   let weirdness = base.weirdness;
   let styleInfluence = base.styleInfluence;
@@ -6264,6 +6417,24 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   if (structMod) {
     weirdness += structMod.weirdness;
     styleInfluence += structMod.styleInfluence;
+  }
+
+  // Aggression modifier (hip-hop only — production intensity nudges genre lock)
+  if (genre === 'hiphop' && aggression) {
+    const aggrMod = AGGRESSION_SUNO_MODIFIERS[String(aggression).toLowerCase()];
+    if (aggrMod) {
+      weirdness += aggrMod.weirdness;
+      styleInfluence += aggrMod.styleInfluence;
+    }
+  }
+
+  // Lyric tier modifier (universal — radio = locked, archival = experimental)
+  if (lyricTier) {
+    const tierMod = LYRIC_TIER_SUNO_MODIFIERS[String(lyricTier).toLowerCase()];
+    if (tierMod) {
+      weirdness += tierMod.weirdness;
+      styleInfluence += tierMod.styleInfluence;
+    }
   }
 
   // Rap substyle modifier (hip-hop only — some styles are more experimental)
