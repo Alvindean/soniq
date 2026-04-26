@@ -539,6 +539,9 @@ module.exports = async function handler(req, res) {
         // No paywall on tier itself; craft is part of core output, not a gated feature.
         const VALID_TIERS = new Set(['radio','street','conscious','archival']);
         if (p.lyricTier && !VALID_TIERS.has(p.lyricTier)) p.lyricTier = 'street';
+        // Aggression whitelist — invalid → '' (server resolves to no aggression note)
+        const VALID_AGGRESSION = new Set(['mellow','mid','heat','rage']);
+        if (p.aggression && !VALID_AGGRESSION.has(p.aggression)) p.aggression = '';
         // Edge mode — strict boolean coercion. Edge stays inside the lyric tier ceiling.
         p.edgeMode = p.edgeMode === true;
         // Region whitelist — invalid → no region overlay (silent fallback)
@@ -597,6 +600,8 @@ module.exports = async function handler(req, res) {
         mood: sunoParams.mood,
         structure: sunoParams.structure,
         rapStyle: sunoParams.rapStyle,
+        aggression: sunoParams.aggression,
+        lyricTier: sunoParams.lyricTier,
         userLearning: sunoParams.sunoLearning
       });
       const lyricTier = sunoParams.lyricTier || 'street';
