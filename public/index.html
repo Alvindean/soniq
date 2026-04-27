@@ -3014,6 +3014,13 @@ body.craft-advanced .craft-basic-only{display:none !important}
 <script src="./lib/lyrics-analysis-engine.js"></script>
 <script src="./lib/liu-components.js"></script>
 <script src="./lib/smart-lyrics-upgrade-integration.js"></script>
+
+<!-- Vercel Analytics (pageviews + custom events) + Speed Insights (Core Web Vitals).
+     Both endpoints are served by Vercel automatically; no API key required.
+     window.va is the public hook for emitting custom events from app code. -->
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
 <!-- v2.1 topbar progress -->
@@ -10642,6 +10649,8 @@ VIDEO PROMPT:
     finishSongProgress('res');
     parseSongResult(raw, genreLabel, topic, genProdData);
     if (S.currentSong) {
+      // Vercel Analytics conversion event — main app activation signal
+      try { window.va && window.va('event', { name: 'song_generated', genre: genre || '', tier: S.plan || 'free' }); } catch (_) {}
       if (S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
       if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
       if (lyricTier) S.currentSong.lyricTier = lyricTier;
@@ -14675,6 +14684,8 @@ async function startCheckout(variant) {
     });
     const data = await resp.json();
     if (data.url) {
+      // Vercel Analytics conversion event — checkout intent (fires before Stripe redirect)
+      try { window.va && window.va('event', { name: 'checkout_started', plan: plan, path: 'api' }); } catch (_) {}
       window.location.href = data.url;
       return;
     }
@@ -14682,6 +14693,8 @@ async function startCheckout(variant) {
   } catch (e) {
     // Only use payment links as fallback for non-auth errors (API down, etc.)
     if (e.message !== 'no session') {
+      // Fire conversion event on the fallback path too, so funnel doesn't go dark when /api/stripe is down
+      try { window.va && window.va('event', { name: 'checkout_started', plan: plan, path: 'fallback' }); } catch (_) {}
       const link = STRIPE_PAYMENT_LINKS[plan] || STRIPE_PAYMENT_LINKS['pro'];
       window.open(link, '_blank', 'noopener');
     }
@@ -14930,6 +14943,9 @@ async function authSignUp() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'welcome', email, name })
   }).catch(() => {});
+
+  // Vercel Analytics conversion event — funnels start here
+  try { window.va && window.va('event', { name: 'signup_success' }); } catch (_) {}
 
   document.getElementById('auth-form-signup').style.display = 'none';
   const succ = document.getElementById('auth-success');

@@ -1486,6 +1486,18 @@
       }
     }
   </style>
+
+  <!-- Search engine verification — replace TODO tokens after registering each property -->
+  <!-- Google Search Console: https://search.google.com/search-console -->
+  <meta name="google-site-verification" content="TODO_GOOGLE_VERIFICATION_TOKEN" />
+  <!-- Bing Webmaster Tools: https://www.bing.com/webmasters -->
+  <meta name="msvalidate.01" content="TODO_BING_VERIFICATION_TOKEN" />
+
+  <!-- Vercel Analytics (pageviews + custom events) + Speed Insights (Core Web Vitals) -->
+  <!-- Both endpoints are served by Vercel automatically; no API key required. -->
+  <script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
 
@@ -1858,7 +1870,7 @@
     <div class="pricing-grid">
 
       <!-- FREE -->
-      <div class="pricing-card fade-in">
+      <div class="pricing-card fade-in" data-tier="free">
         <div class="pricing-name">Free</div>
         <div class="pricing-price">$0</div>
         <div class="pricing-period">forever free</div>
@@ -1873,7 +1885,7 @@
       </div>
 
       <!-- STARTER -->
-      <div class="pricing-card fade-in" style="transition-delay:0.08s">
+      <div class="pricing-card fade-in" style="transition-delay:0.08s" data-tier="entry">
         <div class="pricing-name">Entry</div>
         <div class="pricing-price">$9.99<span>/mo</span></div>
         <div class="pricing-period">billed monthly</div>
@@ -1890,7 +1902,7 @@
       </div>
 
       <!-- PRO — featured -->
-      <div class="pricing-card featured fade-in" style="transition-delay:0.16s" id="pricing-founding-card">
+      <div class="pricing-card featured fade-in" style="transition-delay:0.16s" id="pricing-founding-card" data-tier="pro">
         <div class="pricing-badge" id="pricing-founding-badge">Most Popular</div>
         <div class="pricing-name" id="pricing-founding-name">Pro</div>
         <div class="pricing-price" id="pricing-founding-price">$19<span>/mo</span></div>
@@ -1918,7 +1930,7 @@
       </div>
 
       <!-- STUDIO -->
-      <div class="pricing-card fade-in" style="transition-delay:0.24s">
+      <div class="pricing-card fade-in" style="transition-delay:0.24s" data-tier="studio">
         <div class="pricing-name">Studio</div>
         <div class="pricing-price">$49<span>/mo</span></div>
         <div class="pricing-period">billed monthly</div>
@@ -2370,6 +2382,41 @@
         showNext();
         setInterval(showNext, 32000 + Math.random() * 13000);
       }, 8000);
+    })();
+  </script>
+
+  <!-- Conversion tracking: clicks leaving the landing for /app fire a Vercel
+       Analytics event. Pricing-tier CTAs (Free/Entry/Pro/Studio) tag a `tier`
+       via data-tier on the .pricing-card wrapper so funnels split by plan.
+       Auth-modal links (/app#account) emit `cta_click_signin`; everything else
+       emits `cta_click_signup` so the funnel separates "open auth" from
+       "start the product". Hash-anchor links (#pricing, #how-it-works) skipped.
+       Modifier-key clicks (Cmd/Ctrl/middle/Shift) skipped — those are tab-opens,
+       not in-page conversions. -->
+  <script>
+    (function () {
+      document.addEventListener('click', function (e) {
+        // Skip modifier clicks — those typically open in new tab and aren't single-funnel events
+        if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.defaultPrevented) return;
+        var a = e.target.closest('a');
+        if (!a) return;
+        var href = a.getAttribute('href') || '';
+        if (!href.startsWith('/app')) return;
+
+        // Pull the tier from nearest pricing card (if any)
+        var tierEl = a.closest('[data-tier]');
+        var tier = tierEl ? tierEl.dataset.tier : '';
+
+        // Pull a label from button text (trimmed, max 40 chars)
+        var label = (a.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+
+        // Differentiate "open auth modal" links from "start product" links
+        var name = href.indexOf('#account') !== -1 ? 'cta_click_signin' : 'cta_click_signup';
+
+        try {
+          if (window.va) window.va('event', { name: name, href: href, tier: tier, label: label });
+        } catch (_) {}
+      });
     })();
   </script>
 </body>
