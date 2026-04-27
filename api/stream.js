@@ -542,6 +542,26 @@ module.exports = async function handler(req, res) {
         // Aggression whitelist — invalid → '' (server resolves to no aggression note)
         const VALID_AGGRESSION = new Set(['mellow','mid','heat','rage']);
         if (p.aggression && !VALID_AGGRESSION.has(p.aggression)) p.aggression = '';
+        // Punchline-craft tool whitelist — array of known tool keys, max 3.
+        // Invalid keys are silently dropped; the brain's own filter is the
+        // canonical gate, this is just defense-in-depth.
+        const VALID_PUNCHLINE_TOOLS = new Set(['setup_pause_punchline','hashtag_flow','brag_vulnerability_pivot']);
+        if (Array.isArray(p.punchlineCraft)) {
+          p.punchlineCraft = p.punchlineCraft.filter(t => VALID_PUNCHLINE_TOOLS.has(t)).slice(0, 3);
+        } else {
+          p.punchlineCraft = [];
+        }
+        // Genre-craft tool whitelist — same shape as punchline craft, but the
+        // valid key set varies per genre. We trust the brain's hasOwnProperty
+        // filter as the canonical gate; here we just enforce: must be array,
+        // entries must be plain strings, max 3.
+        if (Array.isArray(p.genreCraft)) {
+          p.genreCraft = p.genreCraft
+            .filter(t => typeof t === 'string' && /^[a-z0-9_]{1,40}$/.test(t))
+            .slice(0, 3);
+        } else {
+          p.genreCraft = [];
+        }
         // Edge mode — strict boolean coercion. Edge stays inside the lyric tier ceiling.
         p.edgeMode = p.edgeMode === true;
         // Region whitelist — invalid → no region overlay (silent fallback)
