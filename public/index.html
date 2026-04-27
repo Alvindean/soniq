@@ -6020,6 +6020,31 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
     </div>
 
+    <!-- Pipeline reconciliation — surfaces drift between Redis counters, the songs DB,
+         and the genre ZSET. If these diverge significantly the fan-out logic in
+         api/track.js or the prompt builders has a counting bug. -->
+    <div class="card" id="adm-recon-card" style="padding:12px 14px;margin-bottom:16px;display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1)">🔀 Pipeline Reconciliation</div>
+        <div id="adm-recon-status" style="font-size:11px;font-weight:600"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px">
+        <div style="padding:8px;background:var(--bg2);border-radius:6px">
+          <div style="color:var(--tx3);font-size:10px;text-transform:uppercase">Songs (DB authoritative)</div>
+          <div id="adm-songs-db" style="font-size:18px;font-weight:800;color:var(--amber)">—</div>
+        </div>
+        <div style="padding:8px;background:var(--bg2);border-radius:6px">
+          <div style="color:var(--tx3);font-size:10px;text-transform:uppercase">Songs (Redis counter)</div>
+          <div id="adm-songs-redis" style="font-size:18px;font-weight:800;color:#60a5fa">—</div>
+        </div>
+        <div style="padding:8px;background:var(--bg2);border-radius:6px">
+          <div style="color:var(--tx3);font-size:10px;text-transform:uppercase">Genre ZSET total</div>
+          <div id="adm-genre-zset-total" style="font-size:18px;font-weight:800;color:#a78bfa">—</div>
+        </div>
+      </div>
+      <div id="adm-recon-note" style="font-size:11px;color:var(--tx3);margin-top:8px;line-height:1.5"></div>
+    </div>
+
     <!-- Plan breakdown + Top genres (2 col) -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div class="card">
@@ -6294,6 +6319,19 @@ body.craft-advanced .craft-basic-only{display:none !important}
           <div id="seo-ai-citations" style="font-size:22px;font-weight:900;color:#f47292">—</div>
           <div style="font-size:10px;color:var(--tx3);text-transform:uppercase">AI Citations</div>
         </div>
+      </div>
+
+      <!-- Deep links — external dashboards that already have the live data.
+           Vercel Analytics has no free public API so we link out rather than
+           re-query; Search Console + Bing Webmaster show indexing + search query
+           data; sitemap.xml is a sanity-check that the site is crawlable. -->
+      <div class="card" style="padding:10px 12px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <div style="font-size:11px;color:var(--tx3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-right:6px">Live Dashboards</div>
+        <a href="https://vercel.com/dashboard" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:11px">📊 Vercel Analytics</a>
+        <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amysoniq.com" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:11px">🔍 Google Search Console</a>
+        <a href="https://www.bing.com/webmasters" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:11px">🔍 Bing Webmaster</a>
+        <a href="/sitemap.xml" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:11px">🗺 sitemap.xml</a>
+        <a href="/robots.txt" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:11px">🤖 robots.txt</a>
       </div>
 
       <!-- Keyword Rankings Table -->
@@ -20174,6 +20212,56 @@ function renderAdminDashboard(data) {
   document.getElementById('adm-total-reactions').textContent = data.summary?.total_reactions ?? '—';
   document.getElementById('adm-total-comments').textContent = data.summary?.total_comments ?? '—';
 
+  // Pipeline reconciliation — surfaces drift between Redis counters and the
+  // authoritative DB count. Only shows when at least one of the diagnostic
+  // numbers came back from the API (prevents showing dashes if the field is
+  // missing from older API responses).
+  const sumS = data.summary || {};
+  const songsDb = sumS.total_songs_db;
+  const songsRedis = sumS.total_songs_redis;
+  const genreTotal = sumS.genre_zset_total;
+  const reconCard = document.getElementById('adm-recon-card');
+  if (reconCard && (songsDb !== undefined || songsRedis !== undefined)) {
+    reconCard.style.display = '';
+    document.getElementById('adm-songs-db').textContent = songsDb ?? '—';
+    document.getElementById('adm-songs-redis').textContent = songsRedis ?? '—';
+    document.getElementById('adm-genre-zset-total').textContent = genreTotal ?? '—';
+    const status = document.getElementById('adm-recon-status');
+    const note = document.getElementById('adm-recon-note');
+    // null-safety: skip drift math when any source returned null (Supabase blip,
+    // Redis cache miss, etc.) — false drift warnings are worse than no warning.
+    const allPresent = songsDb !== null && songsDb !== undefined
+                    && songsRedis !== null && songsRedis !== undefined
+                    && genreTotal !== null && genreTotal !== undefined;
+    if (!allPresent) {
+      status.textContent = '⚠️ Partial data';
+      status.style.color = 'var(--tx3)';
+      note.textContent = 'One or more counts didn\'t come back from the API; drift check skipped.';
+    } else {
+      const dbN = Number(songsDb);
+      const redisN = Number(songsRedis);
+      const genreN = Number(genreTotal);
+      const drift = Math.max(Math.abs(dbN - redisN), Math.abs(dbN - genreN));
+      const tolerance = Math.max(2, Math.round(dbN * 0.1));
+      if (dbN === 0 && redisN === 0 && genreN === 0) {
+        status.textContent = '⚪ No songs yet';
+        status.style.color = 'var(--tx3)';
+        note.textContent = '';
+      } else if (drift <= tolerance) {
+        status.textContent = '✓ In sync';
+        status.style.color = '#34d399';
+        note.textContent = '';
+      } else {
+        status.textContent = '⚠️ Drift detected';
+        status.style.color = '#f47292';
+        const parts = [];
+        if (Math.abs(dbN - redisN) > tolerance) parts.push(`DB vs Redis off by ${Math.abs(dbN - redisN)} — Redis counter may be reset/stale, or fan-out missed some increments.`);
+        if (Math.abs(dbN - genreN) > tolerance) parts.push(`Genre ZSET total (${genreN}) ≠ DB count (${dbN}) — investigate fan-out (Lucky fusion writing g1+g2, alt-take reruns, or Redis seed/reset history).`);
+        note.textContent = parts.join(' ');
+      }
+    }
+  }
+
   // Community posts by type breakdown
   const commBreak = document.getElementById('adm-comm-breakdown');
   const postsByType = data.posts_by_type || {};
@@ -20666,7 +20754,7 @@ Hi [name],
 
 I've been reading [publication] for a while — your piece on [specific article] particularly stuck with me.
 
-I'm Alvin, founder of SONIQ. We're an AI songwriting studio, but positioned differently from Suno/Udio — instead of generating finished audio, we generate the complete song concept: lyrics, music theory analysis, a Suno-ready production brief, sync licensing metadata, and copyright registration. 24 genre DNA frameworks. Pitched at real songwriters and producers, not TikTok creators.
+I'm Alvin, founder of SONIQ. We're an AI songwriting studio, but positioned differently from Suno/Udio — instead of generating finished audio, we generate the complete song concept: lyrics, music theory analysis, a Suno-ready production brief, sync licensing metadata, and copyright registration. 30 genre DNA frameworks. Pitched at real songwriters and producers, not TikTok creators.
 
 Why I'm writing: I think there's an honest piece to be written about the difference between AI audio generators (Suno/Udio/ElevenLabs Music) and AI songwriting co-pilots (us). It's the kind of nuance your readers actually care about — not "best 10 AI tools" fluff.
 
@@ -20684,7 +20772,7 @@ Hi [name],
 
 Quick one — saw your piece "[article title]" ranking well on [query]. Noticed [competitor 1] and [competitor 2] are on the list, but SONIQ isn't.
 
-We'd earn the spot on honest merit: we're the only tool that generates a complete song concept (lyrics + theory + production brief + sync metadata + copyright registration) across 24 genre DNA frameworks. We don't generate audio — we're the pre-production layer that feeds Suno/Udio.
+We'd earn the spot on honest merit: we're the only tool that generates a complete song concept (lyrics + theory + production brief + sync metadata + copyright registration) across 30 genre DNA frameworks. We don't generate audio — we're the pre-production layer that feeds Suno/Udio.
 
 If you'd consider adding us, I'll send you:
 1. A 2-sentence description you can copy
@@ -20701,7 +20789,7 @@ https://www.mysoniq.com`,
 
 [Name] — 4-sentence response:
 
-SONIQ (https://www.mysoniq.com) is an AI songwriting studio built for real songwriters and producers, not TikTok creators. Unlike Suno and Udio (which generate finished audio), SONIQ generates the complete song concept — lyrics, music theory analysis, production brief, sync licensing metadata — across 24 genre DNA frameworks. Songwriters use it to co-write; producers use it to build sync-ready briefs. Quote-worthy angle: "The AI tool category is splitting between audio generators and songwriting co-pilots, and songwriters want the latter."
+SONIQ (https://www.mysoniq.com) is an AI songwriting studio built for real songwriters and producers, not TikTok creators. Unlike Suno and Udio (which generate finished audio), SONIQ generates the complete song concept — lyrics, music theory analysis, production brief, sync licensing metadata — across 30 genre DNA frameworks. Songwriters use it to co-write; producers use it to build sync-ready briefs. Quote-worthy angle: "The AI tool category is splitting between audio generators and songwriting co-pilots, and songwriters want the latter."
 
 Happy to expand on any of this.
 
@@ -20712,7 +20800,7 @@ thealvindean@gmail.com`
 const PH_LAUNCH = {
   title: 'SONIQ — AI songwriting studio for real music people',
   tagline: 'Complete song concepts — lyrics, theory, brief, sync meta',
-  description: 'SONIQ turns an idea into a full song concept in seconds: lyrics, music theory analysis, Suno-ready production brief, sync licensing metadata, and copyright registration. 24 genre DNAs. For songwriters and producers — not TikTok creators.',
+  description: 'SONIQ turns an idea into a full song concept in seconds: lyrics, music theory analysis, Suno-ready production brief, sync licensing metadata, and copyright registration. 30 genre DNAs. For songwriters and producers — not TikTok creators.',
   makerComment: `Hey Product Hunt 👋
 
 I'm Alvin, founder of SONIQ. Quick context on why we exist:
@@ -20726,7 +20814,7 @@ But as a songwriter, that's not what I needed. I needed a tool that:
 — Hands me sync licensing metadata the way a music supervisor expects it
 — Handles ISRC, BMI/ASCAP/SESAC registration (through our parent co. Nu Wav Media LLC)
 
-So we built it. 24 genre DNA frameworks. This week we added coverage for 13 more substyles — alt-rock, punk, blues, reggae, K-Pop, Latin, reggaeton, neo-soul, gospel, children's music, parody, comedy, and TV/musical.
+So we built it. 30 genre DNA frameworks. This week we added coverage for 13 more substyles — alt-rock, punk, blues, reggae, K-Pop, Latin, reggaeton, neo-soul, gospel, children's music, parody, comedy, and TV/musical.
 
 Free tier: 1 song/day. Paid from $9/mo. Feedback welcome — especially the harsh kind.
 
@@ -21491,58 +21579,116 @@ async function cmsAIGenerate(mode) {
 }
 
 // ── SEO & TRAFFIC DASHBOARD ──
-function loadSEODashboard() {
-  renderSEOPages();
-  renderSEOKeywords();
+// SEO & Traffic dashboard — real data only.
+// Sources: Supabase blog_posts (.views), /sitemap.xml (parsed for URL count),
+// Vercel Analytics deep-link (Vercel doesn't have a free public API, so we link
+// to the dashboard rather than re-querying), Google Search Console deep-link.
+async function loadSEODashboard() {
+  await Promise.all([
+    renderSEOPagesReal(),
+    renderSEOSitemapStatus(),
+    renderSEOKeywordsPlaceholder(),
+  ]);
 }
 
-function renderSEOPages() {
-  const table = document.getElementById('seo-pages-table');
-  if(!table) return;
-
-  const pages = [
-    {url: '/blog/getting-started', views: 1243, bounce: 32, avgTime: '2m 14s', traffic: 'organic'},
-    {url: '/features', views: 892, bounce: 28, avgTime: '3m 01s', traffic: 'direct'},
-    {url: '/pricing', views: 756, bounce: 45, avgTime: '1m 32s', traffic: 'organic'},
-    {url: '/blog/advanced-tips', views: 634, bounce: 22, avgTime: '4m 18s', traffic: 'organic'},
-    {url: '/', views: 2156, bounce: 18, avgTime: '5m 42s', traffic: 'direct'}
-  ];
-
-  table.innerHTML = pages.map(p => `
-    <div style="display:grid;grid-template-columns:1fr 80px 80px 120px 100px;gap:12px;padding:12px;border-bottom:1px solid var(--b2);align-items:center">
-      <div style="color:var(--tx1);font-size:13px">${p.url}</div>
-      <div style="text-align:center;color:var(--tx2);font-weight:600">${p.views}</div>
-      <div style="text-align:center;color:${p.bounce > 40 ? 'var(--red)' : 'var(--grn)'};font-weight:600">${p.bounce}%</div>
-      <div style="text-align:center;color:var(--tx2)">${p.avgTime}</div>
-      <div style="text-align:center;font-size:12px;color:var(--tx3)">${p.traffic}</div>
-    </div>
-  `).join('');
+// Top stat tiles: Pages Indexed comes from sitemap URL count (best proxy without
+// a Search Console API hookup). Keywords Tracked = blog_posts count (each post
+// targets a keyword cluster). Avg Position / Total Views / AI Citations need
+// external integrations — show "—" + a tooltip pointer rather than fake data.
+async function renderSEOSitemapStatus() {
+  try {
+    const r = await fetch('/sitemap.xml', { cache: 'no-store' });
+    if (!r.ok) throw new Error('sitemap fetch failed');
+    const xml = await r.text();
+    const urlMatches = xml.match(/<loc>/g) || [];
+    document.getElementById('seo-pages-indexed').textContent = urlMatches.length;
+  } catch (_) {
+    document.getElementById('seo-pages-indexed').textContent = '—';
+  }
+  // Keywords Tracked = published blog post count
+  try {
+    if (S.supabase) {
+      const { count } = await S.supabase.from('blog_posts').select('id', { count: 'exact', head: true }).eq('status', 'published');
+      document.getElementById('seo-keywords-tracked').textContent = count ?? '—';
+    }
+  } catch (_) {}
+  // Total Views — sum of blog_posts.views (rough lower bound; ignores landing/app)
+  try {
+    if (S.supabase) {
+      const { data } = await S.supabase.from('blog_posts').select('views').eq('status', 'published');
+      const sum = (data || []).reduce((acc, r) => acc + (r.views || 0), 0);
+      document.getElementById('seo-total-views').textContent = sum.toLocaleString();
+    }
+  } catch (_) {}
+  // Avg Position + AI Citations require Search Console API + custom tracking.
+  // Hard-coded "—" with explanatory tooltip instead of fake numbers.
+  const avgPos = document.getElementById('seo-avg-position');
+  const aiCit = document.getElementById('seo-ai-citations');
+  if (avgPos) { avgPos.textContent = '—'; avgPos.title = 'Connect Google Search Console API to populate'; }
+  if (aiCit)  { aiCit.textContent  = '—'; aiCit.title  = 'Tracking via OpenRouter/Perplexity/Claude citation logs — coming soon'; }
 }
 
-function renderSEOKeywords() {
-  const table = document.getElementById('seo-keywords-table');
-  if(!table) return;
+async function renderSEOPagesReal() {
+  const body = document.getElementById('seo-pages-body');
+  if (!body) return;
+  body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">Loading…</td></tr>';
 
-  const keywords = [
-    {keyword: 'music production', position: 3, volume: 8900, cpc: '$2.40', trend: '↑'},
-    {keyword: 'daw software', position: 5, volume: 6200, cpc: '$1.85', trend: '↑'},
-    {keyword: 'beat maker', position: 8, volume: 5400, cpc: '$1.20', trend: '↓'},
-    {keyword: 'audio editing', position: 12, volume: 4100, cpc: '$3.10', trend: '→'},
-    {keyword: 'music collaboration', position: 2, volume: 3200, cpc: '$2.80', trend: '↑'}
-  ];
+  if (!S.supabase) {
+    body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">Supabase not connected — sign in as admin</td></tr>';
+    return;
+  }
 
-  table.innerHTML = keywords.map(k => {
-    const posColor = k.position <= 3 ? 'var(--grn)' : k.position <= 10 ? 'var(--amb)' : 'var(--red)';
-    return `
-      <div style="display:grid;grid-template-columns:1fr 80px 100px 100px 80px;gap:12px;padding:12px;border-bottom:1px solid var(--b2);align-items:center">
-        <div style="color:var(--tx1);font-size:13px">${k.keyword}</div>
-        <div style="text-align:center;font-weight:600;color:${posColor}">#${k.position}</div>
-        <div style="text-align:center;color:var(--tx2);font-size:12px">${k.volume.toLocaleString()} mo</div>
-        <div style="text-align:center;color:var(--tx2);font-size:12px">${k.cpc}</div>
-        <div style="text-align:center;color:${k.trend === '↑' ? 'var(--grn)' : k.trend === '↓' ? 'var(--red)' : 'var(--tx3)'};">${k.trend}</div>
-      </div>
-    `;
-  }).join('');
+  try {
+    const { data, error } = await S.supabase
+      .from('blog_posts')
+      .select('id,title,slug,status,views,published_at,created_at,category')
+      .order('views', { ascending: false, nullsFirst: false });
+    if (error) throw error;
+    const rows = data || [];
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">No blog posts in Supabase yet</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map(p => {
+      // Slug is technically admin-controlled, but defense-in-depth: escape into
+      // both the href attribute and any text usage in case a slug ever contains
+      // a quote or angle bracket.
+      const safeSlug = encodeURIComponent(String(p.slug || ''));
+      const url = '/blog/' + safeSlug;
+      const hrefAttr = escapeHtml(url);
+      const views = (p.views || 0).toLocaleString();
+      const status = p.status === 'published' ? '<span style="color:#34d399">●</span> Live' : '<span style="color:var(--tx4)">○</span> ' + escapeHtml(p.status || 'draft');
+      return `<tr style="border-bottom:1px solid var(--b2);font-size:11px">
+        <td style="padding:8px 12px"><a href="${hrefAttr}" target="_blank" rel="noopener" style="color:var(--tx1);text-decoration:none">${escapeHtml(p.title || p.slug)}</a></td>
+        <td style="padding:8px;text-align:center;color:var(--tx3)">${escapeHtml(p.category || 'blog')}</td>
+        <td style="padding:8px;text-align:center">${status}</td>
+        <td style="padding:8px;text-align:center;color:var(--tx2);font-weight:600">${views}</td>
+        <td style="padding:8px;text-align:center;color:var(--tx4)" title="Connect Search Console for keyword data">—</td>
+        <td style="padding:8px;text-align:center;color:var(--tx4)">—</td>
+        <td style="padding:8px;text-align:center;color:var(--tx4)">—</td>
+        <td style="padding:8px;text-align:center"><a href="${hrefAttr}" target="_blank" rel="noopener" style="font-size:10px;color:var(--amber)">View →</a></td>
+      </tr>`;
+    }).join('');
+  } catch (e) {
+    body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#f47292">Load failed: ' + escapeHtml(e.message || String(e)) + '</td></tr>';
+  }
+}
+
+function renderSEOKeywordsPlaceholder() {
+  const body = document.getElementById('seo-keywords-body');
+  if (!body) return;
+  body.innerHTML = `<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--tx4);font-size:11px;line-height:1.6">
+    Keyword ranking data requires a Google Search Console API connection.<br>
+    <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amysoniq.com" target="_blank" rel="noopener" style="color:var(--amber);text-decoration:none">Open Search Console →</a>
+    &nbsp;·&nbsp;
+    <a href="https://vercel.com/dashboard" target="_blank" rel="noopener" style="color:var(--amber);text-decoration:none">Open Vercel Analytics →</a>
+  </td></tr>`;
+}
+
+// Tiny HTML-escape helper used in the SEO table renders (fallback if a
+// project-level helper doesn't exist).
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 // ═══════════════════════════════════════════════════════

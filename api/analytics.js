@@ -220,6 +220,10 @@ module.exports = async function handler(req, res) {
       ['ZREVRANGE', 'soniq:genres:top',  '0', '19', 'WITHSCORES'],
       ['ZREVRANGE', 'soniq:topics:top',  '0', '19', 'WITHSCORES'],
       ['LRANGE',   'soniq:recent',       '0', '49'],
+      // Full genre ZSET dump for drift detection — sum of ALL scores. Top-20
+      // slice above isn't enough because fusion modes write arbitrary "g1+g2"
+      // keys, plus 'unknown' / case variants — easy to exceed 20 distinct keys.
+      ['ZRANGE', 'soniq:genres:top', '0', '-1', 'WITHSCORES'],
       // Community activity counters
       ['GET', 'soniq:community:posts:total'],
       ['GET', 'soniq:community:posts:song'],
@@ -233,7 +237,7 @@ module.exports = async function handler(req, res) {
       ...days.map(d => ['HGETALL', `soniq:events:daily:${d}`])
     ];
 
-    const [redisResults, profilesResult, songsByPlanResult, totalUsersResult, commPostsResult, commReactionsResult] =
+    const [redisResults, profilesResult, songsByPlanResult, totalUsersResult, totalSongsDbResult, commPostsResult, commReactionsResult] =
       await Promise.all([
         redisPipeline(redisCommands),
         supabase
@@ -241,16 +245,20 @@ module.exports = async function handler(req, res) {
           .select('id, email, display_name, artist_name, plan, created_at, song_count, liked_count, xp, level, streak, last_active, genres')
           .order('created_at', { ascending: false })
           .limit(500),
-        supabase
-          .from('songs')
-          .select('plan:profiles!inner(plan)', { count: 'exact' })
-          .then(async () => {
-            // Aggregate songs by plan via a dedicated query
-            return supabase.rpc('songs_by_plan').then(r => r).catch(() => ({ data: null, error: null }));
-          }),
+        // Songs by plan (RPC). Pre-existing query; left as-is.
+        supabase.rpc('songs_by_plan').then(r => r).catch(() => ({ data: null, error: null })),
         supabase
           .from('profiles')
           .select('id', { count: 'exact', head: true }),
+        // Authoritative songs count from the songs table — used to detect drift
+        // against Redis soniq:total_songs counter (which can fall behind on resets
+        // or when fan-out increments fail mid-flight). Wrapped in catch so a
+        // transient songs-table blip doesn't blank the whole dashboard.
+        supabase
+          .from('songs')
+          .select('id', { count: 'exact', head: true })
+          .then(r => r)
+          .catch(() => ({ count: null, error: null })),
         supabase
           .from('community_posts')
           .select('id', { count: 'exact', head: true })
@@ -260,13 +268,14 @@ module.exports = async function handler(req, res) {
           .select('id', { count: 'exact', head: true })
       ]);
 
-    // Destructure Redis results
+    // Destructure Redis results — order MUST match the redisCommands array above
     const [
       totalSongsRaw,
       totalPublishedRaw,
       topGenresRaw,
       topTopicsRaw,
       recentRaw,
+      genresFullRaw,
       commPostsTotalRaw,
       commPostsSongRaw,
       commPostsThoughtRaw,
@@ -280,7 +289,13 @@ module.exports = async function handler(req, res) {
     ] = redisResults;
 
     // Summary
-    const total_songs      = parseInt(totalSongsRaw)         || 0;
+    const total_songs_redis = parseInt(totalSongsRaw)         || 0;
+    // Use ?? so a real 0 from the DB doesn't fall back to a stale Redis count
+    // (the exact drift case the reconciliation card is meant to surface).
+    const total_songs_db    = totalSongsDbResult.count         ?? null;
+    // Authoritative count for headline metric is the DB; Redis counter is exposed
+    // for diagnostics so admins can spot drift between the two pipelines.
+    const total_songs       = total_songs_db ?? total_songs_redis;
     const total_published  = parseInt(totalPublishedRaw)     || 0;
     const total_users      = totalUsersResult.count           ?? 0;
     // Community counts: prefer Supabase exact counts; Redis used for breakdown by post type
@@ -297,11 +312,24 @@ module.exports = async function handler(req, res) {
       snippet:  parseInt(commPostsSnippetRaw)  || 0,
     };
 
-    const summary = { total_users, total_songs, total_published, total_posts, total_reactions, total_comments };
+    const summary = {
+      total_users, total_songs, total_published, total_posts, total_reactions, total_comments,
+      // Diagnostic split — admin UI shows both side-by-side to surface pipeline drift
+      total_songs_db, total_songs_redis,
+      // Genre ZSET total — should equal total_songs_db; if wildly off, indicates
+      // a fan-out bug (e.g. Lucky double-incrementing g1+g2, alt-take rerunning, etc.)
+      genre_zset_total: 0  // populated below after parseZSet
+    };
 
     // Top genres / topics
     const top_genres = parseZSet(topGenresRaw);
     const top_topics = parseZSet(topTopicsRaw);
+    // Sum of ALL genre ZSET scores (not just top-20 slice) — drift indicator
+    // vs total_songs_db. The ZRANGE 0 -1 fetch is unbounded but capped by the
+    // actual genre key count, which is small in practice (<100).
+    const genres_full = parseZSet(genresFullRaw);
+    summary.genre_zset_total = genres_full.reduce((sum, g) => sum + (g.count || 0), 0);
+    summary.genre_zset_keys = genres_full.length;
 
     // Recent events
     const recent = (recentRaw || []).map(s => {
