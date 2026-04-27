@@ -5461,6 +5461,235 @@ Critical rules: (1) the modulation lands at the END of the bridge, NOT the middl
       },
     },
   },
+  // Rock + Punk share the same anthem-craft toolkit — same techniques work for
+  // stadium rock, alt-rock, and punk because all three traditions inherit from
+  // garage-rock economy. The data is duplicated under both genre keys (instead
+  // of using shared object references) so UI rendering is straightforward.
+  rock: {
+    label: 'Anthem Toolkit',
+    tools: {
+      gang_chorus: {
+        label: 'Gang Chorus',
+        short: 'Multiple voices in unison on the chorus — intentionally raw, off-pitch is fine, off-pitch is the point.',
+        directive: `GANG CHORUS (rock/punk's communal payoff):
+The final chorus (and often every chorus from the second onward) should be sung by MULTIPLE voices in unison — not pristine layered harmony, but a crowd of voices yelling the same words together. Mark with [Gang Vocals] tag on its own line before the chorus. Off-pitch entries are NOT a flaw; they are the technique. Mix instructions: gang vocals slightly behind the lead in time, slightly off-pitch in places, raw room sound preferred over close-mic clarity.
+Critical rules: (1) only on the CHORUS — never the verse, never the bridge until the final chorus, (2) absolute uniformity in lyrics — every voice sings the EXACT same words, (3) the lead vocal stays mixed slightly above so the listener can still parse the words, (4) at least 4 voices, ideally 6-12.
+Why it works: communal singing is the oldest form of music. When the listener hears a crowd of voices, they're invited into the song. Solo vocals = performer. Gang vocals = community.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Mr. Brightside" — the final chorus crowd-singalong is the song\'s emotional contract. "Seven Nation Army" — the wordless gang chant became the chorus. "Wonderwall" — the chorus is engineered for crowd participation. "Anthem of the Year 2000" (Silverchair) — the title section is gang-sung.',
+      },
+      quiet_loud_dynamic: {
+        label: 'Quiet-Loud Dynamic',
+        short: 'Verse strips way down (clean guitar, sparse drums); chorus explodes. The contrast IS the song.',
+        directive: `QUIET-LOUD DYNAMIC (the Pixies blueprint that defines modern rock):
+Build extreme dynamic contrast between verse and chorus. The VERSE should be near-acoustic — clean guitar (or palm-muted), sparse drums, vocal close to the mic, low energy. The CHORUS should EXPLODE — full distorted guitar, full kit, vocal pulled back from the mic, high energy. The transition into the chorus should feel like a wall of sound suddenly hitting.
+Mark explicitly with [Quiet] before verse sections and [LOUD] or [Distorted] before choruses. Don't blend the dynamic — sharper contrast = more impact.
+Critical rules: (1) the verse must SOUND restrained, not just BE quieter — fewer instruments, less reverb, less compression, (2) the chorus entry should be dramatic — often punctuated by a single guitar chord or drum hit BEFORE the chorus melody starts, (3) the pre-chorus can build, but the actual jump from quiet to loud should still be perceptible.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Smells Like Teen Spirit" — the canonical example; clean verse riff, distorted chorus wall. "Where Is My Mind?" — soft verse, screamed chorus. "Bring Me to Life" — quiet piano verse, full-band chorus. "Sweet Child O\' Mine" — clean intro, loud chorus.',
+      },
+      power_chord_drone: {
+        label: 'Power-Chord Drone',
+        short: 'Sustained chord under the entire chorus — bass + guitar lock on root, no chord changes.',
+        directive: `POWER-CHORD DRONE (the trick that makes a chorus feel inevitable):
+Lock the chorus harmonically on a SINGLE chord (or a 2-chord oscillation) for the entire chorus duration. Bass plays the root note throughout; guitar plays power chords (root + fifth, no third) on the same root. The chorus melody floats over this stationary harmonic ground.
+Why it works: when the chord doesn't change, the listener's ear stops anticipating harmonic motion and locks onto the melodic motion instead. Combined with quiet-loud dynamics, this is what makes a stadium chorus feel like a cliff edge.
+Critical rules: (1) NO chord changes during the chorus melody — the chord change happens only on the BAR BOUNDARY between chorus repeats or returning to verse, (2) bass MUST stay on the root — any bass walk-up or walk-down breaks the drone, (3) the verse can be harmonically active (3-4 chords) — the contrast between active verse and static chorus is where the technique pays off.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Seven Nation Army" — the song lives on a single bass note for nearly its entire run. "Boulevard of Broken Dreams" — the chorus drones on i. "Iris" — the chorus drone gives the lead guitar the spotlight. "Brick" (Ben Folds Five) — verse moves harmonically, chorus drones.',
+      },
+      solo_placement: {
+        label: 'Instrumental Solo',
+        short: 'Instrumental break of 8-16 bars after second chorus. The lead instrument takes the melodic weight.',
+        directive: `INSTRUMENTAL SOLO PLACEMENT (rock\'s contract with the listener):
+Plant an instrumental solo (guitar typically, but keyboards/sax/etc. work) of 8-16 bars after the SECOND chorus. Mark with [Guitar Solo | 12 bars] or similar. The solo replaces a verse — it's a DIFFERENT way of saying what a verse would say.
+The solo should follow the song's melodic contour, NOT be a virtuosity exercise. Listeners want to be able to HUM the solo afterward — that's the test. Solos that show off technique without melodic memory are forgettable; solos that play the song's emotional argument with notes are immortal.
+Critical rules: (1) length 8-16 bars — shorter feels like an interlude, longer breaks the song's momentum, (2) the solo should END on a note that resolves into the next chorus, NOT trail off, (3) place AFTER the second chorus, BEFORE the bridge or final-chorus sequence, (4) the bar before the solo should drop in dynamics so the solo entry has impact.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"November Rain" — the guitar solo IS the song\'s emotional centre. "Comfortably Numb" — two solos, both melodic, both hummable. "Hotel California" — twin-guitar harmonised solo. "Stairway to Heaven" — the solo is the climb the song builds toward.',
+      },
+    },
+  },
+  punk: {
+    label: 'Anthem Toolkit',
+    tools: {
+      gang_chorus: {
+        label: 'Gang Chorus',
+        short: 'Multiple voices yelling the chorus together. Off-pitch is the point. Punk\'s communal contract.',
+        directive: `GANG CHORUS (punk's mandatory communal payoff):
+The chorus must be sung by multiple voices in unison — punk's central craft technique. Mark with [Gang Vocals] tag. Off-pitch entries are NOT a flaw; they are the genre. Multiple shouting voices, slightly out of time with each other, no auto-tune, no comp editing.
+Punk-specific: gang vocals are MORE essential here than in rock. A punk song without gang vocals is suspect — it suggests the song is performed AT the audience, not WITH them. The most iconic punk choruses are the ones a basement of 30 people can yell together.
+Critical rules: (1) chorus only — verses are solo, (2) at least 4 voices, more is better, (3) the words must be SIMPLE enough that a listener can yell them on first listen — punk choruses are typically 4-8 syllables max per line, (4) imperfection is non-negotiable; if the gang vocals sound studio-perfect, you've broken the genre.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Blitzkrieg Bop" — "Hey ho, let\'s go" is the textbook. "Smells Like Teen Spirit" (post-punk) — chorus designed for crowd. "Anarchy in the U.K." — gang-sung defiance. "I Wanna Be Sedated" — even the title is engineered for shouting along.',
+      },
+      three_chord_economy: {
+        label: 'Three-Chord Economy',
+        short: 'Entire song built on 3 chords. No bridges, no key changes, no virtuosity. Restraint is the technique.',
+        directive: `THREE-CHORD ECONOMY (punk's anti-virtuosity contract):
+Build the entire song on 3 chords — typically I, IV, V (e.g., C, F, G) or I, V, vi (e.g., C, G, Am). NO bridges, NO key changes, NO solos longer than 4 bars, NO chord substitutions, NO seventh chords. The restraint IS the technique.
+Why it works: punk's foundational claim is that anyone can do this. The 3-chord structure is the sound of accessibility. Adding harmonic complexity reads as betrayal of the genre's social contract.
+Critical rules: (1) literally 3 chords for the entire song — verse, chorus, outro all use the same 3 chords in different orders, (2) song length: 1:30 to 3:00 — anything longer is no longer punk, (3) NO bridge — go from verse to chorus to verse to chorus to outro. The "bridge" in punk is usually just an extra chorus. (Tempo direction: see Tempo As Attitude tool if also selected; otherwise 150-180 BPM is the default punk pocket.)`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Blitzkrieg Bop" — three chords, two minutes, no bridge. "Basket Case" — A, E, F#m, D — within the 3-chord-flexible spirit. "I Wanna Be Sedated" — entire song on 3 chords, no harmonic deviation. "California Über Alles" — 3-chord economy carrying political weight.',
+      },
+      tempo_as_attitude: {
+        label: 'Tempo As Attitude',
+        short: '180+ BPM. Speed is the political stance. Drag the tempo and the song stops being punk.',
+        directive: `TEMPO AS ATTITUDE (punk's pacing rule):
+Lock the tempo at 180+ BPM. The song should feel like it's racing toward its end. Slow punk is suspect — it usually means the writer wanted to write rock but called it punk. The genre's social claim (urgency, refusal to perform craft, immediacy) is encoded in the tempo.
+Mark explicitly: BPM 180-220 in the SONG PROMPT. Drum patterns: straight 8th-note hi-hat or driving 16ths, kick on every beat (or every other beat), no half-time sections.
+Critical rules: (1) tempo MUST stay at or above 180 BPM for the whole song — no slow intros, no half-time choruses, no bridge breakdowns, (2) drum pattern should not vary — punk drums are about RELENTLESSNESS, not flair, (3) song duration should be consequently short — at 200 BPM, even a "long" punk song is under 3 minutes.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Holiday in Cambodia" — 200+ BPM throughout. "Anarchy in the U.K." — driving tempo never lets up. "Linoleum" (NOFX) — fast and short. "Last Caress" (Misfits) — 90 seconds of relentless tempo.',
+      },
+      abrupt_ending: {
+        label: 'Abrupt Ending',
+        short: 'No fade out. Song ends on a single hard hit or a clipped final word. Refusing to wind down.',
+        directive: `ABRUPT ENDING (punk's anti-resolution stance):
+The song must NOT fade out. End on a single hard chord, a single drum hit, or a clipped final word — the listener gets no gentle wind-down. Mark the final section with [Abrupt End] or [Cold Stop].
+Why it works: punk refuses gentle resolutions. Fade-outs are pop's polite goodbye; abrupt endings are punk's slammed door. The structural choice carries the genre's refusal to soften for the listener.
+Critical rules: (1) the LAST line of the song should be at full energy — never trail off, never decrescendo into the final note, (2) the band must STOP together on a clean beat boundary — sloppy stops sound like mistakes, abrupt stops sound like decisions, (3) ideally the song ends on the FIRST beat of a bar — leaving you on a "dot one" cold cut, not letting the bar play out.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Blitzkrieg Bop" — abrupt cold stop on the final "hey ho." "Holiday in Cambodia" — ends on a single chord with no fade. "I Wanna Be Sedated" — clipped final phrase. "Anarchy in the U.K." — single feedback hit then silence.',
+      },
+    },
+  },
+  latin: {
+    label: 'Rhythmic Toolkit',
+    tools: {
+      clave_anchoring: {
+        label: 'Clave Anchoring',
+        short: 'Build the entire song on the 2-3 or 3-2 clave pattern. Every melody and rhythm must respect it.',
+        directive: `CLAVE ANCHORING (Latin music's foundational rhythm grid):
+Pick ONE clave pattern (2-3 or 3-2 — the choice depends on which side starts the phrase) and lock the ENTIRE song to it. Every melodic phrase, every percussion accent, every vocal phrase entry must respect the clave. Mark with [Clave: 2-3] or [Clave: 3-2] in the SONG PROMPT.
+Why it works: clave is the ear-training Latin listeners have absorbed. A song that "feels Latin" but doesn't lock to clave reads as touristic — Latin musicians can hear the violation immediately. Clave-locked songs feel inevitable.
+Critical rules: (1) the clave pattern is an INVISIBLE ruler running under the song — no instrument needs to play the clave verbatim, but every rhythm must align with its accents, (2) once you choose 2-3 or 3-2, you DO NOT switch sides mid-song unless the song is about that switch, (3) the chorus melody's strong syllables should land on clave accent points, not against them.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Vivir Mi Vida" — locked to 3-2 clave; the celebratory feel comes from the clave alignment. "Suavemente" — 2-3 clave anchors the merengue-bachata hybrid. "Despacito" — modern reggaeton/Latin pop locked to clave-derived dembow. "Oye Como Va" — entire song built on clave architecture.',
+      },
+      montuno_call_response: {
+        label: 'Montuno Call & Response',
+        short: 'Repeating piano figure during second half; coro answers lead vocal. Bidirectional conversation.',
+        directive: `MONTUNO CALL AND RESPONSE (Latin music's communal section):
+After the second chorus, transition into a MONTUNO section: a repeating syncopated piano figure (2-4 bars, looped) over which the lead vocal (improvised or scripted) trades lines with a coro (group response). Mark with [Montuno] section header.
+The structure: piano locks the figure, percussion intensifies, lead vocal calls a line, coro answers with a fixed phrase (often the song's title or a key hook). Each call-response pair should escalate in energy — the section builds toward a release.
+Critical rules: (1) montuno is a SECTION, not a moment — minimum 8 bars, often 16-32, (2) the coro response is FIXED throughout — same words every time, (3) the lead can improvise or escalate but the coro is the anchor the listener latches onto, (4) tempo and harmonic motion stay consistent — the energy comes from RHYTHMIC + VOCAL escalation, not chord changes.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Vivir Mi Vida" — extended montuno section is the song\'s emotional climax. "El Cantante" — the montuno IS half the song. "Pedro Navaja" — montuno carries the narrative escalation. "Suavemente" — coro response is the song\'s recurring hook.',
+      },
+      bilingual_codeswitch: {
+        label: 'Bilingual Code-Switch',
+        short: 'Spanish for emotional content, English for hooks (or vice versa). Language layering carries cultural authenticity.',
+        directive: `BILINGUAL CODE-SWITCH (modern Latin pop's signature technique):
+Layer Spanish and English in the song deliberately — verses in one, chorus in another; or alternating lines; or English hook + Spanish bridge. The code-switch is a cultural marker AND a craft technique.
+Common patterns: (1) Spanish verses + English chorus (broader pop accessibility), (2) English verses + Spanish chorus (Latin-rooted authenticity with Anglo-leaning verse), (3) line-by-line alternation (intimate bilingual address), (4) Spanish for emotional/sensual content + English for assertive/playful content (or vice versa).
+Critical rules: (1) the switch must be CONSISTENT — pick a pattern and hold it, don't randomly mix, (2) the language carrying the HOOK is the language the listener will leave with — choose deliberately, (3) Spanglish (mid-line switching) is its own style — distinct from clean code-switching at section boundaries, (4) cultural authenticity matters more than grammar — colloquial Spanish/English beats textbook correctness every time.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Despacito" — Spanish verses, Spanish chorus, English-friendly title. "Mi Gente" — predominantly Spanish with English-leaning hook structure. "Tusa" (Karol G/Nicki Minaj) — Spanish verses, English rap break. "Bilingüe" tradition: half-Spanish half-English deliberately, like Selena\'s "Bidi Bidi Bom Bom" → "I Could Fall in Love" pivot.',
+      },
+      coro_stack: {
+        label: 'Coro Vocal Stack',
+        short: 'Group vocal stack on chorus, harmonised in 3rds + 6ths. The Latin chorus is choral by default.',
+        directive: `CORO VOCAL STACK (Latin music's harmony architecture):
+The chorus is sung by a STACKED group vocal — multiple voices harmonised in parallel 3rds and 6ths above the lead. Mark with [Coro Stack | 3rds + 6ths]. This is different from rock's gang vocal (unison/raw) — Latin coro is HARMONISED, polished, musically layered.
+The stack structure: lead vocal carries the melody; one harmony voice sits a 3rd above; another sits a 6th above (or 3rd below); occasionally a fourth voice sits on the root for thickness. Backgrounds enter on the chorus, exit on the verse.
+Critical rules: (1) the coro should sound TIGHT — pitch and timing aligned, unlike punk/rock gang vocals, (2) parallel motion (all voices moving in the same direction) is preferred over contrary motion — Latin choral harmony is direct, not contrapuntal, (3) the lead stays slightly louder so the listener parses melody first, harmony second.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Vivir Mi Vida" — coro stack is the song\'s communal handprint. "Suavemente" — group chorus harmonies define the bachata-pop chorus. "La Vida Es Un Carnaval" — Celia Cruz era coro built around stacked harmonies. "Bachata Rosa" — close-harmony coro on every chorus.',
+      },
+    },
+  },
+  afrobeats: {
+    label: 'Polyrhythm Toolkit',
+    tools: {
+      dembow_lock: {
+        label: 'Dembow Lock',
+        short: 'Rhythm grid is dembow (kick on 1, accent on +2). Every melody respects it.',
+        directive: `DEMBOW LOCK (Afrobeats's foundational rhythmic grid):
+Lock the entire song to a dembow rhythm pattern — kick on beat 1, snare/clap on beat 3, with a syncopated accent on the "+" of beat 2. The dembow grid is what makes the song FEEL Afrobeats. Mark with [Dembow Pattern | 100-110 BPM] in the SONG PROMPT.
+This is shared with reggaeton and dancehall — the same rhythmic ancestor — but in Afrobeats the dembow is faster, slightly more swung, and layered with additional percussion (talking drum, shaker, log drum).
+Critical rules: (1) BPM range 100-115 — slower than reggaeton, faster than reggae, (2) the dembow stays consistent through the WHOLE song; verse and chorus don't switch grids, (3) every melodic phrase entry should align with the dembow accents — phrases that fight the grid feel imported from another genre, (4) fills happen ON the grid, not against it.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Essence" (Wizkid) — dembow lock at 105 BPM defines the song. "Last Last" (Burna Boy) — dembow + log drum grid carries the entire song. "Calm Down" (Rema) — modern Afrobeats dembow at 107 BPM. "Sungba" (Asake) — dembow with amapiano log-drum overlay.',
+      },
+      talking_drum_break: {
+        label: 'Talking-Drum Break',
+        short: '4-8 bar percussion breakdown that imitates speech rhythm. The drum literally talks.',
+        directive: `TALKING-DRUM BREAK (Afrobeats's cultural anchor):
+Plant a 4-8 bar talking-drum (or djembe / shekere) breakdown in the song — typically after the second chorus, before the final chorus or bridge. The talking drum imitates the rhythm of spoken Yoruba or other West African tonal languages — short-long patterns, rising/falling pitch shifts.
+Mark with [Talking Drum Break | 8 bars] section header. During this section, other instruments DROP OUT (or pull way back) — the drum carries the section alone or with minimal percussion accompaniment.
+Critical rules: (1) the break should imitate SPEECH rhythm specifically — not generic drum fills, (2) length 4-8 bars — long enough for the listener to register it, short enough to maintain song momentum, (3) place between sections, never inside a verse or chorus, (4) the break should set up an emotional shift — the song after the break is at a different intensity than before.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Last Last" (Burna Boy) — extended talking-drum-led break before final chorus. "Ye" (Burna Boy) — talking drum carries the bridge. "Ojuelegba" — djembe break shifts the song\'s register. "Water No Get Enemy" (Fela) — entire songs are built around talking-drum architecture.',
+      },
+      pidgin_english_layer: {
+        label: 'Pidgin/English Layer',
+        short: 'Verse in Pidgin/Yoruba/Twi, chorus in English (or vice versa). Language layering carries cultural authenticity.',
+        directive: `PIDGIN/ENGLISH LANGUAGE LAYER (Afrobeats's bilingual architecture):
+Layer Nigerian Pidgin (or Yoruba, Twi, Swahili) and English deliberately. Common patterns: (1) Pidgin verses + English chorus (international accessibility with cultural roots), (2) English verses + Pidgin chorus (story in English, communal hook in cultural language), (3) chorus repeats key phrase in BOTH languages.
+Why it works: Afrobeats's global rise is partly because its bilingual structure makes the songs accessible without erasing cultural specificity. Removing the Pidgin/Yoruba layer makes the song feel sterilised; keeping it in every line restricts global crossover. The toggle is the craft.
+Critical rules: (1) the chorus's HOOK PHRASE should be the part most listeners can sing — usually English or a Pidgin phrase short enough to repeat, (2) Pidgin spelling matters — "wahala" not "wallah," "no dey" not "no dey eh", (3) cultural-specific terms should land in the verse where context makes meaning clearer, (4) the language toggle should be CONSISTENT — pick a pattern and hold it.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Last Last" (Burna Boy) — Pidgin verses, English chorus hook ("Last last, na everybody go chop breakfast"). "Calm Down" — Pidgin/English verse with English chorus. "Essence" — Yoruba phrases woven through English verses. "Ye" — Pidgin throughout, English-accessible hook.',
+      },
+      highlife_guitar_ostinato: {
+        label: 'Highlife Guitar Ostinato',
+        short: 'Repeating clean-tone guitar pattern that runs the entire song. The melodic backbone.',
+        directive: `HIGHLIFE GUITAR OSTINATO (Afrobeats's melodic backbone):
+Plant a repeating clean-tone electric guitar ostinato (a 2-4 bar pattern, looped) that runs the ENTIRE song. The pattern is the song's melodic fingerprint — every other element (vocal, percussion, bass) sits on top of this repeating figure.
+The pattern should be: clean tone (no distortion, possibly slight chorus or tape-echo), high register (rarely below the 5th fret), syncopated (entries on off-beats), and harmonically simple (often arpeggiates 1-2 chords across the pattern).
+Critical rules: (1) the ostinato runs THROUGH verse, chorus, AND bridge — only dropping out for the talking-drum break, (2) the pattern is 2-4 bars — long enough to be melodic, short enough to be hypnotic, (3) the guitar tone is bright and clean — distortion or rock-style tone breaks the genre code, (4) the pattern's first note should be on a syncopated entry, not on beat 1.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Essence" (Wizkid) — clean syncopated guitar ostinato runs the entire song. "Cocoa Butter Kisses" influence on Afro-pop. "Yebba" — Afro-soul guitar ostinato. "Ye" (Burna Boy) — guitar pattern carries the melodic argument under the vocal.',
+      },
+    },
+  },
+  ss: {
+    label: 'Confessional Toolkit',
+    tools: {
+      specific_tuesday_detail: {
+        label: 'Specific-Tuesday Detail',
+        short: 'Name a specific day, hour, weather, year. The more specific the more universal.',
+        directive: `SPECIFIC-TUESDAY DETAIL (singer-songwriter\'s craft of intimacy):
+Plant 2-4 hyper-specific time-and-place details in the song. Not "one summer day" but "the third Tuesday in August, 2:14 PM." Not "we drove home" but "we took the long way back on Route 6, that summer the cicadas were loud." The specificity is the craft — vagueness reads as posturing in singer-songwriter, exact memory reads as truth.
+This shares DNA with country's Specific-Detail rule, but singer-songwriter pushes it further: the details should feel UNGENERALIZABLE — they belong to one specific person's one specific memory. The listener fills in their own equivalent by analogy.
+Critical rules: (1) at least 2 specific details per verse — never less, (2) the details should be SENSORY — not just facts but smells, sounds, textures, lights, (3) avoid universally-relatable details ("the sky was blue") — pick details that sound private, (4) the chorus can stay slightly more universal so listeners can sing it as their own.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Cover Me Up" (Isbell) — specific Tuesday morning, specific drink, specific room. "Bad Religion" (Frank Ocean) — specific cab ride, specific 5 dollars. "Marvin\'s Room" — specific 3 AM call. "Pink Moon" — specific lunar event becomes the whole song. "Pictures of You" (The Cure) — specific photograph, specific moment.',
+      },
+      whispered_confession: {
+        label: 'Whispered Confession',
+        short: 'ONE line in the song, set off by [whispered] tag, delivered just above audible.',
+        directive: `WHISPERED CONFESSION LINE (singer-songwriter\'s most powerful single technique):
+Plant exactly ONE line in the song where the vocalist drops to a whisper — not metaphorically, literally. Mark with [whispered] tag on its own line immediately before the lyric. The whisper should be JUST above audible — the listener has to lean in.
+This is the song's most vulnerable moment. The whispered line is usually: a confession the singer hasn't admitted before, the truth behind the song's main claim, an intimate address to a specific person, or the question the rest of the song is afraid to ask.
+Critical rules: (1) exactly ONE whispered line — repetition kills the technique, (2) place it on the BRIDGE or the second verse's most vulnerable line, (3) the line BEFORE the whisper should be at normal volume — the contrast carries the impact, (4) the line AFTER should ALSO be quiet — let the listener stay in the intimate space before the song reasserts itself, (5) the whispered line should be CONFESSIONAL content, not aesthetic decoration.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Last Goodbye" (Jeff Buckley) — quiet whispered admissions punctuating the song. "I Will Follow You Into the Dark" — whisper-quality vocal throughout, with one line that drops further. "Hurt" (Cash cover) — Cash\'s entire delivery is near-whispered, with one line at the bridge that\'s barely audible. "Skinny Love" (Bon Iver) — falsetto-whispered admissions.',
+      },
+      imagery_anchor: {
+        label: 'Imagery Anchor',
+        short: 'Return to ONE image throughout — a window, a road, a glass — that recurs in V1, bridge, outro.',
+        directive: `IMAGERY ANCHOR (singer-songwriter\'s structural memory device):
+Pick ONE concrete image (not abstract feeling) and return to it throughout the song — V1, V2, bridge, outro. The image should be SPECIFIC and TANGIBLE: a window, a coffee cup, a road, a coat, a phone number, a glass, a door, a song on the radio, a particular weather. Each return RECONTEXTUALIZES the image — same object, different meaning each time.
+This is the difference between a collection of verses and a SONG. The anchor image gives the listener something to hold onto across the song's emotional shifts. By the outro, the image carries the weight of every previous reference.
+Critical rules: (1) ONE anchor image per song — multiple anchors dilute, (2) the image must be CONCRETE — "loneliness" is not an anchor; "an empty chair at the kitchen table" is, (3) return to the image at LEAST in V1, the bridge, and the outro — ideally also in V2 with a slight shift, (4) each return should re-mean the image — the chair starts as her chair, becomes my chair, becomes anybody\'s chair.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Vincent" (McLean) — starry night returns from V1 to outro, meaning shifts each time. "Both Sides Now" (Mitchell) — clouds anchor the song; V1 looking up, V2 looking from above, V3 not knowing. "Cat\'s in the Cradle" — phrase "we\'ll get together then" recurs as time-anchor. "Hallelujah" — the word itself is the anchor; meaning shifts every verse.',
+      },
+      bridge_revelation: {
+        label: 'Bridge Revelation',
+        short: 'The bridge is the moment of self-knowledge. The question or admission V1 couldn\'t ask.',
+        directive: `BRIDGE REVELATION (singer-songwriter\'s most loaded section):
+The bridge is NOT a contrast section in singer-songwriter — it is the song\'s moment of self-knowledge. V1 sets up the situation; V2 develops it; the bridge is where the singer admits what they couldn\'t admit before, asks the question they\'ve been avoiding, or names the truth the rest of the song was circling.
+The bridge in this genre is often quieter than verses (sometimes whispered or near-whispered — pairs well with the Whispered Confession technique). It\'s sparse instrumentally — often just voice + one instrument. The lyric is the heaviest single passage in the song.
+Critical rules: (1) the bridge admits something — not just adds detail, but SHIFTS the song\'s emotional contract, (2) bridge length: 4-8 bars — long enough to land the admission, short enough that the listener doesn\'t have time to brace, (3) the line BEFORE the bridge should be at full energy; the bridge entry should drop dynamics suddenly, (4) the post-bridge return to chorus should hit DIFFERENTLY — the chorus now carries the weight of what the bridge revealed.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"The Night We Met" (Lord Huron) — the bridge is the admission. "Liability" (Lorde) — bridge confesses what verses circled. "Skinny Love" — bridge is the breakdown. "How to Save a Life" — bridge\'s "where did I go wrong" is the song\'s self-knowledge moment. "Black" (Pearl Jam) — the bridge "I know someday you\'ll have a beautiful life" is the entire song\'s emotional truth.',
+      },
+    },
+  },
 };
 
 // Compose the genre craft prompt block. Genre key + array of tool keys (UI
