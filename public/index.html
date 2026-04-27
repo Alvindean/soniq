@@ -3479,6 +3479,18 @@ body.craft-advanced .craft-basic-only{display:none !important}
               <span class="bs-label">Off</span>
             </button>
           </div>
+          <!-- Punchline Craft Tools — multi-select, max 3. Each tool is a discrete craft
+               technique abstracted from the Bad Boy / DJ Clue mixtape / Detroit punchline
+               lineage. Tools STACK with flow/rhyme/density — they're an orthogonal layer. -->
+          <div class="rl-dim-row">
+            <span class="rl-dim-label">Punchline Craft</span>
+            <div class="rl-dim-pills" id="rld-punchline" data-multi="1">
+              <span class="rl-dpill" data-tool="setup_pause_punchline" onclick="togglePunchlineCraft(this,'setup_pause_punchline')" title="Comedian-timing punchlines — setup line, deliberate dead-air gap, then payoff. The pause IS the technique.">Setup-Pause-Punchline ✦</span>
+              <span class="rl-dpill" data-tool="hashtag_flow" onclick="togglePunchlineCraft(this,'hashtag_flow')" title="End the line with a one-word coda after a breath. 'Doing it big — fat.' Detroit punchline lineage.">Hashtag Flow ✦</span>
+              <span class="rl-dpill" data-tool="brag_vulnerability_pivot" onclick="togglePunchlineCraft(this,'brag_vulnerability_pivot')" title="Alternate flex bars and confession bars across the verse. Each external win shadowed by an internal cost. The whiplash IS the technique.">Brag↔Vulnerability ✦</span>
+            </div>
+            <div class="rl-dim-legend" style="font-size:9px;margin-left:8px"><span style="color:var(--tx3)">stack up to 3 — applies to verses, not the hook</span></div>
+          </div>
           <div class="rl-agent-badge" id="rl-agent-badge"></div>
         </div>
       </div>
@@ -8657,6 +8669,8 @@ const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
   rapStyle: 'trap',
   rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:['medium'], vocabRegister:['street-coded'], persona:['first-person-raw'] },
+  // Punchline Craft tools — multi-select, max 3. Whitelist enforced server-side too.
+  punchlineCraft: [],
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
@@ -9281,6 +9295,10 @@ function onGenreChange(g){
       row.style.display='block';
       if(rapLabPanel) rapLabPanel.style.display='none';
       S.rapLabActive=false;
+      // Leaving hiphop: clear Rap-Lab-only state so it doesn't leak into a
+      // future hiphop session as a stale selection.
+      S.punchlineCraft = [];
+      document.querySelectorAll('#rld-punchline .rl-dpill').forEach(p => p.classList.remove('on'));
       // Scroll the substyle row into view so users always see the available
       // styles immediately after picking a genre. Without this, the row
       // sometimes sits below the fold on shorter viewports and gets missed.
@@ -9489,6 +9507,11 @@ function onRapStyleSelect(styleId) {
   S.rapLabActive = true;
   const defaults = RAP_DIM_DEFAULTS[styleId] || {};
   S.rapDimensions = { ...defaults, flow: [defaults.flow || 'syncopated'], rhymeArch: [defaults.rhymeArch || 'end-only'] };
+  // New rap style = fresh punchline-craft selection. Without this reset,
+  // tools picked under the previous style silently apply to the new style's
+  // generation, which is rarely the intent.
+  S.punchlineCraft = [];
+  document.querySelectorAll('#rld-punchline .rl-dpill').forEach(p => p.classList.remove('on'));
   // Update card selection
   document.querySelectorAll('.rl-style-card').forEach(c => c.classList.toggle('on', c.dataset.style === styleId));
   // Show dimensions panel
@@ -9588,6 +9611,25 @@ function setRapDim(el, dim, value) {
     document.querySelectorAll(`#rld-${dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
     el.classList.add('on');
   }
+}
+
+// Punchline Craft toggle — multi-select, max 3 active tools. Server-side
+// whitelist enforces the same cap as defense-in-depth.
+function togglePunchlineCraft(el, tool) {
+  const list = Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [];
+  const idx = list.indexOf(tool);
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    el.classList.remove('on');
+  } else {
+    if (list.length >= 3) {
+      toast && toast('Max 3 punchline tools — deselect one first');
+      return;
+    }
+    list.push(tool);
+    el.classList.add('on');
+  }
+  S.punchlineCraft = list;
 }
 
 function setRapLabTab(el, cat) {
@@ -10419,6 +10461,7 @@ async function generateSong(){
     rapStyle: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined,
     rapDimensions: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapDimensions : undefined,
     rapLabActive: (S.selectedGenre === 'hiphop' && S.rapLabActive) || false,
+    punchlineCraft: (S.selectedGenre === 'hiphop' && S.rapLabActive && Array.isArray(S.punchlineCraft)) ? S.punchlineCraft : [],
     hookStyle: S.hookStyle || 'auto',
     bracketMode: S.bracketMode || 'suno',
     voice: {

@@ -542,6 +542,15 @@ module.exports = async function handler(req, res) {
         // Aggression whitelist — invalid → '' (server resolves to no aggression note)
         const VALID_AGGRESSION = new Set(['mellow','mid','heat','rage']);
         if (p.aggression && !VALID_AGGRESSION.has(p.aggression)) p.aggression = '';
+        // Punchline-craft tool whitelist — array of known tool keys, max 3.
+        // Invalid keys are silently dropped; the brain's own filter is the
+        // canonical gate, this is just defense-in-depth.
+        const VALID_PUNCHLINE_TOOLS = new Set(['setup_pause_punchline','hashtag_flow','brag_vulnerability_pivot']);
+        if (Array.isArray(p.punchlineCraft)) {
+          p.punchlineCraft = p.punchlineCraft.filter(t => VALID_PUNCHLINE_TOOLS.has(t)).slice(0, 3);
+        } else {
+          p.punchlineCraft = [];
+        }
         // Edge mode — strict boolean coercion. Edge stays inside the lyric tier ceiling.
         p.edgeMode = p.edgeMode === true;
         // Region whitelist — invalid → no region overlay (silent fallback)

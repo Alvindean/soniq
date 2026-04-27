@@ -5236,6 +5236,84 @@ VIDEO PROMPT:
   };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// PUNCHLINE CRAFT TOOLKIT — orthogonal layer for Rap Lab
+// Techniques abstracted from the Bad Boy / DJ Clue mixtape / Detroit punchline
+// lineage (Mase / Fabolous / Cassidy / Sean / Pusha / Cam'ron / Drake / Cole).
+// These are TOOLS the model can apply — not artist clones (Suno strips artist
+// names anyway). Stack 1-3 per song; each adds a directive to the prompt.
+//
+// V1 ships 3 tools. Roadmap: 6 more (Triple Entendre, Setup-Misdirection,
+// Mid-Bar Switch-Up, Quote-and-Flip, Tone-Content Contradiction, Hashtag Stack).
+// ═══════════════════════════════════════════════════════════════════════════
+const PUNCHLINE_CRAFT_TOOLS = {
+  setup_pause_punchline: {
+    label: 'Setup-Pause-Punchline',
+    short: 'Comedian-timing punchlines: setup line, deliberate dead-air gap, then payoff.',
+    directive: `SETUP-PAUSE-PUNCHLINE TIMING (apply to 2-4 lines per verse, never every bar):
+Construct the line as setup → gap → payoff. The setup runs the front of the bar; the payoff lands AFTER a deliberate breath. Mark the gap with an ellipsis (...) or a line break inside the bar. The pause is the technique — without it, the punchline is just a regular bar.
+Example shape: "Said I'd never make it out the city... still here." The "...still here" hits because the listener anticipated something different.
+Use sparingly — overuse turns the verse into a list of jokes. Reserve for the verse's most quotable lines.`,
+    when: { tier: ['street','conscious','archival'] },
+    examples: '"Bounce Back" (rapper sets up a fall, lands the rebound). "I Don\'t Fuck With You" (the spaced delivery of the title hook IS the technique). "Mercy" guest verse (the "I\'m bigger than the city" cluster uses 3 setup-pause-punchline pairs back-to-back).',
+  },
+  hashtag_flow: {
+    label: 'Hashtag Flow',
+    short: 'End the line with a one-word coda that recontextualises everything before it.',
+    directive: `HASHTAG FLOW (apply to 3-6 lines across the song, NOT every bar):
+End specific lines with a single-word coda that recontextualises the line you just heard. The coda lands AFTER a breath, often a noun or unexpected adjective. The pause before the coda is non-negotiable.
+Mark the breath with an ellipsis (...) or a comma — NEVER an em dash (the global lyric rules ban em dashes in the output).
+Example shapes: "I'm doing it big... fat." / "She drove me crazy, uber." / "Got the swag picking up... steeze." The setup must be a complete thought; the coda flips its meaning sideways.
+Critical rules: (1) the coda is one or two words MAX, (2) there must be visible whitespace or punctuation before the coda in the lyric, (3) it works because of the cognitive lag — the listener catches the second meaning a half-beat after delivery.`,
+    when: { tier: ['radio','street','conscious','archival'] },
+    examples: '"Don\'t Tell \'Em" hooks. "All Me" verse codas. "Marvin Gaye and Chardonnay" — the title itself follows hashtag-flow structure (setup phrase + coda). The technique was popularised by a Detroit rapper around 2010 and adopted by Toronto and Compton schools shortly after.',
+  },
+  brag_vulnerability_pivot: {
+    label: 'Brag-Vulnerability Pivot',
+    short: 'Alternate flex bars and confession bars within the same verse — whiplash IS the technique.',
+    directive: `BRAG-VULNERABILITY PIVOT (apply across the WHOLE verse, not as a single moment):
+Alternate aspirational/flex bars with emotional-confession bars within the same verse. Bar 1: an external achievement. Bar 2: an internal admission. Bar 3: another flex. Bar 4: another vulnerability. The whiplash between registers IS the technique — listeners feel access in a genre that often guards against it.
+Concrete pattern: "Just got the deposit cleared / my dad still hasn't called me back. / Bought a house in the hills / felt empty by Tuesday." Each pair: external win → emotional cost.
+Critical rules: (1) the flex must be SPECIFIC (dollar amount, brand, milestone), (2) the vulnerability must be EQUALLY SPECIFIC (named person, specific feeling, specific Tuesday), (3) DO NOT resolve them — leave the contradiction open. The unresolved tension is what makes the verse stick.
+Use this when the topic is achievement-adjacent (success, fame, money, status). Don't use it on pure hype tracks or pure ballads — it needs the achievement context to land.`,
+    when: { tier: ['street','conscious','archival'] },
+    examples: '"Marvin\'s Room" (the whole song operates this way). "Blessings" guest verse (every brag is shadowed by a confession). "Started From the Bottom" (the achievement is real, but the loneliness is named explicitly). The technique pairs especially well with second verses where the artist has already established external credentials in verse 1.',
+  },
+};
+
+// Compose the punchline-craft prompt block. Accepts an array of tool keys
+// (the UI sends checkbox selections). Returns '' if nothing selected.
+// Note: hasOwnProperty check is required — bare `PUNCHLINE_CRAFT_TOOLS[k]` would
+// resolve prototype keys like 'toString' to truthy function refs and crash later
+// when accessing .label/.directive on them.
+function buildPunchlineCraftNote(toolKeys, mood, lyricTier) {
+  if (!Array.isArray(toolKeys) || toolKeys.length === 0) return '';
+  const tierKey = String(lyricTier || 'street').toLowerCase();
+  const selected = toolKeys
+    .filter(k => Object.prototype.hasOwnProperty.call(PUNCHLINE_CRAFT_TOOLS, k))
+    .map(k => PUNCHLINE_CRAFT_TOOLS[k])
+    // Tier gate — radio tier disallows tools that need craft headroom
+    .filter(t => !t.when || !t.when.tier || t.when.tier.includes(tierKey))
+    .slice(0, 3); // hard cap — 3+ tools dilute each other
+  if (!selected.length) return '';
+
+  const blocks = selected.map(t =>
+    `▸ ${t.label.toUpperCase()}\n${t.directive}\n  Examples in this lineage: ${t.examples}`
+  );
+
+  // No leading \n\n — sibling note builders rely on the surrounding template's
+  // line breaks, and adding leading newlines here produces a triple-blank-line
+  // gap before this block that's inconsistent with the rest of the prompt.
+  return `🎯 PUNCHLINE CRAFT TOOLS — apply these techniques to the verses (not the hook unless specified). Each tool is a discrete craft technique, not a vibe. Read the directive carefully — these are about WHERE in the bar a payoff lands and HOW the cognitive timing works.
+
+${blocks.join('\n\n')}
+
+PUNCHLINE CRAFT META-RULES:
+• Don't apply a technique to every bar — saturation kills the effect. Pick the bars that earn it.
+• Punchline tools work BEST on Verse 2 and the Bridge — verses where the listener is already locked in. Verse 1 should establish topic; punchline tools refine it.
+• If the song is melodic / sung-hook driven, the punchline tools belong in the rapped sections only.`;
+}
+
 // ── RAP STYLES ───────────────────────────────────────────────────────────────
 // 24 styles: 14 established + 5 forward-looking + 5 revisionist
 // Each style has a specialist agent persona and default dimension values
@@ -5509,7 +5587,8 @@ function buildRapLabPrompt(params) {
     freestyleMode = false,
     barSwitch = 0,
     breakRule = false,
-    length = 'medium'
+    length = 'medium',
+    punchlineCraft = []
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -5662,6 +5741,7 @@ ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier)}
 ${buildRegionNote('hiphop', params.region)}
 ${buildEmotionalVelocityNote('hiphop', params.emotionalVelocity)}
+${buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier)}
 
 Respond with EXACTLY this format:
 
