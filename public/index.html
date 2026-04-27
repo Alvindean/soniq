@@ -3389,6 +3389,17 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <div class="spills" id="substyle-pills"></div>
       </div>
 
+      <!-- GENRE CRAFT TOOLKIT (shows only for genres with a toolkit defined).
+           Pills are populated dynamically by syncGenreCraftPills() based on the
+           current S.selectedGenre. Multi-select, max 3. Hidden for genres without
+           a toolkit (e.g. metal, indie) and for the hiphop path (Rap Lab has its
+           own punchline-craft layer). -->
+      <div class="substyle-wrap" id="genre-craft-row" style="display:none">
+        <span class="substyle-label-txt" id="genre-craft-label">Craft Tools</span>
+        <div class="spills" id="genre-craft-pills"></div>
+        <div style="font-size:9px;color:var(--tx3);margin-top:4px">stack up to 3 craft techniques</div>
+      </div>
+
       <!-- RAP LAB PANEL -->
       <div id="rap-lab-panel" class="rap-lab-panel" style="display:none">
         <div class="rl-header">
@@ -8671,6 +8682,9 @@ const S={selectedGenre:'pop',
   rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:['medium'], vocabRegister:['street-coded'], persona:['first-person-raw'] },
   // Punchline Craft tools — multi-select, max 3. Whitelist enforced server-side too.
   punchlineCraft: [],
+  // Genre Craft tools (per-genre toolkit) — multi-select, max 3.
+  // Cleared and re-rendered on every genre change.
+  genreCraft: [],
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
@@ -9314,6 +9328,11 @@ function onGenreChange(g){
     if(rapLabPanel) rapLabPanel.style.display='none';
     S.rapLabActive=false;
   }
+  // Re-render the per-genre craft toolkit pills (handles genre→genre
+  // transitions; clears state and shows/hides the row based on whether
+  // the new genre has a toolkit defined). Runs for ALL genres including
+  // hiphop (where it just hides the row).
+  if (typeof syncGenreCraftPills === 'function') syncGenreCraftPills();
 }
 function setQ(el,v){document.querySelectorAll('#quality-pills .qpill').forEach(p=>p.classList.remove('on'));el.classList.add('on');S.quality=v;}
 
@@ -9630,6 +9649,92 @@ function togglePunchlineCraft(el, tool) {
     el.classList.add('on');
   }
   S.punchlineCraft = list;
+}
+
+// ═══════════════════════════════════════════════════════
+// GENRE CRAFT TOOLKITS (client mirror — labels + tooltips only).
+// The actual directives live server-side in api/_brain.js. The client
+// only needs the human-readable label + short for rendering pills.
+// Keys MUST match the backend GENRE_CRAFT_TOOLKITS keys exactly.
+// ═══════════════════════════════════════════════════════
+const GENRE_CRAFT_TOOLKITS_CLIENT = {
+  country: {
+    label: "Storyteller's Toolkit",
+    tools: [
+      { key: 'title_hook_landing',     label: 'Title-Hook Landing',     short: 'Title lands as the LAST line of every chorus.' },
+      { key: 'specific_detail_emotion', label: 'Specific Detail',        short: 'Replace generic nouns with hyper-specific ones. Specificity = truth in country.' },
+      { key: 'geographic_anchor',      label: 'Geographic Anchor',      short: 'Plant 1-2 specific place references. The place is a character.' },
+      { key: 'verse_2_reveal',         label: 'Verse-2 Reveal',         short: 'Verse 2 reframes everything in Verse 1 — death, divorce, return.' },
+    ],
+  },
+  rnb: {
+    label: 'Vocal Architecture Toolkit',
+    tools: [
+      { key: 'melisma_run_placement', label: 'Melisma Run Placement',  short: 'Mark 2-4 specific syllables for vocal runs. Never every line.' },
+      { key: 'call_response_stack',   label: 'Call & Response Stack',  short: 'Lead calls, backgrounds respond — backgrounds are an equal voice.' },
+      { key: 'falsetto_pivot',        label: 'Falsetto Pivot',         short: 'ONE moment flips into falsetto — bridge peak or final-chorus tail.' },
+      { key: 'belted_release',        label: 'Belted Release',         short: 'ONE sustained belted note. The bar BEFORE must be quiet.' },
+    ],
+  },
+  pop: {
+    label: 'Hook Construction Toolkit',
+    tools: [
+      { key: 'pre_chorus_lift',        label: 'Pre-Chorus Lift',         short: '2-4 line ramp that builds tension the chorus releases.' },
+      { key: 'title_hashtag_chorus',   label: 'Title Hashtag in Chorus', short: 'Title lands as a hashtag-flow coda after a breath.' },
+      { key: 'post_chorus_singalong',  label: 'Post-Chorus Singalong',   short: '4-8 bars of vowels after every chorus. The TikTok hook lives here.' },
+      { key: 'bridge_key_change',      label: 'Bridge Key Change',       short: 'Modulate up 1-3 semitones — final chorus sits noticeably higher.' },
+    ],
+  },
+};
+
+// Re-render the genre-craft pill row when the genre changes. Called by
+// onGenreChange after S.selectedGenre is updated.
+function syncGenreCraftPills() {
+  const row = document.getElementById('genre-craft-row');
+  const pills = document.getElementById('genre-craft-pills');
+  const label = document.getElementById('genre-craft-label');
+  if (!row || !pills || !label) return;
+  // Wipe state FIRST — stale selections from a previous genre would otherwise
+  // ride out on the request body even if the new genre has no toolkit (the
+  // brain catches it, but it's bad data over the wire and pollutes any
+  // pre-brain logging).
+  S.genreCraft = [];
+  pills.innerHTML = '';
+  // Hide for hiphop (Rap Lab has its own punchline craft layer) and for any
+  // genre we haven't built a toolkit for yet.
+  const toolkit = GENRE_CRAFT_TOOLKITS_CLIENT[S.selectedGenre];
+  if (!toolkit || S.selectedGenre === 'hiphop') {
+    row.style.display = 'none';
+    return;
+  }
+  row.style.display = 'block';
+  label.textContent = toolkit.label;
+  toolkit.tools.forEach(t => {
+    const el = document.createElement('span');
+    el.className = 'spill';
+    el.textContent = t.label;
+    el.title = t.short;
+    el.dataset.tool = t.key;
+    el.onclick = () => toggleGenreCraft(el, t.key);
+    pills.appendChild(el);
+  });
+}
+
+function toggleGenreCraft(el, tool) {
+  const list = Array.isArray(S.genreCraft) ? S.genreCraft : [];
+  const idx = list.indexOf(tool);
+  if (idx >= 0) {
+    list.splice(idx, 1);
+    el.classList.remove('on');
+  } else {
+    if (list.length >= 3) {
+      toast && toast('Max 3 craft tools — deselect one first');
+      return;
+    }
+    list.push(tool);
+    el.classList.add('on');
+  }
+  S.genreCraft = list;
 }
 
 function setRapLabTab(el, cat) {
@@ -10462,6 +10567,9 @@ async function generateSong(){
     rapDimensions: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapDimensions : undefined,
     rapLabActive: (S.selectedGenre === 'hiphop' && S.rapLabActive) || false,
     punchlineCraft: (S.selectedGenre === 'hiphop' && S.rapLabActive && Array.isArray(S.punchlineCraft)) ? S.punchlineCraft : [],
+    // Genre Craft tools (non-hiphop genres). Stripped to [] for hiphop so it
+    // never collides with rap-side punchlineCraft.
+    genreCraft: (S.selectedGenre !== 'hiphop' && Array.isArray(S.genreCraft)) ? S.genreCraft : [],
     hookStyle: S.hookStyle || 'auto',
     bracketMode: S.bracketMode || 'suno',
     voice: {

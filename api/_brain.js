@@ -4633,7 +4633,8 @@ function buildSongPrompt(params) {
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
     freestyleMode = false, breakRule = false, eraUndertone = '',
     graftGenre = '', graftSection = 'chorus', invertCounter = false,
-    coachInstruction = '', originalLyrics = '', aggression = ''
+    coachInstruction = '', originalLyrics = '', aggression = '',
+    genreCraft = []
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -4970,7 +4971,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -5312,6 +5313,186 @@ PUNCHLINE CRAFT META-RULES:
 • Don't apply a technique to every bar — saturation kills the effect. Pick the bars that earn it.
 • Punchline tools work BEST on Verse 2 and the Bridge — verses where the listener is already locked in. Verse 1 should establish topic; punchline tools refine it.
 • If the song is melodic / sung-hook driven, the punchline tools belong in the rapped sections only.`;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// GENRE CRAFT TOOLKITS — per-genre orthogonal craft layer for buildSongPrompt
+// Same architecture as PUNCHLINE_CRAFT_TOOLS but keyed by genre. Each genre's
+// toolkit is a small set of named techniques that the user can stack onto a
+// song (max 3 per song). Each tool has the same shape:
+//   label / short / directive (LLM-facing) / when (tier gate) / examples
+//
+// V1 ships 3 genres × 4 tools = 12 techniques. Roadmap: Rock, Latin, Afrobeats,
+// Singer-Songwriter — same pattern, just adds entries to this object.
+// ═══════════════════════════════════════════════════════════════════════════
+const GENRE_CRAFT_TOOLKITS = {
+  country: {
+    label: 'Storyteller\'s Toolkit',
+    tools: {
+      title_hook_landing: {
+        label: 'Title-Hook Landing',
+        short: 'Build every line so the song\'s TITLE lands as the chorus payoff — never earlier.',
+        directive: `TITLE-HOOK LANDING (country structural signature):
+The song's TITLE must be the LAST line of the chorus on every chorus repeat — never the first. Verses, pre-chorus, and chorus all walk toward it. Country listeners are conditioned to wait for the title; landing it anywhere else (or burying it inside a chorus) wastes the conditioning.
+Craft pattern: chorus lines 1-3 build emotional context, line 4 IS the title. The title should feel earned, not announced. The pre-chorus should set up a tension that only the title resolves.
+Critical rules: (1) the title appears verbatim on the LAST line of every chorus, (2) verses do NOT contain the full title — at most an echo or partial reference, (3) the song's emotional climax is the FINAL chorus's title landing.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"The Dance" — title arrives as the last line of the chorus, recontextualises the whole song. "Whiskey Glasses" — title is the chorus payoff every time. "Before He Cheats" — title is the chorus button. "I Will Always Love You" — title IS the chorus.',
+      },
+      specific_detail_emotion: {
+        label: 'Specific Detail = Emotion',
+        short: 'Replace every generic noun with a hyper-specific one. Specificity creates universality in country.',
+        directive: `SPECIFIC DETAIL AS EMOTION (country's central craft technique):
+Replace every generic noun with a specific one. NOT "she left me" but "she left a half-drunk Bud Light on the kitchen counter." NOT "we drove home" but "we took the long way back on Route 31 with the windows cracked." Country craft lives on the proper noun, the brand name, the precise hour, the specific Tuesday.
+Why it works: listeners read specificity as TRUTH. "A truck" is generic; "a '93 Silverado with a busted tailgate" sounds like memory. The listener fills in their own detail by analogy. Vagueness reads as posturing in country — country is the only major genre where MORE specific = MORE universal.
+Apply to: at least one detail per verse, two per chorus, one per bridge. Don't fake it — if you don't have a specific detail, the verse line should be cut, not generalised.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Something in the Orange" — specific hour, specific sky color, specific Tuesday morning. "The House That Built Me" — specific bedroom carpet, specific window. "Cover Me Up" — specific date, specific drink, specific room. "Strawberry Wine" — specific year, specific summer, specific 17.',
+      },
+      geographic_anchor: {
+        label: 'Geographic Anchor',
+        short: 'Plant 1-2 specific place references per song. The place is a character.',
+        directive: `GEOGRAPHIC ANCHOR (country needs to live somewhere):
+Plant 1-2 specific geographic references in the song. Highway names, county names, town names, regional vocabulary, landscape features, named landmarks. Generic regional vibes ("the country", "down south") don't count — name a SPECIFIC place that exists on a map.
+The place is a character: it shows up in verse imagery, gets named in the bridge, and frames the emotional landscape. "Down a back road" is filler; "Down a back road in Bakersfield" is craft. "She came from a small town" is filler; "She came from Boone County" is craft.
+This works because country listeners place trust in songs that know their geography. Vagueness reads as touristic; specificity reads as native.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Country Squire" — Eastern Kentucky vocabulary saturates every verse. "Take Me Home, Country Roads" — the title declares the geographic premise; West Virginia in every chorus. "Murder on Music Row" — Nashville as character.',
+      },
+      verse_2_reveal: {
+        label: 'Verse-2 Reveal',
+        short: 'Verse 2 reframes Verse 1 — death, divorce, return, betrayal. Don\'t describe more; SHIFT.',
+        directive: `VERSE-2 REVEAL (country's signature structural move):
+Verse 1 sets up the relationship/scene at face value. Verse 2 must REVEAL something that reframes everything in Verse 1. Not just "more detail" — a SHIFT in the listener's understanding. Common reveal types: a death announced, a divorce explained, a return after years away, a betrayal exposed, a regret named, a years-later perspective, a child's voice now adult.
+Critical rules: (1) Verse 1 must be readable as ONE thing on first listen; Verse 2 must reveal it was ANOTHER thing all along, (2) the reveal lands in the FIRST 4 lines of Verse 2 — don't bury it, (3) after the reveal, the chorus hits differently because the title now means something new.
+This is why country songs reward second listens — the reveal makes the listener want to hear Verse 1 again with the new context.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"He Stopped Loving Her Today" — Verse 1: he kept her things. Verse 2 reveal: she\'s coming to his funeral. "Strawberry Wine" — Verse 1: that summer at 17. Verse 2 reveal: years have passed and that summer was the only one. "Whiskey Lullaby" — Verse 1: he drank himself to death. Verse 2 reveal: she did the same.',
+      },
+    },
+  },
+  rnb: {
+    label: 'Vocal Architecture Toolkit',
+    tools: {
+      melisma_run_placement: {
+        label: 'Melisma Run Placement',
+        short: 'Mark 2-4 specific syllables per song where the vocal runs/melismates — never every line.',
+        directive: `MELISMA RUN PLACEMENT (R&B vocal craft):
+Identify 2-4 specific syllables in the song where the vocalist should RUN the note (melismate — extend a single syllable across multiple pitches). Mark these explicitly with [vocal run] or [melisma] on its own line immediately before the lyric line that contains the runnable syllable.
+Reserve runs for the words that carry the most emotional weight: a lover's name, a feeling-word ("love", "stay", "gone", "you"), a confession's keyword. Overuse is the most common R&B mistake — it turns into vocal showboating and the runs lose their meaning.
+Critical rules: (1) max 4 marked runs across the entire song, (2) at least one should be on the bridge, one on the final chorus, (3) the run should land on a single vowel that opens up — "you", "stay", "free", "alone".`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Crazy in Love" — runs land on the peaks of the chorus, never the verse. "If I Ain\'t Got You" — runs concentrate on "you" specifically, never on filler words. "Untitled (How Does It Feel)" — the bridge is essentially one extended run on a single syllable.',
+      },
+      call_response_stack: {
+        label: 'Background-Vocal Call & Response',
+        short: 'Lead vocal calls; background vocals respond — backgrounds are an equal voice, not a doubling.',
+        directive: `BACKGROUND-VOCAL CALL AND RESPONSE (R&B chorus architecture):
+Construct the chorus as a conversation between the lead vocal and the background vocals. Mark with [Call] and [Response] tags inline. The response is its OWN melodic line — it can echo the lead, finish the lead's phrase, ask back, or contradict. Never just doubling.
+Apply on: the chorus (mandatory), optionally the bridge climax. Verses should be lead-only or have minimal background ad-libs.
+Critical rules: (1) the response is a DIFFERENT melodic line, not a unison double, (2) place the response on the SECOND half of the bar so the listener hears the lead first, then the answer, (3) the response can be wordless ("ooh", "yeah", "mmm") or word-based — choose based on whether the call is a question (response answers) or a statement (response affirms).`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"Crazy" (Gnarls Barkley) — calls and responses run through the chorus structure. "I Wanna Dance With Somebody" — backgrounds finish the lead\'s sentence. "Halo" — choir-style response on the chorus tail. "Real Love" — the call-response IS the chorus melody.',
+      },
+      falsetto_pivot: {
+        label: 'Falsetto Pivot',
+        short: 'ONE moment in the song flips into falsetto — bridge peak or final-chorus penultimate line.',
+        directive: `FALSETTO PIVOT (R&B emotional lift):
+Plant exactly ONE moment in the song where the vocalist pivots into falsetto. Mark with [falsetto] on its own line immediately before the lyric. Best placements: the bridge peak, the second-to-last line of the final chorus, or a specific word that demands lift.
+Critical rules: (1) the PIVOT is the technique — don't sustain falsetto for whole sections, (2) the bar BEFORE the falsetto pivot should be in chest voice so the contrast lands, (3) the bar AFTER the falsetto can return to chest or stay in falsetto for resolution; pick one and commit. The unexpected pivot creates the emotional access R&B is built on.
+Why one moment, not many: falsetto reads as vulnerability. If everything is in falsetto, nothing is. If ONE line is in falsetto and that line carries the song's most fragile admission, the listener catches the meaning AND the technique simultaneously.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Stay With Me" — falsetto pivot on the chorus tail, returns to chest. "End of the Road" — the bridge falsetto release defines the song. "Adorn" — falsetto pivot lands on the title word specifically. "Call Out My Name" — pivot lands on the bridge\'s most vulnerable confession.',
+      },
+      belted_release: {
+        label: 'Belted Release',
+        short: 'ONE sustained belted note at the bridge climax or final chorus penultimate. The bar BEFORE must be quiet.',
+        directive: `BELTED RELEASE (R&B's emotional payoff moment):
+Plant exactly ONE belted release in the song — a sustained, full-chest note held for 2-4 beats on a single vowel. Place it on the BRIDGE CLIMAX or the FINAL CHORUS penultimate line. Mark with [belted] or [held — 4 beats] on its own line immediately before the lyric.
+The dynamics setup is non-negotiable: the bar IMMEDIATELY BEFORE the belt must be quieter than everything else around it. Without the dynamic dip, the belt has nothing to release against and lands flat. Often this means a whispered or near-spoken line right before the belt.
+Critical rules: (1) ONE belt per song — repetition kills the effect, (2) the belt should land on an OPEN vowel ("you", "no", "free", "stay", "all", "home"), (3) the bar AFTER the belt should be sparse — let the listener recover. Music after a belt should NEVER compete with the residue.`,
+        when: { tier: ['street','conscious','archival'] },
+        examples: '"I Will Always Love You" — the famous bridge belt; the silence before it is the technique. "Listen" (Dreamgirls) — final chorus belt earned by the bridge buildup. "Hallelujah" (Jeff Buckley) — sustained holds become belted by the final chorus. "Greatest Love of All" — belt placement on the title word.',
+      },
+    },
+  },
+  pop: {
+    label: 'Hook Construction Toolkit',
+    tools: {
+      pre_chorus_lift: {
+        label: 'Pre-Chorus Lift',
+        short: 'A 2-4 line ramp that builds tension the chorus releases. Most "almost-pop" songs lack this.',
+        directive: `PRE-CHORUS LIFT (modern pop's load-bearing structural element):
+Construct a 2-4 line pre-chorus that builds harmonically AND lyrically toward the chorus. Each line should rise — in pitch, in pacing, or in emotional intensity. The LAST pre-chorus line should END mid-thought so the chorus completes it.
+Without a pre-chorus, modern pop choruses arrive flat. With one, the chorus releases the tension the pre-chorus built. This is the difference between songs that pop and songs that drift past.
+Critical rules: (1) length: 2-4 lines, NOT longer — past 4 lines the lift loses momentum, (2) harmonic motion: pre-chorus should move AWAY from the home key (often to the IV or vi) so the chorus return feels like coming home, (3) the last pre-chorus line should set up a question, an action, or a partial phrase that the chorus resolves.`,
+        when: { tier: ['radio','street','conscious','archival'] },
+        examples: '"Levitating" — the pre-chorus is the song\'s fingerprint and what makes the chorus inevitable. "Shape of You" — pre-chorus walks straight into the post-chorus drop. "Bad Guy" — the whispered pre-chorus is the launchpad for the explosive chorus. "Espresso" — pre-chorus tension makes the title-as-chorus land.',
+      },
+      title_hashtag_chorus: {
+        label: 'Title-as-Hashtag in Chorus',
+        short: 'Title lands as a hashtag-flow coda in the chorus — set up the line, breath, drop the title.',
+        directive: `TITLE-AS-HASHTAG IN CHORUS (modern pop conditioning):
+Construct the chorus so the song's TITLE lands as a hashtag-flow coda — set up the chorus line, leave a deliberate breath (mark with ellipsis "..." or comma — never em dash, the global rule), then drop the title as a coda. Repeat this exact structure on every chorus iteration so the title becomes the trademark beat the listener anticipates.
+Why it works: pop listeners are conditioned to wait for the title. If it always lands in the same structural slot (after a breath, at the chorus tail), the listener can sing along by the second chorus without learning the rest of the lyrics.
+Critical rules: (1) the title is the LAST 1-3 syllables of the chorus, (2) the breath before the title is non-negotiable — mark with ellipsis or comma in the lyric, (3) the line BEFORE the title should be a complete thought; the title then flips its meaning sideways or completes it.`,
+        when: { tier: ['radio','street','conscious'] },
+        examples: '"Espresso" — title lands as a comma-coda after the setup line. "WAP" — the title IS the hashtag-flow coda. "Levitating" — "I\'m levitating" is set up by the line before, then released after the breath. "Don\'t Start Now" — title lands as the chorus button after a setup line.',
+      },
+      post_chorus_singalong: {
+        label: 'Post-Chorus Singalong',
+        short: 'A 4-8 bar wordless or syllable-only section after every chorus. The TikTok hook lives here.',
+        directive: `POST-CHORUS SINGALONG (the modern pop hook hides here):
+After every chorus, write a 4-8 bar post-chorus section using vowel sounds, "na-na-na", "oh-oh-oh", "la-la-la", or the song's signature syllable. Mark with [Post-Chorus] tag on its own line. This is what plays in the background of TikToks; it's the part listeners hum without knowing the lyrics. Make it instantly memorable — should be singable on first listen.
+Why it works: post-chorus removes the cognitive load of words and gives the listener pure melodic memory. The chorus is the SONG; the post-chorus is the EARWORM. Modern pop's biggest songs all have one.
+Critical rules: (1) 4-8 bars, no more (longer drags), (2) max 2 distinct syllables — "na-na-na" is two syllables (NA, NA-NA pattern), "oh-oh-oh" is one, (3) the post-chorus melody should DIFFER from the chorus melody — if it's the same melody with vowels, it's not earning its place, (4) repeat the same post-chorus on every chorus iteration so it becomes the song's signature.`,
+        when: { tier: ['radio','street','conscious'] },
+        examples: '"We Don\'t Talk About Bruno" — post-chorus chant. "Stay" (Justin Bieber/Kid LAROI) — "oh oh oh" post-chorus is the actual hook. "Watermelon Sugar" — the wordless post-chorus IS what plays on TikTok. "Lose Yourself to Dance" — pure post-chorus singalong architecture. "Levitating" — "if you wanna run away with me" is the post-chorus singalong substitute.',
+      },
+      bridge_key_change: {
+        label: 'Bridge Key Change',
+        short: 'Modulate up 1-3 semitones at the bridge end — final chorus sits noticeably higher.',
+        directive: `BRIDGE KEY CHANGE (the trucker key change — yes it works because audience conditioning is real):
+At the bridge end, modulate up 1-3 semitones (key change) so the final chorus sits noticeably higher than every previous chorus. Mark with [Key Change Up — +2 semitones] (or +1, +3) in the section header. The final chorus should feel like the song lifting itself onto a ledge it couldn't reach before.
+This is the most universally recognised pop modulation. Critics call it cliché; audiences respond to it because pop ear-training has conditioned the response for 60 years. Use it intentionally — once per song, on the final chorus, never anywhere else.
+Critical rules: (1) the modulation lands at the END of the bridge, NOT the middle — the bridge should be in the original key for at least 4 bars before lifting, (2) the lift transition should be a HALF beat of harmonic ambiguity (a single chord, a sustained note, or a brief silence) — abrupt key changes feel jarring, (3) the final chorus should stay in the new key for the whole chorus AND post-chorus — don't return to the original key.`,
+        when: { tier: ['radio','street'] },
+        examples: '"I Will Always Love You" — the canonical example; bridge ends, key shifts up, final chorus belted in the new key. "Love On Top" — modulates 4 times in 90 seconds, each lift a new emotional plateau. "Living on a Prayer" — second-to-last chorus modulates up; the last verse is in the new key. "Man! I Feel Like a Woman" — bridge ends with the key shift; final chorus is iconic.',
+      },
+    },
+  },
+};
+
+// Compose the genre craft prompt block. Genre key + array of tool keys (UI
+// sends checkbox selections). Returns '' if the genre has no toolkit defined
+// or if no valid tools are selected after tier filtering.
+function buildGenreCraftNote(genre, toolKeys, mood, lyricTier) {
+  if (!Array.isArray(toolKeys) || toolKeys.length === 0) return '';
+  const toolkit = GENRE_CRAFT_TOOLKITS[genre];
+  if (!toolkit || !toolkit.tools) return '';
+  const tools = toolkit.tools;
+  const tierKey = String(lyricTier || 'street').toLowerCase();
+
+  const selected = toolKeys
+    // hasOwnProperty guard against prototype keys (toString, __proto__, etc.)
+    .filter(k => Object.prototype.hasOwnProperty.call(tools, k))
+    .map(k => tools[k])
+    .filter(t => !t.when || !t.when.tier || t.when.tier.includes(tierKey))
+    .slice(0, 3);
+  if (!selected.length) return '';
+
+  const blocks = selected.map(t =>
+    `▸ ${t.label.toUpperCase()}\n${t.directive}\n  Examples in this lineage: ${t.examples}`
+  );
+
+  return `🎯 ${toolkit.label.toUpperCase()} — apply these techniques deliberately. Each is a discrete craft move, not a vibe. Read the directive carefully — these are about WHERE in the song a payoff lands and HOW the structural timing works.
+
+${blocks.join('\n\n')}
+
+CRAFT META-RULES:
+• Don't apply a technique to every line/section — saturation kills the effect.
+• Tools STACK with each other; pick combinations that reinforce, not compete.
+• If a tool's directive contradicts another part of the prompt, the tool wins for the section it covers.`;
 }
 
 // ── RAP STYLES ───────────────────────────────────────────────────────────────
