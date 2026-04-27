@@ -9685,6 +9685,52 @@ const GENRE_CRAFT_TOOLKITS_CLIENT = {
       { key: 'bridge_key_change',      label: 'Bridge Key Change',       short: 'Modulate up 1-3 semitones — final chorus sits noticeably higher.' },
     ],
   },
+  // Rock + Punk share the Anthem Toolkit (registered separately for UI clarity).
+  rock: {
+    label: 'Anthem Toolkit',
+    tools: [
+      { key: 'gang_chorus',         label: 'Gang Chorus',           short: 'Multiple voices yell the chorus together. Off-pitch is the point.' },
+      { key: 'quiet_loud_dynamic',  label: 'Quiet-Loud Dynamic',    short: 'Verse strips down (clean guitar); chorus explodes (full distortion).' },
+      { key: 'power_chord_drone',   label: 'Power-Chord Drone',     short: 'Chorus locks on ONE chord — bass+guitar drone, melody floats above.' },
+      { key: 'solo_placement',      label: 'Instrumental Solo',     short: '8-16 bar solo after second chorus. Hummable, not virtuosic.' },
+    ],
+  },
+  punk: {
+    label: 'Anthem Toolkit',
+    tools: [
+      { key: 'gang_chorus',         label: 'Gang Chorus',           short: 'Multiple voices yell the chorus together. Punk\'s communal contract.' },
+      { key: 'three_chord_economy', label: 'Three-Chord Economy',   short: 'Entire song on 3 chords. No bridge, no key change. Restraint IS the technique.' },
+      { key: 'tempo_as_attitude',   label: 'Tempo As Attitude',     short: '180+ BPM. Speed is the political stance.' },
+      { key: 'abrupt_ending',       label: 'Abrupt Ending',         short: 'No fade out. Single hard hit, clipped final word. Slammed door.' },
+    ],
+  },
+  latin: {
+    label: 'Rhythmic Toolkit',
+    tools: [
+      { key: 'clave_anchoring',          label: 'Clave Anchoring',         short: 'Lock the song to 2-3 or 3-2 clave. Every melody respects it.' },
+      { key: 'montuno_call_response',    label: 'Montuno Call & Response', short: 'Repeating piano figure + coro answering lead. Bidirectional.' },
+      { key: 'bilingual_codeswitch',     label: 'Bilingual Code-Switch',   short: 'Spanish for emotion, English for hooks (or vice versa). Layered.' },
+      { key: 'coro_stack',               label: 'Coro Vocal Stack',        short: 'Group vocal stack on chorus, harmonised in 3rds + 6ths.' },
+    ],
+  },
+  afrobeats: {
+    label: 'Polyrhythm Toolkit',
+    tools: [
+      { key: 'dembow_lock',              label: 'Dembow Lock',             short: 'Rhythm grid is dembow at 100-115 BPM. Every melody respects it.' },
+      { key: 'talking_drum_break',       label: 'Talking-Drum Break',      short: '4-8 bar drum-led break that imitates speech rhythm.' },
+      { key: 'pidgin_english_layer',     label: 'Pidgin/English Layer',    short: 'Pidgin/Yoruba verses, English chorus (or vice versa). Cultural anchor.' },
+      { key: 'highlife_guitar_ostinato', label: 'Highlife Guitar Ostinato',short: 'Repeating clean-tone guitar pattern runs the whole song.' },
+    ],
+  },
+  ss: {
+    label: 'Confessional Toolkit',
+    tools: [
+      { key: 'specific_tuesday_detail',  label: 'Specific-Tuesday Detail', short: 'Name a specific day, hour, weather. The more specific the more universal.' },
+      { key: 'whispered_confession',     label: 'Whispered Confession',    short: 'ONE line in [whispered] tag, just above audible. The song\'s most vulnerable moment.' },
+      { key: 'imagery_anchor',           label: 'Imagery Anchor',          short: 'ONE concrete image returns through V1, bridge, outro. Re-meaning each time.' },
+      { key: 'bridge_revelation',        label: 'Bridge Revelation',       short: 'Bridge admits what V1 couldn\'t ask. The moment of self-knowledge.' },
+    ],
+  },
 };
 
 // Re-render the genre-craft pill row when the genre changes. Called by
