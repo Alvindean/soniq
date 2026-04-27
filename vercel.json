@@ -12,7 +12,8 @@
     "api/stripe.js":         { "maxDuration": 30 },
     "api/founding.js":       { "maxDuration": 10 },
     "api/admin-session.js":  { "maxDuration": 10 },
-    "api/aff.js":            { "maxDuration": 10 }
+    "api/aff.js":            { "maxDuration": 10 },
+    "api/health.js":         { "maxDuration": 5 }
   },
   "headers": [
     {
