@@ -614,6 +614,13 @@ module.exports = async function handler(req, res) {
         } else {
           lp.punchlineCraft = [];
         }
+        // Substyle override for Lucky — string up to 60 chars, sanitised by brain.
+        // When unset, buildLuckyPrompt auto-picks a genre-appropriate substyle.
+        if (typeof lp.substyle === 'string') {
+          lp.substyle = lp.substyle.trim().slice(0, 60);
+        } else {
+          lp.substyle = '';
+        }
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);
