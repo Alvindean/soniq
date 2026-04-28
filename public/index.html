@@ -10308,7 +10308,7 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : []}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null, sunoSettings: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
@@ -10650,7 +10650,11 @@ async function generateSong(){
     rapStyle: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined,
     rapDimensions: (S.selectedGenre === 'hiphop' && S.rapLabActive) ? S.rapDimensions : undefined,
     rapLabActive: (S.selectedGenre === 'hiphop' && S.rapLabActive) || false,
-    punchlineCraft: (S.selectedGenre === 'hiphop' && S.rapLabActive && Array.isArray(S.punchlineCraft)) ? S.punchlineCraft : [],
+    // Punchline / strategic-mind craft tools — available cross-genre.
+    // Hip-Hop fires via Rap Lab; non-hiphop genres can pass tools too if the
+    // user has selected any (e.g. Nu-Metal rapped verses + Observe→Deduce,
+    // prog-metal + 5 Moves Ahead, alt-rock + Long-Con Callback).
+    punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [],
     // Genre Craft tools (non-hiphop genres). Stripped to [] for hiphop so it
     // never collides with rap-side punchlineCraft.
     genreCraft: (S.selectedGenre !== 'hiphop' && Array.isArray(S.genreCraft)) ? S.genreCraft : [],

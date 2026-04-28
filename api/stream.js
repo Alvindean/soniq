@@ -545,7 +545,12 @@ module.exports = async function handler(req, res) {
         // Punchline-craft tool whitelist — array of known tool keys, max 3.
         // Invalid keys are silently dropped; the brain's own filter is the
         // canonical gate, this is just defense-in-depth.
-        const VALID_PUNCHLINE_TOOLS = new Set(['setup_pause_punchline','hashtag_flow','brag_vulnerability_pivot']);
+        const VALID_PUNCHLINE_TOOLS = new Set([
+          // Original 3 punchline-timing tools
+          'setup_pause_punchline','hashtag_flow','brag_vulnerability_pivot',
+          // Strategic-mind craft tools (Sun Tzu / Sherlock / Batman / Machiavelli register)
+          'observation_deduction','five_moves_ahead','patience_as_weapon','art_of_war_inversion','long_con_callback'
+        ]);
         if (Array.isArray(p.punchlineCraft)) {
           p.punchlineCraft = p.punchlineCraft.filter(t => VALID_PUNCHLINE_TOOLS.has(t)).slice(0, 3);
         } else {
@@ -598,6 +603,17 @@ module.exports = async function handler(req, res) {
         if (lp.emotionalVelocity && !VALID_LUCKY_VELOCITY.has(lp.emotionalVelocity)) lp.emotionalVelocity = 'auto';
         const VALID_LUCKY_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (lp.region && !VALID_LUCKY_REGIONS.has(lp.region)) lp.region = '';
+        // Punchline-craft tool whitelist for Lucky — same set as the song path.
+        // When unset, buildLuckyPrompt auto-picks 1-2 tools for thinking-artist genres.
+        const VALID_LUCKY_PUNCHLINE = new Set([
+          'setup_pause_punchline','hashtag_flow','brag_vulnerability_pivot',
+          'observation_deduction','five_moves_ahead','patience_as_weapon','art_of_war_inversion','long_con_callback'
+        ]);
+        if (Array.isArray(lp.punchlineCraft)) {
+          lp.punchlineCraft = lp.punchlineCraft.filter(t => VALID_LUCKY_PUNCHLINE.has(t)).slice(0, 3);
+        } else {
+          lp.punchlineCraft = [];
+        }
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);

@@ -4708,7 +4708,8 @@ function buildSongPrompt(params) {
     freestyleMode = false, breakRule = false, eraUndertone = '',
     graftGenre = '', graftSection = 'chorus', invertCounter = false,
     coachInstruction = '', originalLyrics = '', aggression = '',
-    genreCraft = []
+    genreCraft = [],
+    punchlineCraft = []
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -5045,7 +5046,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -5192,6 +5193,25 @@ function buildLuckyPrompt(params) {
   const edgeNote = buildEdgeNote(params.edgeMode, params.lyricTier);
   const regionNote = buildRegionNote(g1, params.region);
 
+  // ── Punchline / strategic-mind craft tools for Lucky ───────────────────
+  // When the fusion includes a "thinking-artist" genre (lyric-dense traditions
+  // where strategic bars land — hip-hop, metal, alt-rock, rock, punk, jazz,
+  // singer-songwriter, folk), auto-pick 2 craft tools so Lucky songs in those
+  // genres get the same craft ceiling as Rap Lab. Honour client-supplied
+  // tools when present (advanced UI lets the user prompt for specific tools).
+  // g1/g2 arrive title-case from FUSION_DATA keys ("Metal", "Hip-Hop", "Alt-Rock"),
+  // so normalise via _normalizeGenreKey before the lowercase-keyed lookup.
+  const THINKING_GENRES = new Set(['hiphop','metal','altrock','rock','punk','jazz','ss','folk']);
+  const _g1Think = _normalizeGenreKey(g1);
+  const _g2Think = _normalizeGenreKey(g2);
+  const luckyAutoCraftPool = ['observation_deduction','five_moves_ahead','patience_as_weapon','art_of_war_inversion','long_con_callback','setup_pause_punchline','hashtag_flow','brag_vulnerability_pivot'];
+  const _userPunchlineCraft = Array.isArray(params && params.punchlineCraft) ? params.punchlineCraft : [];
+  const _luckyShouldAutoCraft = _userPunchlineCraft.length === 0 && (THINKING_GENRES.has(_g1Think) || THINKING_GENRES.has(_g2Think));
+  const luckyPunchlineCraft = _userPunchlineCraft.length > 0
+    ? _userPunchlineCraft
+    : (_luckyShouldAutoCraft ? [pickRandom(luckyAutoCraftPool), pickRandom(luckyAutoCraftPool)].filter((v,i,a)=>a.indexOf(v)===i) : []);
+  const punchlineCraftNote = buildPunchlineCraftNote(luckyPunchlineCraft, mood, params && params.lyricTier);
+
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
   const o2 = GENRE_BIBLE[g2]?.outliers;
@@ -5225,7 +5245,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
