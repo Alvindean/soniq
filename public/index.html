@@ -8200,6 +8200,7 @@ const SUBSTYLE_BRACKETS={
   'East Coast':        { verse:'[16-bar Verse | Boom Bap | Lyrical]',     hook:'[Hook | Chanted | Anthemic]',                extra:['[Boom Bap Break]','[Outro]'] },
   'Midwest':           { verse:'[16-bar Verse | Soulful | Rap Verse]',    hook:'[Hook | Sung | Soul | Chipmunk]',            extra:['[Soul Break]','[Outro Vamp]'] },
   'Cloud Rap':         { verse:'[16-bar Verse | Hazy | Slow Flow]',       hook:'[Hook | Ethereal | Whispered | Melodic]',    extra:['[Ambient Break]','[Outro | Fade-Out]'] },
+  'Phonk':             { verse:'[16-bar Verse | Pitched-Down | Demonic Cadence]', hook:'[Hook | Distorted Chant | Memphis Slowed]', extra:['[Cowbell Break | 8 bars | Drift Section]','[Vocal Chop | Pitched-Down Memphis Sample]','[Outro | Distorted 808 Fade]'] },
   'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Chanted | Anthemic | Conscious]',    extra:['[Spoken Word Bridge]','[Outro]'] },
   'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Rapped | Classic]',                  extra:['[Scratch Break]','[Outro]'] },
   // Neo-Soul
@@ -8244,6 +8245,19 @@ const SUBSTYLE_BRACKETS={
   'Piano-based':              { verse:'[Verse | Piano-Led | Whispered]',                hook:'[Chorus | Belted | Piano Counter-Line]',       extra:['[Bridge | Stripped to Piano Alone]','[Outro | Final Piano Line]'] },
   'Anti-folk / Lo-fi':       { verse:'[Verse | Conversational | Imperfect]',           hook:'[Chorus | Off-Hand | Refrain]',                extra:['[Tape Break | Cassette Glitch]','[Outro | Spoken Fade]'] },
   'Through-composed':        { verse:'[Movement 1 | Establishing]',                    hook:'[Movement 2 | Development]',                   extra:['[Movement 3 | Recapitulation Transformed]','[Coda | Final Image]'] },
+  // Metal substyles (12 — Nu-Metal is the rap-metal headline; the rest cover the tradition's main lineages)
+  'Classic Metal':           { verse:'[Verse | Galloping Riff | Mid-Tempo | Clean Belted]',          hook:'[Chorus | Anthemic Clean | Twin-Guitar Harmony]',                  extra:['[Pre-Chorus | Building Riff]','[Guitar Solo | Melodic | Twin-Lead Harmony]','[Outro | Riff Reprise]'] },
+  'Nu-Metal':                { verse:'[Verse | Rapped | Aggressive | Half-Time Chug]',              hook:'[Chorus | Clean Belted | Cathartic | Power Chords]',               extra:['[Pre-Chorus | Building Tension]','[Breakdown | Screamed | Half-Time Mosh | 8 bars]','[Bridge | DJ Scratch | Industrial Texture]','[Final Chorus | Layered Clean + Backing Screams]'] },
+  'Metalcore':               { verse:'[Verse | Riff-Driven | Fry Scream]',                           hook:'[Chorus | Clean Belted | Melodic Hook]',                            extra:['[Pre-Chorus | Tension Build]','[Breakdown | 8-string Crush | Half-Time | 8 bars]','[Bridge | Clean Pivot | Atmospheric]','[Final Chorus | Layered Clean + Backing Screams]'] },
+  'Thrash':                  { verse:'[Verse | Fast Chug | Aggressive Bark]',                       hook:'[Chorus | Shouted Group | Power Chord Anthem]',                    extra:['[Pre-Chorus | Tempo Surge]','[Guitar Solo | Shredding | Technical | 16 bars]','[Breakdown | Half-Time Crush | 8 bars]'] },
+  'Death Metal':             { verse:'[Verse | Tremolo Picking | Low Growl]',                       hook:'[Chorus | Brutal | Group Growl]',                                  extra:['[Blast Beat Section | 8 bars]','[Guitar Solo | Atonal | Technical]','[Breakdown | Slowed Crush | Pig-Squeal Accents]'] },
+  'Black Metal':             { verse:'[Verse | Tremolo Wall | Shrieked]',                           hook:'[Chorus | Atmospheric | Layered Shrieks]',                         extra:['[Blast Beat | Atmospheric Wall | 16 bars]','[Acoustic Interlude | Folk | 8 bars]','[Outro | Tremolo Fade | Fading into Wind]'] },
+  'Doom Metal':              { verse:'[Verse | Slow Sludge Riff | Despairing Clean]',               hook:'[Chorus | Sustained Power | Single-Chord Doom]',                   extra:['[Bridge | Drone | Single Chord | 16 bars]','[Outro | Slow Decay | Feedback Wall]'] },
+  'Power Metal':             { verse:'[Verse | Galloping | Soaring Clean]',                         hook:'[Chorus | Anthemic Belted | Choir Layers]',                        extra:['[Pre-Chorus | Speed Build]','[Guitar Solo | Neoclassical Shred | 16 bars]','[Final Chorus | Double-Time Belt | Key Up +1]'] },
+  'Symphonic Metal':         { verse:'[Verse | Orchestra Bed | Operatic Female Lead]',              hook:'[Chorus | Choir + Belt | Cinematic Strings]',                      extra:['[Pre-Chorus | String Build]','[Bridge | Spoken Word or Whispered]','[Final Chorus | Full Orchestra + Belt]'] },
+  'Progressive Metal':       { verse:'[Verse | Odd Time Signature | Technical Clean]',              hook:'[Chorus | Hooks Through Complexity]',                              extra:['[Instrumental Section | Polymetric | 16 bars]','[Bridge | Atmospheric Pivot]','[Outro | Polyrhythmic Resolution]'] },
+  'Djent':                   { verse:'[Verse | Polyrhythmic Chug | Mid-Range Clean or Scream]',     hook:'[Chorus | Soaring Clean | Wall of 7-string Chug]',                 extra:['[Breakdown | 7-string Djent | Polymetric | 8 bars]','[Bridge | Ambient Clean]','[Outro | Polyrhythmic Resolve]'] },
+  'Melodic Death Metal':     { verse:'[Verse | Gothenburg Twin Guitar | Growl]',                    hook:'[Chorus | Melodic Twin Lead | Mid Scream]',                        extra:['[Bridge | Acoustic Interlude | 8 bars]','[Guitar Solo | Harmonic Minor | Melodic | 16 bars]'] },
 };
 
 // Maps hook style → full DNA instruction injected into the prompt
@@ -8262,6 +8276,7 @@ const HOOK_STYLE_NOTES={
   'Double Hook A+B': 'HOOK STYLE: Double hook — two distinct hook sections back to back. Hook A (4 bars, melodic/sung) → Hook B (4 bars, different cadence/energy, rapped or chanted). Travis Scott / Kanye style. Creates two earworms in one.',
   'Gospel Vamp':   'HOOK STYLE: Gospel vamp hook — the hook repeats and ad-libs ESCALATE over it. Start simple, each repeat adds a new ad-lib or harmony layer. Outro vamp version goes 2-3 minutes, building to emotional peak. Sam Smith, Beyoncé, Kirk Franklin tradition.',
   'Post-Hook Drop':'HOOK STYLE: Hook + post-hook drop. Main hook (4 bars sung/melodic) → Post-hook (2-bar punchy instrumental or vocal phrase that lands like a punch). The post-hook is where the bass drops or the sample flips.',
+  'Demonic Chant / Pitched-Down': 'HOOK STYLE: Phonk demonic chant hook — 4-8 syllable phrase pitched-down to a baritone/demonic register, looped 6-8 times. Memphis 1990s lineage. Lyric is minimal — atmosphere does the work. Hard consonants land on the cowbell hits. Vocal sounds slowed, distorted, tape-saturated. Hook repeats unchanged; ad-libs ((pitched down), (demonic), aaagh) decorate. 4-bar phrase max. Drift Phonk: aggressive at 140-160 BPM. Slowed Phonk: hypnotic at 75-90 BPM.',
 };
 
 const SUBSTYLE_NOTES={
@@ -8274,6 +8289,7 @@ const SUBSTYLE_NOTES={
   'East Coast':  'East Coast DNA: New York lyricism tradition. Complex internal rhyme schemes, dense wordplay, cultural references. Jazz/soul samples (Pete Rock, Large Professor, RZA). Boom bap drums, minimal production. 85-95 BPM. Verses carry the song — hooks are functional not melodic. Suno style: "east coast hip-hop, boom bap, jazz sample, vinyl, 90 BPM, new york". Artists: Nas, Jay-Z, Biggie, Rakim, Big L, Mobb Deep, Wu-Tang.',
   'Midwest':     'Midwest DNA: Chicago soul samples (Kanye era), Twista hyperspeed flow, Detroit grit (Big Sean, Royce da 5\'9"), St. Louis bounce. Emotional vulnerability alongside street realism. Chipmunk soul samples. Suno style: "midwest rap, soul sample, chicago, 95 BPM, emotional, chipmunk soul". Artists: Kanye West, Twista, Common, Lupe Fiasco, Chance the Rapper, Big Sean.',
   'Cloud Rap':   'Cloud Rap DNA: Ethereal, atmospheric, lo-fi production. Hazy drum machines, woozy synth pads, reverb-drenched vocals. Existential/introspective themes, often melancholic. Very slow BPM 70-90. Mumbled delivery. Suno style: "cloud rap, ethereal, lo-fi, reverb, atmospheric synths, 80 BPM, dreamy". Artists: Lil B, Bladee, Yung Lean, Carti (early), Bones.',
+  'Phonk':       'Phonk DNA: Memphis 1990s rap reborn for the TikTok era. Drift Phonk subtype (the dominant modern variant): aggressive cowbell-driven percussion at 140-160 BPM — gym, drift-car, gaming culture soundtrack. Slowed Phonk: chopped Memphis tempo at 75-90 BPM with screwed pitch. Production signatures: distorted 808s, lo-fi vinyl crackle, slowed/screwed Memphis vocal samples, demonic ad-libs. Vocals heavily processed — pitched-down, distorted, often demonic. Themes: drift culture, Memphis horror imagery, dark moods, gym aggression. Suno style: "phonk, distorted 808, cowbell, slowed memphis chant, dark vibe, 150 BPM, drift". Modern: Kordhell, DVRST, Phonky Town, MoneySign Suede, Dxrk. Origins: Three 6 Mafia, DJ Screw, DJ Spanish Fly, Tommy Wright III.',
   // Neo-Soul substyles
   'Classic Neo-Soul':    'Classic Neo-Soul DNA: D\'Angelo / Erykah Badu era. Warm Rhodes piano, upright or Fender bass, live drums with swing (slightly behind the beat). Head-nod groove mandatory. Vocals are conversational and improvised-feeling. Suno style: "neo-soul, Rhodes piano, live drums, swing, 90 BPM, warm vinyl, head-nod groove". Artists: D\'Angelo, Erykah Badu, Maxwell.',
   'Hip-Hop Neo-Soul':    'Hip-Hop Neo-Soul DNA: The Lauryn Hill / Common / J Dilla intersection. Boom bap or Dilla-off-beat drum programming under soulful vocal delivery. Rapped bridges or verses inside a sung structure. Sample-flipped soul. Suno style: "neo-soul, hip-hop drums, J Dilla beat, soul vocal, 85 BPM, vinyl warmth". Artists: Lauryn Hill, Common, Bilal, H.E.R.',
@@ -8324,7 +8340,8 @@ const SUBSTYLE_NOTES={
 const SUBSTYLES={
   country:['Outlaw Country','Bakersfield','Nashville Pop','Americana','Bluegrass','Bro-Country','Alt-Country','Texas / Red Dirt','Classic Honky-Tonk','Country Gospel','Country Rap','Country Blues'],
   kpop:['Girl Group','Boy Group','K-Pop Ballad','Dance Pop','Dark Concept','Bubblegum','Hip-Hop K-Pop','R&B K-Pop'],
-  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap'],
+  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap','Phonk'],
+  metal:['Classic Metal','Nu-Metal','Metalcore','Thrash','Death Metal','Black Metal','Doom Metal','Power Metal','Symphonic Metal','Progressive Metal','Djent','Melodic Death Metal'],
   latin:['Salsa','Bachata','Cumbia','Bossa Nova','Latin Pop','Latin Jazz','Mariachi'],
   reggaeton:['Perreo Clásico','Trap Latino','Reggaeton Romántico','Urbano Latino','Dembow Puro','Reggaeton Pop'],
   altrock:['Shoegaze','Post-Punk','Grunge','Indie Rock','Lo-Fi','Art Rock','Emo','Math Rock'],
@@ -9348,11 +9365,12 @@ const RAP_STYLES_CLIENT = {
   east_coast:      { label:'East Coast', category:'established', era:'1990s–present', teaser:'Lyricism as identity. Dense, competitive, literate.' },
   midwest:         { label:'Midwest', category:'established', era:'2000–present', teaser:'Soul samples and emotional honesty. Chipmunk soul.' },
   cloud_rap:       { label:'Cloud Rap', category:'established', era:'2010–present', teaser:'Hazy, slow, ethereal. Mood over message.' },
+  // Phonk is registered below alongside the other established Rap Lab styles (single source of truth).
   drill_uk:        { label:'UK Drill', category:'established', era:'2016–present', teaser:'Sliding triplets, cold precision, London coded.' },
   afro_rap:        { label:'Afro-Rap', category:'established', era:'2015–present', teaser:'West African rhythm patterns fused with hip-hop structure.' },
   latin_rap:       { label:'Latin Rap', category:'established', era:'1990s–present', teaser:'Spanish + Spanglish bars. Barrio metaphors, dembow-trap fusion.' },
   hyphy_rap:       { label:'Hyphy Rap', category:'established', era:'2003–present', teaser:'Bay Area energy. Hella slap, scraper bass, turf vocabulary.' },
-  phonk:           { label:'Phonk', category:'established', era:'2020–present', teaser:'Slow-motion threat. Dark Memphis revival. Every bar a cowbell-kick warning.' },
+  phonk:           { label:'Phonk', category:'established', era:'2018–present (Memphis 1990s lineage)', teaser:'Slow-motion threat. Dark Memphis revival. Every bar a cowbell-kick warning.' },
   anthem_rap:      { label:'Anthem Rap', category:'established', era:'1990s–present', teaser:'First-person triumph that speaks for the collective. Every bar belongs on a walk-out.' },
   hustle_grind:    { label:'Hustle / Grind', category:'established', era:'1990s–present', teaser:'The come-up documented. Sacrifice, late nights, doubters proven wrong.' },
   post_algorithm:  { label:'Post-Algorithm', category:'forward', era:'2025→', teaser:'If the algorithm can predict it, it has already failed.' },
@@ -9382,7 +9400,7 @@ const RAP_DIM_DEFAULTS = {
   afro_rap:         { flow:'on-beat',       rhymeArch:'chain',           density:'medium',       vocabRegister:'street-coded',        persona:'collective-we' },
   latin_rap:        { flow:'syncopated',    rhymeArch:'internal',        density:'dense',        vocabRegister:'street-coded',        persona:'first-person-raw' },
   hyphy_rap:        { flow:'double-time',   rhymeArch:'end-only',        density:'dense',        vocabRegister:'street-coded',        persona:'collective-we' },
-  phonk:            { flow:'behind-beat',   rhymeArch:'end-only',        density:'sparse',       vocabRegister:'street-coded',        persona:'first-person-raw' },
+  phonk:            { flow:'syncopated',    rhymeArch:'end-only',        density:'sparse',       vocabRegister:'minimal-phonetic',    persona:'first-person-raw' },
   anthem_rap:       { flow:'on-beat',       rhymeArch:'multi-syllabic',  density:'medium',       vocabRegister:'street-coded',        persona:'collective-we' },
   hustle_grind:     { flow:'conversational',rhymeArch:'multi-syllabic',  density:'medium',       vocabRegister:'street-coded',        persona:'first-person-raw' },
   post_algorithm:   { flow:'mosaic',        rhymeArch:'mosaic',          density:'dense',        vocabRegister:'abstract-surreal',    persona:'omniscient' },
@@ -9415,11 +9433,12 @@ const RAP_STYLE_ADLIBS_CLIENT = {
   'East Coast':           ['yo','word up','ayo','c\'mon son','true indeed','check it','nawmean','that\'s real'],
   'Midwest':              ['(chipmunk soul)','uh','yep','you know','c\'mon','(soul chop)','mmm','check it'],
   'Cloud Rap':            ['(whispered)','(echo)','(mumbled)','(ethereal)','yeahh','uhh','(hazy)','(reverb)'],
+  // Phonk lives in the Rap Lab block below (single source of truth).
   'UK Drill':             ['oi','bruv','fam','gang','straight up','innit','splash','brrap'],
   'Afro-Rap':             ['O YO!','EHEN!','NA WETIN!','MAKE I TELL YOU','(laughter)','ODESHI!','BROKE WASH','(drum break)'],
   'Latin Rap':            ['¡DALE!','¡WEPA!','¡ESO!','BRR','JEJE','QUE LO QUE','¡FUEGO!','¡VAMOS!'],
   'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
-  'Phonk':                ['(ominous)','yea hoe','pimp','triple six','(drawl)','smokin','grim','(slowed)'],
+  'Phonk':                ['(pitched down)','(demonic)','yea hoe','triple six','(drawl)','aaagh','(slowed)','(screwed)'],
   'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
   'Hustle / Grind':       ['still up','on my grind','the marathon','(grinding)','no sleep','up first','the mix','get it'],
   'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
@@ -9451,6 +9470,7 @@ const RAP_STYLE_SUNO_CLIENT = {
   'East Coast':           'east coast hip-hop, boom bap, jazz sample, vinyl crackle, 90 BPM, new york lyrical',
   'Midwest':              'midwest rap, chipmunk soul sample, chicago hip-hop, 95 BPM, emotional vulnerability',
   'Cloud Rap':            'cloud rap, ethereal haze, lo-fi drum machine, deep reverb, atmospheric synth pads, 80 BPM',
+  // Phonk lives in the Rap Lab block below (single source of truth).
   'UK Drill':             'UK drill, sliding 808 basslines, snappy off-beat snares, dark piano chords, 140 BPM, London drill flow, Tottenham/Peckham vocabulary, menacing minor key',
   'Afro-Rap':             'afro rap, amapiano log drum bass, talking drum percussion, Afrobeats groove, 105 BPM, modern West African hip-hop crossover, pidgin/Yoruba inflected',
   'Latin Rap':            'latin rap, dembow trap hybrid, Spanish flow, salsa horn stabs, 95 BPM, modern barrio-trap, reggaeton drums under 808 bass',
@@ -10663,7 +10683,7 @@ async function generateSong(){
 - Internal rhymes every 2-3 syllables add density on top of end rhymes.`:'';
   // Hook style note — explicit override or auto-derived from substyle
   const resolvedHookStyle = (S.hookStyle && S.hookStyle !== 'auto') ? S.hookStyle
-    : ({Trap:'Melodic Auto-Tune','G-Funk':'Smooth Sung','Bay Area':'Call & Response','Down South':'Southern Drawl','Crunk':'Screamed / Crunk','Chopped & Screwed':'Chopped','Boom Bap':'Chanted','East Coast':'Rapped Hook','Cloud Rap':'Minimal / Groove','Gospel':'Gospel Vamp'}[S.substyle] || null);
+    : ({Trap:'Melodic Auto-Tune','G-Funk':'Smooth Sung','Bay Area':'Call & Response','Down South':'Southern Drawl','Crunk':'Screamed / Crunk','Chopped & Screwed':'Chopped','Boom Bap':'Chanted','East Coast':'Rapped Hook','Cloud Rap':'Minimal / Groove','Phonk':'Demonic Chant / Pitched-Down','Gospel':'Gospel Vamp'}[S.substyle] || null);
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle]
     ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}`
     : '';

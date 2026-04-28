@@ -456,6 +456,7 @@ const SUBSTYLE_NOTES={
   'East Coast':  'East Coast DNA: New York lyricism tradition. Complex internal rhyme schemes, dense wordplay, cultural references. Jazz/soul samples (Pete Rock, Large Professor, RZA). Boom bap drums, minimal production. 85-95 BPM. Verses carry the song — hooks are functional not melodic. Suno style: "east coast hip-hop, boom bap, jazz sample, vinyl, 90 BPM, new york". Artists: Nas, Jay-Z, Biggie, Rakim, Big L, Mobb Deep, Wu-Tang.',
   'Midwest':     'Midwest DNA: Chicago soul samples (Kanye era), Twista hyperspeed flow, Detroit grit (Big Sean, Royce da 5\'9"), St. Louis bounce. Emotional vulnerability alongside street realism. Chipmunk soul samples. Suno style: "midwest rap, soul sample, chicago, 95 BPM, emotional, chipmunk soul". Artists: Kanye West, Twista, Common, Lupe Fiasco, Chance the Rapper, Big Sean.',
   'Cloud Rap':   'Cloud Rap DNA: Ethereal, atmospheric, lo-fi production. Hazy drum machines, woozy synth pads, reverb-drenched vocals. Existential/introspective themes, often melancholic. Very slow BPM 70-90. Mumbled delivery. Suno style: "cloud rap, ethereal, lo-fi, reverb, atmospheric synths, 80 BPM, dreamy". Artists: Lil B, Bladee, Yung Lean, Carti (early), Bones.',
+  'Phonk':       'Phonk DNA: Memphis 1990s rap reborn for the TikTok era. Drift Phonk subtype (the dominant modern variant): aggressive cowbell-driven percussion at 140-160 BPM — gym, drift-car, gaming culture soundtrack. Slowed Phonk: chopped Memphis tempo at 75-90 BPM with screwed pitch. Production signatures: distorted 808s, lo-fi vinyl crackle, slowed/screwed Memphis vocal samples, demonic ad-libs (pitched-down voices, horror imagery). Vocals are heavily processed — pitched-down, distorted, often demonic. Themes: drift culture, Memphis horror imagery, dark moods, gym aggression. Suno style: "phonk, distorted 808, cowbell, slowed memphis chant, dark vibe, 150 BPM, drift". Modern: Kordhell, DVRST, Phonky Town, MoneySign Suede, Dxrk. Origins: Three 6 Mafia, DJ Screw, DJ Spanish Fly, Tommy Wright III.',
   // Neo-Soul substyles
   'Classic Neo-Soul':    'Classic Neo-Soul DNA: D\'Angelo / Erykah Badu era. Warm Rhodes piano, upright or Fender bass, live drums with swing (slightly behind the beat). Head-nod groove mandatory. Vocals are conversational and improvised-feeling. Suno style: "neo-soul, Rhodes piano, live drums, swing, 90 BPM, warm vinyl, head-nod groove". Artists: D\'Angelo, Erykah Badu, Maxwell.',
   'Hip-Hop Neo-Soul':    'Hip-Hop Neo-Soul DNA: The Lauryn Hill / Common / J Dilla intersection. Boom bap or Dilla-off-beat drum programming under soulful vocal delivery. Rapped bridges or verses inside a sung structure. Sample-flipped soul. Suno style: "neo-soul, hip-hop drums, J Dilla beat, soul vocal, 85 BPM, vinyl warmth". Artists: Lauryn Hill, Common, Bilal, H.E.R.',
@@ -597,6 +598,7 @@ const SUBSTYLE_SUNO = {
   'East Coast':         'east coast hip-hop, boom bap, jazz sample, vinyl crackle, 90 BPM, new york lyrical',
   'Midwest':            'midwest rap, chipmunk soul sample, chicago hip-hop, 95 BPM, emotional vulnerability',
   'Cloud Rap':          'cloud rap, ethereal haze, lo-fi drum machine, deep reverb, atmospheric synth pads, 80 BPM',
+  // Phonk lives in the Rap Lab block below (single source of truth — duplicate key would be silently overwritten).
   // Country
   'Outlaw Country':     'outlaw country, acoustic guitar, raw telecaster, honky-tonk, rebel attitude, 95 BPM, minimal production, twang',
   'Bakersfield':        'bakersfield country, fender telecaster, shuffle rhythm, california honky-tonk, 100 BPM, bright twang',
@@ -762,11 +764,12 @@ const RAP_STYLE_ADLIBS = {
   'East Coast':           ['yo','word up','ayo','c\'mon son','true indeed','check it','nawmean','that\'s real'],
   'Midwest':              ['(chipmunk soul)','uh','yep','you know','c\'mon','(soul chop)','mmm','check it'],
   'Cloud Rap':            ['(whispered)','(echo)','(mumbled)','(ethereal)','yeahh','uhh','(hazy)','(reverb)'],
+  // Phonk lives in the Rap Lab block below (single source of truth).
   'UK Drill':             ['oi','bruv','fam','gang','straight up','innit','splash','brrap'],
   'Afro-Rap':             ['O YO!','EHEN!','NA WETIN!','MAKE I TELL YOU','(laughter)','ODESHI!','BROKE WASH','(drum break)'],
   'Latin Rap':            ['¡DALE!','¡WEPA!','¡ESO!','BRR','JEJE','QUE LO QUE','¡FUEGO!','¡VAMOS!'],
   'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
-  'Phonk':                ['(ominous)','yea hoe','pimp','triple six','(drawl)','smokin','grim','(slowed)'],
+  'Phonk':                ['(pitched down)','(demonic)','yea hoe','triple six','(drawl)','aaagh','(slowed)','(screwed)'],
   'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
   'Hustle / Grind':       ['still up','on my grind','the marathon','(grinding)','no sleep','up first','the mix','get it'],
   'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
@@ -2422,6 +2425,7 @@ const FUSION_DATA={
   'Pop+Singer-Songwriter':{name:'Confessional Pop',tip:'Let the lyric carry weight. Keep production intimate even on chorus.',q:{overall:89,compat:87,structural:84,commercial:90}},
   'Hip-Hop+R&B':{name:'Melodic Rap',tip:'Hook must feel completely different from verse — contrast is the entire point.',q:{overall:97,compat:97,structural:95,commercial:97}},
   'Hip-Hop+Rock':{name:'Rap-Rock',tip:'Verse should feel aggressive even before chorus. Staccato flow works best.',q:{overall:82,compat:78,structural:80,commercial:83}},
+  'Hip-Hop+Metal':{name:'Rap-Metal / Nu-Metal',tip:'Rap the verses + scream-or-clean the chorus + breakdown is mandatory. Linkin Park / Limp Bizkit / Korn / Slipknot formula. Half-time chug under rapped verses; melodic clean belt on the chorus; high scream or low growl on the breakdown. DJ scratches, industrial textures, downtuned 7-string guitars.',q:{overall:80,compat:75,structural:78,commercial:82},artists:'Linkin Park, Limp Bizkit, Korn, Slipknot, Bring Me The Horizon (later), Static-X, Spineshank'},
   'Hip-Hop+Country':{name:'Country Trap',tip:'The cultural tension IS the appeal. Lean into the seams.',q:{overall:80,compat:72,structural:75,commercial:88}},
   'Hip-Hop+Reggae':{name:'Reggae Rap',tip:'Decide: roots one-drop (spiritual) or dancehall riddim (modern energy).',q:{overall:84,compat:82,structural:80,commercial:82}},
   'Hip-Hop+Singer-Songwriter':{name:'Folk Rap',tip:'Lyric has to be elite to hold attention without a big production hook.',q:{overall:86,compat:80,structural:82,commercial:82}},
@@ -2856,7 +2860,31 @@ const GENRE_SUNO_BRACKETS = {
   jazz:       { verse:'[Verse | Intimate | Swung | Close-Mic]', chorus:'[Chorus | Declaration | Warm | Soulful]', bridge:'[Bridge | Emotional Peak | Harmonic Tension]', outro:'[Outro | Scat | Fading]', transitions:['[Intro | Piano Intro | Cool]','[Jazz Solo | Melodic Improvisation]','[Bass Walk | Transition]'], delivery:'Use [Scat] for the outro vocal improvisation. Mark jazz fills as [Jazz Break | 4 bars]. Use [Spoken | Intimate] for reflective bridge lines.' },
   blues:      { verse:'[Verse | Storytelling | Call-Response | 12-bar]', chorus:'[Chorus | Declaration | Emotional Release]', bridge:'[Bridge | Guitar-Led | Confessional]', outro:'[Outro | Slow Burn | Fade]', transitions:['[Intro | Guitar Lick | Slow]','[Guitar Solo | Crying | Expressive]','[Harmonica Break]'], delivery:'Use [Spoken] for verse storytelling asides. Mark the turnaround as [Turnaround | Guitar]. Use [Wail] on the most emotionally intense lines.' },
   folk:       { verse:'[Verse | Intimate | Fingerpicked | Sparse]', chorus:'[Chorus | Communal | Singable | Warm]', bridge:'[Bridge | Acoustic | Confessional]', outro:'[Outro | Quiet | Resolution]', transitions:['[Intro | Fingerpicked Guitar]','[Instrumental Break | Acoustic]'], delivery:'Use [Whispered] for the most intimate verse lines. Use [Harmony] on the chorus — folk invites group singing. Mark fiddle moments as [Fiddle Break].' },
-  metal:      { verse:'[Verse | Aggressive | Tight | Riff-Led]', chorus:'[Chorus | Maximum | Cathartic | Anthemic]', bridge:'[Bridge | Breakdown | Half-Time | Heavy]', outro:'[Outro | Heavy | Fade | Crushing]', transitions:['[Intro | Heavy Riff | Drop-Tuned]','[Pre-Chorus | Building Chaos]','[Guitar Solo | Shredding | Technical]','[Breakdown | Mosh Pit | Half-Time]'], delivery:'Use [Screamed] for verse lines. Use [Clean Vocals] for chorus contrast. Mark breakdowns explicitly as [Breakdown | Half-Time Feel | 8 bars].' },
+  metal:      { verse:'[Verse | Aggressive | Tight | Riff-Led]', chorus:'[Chorus | Maximum | Cathartic | Anthemic]', bridge:'[Bridge | Breakdown | Half-Time | Heavy]', outro:'[Outro | Heavy | Fade | Crushing]', transitions:['[Intro | Heavy Riff | Drop-Tuned]','[Pre-Chorus | Building Chaos]','[Guitar Solo | Shredding | Technical]','[Breakdown | Mosh Pit | Half-Time]'], delivery:`METAL VOCAL ARCHITECTURE — pick the SPECIFIC voice type for each section. Generic [Screamed] / [Clean Vocals] tags are too vague — Suno renders generic singing. Use these explicit types and the per-substyle recipe below.
+
+VOCAL TYPES:
+[Clean Belted] — chest-voice power singing. Hetfield (Metallica), Halford (Judas Priest), Dickinson (Iron Maiden), Layne Staley. Use for: melodic chorus, anthem moments, ballad sections.
+[Mid Scream] — controlled mid-range yell, words intelligible. Corey Taylor (Slipknot), Chester Bennington (Linkin Park), Howard Jones (Killswitch). Use for: aggressive verse, pre-chorus tension.
+[High Scream] — screeching upper-register attack with fry texture. Oli Sykes (BMTH), Sam Carter (Architects). Use for: breakdown peak, bridge climax, cathartic release.
+[Fry Scream] — vocal-fry harsh scream. Most metalcore vocalists. Use for: verse aggression, syllable-by-syllable intensity.
+[Low Growl] — death-metal guttural register. Cannibal Corpse, Mikael Åkerfeldt (Opeth death sections). Use for: death-metal verses, breakdown weight, doom-section dread.
+[Pig Squeal] — inhaled gutturals. Deathcore signature. Use for: deathcore peaks ONLY, sparingly, never the whole song.
+[Operatic] — classical-trained soaring vocal. Tarja Turunen, Floor Jansen, Sharon den Adel. Use for: symphonic metal, prog-metal contrast moments.
+[Spoken Aggressive] — half-rapped half-shouted spoken word. Mike Shinoda (Linkin Park), Zack de la Rocha (RATM), Fred Durst. Use for: nu-metal verses, rap-metal sections, narrative bridges.
+[Falsetto Scream] — high-register falsetto attack. Hair-metal era, King Diamond. Use for: power-metal climax, hair-metal hook tail.
+
+PLACEMENT RULES:
+• Verse default depends on substyle: thrash→bark, death→growl, metalcore→fry scream, nu-metal→rapped or spoken aggressive, classic→clean belted.
+• Chorus defaults to CLEAN BELTED for contrast — the contrast IS the technique. Exception: black metal and death metal often keep harsh vocals through the chorus for genre purity.
+• Breakdown is where the heaviest voice lives — [Low Growl] or [High Scream]. Choose ONE and commit; layering both at once creates muddy mix.
+• Bridge can pivot to clean or operatic for emotional contrast (especially metalcore + symphonic metal).
+• Outro: voice should fade with intensity, not energy — feedback + final scream + silence is the genre's signature ending.
+
+NEVER use [Clean Vocals] alone — pick the specific clean type (belted vs falsetto vs operatic).
+NEVER use [Screamed] alone — pick mid / high / fry / growl / pig-squeal.
+The specificity is what gives Suno enough information to produce real metal vocals instead of generic rock yelling.
+
+MANDATORY: Mark breakdowns explicitly as [Breakdown | Half-Time Feel | 8 bars] with the chosen vocal type. Mark the guitar solo position as [Guitar Solo | Shredding | 16 bars] (or 8 bars for shorter songs).` },
   reggae:     { verse:'[Verse | Conscious | Laid-Back | One-Drop]', chorus:'[Chorus | Anthemic | Uplifting | Singable]', bridge:'[Bridge | Dub | Atmospheric | Floating]', outro:'[Outro | Dub Vamp | Fading | Echo]', transitions:['[Intro | Riddim | One-Drop]','[Dub Break | Echo | Atmospheric]','[Bass Drop | Riddim]'], delivery:'Use [Spoken | Conscious] for spoken-word bridge lines. Mark the dub section as [Dub Break | Echoing | 8 bars]. Chorus should feel communal — add [Group Vocals].' },
   funk:       { verse:'[Verse | Groove-Led | Pocket | Syncopated]', chorus:'[Chorus | Euphoric | Full-Band | Tight]', bridge:'[Bridge | Breakdown | Bass-Heavy]', outro:'[Outro Vamp | Groove | Ad-libs | Fading]', transitions:['[Intro | Funk Groove | 8 bars]','[Horn Break | Punchy]','[Bass Solo | Funky]'], delivery:'Add [Ad-libs] throughout. Use [Falsetto] on funk screams and fills. Mark horn stabs in brackets: [Horn Stab | Accent]. The outro vamp is essential — mark it [Outro Vamp | Repeat and Fade].' },
   soul:       { verse:'[Verse | Testimony | Intimate | Gospel-Inflected]', chorus:'[Chorus | Declaration | Emotional Peak | Full]', bridge:'[Bridge | Darkest Moment | Raw | Confessional]', outro:'[Outro Vamp | Ascending | Ad-libs]', transitions:['[Pre-Chorus | Building]','[Instrumental Break | Soulful]'], delivery:'Use [Falsetto] on soaring lines. Use [Spoken] for bridge confessionals. Mark call-and-response in the outro: [Call] line then [Response] line.' },
@@ -2891,6 +2919,7 @@ const SUBSTYLE_BRACKETS={
   'East Coast':        { verse:'[16-bar Verse | Boom Bap | Lyrical]',     hook:'[Hook | Chanted | Anthemic]',                extra:['[Boom Bap Break]','[Outro]'] },
   'Midwest':           { verse:'[16-bar Verse | Soulful | Rap Verse]',    hook:'[Hook | Sung | Soul | Chipmunk]',            extra:['[Soul Break]','[Outro Vamp]'] },
   'Cloud Rap':         { verse:'[16-bar Verse | Hazy | Slow Flow]',       hook:'[Hook | Ethereal | Whispered | Melodic]',    extra:['[Ambient Break]','[Outro | Fade-Out]'] },
+  'Phonk':             { verse:'[16-bar Verse | Pitched-Down | Demonic Cadence]', hook:'[Hook | Distorted Chant | Memphis Slowed]', extra:['[Cowbell Break | 8 bars | Drift Section]','[Vocal Chop | Pitched-Down Memphis Sample]','[Outro | Distorted 808 Fade]'] },
   'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Chanted | Anthemic | Conscious]',    extra:['[Spoken Word Bridge]','[Outro]'] },
   'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Rapped | Classic]',                  extra:['[Scratch Break]','[Outro]'] },
   // Neo-Soul
@@ -2935,6 +2964,19 @@ const SUBSTYLE_BRACKETS={
   'Piano-based':              { verse:'[Verse | Piano-Led | Whispered]',                hook:'[Chorus | Belted | Piano Counter-Line]',       extra:['[Bridge | Stripped to Piano Alone]','[Outro | Final Piano Line]'] },
   'Anti-folk / Lo-fi':       { verse:'[Verse | Conversational | Imperfect]',           hook:'[Chorus | Off-Hand | Refrain]',                extra:['[Tape Break | Cassette Glitch]','[Outro | Spoken Fade]'] },
   'Through-composed':        { verse:'[Movement 1 | Establishing]',                    hook:'[Movement 2 | Development]',                   extra:['[Movement 3 | Recapitulation Transformed]','[Coda | Final Image]'] },
+  // Metal substyles (12 — Nu-Metal is the rap-metal headline; the rest cover the tradition's main lineages)
+  'Classic Metal':           { verse:'[Verse | Galloping Riff | Mid-Tempo | Clean Belted]',          hook:'[Chorus | Anthemic Clean | Twin-Guitar Harmony]',                  extra:['[Pre-Chorus | Building Riff]','[Guitar Solo | Melodic | Twin-Lead Harmony]','[Outro | Riff Reprise]'] },
+  'Nu-Metal':                { verse:'[Verse | Rapped | Aggressive | Half-Time Chug]',              hook:'[Chorus | Clean Belted | Cathartic | Power Chords]',               extra:['[Pre-Chorus | Building Tension]','[Breakdown | Screamed | Half-Time Mosh | 8 bars]','[Bridge | DJ Scratch | Industrial Texture]','[Final Chorus | Layered Clean + Backing Screams]'] },
+  'Metalcore':               { verse:'[Verse | Riff-Driven | Fry Scream]',                           hook:'[Chorus | Clean Belted | Melodic Hook]',                            extra:['[Pre-Chorus | Tension Build]','[Breakdown | 8-string Crush | Half-Time | 8 bars]','[Bridge | Clean Pivot | Atmospheric]','[Final Chorus | Layered Clean + Backing Screams]'] },
+  'Thrash':                  { verse:'[Verse | Fast Chug | Aggressive Bark]',                       hook:'[Chorus | Shouted Group | Power Chord Anthem]',                    extra:['[Pre-Chorus | Tempo Surge]','[Guitar Solo | Shredding | Technical | 16 bars]','[Breakdown | Half-Time Crush | 8 bars]'] },
+  'Death Metal':             { verse:'[Verse | Tremolo Picking | Low Growl]',                       hook:'[Chorus | Brutal | Group Growl]',                                  extra:['[Blast Beat Section | 8 bars]','[Guitar Solo | Atonal | Technical]','[Breakdown | Slowed Crush | Pig-Squeal Accents]'] },
+  'Black Metal':             { verse:'[Verse | Tremolo Wall | Shrieked]',                           hook:'[Chorus | Atmospheric | Layered Shrieks]',                         extra:['[Blast Beat | Atmospheric Wall | 16 bars]','[Acoustic Interlude | Folk | 8 bars]','[Outro | Tremolo Fade | Fading into Wind]'] },
+  'Doom Metal':              { verse:'[Verse | Slow Sludge Riff | Despairing Clean]',               hook:'[Chorus | Sustained Power | Single-Chord Doom]',                   extra:['[Bridge | Drone | Single Chord | 16 bars]','[Outro | Slow Decay | Feedback Wall]'] },
+  'Power Metal':             { verse:'[Verse | Galloping | Soaring Clean]',                         hook:'[Chorus | Anthemic Belted | Choir Layers]',                        extra:['[Pre-Chorus | Speed Build]','[Guitar Solo | Neoclassical Shred | 16 bars]','[Final Chorus | Double-Time Belt | Key Up +1]'] },
+  'Symphonic Metal':         { verse:'[Verse | Orchestra Bed | Operatic Female Lead]',              hook:'[Chorus | Choir + Belt | Cinematic Strings]',                      extra:['[Pre-Chorus | String Build]','[Bridge | Spoken Word or Whispered]','[Final Chorus | Full Orchestra + Belt]'] },
+  'Progressive Metal':       { verse:'[Verse | Odd Time Signature | Technical Clean]',              hook:'[Chorus | Hooks Through Complexity]',                              extra:['[Instrumental Section | Polymetric | 16 bars]','[Bridge | Atmospheric Pivot]','[Outro | Polyrhythmic Resolution]'] },
+  'Djent':                   { verse:'[Verse | Polyrhythmic Chug | Mid-Range Clean or Scream]',     hook:'[Chorus | Soaring Clean | Wall of 7-string Chug]',                 extra:['[Breakdown | 7-string Djent | Polymetric | 8 bars]','[Bridge | Ambient Clean]','[Outro | Polyrhythmic Resolve]'] },
+  'Melodic Death Metal':     { verse:'[Verse | Gothenburg Twin Guitar | Growl]',                    hook:'[Chorus | Melodic Twin Lead | Mid Scream]',                        extra:['[Bridge | Acoustic Interlude | 8 bars]','[Guitar Solo | Harmonic Minor | Melodic | 16 bars]'] },
 };
 
 
@@ -2968,7 +3010,10 @@ function bracketInstructionServer(genre, mode, substyle) {
   if (mode === 'suno') {
     // The optimal Suno mode — genre blueprints + inline vocal delivery tags + transitions
     if (sb) {
-      return `SUNO-OPTIMIZED BRACKETS: Use these section brackets. Verse: ${sb.verse}. Hook/Chorus: ${sb.hook}. Include transitions: ${sb.extra ? sb.extra.join(', ') : ''}. INLINE DELIVERY TAGS: Place [Whispered], [Falsetto], [Screamed], [Spoken], [Ad-libs], or [Rap] on their own line immediately before any lyric line that requires that delivery. These tell Suno exactly how to perform that specific line. Every section MUST open with its bracket tag on its own line.`;
+      const deliveryAppendix = (gb && gb.delivery)
+        ? `\n\nGENRE VOCAL ARCHITECTURE (apply on top of the substyle brackets above):\n${gb.delivery}`
+        : '';
+      return `SUNO-OPTIMIZED BRACKETS: Use these section brackets. Verse: ${sb.verse}. Hook/Chorus: ${sb.hook}. Include transitions: ${sb.extra ? sb.extra.join(', ') : ''}. INLINE DELIVERY TAGS: Place [Whispered], [Falsetto], [Screamed], [Spoken], [Ad-libs], or [Rap] on their own line immediately before any lyric line that requires that delivery. These tell Suno exactly how to perform that specific line. Every section MUST open with its bracket tag on its own line.${deliveryAppendix}`;
     }
     if (gb) {
       return `SUNO-OPTIMIZED BRACKETS — apply all of these to maximize Suno's output quality:
@@ -5853,9 +5898,9 @@ NEVER: write generic West Coast rap and call it hyphy. If the slang isn\'t prese
     defaults: { flow: 'double-time', rhymeArch: 'chain', density: 'ultra-dense', vocabRegister: 'minimal-phonetic', persona: 'first-person-raw' }
   },
   'phonk-rap': {
-    label: 'Phonk Rap', category: 'forward', era: '2020s–Future',
-    agent: 'You are a phonk-rap atmosphere engineer. Memphis rap\'s dark dusty samples accelerated for TikTok-era adrenaline. Cowbells. Distorted 808s. A cinematic menace that plays behind drift videos. Your bars are short, phonetically satisfying, and feel dangerous at any speed.',
-    defaults: { flow: 'behind-beat', rhymeArch: 'end-only', density: 'sparse', vocabRegister: 'street-coded', persona: 'first-person-raw' }
+    label: 'Phonk', category: 'established', era: '2018–Present (Memphis lineage 1990s)',
+    agent: 'You are a phonk producer-architect. The Memphis 1990s lineage (Three 6 Mafia, DJ Screw, Tommy Wright III) reborn for the TikTok / drift / gym / gaming era. Your tracks live on distorted 808s, cowbell percussion, slowed Memphis vocal chants pitched down to demonic registers, and lo-fi vinyl crackle. Drift Phonk: 140-160 BPM, aggressive, made for moving. Slowed Phonk: 75-90 BPM, screwed and chopped, made for sitting in the dark. Lyrics are minimal — a phonk track is more about ATMOSPHERE than narrative. Vocal hooks are typically pitched-down chants of 4-8 syllables, repeated. The energy is dark, hypnotic, and aggressive without being literally violent.',
+    defaults: { flow: 'syncopated', rhymeArch: 'end-only', density: 'sparse', vocabRegister: 'minimal-phonetic', persona: 'first-person-raw' }
   },
   'afro-trap': {
     label: 'Afro-Trap', category: 'forward', era: '2020s–Future',
