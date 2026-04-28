@@ -3919,6 +3919,50 @@ const MASTERING_TARGETS = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SUBSTYLE_FX_OVERRIDES — substyles that architecturally diverge from their
+// genre's default FX profile. Each entry is a PARTIAL override — only the
+// fields that diverge are listed; everything else inherits the genre default.
+//
+// Used by buildProductionData(genre, substyle) to merge override on top of
+// GENRE_FX_PROFILES[genre]. So a Doom Metal song gets metal as base + doom-
+// specific reverb/delay/eq overrides, not generic metal tight-room FX.
+//
+// Coverage criteria: only substyles whose production aesthetic is notably
+// different from their genre default. Most substyles inherit cleanly.
+// ═══════════════════════════════════════════════════════════════════════════
+const SUBSTYLE_FX_OVERRIDES = {
+  // ── Pop divergence ─────────────────────────────────────────────────────
+  'Bedroom Pop':         { reverb: 'Long ambient bath (2.5–4s) + cassette tape pre-delay 80ms + slight wow/flutter', delay: 'Ping-pong with high-cut filter (rolled off above 4 kHz) — lo-fi character', compression: 'No bus glue — preserve uneven dynamics. Slight tape saturation on master', eq: 'High-cut at 12 kHz (no air shelf), low boost 80–150 Hz for bedroom warmth, gentle mud-cut at 350 Hz', width: 'Centered intimate — slight stereo widener on backing harmony only', sidechain: 'None — bedroom-pop is anti-pump aesthetic' },
+  'Hyper-Pop':           { reverb: 'Hard plate (0.6s) on glitched drums + ultra-short on vocal (no decay tail) + occasional gated reverb', delay: 'Pitched delay (octave up + down) + bit-crushed slap + glitch-cut feedback', compression: 'Multi-band brick-wall limiting — let the master clip intentionally for distortion', eq: 'Maximum air at 16 kHz + extreme sub at 30–50 Hz + scoop everything else (V-shaped EQ)', width: 'Maximum stereo on saw-wave synths — saturate the field', sidechain: 'Heavy 1/16-note sidechain pump on pads (8–12 dB) — glitch-pumped' },
+  'Pop Ballad':          { reverb: 'Lush concert hall (2.5–4s) on lead vocal + medium plate on piano + long string verb', delay: 'Long quarter-note tails on vocal harmonies (no slapback)', compression: 'Optical LA-2A on lead vocal preserving dynamics — gentle bus glue (1–2 dB GR max)', eq: 'Warm 200–400 Hz on piano, air shelf at 12 kHz on vocal, conservative low-end (no sub boost)', width: 'Centered piano + vocal, wide string section', sidechain: 'NONE — ballads are anti-pump. Let the dynamics breathe' },
+  'Pop-Rap Rock':        { reverb: 'Live room ambience (1.5s) on drum kit + medium plate on rapped vocal + long hall on featured-vocalist chorus', delay: 'Slapback on rapped verse + 1/4 ping-pong on power-chord guitar fills', compression: 'Parallel NY compression on live drums + 1176 on rapped vocal + LA-2A on featured-vocalist chorus', eq: 'Mid-forward 800 Hz on power chords + presence 4 kHz on rapped vocal + air on featured chorus', width: 'Hard-pan power chords L/R, mono kick/bass/rap-vocal, wide featured-chorus stack', sidechain: 'Light kick→bass pump only — live-band feel over heavy production' },
+  // ── Metal divergence ───────────────────────────────────────────────────
+  'Doom Metal':          { reverb: 'Massive cathedral (5–8s) on EVERYTHING — guitar, bass, vocal, drums all drowning', delay: 'Long quarter-note feedback delays on guitar (2 sec+), no fast slapback', compression: 'Minimal — preserve the slow dynamic crawl. Maybe gentle bus glue (1–2 dB)', eq: 'MASSIVE low end — boost 50–100 Hz heavily, cut 800 Hz for sludge, smooth high roll-off above 8 kHz', width: 'Wide guitar + bass — let the drone fill the field', sidechain: 'NONE — doom is anti-pump, the drone IS the song' },
+  'Avant-Garde Metal':   { reverb: 'VARIES PER SECTION — gated metal verb on heavy parts, hall on operatic, dry on clown-voice spoken — vocal character switching IS the FX strategy', delay: 'Per-section delay matched to vocal character (pitched on operatic, slap on aggressive, none on whispered)', compression: 'Variable per section — heavy on rhythm guitar, gentle on operatic vocal, dynamic on theatrical sections', eq: 'Eclectic — apply genre-appropriate EQ per section (folk-modal sections get warm acoustic EQ, metal sections get scooped mids)', width: 'Maximum width on orchestral pivots, narrowed for intimate spoken sections', sidechain: 'None — preserves the textural variety' },
+  'Black Metal':         { reverb: 'Long atmospheric hall (4–6s) on EVERYTHING — INTENTIONALLY OVERPROCESSED, treble-heavy', delay: 'Long feedback delay on tremolo guitar, no slapback', compression: 'Minimal compression — let the tremolo wall be raw and unmastered. Hard limit at the END only', eq: 'TREBLE-HEAVY MIX — boost 8–12 kHz aggressively, scoop 200–500 Hz for thinness, cut sub heavily (this is the genre signature lo-fi aesthetic, NOT a flaw)', width: 'Maximum stereo wall — guitars + tremolo doubles fill the field completely', sidechain: 'None — anti-modern-mix aesthetic' },
+  // ── Jazz divergence ────────────────────────────────────────────────────
+  'Free Jazz':           { reverb: 'Live-room natural (1.5s) — capture the cacophony as-recorded', delay: 'NONE — preserve the chaos as-played', compression: 'NO COMPRESSION on the master — the dynamics ARE the music. Gentle peak limiting only at extreme moments', eq: 'Natural full-range — preserve the screaming sax multiphonics as captured', width: 'Wide ensemble capture — let the players occupy the field naturally', sidechain: 'None — anti-mix aesthetic' },
+  'Vocal Jazz':          { reverb: 'Intimate vintage chamber (1.8s) on vocal + plate on piano + brushed-snare room ambience', delay: 'Vintage tape echo (1/8 + 1/4 dotted) on lead vocal — light slapback character', compression: 'Vintage tube optical (Fairchild-style) on lead vocal — color over control. Gentle bus glue', eq: 'Warm 300–500 Hz on lead vocal, air at 8 kHz, smooth high-end (no harshness)', width: 'Centered intimate vocal, traditional stereo ensemble', sidechain: 'None — preserve dynamics' },
+  'Smooth Jazz':         { reverb: 'Polished long plate (2.5s) on soprano sax + chamber on vocal — the genre signature glassy reverb', delay: 'Subtle 1/4 dotted on lead', compression: 'Polished bus glue (3–4 dB GR) — the smooth-jazz signature compressed-loudness', eq: 'Bright air at 14 kHz on sax, warm 200–400 Hz on Rhodes, scoop 700 Hz for polish', width: 'Wide synth pads + sax doubled, mono bass and kick', sidechain: 'Light kick→bass — polished R&B-influenced FX' },
+  // ── R&B / Funk divergence ──────────────────────────────────────────────
+  'Quiet Storm':         { reverb: 'LUSH long chamber (3–4s) on whispered vocal — the genre signature atmospheric verb', delay: 'Long quarter-note tails on vocal — no slapback (Quiet Storm is anti-slap)', compression: 'Vintage tube optical on vocal preserving the whispered intimacy — minimal bus comp', eq: 'Smooth warm — boost 200 Hz, gentle air at 10 kHz, high-cut at 14 kHz for analog-era warmth', width: 'Centered intimate vocal, wide synth pad bath', sidechain: 'None — preserve the slow-burn feel' },
+  // ── EDM divergence ─────────────────────────────────────────────────────
+  'Trance':              { reverb: 'Long euphoric pad reverb (4–8s) on supersaw lead + medium hall on snare', delay: 'Massive 1/4 dotted ping-pong with high feedback (genre signature) + reverse-reverb sweep pre-drop', compression: 'Sidechain pump on pads (10–14 dB — heavier than generic edm), heavy bus limiting for euphoric loudness', eq: 'Maximum air at 16 kHz on supersaw lead, deep mid-scoop for clarity, 50 Hz sub boost', width: 'Maximum stereo width on supersaw — fill the field completely', sidechain: 'HEAVY 4/4 sidechain pump (genre signature) — pads breathe with the kick' },
+  'Drum & Bass':         { reverb: 'Short room on snare + medium plate on amen break + atmospheric pad verb', delay: '1/8 ping-pong on vocal + glitched stutter on drum fills', compression: 'Multi-band aggressive on reese bass — sidechain bass to kick AGGRESSIVELY for clarity', eq: 'Reese bass deep sub 30–60 Hz + scooped mids 400 Hz + amen break bright 4 kHz', width: 'Mono reese bass + wide stereo amen break + wide pads', sidechain: 'AGGRESSIVE kick→bass sidechain (8–10 dB) — the reese bass needs to duck for kick clarity' },
+  'Dubstep':             { reverb: 'Short snare verb (0.4s) + atmospheric pad verb on breakdown — wobble bass DRY', delay: 'Stuttered 1/16 delay on synth tease, no delay on the wobble drop', compression: 'Heavy multi-band on the wobble bass — squashed for power. Hard bus limiting', eq: 'EXTREME low end — boost 30–60 Hz on wobble + scoop 200–400 Hz + boost 3–5 kHz for snare attack', width: 'Mono wobble bass + wide stereo synth tease + wide reverb tail', sidechain: 'Heavy kick→wobble pump for clarity' },
+  'Ambient / IDM':       { reverb: 'Massive evolving reverb (10s+) — Ambient is reverb-AS-instrument', delay: 'Long polyrhythmic delays + glitched stutter on IDM beats', compression: 'NO bus compression — preserve evolving dynamics. Gentle peak limiting only', eq: 'Full-spectrum natural — preserve field-recording textures, gentle high-cut to taste', width: 'MAXIMUM stereo field — Ambient lives in the spatial dimension', sidechain: 'None — anti-pump aesthetic, except IDM glitches may have stutter-pumps' },
+  'Techno':              { reverb: 'Short industrial room (0.8s) — keep it tight and loop-friendly', delay: 'Short slap on hi-hats only — Techno avoids long delay tails', compression: 'Hard bus compression for industrial loudness, sidechain pump on synth loops', eq: 'Industrial mid-forward — boost 800 Hz–2 kHz on synth loops + deep sub on kick + scoop air', width: 'Centered hypnotic loop, slight width on synth atmospheres', sidechain: 'Moderate kick→synth pump for industrial drive' },
+  // ── Hip-Hop divergence ─────────────────────────────────────────────────
+  'Phonk':               'inherit-genre-but-add: Tape saturation + vinyl crackle + lo-fi pitch-down on Memphis vocal samples + heavy distortion on 808 (the Phonk genre signature) + spring reverb on snare. Mix is intentionally ROUGH and lo-fi — opposite of polished hiphop.',
+  // ── Reggae-Rock divergence ─────────────────────────────────────────────
+  'Reggae-Rock':         { reverb: 'Spring reverb (3s) on guitar + dub plate on snare + huge hall on bridge sections — borrows reggae FX over altrock defaults', delay: '1/4 dotted echoes on EVERYTHING (the reggae signature) + dub-style feedback on bridge', compression: 'Gentle optical on vocal, low bus comp for live-band dynamics', eq: 'Bass-forward 80–120 Hz, scooped mids on guitar, warm vocal — borrows reggae FX', width: 'Rhythm guitar wide, walking bass center', sidechain: 'Light kick→bass — closer to reggae than altrock' },
+  // ── Folk divergence ────────────────────────────────────────────────────
+  'Murder Ballad / Dark Folk': { reverb: 'Long sparse hall (4s) on vocal + drone-bed reverb sustaining + sparse instrumentation', delay: 'Long quarter-note tails on vocal — atmospheric, doom-leaning', compression: 'Minimal — preserve the slow dynamic build. Vintage tube color on vocal', eq: 'Warm low-mid 200–400 Hz on acoustic, smooth high roll-off, sustained drone bed', width: 'Centered intimate vocal, sparse stereo drone', sidechain: 'None — anti-pump aesthetic' },
+  'Bluegrass Folk':      { reverb: 'Live-room close-mic (0.8s) — bluegrass is acoustic-only, mic the room with players in a circle', delay: 'NONE — bluegrass is dry-acoustic by tradition', compression: 'Vintage tube optical on lead vocal preserving high-lonesome dynamics — gentle ensemble bus comp', eq: 'Bright on banjo (8–10 kHz), warm on upright bass (200 Hz), natural acoustic full-range', width: 'Traditional stereo — fiddle/mandolin/banjo each in their own pan position', sidechain: 'None — preserve acoustic dynamics' },
+  'Celtic / Irish Folk': { reverb: 'Pub-room ambience (2s) on group vocal + bright hall on fiddle + bodhrán close-mic — captures the live-pub feel', delay: 'Subtle slapback on lead vocal — vintage analog character', compression: 'Light optical on vocal, dynamic group ensemble', eq: 'Bright fiddle 6 kHz, warm acoustic 200–400 Hz, presence on tin whistle', width: 'Wide group vocal, fiddle and whistle stereo-distributed', sidechain: 'None — preserve pub-room feel' }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRODUCTION INTENSITY LAYER
 // Aggression / mood / tier modulate the genre's baseline production texture.
 // Mood overlay applies to all genres (sad pop ≠ angry pop in production terms).
@@ -5895,7 +5939,10 @@ VIDEO PROMPT:
   return {
     system,
     prompt,
-    meta: { g1, g2, topic, mood, vocal, structure, fd, fusionName: fd?.name || g1 + ' × ' + g2 }
+    // Surface the auto-picked substyle in meta so downstream callers
+    // (stream.js → buildProductionData) can apply the SUBSTYLE_FX_OVERRIDES
+    // for substyles that architecturally diverge from genre default FX.
+    meta: { g1, g2, topic, mood, vocal, structure, fd, fusionName: fd?.name || g1 + ' × ' + g2, substyle: luckySubstyle || '' }
   };
 }
 
@@ -7419,8 +7466,25 @@ function buildPromptIntelligence(params) {
   };
 }
 
-function buildProductionData(genre) {
-  const fx  = GENRE_FX_PROFILES[genre]  || {};
+function buildProductionData(genre, substyle) {
+  const baseFx = GENRE_FX_PROFILES[genre]  || {};
+  // Merge substyle-specific FX overrides on top of genre default. The override
+  // is a partial — only listed fields override; everything else inherits.
+  // Two override formats supported:
+  //   - object: standard partial override (merge)
+  //   - string starting with "inherit-genre-but-add:": append-only (genre stays
+  //     intact, substyle adds a note after — used when substyle keeps genre FX
+  //     but layers ADDITIONAL character on top, e.g. Phonk).
+  const ov = substyle && SUBSTYLE_FX_OVERRIDES[substyle];
+  let fx = baseFx;
+  let inheritNote = '';
+  if (ov) {
+    if (typeof ov === 'string' && ov.startsWith('inherit-genre-but-add:')) {
+      inheritNote = ov.slice('inherit-genre-but-add:'.length).trim();
+    } else if (typeof ov === 'object') {
+      fx = Object.assign({}, baseFx, ov); // override fields where present
+    }
+  }
   const pl  = GENRE_PLUGIN_CHAINS[genre] || {};
   const mst = MASTERING_TARGETS[genre]  || {};
   return {
@@ -7431,6 +7495,7 @@ function buildProductionData(genre) {
       fx.eq            ? `EQ: ${fx.eq}`                     : '',
       fx.sidechain     ? `SIDECHAIN: ${fx.sidechain}`       : '',
       fx.width         ? `SIGNATURE EFFECT: ${fx.width}`    : '',
+      inheritNote      ? `SUBSTYLE OVERLAY (${substyle}): ${inheritNote}` : '',
     ].filter(Boolean).join('\n') : '',
     pluginToolkit: (pl.free || pl.paid) ? [
       pl.free ? `FREE: ${pl.free.join(', ')}` : '',
@@ -7681,7 +7746,7 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote };
 
 
 

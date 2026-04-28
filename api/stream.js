@@ -632,7 +632,11 @@ module.exports = async function handler(req, res) {
       max_tokens = 4096;
       // Attach production data + lucky meta + suno settings to response header (read by client parsers)
       const metaGenre = (body.params?.genre) || (built.meta?.g1) || 'pop';
-      const prodData = brain.buildProductionData(metaGenre);
+      // Pass substyle so SUBSTYLE_FX_OVERRIDES can divergence-correct genre FX
+      // for substyles that architecturally diverge (Doom Metal, Bedroom Pop,
+      // Trance, etc.). When substyle has no override, genre default is used.
+      const metaSubstyle = body.params?.substyle || built.meta?.substyle || '';
+      const prodData = brain.buildProductionData(metaGenre, metaSubstyle);
       // Compute the raw Suno settings alongside the prompt build so the
       // client can render them as chips next to the title and feed them
       // into the like-feedback learning loop.
