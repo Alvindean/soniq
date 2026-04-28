@@ -4241,9 +4241,13 @@ const _FUSION_KEY_MAP = {
   'Afrobeats': 'afrobeats', 'Alt-Rock': 'altrock', 'Blues': 'blues',
   'Country': 'country', 'EDM': 'edm', 'Folk': 'folk', 'Gospel': 'gospel',
   'Hip-Hop': 'hiphop', 'Jazz': 'jazz', 'K-Pop': 'kpop', 'Latin': 'latin',
+  'Metal': 'metal', 'Children\'s': 'children', 'Parody': 'parody',
+  'Comedy': 'comedy', 'TV / Musical': 'tvmusical', 'Brazilian': 'brazilian',
+  'Amapiano': 'amapiano', 'Dancehall': 'dancehall', 'Bollywood': 'bollywood',
+  'Arabesque': 'arabesque', 'Mandopop': 'mandopop',
   'Neo-Soul': 'neosoul', 'Pop': 'pop', 'Punk': 'punk', 'R&B': 'rnb',
   'Reggae': 'reggae', 'Reggaeton': 'reggaeton', 'Rock': 'rock',
-  'Singer-Songwriter': 'ss', 'Soul': 'neosoul'
+  'Singer-Songwriter': 'ss', 'Soul': 'neosoul', 'Funk': 'rnb'
 };
 function _normalizeGenreKey(genre) {
   return _FUSION_KEY_MAP[genre] || genre;
@@ -5450,6 +5454,211 @@ const GENRE_SUBSTYLE_LISTS = {
   neosoul:   ['Classic Neo-Soul','Hip-Hop Neo-Soul','Neo-Soul Ballad','Afro-Soul','Jazz-Soul','Lo-Fi Soul','Psychedelic Soul','Gospel Soul']
 };
 
+// ═════════════════════════════════════════════════════════════════════════════
+// CROSSOVER_TAXONOMY — the universal vocabulary of [] brackets, () ad-libs,
+// rhyme schemes, and fusion-DNA shared across all genres in the system.
+//
+// Used by buildCrossoverNote() to surface the natural meeting points between
+// any two genres in a fusion. When Lucky pairs Nu-Metal × Adult Alt-Rock, both
+// share [Clean Belted] chorus + opposing vocal registers — the LLM gets that
+// shared anchor explicitly instead of having to infer it.
+//
+// Each map's values are normalised genre IDs OR substyle IDs. A genre's
+// substyle membership is implicit via SUBSTYLE_NOTES — this taxonomy abstracts
+// the WHERE-IT-FIRES question without requiring per-substyle lookups at every
+// site that asks "what do these two genres share?".
+// ═════════════════════════════════════════════════════════════════════════════
+const CROSSOVER_TAXONOMY = {
+  // [] brackets: tag → genres where it fires (universal vocal-direction tags
+  // appear in many genres; specialised tags like [Wobble Bass] are narrow)
+  brackets: {
+    // VOCAL DIRECTION (most universal)
+    '[Clean Belted]':       ['pop','rock','metal','rnb','gospel','country','folk','jazz','altrock','kpop','punk'],
+    '[Whispered]':          ['rnb','altrock','folk','jazz','pop','metal','hiphop','neosoul'],
+    '[Falsetto]':           ['rnb','pop','altrock','folk','soul','rock','metal','funk','neosoul'],
+    '[Spoken]':             ['hiphop','rnb','altrock','folk','jazz','country','metal','funk'],
+    '[Operatic]':           ['metal','jazz','classical','symphonic'],
+    '[Half-Rapped]':        ['hiphop','altrock','metal','rnb','pop','reggaeton','reggae'],
+    '[Rapped]':             ['hiphop','metal-numetal','altrock','reggae','funk-rock','rnb-newjackswing'],
+    '[Mid Scream]':         ['metal','punk','altrock','metalcore'],
+    '[Fry Scream]':         ['metal-screamo','metal-metalcore','metal-deathmetal'],
+    '[Low Growl]':          ['metal-deathmetal','metal-melodicdeath','metal-doom-deathdoom'],
+    '[High Scream]':        ['metal-blackmetal','metal-screamo'],
+    '[Vocal Character Switch]': ['metal-avantgarde'],
+    '[Pig Squeal]':         ['metal-deathmetal'],
+
+    // TEXTURE / STRUCTURE
+    '[Build]':              ['edm','pop-dance','rock','metalcore','dubstep','trance'],
+    '[Drop]':               ['edm','dubstep','future-bass','dance-pop','hardstyle','dnb'],
+    '[Half-Time]':          ['hiphop-trap','metal-numetal','rnb','pop-rap','dubstep','dnb'],
+    '[Breakdown]':          ['metal','metalcore','screamo','funk','dubstep','hardcore'],
+    '[Modulation Up +1]':   ['pop','rnb','gospel','jazz-vocaljazz','teen-pop','country','popballad'],
+    '[A Cappella]':         ['gospel','rnb','folk','jazz','soul','indie','altrock'],
+    '[Beat Switch]':        ['hiphop','pop-rap','rnb','indie-pop','nu-jazz'],
+    '[Modal Vamp]':         ['jazz-modal','funk','afrofunk','rock-prog','psychedelic'],
+    '[Walking Bass]':       ['jazz','blues','swing','folk-bluegrass','rockabilly','country'],
+    '[4-on-the-Floor]':     ['edm','disco-pop','dance-pop','house','techno','boogie-postdisco'],
+    '[Reese Bass]':         ['edm-dnb','edm-dubstep'],
+    '[Wobble Bass]':        ['edm-dubstep'],
+    '[La Pompe]':           ['gypsy-jazz'],
+    '[Slap Bass]':          ['funk','funk-rock','disco','jazz-fusion','minneapolis-funk','modern-funk'],
+
+    // INSTRUMENT SIGNATURES
+    '[Mute Trumpet]':       ['cool-jazz','vocal-jazz','smooth-jazz'],
+    '[Tremolo Picking]':    ['metal-deathmetal','metal-blackmetal','metal-melodicdeath'],
+    '[7-string Chug]':      ['metal-metalcore','metal-djent','metal-numetal'],
+    '[Hammond Organ]':      ['rnb','jazz-hardbop','jazz-soulacid','blues','rock','funk','gospel'],
+    '[Talking Drum]':       ['afro-funk','afrobeats'],
+    '[Bodhrán]':            ['celtic-folk'],
+    '[Fiddle Solo]':        ['bluegrass','celtic-folk','country','folk','folk-rock'],
+    '[Banjo Roll]':         ['bluegrass','traditional-folk','country','folk-revival'],
+    '[Pedal Steel]':        ['country','altcountry','folk-leaning','adult-alt-rock'],
+    '[String Sweep]':       ['motown','philadelphia-soul','disco-pop','pop-ballad','adult-alt-rock','symphonic-metal'],
+    '[Talk-Box]':           ['p-funk','minneapolis-funk','rap-g-funk'],
+    '[DJ Scratch]':         ['hiphop','metal-numetal','funk-rock','new-jack-swing'],
+    '[Vocoder]':            ['p-funk','jazz-fusion','disco-pop','synth-pop','hyper-pop','boogie']
+  },
+
+  // () ad-libs: vocab → where it fires + cultural source. Universal ad-libs
+  // ("yeah", "uh") work everywhere; signature ad-libs are genre-tagged.
+  adlibs: {
+    '(yeah)':                'UNIVERSAL — energy filler in every genre',
+    '(uh)':                  'hiphop, rap-rock, nu-metal, modern-funk, contemporary-rnb',
+    '(woo!)':                'hiphop-trap (Travis Scott), pop, rock, hardstyle, festival-edm',
+    '(skrt)':                'hiphop-trap signature',
+    '(c\'mon)':              'soul, funk, rock, hiphop, gospel',
+    '(let\'s go)':           'hiphop, edm, rock, pop-punk, hardcore',
+    '(WHOA-OH-OH)':          'classic-metal, power-metal, pop-punk, folk-punk, festival-edm',
+    '(BLEGH)':               'metalcore, screamo, deathcore signature',
+    '(yodel-AY-EE)':         'bluegrass, country (mountain holler)',
+    '(too-ra-loo-ra)':       'celtic-irish-folk pub-singalong',
+    '(amen)':                'gospel, hard-bop, soul-jazz, blues',
+    '(hit me!)':             'classic-funk James Brown signature',
+    '(make my funk the P-Funk)': 'p-funk Clinton signature',
+    '(eh-eh-eh)':            'afro-funk Yoruba sustained',
+    '(¡eso!)':               'reggae-rock Spanish, salsa, latin-jazz, latin',
+    '(la-la-la)':            'pop, folk, indie, adult-alt outro singalong',
+    '(na-na-na)':            'pop-punk MCR Black Parade, indie-pop',
+    '(scat: doo-be-doo)':    'jazz vocal-jazz, big-band, bebop',
+    '(MC tag)':              'edm-garage, edm-dnb, hiphop, drum-and-bass',
+    '(rewind!)':             'reggae, drum-and-bass, garage',
+    '(mercy!)':              'stax-memphis-soul, hard-bop, gospel, blues',
+    '(SHUT UP!)':            'metal-numetal breakdown',
+    '(WAKE UP!)':            'metal-avantgarde SOAD signature',
+    '(ooh-wah-ah-ah)':       'metal-numetal Disturbed signature',
+    '(have mercy)':          'stax-memphis-soul, gospel',
+    '(turn off the lights)': 'philadelphia-soul Teddy Pendergrass',
+    '(dearly beloved)':      'minneapolis-funk Prince spoken-tag',
+    '(blow!)':               'jazz, hard-bop, soul-jazz, big-band trade-call',
+    '(swing it!)':           'big-band, swing-era',
+    '(B3!)':                 'soul-jazz, hard-bop, hammond-organ-funk',
+    '(get down)':            'funk, disco, boogie-postdisco',
+    '(festival!)':           'edm-bigroom, festival-edm',
+    '(BASS!)':               'dubstep, dnb',
+    '(make it bounce)':      'edm-garage, edm-tech-house',
+    '(I.T.T.)':              'afro-funk Fela political-chant signature',
+    '(suffering and smiling)':'afro-funk Fela political-chant signature'
+  },
+
+  // RHYME-SCHEME cross-genre map: scheme → genres-or-substyles where it lives
+  rhymeSchemes: {
+    'AABB-anaphoric':           ['pop-punk','hardcore','classic-funk','traditional-folk','blues'],
+    'AABB-anthemic':            ['classic-metal','power-metal','pop-rock','country','folk-rock'],
+    'AABB-rapped':              ['hiphop','nu-metal-verses','pop-rap','funk-rock-verses','reggae-rock-verses'],
+    'AABB-radio-singalong':     ['post-grunge','dance-pop','teen-pop','synth-pop','pop-rock'],
+    'ABAB-melodic':             ['pop','indie-pop','contemporary-folk','adult-alt-rock','motown','contemporary-rnb','alt-rb'],
+    'ABAB-ornate':              ['philadelphia-soul','pop-ballad','vocal-jazz','adult-alt-rock','symphonic-metal'],
+    'AABA-standard':            ['vocal-jazz','big-band','gypsy-jazz','bebop-vocal','swing-era','tin-pan-alley'],
+    '12-bar-blues':             ['blues','hard-bop','soul-jazz','rockabilly'],
+    'abandoned-rhyme':          ['free-jazz','black-metal','ambient-idm','modal-jazz-instrumental','avant-garde-metal','progressive-metal-tool-style'],
+    'mantra-repetition':        ['house','mantra-hooks','gospel-vamp','p-funk','techno-fragment'],
+    'opposition-pair-rhyme':    ['nu-metal-verses (alone/phone, real/steal — conflict-in-the-rhyme)'],
+    'multisyllabic-dense':      ['lyrical-conscious-rap','jazz-rap','indie-pop (Lorde/Olivia)','pop-rap','contemporary-folk (Damien Rice/Hozier)'],
+    'doom-couplets':            ['doom-metal','murder-ballad-dark-folk'],
+    'call-response':            ['gospel','classic-funk','hard-bop','afro-funk','motown','blues','metalcore-breakdowns'],
+    'modal-non-rhymed':         ['modal-jazz','black-metal','indie-folk-leaning','progressive-metal'],
+    'narrative-ballad':         ['traditional-folk','folk-revival','bluegrass','murder-ballad','celtic-folk','country-storytelling']
+  },
+
+  // FUSION-DNA: shared architectural moves across genres — what cross-genre
+  // pairings have natural meeting points. Used to surface "where these two
+  // genres MESH" guidance for Lucky and any cross-genre fusion path.
+  fusionDNA: {
+    'rapped-verse + sung-chorus':  ['nu-metal','pop-rap','reggae-rock','funk-rock','new-jack-swing','jazz-fusion','contemporary-rnb','drum-and-bass'],
+    'quiet-loud-quiet-arc':        ['adult-alt-rock','post-grunge','indie-folk','pop-ballad','contemporary-folk','grunge','emo','contemporary-rnb'],
+    'breakdown-anaphora':          ['nu-metal','metalcore','screamo','funk-rock','hardcore'],
+    'modulation-up-final-chorus':  ['pop','teen-pop','rnb','gospel','vocal-jazz','contemporary-folk','pop-ballad'],
+    '4-on-the-floor':              ['house','techno','disco-pop','dance-pop','boogie-postdisco','garage'],
+    'walking-bass-foundation':     ['jazz','blues','rockabilly','swing','bluegrass','folk','gypsy-jazz'],
+    'modal-single-chord-vamp':     ['modal-jazz','funk','afro-funk','prog-rock','psychedelic-rock','classic-funk'],
+    'group-chant-chorus':          ['classic-funk','pop-punk','folk-punk','metal-thrash','celtic-irish','gospel','hardstyle','metalcore-breakdowns'],
+    'group-call-and-response':     ['gospel','classic-funk','afro-funk','hard-bop','blues','motown','soul','metalcore-breakdowns'],
+    'half-time-feel':              ['hiphop-trap','nu-metal','dubstep','drum-and-bass','contemporary-rnb','future-bass','metalcore'],
+    'string-pad-build':            ['adult-alt-rock','pop-ballad','indie-folk','contemporary-folk','symphonic-metal','disco-pop'],
+    'open-strum-acoustic-bed':     ['adult-alt-rock','contemporary-folk','indie-folk','folk-revival','pop-rock','country-storytelling'],
+    'breakdown-screamed-clean-pivot': ['nu-metal','metalcore','screamo','funk-rock'],
+    'swing-triplet-feel':          ['jazz','big-band','swing-era','hard-bop','rockabilly','western-swing'],
+    'distorted-bass-led':          ['funk-rock','metal','dubstep','drum-and-bass','hardstyle','industrial']
+  }
+};
+
+// Build a fusion-pollination note — surfaces the natural meeting points
+// between two genres in the form of shared brackets, rhyme schemes, and
+// fusion-DNA architectures. Returns '' if no cross-pollination is found
+// (e.g. very thin genre coverage). Used in buildLuckyPrompt.
+function buildCrossoverNote(g1, g2) {
+  if (!g1 || !g2) return '';
+  const k1 = String(_normalizeGenreKey(g1)).toLowerCase();
+  const k2 = String(_normalizeGenreKey(g2)).toLowerCase();
+  if (k1 === k2) return ''; // Same genre — no cross-pollination to surface
+
+  // Match helper — case-insensitive, accepts exact-match OR g.startsWith(k+'-')
+  // OR g.startsWith(k) for prefix-style sub-genre tags (e.g. metal-numetal,
+  // hiphop-trap, jazz-modal). Note: bare g.startsWith(k) covers both.
+  const matches = (genres, k) => genres.some(g => {
+    const lg = String(g).toLowerCase();
+    return lg === k || lg.startsWith(k + '-') || lg.startsWith(k);
+  });
+
+  // Find shared brackets — tags that fire in BOTH genres
+  const sharedBrackets = [];
+  for (const [tag, genres] of Object.entries(CROSSOVER_TAXONOMY.brackets)) {
+    if (matches(genres, k1) && matches(genres, k2)) sharedBrackets.push(tag);
+  }
+
+  // Find shared rhyme schemes (g.includes for rhyme schemes since the values
+  // are descriptive strings like "nu-metal-verses (alone/phone, real/steal)")
+  const sharedRhymes = [];
+  for (const [scheme, genres] of Object.entries(CROSSOVER_TAXONOMY.rhymeSchemes)) {
+    const inG1 = genres.some(g => String(g).toLowerCase().includes(k1));
+    const inG2 = genres.some(g => String(g).toLowerCase().includes(k2));
+    if (inG1 && inG2) sharedRhymes.push(scheme);
+  }
+
+  // Find shared fusion-DNA architectures
+  const sharedFusionDNA = [];
+  for (const [arch, genres] of Object.entries(CROSSOVER_TAXONOMY.fusionDNA)) {
+    const inG1 = genres.some(g => String(g).toLowerCase().includes(k1));
+    const inG2 = genres.some(g => String(g).toLowerCase().includes(k2));
+    if (inG1 && inG2) sharedFusionDNA.push(arch);
+  }
+
+  if (!sharedBrackets.length && !sharedRhymes.length && !sharedFusionDNA.length) return '';
+
+  const lines = [`\n\n🧬 FUSION CROSSOVER — where ${k1} and ${k2} MESH naturally:`];
+  if (sharedBrackets.length) {
+    lines.push(`• Shared bracket tags (use these in BOTH the verse and the chorus to anchor the fusion): ${sharedBrackets.slice(0, 6).join(' · ')}`);
+  }
+  if (sharedRhymes.length) {
+    lines.push(`• Shared rhyme schemes (the fusion's lyric backbone): ${sharedRhymes.slice(0, 3).join(' · ')}`);
+  }
+  if (sharedFusionDNA.length) {
+    lines.push(`• Shared architectural moves (the fusion's structural anchors): ${sharedFusionDNA.slice(0, 4).join(' · ')}`);
+  }
+  lines.push(`The fusion lands when these shared anchors are EXPLICIT in the song. Don't just stylistically blend — let one shared move from each list above carry across the whole song.`);
+  return lines.join('\n');
+}
+
 function buildLuckyPrompt(params) {
   const keys = Object.keys(FUSION_DATA);
   const rawG1 = params && params.g1 ? sanitizeInput(params.g1, 50) : null;
@@ -5515,13 +5724,15 @@ function buildLuckyPrompt(params) {
   let luckySubstyle = _userSubstyle;
   let luckySubstyleSource = _userSubstyle ? g1 : null;
   if (!luckySubstyle) {
-    // Try primary genre first, fall back to secondary
-    const subList1 = GENRE_SUBSTYLE_LISTS[_g1Think];
-    const subList2 = GENRE_SUBSTYLE_LISTS[_g2Think];
-    if (subList1 && subList1.length) {
+    // Try primary genre first, fall back to secondary. Filter to substyles
+    // with SUBSTYLE_NOTES coverage so the lock paragraph isn't silently empty
+    // when the picker lands on a substyle that only has SUNO + BRACKETS.
+    const subList1 = (GENRE_SUBSTYLE_LISTS[_g1Think] || []).filter(s => SUBSTYLE_NOTES[s]);
+    const subList2 = (GENRE_SUBSTYLE_LISTS[_g2Think] || []).filter(s => SUBSTYLE_NOTES[s]);
+    if (subList1.length) {
       luckySubstyle = pickRandom(subList1);
       luckySubstyleSource = g1;
-    } else if (subList2 && subList2.length) {
+    } else if (subList2.length) {
       luckySubstyle = pickRandom(subList2);
       luckySubstyleSource = g2;
     }
@@ -5534,6 +5745,13 @@ function buildLuckyPrompt(params) {
   const luckySubstyleSunoLock = luckySubstyleSunoTag
     ? `\n\n⚠️ PRODUCTION LOCK — ${luckySubstyle}: The SONG PROMPT must contain these exact production tags: "${luckySubstyleSunoTag}" — do NOT substitute generic ${luckySubstyleSource} production tags.`
     : '';
+
+  // ── Crossover / mesh note for the fusion ───────────────────────────────
+  // Surfaces the universal taxonomy intersection between g1 and g2 — shared
+  // bracket tags, rhyme schemes, and fusion-DNA architectures — so the LLM
+  // gets explicit "where these genres MESH naturally" guidance instead of
+  // having to infer the meeting point.
+  const crossoverNote = buildCrossoverNote(g1, g2);
 
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
@@ -5568,7 +5786,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
