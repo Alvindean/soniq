@@ -949,7 +949,7 @@ const RAP_STYLE_ADLIBS = {
   'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
   'Phonk':                ['(pitched down)','(demonic)','yea hoe','triple six','(drawl)','aaagh','(slowed)','(screwed)'],
   'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
-  'Hustle / Grind':       ['still up','on my grind','the marathon','(grinding)','no sleep','up first','the mix','get it'],
+  'Hustle / Grind':       ['still up','on my grind','long road','(grinding)','no sleep','up first','no days off','get it'],
   'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
   'Neo-Phonetic':         ['(stutter)','brr brr','kah','tata','(chopped syllable)','boof','ah ah','(phonetic)'],
   'Climate Rap':          ['(breath)','(sigh)','look around','real talk','(urgent)','(grim)','time\'s up','(sobering)'],
@@ -1571,7 +1571,30 @@ NATURAL-SPEECH EXCEPTION: If a banned word is also a common English word used in
 
 META-RAP EXCEPTION: Some rap lineages (Eminem, J. Cole, Lupe Fiasco) genuinely reference their own craft in-bar. If and only if the topic is EXPLICITLY about rapping or writing, a SINGLE meta-reference per song is allowed — but still never using the exact pill labels from the UI. Write "I bend syllables", not "I use multi-syllabic rhyme".
 
-DEMONSTRATE the technique. NEVER NAME it. If the listener could hear the verse and identify the technique without you labeling it, you executed it correctly. If you had to SAY the label, you failed to execute.`;
+DEMONSTRATE the technique. NEVER NAME it. If the listener could hear the verse and identify the technique without you labeling it, you executed it correctly. If you had to SAY the label, you failed to execute.
+
+🚫 ARTIST-SIGNATURE PHRASE FIREWALL — ABSOLUTE RULE (separate from craft vocab):
+
+The following phrases are TRADEMARKED to specific artists and carry their cultural identity. They MUST NOT appear verbatim in lyric output unless the song's TOPIC explicitly invokes that artist (tribute, homage, named reference). Even if these phrases appear in directive examples or ad-lib reference lists, treat them as descriptions of LINEAGE, not as material to copy.
+
+FORBIDDEN VERBATIM (unless song is explicitly about this artist):
+• "the marathon" / "marathon continues" / "TMC" — Nipsey Hussle's brand and foundation
+• "started from the bottom" — Drake-canonical
+• "no flex zone" — Rae Sremmurd
+• "shmoney" / "shmoney dance" — Bobby Shmurda
+• "esketit" / "ooh esketit" — Lil Pump
+• "issa knife" / "issa" — 21 Savage
+• "we the best" / "another one" — DJ Khaled
+• "young moolah baby" — Lil Wayne / YMCMB
+• "rich gang" — Birdman / Cash Money
+• "okurr" / "okurrr" — Cardi B
+• "y'all gon' make me lose my mind" — DMX-canonical hook
+• "real recognize real" — Plies-canonical
+• "sit down, be humble" — Kendrick "HUMBLE." hook (the chant itself, not the concept of humility)
+
+WHY: These phrases function as artists' LIVING TRADEMARKS — using them in an unrelated song is the lyric equivalent of citing a competitor's brand name. Reference them in PROSE describing a genre's lineage (e.g. ad-lib reference lists, vocab register descriptions) — but NEVER copy them into lyric output of an unrelated song.
+
+THE TEST: After writing each line, ask "is this phrase associated with one specific artist's brand?" If yes and the song isn't about that artist, rewrite with original phrasing that captures the same energy.`;
 }
 
 // ============ SPEED GEARS SYSTEM ============
