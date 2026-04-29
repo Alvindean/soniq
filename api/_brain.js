@@ -5023,6 +5023,8 @@ function buildSongPrompt(params) {
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
     freestyleMode = false, breakRule = false, eraUndertone = '',
+    offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
+    producerTemplate = '',         // Wave 4d — producer beat template
     graftGenre = '', graftSection = 'chorus', invertCounter = false,
     coachInstruction = '', originalLyrics = '', aggression = '',
     genreCraft = [],
@@ -5363,7 +5365,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -5628,7 +5630,19 @@ const CROSSOVER_TAXONOMY = {
     '(hands up!)':           'pop-rap, pop-rap-rock, pop-punk, festival-edm, hardstyle — universal anthem crowd-call',
     '(stand up!)':           'gospel, anthem rock, hardcore, pop-rap-rock, hip-hop — anthem-call (often pre-final-chorus)',
     '(everybody!)':          'UNIVERSAL anthem crowd-call — pop, hiphop, rock, edm, gospel, festival',
-    '(make some noise!)':    'house, festival-edm, pop-rap, pop-rap-rock, hiphop concert-call — pre-drop or pre-final-chorus build'
+    '(make some noise!)':    'house, festival-edm, pop-rap, pop-rap-rock, hiphop concert-call — pre-drop or pre-final-chorus build',
+
+    // OFF-THE-TOP FREESTYLE AD-LIBS (Wave 4d)
+    // Meta-aware ad-libs that signal real-time improvisation. Used by
+    // OFF_THE_TOP_DIRECTIVE — a Harry Mack / Black Thought (Funk Flex) /
+    // Big L (Stretch & Bobbito) / Eminem (Wake Up Show) freestyle move.
+    // Use 1-3 across a verse — they prove the freestyle is real-time, not
+    // pre-written.
+    '(off the top)':         'off-the-top freestyle meta-tag — Harry Mack / Funk Flex / Stretch & Bobbito lineage. Use once per verse to signal improvisation',
+    '(no pen no pad)':       'off-the-top freestyle meta-tag — affirms the rapper is freestyling without notes. Black Thought / Joe Budden / Big L tradition',
+    '(right off the dome)':  'off-the-top freestyle meta-tag — same family as off-the-top. Sway In The Morning / L.A. Leakers register',
+    '(as I\'m spittin\')':    'off-the-top freestyle meta-tag — present-tense self-reference, signals real-time delivery. Harry Mack signature',
+    '(scratch that)':        'off-the-top restart-move — the rapper corrects mid-bar, signals authenticity by leaving the imperfection in. Use once max per verse'
   },
 
   // RHYME-SCHEME cross-genre map: scheme → genres-or-substyles where it lives
@@ -6746,6 +6760,159 @@ const PERSONA_NOTES = {
   'collective-we':     'Collective we — "we" as the subject. Community voice, anthemic, represents a group not an individual.'
 };
 
+// ═════════════════════════════════════════════════════════════════════════════
+// OFF_THE_TOP_DIRECTIVE — improvisation-energy overlay for freestyleMode.
+//
+// freestyleMode strips structure (no hook/chorus/bridge). This directive adds
+// the IMPROVISATION CHARACTER on top — the Harry Mack / Black Thought / Big L /
+// Eminem (Wake Up Show) / Sway In The Morning / L.A. Leakers freestyle lineage.
+//
+// Used by buildRapLabPrompt + buildSongPrompt when freestyleMode AND
+// offTheTopMode are both true.
+// ═════════════════════════════════════════════════════════════════════════════
+const OFF_THE_TOP_DIRECTIVE = `
+
+🎤 OFF-THE-TOP IMPROVISATION ENERGY (overlay on top of FREESTYLE MODE structural strip):
+
+This is freestyle as REAL-TIME IMPROVISATION — not freestyle as poetry. The Harry Mack / Black Thought (Funk Flex 10-min freestyle) / Big L (Stretch & Bobbito) / Eminem (Wake Up Show, 8 Mile) / Sway In The Morning / L.A. Leakers / Cole Bennett Lyrical Lemonade lineage. The lyric should READ like the rapper is making it up bar-by-bar in real time, not pre-writing a polished verse.
+
+CRAFT MOVES (use 4-8 across the verse — don't overdo any one):
+
+1. META-AWARENESS — reference the act of freestyling 2-4 times across the verse:
+   "off the top", "right off the dome", "no pen no pad", "as I'm spittin'", "as you can hear", "I'm just gettin' started", "let me get on this beat", "watch this", "I ain't even thinkin'"
+
+2. BEAT ACKNOWLEDGMENT — reference the beat itself 1-2 times:
+   "this beat right here", "this knockin'", "what is this", "ayo turn it up", "that's the gas", "this beat is crazy"
+
+3. WORD-ASSOCIATION CHAINS — let one bar's last word trigger the NEXT bar's topic. Free-association is welcomed; topic drift IS the technique. Example: bar mentions "Brooklyn" → next bar references "bridges" → next references "burning" → next references "fire". This proves the verse is real-time, not pre-planned.
+
+4. RESTART-MOVES (use 1-2 max — sparingly): "scratch that", "let me say that again", "wait, hold up", "let me run that back". These signal authenticity but lose density if overused.
+
+5. ENVIRONMENT CUES (when applicable): "right here, right now", "this room", "see this?", "y'all see what I'm doin'?". References to a real or imagined live moment.
+
+6. CATCH-UP / FILLER BARS: It's OK — and AUTHENTIC — to have 1-2 placeholder-rhyme bars per verse where the rapper is "thinking" between punchlines. These CAN'T all be polished. The contrast makes the punchline-bars hit harder.
+
+7. NUMBERED CALLBACKS (Harry Mack signature): If a name, word, or specific detail appears in bar 3, reference it again in bar 11 ("like I said earlier", "back to what I was sayin'", "remember when I said"). The callback proves the freestyle is real-time and tracking itself.
+
+8. ENCOURAGEMENT LOOPS — self-talk between bars: "let's keep goin'", "I got more", "watch this", "yeah I see you", "yes sir". These signal the rapper is feeling themselves in the moment, not reciting from memory.
+
+RHYME RELAXATION:
+- Slant rhymes WELCOMED. The freestyle doesn't need perfect rhyme on every line.
+- Multisyllabics OPTIONAL — when they happen, they should feel earned in the moment, not pre-planned. Single-syllable end-rhymes are fine and authentic.
+- One occasional "near miss" (a rhyme that almost works but not quite) is fine — proves the freestyle is real.
+
+WHAT TO AVOID:
+- Polished poetry-density throughout (that's written-freestyle, not off-the-top).
+- Perfect AABA / AABB metric consistency line-by-line (that signals pre-writing).
+- Pre-planned "punchline at the end of every bar" (off-the-top has variable density).
+- Over-precious imagery (off-the-top is conversational, not literary).
+
+The whole verse should feel like the rapper turned the camera on and started rapping with no notes — virtuosic at moments, casual at others, but ALWAYS feeling like it's happening NOW.`;
+
+// ═════════════════════════════════════════════════════════════════════════════
+// PRODUCER_TEMPLATES — beat-signature DNA per producer. Selectable alongside
+// any rap substyle to give the song a producer-specific beat character.
+//
+// Each entry provides BPM, drum pattern, instrumentation signature, energy,
+// reference tracks, Suno production tag string, producer-tag opening, and
+// "best for" guidance (which substyles / contexts pair best).
+// ═════════════════════════════════════════════════════════════════════════════
+const PRODUCER_TEMPLATES = {
+  'Swizz Beatz': {
+    label: 'Swizz Beatz',
+    era: '1998-present',
+    bpm: '85-95',
+    drumPattern: 'Pounding kick on 1 and 3, snare DOUBLED with hand claps on 2 and 4, sticked drums (NO triplet hi-hats — this is pre-trap).',
+    instrumentation: 'Childlike Casio-style synth lead (the Swizz signature — playground melody on top of pounding drums), 808 sub-bass for impact, occasional horn stabs, sometimes soul samples, hand-claps featured prominently.',
+    energy: 'Explosive but spacious — lots of room for the rapper. Each hit is impactful. Energy is "showtime" / "stadium-anthem" / Bronx-block-party.',
+    referenceTracks: 'DMX "Ruff Ryders Anthem", Eve "What Y\'all Want", Ja Rule "Holla Holla", Beyoncé "Ring The Alarm", Cassidy "I\'m a Hustla", Jay-Z "On to the Next One", Busta Rhymes "Pass The Courvoisier"',
+    suno: 'swizz beatz production, pounding kick on 1 and 3, hand claps + snare on 2 and 4, childlike Casio-style synth lead, 808 sub-bass, horn stabs, 90 BPM, Bronx block-party stadium anthem, Show Me What You Got energy, no triplet hi-hats',
+    producerTag: '"(SHOWTIME!)" or "(Show me what you got)" Swizz-canonical producer-tag opening',
+    bestFor: 'anthem rap, posse cuts, hype tracks, showtime moments, off-the-top freestyles (the pound + space pairs PERFECTLY with improv — leaves room for the rapper to breathe and react)'
+  },
+  'Hit-Boy': {
+    label: 'Hit-Boy',
+    era: '2009-present',
+    bpm: '70-95',
+    drumPattern: 'Clean knocking kicks (modern 808 tuning), snappy layered snare programming, hi-hat rolls (modern trap influence but cleaner than Atlanta trap), sometimes orchestral percussion under.',
+    instrumentation: 'Melodic synth leads (anthem-quality, sometimes orchestral string overlays), bass-as-melody (the bass plays a melodic line, not just sub-rumble), occasional gospel/soul samples (Nas King\'s Disease era), modern polished mix.',
+    energy: 'Anthem-energy / victorious / confident. Production feels "trophy-room" — clean, mature, modern-classic. Works equally well for triumphant rap and reflective rap.',
+    referenceTracks: 'Nas "Ultra Black" (King\'s Disease), Big Sean "Bounce Back", Jay-Z + Kanye "Niggas in Paris" (co-prod), Travis Scott "Goosebumps" (co-prod), Beyoncé "Drunk In Love" (co-prod), Big Sean "Detroit 2" album, Nipsey Hussle "Last Time That I Checc\'d", Nas + Hit-Boy "King\'s Disease II"',
+    suno: 'hit-boy production, clean knocking 808 kick, snappy layered snare, hi-hat rolls, melodic synth lead, bass-as-melody hook, 85 BPM, modern polished anthem-energy, victory-lap rap, Nas Kings Disease era',
+    producerTag: '"(Hit-Boy)" sotto-voce producer-tag opening',
+    bestFor: 'lyrical conscious rap, victory-lap tracks, mature reflective rap, modern anthem rap, off-the-top freestyles (the bass-melody-hook gives rappers a melodic line to ride)'
+  },
+  'Metro Boomin': {
+    label: 'Metro Boomin',
+    era: '2013-present',
+    bpm: '130-150 (half-time feel = 70 BPM perceived)',
+    drumPattern: 'Hard-hitting 808 kicks (Atlanta trap signature), rolling triplet hi-hats, sub-rumble bass, snare on 2 and 4, clap layered with snare.',
+    instrumentation: 'Ambient pad textures (the Metro signature — atmospheric pads under the trap drums), dark melodic synth leads (often minor key), orchestral strings sometimes, bell-tone melodies, deep sub-bass.',
+    energy: 'Dark, atmospheric, cinematic. Trap with depth. Maximum sub-bass — these beats are MEANT to shake. Modern-mafioso atmosphere.',
+    referenceTracks: 'Future "Mask Off", Drake "Jumpman", Migos "Bad and Boujee", 21 Savage "Bank Account", Travis Scott "Goosebumps" (co-prod), Future + Drake "Life Is Good", The Weeknd "Heartless", 21 Savage + Metro "Without Warning"',
+    suno: 'metro boomin production, hard 808 trap kick, rolling triplet hi-hats, ambient pad textures, dark minor-key synth lead, atmospheric strings, 140 BPM half-time feel, Atlanta trap signature, deep sub-bass',
+    producerTag: '"(If young Metro don\'t trust you, I\'m gon\' shoot you)" Metro-canonical producer-tag opening',
+    bestFor: 'modern trap, drill-adjacent, atmospheric rap, dark cinematic, anthemic trap, mafioso modern'
+  },
+  'Pharrell Williams (Neptunes era)': {
+    label: 'Pharrell Williams (Neptunes era)',
+    era: '2001-2010 (peak Neptunes)',
+    bpm: '90-110',
+    drumPattern: 'Minimal-but-pounding kick on 1, hand claps + snare on 2 and 4 (very dry — not reverbed), no hi-hat rolls — this is pre-trap.',
+    instrumentation: 'Synth-bass-as-melody (the Neptunes signature — bass plays a hooky melodic figure), ARP arpeggio synth lines, falsetto-friendly mix (lots of high-end space for high vocal), minimal layering — every element earns its place.',
+    energy: 'Bouncy, futurist, club-meets-art-school. Production feels weightless on top of tight rhythm. Famous for letting the SPACE between elements be a feature.',
+    referenceTracks: 'Snoop Dogg "Drop It Like It\'s Hot", Clipse "Grindin\'", Kelis "Milkshake", Justin Timberlake "Like I Love You", Jay-Z "I Just Wanna Love U", Britney Spears "I\'m a Slave 4 U", Nelly + Kelly "Dilemma", Pusha T "Diet Coke"',
+    suno: 'pharrell williams neptunes era production, minimal pounding kick, dry hand claps + snare on 2-4, synth-bass-as-melody hooky bass figure, ARP arpeggio synth, falsetto-friendly mix, bouncy futurist art-school R&B-rap, 100 BPM, 2000s Neptunes signature, no hi-hat rolls',
+    producerTag: '"(Skateboard P)" or "(Neptunes)" Pharrell-canonical producer-tag opening',
+    bestFor: 'art-school rap, futurist hip-hop, club-meets-thoughtful, falsetto-rap pairings, skater-rap, R&B-rap crossover'
+  },
+  'J Dilla': {
+    label: 'J Dilla',
+    era: '1995-2006',
+    bpm: '85-100',
+    drumPattern: 'Off-grid drum programming (the genre signature — Dilla deliberately sequenced drums OFF the metronome grid for a humanized swing), kick + snare with brushed feel, head-nod groove, light triplet hi-hat.',
+    instrumentation: 'Soul samples (rare grooves chopped — the SP-1200 / MPC sample-flip aesthetic), warm dusty-vinyl texture, sometimes Rhodes piano or live keys, walking bass occasionally, NO synth leads (sample-driven only).',
+    energy: 'Head-nod / cigarette-smoke / late-night-studio. The groove is the entire point — the drums sit BEHIND the beat, the listener leans in.',
+    referenceTracks: 'Common "The Light", D\'Angelo "Send It On", The Pharcyde "Drop", Slum Village "Players", Erykah Badu "Didn\'t Cha Know", Q-Tip "Won\'t Trade", J Dilla "Donuts" album (entire), De La Soul "Stakes Is High"',
+    suno: 'j dilla production, off-grid drum programming, kick + snare brushed feel, head-nod groove, soul sample chopped (rare groove), warm dusty-vinyl texture, 90 BPM, 1990s-2000s sample-flip aesthetic, behind-the-beat',
+    producerTag: '"(Dilla)" sotto-voce producer-tag opening',
+    bestFor: 'lyrical conscious rap, jazz-rap, neo-soul-rap crossover, late-night reflective rap, mature lyrical rap, head-nod-driven freestyles'
+  },
+  'The Alchemist': {
+    label: 'The Alchemist',
+    era: '2000-present',
+    bpm: '85-100',
+    drumPattern: 'Boom-bap kick + snare (90s East Coast tradition), warm vinyl drums, NO triplet hi-hat (this is anti-trap), sometimes subtle swing.',
+    instrumentation: 'Soul / jazz / world-music sample loops (Alchemist is famous for OBSCURE sample sources — Italian library music, Greek folk, Turkish funk), atmospheric layered ambient samples, sometimes vinyl crackle deliberate, no synth leads.',
+    energy: 'Cinematic, mafioso, cigarette-smoke-and-bourbon. Beats feel like film scores chopped into rap beats. Spacious — lots of room for dense rhyming.',
+    referenceTracks: 'Mobb Deep "Hurt Niggas", Action Bronson "Easy Rider", Mach-Hommy "Pray for Haiti" (Alchemist co-prod), Boldy James "The Price of Tea in China" (Alchemist prod), Conway the Machine + Roc Marciano work, Freddie Gibbs + Alchemist "Alfredo" (full album)',
+    suno: 'the alchemist production, boom-bap kick + snare, warm vinyl drums, obscure soul jazz world-music sample loop, atmospheric ambient layer, 90 BPM, 1990s East Coast revival cinematic mafioso aesthetic, no trap hats',
+    producerTag: '"(Alchemist)" or sample-led intro Alchemist-canonical opening',
+    bestFor: 'lyrical conscious rap, archival-tier rap, cinematic-storytelling rap, modern-mafioso, Griselda-adjacent'
+  }
+};
+
+// Build a producer-template directive for prompt injection. Returns the
+// formatted block listing drum pattern, instrumentation, energy, reference
+// tracks, Suno production tag, producer-tag opening. Returns '' if unknown.
+function buildProducerTemplateNote(producerKey) {
+  if (!producerKey) return '';
+  const p = PRODUCER_TEMPLATES[producerKey];
+  if (!p) return '';
+  return `
+
+🎛️ PRODUCER BEAT TEMPLATE — ${p.label} (${p.era}, ${p.bpm} BPM):
+• DRUMS: ${p.drumPattern}
+• INSTRUMENTATION: ${p.instrumentation}
+• ENERGY: ${p.energy}
+• REFERENCE TRACKS: ${p.referenceTracks}
+• SUNO PRODUCTION LOCK: ${p.suno}
+• PRODUCER-TAG OPENING: ${p.producerTag}
+• PAIRS BEST WITH: ${p.bestFor}
+
+The beat MUST feel like ${p.label}'s production signature — not generic ${p.label}-influenced. Cite the producer-tag opening if appropriate to the song's intro.`;
+}
+
 function buildRapLabPrompt(params) {
   const {
     genre = 'hiphop',
@@ -6759,6 +6926,8 @@ function buildRapLabPrompt(params) {
     rapDimensions = {},
     hookStyle = 'auto',
     freestyleMode = false,
+    offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
+    producerTemplate = '',         // Wave 4d — Swizz Beatz / Hit-Boy / etc. beat template
     barSwitch = 0,
     breakRule = false,
     length = 'medium',
@@ -6859,6 +7028,16 @@ function buildRapLabPrompt(params) {
 - No melodic sung sections. Spoken-rapped delivery throughout.
 - Verses can vary in length (12-24 bars each) — let the thought drive the bar count, not a template.` : '';
 
+  // Wave 4d — off-the-top improvisation overlay (only when freestyleMode AND
+  // offTheTopMode are both true). Adds Harry Mack-style meta-awareness, beat
+  // acknowledgment, restart-moves, word-association chains, rhyme relaxation
+  // on top of the structural strip from freestyleLock.
+  const offTheTopLock = (freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : '';
+
+  // Wave 4d — producer beat template (Swizz Beatz, Hit-Boy, etc.). Injects
+  // producer-specific drum pattern + instrumentation + Suno production lock.
+  const producerTemplateNote = buildProducerTemplateNote(producerTemplate);
+
   const system = `${style.agent}
 
 RAP LAB ACTIVE: You are operating in precision rap construction mode. Every dimension below is a hard constraint — not a suggestion. Your craft must honor the specific combination of dimensions requested.`;
@@ -6892,7 +7071,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${barSwitchLock}${breakRuleLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${barSwitchLock}${breakRuleLock}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
