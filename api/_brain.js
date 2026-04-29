@@ -5026,6 +5026,7 @@ function buildSongPrompt(params) {
     offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
     producerTemplate = '',         // Wave 4d — producer beat template
     viralMode = false,             // Wave 4e — Viral Producer Mode (genre-gated)
+    sampleHookMode = false,        // Wave 4f — auto-extract sample phrase hook
     graftGenre = '', graftSection = 'chorus', invertCounter = false,
     coachInstruction = '', originalLyrics = '', aggression = '',
     genreCraft = [],
@@ -5366,7 +5367,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -5851,6 +5852,14 @@ function buildLuckyPrompt(params) {
   // adds variety without overwhelming non-viral aesthetics
   const luckyViralLock = luckyViralMode ? VIRAL_PRODUCER_DIRECTIVE : '';
 
+  // ── Sample Hook Mode for Lucky (Wave 4f) ──────────────────────────────
+  // User-supplied OR auto-enabled when viralMode is on (sample hooks are core
+  // to viral architecture). Genre-agnostic — works in any fusion.
+  const _userSampleHook = !!(params && params.sampleHookMode);
+  const luckySampleHookMode = _userSampleHook || (luckyViralMode && Math.random() < 0.5);
+  // 50% co-fire with viralMode — half of viral lucky songs get the sample-hook treatment
+  const luckySampleHookLock = luckySampleHookMode ? SAMPLE_HOOK_DIRECTIVE : '';
+
   // ── Producer template for Lucky ────────────────────────────────────────
   // Honour client-supplied producer or pick one randomly weighted toward
   // viral-leaning producers when viral mode is on
@@ -5891,7 +5900,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${luckySampleHookLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -7034,6 +7043,89 @@ ANTI-PATTERNS — what kills virality (avoid all of these):
 
 The whole song must feel like it was BUILT for the 15-second clip — not as an album cut that happens to have a hook. The hook IS the song; the verses serve the hook. Repetition is the strategy.`;
 
+// ═════════════════════════════════════════════════════════════════════════════
+// SAMPLE_HOOK_DIRECTIVE — auto-generated vocal-sample hook architecture.
+//
+// User-facing concept: "All the Smoke" energy — pick the most quotable phrase
+// from the song's core idea, then BUILD THE ENTIRE BEAT around looping that
+// phrase as a vocal-sample hook element. The phrase itself becomes the meme.
+//
+// Activates when params.sampleHookMode is true. Compounds cleanly with:
+//   - viralMode (sample hooks are core to viral architecture)
+//   - producerTemplate (especially Tay Keith, Murda Beatz, Hit-Boy — producers
+//     known for sample-flip + chop-loop signatures)
+//   - any substyle (sample hooks are genre-agnostic)
+// ═════════════════════════════════════════════════════════════════════════════
+const SAMPLE_HOOK_DIRECTIVE = `
+
+🎚️ SAMPLE HOOK MODE — auto-extract vocal sample, build the song around it:
+
+Engineering rule: identify the most quotable, repeatable, sticky phrase from the song's core concept (topic + mood), treat it AS a chopped vocal sample, and build the entire song architecture around looping that phrase. The Cardi B "WAP", Megan "Savage", Soulja Boy "Crank That", Outkast "Hey Ya", Kendrick "HUMBLE.", Lil Nas X "Industry Baby" template — the phrase BECOMES the song.
+
+THE EXTRACTION LOGIC (model self-decides):
+1. Read the song's TOPIC and MOOD. Extract the most quotable possible phrase from that concept — 2-6 syllables maximum, ideally ending on a HARD consonant or LONG vowel for sticky-end resonance.
+   • Example: topic "rebuilding from zero" → sample phrase could be "starting over" (4 syllables, ends on "-er") or "back from the dead" (4 syllables, hard "-d" ending)
+   • Example: topic "I want all the smoke" → sample phrase IS "all the smoke" — already perfectly sample-shaped
+   • Example: topic "summer in Atlanta" → sample phrase "ATL summer" (4 syllables) or "summertime, ATL" (5 syllables)
+2. Choose for SOUND, not just meaning. The phrase has to sound great LOOPED — repeat it 8-10 times in your head and check that it doesn't get annoying. If it does, pick again.
+3. The phrase MUST be hummable, mimickable, and isolatable. Someone hearing only the sample (with no song context) should still find it sticky.
+
+THE ARCHITECTURE (build the song AROUND the sample, not the other way):
+1. The sample phrase appears 8-12+ times across the song. Use the [Sample Hook] tag every time it fires.
+2. The CHORUS uses the sample phrase as the hook itself — repeat 4-6 times in a single chorus.
+3. The verses build TOWARD and AWAY from the sample — the sample interrupts the verse, returns at the chorus, fades into the outro.
+4. The pre-chorus often uses a SHORTENED version of the sample as a build (e.g. just the first 1-2 syllables looped).
+5. The bridge can SUBVERT the sample — pitched up, slowed down, chopped to a single syllable, or flipped (Travis Scott "Sicko Mode" beat-switch territory).
+
+VOCAL-SAMPLE TREATMENT VARIATIONS (use 2-4 across the song for variety):
+• [Sample Hook | Original] — the full phrase, no manipulation, baseline reference
+• [Sample Hook | Pitched-Up] — Alvin-Chipmunk-coded, pop-rap viral signature
+• [Sample Hook | Pitched-Down] — Phonk / chopped-and-screwed coded, dark menace
+• [Sample Hook | Chopped] — cut mid-phrase, half the syllables, used as drum-fill substitute
+• [Sample Hook | Echoed/Doubled] — phrase + phrase delayed by a 1/4 note, ping-pong stereo
+• [Sample Hook | Reversed] — backwards, used for transitions / pre-drop builds
+• [Sample Hook | Filtered] — high-pass or low-pass during breakdown, full-spectrum on drop
+
+REFERENCE TRACKS (study how each builds around its sample):
+• Cardi B "WAP" — Frank Ski "Whores in this House" sample as the title-phrase hook
+• Megan Thee Stallion "Savage" — "savage" repeated as the lyric-AND-vocal-sample
+• Soulja Boy "Crank That" — "Soulja Boy off in this hoe" repeated 12+ times
+• Outkast "Hey Ya" — "shake it like a Polaroid picture" repeated as the imitation-hook
+• Kendrick Lamar "HUMBLE." — "be humble" sit-down chant repeated as the centerpiece
+• Lil Nas X "Industry Baby" — trumpet + "I told you long ago on the road" anthem-loop
+• Lil Nas X "Old Town Road" — banjo sample is the hook itself
+• Travis Scott "Sicko Mode" — sample chops + beat switches around them
+• Drake "In My Feelings" — "Kiki, do you love me" became the imitation/dance-meme
+• 50 Cent "In Da Club" — "go shorty, it's your birthday" repeated as the centerpiece
+• Future "Mask Off" — flute sample IS the hook
+• Black Eyed Peas "I Gotta Feeling" — "tonight's gonna be a good night" repeated 8+ times
+• OT Genasis "CoCo" — "I'm in love with the coco" repeated 12+ times
+• Migos "Bad and Boujee" — "Raindrop, drop top" repeated as imitation-hook
+• Beyoncé "Texas Hold 'Em" — "Texas hold 'em" repeated as the centerpiece
+
+THE OUTPUT SHAPE — emit the sample phrase explicitly:
+
+The [Sample Hook] tag MUST be emitted on its own line above each instance. Format:
+
+[Sample Hook | Original]
+"the phrase here"
+
+[Sample Hook | Pitched-Up]
+"the phrase pitched up"
+
+[Sample Hook | Chopped]
+"the chop"
+
+The phrase in quotes IS the literal lyric. The [Sample Hook] tag tells Suno to treat that line as a chopped/looped sample element rather than a sung lyric line.
+
+THINGS TO AVOID:
+✗ Don't pick a phrase longer than 6 syllables — it stops being sample-shaped, becomes a lyric line.
+✗ Don't pick an abstract phrase ("the universe within me") — sample hooks need CONCRETE, IMITABLE content.
+✗ Don't use the sample only at the chorus — it must appear in verses too as drum-fill / transition / pre-chorus build.
+✗ Don't manipulate the sample in 5+ ways — pick 2-4 treatments max for sonic coherence.
+
+The whole song is now a vehicle for the looped phrase. The verses serve the sample. The chorus IS the sample. Repetition is the strategy.`;
+
 // Build a producer-template directive for prompt injection. Returns the
 // formatted block listing drum pattern, instrumentation, energy, reference
 // tracks, Suno production tag, producer-tag opening. Returns '' if unknown.
@@ -7071,6 +7163,7 @@ function buildRapLabPrompt(params) {
     offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
     producerTemplate = '',         // Wave 4d — Swizz Beatz / Hit-Boy / etc. beat template
     viralMode = false,             // Wave 4e — Viral Producer Mode (TikTok-ready hook architecture)
+    sampleHookMode = false,        // Wave 4f — auto-extract sample phrase hook
     barSwitch = 0,
     breakRule = false,
     length = 'medium',
@@ -7185,6 +7278,10 @@ function buildRapLabPrompt(params) {
   // Hip-hop is always in the whitelist so Rap Lab fires this when toggled.
   const viralLock = (viralMode && VIRAL_GENRE_WHITELIST.has('hiphop')) ? VIRAL_PRODUCER_DIRECTIVE : '';
 
+  // Wave 4f — Sample Hook Mode. Auto-extracts sticky phrase from topic and
+  // builds the song around looping it. Genre-agnostic — fires whenever toggled.
+  const sampleHookLock = sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : '';
+
   const system = `${style.agent}
 
 RAP LAB ACTIVE: You are operating in precision rap construction mode. Every dimension below is a hard constraint — not a suggestion. Your craft must honor the specific combination of dimensions requested.`;
@@ -7218,7 +7315,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${barSwitchLock}${breakRuleLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
