@@ -576,6 +576,9 @@ module.exports = async function handler(req, res) {
         // Wave 4e — Viral Producer Mode strict boolean coercion. Genre-gated
         // server-side (only fires for VIRAL_GENRE_WHITELIST genres).
         p.viralMode = p.viralMode === true;
+        // Wave 4f — Sample Hook Mode strict boolean. Auto-extracts the sticky
+        // phrase from topic and builds the song around looping it.
+        p.sampleHookMode = p.sampleHookMode === true;
         // Wave 4d + 4e — producer template whitelist. Album-leaning producers
         // (Wave 4d) + viral-leaning producers (Wave 4e). Invalid keys silently
         // drop — buildProducerTemplateNote returns '' for unknowns.
@@ -644,6 +647,10 @@ module.exports = async function handler(req, res) {
         // buildLuckyPrompt auto-enables ~25% of the time on viral-eligible
         // fusions (both genres in VIRAL_GENRE_WHITELIST + radio/street tier).
         lp.viralMode = lp.viralMode === true;
+        // Wave 4f — Sample Hook Mode for Lucky. Strict boolean. When unset,
+        // buildLuckyPrompt auto-enables ~50% of the time when viralMode is on
+        // (sample hooks pair naturally with viral architecture).
+        lp.sampleHookMode = lp.sampleHookMode === true;
         // Wave 4d + 4e — producer template whitelist for Lucky (same as song path)
         const VALID_LUCKY_PRODUCERS = new Set([
           'Swizz Beatz','Hit-Boy','Metro Boomin','Pharrell Williams (Neptunes era)','J Dilla','The Alchemist',
