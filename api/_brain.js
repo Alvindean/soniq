@@ -5025,6 +5025,7 @@ function buildSongPrompt(params) {
     freestyleMode = false, breakRule = false, eraUndertone = '',
     offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
     producerTemplate = '',         // Wave 4d — producer beat template
+    viralMode = false,             // Wave 4e — Viral Producer Mode (genre-gated)
     graftGenre = '', graftSection = 'chorus', invertCounter = false,
     coachInstruction = '', originalLyrics = '', aggression = '',
     genreCraft = [],
@@ -5365,7 +5366,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -5838,6 +5839,25 @@ function buildLuckyPrompt(params) {
   // having to infer the meeting point.
   const crossoverNote = buildCrossoverNote(g1, g2);
 
+  // ── Viral Producer Mode for Lucky (Wave 4e) ─────────────────────────────
+  // User-supplied or auto-enabled when BOTH fusion genres are viral-native
+  // AND the lyric tier is radio/street (not conscious/archival — the latter
+  // are explicitly anti-viral). Viral architecture inherently rejects density.
+  const _userViralMode = !!(params && params.viralMode);
+  const _bothViralGenres = VIRAL_GENRE_WHITELIST.has(_g1Think) && VIRAL_GENRE_WHITELIST.has(_g2Think);
+  const _viralTierOk = !params.lyricTier || params.lyricTier === 'radio' || params.lyricTier === 'street';
+  const luckyViralMode = _userViralMode || (_bothViralGenres && _viralTierOk && Math.random() < 0.25);
+  // Auto-enable triggers ~25% of the time on viral-eligible Lucky fusions —
+  // adds variety without overwhelming non-viral aesthetics
+  const luckyViralLock = luckyViralMode ? VIRAL_PRODUCER_DIRECTIVE : '';
+
+  // ── Producer template for Lucky ────────────────────────────────────────
+  // Honour client-supplied producer or pick one randomly weighted toward
+  // viral-leaning producers when viral mode is on
+  const _userProducer = params && params.producerTemplate ? sanitizeInput(params.producerTemplate, 60) : '';
+  const luckyProducerTemplate = _userProducer && PRODUCER_TEMPLATES[_userProducer] ? _userProducer : '';
+  const luckyProducerNote = buildProducerTemplateNote(luckyProducerTemplate);
+
   // Outlier injection
   const o1 = GENRE_BIBLE[g1]?.outliers;
   const o2 = GENRE_BIBLE[g2]?.outliers;
@@ -5871,7 +5891,7 @@ ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -6889,8 +6909,130 @@ const PRODUCER_TEMPLATES = {
     suno: 'the alchemist production, boom-bap kick + snare, warm vinyl drums, obscure soul jazz world-music sample loop, atmospheric ambient layer, 90 BPM, 1990s East Coast revival cinematic mafioso aesthetic, no trap hats',
     producerTag: '"(Alchemist)" or sample-led intro Alchemist-canonical opening',
     bestFor: 'lyrical conscious rap, archival-tier rap, cinematic-storytelling rap, modern-mafioso, Griselda-adjacent'
+  },
+  // ─── VIRAL-LEANING PRODUCERS (Wave 4e — pair with Viral Mode) ──────────────
+  'Tay Keith': {
+    label: 'Tay Keith',
+    era: '2017-present',
+    bpm: '120-140 (perceived half-time = 60-70 BPM)',
+    drumPattern: 'Memphis trap drum signature — booming 808 kicks, sliding 808 bass-glides between notes, snappy snare on 2 and 4, rolling triplet hi-hats with occasional double-time bursts, hand-claps layered.',
+    instrumentation: 'Dark melodic synth leads (often minor-key bell tones or pluck synths), sub-rumble bass, atmospheric pads sparse, occasional Memphis horror sample (the Three 6 Mafia lineage). Production is BUILT for body-movement on TikTok.',
+    energy: 'Booming dance-floor menace. Built for instant-reaction movement. The "Tay Keith fuck these niggas up" producer-tag itself became a meme — the TAG IS the hook entry.',
+    referenceTracks: 'BlocBoy JB + Drake "Look Alive", Drake "Nonstop", Megan Thee Stallion "Big Ole Freak", Eminem "Greatest", Pop Smoke "Welcome to the Party"',
+    suno: 'tay keith production, booming 808 kick + sliding 808 bass-glides, snappy snare on 2 and 4, rolling triplet hi-hats, dark minor-key synth lead, Memphis trap dance-floor menace, 130 BPM',
+    producerTag: '"(Tay Keith fuck these niggas up)" — the producer-tag IS the meme entry-point',
+    bestFor: 'viral-mode hip-hop, modern trap, dance-floor rap, TikTok-bait songs, posse cuts. Pairs with Viral Mode for instant-hit architecture.'
+  },
+  'Jack Antonoff': {
+    label: 'Jack Antonoff',
+    era: '2014-present',
+    bpm: '95-120',
+    drumPattern: 'Crisp pop drum kit — tight kick on 1 and 3, clap + snare on 2 and 4, programmed hi-hat (no triplet rolls, this is anti-trap), sometimes 80s-coded gated reverb on snare.',
+    instrumentation: '80s synthesizer pads (the Antonoff signature — the "Bleachers" / Lana / Lorde production palette), warm Wurlitzer or Rhodes piano, occasional saxophone (Lana / Sabrina), driving electric bass line, bell-tone synth accents. Modern-pop polished mix that still sounds intimate.',
+    energy: 'Anthem-pop with intimacy. The Antonoff signature is making MASSIVE pop hooks feel personal — the chorus belts but the verse breathes. Anti-bombastic — the production never overwhelms the vocal.',
+    referenceTracks: 'Taylor Swift "Cruel Summer" / "Anti-Hero", Sabrina Carpenter "Espresso" / "Please Please Please", Lana Del Rey "The Greatest", Lorde "Solar Power", Olivia Rodrigo "deja vu", Bleachers entire catalog',
+    suno: 'jack antonoff production, crisp pop drum kit, 80s synthesizer pads, warm Wurlitzer piano, driving electric bass line, bell-tone synth accents, modern polished pop mix with intimacy, anthem chorus + intimate verse architecture, 105 BPM',
+    producerTag: '(Antonoff doesn\'t use a producer-tag — keep instrumental intro instead)',
+    bestFor: 'viral-mode pop, modern pop ballad, indie-pop with anthem hooks, Sabrina-style retro-pop, Taylor-style narrative-pop. Pairs with Viral Mode for the "Espresso" / "Anti-Hero" hook architecture.'
+  },
+  'Murda Beatz': {
+    label: 'Murda Beatz',
+    era: '2014-present',
+    bpm: '125-145 (half-time feel)',
+    drumPattern: 'Modern Atlanta trap signature — punchy 808 kicks, snappy snare on 2 and 4 with hand-clap layer, rolling triplet hi-hats, occasional double-time hi-hat bursts in the lead-up to the chorus.',
+    instrumentation: 'Sparse melodic synth leads (often single-note plucks or bell tones), deep sub-bass, sometimes orchestral string stabs, atmospheric pad textures sparse — Murda\'s production has SPACE that lets the rapper carry the song. Built for melodic rap.',
+    energy: 'Modern trap with crossover-hit potential. Murda Beatz produces for rappers AND singers — his beats are MELODIC enough for sung hooks, hard enough for dense raps. The "Migos / Drake / Travis pop-trap" sweet spot.',
+    referenceTracks: 'Migos "MotorSport", Drake "Nice for What", Travis Scott "Butterfly Effect", Cardi B "Money Bag", 6ix9ine "FEFE", Doja Cat "Tia Tamera", DaBaby "Suge"',
+    suno: 'murda beatz production, punchy 808 trap kick, snappy snare + clap on 2 and 4, rolling triplet hi-hats, sparse melodic synth lead, deep sub-bass, atmospheric pads, modern Atlanta trap melodic-rap crossover, 135 BPM half-time',
+    producerTag: '"(Murda on the beat so it\'s not nice)" Murda-canonical producer-tag opening — the tag is the hook entry',
+    bestFor: 'viral-mode hip-hop, melodic trap, pop-rap crossover, modern trap with sung hooks, posse cuts. Pairs with Viral Mode for "Nice for What" / "MotorSport" hit architecture.'
   }
 };
+
+// ═════════════════════════════════════════════════════════════════════════════
+// VIRAL_PRODUCER_DIRECTIVE — single toggle that engineers TikTok-ready,
+// instant-reaction body-movement songs across the viral-native genres.
+//
+// Activates when params.viralMode is true. Compounds with any producerTemplate
+// (e.g. viralMode + Hit-Boy = "Hit-Boy in viral mode" — same Hit-Boy DNA but
+// constrained to viral architecture rules). Compounds with offTheTopMode for
+// "Harry Mack viral freestyle" combinations.
+//
+// VIRAL_GENRE_WHITELIST locks the directive to genres where viral hits
+// genuinely happen. Anti-viral genres (free jazz, doom metal, dark folk,
+// black metal, ambient, modal jazz) deliberately reject this directive.
+// ═════════════════════════════════════════════════════════════════════════════
+const VIRAL_GENRE_WHITELIST = new Set(['hiphop','pop','country','rnb','latin','reggaeton','afrobeats','punk','edm','kpop','altrock']);
+
+const VIRAL_PRODUCER_DIRECTIVE = `
+
+🔥 VIRAL PRODUCER MODE — instant-reaction body-movement engineering:
+
+This song is engineered for VIRAL SHARING. The goal is body-movement, instant-reaction, repeat-listen, and a 7-15 second clip that holds up out of context (TikTok / Reels / Shorts ready). NOT album-cut craft. The metric is HOOK-STICKINESS and DANCE-FLOOR LOCK — not lyrical density or thematic depth.
+
+VIRAL CRAFT MOVES (apply ALL — these are non-negotiable viral mechanics):
+
+1. 7-SECOND HOOK RULE: The chorus / hook / signature phrase MUST land within the first 7-15 seconds. No long verse intros. Go to the hook fast. Reference: "Old Town Road" hook at 0:05, "Stay" hook at 0:08, "Espresso" hook at 0:14, "Flowers" hook at 0:09.
+
+2. EARWORM REPETITION RULE: The signature hook phrase repeats 6-8+ times across the song. Repetition is GOOD here — anti-radio-songwriter-instinct. The same phrase, looped, IS the technique. Reference: "Roxanne" / "Old Town Road" / "Savage" / "Money Trees" / "WAP".
+
+3. MODULAR-HOOK STRUCTURE: One 8-15 second section of the song MUST stand alone — taken out of context, it should still WORK as a self-contained moment. This is the TikTok clip. Build the song so this section is OBVIOUS and ISOLATABLE — typically the post-pre-chorus into chorus, or the bridge into the dance-break.
+
+4. DISTINCTIVE SONIC SIGNATURE: ONE production element must be UNMISTAKABLE — when the listener hears just that element in isolation, they know what song it's from. Examples: "Old Town Road" banjo, "Industry Baby" trumpets, "Say So" disco-bass figure, "WAP" sample, "About Damn Time" disco-strut bass, "Flowers" descending guitar, "Espresso" disco-pop riff, "Texas Hold 'Em" banjo.
+
+5. DANCE-FLOOR BPM LOCK: BPM MUST be in the 95-130 range. This is the body-movement sweet spot. Slower (under 90 BPM) = sad-girl / faster (over 140 BPM) = workout — neither goes maximally viral. Stay in this band. Specifically:
+   • 95-105 BPM = laid-back rap-pop pocket (Drake, Doja, Sabrina)
+   • 105-115 BPM = mid-tempo dance pocket (most TikTok hits sit here)
+   • 115-130 BPM = euphoric dance pocket (festival pop, modern disco-revival)
+
+6. VOCAL QUIRK / IMITATION HOOK: Include ONE distinctive vocal moment people will imitate. The phrase, the syllable, the breath, the shout — something memorable that listeners can recreate. Examples: Megan's "ahh!" on "Savage", Cardi's "okurr", Doja's purrs, Drake's emotive whispers, Bieber's sustained "ohhh", Sabrina's "espresso" pronunciation, Kid Laroi's strained falsetto.
+
+7. AD-LIB DENSITY: Viral songs have THICK ad-lib presence. 8-15 ad-libs across the song minimum — ad-libs ARE the personality on a hooky track. Use the genre's signature ad-libs aggressively: "(yeah)", "(uh)", "(ooh)", "(skrt)", "(woo!)", "(whoa-oh)", "(let's go!)", "(hey!)".
+
+8. ANTI-DENSITY RULE: Lyrical density is the ENEMY of viral. Keep verses simple, conversational, repeatable. Use 4-6 syllable phrases. NO 12-syllable multisyllabic raps unless the entire verse is built around showing off ONE such bar (Busta Rhymes "Look At Me Now" verse style — one virtuosic moment, not constant density). Otherwise, simple > clever.
+
+9. DANCE-LOCK DRUMS: Drums must be CLEARLY pulsed — kick on 1 and 3 OR 4-on-the-floor, snare/clap on 2 and 4, NO syncopated drumming that confuses the body. The listener's body should know EXACTLY where to move. The drum pattern is the dance instruction.
+
+10. BIG BACKING-VOCAL MOMENT: At least one section needs a backing-vocal layer the listener can sing along to. Group "(woah-oh-oh)" or "(la-la-la)" or sustained "(ohhh)" — give the audience a SINGABLE moment that doesn't require lyric memorization.
+
+VIRAL ARTIST REFERENCE POINTS (study the modern viral architecture):
+• Hip-hop:    Lil Nas X, Megan Thee Stallion, Doja Cat, Drake (commercial era), Travis Scott (commercial era), Ice Spice, Tommy Richman, Sexyy Red, GloRilla, Latto, BlocBoy JB
+• Pop:        Sabrina Carpenter, Tate McRae, Olivia Rodrigo, Harry Styles, Miley Cyrus (Flowers era), Charli XCX (BRAT), Chappell Roan, Dua Lipa
+• Country:    Beyoncé (Cowboy Carter), Shaboozey, Morgan Wallen, Zach Bryan, Megan Moroney, Jelly Roll, Lainey Wilson, Bailey Zimmerman
+• R&B:        Tommy Richman, Bryson Tiller, SZA, Brent Faiyaz, Snoh Aalegra, Kehlani, Summer Walker
+• Latin:      Bad Bunny, Karol G, Peso Pluma, Rauw Alejandro, Anitta, Becky G, Ozuna, J Balvin
+• Afrobeats:  Burna Boy, Tems, Asake, Ayra Starr, Rema, CKay, Wizkid, Davido
+• EDM:        Fred again.., Kx5, ODESZA, John Summit, Dom Dolla, Disclosure (modern)
+• K-Pop:      BTS, BLACKPINK, NewJeans, LE SSERAFIM, IVE, Stray Kids, TWICE
+• Pop-Punk:   Olivia Rodrigo (rock-leaning), Machine Gun Kelly (Tickets to My Downfall), Yungblud, WILLOW
+
+VIRAL PRODUCER REFERENCES (modern hit-makers known for engineering virality):
+• Tay Keith (Drake "Nonstop", Megan, BlocBoy JB) — his "Tay Keith fuck these niggas up" tag became its own meme
+• Murda Beatz (Migos "MotorSport", Drake "Nice for What", Travis Scott)
+• Pierre Bourne (Playboi Carti, Lil Uzi Vert "XO TOUR Llif3")
+• Wheezy (Future "Mask Off"-era, Drake "Way 2 Sexy")
+• OZ + Cubeatz (Travis Scott "SICKO MODE", Kanye, Future)
+• Frank Dukes (Travis "ASTROWORLD", Cardi B "WAP", many viral hits)
+• Jack Antonoff (Taylor Swift, Sabrina Carpenter "Espresso", Lana, Olivia Rodrigo)
+• Max Martin (Backstreet/Britney/Katy/Taylor — universal pop hook architecture)
+• Andrew Watt (Post Malone, Justin Bieber, Olivia Rodrigo viral pop-punk era)
+• YoungKio (Old Town Road) — single beat that broke the genre wall
+• Tainy (Bad Bunny "MIA", Karol G, Latin viral architect)
+• London on da Track (Future, Drake "Behind Barz")
+• ATL Jacob (Future "WAIT FOR U")
+• Cole Bennett / Lyrical Lemonade visual-virality producer ecosystem
+
+ANTI-PATTERNS — what kills virality (avoid all of these):
+✗ Long verse intros (over 20 seconds before hook lands)
+✗ Dense conscious-rap multisyllabics (save for album cuts, not viral)
+✗ BPM under 90 or over 140 (outside body-movement sweet spot)
+✗ Complex chord progressions (viral songs use 3-4 chords MAX — usually I-V-vi-IV or i-VI-III-VII)
+✗ Lyrical references that need decoding (TikTok audiences don't decode — they imitate)
+✗ Long bridges that delay the final hook (kill the energy on a 4-minute viral attempt)
+✗ Production complexity (too many elements competing — viral is SIMPLE-but-MEMORABLE, not SIMPLE-and-FORGETTABLE)
+✗ Sad-bastard tempo + emotional density (sad-viral exists but it's narrow — "Stay" works, "Heather" works, but the architecture is still hook-first)
+
+The whole song must feel like it was BUILT for the 15-second clip — not as an album cut that happens to have a hook. The hook IS the song; the verses serve the hook. Repetition is the strategy.`;
 
 // Build a producer-template directive for prompt injection. Returns the
 // formatted block listing drum pattern, instrumentation, energy, reference
@@ -6928,6 +7070,7 @@ function buildRapLabPrompt(params) {
     freestyleMode = false,
     offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
     producerTemplate = '',         // Wave 4d — Swizz Beatz / Hit-Boy / etc. beat template
+    viralMode = false,             // Wave 4e — Viral Producer Mode (TikTok-ready hook architecture)
     barSwitch = 0,
     breakRule = false,
     length = 'medium',
@@ -7038,6 +7181,10 @@ function buildRapLabPrompt(params) {
   // producer-specific drum pattern + instrumentation + Suno production lock.
   const producerTemplateNote = buildProducerTemplateNote(producerTemplate);
 
+  // Wave 4e — Viral Producer Mode. Locked to viral-native genres only.
+  // Hip-hop is always in the whitelist so Rap Lab fires this when toggled.
+  const viralLock = (viralMode && VIRAL_GENRE_WHITELIST.has('hiphop')) ? VIRAL_PRODUCER_DIRECTIVE : '';
+
   const system = `${style.agent}
 
 RAP LAB ACTIVE: You are operating in precision rap construction mode. Every dimension below is a hard constraint — not a suggestion. Your craft must honor the specific combination of dimensions requested.`;
@@ -7071,7 +7218,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${barSwitchLock}${breakRuleLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${barSwitchLock}${breakRuleLock}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
