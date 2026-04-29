@@ -949,7 +949,7 @@ const RAP_STYLE_ADLIBS = {
   'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
   'Phonk':                ['(pitched down)','(demonic)','yea hoe','triple six','(drawl)','aaagh','(slowed)','(screwed)'],
   'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
-  'Hustle / Grind':       ['still up','on my grind','the marathon','(grinding)','no sleep','up first','the mix','get it'],
+  'Hustle / Grind':       ['still up','on my grind','long road','(grinding)','no sleep','up first','no days off','get it'],
   'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
   'Neo-Phonetic':         ['(stutter)','brr brr','kah','tata','(chopped syllable)','boof','ah ah','(phonetic)'],
   'Climate Rap':          ['(breath)','(sigh)','look around','real talk','(urgent)','(grim)','time\'s up','(sobering)'],
@@ -1571,7 +1571,30 @@ NATURAL-SPEECH EXCEPTION: If a banned word is also a common English word used in
 
 META-RAP EXCEPTION: Some rap lineages (Eminem, J. Cole, Lupe Fiasco) genuinely reference their own craft in-bar. If and only if the topic is EXPLICITLY about rapping or writing, a SINGLE meta-reference per song is allowed — but still never using the exact pill labels from the UI. Write "I bend syllables", not "I use multi-syllabic rhyme".
 
-DEMONSTRATE the technique. NEVER NAME it. If the listener could hear the verse and identify the technique without you labeling it, you executed it correctly. If you had to SAY the label, you failed to execute.`;
+DEMONSTRATE the technique. NEVER NAME it. If the listener could hear the verse and identify the technique without you labeling it, you executed it correctly. If you had to SAY the label, you failed to execute.
+
+🚫 ARTIST-SIGNATURE PHRASE FIREWALL — ABSOLUTE RULE (separate from craft vocab):
+
+The following phrases are TRADEMARKED to specific artists and carry their cultural identity. They MUST NOT appear verbatim in lyric output unless the song's TOPIC explicitly invokes that artist (tribute, homage, named reference). Even if these phrases appear in directive examples or ad-lib reference lists, treat them as descriptions of LINEAGE, not as material to copy.
+
+FORBIDDEN VERBATIM (unless song is explicitly about this artist):
+• "the marathon" / "marathon continues" / "TMC" — Nipsey Hussle's brand and foundation
+• "started from the bottom" — Drake-canonical
+• "no flex zone" — Rae Sremmurd
+• "shmoney" / "shmoney dance" — Bobby Shmurda
+• "esketit" / "ooh esketit" — Lil Pump
+• "issa knife" / "issa" — 21 Savage
+• "we the best" / "another one" — DJ Khaled
+• "young moolah baby" — Lil Wayne / YMCMB
+• "rich gang" — Birdman / Cash Money
+• "okurr" / "okurrr" — Cardi B
+• "y'all gon' make me lose my mind" — DMX-canonical hook
+• "real recognize real" — Plies-canonical
+• "sit down, be humble" — Kendrick "HUMBLE." hook (the chant itself, not the concept of humility)
+
+WHY: These phrases function as artists' LIVING TRADEMARKS — using them in an unrelated song is the lyric equivalent of citing a competitor's brand name. Reference them in PROSE describing a genre's lineage (e.g. ad-lib reference lists, vocab register descriptions) — but NEVER copy them into lyric output of an unrelated song.
+
+THE TEST: After writing each line, ask "is this phrase associated with one specific artist's brand?" If yes and the song isn't about that artist, rewrite with original phrasing that captures the same energy.`;
 }
 
 // ============ SPEED GEARS SYSTEM ============
@@ -3082,10 +3105,10 @@ const HOOK_STYLE_NOTES={
   'Spelling Hook':         'HOOK STYLE: Spelling hook — chorus SPELLS a word, letter by letter. The spelling itself IS the hook. Limited but iconic. Examples: Aretha Franklin "Respect" (R-E-S-P-E-C-T find out what it means to me — the canonical spelling hook), Fergie "Glamorous" (G-L-A-M-O-R-O-U-S), N*SYNC "Bye Bye Bye" (no spelling but name-shape hook), Backstreet Boys "Larger Than Life" (the implicit), Bowling for Soup "1985" (spelling era), Jackson 5 "ABC" (alphabet as melody), Tribe Called Quest "Bonita Applebum" (name-spelling adjacent). Pick a 5-9 letter word that\'s the song\'s thesis — spell it once or twice in the chorus, drop one letter at a time on the beat. Each letter lands on a snare or clap.',
   'Repeat-with-Twist':     'HOOK STYLE: Repeat-with-twist hook — chorus repeats but the FINAL repetition changes one word/phrase to deliver a punchline or emotional turn. The expectation-then-subversion IS the hook. Universal across pop, hip-hop, country. Examples: Ed Sheeran "Shape of You" (last repetition rotates body part), Drake "In My Feelings" (rotating names — Kiki / Resha / JT), Taylor Swift "Style" (the final chorus shifts), Beyoncé "If I Were a Boy" (the final time the meaning flips), Cher "Believe" (auto-tune crack on the final repeat), Chappell Roan "Pink Pony Club" (final chorus subversion). Pattern: chorus 1 = X / chorus 2 = X / final chorus = X-but-one-word-changed. The change is small but POINTED.',
   'Antithesis Hook':       'HOOK STYLE: Antithesis / opposition hook — chorus pairs two CONTRASTING ideas in adjacent lines. The contrast IS the hook. Universal across pop, R&B, hip-hop, country. Examples: The Supremes "Stop! In the Name of Love" (stop + love — opposing actions), Lil Wayne "How to Love" (love + hate alternation), Beyoncé "If I Were a Boy" (boy/girl contrast), Whitney "How Will I Know" (knowing + not-knowing), Adele "Set Fire to the Rain" (fire + rain physical impossibility), Macklemore "Same Love" (the title is itself contrast — same/love), TLC "No Scrubs" (the negation IS the assertion). Build the chorus with PAIRED OPPOSITES: love/hate, near/far, alive/dead, light/dark, hot/cold, friend/enemy. Each line OPPOSES the previous — the contrast carries the meaning.',
-
-  // META-RULE: pick ONE pattern per chorus — stacking dilutes
-  // (This entry is a special directive, NOT a hook-style — fires when the LLM sees multiple hook-style requests)
-  '_stacking_meta':        'META-RULE: When MULTIPLE hook-style patterns are selected for a single song, USE ONLY ONE per chorus — stacking patterns dilutes each one. If two are selected (e.g. Title Drop + Octave Jump), apply Title Drop to chorus 1 and 2, save Octave Jump for the FINAL chorus as the climax move. Combining 3+ hook-style patterns in one chorus produces an overstuffed, unmemorable hook. The Pro Tip: pick ONE per chorus.',
+  // Note: hookStyle is single-string by design (one pattern per song). The
+  // "pick ONE per chorus" guidance is implicit — there's nothing to over-stack
+  // at the API layer. Any future multi-select feature should re-add a meta
+  // entry and gate it via the leading-underscore filter at lookup sites.
 };
 
 // Genre-level Suno bracket blueprints — used when no substyle is set
@@ -5176,7 +5199,10 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   else if (genre === 'tvmusical') genreSpecificNote = `\n\nTV/MUSICAL RULES:\n- Every song has a DRAMATIC FUNCTION.\n- Characters sing because dialogue is insufficient.\n- "I want" structure in verse 1/chorus 1.\n- Reprise principle: same melody, changed lyrics = devastating.`;
 
   // Hook style
-  const resolvedHookStyle = (hookStyle && hookStyle !== 'auto') ? hookStyle : null;
+  // Defensive filter: leading-underscore keys are reserved for internal meta-
+  // entries (e.g. _stacking_meta from a previous wave). They must never be
+  // injected as a user-facing hook directive even if a client passes one.
+  const resolvedHookStyle = (hookStyle && hookStyle !== 'auto' && !String(hookStyle).startsWith('_')) ? hookStyle : null;
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle] ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}` : '';
 
   // Blend — secondary genre + writing style influence (rewritten to inject the
@@ -7303,7 +7329,9 @@ function buildRapLabPrompt(params) {
   const structStr = freestyleMode
     ? '[Intro | 4-8 bars beat] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
     : (STRUCTURES[structure] || STRUCTURES.standard);
-  const hookNote = freestyleMode ? '' : (HOOK_STYLE_NOTES[hookStyle] || '');
+  // Defensive filter: leading-underscore keys are reserved for internal meta-entries
+  const _safeHookStyle = (hookStyle && !String(hookStyle).startsWith('_')) ? hookStyle : null;
+  const hookNote = freestyleMode ? '' : (_safeHookStyle && HOOK_STYLE_NOTES[_safeHookStyle] || '');
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
