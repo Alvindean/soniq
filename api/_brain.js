@@ -3082,10 +3082,10 @@ const HOOK_STYLE_NOTES={
   'Spelling Hook':         'HOOK STYLE: Spelling hook — chorus SPELLS a word, letter by letter. The spelling itself IS the hook. Limited but iconic. Examples: Aretha Franklin "Respect" (R-E-S-P-E-C-T find out what it means to me — the canonical spelling hook), Fergie "Glamorous" (G-L-A-M-O-R-O-U-S), N*SYNC "Bye Bye Bye" (no spelling but name-shape hook), Backstreet Boys "Larger Than Life" (the implicit), Bowling for Soup "1985" (spelling era), Jackson 5 "ABC" (alphabet as melody), Tribe Called Quest "Bonita Applebum" (name-spelling adjacent). Pick a 5-9 letter word that\'s the song\'s thesis — spell it once or twice in the chorus, drop one letter at a time on the beat. Each letter lands on a snare or clap.',
   'Repeat-with-Twist':     'HOOK STYLE: Repeat-with-twist hook — chorus repeats but the FINAL repetition changes one word/phrase to deliver a punchline or emotional turn. The expectation-then-subversion IS the hook. Universal across pop, hip-hop, country. Examples: Ed Sheeran "Shape of You" (last repetition rotates body part), Drake "In My Feelings" (rotating names — Kiki / Resha / JT), Taylor Swift "Style" (the final chorus shifts), Beyoncé "If I Were a Boy" (the final time the meaning flips), Cher "Believe" (auto-tune crack on the final repeat), Chappell Roan "Pink Pony Club" (final chorus subversion). Pattern: chorus 1 = X / chorus 2 = X / final chorus = X-but-one-word-changed. The change is small but POINTED.',
   'Antithesis Hook':       'HOOK STYLE: Antithesis / opposition hook — chorus pairs two CONTRASTING ideas in adjacent lines. The contrast IS the hook. Universal across pop, R&B, hip-hop, country. Examples: The Supremes "Stop! In the Name of Love" (stop + love — opposing actions), Lil Wayne "How to Love" (love + hate alternation), Beyoncé "If I Were a Boy" (boy/girl contrast), Whitney "How Will I Know" (knowing + not-knowing), Adele "Set Fire to the Rain" (fire + rain physical impossibility), Macklemore "Same Love" (the title is itself contrast — same/love), TLC "No Scrubs" (the negation IS the assertion). Build the chorus with PAIRED OPPOSITES: love/hate, near/far, alive/dead, light/dark, hot/cold, friend/enemy. Each line OPPOSES the previous — the contrast carries the meaning.',
-
-  // META-RULE: pick ONE pattern per chorus — stacking dilutes
-  // (This entry is a special directive, NOT a hook-style — fires when the LLM sees multiple hook-style requests)
-  '_stacking_meta':        'META-RULE: When MULTIPLE hook-style patterns are selected for a single song, USE ONLY ONE per chorus — stacking patterns dilutes each one. If two are selected (e.g. Title Drop + Octave Jump), apply Title Drop to chorus 1 and 2, save Octave Jump for the FINAL chorus as the climax move. Combining 3+ hook-style patterns in one chorus produces an overstuffed, unmemorable hook. The Pro Tip: pick ONE per chorus.',
+  // Note: hookStyle is single-string by design (one pattern per song). The
+  // "pick ONE per chorus" guidance is implicit — there's nothing to over-stack
+  // at the API layer. Any future multi-select feature should re-add a meta
+  // entry and gate it via the leading-underscore filter at lookup sites.
 };
 
 // Genre-level Suno bracket blueprints — used when no substyle is set
@@ -5176,7 +5176,10 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   else if (genre === 'tvmusical') genreSpecificNote = `\n\nTV/MUSICAL RULES:\n- Every song has a DRAMATIC FUNCTION.\n- Characters sing because dialogue is insufficient.\n- "I want" structure in verse 1/chorus 1.\n- Reprise principle: same melody, changed lyrics = devastating.`;
 
   // Hook style
-  const resolvedHookStyle = (hookStyle && hookStyle !== 'auto') ? hookStyle : null;
+  // Defensive filter: leading-underscore keys are reserved for internal meta-
+  // entries (e.g. _stacking_meta from a previous wave). They must never be
+  // injected as a user-facing hook directive even if a client passes one.
+  const resolvedHookStyle = (hookStyle && hookStyle !== 'auto' && !String(hookStyle).startsWith('_')) ? hookStyle : null;
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle] ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}` : '';
 
   // Blend — secondary genre + writing style influence (rewritten to inject the
@@ -7303,7 +7306,9 @@ function buildRapLabPrompt(params) {
   const structStr = freestyleMode
     ? '[Intro | 4-8 bars beat] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
     : (STRUCTURES[structure] || STRUCTURES.standard);
-  const hookNote = freestyleMode ? '' : (HOOK_STYLE_NOTES[hookStyle] || '');
+  // Defensive filter: leading-underscore keys are reserved for internal meta-entries
+  const _safeHookStyle = (hookStyle && !String(hookStyle).startsWith('_')) ? hookStyle : null;
+  const hookNote = freestyleMode ? '' : (_safeHookStyle && HOOK_STYLE_NOTES[_safeHookStyle] || '');
   const brackets = GENRE_SUNO_BRACKETS.hiphop;
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';

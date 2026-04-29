@@ -8376,8 +8376,6 @@ const HOOK_STYLE_NOTES={
   'Spelling Hook':         'HOOK STYLE: Spelling hook — chorus SPELLS a word, letter by letter. The spelling itself IS the hook. Limited but iconic. Examples: Aretha Franklin "Respect" (R-E-S-P-E-C-T find out what it means to me — the canonical spelling hook), Fergie "Glamorous" (G-L-A-M-O-R-O-U-S), N*SYNC "Bye Bye Bye" (no spelling but name-shape hook), Backstreet Boys "Larger Than Life" (the implicit), Bowling for Soup "1985" (spelling era), Jackson 5 "ABC" (alphabet as melody), Tribe Called Quest "Bonita Applebum" (name-spelling adjacent). Pick a 5-9 letter word that\'s the song\'s thesis — spell it once or twice in the chorus, drop one letter at a time on the beat. Each letter lands on a snare or clap.',
   'Repeat-with-Twist':     'HOOK STYLE: Repeat-with-twist hook — chorus repeats but the FINAL repetition changes one word/phrase to deliver a punchline or emotional turn. The expectation-then-subversion IS the hook. Universal across pop, hip-hop, country. Examples: Ed Sheeran "Shape of You" (last repetition rotates body part), Drake "In My Feelings" (rotating names — Kiki / Resha / JT), Taylor Swift "Style" (the final chorus shifts), Beyoncé "If I Were a Boy" (the final time the meaning flips), Cher "Believe" (auto-tune crack on the final repeat), Chappell Roan "Pink Pony Club" (final chorus subversion). Pattern: chorus 1 = X / chorus 2 = X / final chorus = X-but-one-word-changed. The change is small but POINTED.',
   'Antithesis Hook':       'HOOK STYLE: Antithesis / opposition hook — chorus pairs two CONTRASTING ideas in adjacent lines. The contrast IS the hook. Universal across pop, R&B, hip-hop, country. Examples: The Supremes "Stop! In the Name of Love" (stop + love — opposing actions), Lil Wayne "How to Love" (love + hate alternation), Beyoncé "If I Were a Boy" (boy/girl contrast), Whitney "How Will I Know" (knowing + not-knowing), Adele "Set Fire to the Rain" (fire + rain physical impossibility), Macklemore "Same Love" (the title is itself contrast — same/love), TLC "No Scrubs" (the negation IS the assertion). Build the chorus with PAIRED OPPOSITES: love/hate, near/far, alive/dead, light/dark, hot/cold, friend/enemy. Each line OPPOSES the previous — the contrast carries the meaning.',
-  // META-RULE: pick ONE pattern per chorus — stacking dilutes
-  '_stacking_meta':        'META-RULE: When MULTIPLE hook-style patterns are selected for a single song, USE ONLY ONE per chorus — stacking patterns dilutes each one. If two are selected (e.g. Title Drop + Octave Jump), apply Title Drop to chorus 1 and 2, save Octave Jump for the FINAL chorus as the climax move. Combining 3+ hook-style patterns in one chorus produces an overstuffed, unmemorable hook. The Pro Tip: pick ONE per chorus.',
 };
 
 const SUBSTYLE_NOTES={
@@ -10881,8 +10879,10 @@ async function generateSong(){
 - [Beat Switch]: the section after must feel like a completely different song (different energy, flow, topic angle).
 - Internal rhymes every 2-3 syllables add density on top of end rhymes.`:'';
   // Hook style note — explicit override or auto-derived from substyle
-  const resolvedHookStyle = (S.hookStyle && S.hookStyle !== 'auto') ? S.hookStyle
+  // Defensive filter: leading-underscore keys are reserved for internal meta-entries
+  const _rawHook = (S.hookStyle && S.hookStyle !== 'auto') ? S.hookStyle
     : ({Trap:'Melodic Auto-Tune','G-Funk':'Smooth Sung','Bay Area':'Call & Response','Down South':'Southern Drawl','Crunk':'Screamed / Crunk','Chopped & Screwed':'Chopped','Boom Bap':'Chanted','East Coast':'Rapped Hook','Cloud Rap':'Minimal / Groove','Phonk':'Demonic Chant / Pitched-Down','Gospel':'Gospel Vamp'}[S.substyle] || null);
+  const resolvedHookStyle = (_rawHook && !String(_rawHook).startsWith('_')) ? _rawHook : null;
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle]
     ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}`
     : '';
