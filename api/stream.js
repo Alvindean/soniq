@@ -569,6 +569,19 @@ module.exports = async function handler(req, res) {
         }
         // Edge mode — strict boolean coercion. Edge stays inside the lyric tier ceiling.
         p.edgeMode = p.edgeMode === true;
+        // Wave 4d — off-the-top mode strict boolean coercion. Only fires when
+        // freestyleMode is also true (the directive is an overlay, not a replacement).
+        p.offTheTopMode = p.offTheTopMode === true;
+        p.freestyleMode = p.freestyleMode === true;
+        // Wave 4d — producer template whitelist (Swizz Beatz, Hit-Boy, etc.).
+        // Invalid keys silently dropped — buildProducerTemplateNote returns ''
+        // when the key is unknown, so unknown values just no-op.
+        const VALID_PRODUCER_TEMPLATES = new Set(['Swizz Beatz','Hit-Boy','Metro Boomin','Pharrell Williams (Neptunes era)','J Dilla','The Alchemist']);
+        if (typeof p.producerTemplate === 'string') {
+          p.producerTemplate = VALID_PRODUCER_TEMPLATES.has(p.producerTemplate) ? p.producerTemplate : '';
+        } else {
+          p.producerTemplate = '';
+        }
         // Region whitelist — invalid → no region overlay (silent fallback)
         const VALID_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (p.region && !VALID_REGIONS.has(p.region)) p.region = '';
