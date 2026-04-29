@@ -573,10 +573,16 @@ module.exports = async function handler(req, res) {
         // freestyleMode is also true (the directive is an overlay, not a replacement).
         p.offTheTopMode = p.offTheTopMode === true;
         p.freestyleMode = p.freestyleMode === true;
-        // Wave 4d — producer template whitelist (Swizz Beatz, Hit-Boy, etc.).
-        // Invalid keys silently dropped — buildProducerTemplateNote returns ''
-        // when the key is unknown, so unknown values just no-op.
-        const VALID_PRODUCER_TEMPLATES = new Set(['Swizz Beatz','Hit-Boy','Metro Boomin','Pharrell Williams (Neptunes era)','J Dilla','The Alchemist']);
+        // Wave 4e — Viral Producer Mode strict boolean coercion. Genre-gated
+        // server-side (only fires for VIRAL_GENRE_WHITELIST genres).
+        p.viralMode = p.viralMode === true;
+        // Wave 4d + 4e — producer template whitelist. Album-leaning producers
+        // (Wave 4d) + viral-leaning producers (Wave 4e). Invalid keys silently
+        // drop — buildProducerTemplateNote returns '' for unknowns.
+        const VALID_PRODUCER_TEMPLATES = new Set([
+          'Swizz Beatz','Hit-Boy','Metro Boomin','Pharrell Williams (Neptunes era)','J Dilla','The Alchemist',
+          'Tay Keith','Jack Antonoff','Murda Beatz'
+        ]);
         if (typeof p.producerTemplate === 'string') {
           p.producerTemplate = VALID_PRODUCER_TEMPLATES.has(p.producerTemplate) ? p.producerTemplate : '';
         } else {
@@ -633,6 +639,20 @@ module.exports = async function handler(req, res) {
           lp.substyle = lp.substyle.trim().slice(0, 60);
         } else {
           lp.substyle = '';
+        }
+        // Wave 4e — Viral Producer Mode for Lucky. Strict boolean. When unset,
+        // buildLuckyPrompt auto-enables ~25% of the time on viral-eligible
+        // fusions (both genres in VIRAL_GENRE_WHITELIST + radio/street tier).
+        lp.viralMode = lp.viralMode === true;
+        // Wave 4d + 4e — producer template whitelist for Lucky (same as song path)
+        const VALID_LUCKY_PRODUCERS = new Set([
+          'Swizz Beatz','Hit-Boy','Metro Boomin','Pharrell Williams (Neptunes era)','J Dilla','The Alchemist',
+          'Tay Keith','Jack Antonoff','Murda Beatz'
+        ]);
+        if (typeof lp.producerTemplate === 'string') {
+          lp.producerTemplate = VALID_LUCKY_PRODUCERS.has(lp.producerTemplate) ? lp.producerTemplate : '';
+        } else {
+          lp.producerTemplate = '';
         }
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
