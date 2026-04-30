@@ -3556,6 +3556,37 @@ const OUTRO_ARCHETYPES = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
+// GENRE_INTRO_INTERLUDE_PREFS (Wave 4j) — per-genre weighted preferences for
+// the intro + interlude pickers. Each genre's `intro` array lists archetype
+// names that fit the genre's tradition; the picker uses these 70% of the time
+// (per pickWeightedArchetype's bias logic) and 30% fully random for surprise.
+// Genres NOT in this map fall back to uniform random across the full archetype
+// list (still works — pickWeightedArchetype handles undefined preferred lists).
+// ═══════════════════════════════════════════════════════════════════════════
+const GENRE_INTRO_INTERLUDE_PREFS = {
+  pop:       { intro: ['Vamp Intro','Build-Up','A Cappella Drop','Sample Open'],         interlude: ['Production-Only Loop','Beat-Switch'] },
+  hiphop:    { intro: ['Drop-In','Sample Open','Producer-Tag','Counted-In'],             interlude: ['Phone-Call Skit','Beat-Switch','Sample Drop','Drum-Break'] },
+  rnb:       { intro: ['Vamp Intro','A Cappella Drop','Sample Open'],                    interlude: ['Phone-Call Skit','Choir / Group-Vocal Drop','Production-Only Loop'] },
+  neosoul:   { intro: ['Vamp Intro','A Cappella Drop','Sample Open','Field-Recording'],  interlude: ['Phone-Call Skit','Spoken Aside','Choir / Group-Vocal Drop'] },
+  jazz:      { intro: ['Vamp Intro','A Cappella Drop','False-Start Tease'],              interlude: ['Instrumental Solo','Drum-Break'] },
+  blues:     { intro: ['Riff-First','Vamp Intro','A Cappella Drop'],                     interlude: ['Instrumental Solo','Drum-Break'] },
+  gospel:    { intro: ['A Cappella Drop','Vamp Intro'],                                  interlude: ['Choir / Group-Vocal Drop','Spoken Aside'] },
+  country:   { intro: ['Riff-First','Vamp Intro','Counted-In'],                          interlude: ['Instrumental Solo','Spoken Aside'] },
+  rock:      { intro: ['Riff-First','Drop-In','Counted-In','Build-Up'],                  interlude: ['Instrumental Solo','Production-Only Loop','Drum-Break'] },
+  altrock:   { intro: ['Riff-First','Build-Up','Drop-In','Field-Recording'],             interlude: ['Instrumental Solo','Beat-Switch'] },
+  edm:       { intro: ['Build-Up','Drop-In','Producer-Tag'],                             interlude: ['Beat-Switch','Production-Only Loop'] },
+  metal:     { intro: ['Riff-First','Drop-In','Build-Up'],                               interlude: ['Instrumental Solo','Drum-Break','Sample Drop'] },
+  punk:      { intro: ['Counted-In','Drop-In','Riff-First'],                             interlude: ['Drum-Break','Instrumental Solo'] },
+  folk:      { intro: ['A Cappella Drop','Vamp Intro','Field-Recording'],                interlude: ['Instrumental Solo','Spoken Aside'] },
+  ss:        { intro: ['A Cappella Drop','Vamp Intro','Field-Recording'],                interlude: ['Instrumental Solo','Spoken Aside'] },
+  reggae:    { intro: ['Vamp Intro','Drop-In','Sample Open'],                            interlude: ['Instrumental Solo','Drum-Break','Production-Only Loop'] },
+  reggaeton: { intro: ['Drop-In','Producer-Tag','Sample Open'],                          interlude: ['Beat-Switch','Drum-Break'] },
+  afrobeats: { intro: ['Drop-In','Producer-Tag','Field-Recording'],                      interlude: ['Beat-Switch','Drum-Break','Choir / Group-Vocal Drop'] },
+  latin:     { intro: ['Vamp Intro','Counted-In','Drop-In'],                             interlude: ['Instrumental Solo','Drum-Break'] },
+  kpop:      { intro: ['Build-Up','Drop-In','Producer-Tag'],                             interlude: ['Beat-Switch','Production-Only Loop'] }
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // INTRO ARCHETYPES (Wave 4h) — the first 7 seconds. This is what stops the
 // scroll on TikTok / Spotify / radio. Universal across all genres.
 // Each archetype defines HOW the song opens.
@@ -5239,10 +5270,13 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   // Interlude fires probabilistically (~35% of songs) plus mandatory at
   // archival/conscious tiers — not every song needs an interlude, and forcing
   // one onto short-form / radio-tier songs degrades the listener experience.
-  const _ia  = pickWeightedArchetype(INTRO_ARCHETYPES,      _gsd.bridge?.preferred_intro);
+  // Wave 4j — preferred lists now sourced from GENRE_INTRO_INTERLUDE_PREFS
+  // (separate const so we don't have to edit 30+ GENRE_SECTION_DNA entries).
+  const _giip = GENRE_INTRO_INTERLUDE_PREFS[genre] || {};
+  const _ia  = pickWeightedArchetype(INTRO_ARCHETYPES,      _giip.intro);
   const _ltier = params.lyricTier;
   const _shouldInterlude = (_ltier === 'archival' || _ltier === 'conscious' || Math.random() < 0.35);
-  const _intla = _shouldInterlude ? pickWeightedArchetype(INTERLUDE_ARCHETYPES, _gsd.bridge?.preferred_interlude) : null;
+  const _intla = _shouldInterlude ? pickWeightedArchetype(INTERLUDE_ARCHETYPES, _giip.interlude) : null;
 
   // Hook structural variation (separate from delivery style — picked randomly)
   const _hookStructKeys = Object.keys(HOOK_STRUCTURE_NOTES).filter(k => k !== 'auto');
@@ -5638,17 +5672,17 @@ const CROSSOVER_TAXONOMY = {
 
     // TEXTURE / STRUCTURE
     '[Build]':              ['edm','pop-dance','rock','metalcore','dubstep','trance'],
-    '[Drop]':               ['edm','dubstep','future-bass','dance-pop','hardstyle','dnb'],
-    '[Half-Time]':          ['hiphop-trap','metal-numetal','rnb','pop-rap','dubstep','dnb'],
+    '[Drop]':               ['edm','dubstep','future-bass','dance-pop','hardstyle','drum-and-bass'],
+    '[Half-Time]':          ['hiphop-trap','metal-numetal','rnb','pop-rap','dubstep','drum-and-bass'],
     '[Breakdown]':          ['metal','metalcore','screamo','funk','dubstep','hardcore'],
-    '[Modulation Up +1]':   ['pop','rnb','gospel','jazz-vocaljazz','teen-pop','country','popballad'],
+    '[Modulation Up +1]':   ['pop','rnb','gospel','jazz-vocaljazz','teen-pop','country','pop-ballad'],
     '[A Cappella]':         ['gospel','rnb','folk','jazz','soul','indie','altrock'],
     '[Beat Switch]':        ['hiphop','pop-rap','rnb','indie-pop','nu-jazz'],
-    '[Modal Vamp]':         ['jazz-modal','funk','afrofunk','rock-prog','psychedelic'],
+    '[Modal Vamp]':         ['modal-jazz','funk','afro-funk','rock-prog','psychedelic'],
     '[Walking Bass]':       ['jazz','blues','swing','folk-bluegrass','rockabilly','country'],
     '[4-on-the-Floor]':     ['edm','disco-pop','dance-pop','house','techno','boogie-postdisco'],
-    '[Reese Bass]':         ['edm-dnb','edm-dubstep'],
-    '[Wobble Bass]':        ['edm-dubstep'],
+    '[Reese Bass]':         ['drum-and-bass','dubstep'],
+    '[Wobble Bass]':        ['dubstep'],
     '[La Pompe]':           ['gypsy-jazz'],
     '[Slap Bass]':          ['funk','funk-rock','disco','jazz-fusion','minneapolis-funk','modern-funk'],
 
@@ -5769,19 +5803,19 @@ const CROSSOVER_TAXONOMY = {
   // pairings have natural meeting points. Used to surface "where these two
   // genres MESH" guidance for Lucky and any cross-genre fusion path.
   fusionDNA: {
-    'rapped-verse + sung-chorus':  ['nu-metal','pop-rap','reggae-rock','funk-rock','new-jack-swing','jazz-fusion','contemporary-rnb','drum-and-bass'],
+    'rapped-verse + sung-chorus':  ['metal-numetal','pop-rap','reggae-rock','funk-rock','new-jack-swing','jazz-fusion','contemporary-rnb','drum-and-bass'],
     'quiet-loud-quiet-arc':        ['adult-alt-rock','post-grunge','indie-folk','pop-ballad','contemporary-folk','grunge','emo','contemporary-rnb'],
-    'breakdown-anaphora':          ['nu-metal','metalcore','screamo','funk-rock','hardcore'],
+    'breakdown-anaphora':          ['metal-numetal','metalcore','screamo','funk-rock','hardcore'],
     'modulation-up-final-chorus':  ['pop','teen-pop','rnb','gospel','vocal-jazz','contemporary-folk','pop-ballad'],
     '4-on-the-floor':              ['house','techno','disco-pop','dance-pop','boogie-postdisco','garage'],
     'walking-bass-foundation':     ['jazz','blues','rockabilly','swing','bluegrass','folk','gypsy-jazz'],
     'modal-single-chord-vamp':     ['modal-jazz','funk','afro-funk','prog-rock','psychedelic-rock','classic-funk'],
     'group-chant-chorus':          ['classic-funk','pop-punk','folk-punk','metal-thrash','celtic-irish','gospel','hardstyle','metalcore-breakdowns'],
     'group-call-and-response':     ['gospel','classic-funk','afro-funk','hard-bop','blues','motown','soul','metalcore-breakdowns'],
-    'half-time-feel':              ['hiphop-trap','nu-metal','dubstep','drum-and-bass','contemporary-rnb','future-bass','metalcore'],
+    'half-time-feel':              ['hiphop-trap','metal-numetal','dubstep','drum-and-bass','contemporary-rnb','future-bass','metalcore'],
     'string-pad-build':            ['adult-alt-rock','pop-ballad','indie-folk','contemporary-folk','symphonic-metal','disco-pop'],
     'open-strum-acoustic-bed':     ['adult-alt-rock','contemporary-folk','indie-folk','folk-revival','pop-rock','country-storytelling'],
-    'breakdown-screamed-clean-pivot': ['nu-metal','metalcore','screamo','funk-rock'],
+    'breakdown-screamed-clean-pivot': ['metal-numetal','metalcore','screamo','funk-rock'],
     'swing-triplet-feel':          ['jazz','big-band','swing-era','hard-bop','rockabilly','western-swing'],
     'distorted-bass-led':          ['funk-rock','metal','dubstep','drum-and-bass','hardstyle','industrial']
   }
@@ -5938,16 +5972,24 @@ function buildLuckyPrompt(params) {
   // having to infer the meeting point.
   const crossoverNote = buildCrossoverNote(g1, g2);
 
-  // ── Viral Producer Mode for Lucky (Wave 4e) ─────────────────────────────
-  // User-supplied or auto-enabled when BOTH fusion genres are viral-native
+  // ── Viral Producer Mode for Lucky (Wave 4e + Wave 4j gate fix) ──────────
+  // User-supplied OR auto-enabled when BOTH fusion genres are viral-native
   // AND the lyric tier is radio/street (not conscious/archival — the latter
   // are explicitly anti-viral). Viral architecture inherently rejects density.
+  // Wave 4j: even user-supplied viralMode is now whitelist-gated (matches the
+  // song path's behavior in buildSongPrompt — silent no-op outside whitelist).
+  // At least ONE fusion genre must be viral-native for the directive to fire.
   const _userViralMode = !!(params && params.viralMode);
   const _bothViralGenres = VIRAL_GENRE_WHITELIST.has(_g1Think) && VIRAL_GENRE_WHITELIST.has(_g2Think);
+  const _eitherViralGenre = VIRAL_GENRE_WHITELIST.has(_g1Think) || VIRAL_GENRE_WHITELIST.has(_g2Think);
   const _viralTierOk = !params.lyricTier || params.lyricTier === 'radio' || params.lyricTier === 'street';
-  const luckyViralMode = _userViralMode || (_bothViralGenres && _viralTierOk && Math.random() < 0.25);
+  const _userViralEligible = _userViralMode && _eitherViralGenre;
+  const _autoViralEligible = _bothViralGenres && _viralTierOk && Math.random() < 0.25;
+  const luckyViralMode = _userViralEligible || _autoViralEligible;
   // Auto-enable triggers ~25% of the time on viral-eligible Lucky fusions —
-  // adds variety without overwhelming non-viral aesthetics
+  // adds variety without overwhelming non-viral aesthetics. User-supplied
+  // viralMode requires at least one fusion genre in the whitelist (else
+  // silently no-ops, matching buildSongPrompt's gate).
   const luckyViralLock = luckyViralMode ? VIRAL_PRODUCER_DIRECTIVE : '';
 
   // ── Sample Hook Mode for Lucky (Wave 4f) ──────────────────────────────
@@ -5959,8 +6001,9 @@ function buildLuckyPrompt(params) {
   const luckySampleHookLock = luckySampleHookMode ? SAMPLE_HOOK_DIRECTIVE : '';
 
   // ── Producer template for Lucky ────────────────────────────────────────
-  // Honour client-supplied producer or pick one randomly weighted toward
-  // viral-leaning producers when viral mode is on
+  // Honour client-supplied producer template only. Auto-pick was considered
+  // but not implemented — Lucky's fusion-DNA already varies enough, and
+  // producer selection stays user-controlled to keep artist intent clear.
   const _userProducer = params && params.producerTemplate ? sanitizeInput(params.producerTemplate, 60) : '';
   const luckyProducerTemplate = _userProducer && PRODUCER_TEMPLATES[_userProducer] ? _userProducer : '';
   const luckyProducerNote = buildProducerTemplateNote(luckyProducerTemplate);
@@ -8269,7 +8312,14 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+  // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
+  OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
+  PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
+  CROSSOVER_TAXONOMY, buildCrossoverNote, buildProducerTemplateNote,
+  VIRAL_GENRE_WHITELIST, EDGE_GENRE_PROFANITY_DEFAULTS, GENRE_SUBSTYLE_LISTS,
+  GENRE_INTRO_INTERLUDE_PREFS, HOOK_STYLE_NOTES, BRIDGE_ARCHETYPES,
+  OUTRO_ARCHETYPES, VERSE2_ARCHETYPES, PRE_CHORUS_ARCHETYPES, POST_CHORUS_ARCHETYPES };
 
 
 
