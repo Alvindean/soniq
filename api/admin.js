@@ -1,16 +1,19 @@
 /**
- * SONIQ — Admin analytics API
- * Headers: x-admin-key: <ADMIN_PASSWORD>
+ * SONIQ — Admin analytics API (used by /public/admin.html)
+ *
+ * Headers (either accepted):
+ *   x-admin-key: <HMAC_SHA256(ADMIN_TOKEN_SECRET, ADMIN_PASSWORD)>  — preferred
+ *   x-admin-key: <ADMIN_PASSWORD>                                     — backward-compat
  *
  * Returns JSON with:
- *   total_songs, top_genres, top_fusions, top_topics,
- *   daily_events (last 7 days), recent (last 20 events)
+ *   total_songs, top_genres, top_fusions, top_topics, top_rapstyles,
+ *   trending_rapstyles, daily_events (last 7 days), recent (last 20 events)
  */
 
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const { timingSafeEqual, createHash } = require('crypto');
+const { timingSafeEqual, createHash, createHmac } = require('crypto');
 
 // Timing-safe string comparison — hashes both values to normalize length before comparison
 function safeEqual(a, b) {
@@ -58,11 +61,25 @@ module.exports = async function handler(req, res) {
   if (req.method !== 'GET') return res.status(405).end();
 
   const adminPassword = process.env.ADMIN_PASSWORD;
+  const tokenSecret   = process.env.ADMIN_TOKEN_SECRET;
   if (!adminPassword) return res.status(503).json({ error: 'ADMIN_PASSWORD not configured' });
 
-  // Only accept key via header — never via query string (query params appear in server logs and browser history)
+  // Only accept key via header — never via query string (query params appear
+  // in server logs, browser history, referrers). Accept the HMAC token (the
+  // value /api/admin-session returns) OR the raw password — same header,
+  // either form works. HMAC path is preferred so the raw password never lives
+  // in localStorage.
   const provided = req.headers['x-admin-key'] || '';
-  if (!safeEqual(provided, adminPassword)) {
+  let ok = false;
+  if (provided) {
+    if (safeEqual(provided, adminPassword)) {
+      ok = true;
+    } else if (tokenSecret && tokenSecret.length >= 16) {
+      const expected = createHmac('sha256', tokenSecret).update(adminPassword).digest('hex');
+      if (safeEqual(provided, expected)) ok = true;
+    }
+  }
+  if (!ok) {
     // Add a small fixed delay to further blunt timing attacks
     await new Promise(r => setTimeout(r, 200));
     return res.status(401).json({ error: 'Unauthorized' });

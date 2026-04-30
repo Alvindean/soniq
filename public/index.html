@@ -1424,12 +1424,20 @@ body.craft-advanced .craft-basic-only{display:none !important}
   #pg-profile [style*="grid-template-columns: 1fr 1fr"]{grid-template-columns:1fr!important}
 }
 /* ── ADMIN TABS + CONTENT CMS ── */
-.adm-tabs{display:flex;gap:0;border-bottom:1px solid var(--b2);margin-bottom:20px}
-.adm-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.adm-tabs{display:flex;gap:0;border-bottom:1px solid var(--b2);margin-bottom:20px;flex-wrap:wrap}
+/* Reset native button styling so <button class="adm-tab"> looks like the
+   pre-fix <div class="adm-tab"> — same background, no default border or
+   font shift. min-height:44px ensures iOS/Android touch-target compliance. */
+.adm-tab{padding:10px 20px;font-size:13px;font-weight:600;color:var(--tx3);cursor:pointer;border:none;background:transparent;font-family:inherit;border-bottom:2px solid transparent;transition:all .15s;min-height:44px;display:inline-flex;align-items:center}
 .adm-tab:hover{color:var(--tx1)}
+.adm-tab:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
 .adm-tab.on{color:var(--amber);border-bottom-color:var(--amber)}
 .adm-tab-panel{display:none}
 .adm-tab-panel.on{display:block}
+/* Bump tiny label fonts (9–10px) just below WCAG-AA threshold up to 11px on
+   the admin surface — the daily-bar labels and uppercase tracking-wide caps. */
+#pg-admin .card div[style*="font-size:9px"],
+#pg-admin .card div[style*="font-size:10px"]{font-size:11px!important}
 .cms-toolbar{display:flex;gap:4px;padding:8px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3) var(--r3) 0 0;flex-wrap:wrap}
 .cms-toolbar button{padding:4px 10px;border:1px solid var(--b2);border-radius:4px;background:var(--s3);color:var(--tx2);font-size:12px;cursor:pointer;transition:all .15s}
 .cms-toolbar button:hover{background:var(--s4);color:var(--tx1)}
@@ -6054,16 +6062,16 @@ body.craft-advanced .craft-basic-only{display:none !important}
 <div id="pg-admin" class="pg">
   <div style="max-width:1100px;margin:0 auto;padding:20px">
 
-    <!-- Admin Tab Bar -->
-    <div class="adm-tabs">
-      <div class="adm-tab on" onclick="switchAdmTab('analytics',this)">📊 Analytics</div>
-      <div class="adm-tab" onclick="switchAdmTab('content',this)">✍ Content</div>
-      <div class="adm-tab" onclick="switchAdmTab('seotraffic',this)">🔍 SEO & Traffic</div>
-      <div class="adm-tab" onclick="switchAdmTab('growth',this)">🚀 Growth</div>
+    <!-- Admin Tab Bar (semantic ARIA tabs — keyboard navigable) -->
+    <div class="adm-tabs" role="tablist" aria-label="Admin sections">
+      <button type="button" class="adm-tab on" role="tab" aria-selected="true"  aria-controls="adm-panel-analytics" data-adm-tab="analytics" onclick="switchAdmTab('analytics',this)" onkeydown="admTabKeydown(event)">📊 Analytics</button>
+      <button type="button" class="adm-tab"    role="tab" aria-selected="false" aria-controls="adm-panel-content"   data-adm-tab="content"   onclick="switchAdmTab('content',this)"   onkeydown="admTabKeydown(event)">✍ Content</button>
+      <button type="button" class="adm-tab"    role="tab" aria-selected="false" aria-controls="adm-panel-seotraffic" data-adm-tab="seotraffic" onclick="switchAdmTab('seotraffic',this)" onkeydown="admTabKeydown(event)">🔍 SEO &amp; Traffic</button>
+      <button type="button" class="adm-tab"    role="tab" aria-selected="false" aria-controls="adm-panel-growth"    data-adm-tab="growth"    onclick="switchAdmTab('growth',this)"    onkeydown="admTabKeydown(event)">🚀 Growth</button>
     </div>
 
     <!-- TAB: Analytics (existing content wrapped) -->
-    <div id="adm-panel-analytics" class="adm-tab-panel on">
+    <div id="adm-panel-analytics" class="adm-tab-panel on" role="tabpanel" aria-label="Analytics">
 
     <!-- Header -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
@@ -6131,8 +6139,8 @@ body.craft-advanced .craft-basic-only{display:none !important}
       <div id="adm-recon-note" style="font-size:11px;color:var(--tx3);margin-top:8px;line-height:1.5"></div>
     </div>
 
-    <!-- Plan breakdown + Top genres (2 col) -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <!-- Plan breakdown + Top genres (2 col → 1 col on <=600px via .adm-2col) -->
+    <div class="adm-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
       <div class="card">
         <div style="font-size:12px;font-weight:700;color:var(--tx1);margin-bottom:10px">📋 Plan Breakdown</div>
         <div id="adm-plans"></div>
@@ -6168,11 +6176,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <!-- Users table -->
     <div class="card" style="margin-bottom:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:700;color:var(--tx1)">👥 All Users</div>
-        <input id="adm-user-search" placeholder="Search email / name…" oninput="filterAdminUsers()" style="padding:5px 9px;border-radius:6px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:11px;width:180px">
+        <h3 id="adm-users-heading" style="font-size:12px;font-weight:700;color:var(--tx1);margin:0">👥 All Users</h3>
+        <input id="adm-user-search" placeholder="Search email / name…" aria-label="Search users by email or name" oninput="filterAdminUsers()" style="padding:5px 9px;border-radius:6px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:11px;width:180px">
       </div>
       <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:11px" id="adm-users-table" class="adm-user-table">
+        <table aria-labelledby="adm-users-heading" style="width:100%;border-collapse:collapse;font-size:11px" id="adm-users-table" class="adm-user-table">
           <thead>
             <tr style="color:var(--tx3);text-transform:uppercase;font-size:9px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
               <th style="padding:6px 8px;text-align:left">Email</th>
@@ -6200,7 +6208,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     </div><!-- end adm-panel-analytics -->
 
     <!-- TAB: Content CMS -->
-    <div id="adm-panel-content" class="adm-tab-panel">
+    <div id="adm-panel-content" class="adm-tab-panel" role="tabpanel" aria-label="Content">
 
       <!-- Content List View -->
       <div id="cms-list-view">
@@ -6370,7 +6378,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     </div><!-- end adm-panel-content -->
 
     <!-- TAB: SEO & Traffic -->
-    <div id="adm-panel-seotraffic" class="adm-tab-panel">
+    <div id="adm-panel-seotraffic" class="adm-tab-panel" role="tabpanel" aria-label="SEO &amp; Traffic">
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
         <div>
@@ -6504,7 +6512,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     </div><!-- end adm-panel-seotraffic -->
 
     <!-- TAB: Growth -->
-    <div id="adm-panel-growth" class="adm-tab-panel">
+    <div id="adm-panel-growth" class="adm-tab-panel" role="tabpanel" aria-label="Growth">
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
         <div>
@@ -14933,6 +14941,9 @@ function _initSupabase() {
   const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
   if (!window.supabase) return;
   S.supabase = window.supabase.createClient(url, key);
+  // Admin email allow-list — UX HINT ONLY. The server (/api/analytics, /api/admin)
+  // is the authoritative gate; this list just decides whether to show the admin
+  // button. MUST stay in sync with ADMIN_EMAILS in api/analytics.js.
   const _ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'alvin@nuwavmedia.com', 'rainfiremusic@gmail.com', 'eric@warkershall.com']);
   // Case-insensitive email check. Supabase sometimes preserves the case the
   // user registered with (e.g. "TheAlvinDean@gmail.com") while the whitelist
@@ -14948,9 +14959,11 @@ function _initSupabase() {
       S.plan = 'studio';
       S.isAdmin = true;
       if (typeof initGenreGrid === 'function') initGenreGrid();
-      console.log('%c[SONIQ] Admin detected via email whitelist: ' + S.user.email + ' → plan=studio', 'color:#f5c000;font-weight:bold');
-    } else if (S.user) {
-      console.log('[SONIQ] Signed in as: ' + S.user.email + ' (not in admin whitelist)');
+      // Debug log gated behind window.__SONIQ_DEBUG so admin emails don't leak
+      // to the console of any visitor with DevTools open in production.
+      if (window.__SONIQ_DEBUG) console.log('%c[SONIQ] Admin detected: ' + S.user.email + ' → plan=studio', 'color:#f5c000;font-weight:bold');
+    } else if (S.user && window.__SONIQ_DEBUG) {
+      console.log('[SONIQ] Signed in as: ' + S.user.email);
     }
     updateAuthUI();
     if (event === 'SIGNED_IN') {
@@ -14984,34 +14997,29 @@ function _initSupabase() {
       S.plan = 'studio';
       S.isAdmin = true;
       if (typeof initGenreGrid === 'function') initGenreGrid();
-      console.log('%c[SONIQ] Admin session restored: ' + S.user.email + ' → plan=studio', 'color:#f5c000;font-weight:bold');
+      if (window.__SONIQ_DEBUG) console.log('%c[SONIQ] Admin session restored: ' + S.user.email, 'color:#f5c000;font-weight:bold');
     }
     updateAuthUI();
     loadFoundingStatus();
   });
 
   // Diagnostic helper — call `debugAdmin()` in the browser console to see
-  // exactly what the admin-override subsystem thinks. Useful when a user
-  // reports "I'm not getting full access" — one call reveals whether the
-  // email check matched, the profile.plan value, and the final S.plan.
+  // exactly what the admin-override subsystem thinks. Returns the data
+  // structure either way; only emits to console when window.__SONIQ_DEBUG=true
+  // so casual DevTools openers don't see admin email + token state in prod.
   window.debugAdmin = function() {
     const u = S.user;
     const email = u?.email;
     const emailLower = String(email || '').trim().toLowerCase();
     const whitelist = Array.from(_ADMIN_EMAILS);
     const inWhitelist = whitelist.includes(emailLower);
-    console.group('%c🔍 SONIQ Admin Debug', 'color:#f5c000;font-weight:bold;font-size:14px');
-    console.log('S.user.email (raw):     ', email);
-    console.log('S.user.email (lower):   ', emailLower);
-    console.log('Whitelist emails:       ', whitelist);
-    console.log('In whitelist?           ', inWhitelist);
-    console.log('window.__soniqAdmin:    ', window.__soniqAdmin);
-    console.log('S.isAdmin:              ', S.isAdmin);
-    console.log('S.plan:                 ', S.plan);
-    console.log('S.session?             ', !!S.session);
-    console.log('Has admin token?        ', !!localStorage.getItem('soniq_admin_token'));
-    console.groupEnd();
-    return { email, emailLower, inWhitelist, isAdmin: window.__soniqAdmin, plan: S.plan };
+    const out = { email, emailLower, inWhitelist, isAdmin: window.__soniqAdmin, plan: S.plan, hasToken: !!localStorage.getItem('soniq_admin_token') };
+    if (window.__SONIQ_DEBUG) {
+      console.group('%c🔍 SONIQ Admin Debug', 'color:#f5c000;font-weight:bold;font-size:14px');
+      Object.entries(out).forEach(([k, v]) => console.log(k.padEnd(16) + ':', v));
+      console.groupEnd();
+    }
+    return out;
   };
   // Handle password reset redirect
   if (new URLSearchParams(location.search).get('reset') === '1') {
@@ -19839,34 +19847,59 @@ loadVoiceProfile();
 checkShareLink();
 
 // ── ADMIN BYPASS ──
+// Trigger via `?admin=1` (no password in URL — passwords in URLs end up in
+// browser history, server logs, and referrers). The user is prompted for the
+// password via window.prompt() and we wipe the URL marker BEFORE the network
+// call so that even if the prompt is cancelled, no trace of admin intent
+// remains in history. Also exposed as window.adminLogin() for keyboard use.
+async function adminLogin(suppliedPw) {
+  const password = suppliedPw || (typeof prompt === 'function' ? prompt('Admin password:') : '');
+  if (!password) return false;
+  try {
+    const res = await fetch('/api/admin-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok && data.ok && data.token) {
+      localStorage.setItem('soniq_admin_token', data.token);
+      if (typeof S !== 'undefined') {
+        S.plan = 'studio';
+        S.user = S.user || { id: 'admin', email: 'admin@mysoniq.com' };
+        S.isAdmin = true;
+      }
+      window.__soniqAdmin = true;
+      if (typeof toast === 'function') toast('★ Admin mode active', 2500);
+      return true;
+    }
+    if (typeof toast === 'function') toast('Admin login failed', 2500);
+  } catch (e) {
+    if (typeof toast === 'function') toast('Admin login error: network', 2500);
+  }
+  return false;
+}
+window.adminLogin = adminLogin;
+
 (async function adminBypass() {
   const params = new URLSearchParams(window.location.search);
-  const adminPw = params.get('admin');
-
-  if (adminPw) {
-    try {
-      const res = await fetch('/api/admin-session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: adminPw })
-      });
-      const data = await res.json();
-      if (data.ok && data.token) {
-        localStorage.setItem('soniq_admin_token', data.token);
-        window.history.replaceState({}, '', window.location.pathname);
+  // Wipe the URL marker IMMEDIATELY so the trigger never lingers in history,
+  // referrers, or analytics tooling — regardless of whether login succeeds.
+  if (params.has('admin')) {
+    window.history.replaceState({}, '', window.location.pathname);
+    await adminLogin();
+  } else {
+    // Otherwise — restore an existing session from localStorage if present.
+    const token = localStorage.getItem('soniq_admin_token');
+    if (token) {
+      if (typeof S !== 'undefined') {
+        S.plan = 'studio';
+        S.user = S.user || { id: 'admin', email: 'admin@mysoniq.com' };
+        S.isAdmin = true;
       }
-    } catch (e) { console.error('Admin bypass failed:', e); }
-  }
-
-  const token = localStorage.getItem('soniq_admin_token');
-  if (token) {
-    if (typeof S !== 'undefined') {
-      S.plan = 'studio';
-      S.user = S.user || { id: 'admin', email: 'admin@mysoniq.com' };
-      S.isAdmin = true;
+      window.__soniqAdmin = true;
+      if (window.__SONIQ_DEBUG) console.log('%c★ SONIQ Admin Mode Active', 'color:#f5c000;font-weight:bold');
     }
-    window.__soniqAdmin = true;
-    console.log('%c★ SONIQ Admin Mode Active', 'color: #f5c000; font-size: 14px; font-weight: bold');
   }
 })();
 
@@ -20680,16 +20713,36 @@ function syncProfileToServer(profileOverride) {
 let _adminData = null;
 let _adminUsersAll = [];
 
+// In-flight guard so a user mashing the Refresh button doesn't fire N
+// concurrent /api/analytics requests (each runs Supabase + 14-day Redis
+// pipeline). Last-response-wins races caused stale renders pre-fix.
+let _adminLoadInflight = false;
+
+// Reset every rendered region back to its placeholder state so a refresh
+// failure doesn't leave the admin staring at yesterday's successful data.
+function _resetAdminDashboard(loadingState) {
+  const placeholder = loadingState ? '…' : '—';
+  const statIds = ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs','adm-total-posts','adm-total-reactions','adm-total-comments','adm-songs-db','adm-songs-redis','adm-genre-zset-total'];
+  statIds.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = placeholder; });
+  const emptyHtml = loadingState ? '' : '<div style="color:var(--tx4);font-size:11px">No data</div>';
+  ['adm-plans','adm-genres','adm-topics','adm-comm-breakdown','adm-recent','adm-users-body'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.innerHTML = emptyHtml;
+  });
+  const dailyEl = document.getElementById('adm-daily');         if (dailyEl) dailyEl.innerHTML = '';
+  const labelEl = document.getElementById('adm-daily-labels');  if (labelEl) labelEl.innerHTML = '';
+  const reconCard = document.getElementById('adm-recon-card');  if (reconCard) reconCard.style.display = 'none';
+  const noUsers = document.getElementById('adm-no-users');      if (noUsers) noUsers.style.display = loadingState ? 'none' : '';
+}
+
 async function loadAdminDashboard() {
   if (!S.isAdmin && !window.__soniqAdmin) { toast('Admin access required'); return; }
+  if (_adminLoadInflight) return; // debounce concurrent refreshes
+  _adminLoadInflight = true;
+
   const adminKey = localStorage.getItem('soniq_admin_token') || '';
   const token = S.session?.access_token || '';
 
-  // Show loading state for ALL stat cards
-  const _admStatIds = ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs','adm-total-posts','adm-total-reactions'];
-  _admStatIds.forEach(id => {
-    const el = document.getElementById(id); if (el) el.textContent = '…';
-  });
+  _resetAdminDashboard(true); // loading state — placeholders go to '…'
 
   try {
     const headers = { 'Content-Type': 'application/json' };
@@ -20707,12 +20760,14 @@ async function loadAdminDashboard() {
     _adminUsersAll = _adminData.users || [];
     renderAdminDashboard(_adminData);
   } catch(e) {
-    // Clear loading dots on failure so user sees it failed
-    _admStatIds.forEach(id => {
-      const el = document.getElementById(id); if (el) el.textContent = '—';
-    });
+    // Failure: reset EVERY rendered region (not just stat cards) so the admin
+    // doesn't see stale data from yesterday's successful load mixed with
+    // failure indicators from today.
+    _resetAdminDashboard(false);
     toast('⚠️ Analytics load failed: ' + e.message, 4000);
     console.error('Admin dashboard error:', e);
+  } finally {
+    _adminLoadInflight = false;
   }
 }
 
@@ -20760,7 +20815,10 @@ function renderAdminDashboard(data) {
       const redisN = Number(songsRedis);
       const genreN = Number(genreTotal);
       const drift = Math.max(Math.abs(dbN - redisN), Math.abs(dbN - genreN));
-      const tolerance = Math.max(2, Math.round(dbN * 0.1));
+      // 10% was too lenient — at 1000 songs that masks 100 missing increments.
+      // Tighten to 2% (min 2) so even small drift surfaces as a soft warning.
+      const tolerance = Math.max(2, Math.round(dbN * 0.02));
+      const minorBand = Math.max(5, Math.round(dbN * 0.05)); // up to 5% = "minor"
       if (dbN === 0 && redisN === 0 && genreN === 0) {
         status.textContent = '⚪ No songs yet';
         status.style.color = 'var(--tx3)';
@@ -20769,6 +20827,10 @@ function renderAdminDashboard(data) {
         status.textContent = '✓ In sync';
         status.style.color = '#34d399';
         note.textContent = '';
+      } else if (drift <= minorBand) {
+        status.textContent = '◐ Minor drift';
+        status.style.color = '#fbbf24';
+        note.textContent = `Off by ${drift} — within tolerance for transient blips, but watch the trend.`;
       } else {
         status.textContent = '⚠️ Drift detected';
         status.style.color = '#f47292';
@@ -20914,27 +20976,42 @@ function filterAdminUsers() {
   renderAdminUsers(filtered);
 }
 
-function exportAdminCSV() {
+// PII warning message shared by both export paths — one source of truth so
+// the wording stays consistent if it's reviewed by legal/compliance.
+const _ADMIN_EXPORT_WARN = 'This download contains personally identifiable user data (emails, display names, plans). Treat it as confidential — do not share, attach, or sync to non-secure storage. Continue?';
+
+async function exportAdminCSV() {
   if (!S.isAdmin && !window.__soniqAdmin) return;
+  if (typeof confirm === 'function' && !confirm(_ADMIN_EXPORT_WARN)) return;
   const adminKey = localStorage.getItem('soniq_admin_token') || '';
   const token = S.session?.access_token || '';
   const headers = {};
   if (adminKey) headers['x-admin-key'] = adminKey;
   if (token)    headers['Authorization'] = 'Bearer ' + token;
-  fetch('/api/analytics?format=csv', { headers })
-    .then(r => r.blob())
-    .then(blob => {
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `soniq-users-${new Date().toISOString().slice(0,10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-    }).catch(() => toast('⚠️ Export failed'));
+  try {
+    const r = await fetch('/api/analytics?format=csv', { headers });
+    // Pre-fix: r.blob() ran unconditionally — on 401 the user got a .csv
+    // file containing `{"error":"Unauthorized"}`. Now we surface the failure.
+    if (!r.ok) {
+      const body = await r.json().catch(() => ({}));
+      toast('⚠️ Export failed: ' + (body.error || ('HTTP ' + r.status)), 3500);
+      return;
+    }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `soniq-users-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  } catch (e) {
+    toast('⚠️ Export failed: ' + (e.message || 'network'), 3500);
+  }
 }
 
 function exportAdminJSON() {
   if (!_adminData) { toast('Load dashboard first'); return; }
+  if (typeof confirm === 'function' && !confirm(_ADMIN_EXPORT_WARN)) return;
   const blob = new Blob([JSON.stringify(_adminData, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -21188,17 +21265,46 @@ document.addEventListener('DOMContentLoaded', () => { refreshInspirationBoard();
 function switchAdmTab(tabName, el) {
   // Hide all panels
   document.querySelectorAll('.adm-tab-panel').forEach(p => p.classList.remove('on'));
-  // Deactivate all tabs
-  document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('on'));
+  // Deactivate all tabs (and reflect in aria-selected for screen readers)
+  document.querySelectorAll('.adm-tab').forEach(t => {
+    t.classList.remove('on');
+    t.setAttribute('aria-selected', 'false');
+  });
   // Show selected panel
   const panel = document.getElementById(`adm-panel-${tabName}`);
   if(panel) panel.classList.add('on');
   // Activate selected tab
-  if(el) el.classList.add('on');
+  if(el) {
+    el.classList.add('on');
+    el.setAttribute('aria-selected', 'true');
+  }
   // Load content if needed
   if(tabName === 'content') loadCMSPosts();
   if(tabName === 'seotraffic') loadSEODashboard();
   if(tabName === 'growth') loadGrowthEngine();
+}
+
+// Arrow-key navigation across admin tabs (WAI-ARIA tabs pattern). Left/Right
+// move focus + activate; Home/End jump to ends. Pre-fix the tabs were <div>
+// with onclick — keyboard-only users could not reach Content/SEO/Growth.
+function admTabKeydown(e) {
+  const keys = ['ArrowLeft','ArrowRight','Home','End'];
+  if (!keys.includes(e.key)) return;
+  e.preventDefault();
+  const tabs = Array.from(document.querySelectorAll('.adm-tabs .adm-tab'));
+  if (!tabs.length) return;
+  const i = tabs.indexOf(e.currentTarget);
+  let next = i;
+  if (e.key === 'ArrowLeft')  next = (i - 1 + tabs.length) % tabs.length;
+  if (e.key === 'ArrowRight') next = (i + 1) % tabs.length;
+  if (e.key === 'Home')       next = 0;
+  if (e.key === 'End')        next = tabs.length - 1;
+  const target = tabs[next];
+  if (target) {
+    target.focus();
+    const tabName = target.getAttribute('data-adm-tab');
+    if (tabName) switchAdmTab(tabName, target);
+  }
 }
 
 // ═══════════════════════════════════════════════════
