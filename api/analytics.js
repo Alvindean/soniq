@@ -1,15 +1,22 @@
 /**
  * SONIQ — Extended admin analytics API
  *
- * Auth (either method accepted):
- *   1. Header:  x-admin-key: <ADMIN_PASSWORD>
- *   2. Header:  Authorization: Bearer <supabase-jwt>  (email must be in ADMIN_EMAILS)
+ * Auth (any one accepted):
+ *   1. Header  x-admin-key:    <HMAC_SHA256(ADMIN_TOKEN_SECRET, ADMIN_PASSWORD)>
+ *      — the token returned by POST /api/admin-session. Preferred path for
+ *      browser flows so the raw password never lives in localStorage.
+ *   2. Header  x-admin-key:    <ADMIN_PASSWORD>
+ *      — backward-compat for tooling / admin.html. Same header name; we accept
+ *      either the HMAC token OR the raw password.
+ *   3. Header  Authorization:  Bearer <supabase-jwt>
+ *      — verified server-side; user.email must be in ADMIN_EMAILS.
  *
  * Query params:
  *   ?format=csv  →  returns users table as CSV download
+ *   ?debug=1     →  includes error.detail/stack on 500 (admin-only)
  */
 
-const { timingSafeEqual, createHash } = require('crypto');
+const { timingSafeEqual, createHash, createHmac } = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 
 // ---------------------------------------------------------------------------
@@ -19,9 +26,17 @@ const { createClient } = require('@supabase/supabase-js');
 const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-const ADMIN_EMAILS = new Set([
+// Admin email allow-list — single source of truth lives server-side. Set via
+// env var ADMIN_EMAILS (comma-separated) to override the default. Client UI
+// hint in index.html should be kept in sync but the SERVER is authoritative.
+const _envEmails = (process.env.ADMIN_EMAILS || '')
+  .split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+const ADMIN_EMAILS = new Set(_envEmails.length ? _envEmails : [
   'thealvindean@gmail.com',
-  'lamusicproducers8@gmail.com'
+  'lamusicproducers8@gmail.com',
+  'alvin@nuwavmedia.com',
+  'rainfiremusic@gmail.com',
+  'eric@warkershall.com'
 ]);
 
 // ---------------------------------------------------------------------------
@@ -164,13 +179,28 @@ module.exports = async function handler(req, res) {
   // ---- Authentication -------------------------------------------------------
 
   const adminPassword = process.env.ADMIN_PASSWORD;
+  const tokenSecret   = process.env.ADMIN_TOKEN_SECRET;
   let authenticated = false;
+  let authMethod = null; // for audit logging
+  let authEmail  = null;
 
-  // Method 1: x-admin-key header
+  // Method 1: x-admin-key header — accept BOTH the HMAC token (returned by
+  // /api/admin-session) and the raw password. The HMAC path is preferred for
+  // browsers so the raw password never lives in localStorage; the raw-password
+  // path is kept for tooling and the standalone admin.html page.
   if (adminPassword) {
     const provided = req.headers['x-admin-key'] || '';
-    if (provided && safeEqual(provided, adminPassword)) {
-      authenticated = true;
+    if (provided) {
+      if (safeEqual(provided, adminPassword)) {
+        authenticated = true;
+        authMethod = 'admin-key:password';
+      } else if (tokenSecret && tokenSecret.length >= 16) {
+        const expected = createHmac('sha256', tokenSecret).update(adminPassword).digest('hex');
+        if (safeEqual(provided, expected)) {
+          authenticated = true;
+          authMethod = 'admin-key:hmac';
+        }
+      }
     }
   }
 
@@ -182,15 +212,20 @@ module.exports = async function handler(req, res) {
       const token = match[1];
 
       // Fast pre-check: decode payload and verify email claim is in allow-list
-      // before making a network round-trip to Supabase.
+      // before making a network round-trip to Supabase. Lower-case for case-
+      // insensitive match — Supabase preserves whatever case the user signed
+      // up with.
       const payload = decodeJwtPayload(token);
-      const claimedEmail = payload?.email || '';
+      const claimedEmail = String(payload?.email || '').trim().toLowerCase();
 
       if (ADMIN_EMAILS.has(claimedEmail)) {
         // Full server-side verification (signature + expiry)
         const user = await verifySupabaseToken(token);
-        if (user && ADMIN_EMAILS.has(user.email)) {
+        const verifiedEmail = String(user?.email || '').trim().toLowerCase();
+        if (user && ADMIN_EMAILS.has(verifiedEmail)) {
           authenticated = true;
+          authMethod = 'supabase-jwt';
+          authEmail  = verifiedEmail;
         }
       }
     }
@@ -200,6 +235,15 @@ module.exports = async function handler(req, res) {
     await new Promise(r => setTimeout(r, 200)); // blunt timing attacks
     return res.status(401).json({ error: 'Unauthorized' });
   }
+
+  // Lightweight audit log so a security review can later trace who accessed
+  // admin data, when, and which auth method they used. Stays in console only —
+  // no PII written to disk beyond what Vercel already captures.
+  try {
+    const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
+    const fmt = req.query?.format || 'json';
+    console.log('[admin-access]', JSON.stringify({ ts: new Date().toISOString(), method: authMethod, email: authEmail, format: fmt, ip }));
+  } catch { /* never block the request on logging */ }
 
   // ---- Data fetching --------------------------------------------------------
 
@@ -397,12 +441,16 @@ module.exports = async function handler(req, res) {
 
   } catch (e) {
     console.error('Analytics fetch error:', e.message, e.stack);
-    // Endpoint is admin-auth-gated (checked above), so surfacing detail is safe
-    // and necessary for debugging production 500s from the admin dashboard.
-    return res.status(500).json({
-      error: 'Failed to fetch analytics',
-      detail: e.message || String(e),
-      stack: e.stack ? e.stack.split('\n').slice(0, 6).join('\n') : null
-    });
+    // Even though this endpoint is admin-gated, leaking stack traces (file
+    // paths, package internals) widens the attack surface if the gate is ever
+    // weakened. Stack/detail is now opt-in via ?debug=1 — admins requesting
+    // diagnostics can ask for it explicitly; the default response is opaque.
+    const debug = req.query?.debug === '1' || req.query?.debug === 'true';
+    const body  = { error: 'Failed to fetch analytics' };
+    if (debug) {
+      body.detail = e.message || String(e);
+      body.stack  = e.stack ? e.stack.split('\n').slice(0, 6).join('\n') : null;
+    }
+    return res.status(500).json(body);
   }
 };
