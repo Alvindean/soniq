@@ -1657,6 +1657,217 @@ CALLBACKS ARE EXEMPT:
 A single callback to the original metaphor in a later chorus or bridge is fine — that's a structural rhyme. The rule is about the BODY of verses, not deliberate hook-callbacks.`;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// METAPHOR PALETTE — expanding the metaphor surface area per genre (Wave 4l)
+// ────────────────────────────────────────────────────────────────────────────
+// Pairs with buildMetaphorBalanceNote (the limiter). Where balance prevents
+// over-extension of one image, palette EXPANDS the set of images available
+// so the model doesn't default to crown/throne/king (hip-hop) or whiskey/
+// back-roads (country). Each family carries a SENTIMENT (the feeling) and
+// a small set of seed images that all carry that feeling — so the model can
+// pick ANY image and still land the same emotional truth.
+//
+// Sampling: 4 random families per call (out of 7 available per genre) so
+// no two generations sample identically. Fresh angles always shown — they
+// reframe the obvious-default reading of the genre.
+//
+// Cross-style borrows: when a fusion is in play, the borrow matrix shows
+// images one genre legitimately pulls from another, paired with NOD PATTERNS
+// — the rhetorical moves real artists use to acknowledge the cross-pollination
+// (Lil Nas X "Old Town Road", Beyoncé "Daddy Lessons", FGL+Nelly "Cruise",
+// Sam Hunt "Body Like a Back Road", Bubba Sparxxx "Deliverance", Yelawolf,
+// Jelly Roll, Linkin Park, Post Malone). The directive teaches the model
+// that signaling the borrow is the craft move; sneaking it reads as inauthentic.
+//
+// Base palette: hip-hop, country, pop, R&B, rock (highest-traffic genres).
+// Add new genres / new families / new borrow pairs over time — the structure
+// is expandable by design.
+// ════════════════════════════════════════════════════════════════════════════
+
+const GENRE_METAPHOR_PALETTE = {
+  hiphop: {
+    families: [
+      { name: 'Rise / come-up',     sentiment: "climbing into rooms you weren't invited to",      images: ['climbed out the basement', 'attic to penthouse', 'last seat to first row', "understudy turned lead"] },
+      { name: 'Territory / turf',   sentiment: "where I'm from is part of who I am",              images: ['my block', 'this side of town', 'the corner that raised me', 'familiar concrete'] },
+      { name: 'Witness / presence', sentiment: 'undeniable arrival — the room knows',             images: ['eyes on us', 'whole room turned', 'arrived without asking', 'the air shifted'] },
+      { name: 'Craft / grind',      sentiment: 'I earned this in the dark',                        images: ['midnight pages', 'every notebook full', 'first one in last one out', "the years they didn't see"] },
+      { name: 'Stakes / weight',    sentiment: 'one shot, real consequences',                      images: ['rent on the line', 'family eating off this', 'no rebound', "one shot I can't miss"] },
+      { name: 'Architecture',       sentiment: 'I built this brick by brick',                      images: ['laid the foundation myself', 'blueprint in my head', 'stacked it slow', 'frame before furniture'] },
+      { name: 'Time / patience',    sentiment: 'I waited longer than they thought I would',        images: ['planted seeds early', 'patient money', 'slow burn paid off', 'years counted backwards'] }
+    ],
+    fresh_angles: [
+      'rise told sideways through small wins, not red carpets',
+      'territory as inherited not conquered',
+      'craft as carpentry, not warfare',
+      'witness as quiet — the room knows without announcement'
+    ]
+  },
+  country: {
+    families: [
+      { name: 'Place / home',          sentiment: 'this ground knows me',                       images: ['the porch I never sold', 'two-lane back', 'the road my dad drove', 'kitchen light still on'] },
+      { name: 'Time / seasons',        sentiment: 'measured by harvest, not clock',             images: ['between the harvests', 'first light, last light', 'the quiet hour', 'before the frost'] },
+      { name: 'Work / hands',          sentiment: 'my body is my receipts',                     images: ['blisters earned honest', 'fence I mended twice', 'calluses tell time', 'wrench and a rag'] },
+      { name: 'Memory / lineage',      sentiment: 'I carry who came before',                    images: ['granddaddy used to say', "mama's kitchen song", 'the way we always done it', 'his hat still on the hook'] },
+      { name: 'Open road / departure', sentiment: 'leaving without leaving for good',           images: ['gravel under tires', 'taillights getting smaller', 'one bag and a tank', 'horizon picked me'] },
+      { name: 'Faith / weight',        sentiment: 'something bigger holds the wheel',           images: ['Sunday morning steady', 'a prayer I never finished', 'kneeling at the bedside', 'the cross above the door'] },
+      { name: 'Heartbreak as wear',    sentiment: 'love left a mark like weather',              images: ['worn boots', 'faded jeans', "the truck that won't start cold", 'creak in the floor where she stood'] }
+    ],
+    fresh_angles: [
+      'place as a verb — "I am from here" is a thing I do, not a thing I say',
+      "time told through what's mended, not what's new",
+      'memory carried in tools, not photos',
+      'heartbreak measured in season changes'
+    ]
+  },
+  pop: {
+    families: [
+      { name: 'Bright lights / spectacle', sentiment: 'this moment is luminous',              images: ['neon on the wet street', 'strobe in my eyes', 'glowing under the lamp', 'spotlight found us'] },
+      { name: 'Sky / weather',             sentiment: 'the world matched the feeling',        images: ['summer rain on glass', 'golden hour skin', 'blue hour silhouette', 'sky cracked open'] },
+      { name: 'Now / right here',          sentiment: 'this minute, no other',                images: ['save the clock', 'this exact breath', 'right here, right now', 'the second it landed'] },
+      { name: 'Movement / dance',          sentiment: 'my body knew before my mouth',         images: ["can't stand still", 'hands up', 'the floor moved', 'hips before words'] },
+      { name: 'Connection / chase',        sentiment: 'one face, one room, one decision',     images: ['caught your eyes across', 'walked through the song', 'all I see is you', 'the moment we knew'] },
+      { name: 'Risk / leap',               sentiment: 'I chose the cliff',                    images: ['no parachute', 'eyes closed jump', 'all in or out', 'past the safe edge'] },
+      { name: 'Aftermath / silence',       sentiment: "the room knows what the words don't",  images: ['half a bed', "the song that won't", 'still wearing your', 'the silence after'] }
+    ],
+    fresh_angles: [
+      'bright lights as backdrop, not subject — the lights are watching, not us',
+      'now as everything we have, nothing more',
+      'movement before language — the body is the truth',
+      'aftermath as the real song; the moment is just the prelude'
+    ]
+  },
+  rnb: {
+    families: [
+      { name: 'Touch / skin',           sentiment: 'the body remembers what the mind forgets', images: ['fingers through', 'hand against', 'soft on the back of', 'the warm of you'] },
+      { name: 'Night / candlelight',    sentiment: 'the hour belongs to us',                    images: ['lights low and lower', 'after midnight quiet', 'the hour where things get said', 'shadow on the wall'] },
+      { name: 'Honey / sweetness',      sentiment: 'slow, easy, nothing rushed',                images: ['sweet on you', 'smooth as the pour', 'easy like the song', 'slow burn morning'] },
+      { name: 'Heat / fever',           sentiment: "I can't cool down",                         images: ['burn between us', "fever I can't shake", 'temperature rising', 'the heat under skin'] },
+      { name: 'Devotion / promise',     sentiment: 'lock and key, no others',                   images: ['only you on repeat', 'lock and key', 'every single time', 'all of me, all of it'] },
+      { name: 'Memory / ghost',         sentiment: 'the room still has you in it',              images: ['your scent on the pillow', 'the bed remembers', 'where you stood last', 'the echo in the room'] },
+      { name: 'Voice / call',           sentiment: 'I want to be heard by you',                 images: ['call my name', 'whisper on the line', 'speak it slow', 'your voice in my chest'] }
+    ],
+    fresh_angles: [
+      'touch as language, not preamble',
+      'night as the only honest hour',
+      'devotion told through small loyalties, not grand gestures',
+      'memory as physical residue — the room, not the photograph'
+    ]
+  },
+  rock: {
+    families: [
+      { name: 'Highway / engine',     sentiment: 'forward motion is the cure',                                 images: ['eight cylinders running', 'gasoline in my veins', 'the engine knows the way', 'open road wide'] },
+      { name: 'Storm / weather',      sentiment: 'I am the storm in the room',                                 images: ['thunder in my chest', 'lightning struck once', 'wildfire breath', 'storm front coming through'] },
+      { name: 'Wreckage / ruin',      sentiment: "I survived something that should've killed me",              images: ['ash on my hands', 'the fire we lit', 'broken glass underfoot', 'standing in the ruins'] },
+      { name: 'Chains / freedom',     sentiment: 'I refuse to be held',                                         images: ['off the leash', 'broke the chain', 'no walls hold me', 'untethered run'] },
+      { name: 'War / battlefield',    sentiment: 'every day is a fight I chose',                                images: ['the line we hold', 'march through the front', 'the wound I named', 'battle by daylight'] },
+      { name: 'Ghost / haunting',     sentiment: "I carry voices that aren't mine",                             images: ['voices in the dark', 'the ghost of who I was', 'follows me down stairs', "can't shake the room"] },
+      { name: 'Anthem / unity',       sentiment: 'we are larger than us',                                       images: ['raise your hand', 'the choir behind me', 'we stand the line', 'a thousand voices one'] }
+    ],
+    fresh_angles: [
+      'engine as autonomic — the body keeps moving when the mind quits',
+      'wreckage as evidence of survival, not destruction',
+      'haunting as honest company',
+      'anthem as the room finishing your sentence'
+    ]
+  }
+};
+
+const CROSS_STYLE_METAPHOR_BORROWS = {
+  'country<-hiphop': {
+    images: ['the come-up', 'the grind', 'in my bag', 'the run', 'the trap', 'secured the bag'],
+    nod_patterns: [
+      'name the borrow: "they call it [hiphop term] in the city, I just call it [country reframe]"',
+      'split the lineage: "country boy with a [hiphop term] heart"',
+      'place the energy: "[hiphop term] energy on a [country setting]"'
+    ],
+    lineage: 'Lil Nas X "Old Town Road", Florida Georgia Line + Nelly "Cruise", Jelly Roll, Yelawolf, Bubba Sparxxx "Deliverance", Cowboy Troy'
+  },
+  'hiphop<-country': {
+    images: ['back roads', 'front porch', "the dirt I'm from", 'tailgates', 'pickup truck', 'the creek bed'],
+    nod_patterns: [
+      'name the borrow: "I came up like Compton in a cornfield"',
+      'split the lineage: "city heart, country bones"',
+      'place the energy: "block-tested with [country setting] roots"'
+    ],
+    lineage: 'Bubba Sparxxx, Yelawolf, Big K.R.I.T., Nappy Roots (rural blue-collar hip-hop lineage)'
+  },
+  'pop<-hiphop': {
+    images: ['in my bag', 'main character', 'secured', 'the energy', 'the vibe', 'the run'],
+    nod_patterns: [
+      'name the borrow: "borrowed the slang, kept the meaning"',
+      'place the energy: "[hiphop term] energy at the dinner party"',
+      'split the lineage: "pop song with [hiphop term] under the polish"'
+    ],
+    lineage: 'Post Malone (entire catalog), Olivia Rodrigo, Doja Cat, Lizzo, Lewis Capaldi (vocab pulls)'
+  },
+  'pop<-rnb': {
+    images: ['lock and key', 'slow burn', 'the way you', 'all of me', 'honey-slow'],
+    nod_patterns: [
+      'name the borrow: "this is the slow part of the night"',
+      'split the lineage: "pop melody with R&B in the verses"'
+    ],
+    lineage: 'Bruno Mars (entire approach), Justin Timberlake, The Weeknd (pop-side albums), Dua Lipa "Levitating"'
+  },
+  'rock<-hiphop': {
+    images: ['the come-up', 'in my bag', 'the run', 'gang gang', 'real ones'],
+    nod_patterns: [
+      'name the borrow: "rock kid raised on [hiphop reference]"',
+      'place the energy: "the come-up sounds different over a guitar"',
+      'split the lineage: "amps and ad-libs, same hunger"'
+    ],
+    lineage: 'Linkin Park, Limp Bizkit, Rage Against the Machine; modern: Machine Gun Kelly, Yungblud, KennyHoopla'
+  },
+  'country<-rnb': {
+    images: ['slow burn', 'the way you', 'lock and key', 'late night call', 'honey'],
+    nod_patterns: [
+      'split the lineage: "country song that moves like an R&B verse"',
+      'place the energy: "honey on a back road"'
+    ],
+    lineage: 'Sam Hunt "Body Like a Back Road", Beyoncé "Daddy Lessons", Kane Brown, Mickey Guyton'
+  }
+};
+
+function buildMetaphorPaletteNote(genre, fusionGenre) {
+  const norm = _normalizeGenreKey(genre);
+  const palette = GENRE_METAPHOR_PALETTE[norm];
+  if (!palette) return '';
+
+  // Sample 4 random families (Fisher-Yates) so each generation differs.
+  const families = palette.families.slice();
+  for (let i = families.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = families[i]; families[i] = families[j]; families[j] = tmp;
+  }
+  const sampled = families.slice(0, Math.min(4, families.length));
+
+  // Cross-style borrow section (only when a different fusion genre is supplied
+  // and the borrow pair is registered in the matrix).
+  let borrowSection = '';
+  if (fusionGenre) {
+    const fusionNorm = _normalizeGenreKey(fusionGenre);
+    if (fusionNorm && fusionNorm !== norm) {
+      const borrowKey = norm + '<-' + fusionNorm;
+      const borrow = CROSS_STYLE_METAPHOR_BORROWS[borrowKey];
+      if (borrow) {
+        borrowSection = '\n\nCROSS-STYLE BORROW (' + norm + ' pulling from ' + fusionNorm + '):\n' +
+          'Borrowable images: ' + borrow.images.join(' · ') + '\n' +
+          'Lineage: ' + borrow.lineage + '\n' +
+          'NOD PATTERNS — when you use a borrowed image, NAME the borrow. Don\'t sneak it. Real artists who cross lanes signal the cross — that\'s the craft move:\n' +
+          borrow.nod_patterns.map(function (p) { return '  • ' + p; }).join('\n');
+      }
+    }
+  }
+
+  return '\n\n🎨 METAPHOR PALETTE — expand the surface area beyond obvious defaults:\n\n' +
+    'Each family carries a SENTIMENT (the feeling). ANY image from a family lands the same emotional truth — so VARY the surface across the verse instead of mining one image. These are seeds, not requirements; expand them with your own images that share the sentiment.\n\n' +
+    sampled.map(function (f) {
+      return '• **' + f.name + '** — feels like: "' + f.sentiment + '"\n  Seeds: ' + f.images.join(' · ');
+    }).join('\n\n') +
+    '\n\nFRESH ANGLES (reframe the obvious-default reading of this genre — pick at least one to lean into):\n' +
+    palette.fresh_angles.map(function (a) { return '• ' + a; }).join('\n') +
+    borrowSection;
+}
+
 // ============ SPEED GEARS SYSTEM ============
 // Cadence modulation as a cross-genre storytelling device. Speed is a lever
 // the narrator pulls — acceleration = escalation/panic/list-cascade, pullback
@@ -5538,7 +5749,7 @@ REWRITE RULES:
 ` : '';
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
-${coachRewriteNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}
+${coachRewriteNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(genre)}
 
 Genre: ${genreLabel}
 Topic: ${topic}
@@ -6094,7 +6305,7 @@ function buildLuckyPrompt(params) {
   const luckyProductionNote = buildProductionNote(_luckyProdGenre, mood, params && params.aggression, params && params.lyricTier);
 
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
-${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}
+${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(g1, g2)}
 
 Fusion style: ${fd?.name || g1 + ' × ' + g2}
 ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
@@ -7498,7 +7709,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 
-${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}
+${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote('hiphop')}
 
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dims.vocabRegister.length>1 || dims.persona.length>1) ? `
@@ -7821,7 +8032,7 @@ function buildVariantPrompt(variant, song) {
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier, safeSong.genre);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote() + buildMetaphorBalanceNote();
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote() + buildMetaphorBalanceNote() + buildMetaphorPaletteNote(safeSong.genre);
 }
 
 // ═══════════════════════════════════════════════════════
@@ -7967,7 +8178,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(genre)}`;
 
   return { prompt, system };
 }
@@ -8381,7 +8592,9 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   GENRE_INTRO_INTERLUDE_PREFS, HOOK_STYLE_NOTES, BRIDGE_ARCHETYPES,
   OUTRO_ARCHETYPES, VERSE2_ARCHETYPES, PRE_CHORUS_ARCHETYPES, POST_CHORUS_ARCHETYPES,
   // Wave 4k addition
-  buildMetaphorBalanceNote };
+  buildMetaphorBalanceNote,
+  // Wave 4l additions
+  GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote };
 
 
 
