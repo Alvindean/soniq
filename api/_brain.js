@@ -1769,6 +1769,109 @@ const GENRE_METAPHOR_PALETTE = {
       'haunting as honest company',
       'anthem as the room finishing your sentence'
     ]
+  },
+  // ── Wave 4m: tier-2 genres ──────────────────────────────────────────────
+  jazz: {
+    families: [
+      { name: 'Smoke / haze',          sentiment: 'the air in the room is part of the song',     images: ['half-light at the bar', 'smoke curls slow', 'blue glow on glass', 'the room dim and breathing'] },
+      { name: 'After-hours',           sentiment: 'the songs you write after closing time',      images: ['last set just for me', 'two-am still going', 'the kit running with the room empty', 'the night extending'] },
+      { name: 'Conversation',          sentiment: 'every solo is asking and answering',          images: ['the horn asks back', 'bass walks the question', 'piano waits then answers', 'mid-sentence with each other'] },
+      { name: 'Improvisation',         sentiment: 'I find the line as I walk it',                images: ['no chart tonight', 'lean into the unknown', "the next note isn't written", 'walking off the page'] },
+      { name: 'Blue notes',            sentiment: 'the truth lives between two notes',           images: ['bent the third', 'sad without naming it', 'the gap that hurts', 'half a step shy of right'] },
+      { name: 'Lineage / ancestors',   sentiment: 'my horn carries the dead',                    images: ['Coltrane on the wall', 'the standard I learned at fifteen', 'his solo I steal nightly', 'Mingus before words'] },
+      { name: 'Cool / restraint',      sentiment: 'less is more, said better',                   images: ['the rest is the song', 'hold the silence', 'say less, mean more', 'leave the breath'] }
+    ],
+    fresh_angles: [
+      'improvisation as honesty, not flourish',
+      'silence as instrument',
+      'lineage as living conversation, not museum',
+      "cool told through what you don't play"
+    ]
+  },
+  edm: {
+    families: [
+      { name: 'The build',             sentiment: 'tension as a held breath',                    images: ['the lift before flight', 'a rope pulled tight', 'the climb', 'breath drawing in'] },
+      { name: 'The drop',              sentiment: 'gravity finally wins',                        images: ['the floor opens', 'the world lets go', 'gravity meets us', 'the sky drops in'] },
+      { name: 'Lights / lasers',       sentiment: 'light makes the room bigger than it is',      images: ['a thousand suns', 'beams cutting dark', 'light made solid', 'the room turns into stars'] },
+      { name: 'Pulse / sync',          sentiment: 'hearts running on the same code',             images: ['your heart in my chest', 'one beat owns the room', 'sync at 128', 'the kick is my pulse'] },
+      { name: 'Crowd / oneness',       sentiment: 'the many become one body',                    images: ['ten thousand hands', 'we breathe as one', 'lost in the many', 'a single body the size of a stadium'] },
+      { name: 'Dawn',                  sentiment: 'the night transforms instead of dying',       images: ['first light through smoke', 'the day arrives uninvited', 'sky going pink', 'the night becoming morning'] },
+      { name: 'Loop / eternal',        sentiment: 'this moment will never quite end',            images: ['round again', 'no exit from this', 'time spirals', 'we live in this hour'] }
+    ],
+    fresh_angles: [
+      'the drop as collapse-into-grace, not impact',
+      'crowd as a single body, not a crowd',
+      'repetition as devotion, not redundancy',
+      'dawn as the song refusing to end'
+    ]
+  },
+  latin: {
+    families: [
+      { name: 'Familia',               sentiment: 'blood is the architecture',                   images: ["abuela's hands", 'primos around the table', 'the way we always have', 'the names that come back'] },
+      { name: 'Calle',                 sentiment: 'the street raised me',                        images: ['the corner where', 'el barrio', 'the noise that made me', 'the city in my walk'] },
+      { name: 'Sabor',                 sentiment: 'nothing here is bland',                       images: ['salt and lime', 'spice in everything', "flavor that won't quit", 'the taste of home'] },
+      { name: 'Fuego',                 sentiment: 'I am warm-blooded by inheritance',            images: ['burning in my chest', 'fire that built us', 'fuego adentro', 'never cold inside'] },
+      { name: 'Ritmo',                 sentiment: 'my body knows before my mouth',               images: ['clave in my bones', 'hands clapping ahead of words', 'the body is the count', 'rhythm older than language'] },
+      { name: 'Alma',                  sentiment: "I carry voices that aren't only mine",        images: ['the song my abuela sang', 'what I carry inside', 'soul speaks first', 'voices in my chest'] },
+      { name: 'Baile',                 sentiment: 'dance is how we remember',                    images: ['feet that know the way', 'salsa on the floor', 'hips tell the story', 'the dance my parents did'] }
+    ],
+    fresh_angles: [
+      'familia as the architecture of identity',
+      'calle as a teacher, not a setting',
+      'ritmo as language older than words',
+      'baile as collective memory'
+    ]
+  },
+  afrobeats: {
+    families: [
+      { name: 'Continent / land',      sentiment: 'the soil knew me first',                      images: ['red dirt', 'the soil that knew me', 'mother continent', 'land that calls back'] },
+      { name: 'Ancestors',             sentiment: 'those before me are not behind me',           images: ['names in my blood', 'voices I inherited', 'walking beside me always', 'lineage at the shoulder'] },
+      { name: 'Motion',                sentiment: 'stillness is a foreign concept',              images: ['body knows', 'never still', 'motion is life', 'always moving even at rest'] },
+      { name: 'Sun / heat',            sentiment: 'heat shaped who we are',                      images: ['the sun on backs', 'gold heat', 'sun built us slow', 'heat in the marrow'] },
+      { name: 'Ocean / coast',         sentiment: 'salt water in the family line',               images: ['Atlantic in my chest', 'salt water memory', 'the tide that returns', 'the coast in me'] },
+      { name: 'Joy as resistance',     sentiment: 'laughter is the heaviest medicine',           images: ['laughing through', 'dance is defiance', 'joy that carries weight', 'we laugh because we must'] },
+      { name: 'Pidgin / tongue',       sentiment: 'my language is its own architecture',         images: ['the way we talk', 'words only we know', 'slang as code', 'pidgin in my pocket'] }
+    ],
+    fresh_angles: [
+      'ancestors as present tense, not past',
+      'motion as identity, not transit',
+      'joy as the heaviest medicine',
+      'pidgin as private architecture'
+    ]
+  },
+  kpop: {
+    families: [
+      { name: 'Group / chorus',        sentiment: 'we move as one body',                          images: ['eight hearts one beat', 'no one alone', 'we move as one', 'the group is the singer'] },
+      { name: 'Concept / persona',     sentiment: 'the version of me you see is also true',       images: ['the role I built', 'this version of me', 'the era I am now', 'masks that are also faces'] },
+      { name: 'Code-switching',        sentiment: 'my language is two languages',                 images: ['Korean to English mid-bar', 'the word between languages', 'half-light tongue', 'switching like switching rooms'] },
+      { name: 'Neon future',           sentiment: 'tomorrow has already arrived',                 images: ['glass towers', 'neon brighter than morning', 'the city as spaceship', 'tomorrow is now'] },
+      { name: 'Transformation',        sentiment: 'shedding is part of being',                    images: ['shedding skin', 'the new I', 'this version replaces the last', 'I am iterating'] },
+      { name: 'Fan / connection',      sentiment: 'love can travel oceans',                       images: ['eyes from across the world', 'love at distance', 'the bridge of devotion', 'a stranger who knows me'] },
+      { name: 'Discipline',            sentiment: 'the body is a long-term project',              images: ['the practice room', 'ten thousand hours', 'the body as instrument', 'discipline is devotion'] }
+    ],
+    fresh_angles: [
+      'concept as honest performance, not mask',
+      'code-switching as native, not bilingual',
+      'transformation as iteration, not erasure',
+      'fan-bond as the third voice in the song'
+    ]
+  },
+  metal: {
+    families: [
+      { name: 'Forge / steel',         sentiment: 'I was made through heat',                      images: ['hammer on anvil', 'fire-hardened', 'tempered blade', 'the metal in me'] },
+      { name: 'Rage / fury',           sentiment: 'anger as clarity',                             images: ['storm in my chest', 'blood boiling clean', 'the volcano coming', 'fury that sees'] },
+      { name: 'Ancient / mythic',      sentiment: 'the old truths are still true',                images: ['old gods', 'the dark before light', 'runes carved deep', 'the world before words'] },
+      { name: 'Forest / dark',         sentiment: 'the dark holds knowledge',                     images: ['pines that hide', 'the wood at midnight', 'the trees know', 'shadow that watches'] },
+      { name: 'Blood / oath',          sentiment: 'I am sworn to this',                           images: ['sworn in blood', 'the wound that binds', 'my line and theirs', 'oath stronger than skin'] },
+      { name: 'Chains / breaking',     sentiment: 'I am tearing what holds me',                   images: ['links breaking', 'iron giving way', 'the prison I tore', 'broke the cage'] },
+      { name: 'Hubris / godhood',      sentiment: 'I refuse the limits set for me',               images: ['too close to the sun', 'the throne I claimed', 'defiance of heaven', 'I am my own god'] }
+    ],
+    fresh_angles: [
+      'forge as creation through heat, not destruction',
+      'ancient as the truth modernity forgot',
+      'rage as clarity, not chaos',
+      'godhood as the cost of honesty'
+    ]
   }
 };
 
@@ -1824,6 +1927,61 @@ const CROSS_STYLE_METAPHOR_BORROWS = {
       'place the energy: "honey on a back road"'
     ],
     lineage: 'Sam Hunt "Body Like a Back Road", Beyoncé "Daddy Lessons", Kane Brown, Mickey Guyton'
+  },
+  // ── Wave 4m: tier-2 cross-style pairs ─────────────────────────────────────
+  'jazz<-hiphop': {
+    images: ['the loop', 'the sample', 'the bar', 'in my bag', 'the run'],
+    nod_patterns: [
+      'name the borrow: "Coltrane meeting Madlib"',
+      'place the energy: "[hiphop term] over a Rhodes"',
+      'split the lineage: "blue notes with bars under them"'
+    ],
+    lineage: 'Robert Glasper Experiment, Madlib (Madvillainy fusion), BADBADNOTGOOD, Common "Like Water for Chocolate", Kendrick Lamar "To Pimp a Butterfly" (jazz-rap canon)'
+  },
+  'hiphop<-jazz': {
+    images: ['blue notes', 'walking bass', 'the changes', 'modal', 'the standard'],
+    nod_patterns: [
+      'name the borrow: "this is the standard, my version"',
+      'split the lineage: "Tribe before me, Coltrane before them"',
+      'place the energy: "blue notes under bars"'
+    ],
+    lineage: 'A Tribe Called Quest, J Dilla, Madlib, Robert Glasper Experiment, Kendrick Lamar TPAB, Joey Bada$$, Digable Planets'
+  },
+  'latin<-hiphop': {
+    images: ['the trap', 'in my bag', 'the run', 'the come-up', 'the energy', 'gang'],
+    nod_patterns: [
+      'name the borrow: "trap latino is just barrio plus 808s"',
+      'split the lineage: "block in two languages"',
+      'place the energy: "Spanish bars over trap drums"'
+    ],
+    lineage: 'Bad Bunny, Anuel AA, Ozuna, J Balvin, Cardi B (bilingual lineage), Daddy Yankee (foundational), Tego Calderón'
+  },
+  'kpop<-hiphop': {
+    images: ['the bag', 'the come-up', 'the run', 'real ones', 'the bars', 'gang'],
+    nod_patterns: [
+      'name the borrow: "Korean to English to Korean, all in the same bar"',
+      'place the energy: "[hiphop term] over a synth-pop drop"',
+      'split the lineage: "Seoul rap-line trained on Brooklyn"'
+    ],
+    lineage: 'Suga / Agust D, RM, J-Hope, Stray Kids 3racha, Epik High, KARD rap-line, Lee Hi'
+  },
+  'afrobeats<-hiphop': {
+    images: ['the drip', 'the run', 'in my bag', 'the energy', 'the wave'],
+    nod_patterns: [
+      'name the borrow: "lagos to London to Brooklyn, same energy"',
+      'place the energy: "[hiphop term] over an afrobeats pocket"',
+      'split the lineage: "amapiano percussion with trap cadence"'
+    ],
+    lineage: 'Burna Boy, Wizkid (vocab pulls), Rema, Tems, Asake, Nasty C; UK drill: Pop Smoke (Caribbean roots), Fivio Foreign'
+  },
+  'metal<-hiphop': {
+    images: ['the bag', 'the come-up', 'real ones', 'gang', 'the run'],
+    nod_patterns: [
+      'name the borrow: "rap kid raised on metal, metal kid raised on rap"',
+      'place the energy: "[hiphop term] over downtuned guitars"',
+      'split the lineage: "amps and ad-libs, same hunger"'
+    ],
+    lineage: 'Limp Bizkit, Linkin Park (Mike Shinoda lineage), Korn, Rage Against the Machine, Body Count (Ice-T), Kid Rock; modern: Bring Me the Horizon, Bad Wolves, Code Orange'
   }
 };
 
@@ -1840,16 +1998,23 @@ function buildMetaphorPaletteNote(genre, fusionGenre) {
   }
   const sampled = families.slice(0, Math.min(4, families.length));
 
-  // Cross-style borrow section (only when a different fusion genre is supplied
-  // and the borrow pair is registered in the matrix).
+  // Cross-style borrow section. Lucky-style fusions arrive with a fixed key
+  // order (e.g. FUSION_DATA stores "Hip-Hop+Metal", not "Metal+Hip-Hop"), so
+  // we try BOTH directions — `genre<-fusion` first (preferred direction), then
+  // `fusion<-genre` as fallback. The cross-pollination story is the same
+  // either way for most pairs; only the heading flips to match what we found.
   let borrowSection = '';
   if (fusionGenre) {
     const fusionNorm = _normalizeGenreKey(fusionGenre);
     if (fusionNorm && fusionNorm !== norm) {
-      const borrowKey = norm + '<-' + fusionNorm;
-      const borrow = CROSS_STYLE_METAPHOR_BORROWS[borrowKey];
+      const fwdKey = norm + '<-' + fusionNorm;
+      const revKey = fusionNorm + '<-' + norm;
+      const borrow = CROSS_STYLE_METAPHOR_BORROWS[fwdKey] || CROSS_STYLE_METAPHOR_BORROWS[revKey];
       if (borrow) {
-        borrowSection = '\n\nCROSS-STYLE BORROW (' + norm + ' pulling from ' + fusionNorm + '):\n' +
+        const matchedFwd = !!CROSS_STYLE_METAPHOR_BORROWS[fwdKey];
+        const headFrom = matchedFwd ? norm : fusionNorm;
+        const headTo   = matchedFwd ? fusionNorm : norm;
+        borrowSection = '\n\nCROSS-STYLE BORROW (' + headFrom + ' pulling from ' + headTo + '):\n' +
           'Borrowable images: ' + borrow.images.join(' · ') + '\n' +
           'Lineage: ' + borrow.lineage + '\n' +
           'NOD PATTERNS — when you use a borrowed image, NAME the borrow. Don\'t sneak it. Real artists who cross lanes signal the cross — that\'s the craft move:\n' +
