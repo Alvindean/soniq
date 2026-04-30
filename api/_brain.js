@@ -1597,6 +1597,66 @@ WHY: These phrases function as artists' LIVING TRADEMARKS — using them in an u
 THE TEST: After writing each line, ask "is this phrase associated with one specific artist's brand?" If yes and the song isn't about that artist, rewrite with original phrasing that captures the same energy.`;
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// METAPHOR BALANCE — single-image discipline
+// ────────────────────────────────────────────────────────────────────────────
+// A metaphor is a TOUCHPOINT, not a THROUGHLINE. When a hook, title, or seed
+// line uses an image ("take a picture", "we're on fire", "drowning"), the
+// natural failure mode for an LLM is to mine the entire vocabulary of that
+// image's domain across the rest of the verse — snapshot, shutter, lens,
+// polaroid, exposure, develop, frame, focus, zoom — until the song reads as
+// an extended-metaphor exercise rather than a song. Real songwriters touch
+// the metaphor lightly, then expand the EMOTIONAL meaning using DIFFERENT
+// images that carry the same feeling. Highlight the idea — don't drown in it.
+// ════════════════════════════════════════════════════════════════════════════
+function buildMetaphorBalanceNote() {
+  return `
+
+🎯 METAPHOR BALANCE — ABSOLUTE RULE (ENFORCE PER VERSE):
+
+When a hook, title, or any seed line uses a metaphor, that metaphor is a TOUCHPOINT, not a THROUGHLINE. Use the image ONCE — at most twice — as a sentiment anchor. Then carry the FEELING forward using DIFFERENT images. Do NOT mine vocabulary from the same domain across the rest of the verse.
+
+THE FAILURE MODE TO AVOID:
+The hook says "take a picture." The verse then becomes: snapshot, shutter, lens, polaroid, frame, exposure, develop, flash, zoom, focus, capture, click, lens cap, film roll. That is OVER-EXTENSION. It reads as gimmicky, try-hard, and breaks the listener's emotional connection because every line becomes a vocabulary exercise instead of a feeling.
+
+THE RULE — three steps:
+1. IDENTIFY the SENTIMENT the metaphor carries — what FEELING is the listener supposed to walk away with?
+2. Touch the metaphor ONCE (or at most a callback in the next chorus) as the anchor line.
+3. Expand the SENTIMENT using DIFFERENT images that share the FEELING — not vocabulary that shares the DOMAIN.
+
+SENTIMENT MAP (examples — apply the same logic to any metaphor):
+• "Take a picture"  →  sentiment: LOOK / WITNESS / WE'RE HERE / UNDENIABLE MOMENT
+                       expand with: eyes on us, can't look away, blocks watching, living loud, leaving a mark, real-time legend, feel it in the air, the room knows
+                       NOT with: snapshot, lens, shutter, polaroid, frame, exposure, develop, flash, zoom, focus
+• "We're on fire"   →  sentiment: UNTOUCHABLE / PEAK / EVERYONE'S WATCHING / CAN'T BE STOPPED
+                       expand with: cant slow us down, whole city tuned in, everything's clicking, no ceiling, in the zone, untouchable run, peak hours, every shot drops
+                       NOT with: flames, burn, scorched, ash, smoke, ember, blaze, ignite, kindling, inferno
+• "Drowning"        →  sentiment: OVERWHELMED / SINKING UNDER / CAN'T CATCH BREATH / BURIED
+                       expand with: can't catch up, weight on my chest, room spinning, head under, lights blurring, no air, falling behind myself, slipping
+                       NOT with: ocean, waves, tide, current, surface, anchor, undertow, fathoms, swim, lifeline, shore
+
+WRONG (extended-metaphor mining — do not do this):
+  "Take a picture, snapshot, lens cap off
+   Polaroid moment, shutter clickin' soft
+   Flash on the frame, exposure on max
+   Develop the photo, hang it on my wax"
+
+RIGHT (touchpoint + sentiment expansion):
+  "Take a picture, we really here
+   Whole block watchin', the room go quiet
+   Live loud enough that they feel it from blocks away
+   Leave a mark on the night they gon' play it back"
+
+THE TEST — for every verse:
+After writing the verse, scan it for the metaphor's domain words. If MORE THAN TWO words from the same image-domain appear in the verse, you over-extended. Rewrite the extras using sentiment-equivalent images from a different domain.
+
+WHY THIS MATTERS:
+Listeners feel the SENTIMENT, not the vocabulary. A verse that uses one camera image and then expands into "the room knows / can't look away / leaving a mark" carries the meaning of "take a picture" more powerfully than four bars of camera vocabulary. Highlight the idea. Don't drown in it.
+
+CALLBACKS ARE EXEMPT:
+A single callback to the original metaphor in a later chorus or bridge is fine — that's a structural rhyme. The rule is about the BODY of verses, not deliberate hook-callbacks.`;
+}
+
 // ============ SPEED GEARS SYSTEM ============
 // Cadence modulation as a cross-genre storytelling device. Speed is a lever
 // the narrator pulls — acceleration = escalation/panic/list-cascade, pullback
@@ -5478,7 +5538,7 @@ REWRITE RULES:
 ` : '';
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
-${coachRewriteNote}${buildCraftFirewallNote()}
+${coachRewriteNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}
 
 Genre: ${genreLabel}
 Topic: ${topic}
@@ -6034,7 +6094,7 @@ function buildLuckyPrompt(params) {
   const luckyProductionNote = buildProductionNote(_luckyProdGenre, mood, params && params.aggression, params && params.lyricTier);
 
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
-${buildCraftFirewallNote()}
+${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}
 
 Fusion style: ${fd?.name || g1 + ' × ' + g2}
 ${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
@@ -7438,7 +7498,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 
-${buildCraftFirewallNote()}
+${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}
 
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dims.vocabRegister.length>1 || dims.persona.length>1) ? `
@@ -7761,7 +7821,7 @@ function buildVariantPrompt(variant, song) {
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier, safeSong.genre);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote();
+  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote() + buildMetaphorBalanceNote();
 }
 
 // ═══════════════════════════════════════════════════════
@@ -7907,7 +7967,7 @@ ${ctx}
 EDIT INSTRUCTION: "${p.instruction}"
 
 CURRENT LYRICS:
-${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${buildCraftFirewallNote()}`;
+${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}`;
 
   return { prompt, system };
 }
@@ -8319,7 +8379,9 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   CROSSOVER_TAXONOMY, buildCrossoverNote, buildProducerTemplateNote,
   VIRAL_GENRE_WHITELIST, EDGE_GENRE_PROFANITY_DEFAULTS, GENRE_SUBSTYLE_LISTS,
   GENRE_INTRO_INTERLUDE_PREFS, HOOK_STYLE_NOTES, BRIDGE_ARCHETYPES,
-  OUTRO_ARCHETYPES, VERSE2_ARCHETYPES, PRE_CHORUS_ARCHETYPES, POST_CHORUS_ARCHETYPES };
+  OUTRO_ARCHETYPES, VERSE2_ARCHETYPES, PRE_CHORUS_ARCHETYPES, POST_CHORUS_ARCHETYPES,
+  // Wave 4k addition
+  buildMetaphorBalanceNote };
 
 
 
