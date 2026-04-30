@@ -3511,6 +3511,44 @@ body.craft-advanced .craft-basic-only{display:none !important}
         </div>
       </div>
 
+      <!-- PRODUCTION MODE ACCORDION (Wave 4i) — viral mode, sample hook, off-the-top, producer template -->
+      <div class="blend-acc" id="prodmode-acc">
+        <div class="blend-trigger" onclick="toggleProdMode()">
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="blend-trigger-dot" id="prodmode-dot"></div>
+            <span class="blend-trigger-label">🎚 Production Mode</span>
+          </div>
+          <span class="blend-arrow" id="prodmode-arrow">▼</span>
+        </div>
+        <div class="blend-body" id="prodmode-body" style="display:none;padding:0 16px 16px">
+
+          <!-- BOOLEAN MODE TOGGLES -->
+          <label class="topic-label" style="margin-top:4px">Special Modes</label>
+          <div class="rl-dim-pills" style="flex-wrap:wrap;gap:6px">
+            <span class="rl-dpill" id="pm-viralMode" onclick="toggleProdModeFlag('viralMode')" title="🔥 Engineers TikTok-ready hook architecture: 7-second hook rule, earworm repetition, modular hook structure, dance-floor BPM lock, distinctive sonic signature, anti-density. Locks to viral-native genres (hiphop, pop, country, rnb, latin, reggaeton, afrobeats, punk, edm, kpop, altrock). Silent no-op on jazz, folk, doom-metal, etc.">🔥 Viral Mode</span>
+            <span class="rl-dpill" id="pm-sampleHookMode" onclick="toggleProdModeFlag('sampleHookMode')" title="🎚️ Auto-extracts the stickiest 2-6 syllable phrase from your topic and builds the entire song around looping it as a vocal-sample hook. The 'All the Smoke' / 'WAP' / 'Savage' / 'HUMBLE.' architecture. Genre-agnostic.">🎚️ Sample Hook</span>
+            <span class="rl-dpill" id="pm-offTheTopMode" onclick="toggleProdModeFlag('offTheTopMode')" title="🎤 Harry Mack improvisation overlay. Adds meta-awareness, beat acknowledgment, word-association chains, restart-moves to the freestyle output. Requires Freestyle Mode also on (otherwise silently skipped).">🎤 Off-the-Top</span>
+          </div>
+          <div style="font-size:9px;color:var(--tx3);margin-top:4px;margin-bottom:14px">Off-the-Top requires Freestyle Mode. Viral Mode locks to viral-native genres only.</div>
+
+          <!-- PRODUCER BEAT TEMPLATE -->
+          <label class="topic-label">Producer Beat Template</label>
+          <div class="rl-dim-pills" id="pm-producer-pills" style="flex-wrap:wrap;gap:4px">
+            <span class="rl-dpill on" data-producer="" onclick="setProducerTemplate(this,'')" title="No producer template — use the genre's default production">None</span>
+            <span class="rl-dpill" data-producer="Swizz Beatz" onclick="setProducerTemplate(this,'Swizz Beatz')" title="Bronx pound, playground synth lead, 'SHOWTIME!' tag. DMX / Eve / Ja Rule / Beyoncé Ring The Alarm.">Swizz Beatz</span>
+            <span class="rl-dpill" data-producer="Hit-Boy" onclick="setProducerTemplate(this,'Hit-Boy')" title="Modern bouncy 808s, melodic synth lead, bass-as-melody. Nas King's Disease / Big Sean Bounce Back / Niggas in Paris.">Hit-Boy</span>
+            <span class="rl-dpill" data-producer="Metro Boomin" onclick="setProducerTemplate(this,'Metro Boomin')" title="Atlanta trap signature — hard 808 + ambient pads + minor-key synth. 'If young Metro don't trust you' tag. Future / Drake / 21 Savage / Travis.">Metro Boomin</span>
+            <span class="rl-dpill" data-producer="Pharrell Williams (Neptunes era)" onclick="setProducerTemplate(this,'Pharrell Williams (Neptunes era)')" title="Minimal pounding kick, synth-bass-as-melody, ARP arpeggio synth, falsetto-friendly. Snoop 'Drop It Like It's Hot' / Clipse 'Grindin'' / Kelis 'Milkshake'.">Pharrell (Neptunes)</span>
+            <span class="rl-dpill" data-producer="J Dilla" onclick="setProducerTemplate(this,'J Dilla')" title="Off-grid drum programming (drums DELIBERATELY off the grid for humanized swing), soul samples, dusty-vinyl warmth. Common 'The Light' / D'Angelo / Slum Village.">J Dilla</span>
+            <span class="rl-dpill" data-producer="The Alchemist" onclick="setProducerTemplate(this,'The Alchemist')" title="Boom-bap kick + snare, obscure soul/jazz/world-music sample loops, no trap hats. Mafioso aesthetic. Mobb Deep / Action Bronson / Mach-Hommy / Freddie Gibbs 'Alfredo'.">The Alchemist</span>
+            <span class="rl-dpill" data-producer="Tay Keith" onclick="setProducerTemplate(this,'Tay Keith')" title="Memphis trap — booming 808 + sliding bass-glides + rolling triplet hi-hats. 'Tay Keith fuck these niggas up' tag became its own meme. Drake 'Look Alive' / Megan / BlocBoy JB.">Tay Keith</span>
+            <span class="rl-dpill" data-producer="Jack Antonoff" onclick="setProducerTemplate(this,'Jack Antonoff')" title="80s synth pads, Wurlitzer piano, intimate-anthem architecture. Sabrina 'Espresso' / Taylor 'Anti-Hero' / Lana / Olivia 'deja vu'.">Jack Antonoff</span>
+            <span class="rl-dpill" data-producer="Murda Beatz" onclick="setProducerTemplate(this,'Murda Beatz')" title="Modern Atlanta trap — punchy 808, snappy snare + claps, sparse melodic synth. Crossover-hit potential. 'Murda on the beat' tag. Drake 'Nice for What' / Migos 'MotorSport'.">Murda Beatz</span>
+          </div>
+          <div style="font-size:9px;color:var(--tx3);margin-top:4px">Pairs cleanly with Viral Mode for the 'genre-bait' build.</div>
+        </div>
+      </div>
+
       <!-- ADVANCED SETTINGS ACCORDION -->
       <div class="blend-acc" id="adv-acc">
         <div class="blend-trigger" onclick="toggleAdv()">
@@ -3721,22 +3759,42 @@ body.craft-advanced .craft-basic-only{display:none !important}
             <div id="mode-desc" style="font-size:11px;color:var(--tx3);font-style:italic;align-self:center;padding-left:4px">Genre-appropriate scale selected automatically</div>
           </div>
 
-          <!-- HOOK STYLE -->
-          <label class="bracket-label" style="margin-top:14px">Hook Style <span style="font-weight:400;color:var(--tx4);font-size:10px;text-transform:none;letter-spacing:0">— auto-detected from genre by default</span></label>
+          <!-- HOOK STYLE — expanded Wave 4i to all 32 patterns. Pick ONE per chorus (stacking dilutes). -->
+          <label class="bracket-label" style="margin-top:14px">Hook Style <span style="font-weight:400;color:var(--tx4);font-size:10px;text-transform:none;letter-spacing:0">— auto-detected from genre by default · pick ONE per song</span></label>
           <div class="bracket-pills" id="hook-style-pills">
-            <span class="bpill on"  onclick="setHookStyle(this,'auto')">Auto (from genre)</span>
-            <span class="bpill" onclick="setHookStyle(this,'Smooth Sung')">Smooth Sung</span>
-            <span class="bpill" onclick="setHookStyle(this,'Melodic Auto-Tune')">Melodic / Auto-Tune</span>
-            <span class="bpill" onclick="setHookStyle(this,'Chanted')">Chanted</span>
-            <span class="bpill" onclick="setHookStyle(this,'Call & Response')">Call &amp; Response</span>
-            <span class="bpill" onclick="setHookStyle(this,'Screamed / Crunk')">Screamed / Crunk</span>
-            <span class="bpill" onclick="setHookStyle(this,'Southern Drawl')">Southern Drawl</span>
-            <span class="bpill" onclick="setHookStyle(this,'Rapped Hook')">Rapped Hook</span>
-            <span class="bpill" onclick="setHookStyle(this,'Minimal / Groove')">Minimal / Groove</span>
-            <span class="bpill" onclick="setHookStyle(this,'Mantra')">Mantra</span>
-            <span class="bpill" onclick="setHookStyle(this,'Double Hook A+B')">Double Hook A+B</span>
-            <span class="bpill" onclick="setHookStyle(this,'Gospel Vamp')">Gospel Vamp</span>
-            <span class="bpill" onclick="setHookStyle(this,'Post-Hook Drop')">Post-Hook Drop</span>
+            <span class="bpill on"  onclick="setHookStyle(this,'auto')" title="Derive hook style from substyle (Phonk → Demonic Chant, Trap → Melodic Auto-Tune, etc.)">Auto (from genre)</span>
+            <!-- Original delivery-style hooks (rap-leaning) -->
+            <span class="bpill" onclick="setHookStyle(this,'Smooth Sung')" title="Nate Dogg / R&B crooner. Long vowels, easy to hum. 8 bars, 4 unique melodic lines.">Smooth Sung</span>
+            <span class="bpill" onclick="setHookStyle(this,'Melodic Auto-Tune')" title="Drake / Future / Lil Baby. Auto-tune as melody instrument, simple pitch-bent phrases.">Melodic / Auto-Tune</span>
+            <span class="bpill" onclick="setHookStyle(this,'Chanted')" title="Kendrick / boom bap. Short punchy phrase, crowd-participation ready.">Chanted</span>
+            <span class="bpill" onclick="setHookStyle(this,'Call & Response')" title="Lead line + crowd answer. OutKast / Bay Area / gospel tradition.">Call &amp; Response</span>
+            <span class="bpill" onclick="setHookStyle(this,'Screamed / Crunk')" title="Lil Jon / Three 6 era — 2-4 words shouted, ultra-repetitive, club-floor designed.">Screamed / Crunk</span>
+            <span class="bpill" onclick="setHookStyle(this,'Southern Drawl')" title="Slow elongated vowels, behind-the-beat. Houston / Memphis / Atlanta tradition.">Southern Drawl</span>
+            <span class="bpill" onclick="setHookStyle(this,'Chopped')" title="Pitch-lowered, syrupy, every other syllable elongated. DJ Screw lineage.">Chopped</span>
+            <span class="bpill" onclick="setHookStyle(this,'Rapped Hook')" title="Bars at verse speed but hook-catchy. Eminem / Jay-Z / Big Pun.">Rapped Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Minimal / Groove')" title="Future / 21 Savage. 2-4 words, GROOVE carries the hook not lyric.">Minimal / Groove</span>
+            <span class="bpill" onclick="setHookStyle(this,'Mantra')" title="One devastating SENTENCE looped. 'HUMBLE.' / 'Never broke again.'">Mantra</span>
+            <span class="bpill" onclick="setHookStyle(this,'Double Hook A+B')" title="Two distinct hook sections back-to-back. Travis Scott / Kanye style.">Double Hook A+B</span>
+            <span class="bpill" onclick="setHookStyle(this,'Gospel Vamp')" title="Hook repeats and ad-libs ESCALATE over it. Sam Smith / Beyoncé / Kirk Franklin.">Gospel Vamp</span>
+            <span class="bpill" onclick="setHookStyle(this,'Post-Hook Drop')" title="Main hook (4 bars) → punchy 2-bar drop. Bass drops or sample flips.">Post-Hook Drop</span>
+            <span class="bpill" onclick="setHookStyle(this,'Demonic Chant / Pitched-Down')" title="Phonk signature — 4-8 syllable phrase pitched-down to demonic register, looped 6-8 times.">Demonic Chant</span>
+            <!-- Universal hook-craft patterns (Waves 4g + 4h) -->
+            <span class="bpill" onclick="setHookStyle(this,'One-Word Repeat')" title="Single syllable/word anchor. Beatles 'She Loves You' (yeah-yeah-yeah), Snoop 'Drop It Like It's Hot' (snap snap), Outkast 'Hey Ya'.">One-Word Repeat</span>
+            <span class="bpill" onclick="setHookStyle(this,'Octave Jump')" title="Verse low, chorus LEAPS up an octave. Whitney 'I Will Always Love You', Mariah, Adele 'Rolling in the Deep'.">Octave Jump</span>
+            <span class="bpill" onclick="setHookStyle(this,'Title Drop')" title="Chorus IS the song title repeated 4-8 times. Journey 'Don't Stop Believin'', Toto 'Africa', Adele 'Hello'.">Title Drop</span>
+            <span class="bpill" onclick="setHookStyle(this,'Question Hook')" title="Chorus poses a question. Baha Men 'Who Let The Dogs Out', Marvin Gaye 'What's Going On', Pixies 'Where Is My Mind'.">Question Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Counting Hook')" title="Numbers create rhythmic build. Feist '1234', FOB count-in, Lil Jon '1, 2, 3, 4'.">Counting Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Final-Chorus Key Change')" title="Modulate UP for the FINAL chorus. Beyoncé 'Love On Top' (4 changes!), Whitney, Bon Jovi 'Livin' on a Prayer'.">Final-Chorus Key Change</span>
+            <span class="bpill" onclick="setHookStyle(this,'Wordless Singalong')" title="La-la / na-na / whoa-oh syllables. Beatles 'Hey Jude', MCR 'Black Parade', Coldplay 'Viva La Vida'.">Wordless Singalong</span>
+            <span class="bpill" onclick="setHookStyle(this,'Imperative / Command Hook')" title="Chorus tells listener to DO something. Taylor 'Shake It Off', Daft Punk 'Get Lucky', Salt-N-Pepa 'Push It'.">Imperative / Command</span>
+            <span class="bpill" onclick="setHookStyle(this,'Vocal Run / Melisma Hook')" title="Virtuosic vocal RUN on a single syllable. Mariah 'Emotions', Whitney, Beyoncé 'Love On Top', Ariana Grande catalog.">Vocal Run / Melisma</span>
+            <span class="bpill" onclick="setHookStyle(this,'Anaphora Hook')" title="Every chorus line starts with the SAME word/phrase. Whitney 'I Will' anchor, BSB 'I Want It That Way', Tom Petty 'I Won't Back Down'.">Anaphora Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Whisper-to-Shout')" title="Chorus moves from whispered intimacy to belted catharsis. Sia 'Chandelier', Lana 'Born to Die', Hozier 'Take Me to Church'.">Whisper-to-Shout</span>
+            <span class="bpill" onclick="setHookStyle(this,'List Hook')" title="Chorus is a list of things/names/places. Will Smith 'Miami' cities, Eminem 'Without Me' sequence, Billy Joel 'We Didn't Start the Fire'.">List Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Onomatopoeia Hook')" title="Sound-words AS the hook. BEP 'Boom Boom Pow', Britney 'Womanizer', Soulja Boy 'Crank That'.">Onomatopoeia</span>
+            <span class="bpill" onclick="setHookStyle(this,'Spelling Hook')" title="Chorus spells a word letter-by-letter. Aretha 'R-E-S-P-E-C-T', Fergie 'G-L-A-M-O-R-O-U-S'.">Spelling Hook</span>
+            <span class="bpill" onclick="setHookStyle(this,'Repeat-with-Twist')" title="Chorus repeats but final repetition changes one word. Ed Sheeran 'Shape of You' body-part rotation, Drake 'In My Feelings' name rotation.">Repeat-with-Twist</span>
+            <span class="bpill" onclick="setHookStyle(this,'Antithesis Hook')" title="Chorus pairs CONTRASTING ideas in adjacent lines. Supremes 'Stop! In the Name of Love', Adele 'Set Fire to the Rain', TLC 'No Scrubs'.">Antithesis</span>
           </div>
 
           <!-- ARTIST VOICE PROFILE -->
@@ -8888,6 +8946,8 @@ const MOOD_COLORS = {
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
+  // Wave 4i — Production Mode toggles (server reads these via songParams + Lucky payload)
+  viralMode:false, sampleHookMode:false, offTheTopMode:false, producerTemplate:'',
   rapStyle: 'trap',
   rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:['medium'], vocabRegister:['street-coded'], persona:['first-person-raw'] },
   // Punchline Craft tools — multi-select, max 3. Whitelist enforced server-side too.
@@ -10483,7 +10543,7 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : []}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [], viralMode: S.viralMode === true, sampleHookMode: S.sampleHookMode === true, producerTemplate: typeof S.producerTemplate === 'string' ? S.producerTemplate : ''}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null, sunoSettings: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
@@ -10858,6 +10918,13 @@ async function generateSong(){
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
     aggression: S.selectedAggression || 'mid',
     freestyleMode: S.freestyleMode === true,
+    // Wave 4i — Production Mode toggles. Server validates + applies genre gate
+    // (viralMode is silent no-op outside VIRAL_GENRE_WHITELIST; offTheTopMode
+    // requires freestyleMode also on to fire; sampleHookMode is genre-agnostic).
+    viralMode: S.viralMode === true,
+    sampleHookMode: S.sampleHookMode === true,
+    offTheTopMode: S.offTheTopMode === true,
+    producerTemplate: typeof S.producerTemplate === 'string' ? S.producerTemplate : '',
     edgeMode: window.__qfEdge === true,
     barSwitch: (typeof S.barSwitch === 'number' && [2,4,8].includes(S.barSwitch)) ? S.barSwitch : 0,
     breakRule: S.breakRule === true,
@@ -17848,6 +17915,41 @@ function setHookStyle(el, style) {
   S.hookStyle = style;
   document.querySelectorAll('#hook-style-pills .bpill').forEach(p => p.classList.remove('on'));
   el.classList.add('on');
+}
+
+// ─── Wave 4i — Production Mode handlers ─────────────────────────────────────
+function toggleProdMode() {
+  const body = document.getElementById('prodmode-body');
+  const arrow = document.getElementById('prodmode-arrow');
+  const dot = document.getElementById('prodmode-dot');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+  if (dot) dot.classList.toggle('on', !open);
+}
+
+function toggleProdModeFlag(flag) {
+  // Boolean toggle — used for viralMode, sampleHookMode, offTheTopMode
+  if (!['viralMode','sampleHookMode','offTheTopMode'].includes(flag)) return;
+  S[flag] = !S[flag];
+  const el = document.getElementById('pm-' + flag);
+  if (el) el.classList.toggle('on', S[flag]);
+  // Update accordion-trigger dot if any flag is on
+  const anyOn = S.viralMode || S.sampleHookMode || S.offTheTopMode || (S.producerTemplate && S.producerTemplate !== '');
+  const dot = document.getElementById('prodmode-dot');
+  if (dot) dot.classList.toggle('on', !!anyOn);
+}
+
+function setProducerTemplate(el, name) {
+  // Single-select: producer template OR none
+  S.producerTemplate = name || '';
+  document.querySelectorAll('#pm-producer-pills .rl-dpill').forEach(p => p.classList.remove('on'));
+  if (el) el.classList.add('on');
+  // Update accordion-trigger dot
+  const anyOn = S.viralMode || S.sampleHookMode || S.offTheTopMode || (S.producerTemplate && S.producerTemplate !== '');
+  const dot = document.getElementById('prodmode-dot');
+  if (dot) dot.classList.toggle('on', !!anyOn);
 }
 
 function bracketInstruction() {
