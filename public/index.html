@@ -938,11 +938,20 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .blend-dna-details summary:hover{color:var(--tx2)}
 .blend-dna-full{font-size:11px;line-height:1.6;white-space:pre-wrap;color:var(--tx3);margin-top:6px;padding-top:6px;border-top:1px dashed var(--b1);max-height:240px;overflow-y:auto}
 
+.blend-mode-row{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;padding:10px 12px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2)}
+.blend-mode-pills{display:flex;gap:4px;background:var(--s3);border-radius:99px;padding:3px;align-self:flex-start}
+.blend-mode-pill{padding:7px 14px;font-size:12px;font-weight:700;color:var(--tx3);background:transparent;border:none;border-radius:99px;cursor:pointer;font-family:var(--font);transition:all .15s;min-height:36px}
+.blend-mode-pill:hover{color:var(--tx1);background:rgba(255,255,255,0.04)}
+.blend-mode-pill:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
+.blend-mode-pill.on{background:linear-gradient(135deg,var(--amber),var(--violet));color:#050505}
+.blend-mode-help{font-size:11px;color:var(--tx3);line-height:1.5;font-style:italic}
+
 .blend-dials{margin-top:6px;padding-top:14px;border-top:1px solid var(--b1)}
 .blend-dials-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx4);margin-bottom:10px}
 .blend-dials-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
 .blend-dial{background:var(--s1);border:1px solid var(--b2);border-radius:var(--r2);padding:10px}
-.blend-dial-label{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:6px}
+.blend-dial-label{font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:4px}
+.blend-dial-help{font-size:10px;color:var(--tx4);line-height:1.4;margin-bottom:8px;font-style:italic}
 .blend-dial-pills{display:flex;gap:4px;background:var(--s3);border-radius:99px;padding:3px}
 .blend-pill{flex:1;padding:6px 8px;font-size:10px;font-weight:600;color:var(--tx3);background:transparent;border:none;border-radius:99px;cursor:pointer;font-family:var(--font);transition:all .15s;min-height:32px}
 .blend-pill:hover{color:var(--tx1);background:rgba(255,255,255,0.04)}
@@ -958,6 +967,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
   .blend-clear{min-height:44px!important;min-width:44px!important;padding:6px 12px!important;font-size:13px!important}
   .blend-pill{min-height:44px;font-size:11px}
 }
+
+/* TTS speaker button (Wave 5) — uses existing .btn-sm chrome.
+   .speaking class lights it up while speechSynthesis is active. */
+.tts-btn.speaking{color:var(--cyan);border-color:var(--cyan)}
 .az-controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:18px}
 @media(max-width:540px){.az-controls{grid-template-columns:1fr}}
 .sggrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -5455,6 +5468,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           </div>
           <div class="blend-slot-search">
             <input id="blend-A-search" type="text" class="az-search-input" placeholder="Search Song A — e.g. Hotline Bling" aria-label="Search for Song A" onkeydown="if(event.key==='Enter')blendAnalyzeSlot('A')">
+            <button type="button" class="mic-btn" id="blend-A-mic-btn" onclick="toggleMicFor('blend-A-mic-btn','blend-A-search','inline')" aria-label="Speak Song A name" title="Speak Song A name" style="font-size:15px;padding:5px 9px">🎤</button>
             <button type="button" class="az-search-btn" id="blend-A-btn" onclick="blendAnalyzeSlot('A')">🔬 Analyze</button>
           </div>
           <div id="blend-A-card" class="blend-dna-card" style="display:none" aria-live="polite"></div>
@@ -5467,6 +5481,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           </div>
           <div class="blend-slot-search">
             <input id="blend-B-search" type="text" class="az-search-input" placeholder="Search Song B — e.g. The Less I Know The Better" aria-label="Search for Song B" onkeydown="if(event.key==='Enter')blendAnalyzeSlot('B')">
+            <button type="button" class="mic-btn" id="blend-B-mic-btn" onclick="toggleMicFor('blend-B-mic-btn','blend-B-search','inline')" aria-label="Speak Song B name" title="Speak Song B name" style="font-size:15px;padding:5px 9px">🎤</button>
             <button type="button" class="az-search-btn" id="blend-B-btn" onclick="blendAnalyzeSlot('B')">🔬 Analyze</button>
           </div>
           <div id="blend-B-card" class="blend-dna-card" style="display:none" aria-live="polite"></div>
@@ -5475,13 +5490,27 @@ body.craft-advanced .craft-basic-only{display:none !important}
 
       <!-- DIMENSION DIALS — only shown after both songs analyzed -->
       <div id="blend-dials" class="blend-dials" style="display:none">
-        <div class="blend-dials-title">Per-dimension blend — pick which song each lever leans toward</div>
+        <!-- MODE TOGGLE: Mashup vs Influence -->
+        <div class="blend-mode-row">
+          <div class="blend-mode-pills" role="group" aria-label="Blend mode">
+            <button type="button" class="blend-mode-pill on" data-mode="mashup" aria-pressed="true" onclick="blendSetMode('mashup')" title="Literal hybrid — A's hook + B's chord progression, etc.">🔀 Mashup</button>
+            <button type="button" class="blend-mode-pill" data-mode="influence" aria-pressed="false" onclick="blendSetMode('influence')" title="Extract the scientific + musical principles that make each song work, apply them to a brand-new song">🧠 Influence</button>
+          </div>
+          <div id="blend-mode-help" class="blend-mode-help">Mashup: literal blend — surface elements from each song combine.</div>
+        </div>
+        <div class="blend-dials-title" id="blend-dials-title">Per-dimension blend — pick which song each lever leans toward</div>
         <!-- Filled in by buildBlendDials() -->
         <div id="blend-dials-grid" class="blend-dials-grid"></div>
 
         <!-- TWIST + OVERRIDES -->
         <div class="fld" style="margin-top:14px">
-          <label>Your twist — what's NEW (optional)</label>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:6px;flex-wrap:wrap">
+            <label style="margin:0">Your twist — what's NEW (optional)</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button type="button" class="btn btn-sm btn-amber" onclick="pasteBlendTwist()" title="Paste from clipboard">📋 Paste</button>
+              <button type="button" class="mic-btn" id="blend-twist-mic-btn" onclick="toggleMicFor('blend-twist-mic-btn','blend-twist','lines')" aria-label="Dictate your twist" title="Dictate your twist" style="font-size:15px;padding:3px 8px">🎤</button>
+            </div>
+          </div>
           <textarea id="blend-twist" rows="3" placeholder="e.g. Make it about choosing to walk away even though they want you back… add a gospel bridge… cap it at 2.5 minutes" style="width:100%;background:var(--s1);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:10px;font-size:13px;resize:vertical"></textarea>
         </div>
 
@@ -5518,7 +5547,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
           </div>
           <div class="fld">
             <label>Target mood override (optional)</label>
-            <input id="blend-target-mood" type="text" placeholder="e.g. confident, longing, defiant" style="width:100%;background:var(--s1);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:8px 10px;font-size:13px">
+            <div style="display:flex;gap:6px;align-items:center">
+              <input id="blend-target-mood" type="text" placeholder="e.g. confident, longing, defiant" style="flex:1;background:var(--s1);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:8px 10px;font-size:13px">
+              <button type="button" class="mic-btn" id="blend-target-mood-mic-btn" onclick="toggleMicFor('blend-target-mood-mic-btn','blend-target-mood','inline')" aria-label="Speak target mood" title="Speak target mood" style="font-size:15px;padding:5px 9px;flex-shrink:0">🎤</button>
+            </div>
           </div>
         </div>
 
@@ -13854,24 +13886,105 @@ VIDEO PROMPT:
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// 🔊 TEXT-TO-SPEECH — speechSynthesis helper (Wave 5 addition)
+// ───────────────────────────────────────────────────────────────────────────
+// Speech-to-text already exists app-wide via toggleMicFor(btnId, targetId, mode);
+// that's the canonical pattern used everywhere mics appear (Editor, Topic
+// inputs, campaign briefs, album briefs, etc.). The new Blend Songs inputs
+// hook into that same function — one shared system.
+//
+// What was missing was TTS (read-aloud). speakText() below is browser-native,
+// no API key, broad support. Used by blendToggleTTS() to read the generated
+// blend lyrics aloud. Bracket tags ([Verse 1], [Chorus]) are stripped so the
+// reader doesn't pronounce them literally.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function speakText(text, opts) {
+  opts = opts || {};
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
+    if (typeof toast === 'function') toast('🔊 Text-to-speech not supported in this browser');
+    return { stop: function () {}, isSpeaking: function () { return false; } };
+  }
+  const btn = opts.button || null;
+  // Toggle: if something is already speaking, cancel first.
+  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+    window.speechSynthesis.cancel();
+    if (btn) btn.classList.remove('speaking');
+  }
+  const clean = String(text || '').replace(/\[.*?\]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!clean) return { stop: function () {}, isSpeaking: function () { return false; } };
+  const u = new SpeechSynthesisUtterance(clean);
+  u.lang  = opts.lang  || (navigator.language || 'en-US');
+  u.rate  = opts.rate  || 1.0;
+  u.pitch = opts.pitch || 1.0;
+  u.volume= opts.volume|| 1.0;
+  u.onstart = function () { if (btn) btn.classList.add('speaking'); };
+  u.onend   = function () { if (btn) btn.classList.remove('speaking'); };
+  u.onerror = function () { if (btn) btn.classList.remove('speaking'); };
+  window.speechSynthesis.speak(u);
+  return {
+    stop: function () { window.speechSynthesis.cancel(); if (btn) btn.classList.remove('speaking'); },
+    isSpeaking: function () { return window.speechSynthesis.speaking; }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // 🔀 SONG BLEND (Wave 5) — two analyzed songs + per-dimension dials + twist
 // ═══════════════════════════════════════════════════════════════════════════
 
 S.blend = {
   songA: null,
   songB: null,
+  mode: 'mashup', // 'mashup' (literal hybrid) | 'influence' (mechanism extraction)
   weights: { hook:0, structure:0, lyric:0, vocal:0, production:0, bpmKey:0, mood:0 }
 };
 
-const _BLEND_DIMS = [
-  { key:'hook',       label:'Hook',          icon:'🎣' },
-  { key:'structure',  label:'Structure',     icon:'📐' },
-  { key:'lyric',      label:'Lyric Register',icon:'✍️' },
-  { key:'vocal',      label:'Vocal Delivery',icon:'🎤' },
-  { key:'production', label:'Production',    icon:'🎛' },
-  { key:'bpmKey',     label:'BPM / Key',     icon:'⏱' },
-  { key:'mood',       label:'Mood',          icon:'💛' }
+// Per-mode dial labels — must mirror api/_brain.js _BLEND_DIMS_MASHUP / _INFLUENCE
+// so the UI matches what the backend prompt says. Same keys, different framing.
+const _BLEND_DIMS_MASHUP = [
+  { key:'hook',       label:'Hook',                 icon:'🎣', help:'Chorus shape, repeats, payoff line, melodic contour' },
+  { key:'structure',  label:'Structure',            icon:'📐', help:'Section order, bar counts, bridge placement, intro/outro' },
+  { key:'lyric',      label:'Lyric Register',       icon:'✍️', help:'Vocabulary, imagery, persona, rhyme architecture' },
+  { key:'vocal',      label:'Vocal Delivery',       icon:'🎤', help:'Cadence, ad-libs, falsetto vs chest, melisma vs rap' },
+  { key:'production', label:'Production',           icon:'🎛', help:'Instrument palette, drum pattern, FX, mix character' },
+  { key:'bpmKey',     label:'BPM / Key',            icon:'⏱',  help:'Tempo, key center, time sig, harmonic palette' },
+  { key:'mood',       label:'Mood',                 icon:'💛', help:'Overall feeling, tension/release, where it sits emotionally' }
 ];
+const _BLEND_DIMS_INFLUENCE = [
+  { key:'hook',       label:'Hook Mechanism',       icon:'🧬', help:'The dopamine trigger / earworm device — the WHY behind catchiness' },
+  { key:'structure',  label:'Structural Device',    icon:'🏗',  help:'The architectural innovation — surprise placement, dynamic-shape strategy' },
+  { key:'lyric',      label:'Lyric Mechanism',      icon:'📜', help:'Rhetorical move + density curve + perspective system' },
+  { key:'vocal',      label:'Vocal Mechanism',      icon:'🗣',  help:'Register-switch logic, breath cadence, melisma-vs-rap principle' },
+  { key:'production', label:'Production Psychoacoustic', icon:'🔬', help:'Frequency profile / panning / FX-character SIGNATURE' },
+  { key:'bpmKey',     label:'Tempo & Harmonic Device', icon:'⚛',  help:'Rhythm-pocket science + harmonic-surprise mechanism' },
+  { key:'mood',       label:'Emotional Mechanism',  icon:'💫', help:'Cultural-function trigger — what NEED the song fulfilled' }
+];
+function _blendDims() { return S.blend.mode === 'influence' ? _BLEND_DIMS_INFLUENCE : _BLEND_DIMS_MASHUP; }
+// Backwards-compat alias — old code may still reference _BLEND_DIMS.
+const _BLEND_DIMS = _BLEND_DIMS_MASHUP;
+
+function blendSetMode(mode) {
+  if (mode !== 'mashup' && mode !== 'influence') return;
+  S.blend.mode = mode;
+  // Update toggle pill UI
+  document.querySelectorAll('.blend-mode-pill').forEach(function (p) {
+    const on = p.getAttribute('data-mode') === mode;
+    p.classList.toggle('on', on);
+    p.setAttribute('aria-pressed', String(on));
+  });
+  // Update help text
+  const helpEl = document.getElementById('blend-mode-help');
+  if (helpEl) helpEl.textContent = mode === 'influence'
+    ? 'Influence: extracts the scientific + musical mechanisms that make each song work, applies those PRINCIPLES to a brand-new song. The result is its own song — no borrowed lyrics, hooks, or chord progressions.'
+    : 'Mashup: literal blend — surface elements from each song combine according to the dial leans.';
+  // Update dial section title
+  const titleEl = document.getElementById('blend-dials-title');
+  if (titleEl) titleEl.textContent = mode === 'influence'
+    ? 'Per-axis MECHANISM lean — pick which song each principle inherits from'
+    : 'Per-dimension blend — pick which song each lever leans toward';
+  // Re-render dials with the new labels
+  if (S.blend.songA && S.blend.songB) buildBlendDials();
+}
 
 function _blendResearchPrompt(q) {
   // Mirrors the searchSong research format so the parsed fields line up.
@@ -13978,7 +14091,10 @@ async function blendAnalyzeSlot(which) {
           '<div class="blend-dna-title">' + escHtml(song.title) + '</div>' +
           '<div class="blend-dna-meta">' + escHtml(song.artist) + (song.year ? ' · ' + escHtml(song.year) : '') + (song.bpm ? ' · ' + escHtml(song.bpm) + ' BPM' : '') + (song.key ? ' · ' + escHtml(song.key) : '') + '</div>' +
         '</div>' +
-        '<span class="bdg bdg-gold">' + escHtml(song.genre) + '</span>' +
+        '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
+          '<span class="bdg bdg-gold">' + escHtml(song.genre) + '</span>' +
+          '<button class="btn btn-sm" onclick="copyBlendDna(\'' + which + '\')" aria-label="Copy Song ' + which + ' DNA" title="Copy full DNA to clipboard" style="font-size:11px">📋 Copy</button>' +
+        '</div>' +
       '</div>' +
       (song.structure ? '<div class="blend-dna-struct">📐 ' + escHtml(song.structure) + '</div>' : '') +
       '<details class="blend-dna-details"><summary>Full DNA</summary><div class="blend-dna-full">' + escHtml(raw).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</div></details>';
@@ -14013,17 +14129,17 @@ function buildBlendDials() {
   if (!grid) return;
   const aTitle = S.blend.songA?.title || 'A';
   const bTitle = S.blend.songB?.title || 'B';
-  // Tri-state toggle group — using aria-pressed (not radiogroup) since we
-  // don't implement the full WAI-ARIA radiogroup arrow-key pattern. Each pill
-  // is a plain button reachable via Tab; aria-pressed announces the state.
-  grid.innerHTML = _BLEND_DIMS.map(function (d) {
+  const dims = _blendDims();
+  grid.innerHTML = dims.map(function (d) {
     const w = S.blend.weights[d.key];
-    const dimAria = escHtml(d.label) + ' blend lean: ';
+    const dimAria = escHtml(d.label) + ' lean: ';
+    const helpHtml = d.help ? '<div class="blend-dial-help">' + escHtml(d.help) + '</div>' : '';
     return '<div class="blend-dial">' +
       '<div class="blend-dial-label" id="blend-dial-' + d.key + '-label">' + d.icon + ' ' + escHtml(d.label) + '</div>' +
+      helpHtml +
       '<div class="blend-dial-pills" role="group" aria-labelledby="blend-dial-' + d.key + '-label">' +
         '<button type="button" aria-pressed="' + (w === -1) + '" class="blend-pill ' + (w === -1 ? 'on' : '') + '" onclick="blendSetDimWeight(\'' + d.key + '\', -1)" aria-label="' + dimAria + 'Lean toward ' + escHtml(aTitle) + '" title="Lean toward ' + escHtml(aTitle) + '">Lean A</button>' +
-        '<button type="button" aria-pressed="' + (w === 0)  + '" class="blend-pill ' + (w === 0  ? 'on' : '') + '" onclick="blendSetDimWeight(\'' + d.key + '\', 0)"  aria-label="' + dimAria + 'Balanced" title="Balanced blend">Balanced</button>' +
+        '<button type="button" aria-pressed="' + (w === 0)  + '" class="blend-pill ' + (w === 0  ? 'on' : '') + '" onclick="blendSetDimWeight(\'' + d.key + '\', 0)"  aria-label="' + dimAria + 'Balanced" title="Balanced">Balanced</button>' +
         '<button type="button" aria-pressed="' + (w === 1)  + '" class="blend-pill ' + (w === 1  ? 'on' : '') + '" onclick="blendSetDimWeight(\'' + d.key + '\', 1)"  aria-label="' + dimAria + 'Lean toward ' + escHtml(bTitle) + '" title="Lean toward ' + escHtml(bTitle) + '">Lean B</button>' +
       '</div>' +
     '</div>';
@@ -14066,7 +14182,10 @@ function blendSwapAB() {
           '<div class="blend-dna-title">' + escHtml(song.title) + '</div>' +
           '<div class="blend-dna-meta">' + escHtml(song.artist) + (song.year ? ' · ' + escHtml(song.year) : '') + (song.bpm ? ' · ' + escHtml(song.bpm) + ' BPM' : '') + (song.key ? ' · ' + escHtml(song.key) : '') + '</div>' +
         '</div>' +
-        '<span class="bdg bdg-gold">' + escHtml(song.genre) + '</span>' +
+        '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
+          '<span class="bdg bdg-gold">' + escHtml(song.genre) + '</span>' +
+          '<button class="btn btn-sm" onclick="copyBlendDna(\'' + w + '\')" aria-label="Copy Song ' + w + ' DNA" title="Copy full DNA to clipboard" style="font-size:11px">📋 Copy</button>' +
+        '</div>' +
       '</div>' +
       (song.structure ? '<div class="blend-dna-struct">📐 ' + escHtml(song.structure) + '</div>' : '') +
       '<details class="blend-dna-details"><summary>Full DNA</summary><div class="blend-dna-full">' + escHtml(song.analysis).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</div></details>';
@@ -14074,8 +14193,41 @@ function blendSwapAB() {
   blendUpdateUI();
 }
 
+// Copy the analyzed DNA for a slot. Composes a clean header from the
+// structured fields (title / artist / year / genre / BPM / key / structure)
+// + the full analysis body — same shape as S._presetAnalysisText / the
+// search analyzer's clipboard payload, so users get consistent copy text
+// across the analyzer and the blend slots.
+function copyBlendDna(which) {
+  const song = S.blend[which === 'A' ? 'songA' : 'songB'];
+  if (!song) { toast('Analyze Song ' + which + ' first'); return; }
+  const header =
+    song.title + (song.artist ? ' by ' + song.artist : '') + (song.year ? ' (' + song.year + ')' : '') +
+    (song.bpm   ? ' · ' + song.bpm + ' BPM' : '') +
+    (song.key   ? ' · Key of ' + song.key  : '') +
+    (song.genre ? ' · Genre: ' + song.genre : '');
+  const struct = song.structure ? '\nStructure: ' + song.structure : '';
+  const body   = song.analysis ? '\n\n' + song.analysis : '';
+  safeCopy(header + struct + body, 'Song ' + which + ' DNA');
+}
+
 // In-flight guard so a user mashing Generate doesn't fire concurrent blends
 let _blendInflight = false;
+
+// TTS toggle for the blend output. Reads the lyrics aloud — bracket tags
+// like [Verse 1] / [Chorus] are stripped inside speakText() so they don't
+// get pronounced literally. Click again to stop.
+let _blendTTSHandle = null;
+function blendToggleTTS(btn) {
+  if (_blendTTSHandle && _blendTTSHandle.isSpeaking && _blendTTSHandle.isSpeaking()) {
+    _blendTTSHandle.stop();
+    _blendTTSHandle = null;
+    return;
+  }
+  const text = S._blendLyrics || S._blendRaw || '';
+  if (!text) { toast('No lyrics to read'); return; }
+  _blendTTSHandle = speakText(text, { button: btn });
+}
 
 async function blendGenerate() {
   if (_blendInflight) return;
@@ -14083,10 +14235,12 @@ async function blendGenerate() {
   _blendInflight = true;
   btnLoad('blend-generate-btn', 'Blending…');
   const out = document.getElementById('blend-out');
-  out.innerHTML = '<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Synthesizing hybrid DNA from "' + escHtml(S.blend.songA.title) + '" × "' + escHtml(S.blend.songB.title) + '"…</span></div></div>';
+  const _modeLabel = (S.blend.mode === 'influence') ? '🧠 Extracting influence mechanisms from' : '🔀 Synthesizing hybrid DNA from';
+  out.innerHTML = '<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">' + _modeLabel + ' "' + escHtml(S.blend.songA.title) + '" × "' + escHtml(S.blend.songB.title) + '"…</span></div></div>';
   const params = {
     songA: S.blend.songA,
     songB: S.blend.songB,
+    mode: S.blend.mode || 'mashup',
     weights: S.blend.weights,
     twist: (document.getElementById('blend-twist')?.value || '').trim(),
     targetGenre: (document.getElementById('blend-target-genre')?.value || '').trim(),
@@ -14098,10 +14252,11 @@ async function blendGenerate() {
     };
     const result = await callServerStream('blend', params, cb);
     const raw = result?.text || '';
-    // Parse out the canonical sections for copy buttons
+    // Parse out the canonical sections for copy buttons. Influence mode emits
+    // an "INFLUENCE NOTES:" header; mashup emits "BLEND NOTES:". Match either.
     const titleMatch  = raw.match(/(?:^|\n)TITLE:\s*(.+)/);
-    const verdictMatch= raw.match(/(?:^|\n)VERDICT:\s*([\s\S]*?)(?=\n\n|\nBLEND NOTES:|\nHOOK ISOLATION:)/);
-    const blendNotesMatch = raw.match(/(?:^|\n)BLEND NOTES:\s*([\s\S]*?)(?=\n\n[A-Z]|\nHOOK ISOLATION:)/);
+    const verdictMatch= raw.match(/(?:^|\n)VERDICT:\s*([\s\S]*?)(?=\n\n|\n(?:BLEND|INFLUENCE) NOTES:|\nHOOK ISOLATION:)/);
+    const blendNotesMatch = raw.match(/(?:^|\n)(?:BLEND|INFLUENCE) NOTES:\s*([\s\S]*?)(?=\n\n[A-Z]|\nHOOK ISOLATION:)/);
     const hookMatch   = raw.match(/(?:^|\n)HOOK ISOLATION:\s*([\s\S]*?)(?=\n\n[A-Z]|\nLYRICS:)/);
     const lyricsMatch = raw.match(/(?:^|\n)LYRICS:\s*([\s\S]*?)(?=\n\n[A-Z]|\nSONG PROMPT:)/);
     const promptMatch = raw.match(/(?:^|\n)SONG PROMPT:\s*([\s\S]*?)(?=\n\n[A-Z]|\nPRODUCTION BRIEF:)/);
@@ -14114,28 +14269,43 @@ async function blendGenerate() {
     const promptText  = promptMatch ? promptMatch[1].trim() : '';
     const briefText   = briefMatch ? briefMatch[1].trim() : '';
     // Stash for safe copy (avoid template literal injection)
-    S._blendTitle  = title;
-    S._blendLyrics = lyricsText;
-    S._blendPrompt = promptText;
-    S._blendBrief  = briefText;
-    S._blendRaw    = raw;
+    S._blendTitle    = title;
+    S._blendVerdict  = verdict;
+    S._blendNotes    = blendNotes;
+    S._blendHook     = hookText;
+    S._blendLyrics   = lyricsText;
+    S._blendPrompt   = promptText;
+    S._blendBrief    = briefText;
+    S._blendRaw      = raw;
     out.innerHTML =
       '<div class="card" style="border-left:3px solid var(--cyan)">' +
         '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;flex-wrap:wrap;gap:8px">' +
           '<div>' +
-            '<div style="font-size:16px;font-weight:700;color:var(--cyan)">🔀 ' + escHtml(title) + '</div>' +
-            '<div style="font-size:11px;color:var(--tx4);margin-top:2px">"' + escHtml(S.blend.songA.title) + '" × "' + escHtml(S.blend.songB.title) + '"</div>' +
+            '<div style="font-size:16px;font-weight:700;color:var(--cyan)">' + (S.blend.mode === 'influence' ? '🧠' : '🔀') + ' ' + escHtml(title) + '</div>' +
+            '<div style="font-size:11px;color:var(--tx4);margin-top:2px">' + (S.blend.mode === 'influence' ? 'Influence-derived from ' : '') + '"' + escHtml(S.blend.songA.title) + '" × "' + escHtml(S.blend.songB.title) + '"</div>' +
           '</div>' +
           '<div style="display:flex;gap:6px;flex-wrap:wrap">' +
             (lyricsText ? '<button class="btn btn-sm" onclick="safeCopy(S._blendLyrics,\'Lyrics\')">📋 Lyrics</button>' : '') +
             (promptText ? '<button class="btn btn-sm" onclick="safeCopy(S._blendPrompt,\'Prompt\')">📋 Prompt</button>' : '') +
             (briefText  ? '<button class="btn btn-sm" onclick="safeCopy(S._blendBrief,\'Brief\')">📋 Brief</button>'   : '') +
             '<button class="btn btn-sm" onclick="safeCopy(S._blendRaw,\'Full output\')">📋 All</button>' +
+            (lyricsText ? '<button class="btn btn-sm tts-btn" id="blend-tts-btn" onclick="blendToggleTTS(this)" aria-label="Read lyrics aloud" title="Read lyrics aloud">🔊 Read</button>' : '') +
           '</div>' +
         '</div>' +
-        (verdict ? '<div style="background:var(--s1);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--tx2);border-left:3px solid var(--cyan)">' + escHtml(verdict) + '</div>' : '') +
-        (blendNotes ? '<div style="background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--tx3);border:1px dashed var(--b2)"><b style="color:var(--cyan);font-size:10px;text-transform:uppercase;letter-spacing:.05em">Blend Notes</b><br>' + escHtml(blendNotes) + '</div>' : '') +
-        (hookText ? '<div style="background:var(--amberbg,rgba(251,191,36,0.06));border:1px solid var(--amberline,rgba(251,191,36,0.25));border-radius:8px;padding:10px 12px;margin-bottom:10px"><div style="font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Hook Isolation</div><div style="font-size:13px;line-height:1.6;white-space:pre-wrap">' + escHtml(hookText) + '</div></div>' : '') +
+        (verdict ? '<div style="background:var(--s1);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:var(--tx2);border-left:3px solid var(--cyan);position:relative">' +
+          '<button class="btn btn-sm" onclick="safeCopy(S._blendVerdict,\'Verdict\')" aria-label="Copy verdict" title="Copy verdict" style="position:absolute;top:6px;right:6px;font-size:10px;padding:2px 8px;min-height:28px">📋</button>' +
+          '<div style="padding-right:36px">' + escHtml(verdict) + '</div>' +
+        '</div>' : '') +
+        (blendNotes ? '<div style="background:var(--s2);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:11px;color:var(--tx3);border:1px dashed var(--b2);position:relative">' +
+          '<button class="btn btn-sm" onclick="safeCopy(S._blendNotes,\'' + (S.blend.mode === 'influence' ? 'Influence Notes' : 'Blend Notes') + '\')" aria-label="Copy notes" title="Copy notes" style="position:absolute;top:4px;right:6px;font-size:10px;padding:2px 8px;min-height:28px">📋</button>' +
+          '<b style="color:var(--cyan);font-size:10px;text-transform:uppercase;letter-spacing:.05em">' + (S.blend.mode === 'influence' ? 'Influence Notes' : 'Blend Notes') + '</b>' +
+          '<div style="padding-right:36px">' + escHtml(blendNotes) + '</div>' +
+        '</div>' : '') +
+        (hookText ? '<div style="background:var(--amberbg,rgba(251,191,36,0.06));border:1px solid var(--amberline,rgba(251,191,36,0.25));border-radius:8px;padding:10px 12px;margin-bottom:10px;position:relative">' +
+          '<button class="btn btn-sm" onclick="safeCopy(S._blendHook,\'Hook\')" aria-label="Copy hook" title="Copy hook to clipboard" style="position:absolute;top:6px;right:6px;font-size:10px;padding:2px 8px;min-height:28px">📋 Hook</button>' +
+          '<div style="font-size:10px;color:var(--amber);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Hook Isolation</div>' +
+          '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;padding-right:64px">' + escHtml(hookText) + '</div>' +
+        '</div>' : '') +
         '<div style="font-size:13px;line-height:1.8;white-space:pre-wrap">' + escHtml(raw).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</div>' +
       '</div>';
     toast('✓ Blend generated');
@@ -17553,6 +17723,20 @@ async function pasteAlbBrief() {
     ta.value = text;
     ta.focus();
     toast('✓ Pasted into album brief');
+  } catch(e) {
+    toast('Paste failed — use Ctrl+V / Cmd+V directly in the field');
+  }
+}
+
+async function pasteBlendTwist() {
+  try {
+    const text = await navigator.clipboard.readText();
+    if (!text.trim()) { toast('Clipboard is empty'); return; }
+    const ta = document.getElementById('blend-twist');
+    if (!ta) return;
+    ta.value = text;
+    ta.focus();
+    toast('✓ Pasted into twist');
   } catch(e) {
     toast('Paste failed — use Ctrl+V / Cmd+V directly in the field');
   }

@@ -8352,15 +8352,87 @@ ${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNot
 // SONG BLEND — two analyzed songs + per-dimension blend weights + user twist
 // ────────────────────────────────────────────────────────────────────────────
 // Wave 5: Where Lucky blends GENRES, Song Blend blends two SPECIFIC SONGS.
-// The user analyzes Song A and Song B in the Analyzer, picks per-dimension
-// lean (hook / structure / lyric / vocal / production / bpm-key / mood),
-// adds a twist, and gets a hybrid that recognizably echoes both sources but
-// isn't a cover or a mash-up.
+// Wave 5.1: TWO MODES.
 //
-// Reuses the Wave 4 craft stack (firewall, metaphor balance, metaphor palette,
-// cross-style borrow when source genres differ) and the canonical TITLE / VERDICT
-// / HOOK ISOLATION / LYRICS / SONG PROMPT / PRODUCTION BRIEF output format.
+//   🔀 MASHUP    — literal hybrid. "Take A's hook + B's chord prog" — surface
+//                  elements get spliced according to dimension dials. Output
+//                  recognizably echoes both sources.
+//
+//   🧠 INFLUENCE — mechanism extraction. The model identifies the SCIENTIFIC
+//                  + MUSICALITY reasons each song works (5-axis formula
+//                  below) and applies those PRINCIPLES to a brand-new song
+//                  built from the user's twist + target genre + mood. The
+//                  output should NOT sound like a hybrid — it should sound
+//                  like its own song that learned from both at the principle
+//                  level.
+//
+// Influence mode is genre-agnostic by design: it operates at the abstract
+// mechanism layer rather than against hand-authored palettes, so every genre
+// + every rap substyle + every other substyle works automatically. The model
+// reads the source song's substyle/subgenre from the user-supplied analysis.
 // ════════════════════════════════════════════════════════════════════════════
+
+// THE INFLUENCE FORMULA — 5-axis mechanism extraction.
+// Reused as a directive injected into the influence-mode prompt.
+const INFLUENCE_FORMULA = `THE INFLUENCE FORMULA (5-axis mechanism extraction):
+
+For each reference song, identify the underlying MECHANISMS — the scientific
+and musical principles that make it work — across all five axes. Then apply
+those PRINCIPLES (not the surface elements) to write a NEW song.
+
+AXIS 1 — NEURO TRIGGERS (the science of why the brain locks on):
+  • Dopamine prediction-error: where does the song violate then satisfy expectation?
+  • Zeigarnik tension: open loops that demand resolution (unresolved phrases, bait-and-switch).
+  • Frequency stickiness: the earworm mechanism — what makes it loop in the head?
+  • Identity activation: the "this is me" line that makes a listener claim it.
+  • Mirror-neuron recruitment: ad-libs / call-and-response / chants that invite participation.
+
+AXIS 2 — MUSICAL DEVICES (the craft of why the ear locks on):
+  • Harmonic move: the chord shift that signs the song (the surprise turnaround, the modal interchange).
+  • Rhythmic signature: the lock between drums and bass — where the swing/syncopation/ghost-notes live.
+  • Melodic contour: rising / falling / static / leap-then-step — the shape ear-trains the listener.
+  • Vocal architecture: range, register switches (chest→falsetto), melisma points, breath cadence.
+  • Dynamic shape: where the energy peaks, where it pulls back, what makes the contrast land.
+
+AXIS 3 — LYRIC ARCHITECTURE (the writing mechanism):
+  • Rhetorical move: turn / callback / list / antithesis / repetition-with-twist / volta / pivot.
+  • Perspective system: 1st / 2nd / 3rd person, who's speaking to whom, where the gaze sits.
+  • Imagery domain: the metaphor field — the SENTIMENT each metaphor carries.
+  • Density curve: sparse-to-dense or dense-to-sparse across the song; where the words breathe.
+
+AXIS 4 — CULTURAL FUNCTION (why-it-mattered to its audience):
+  • Emotional need fulfilled: catharsis / validation / escapism / defiance / connection / mourning / celebration.
+  • Moment-in-time it spoke to (era signature without naming the era).
+  • Social mechanism: we-feeling / us-vs-them / lone-truth / shared-pain / individual triumph.
+
+AXIS 5 — PRODUCTION PSYCHOACOUSTICS (the sound design):
+  • Frequency profile: where the song lives in the spectrum — bass-led / mid-forward / air-on-top.
+  • Panning architecture: mono center vs wide stereo, where each element sits in the field.
+  • FX signatures: the reverb tail, the gated snare, the saturation character, the delay throw.
+  • Loudness/dynamics: compression character, transient handling, the "wall-vs-breath" feel.
+
+THE FORMULA:
+  INFLUENCE_OUTPUT(songA, songB, user_inputs)
+    = synthesize(
+        mechanism_set(songA) ∪ mechanism_set(songB),
+        applied_to user_inputs={twist, targetGenre, targetMood, dimensionWeights}
+      )
+
+The dimension weights apply at the MECHANISM level — "Lean A on Hook" means
+"use A's hook MECHANISM (e.g. the descending major-7 melody resolving to
+tonic on the downbeat)" — NOT "use A's actual hook lyrics or melody."
+
+THE CONSTRAINTS — what influence mode MUST NOT do:
+  ✗ Do NOT borrow specific lyrics from A or B
+  ✗ Do NOT copy melodies, hook lines, or chord progressions verbatim
+  ✗ Do NOT name either source artist or song in the output
+  ✗ Do NOT make the output sound like "A meets B" — it should stand alone
+
+THE GOAL:
+  ✓ Use the same craft mechanisms that made A and B work
+  ✓ Apply them fresh, to the user's specific twist / genre / mood
+  ✓ Result feels like a third song built on solid principles — listeners
+    should think "this song works" without reaching for "this is A meets B"`;
 
 function _blendWeightLabel(w, aTitle, bTitle) {
   // Tri-state UI sends -1 / 0 / +1; we accept any number in [-1, 1] for future
@@ -8373,31 +8445,47 @@ function _blendWeightLabel(w, aTitle, bTitle) {
   return `SLIGHT B — mostly "${bTitle}" but blended with "${aTitle}".`;
 }
 
+// Dimension labels per mode — Mashup talks about SURFACE elements, Influence
+// talks about MECHANISM CLASSES at the same axis.
+const _BLEND_DIMS_MASHUP = [
+  { key: 'hook',       label: 'HOOK ARCHITECTURE',     desc: 'the chorus shape, repeats, payoff line, melodic contour' },
+  { key: 'structure',  label: 'SECTION STRUCTURE',     desc: 'verse/pre/chorus order, bar counts, bridge placement, intro/outro logic' },
+  { key: 'lyric',      label: 'LYRIC REGISTER',        desc: 'vocabulary, imagery, persona, density, rhyme architecture' },
+  { key: 'vocal',      label: 'VOCAL DELIVERY',        desc: 'cadence, ad-libs, falsetto vs chest, melisma vs rap, breath patterns' },
+  { key: 'production', label: 'PRODUCTION DNA',        desc: 'instrument palette, drum pattern, FX signatures, mix character' },
+  { key: 'bpmKey',     label: 'TEMPO & KEY FEEL',      desc: 'BPM range, key center, time signature, harmonic palette' },
+  { key: 'mood',       label: 'EMOTIONAL TONE',        desc: 'overall feeling, tension/release, where it sits emotionally' }
+];
+const _BLEND_DIMS_INFLUENCE = [
+  { key: 'hook',       label: 'HOOK MECHANISM',        desc: 'the dopamine trigger / earworm device — the WHY behind the catchiness' },
+  { key: 'structure',  label: 'STRUCTURAL DEVICE',     desc: 'the architectural innovation — section length games, surprise placement, dynamic-shape strategy' },
+  { key: 'lyric',      label: 'LYRIC MECHANISM',       desc: 'the rhetorical move + density curve + perspective system that powers the writing' },
+  { key: 'vocal',      label: 'VOCAL MECHANISM',       desc: 'the register-switch logic, the breath cadence, the melisma-vs-rap principle' },
+  { key: 'production', label: 'PRODUCTION PSYCHOACOUSTIC', desc: 'the frequency-profile / panning / FX-character SIGNATURE that makes the sound stick' },
+  { key: 'bpmKey',     label: 'TEMPO & HARMONIC DEVICE', desc: 'the rhythm-pocket science + the harmonic-surprise mechanism (modal interchange, secondary dominants, etc.)' },
+  { key: 'mood',       label: 'EMOTIONAL MECHANISM',   desc: 'the cultural-function trigger — what NEED the song fulfilled and how it activated it' }
+];
+
 function buildSongBlendPrompt(params) {
   const p = params || {};
+  const mode = (p.mode === 'influence') ? 'influence' : 'mashup';
   const songA = p.songA || {};
   const songB = p.songB || {};
   const aTitle  = sanitizeInput(songA.title  || 'Song A', 120);
   const aArtist = sanitizeInput(songA.artist || 'unknown', 80);
   const aYear   = sanitizeInput(String(songA.year || ''), 12);
   const aGenre  = sanitizeInput(songA.genre  || 'pop', 30);
+  const aSubstyle = sanitizeInput(songA.substyle || '', 60);
   const aDna    = sanitizeInput(songA.analysis || '', 12000);
   const bTitle  = sanitizeInput(songB.title  || 'Song B', 120);
   const bArtist = sanitizeInput(songB.artist || 'unknown', 80);
   const bYear   = sanitizeInput(String(songB.year || ''), 12);
   const bGenre  = sanitizeInput(songB.genre  || 'pop', 30);
+  const bSubstyle = sanitizeInput(songB.substyle || '', 60);
   const bDna    = sanitizeInput(songB.analysis || '', 12000);
 
   const w = p.weights || {};
-  const dims = [
-    { key: 'hook',       label: 'HOOK ARCHITECTURE',     desc: 'the chorus shape, repeats, payoff line, melodic contour' },
-    { key: 'structure',  label: 'SECTION STRUCTURE',     desc: 'verse/pre/chorus order, bar counts, bridge placement, intro/outro logic' },
-    { key: 'lyric',      label: 'LYRIC REGISTER',        desc: 'vocabulary, imagery, persona, density, rhyme architecture' },
-    { key: 'vocal',      label: 'VOCAL DELIVERY',        desc: 'cadence, ad-libs, falsetto vs chest, melisma vs rap, breath patterns' },
-    { key: 'production', label: 'PRODUCTION DNA',        desc: 'instrument palette, drum pattern, FX signatures, mix character' },
-    { key: 'bpmKey',     label: 'TEMPO & KEY FEEL',      desc: 'BPM range, key center, time signature, harmonic palette' },
-    { key: 'mood',       label: 'EMOTIONAL TONE',        desc: 'overall feeling, tension/release, where it sits emotionally' }
-  ];
+  const dims = (mode === 'influence') ? _BLEND_DIMS_INFLUENCE : _BLEND_DIMS_MASHUP;
   const dimLines = dims.map(d => `• ${d.label} (${d.desc}): ${_blendWeightLabel(w[d.key], aTitle, bTitle)}`).join('\n');
 
   const twist        = sanitizeInput(p.twist || '', 600);
@@ -8439,44 +8527,63 @@ function buildSongBlendPrompt(params) {
     ? buildGenreAgentSystem(_dom).replace(/^You are a world-class .+? songwriter/, `You are a world-class ${_dom} songwriter & A&R-grade song-blend specialist`)
     : 'You are an expert songwriter, neuroscientist of music, and AI music production specialist. Write complete, emotionally authentic, production-ready songs. Respond with the exact format requested. No extra commentary.';
 
-  const prompt = `Write a complete song that blends two specific reference songs into something new — not a cover, not a mash-up, but a hybrid that recognizably carries DNA from both sources while standing on its own.
+  // Mode-specific framing — Mashup talks SURFACES, Influence talks MECHANISMS.
+  const introBlock = (mode === 'influence')
+    ? `Study two reference songs at the MECHANISM level. Identify the scientific + musical principles that make each work. Then write a NEW song that applies those principles to the user's twist, target genre, and mood — without copying any specific lyrics, melodies, hooks, or chord progressions from either source.`
+    : `Write a complete song that blends two specific reference songs into something new — not a cover, not a mash-up, but a hybrid that recognizably carries DNA from both sources while standing on its own.`;
+
+  const dimSectionTitle = (mode === 'influence')
+    ? 'PER-AXIS MECHANISM LEAN — for each axis, lean toward the named song\'s MECHANISM (not its surface elements):'
+    : 'PER-DIMENSION BLEND DIRECTIVES — execute each precisely:';
+
+  const goalBlock = (mode === 'influence')
+    ? `THE GOAL — INFLUENCE MODE: the listener should feel "this song WORKS — it's solidly built." They should NOT think "oh, this is '${aTitle}' meets '${bTitle}'." Both source DNAs should be invisible at the surface and present at the principle level. Avoid:
+  ✗ Sneak-mash — secretly using A's hook line or B's chord turnaround. Influence mode forbids this.
+  ✗ Pastiche — making it sound "like the era" of A or B without actually applying the mechanism.
+
+Instead — internalize. Read what makes each song work scientifically and musically. Apply those mechanisms to a brand-new song built around the user's twist + target genre + target mood. The result is a third, original song that quietly inherits the craft of A and B.`
+    : `THE GOAL — MASHUP MODE: when the listener hears this song, they should feel "oh — this carries that '${aTitle}' energy AND that '${bTitle}' feel". Both source DNAs should be detectable. The dimension dials specify exactly which surface elements come from which source. Avoid the two failure modes:
+  ✗ Frankenstein — verse from A, chorus from B, no cohesion
+  ✗ Generic average — both songs flattened into a beige middle that sounds like neither
+
+Instead — synthesize. Take A's hook architecture and apply it to B's emotional palette. Let A's drum pattern carry B's chord progression. Find the move that BOTH songs would have made if they'd collaborated.`;
+
+  const formulaBlock = (mode === 'influence') ? `\n\n${INFLUENCE_FORMULA}` : '';
+
+  const prompt = `${introBlock}
 
 REFERENCE SONG A:
 Title: "${aTitle}" by ${aArtist}${aYear ? ' (' + aYear + ')' : ''}
-Genre: ${aGenre}
+Genre: ${aGenre}${aSubstyle ? ' / ' + aSubstyle : ''}
 Analysis / DNA:
 ${aDna || '(no analysis provided)'}
 
 REFERENCE SONG B:
 Title: "${bTitle}" by ${bArtist}${bYear ? ' (' + bYear + ')' : ''}
-Genre: ${bGenre}
+Genre: ${bGenre}${bSubstyle ? ' / ' + bSubstyle : ''}
 Analysis / DNA:
-${bDna || '(no analysis provided)'}
+${bDna || '(no analysis provided)'}${formulaBlock}
 
-PER-DIMENSION BLEND DIRECTIVES — execute each precisely:
+${dimSectionTitle}
 ${dimLines}
 
-${crossGenre ? `CROSS-GENRE BLEND: this hybrid spans two genres (${aGenre} ↔ ${bGenre}). Lean into the fusion — don't try to hide it. The cross-style metaphor palette below names the lineage artists who legitimately do this cross. Acknowledge the borrow in the lyric craftsmanship rather than sneaking it.` : `SAME-GENRE BLEND: both sources sit in ${aGenre}. The hybrid should feel like a third song in the same lineage — close enough to belong, distinct enough to be its own.`}
+${crossGenre ? `CROSS-GENRE BLEND: this ${mode === 'influence' ? 'mechanism synthesis' : 'hybrid'} spans two genres (${aGenre} ↔ ${bGenre}). Lean into the fusion — don't try to hide it. The cross-style metaphor palette below names the lineage artists who legitimately do this cross.` : `SAME-GENRE BLEND: both sources sit in ${aGenre}. The output should feel like a third song in the same lineage — close enough to belong, distinct enough to be its own.`}
 
-${twist ? `USER TWIST — what's NEW (this is the user's creative direction; honour it):\n"${twist}"` : 'No user twist supplied — pick the most interesting hybrid angle suggested by the per-dimension blend.'}
+${twist ? `USER TWIST — what's NEW (this is the user's creative direction; honour it):\n"${twist}"` : 'No user twist supplied — pick the most interesting angle suggested by the dimension lean.'}
 
-${targetGenre ? `TARGET GENRE OVERRIDE: ${targetGenre} (write the hybrid AS this genre, regardless of source genres).` : `EFFECTIVE GENRE: ${dominantGenre} (derived from the dimension weights — or rebalance if the lyrics naturally pull elsewhere).`}
+${targetGenre ? `TARGET GENRE OVERRIDE: ${targetGenre} (write the output AS this genre, regardless of source genres).` : `EFFECTIVE GENRE: ${dominantGenre} (derived from the dimension weights — or rebalance if the lyrics naturally pull elsewhere).`}
 ${targetMood ? `TARGET MOOD OVERRIDE: ${targetMood}` : ''}
 
-THE GOAL: when the listener hears this song, they should feel "oh — this carries that '${aTitle}' energy AND that '${bTitle}' feel". Both source DNAs should be detectable but neither should dominate beyond what the dimension dials specify. Avoid the two failure modes:
-  ✗ Frankenstein — verse from A, chorus from B, no cohesion
-  ✗ Generic average — both songs flattened into a beige middle that sounds like neither
-
-Instead — synthesize. Take A's hook architecture and apply it to B's emotional palette. Let A's drum pattern carry B's chord progression. Find the move that BOTH songs would have made if they'd collaborated.${craftNote}${speedGearsNote}${lyricTierNote}${velocityNote}${academicNote}${edgeNote}${regionNote}${adlibNote}${productionNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(_dom, fusionGenre)}
+${goalBlock}${craftNote}${speedGearsNote}${lyricTierNote}${velocityNote}${academicNote}${edgeNote}${regionNote}${adlibNote}${productionNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(_dom, fusionGenre)}
 
 Respond with EXACTLY this format — use these exact headers, nothing else:
 
 TITLE: [song title — if the title is in any language other than English, append an English translation in parentheses]
 
-VERDICT: [one sentence on why this blend works — name the specific move from each source and how they synthesize]
+VERDICT: [one sentence on why this ${mode === 'influence' ? 'influence-derived song' : 'blend'} works — ${mode === 'influence' ? 'name the specific MECHANISM you inherited from each source and how you applied it' : 'name the specific move from each source and how they synthesize'}]
 
-BLEND NOTES:
-[Keep to 1-2 sentences. Name exactly which DNA you took from A, which from B, and where the user's twist landed. Be specific (e.g. "A's verse cadence + B's chord progression + twist's protagonist") — don't restate the brief.]
+${mode === 'influence' ? 'INFLUENCE NOTES' : 'BLEND NOTES'}:
+[Keep to 1-2 sentences. ${mode === 'influence' ? 'Name the SPECIFIC mechanism you took from each source (e.g. "A\'s Zeigarnik tension in the pre-chorus + B\'s descending modal interchange in the bridge + twist\'s protagonist applied to a fresh harmonic field"). Do NOT mention the source song titles or artist names.' : 'Name exactly which DNA you took from A, which from B, and where the user\'s twist landed. Be specific (e.g. "A\'s verse cadence + B\'s chord progression + twist\'s protagonist") — don\'t restate the brief.'}]
 
 HOOK ISOLATION:
 [Copy the chorus lyrics here ONLY — the hook in isolation for quick review]
