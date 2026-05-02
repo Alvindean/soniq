@@ -4,6 +4,9 @@
  * NEVER expose this file or its contents to the client.
  */
 
+const { selectVocalDescriptors, buildVocalDescriptorNote } = require('./_vocal-descriptors');
+const { selectSurpriseMoves, buildSurpriseNote } = require('./_surprise-engine');
+
 const GENRE_BIBLE={
   hiphop:{
     dna:'Bars are currency — 1 bar = 1 line. 16-bar verse = 16 lines. Hook = 8 bars = 8 lines (or 4 unique lines repeated). Ad-libs in parentheses: (yeah) (uh) (let\'s go). Internal rhymes every 2-3 syllables create density. Flow variation (normal → double time → triplet) is the surprise weapon.',
@@ -5879,6 +5882,29 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
   const adlibNote = buildAdlibNote(genre);
   const vocalStackNote = buildVocalStackNote(genre);
+  // Lever #7 — vocal character descriptors (texture / character / performance / accent / era / postural / processing).
+  // Picks the WHO of the voice and locks it into the Suno style prompt prefix + negative tag block.
+  // params.vocalDescriptors shape: { texture, character, performance, accent, era, postural, processing, autoMode, negativeAdd }
+  const _vocalDescStack = selectVocalDescriptors({
+    genre, substyle, mood,
+    lyrics: (topic || '') + ' ' + (params.seedLine || ''),
+    overrides: (params.vocalDescriptors && typeof params.vocalDescriptors === 'object') ? params.vocalDescriptors : {},
+    autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
+  });
+  const vocalDescriptorNote = buildVocalDescriptorNote(_vocalDescStack);
+  // Lever #8 — surprise engine. Picks 1-4 human-attractor moves (drops, builds,
+  // pauses, phone-call interjections, off-mic chatter, found-sound samples,
+  // beat switches, key changes, vocal flips) that the LLM must embed in the
+  // lyrics body. Auto mode picks from genre+mood+lyric-content; manual mode
+  // honors params.surprise.userPicks.
+  const _surpriseResult = selectSurpriseMoves({
+    genre, mood, lyrics: (topic || '') + ' ' + (params.seedLine || ''),
+    intensity:    (params.surprise && params.surprise.intensity)    || 'medium',
+    userPicks:    (params.surprise && params.surprise.userPicks)    || [],
+    userExcludes: (params.surprise && params.surprise.userExcludes) || [],
+    autoMode:     !params.surprise || params.surprise.autoMode !== false,
+  });
+  const surpriseNote = buildSurpriseNote(_surpriseResult);
 
   const _aggrMap = {
     mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
@@ -6029,7 +6055,7 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]${vocalStackNote}
+5. [tip 5]${vocalStackNote}${vocalDescriptorNote}${surpriseNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
@@ -6339,6 +6365,24 @@ function buildLuckyPrompt(params) {
   const lengthBudgetNote = buildLengthBudgetNote(length);
   const adlibNote = buildAdlibNote(g1);
   const vocalStackNote = buildVocalStackNote(g1);
+  // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
+  // overrides flow through params.vocalDescriptors when supplied)
+  const _luckyVocalDescStack = selectVocalDescriptors({
+    genre: g1, substyle: params.substyle || '', mood,
+    lyrics: (topic || ''),
+    overrides: (params.vocalDescriptors && typeof params.vocalDescriptors === 'object') ? params.vocalDescriptors : {},
+    autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
+  });
+  const luckyVocalDescriptorNote = buildVocalDescriptorNote(_luckyVocalDescStack);
+  // Lever #8 — surprise engine for Lucky (mirrors Writer behaviour)
+  const _luckySurpriseResult = selectSurpriseMoves({
+    genre: g1, mood, lyrics: topic || '',
+    intensity:    (params.surprise && params.surprise.intensity)    || 'medium',
+    userPicks:    (params.surprise && params.surprise.userPicks)    || [],
+    userExcludes: (params.surprise && params.surprise.userExcludes) || [],
+    autoMode:     !params.surprise || params.surprise.autoMode !== false,
+  });
+  const luckySurpriseNote = buildSurpriseNote(_luckySurpriseResult);
   // Lucky gets the full lyric craft toolkit — money lines, hook kernels, opening/
   // closing gravity, storytelling craft, comedy craft (mood-gated). Same builder
   // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
@@ -6542,7 +6586,7 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]${vocalStackNote}
+5. [tip 5]${vocalStackNote}${luckyVocalDescriptorNote}${luckySurpriseNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
@@ -7956,7 +8000,20 @@ DIRECTOR NOTES:
 2. [Mixing note for this specific style]
 3. [Vocal direction note]
 4. [Suno/AI platform specific tip]
-5. [What makes this combination of dimensions unique]${buildVocalStackNote('hiphop')}${buildSingerNotesInstruction('hiphop', true)}`;
+5. [What makes this combination of dimensions unique]${buildVocalStackNote('hiphop')}${buildVocalDescriptorNote(selectVocalDescriptors({
+  genre: 'hiphop',
+  substyle: backendId,
+  mood,
+  lyrics: topic || '',
+  overrides: (params.vocalDescriptors && typeof params.vocalDescriptors === 'object') ? params.vocalDescriptors : {},
+  autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
+}))}${buildSurpriseNote(selectSurpriseMoves({
+  genre: 'hiphop', mood, lyrics: topic || '',
+  intensity:    (params.surprise && params.surprise.intensity)    || 'medium',
+  userPicks:    (params.surprise && params.surprise.userPicks)    || [],
+  userExcludes: (params.surprise && params.surprise.userExcludes) || [],
+  autoMode:     !params.surprise || params.surprise.autoMode !== false,
+}))}${buildSingerNotesInstruction('hiphop', true)}`;
 
   return { system, prompt };
 }
@@ -9057,7 +9114,11 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   // Wave 4l additions
   GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote,
   // Wave 5 addition — two-song blend
-  buildSongBlendPrompt };
+  buildSongBlendPrompt,
+  // Lever #7 — vocal character descriptors (re-exported for tests / debug)
+  selectVocalDescriptors, buildVocalDescriptorNote,
+  // Lever #8 — surprise / creativity engine
+  selectSurpriseMoves, buildSurpriseNote };
 
 
 

@@ -3359,6 +3359,257 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="craft-upsell-cta" type="button" onclick="if(typeof openUpgradeModal==='function'){openUpgradeModal();}else{toast('Upgrade to Pro for advanced craft tools')}">Upgrade</button>
       </div>
 
+      <!-- ══ VOCAL CHARACTER PICKER (Lever #7) ══ -->
+      <!-- Picks WHO is singing, not just what. Texture/character/performance go
+           into the Suno style prompt prefix; accent/postural are optional polish.
+           "Auto" mode lets the brain pick from genre+mood+lyrics. Presets give
+           one-click moves like the Chasing-Butterflies "Quirky" or the boom-bap
+           "Whiny-Rap Fix" (gravelly + deadpan + spoken). -->
+      <style id="vd-styles">
+        .vd-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 14px;margin-bottom:12px}
+        .vd-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+        .vd-title{font-size:12px;font-weight:700;color:var(--tx1);letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+        .vd-sub{font-size:10px;color:var(--tx3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px}
+        .vd-auto{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--tx2);cursor:pointer;user-select:none;padding:4px 9px;border-radius:99px;border:1px solid var(--b2);background:var(--s1);transition:all .15s}
+        .vd-auto.on{color:var(--amber);border-color:var(--amberline);background:var(--amberbg)}
+        .vd-auto input{appearance:none;width:8px;height:8px;border-radius:50%;background:var(--tx4);transition:all .15s;margin:0}
+        .vd-auto.on input{background:var(--amber);box-shadow:0 0 6px var(--amber)}
+        .vd-presets{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+        .vd-preset{font-size:10px;font-weight:600;padding:5px 10px;border-radius:99px;border:1px solid var(--cyanline);background:var(--cyanbg);color:var(--cyan);cursor:pointer;transition:all .12s;font-family:var(--font)}
+        .vd-preset:hover{background:var(--cyan);color:#050505;transform:translateY(-1px)}
+        .vd-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+        .vd-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+        .vd-cell{display:flex;flex-direction:column;gap:4px}
+        .vd-cell label{font-size:9px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em}
+        .vd-cell select{width:100%;padding:7px 9px;border-radius:var(--r1);background:var(--s1);border:1px solid var(--b2);color:var(--tx1);font-family:var(--font);font-size:11px;cursor:pointer;transition:border-color .15s}
+        .vd-cell select:hover,.vd-cell select:focus{border-color:var(--amberline);outline:none}
+        .vd-cell select:disabled{opacity:.5;cursor:not-allowed}
+        .vd-preview{background:var(--s1);border:1px solid var(--cyanline);border-radius:var(--r1);padding:9px 11px;font-family:var(--mono);font-size:11px;color:var(--cyan);line-height:1.5;word-break:break-word}
+        .vd-preview-label{font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;font-family:var(--font);font-weight:700}
+        .vd-preview-neg{color:var(--red);margin-top:4px;font-size:10px}
+        @media(max-width:600px){.vd-grid{grid-template-columns:1fr 1fr}.vd-grid-2{grid-template-columns:1fr}}
+      </style>
+      <div class="vd-card" id="vd-card">
+        <div class="vd-head">
+          <span class="vd-title">🎙️ Vocal Character <span class="vd-sub">— what does the singer SOUND like?</span></span>
+          <label class="vd-auto on" id="vd-auto-pill">
+            <input type="checkbox" id="vd-auto" checked>
+            <span>Auto</span>
+          </label>
+        </div>
+        <div class="vd-presets" id="vd-presets">
+          <button type="button" class="vd-preset" onclick="vdApplyPreset('quirky')">✨ Quirky (Chasing Butterflies)</button>
+          <button type="button" class="vd-preset" onclick="vdApplyPreset('rapfix')">🎤 Whiny-Rap Fix</button>
+          <button type="button" class="vd-preset" onclick="vdApplyPreset('intimate')">🤫 Intimate</button>
+          <button type="button" class="vd-preset" onclick="vdApplyPreset('menacing')">🗡️ Menacing</button>
+          <button type="button" class="vd-preset" onclick="vdApplyPreset('triumphant')">🚀 Triumphant</button>
+          <button type="button" class="vd-preset" onclick="vdApplyPreset('clear')">↺ Clear</button>
+        </div>
+        <div class="vd-grid">
+          <div class="vd-cell">
+            <label>Texture</label>
+            <select id="vd-texture" disabled onchange="vdSyncPreview()">
+              <option value="">— auto —</option>
+              <option value="raspy">raspy</option>
+              <option value="gravelly">gravelly</option>
+              <option value="smoky">smoky</option>
+              <option value="husky">husky</option>
+              <option value="breathy">breathy</option>
+              <option value="airy">airy</option>
+              <option value="nasal">nasal</option>
+              <option value="throaty">throaty</option>
+              <option value="chesty">chesty</option>
+              <option value="sandpaper">sandpaper</option>
+              <option value="velvety">velvety</option>
+              <option value="honeyed">honeyed</option>
+              <option value="silken">silken</option>
+              <option value="brittle">brittle</option>
+              <option value="reedy">reedy</option>
+              <option value="rich_baritone">rich baritone</option>
+              <option value="paper_thin">paper-thin</option>
+              <option value="whiskey_soaked">whiskey-soaked</option>
+              <option value="cigarette_burned">cigarette-burned</option>
+              <option value="feathered">feathered</option>
+              <option value="glassy">glassy</option>
+            </select>
+          </div>
+          <div class="vd-cell">
+            <label>Character</label>
+            <select id="vd-character" disabled onchange="vdSyncPreview()">
+              <option value="">— auto —</option>
+              <option value="quirky">quirky</option>
+              <option value="theatrical">theatrical</option>
+              <option value="whimsical">whimsical</option>
+              <option value="mischievous">mischievous</option>
+              <option value="deadpan">deadpan</option>
+              <option value="wry">wry</option>
+              <option value="sardonic">sardonic</option>
+              <option value="cartoonish">cartoonish</option>
+              <option value="vaudevillian">vaudevillian</option>
+              <option value="manic_pixie">manic-pixie</option>
+              <option value="oddball">oddball</option>
+              <option value="innocent">innocent</option>
+              <option value="childlike">childlike</option>
+              <option value="world_weary">world-weary</option>
+              <option value="sinister">sinister</option>
+              <option value="seductive">seductive</option>
+              <option value="menacing">menacing</option>
+              <option value="vulnerable">vulnerable</option>
+              <option value="confessional">confessional</option>
+              <option value="drunken">drunken</option>
+              <option value="possessed">possessed</option>
+              <option value="feral">feral</option>
+              <option value="regal">regal</option>
+              <option value="cabaret">cabaret</option>
+              <option value="preacher">preacher</option>
+              <option value="narrator">narrator</option>
+              <option value="matter_of_fact">matter-of-fact</option>
+              <option value="confident">confident</option>
+              <option value="sneering">sneering</option>
+            </select>
+          </div>
+          <div class="vd-cell">
+            <label>Performance</label>
+            <select id="vd-performance" disabled onchange="vdSyncPreview()">
+              <option value="">— auto —</option>
+              <option value="whispered">whispered</option>
+              <option value="spoken">spoken</option>
+              <option value="sprechgesang">half-spoken (Sprechgesang)</option>
+              <option value="shouted">shouted</option>
+              <option value="belted">belted</option>
+              <option value="crooned">crooned</option>
+              <option value="hummed">hummed</option>
+              <option value="chanted">chanted</option>
+              <option value="mumbled">mumbled</option>
+              <option value="sing_song">sing-song</option>
+              <option value="conversational">conversational</option>
+              <option value="declamatory">declamatory</option>
+              <option value="recitative">recitative</option>
+              <option value="preached">preached</option>
+              <option value="half_laughed">half-laughed</option>
+              <option value="half_cried">half-cried</option>
+              <option value="on_exhale">sung on the exhale</option>
+              <option value="on_inhale">sung on the inhale</option>
+              <option value="spoken_rap">spoken rap</option>
+              <option value="percussive">percussive delivery</option>
+              <option value="spit_tight">spit-tight</option>
+              <option value="double_time">double-time</option>
+            </select>
+          </div>
+        </div>
+        <div class="vd-grid">
+          <div class="vd-cell">
+            <label>Accent (opt.)</label>
+            <select id="vd-accent" disabled onchange="vdSyncPreview()">
+              <option value="">— none —</option>
+              <option value="rp_british">RP British</option>
+              <option value="cockney">cockney</option>
+              <option value="scouse">Scouse</option>
+              <option value="irish_lilt">Irish lilt</option>
+              <option value="appalachian">Appalachian</option>
+              <option value="memphis">Memphis drawl</option>
+              <option value="nashville">Nashville twang</option>
+              <option value="bayou">Louisiana bayou</option>
+              <option value="bronx_bodega">Bronx bodega</option>
+              <option value="atl">ATL</option>
+              <option value="west_coast">West Coast</option>
+              <option value="texan">Texan</option>
+              <option value="australian">Australian</option>
+              <option value="french">French-tinged</option>
+              <option value="spanish">Spanish-tinged</option>
+              <option value="patois">Jamaican patois</option>
+            </select>
+          </div>
+          <div class="vd-cell">
+            <label>Postural (opt.)</label>
+            <select id="vd-postural" disabled onchange="vdSyncPreview()">
+              <option value="">— none —</option>
+              <option value="leaning_in">sung leaning in</option>
+              <option value="from_chest">sung from the chest</option>
+              <option value="from_head">sung from the head</option>
+              <option value="back_of_throat">sung from the back of the throat</option>
+              <option value="sharing_secret">sung like sharing a secret</option>
+              <option value="reciting_confession">sung like reciting a confession</option>
+              <option value="through_smile">sung through a smile</option>
+              <option value="gritted_teeth">sung through gritted teeth</option>
+              <option value="on_verge_laughter">sung on the verge of laughter</option>
+              <option value="on_verge_tears">sung on the verge of tears</option>
+              <option value="in_on_joke">sung in on the joke</option>
+            </select>
+          </div>
+          <div class="vd-cell">
+            <label>Processing (opt.)</label>
+            <select id="vd-processing" disabled onchange="vdSyncPreview()">
+              <option value="">— none —</option>
+              <option value="megaphone">megaphone</option>
+              <option value="telephone">telephone-EQ</option>
+              <option value="vintage_ribbon">vintage ribbon mic</option>
+              <option value="lofi_cassette">lo-fi cassette</option>
+              <option value="radio_broadcast">radio-broadcast</option>
+              <option value="talkbox">talkbox</option>
+              <option value="vocoder">vocoder</option>
+              <option value="doubled_octave">doubled an octave down</option>
+              <option value="whisper_doubled">whisper-doubled</option>
+              <option value="pitched_up">pitched-up imp</option>
+              <option value="pitched_down">pitched-down demon</option>
+              <option value="close_mic">close-mic intimate</option>
+            </select>
+          </div>
+        </div>
+        <div class="vd-preview-label">Live preview — what gets sent to Suno</div>
+        <div class="vd-preview" id="vd-preview">
+          <span id="vd-preview-prefix" style="opacity:.7">[Auto — picked from genre + mood at generate time]</span>
+          <div class="vd-preview-neg" id="vd-preview-neg" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- ══ SURPRISE ENGINE PICKER (Lever #8) ══ -->
+      <!-- Picks the human-attractor moves: drops, builds, breaths, pauses,
+           phone-call interjections, off-mic chatter, found-sound samples,
+           beat switches, key changes, vocal flips. Auto mode picks by
+           genre+mood+lyric content. Intensity dial sets the count (1-4). -->
+      <style id="se-styles">
+        .se-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 14px;margin-bottom:12px}
+        .se-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+        .se-title{font-size:12px;font-weight:700;color:var(--tx1);letter-spacing:.02em;display:flex;align-items:center;gap:6px}
+        .se-sub{font-size:10px;color:var(--tx3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px}
+        .se-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+        .se-intensity{display:inline-flex;background:var(--s1);border:1px solid var(--b2);border-radius:99px;padding:2px;gap:0}
+        .se-intensity button{appearance:none;background:transparent;border:none;color:var(--tx3);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:5px 11px;border-radius:99px;cursor:pointer;transition:all .12s;font-family:var(--font)}
+        .se-intensity button.on{background:var(--amber);color:#08080a;box-shadow:0 0 8px rgba(245,192,0,.25)}
+        .se-auto{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:600;color:var(--tx2);cursor:pointer;user-select:none;padding:4px 9px;border-radius:99px;border:1px solid var(--b2);background:var(--s1);transition:all .15s}
+        .se-auto.on{color:var(--cyan);border-color:var(--cyanline);background:var(--cyanbg)}
+        .se-auto input{appearance:none;width:8px;height:8px;border-radius:50%;background:var(--tx4);transition:all .15s;margin:0}
+        .se-auto.on input{background:var(--cyan);box-shadow:0 0 6px var(--cyan)}
+        .se-moves{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+        .se-move{font-size:10px;font-weight:600;padding:5px 9px;border-radius:99px;border:1px solid var(--b2);background:var(--s1);color:var(--tx2);cursor:pointer;transition:all .12s;font-family:var(--font)}
+        .se-move:hover{border-color:var(--cyanline);color:var(--tx1)}
+        .se-move.on{background:var(--cyan);color:#050505;border-color:var(--cyan)}
+        .se-move.excluded{background:var(--redbg);color:var(--red);border-color:var(--redline);text-decoration:line-through}
+        .se-hint{font-size:10px;color:var(--tx3);line-height:1.5;margin-top:8px;padding:8px 10px;background:var(--s1);border-left:2px solid var(--cyan);border-radius:var(--r1)}
+      </style>
+      <div class="se-card" id="se-card">
+        <div class="se-head">
+          <span class="se-title">🎲 Surprise Engine <span class="se-sub">— drops, builds, breaths, phone calls, samples</span></span>
+          <label class="se-auto on" id="se-auto-pill">
+            <input type="checkbox" id="se-auto" checked>
+            <span>Auto</span>
+          </label>
+        </div>
+        <div class="se-row">
+          <span style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Intensity</span>
+          <div class="se-intensity" id="se-intensity">
+            <button type="button" data-int="low"    onclick="seSetIntensity('low')">1 · Low</button>
+            <button type="button" data-int="medium" onclick="seSetIntensity('medium')" class="on">2 · Medium</button>
+            <button type="button" data-int="high"   onclick="seSetIntensity('high')">3 · High</button>
+            <button type="button" data-int="wild"   onclick="seSetIntensity('wild')">4 · Wild</button>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:5px">Force-include moves <span style="opacity:.7;text-transform:none;letter-spacing:0">(click once = include · click again = exclude · third click = clear)</span></div>
+        <div class="se-moves" id="se-moves"></div>
+        <div class="se-hint" id="se-hint">Auto picks 2 moves based on genre, mood, and what your lyrics literally mention. Mention "phone" → phone-call interjection. Mention "rain" → rain ambience. Click moves above to force-include or exclude specific ones.</div>
+      </div>
+
       <!-- PARAMS ROW (Vocal + Structure only) -->
       <div class="params" style="grid-template-columns:1fr 1fr">
         <div class="param">
@@ -11026,6 +11277,188 @@ function regenerateSong(prefix) {
   }
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// Lever #7 — Vocal Character Picker
+// Reads the four/five family selects + Auto toggle into the request body.
+// Presets one-shot the most useful stacks (Quirky, Whiny-Rap Fix, Intimate…).
+// Auto mode disables the selects so the brain picks from genre+mood+lyrics.
+// ──────────────────────────────────────────────────────────────────────────
+const VD_FAMILIES = ['texture','character','performance','accent','postural','processing'];
+const VD_LABELS = {
+  // Mirror of _vocal-descriptors.js display labels — used only for the live
+  // preview chip so users see what gets sent to Suno before they hit Generate.
+  texture:{raspy:'Raspy',gravelly:'Gravelly',smoky:'Smoky',husky:'Husky',breathy:'Breathy',airy:'Airy',nasal:'Nasal',throaty:'Throaty',chesty:'Chesty',sandpaper:'Sandpaper',velvety:'Velvety',honeyed:'Honeyed',silken:'Silken',brittle:'Brittle',reedy:'Reedy',rich_baritone:'Rich Baritone',paper_thin:'Paper-Thin',whiskey_soaked:'Whiskey-Soaked',cigarette_burned:'Cigarette-Burned',feathered:'Feathered',glassy:'Glassy'},
+  character:{quirky:'Quirky',theatrical:'Theatrical',whimsical:'Whimsical',mischievous:'Mischievous',deadpan:'Deadpan',wry:'Wry',sardonic:'Sardonic',cartoonish:'Cartoonish',vaudevillian:'Vaudevillian',manic_pixie:'Manic-Pixie',oddball:'Oddball',innocent:'Innocent',childlike:'Childlike',world_weary:'World-Weary',sinister:'Sinister',seductive:'Seductive',menacing:'Menacing',vulnerable:'Vulnerable',confessional:'Confessional',drunken:'Drunken',possessed:'Possessed',feral:'Feral',regal:'Regal',cabaret:'Cabaret',preacher:'Preacher',narrator:'Narrator',matter_of_fact:'Matter-Of-Fact',confident:'Confident',sneering:'Sneering'},
+  performance:{whispered:'Whispered',spoken:'Spoken',sprechgesang:'Half-Spoken (Sprechgesang)',shouted:'Shouted',belted:'Belted',crooned:'Crooned',hummed:'Hummed',chanted:'Chanted',mumbled:'Mumbled',sing_song:'Sing-Song',conversational:'Conversational',declamatory:'Declamatory',recitative:'Recitative',preached:'Preached',half_laughed:'Half-Laughed',half_cried:'Half-Cried',on_exhale:'Sung On The Exhale',on_inhale:'Sung On The Inhale',spoken_rap:'Spoken Rap',percussive:'Percussive Delivery',spit_tight:'Spit-Tight',double_time:'Double-Time'},
+  accent:{rp_british:'RP British',cockney:'Cockney',scouse:'Scouse',irish_lilt:'Irish Lilt',appalachian:'Appalachian',memphis:'Memphis Drawl',nashville:'Nashville Twang',bayou:'Louisiana Bayou',bronx_bodega:'Bronx Bodega',atl:'ATL',west_coast:'West Coast',texan:'Texan',australian:'Australian',french:'French-Tinged',spanish:'Spanish-Tinged',patois:'Jamaican Patois'},
+  postural:{leaning_in:'Sung Leaning In',from_chest:'Sung From The Chest',from_head:'Sung From The Head',back_of_throat:'Sung From The Back Of The Throat',sharing_secret:'Sung Like Sharing A Secret',reciting_confession:'Sung Like Reciting A Confession',through_smile:'Sung Through A Smile',gritted_teeth:'Sung Through Gritted Teeth',on_verge_laughter:'Sung On The Verge Of Laughter',on_verge_tears:'Sung On The Verge Of Tears',in_on_joke:'Sung In On The Joke'},
+  processing:{megaphone:'Megaphone',telephone:'Telephone-EQ',vintage_ribbon:'Vintage Ribbon Mic',lofi_cassette:'Lo-Fi Cassette',radio_broadcast:'Radio-Broadcast',talkbox:'Talkbox',vocoder:'Vocoder',doubled_octave:'Doubled An Octave Down',whisper_doubled:'Whisper-Doubled',pitched_up:'Pitched-Up Imp',pitched_down:'Pitched-Down Demon',close_mic:'Close-Mic Intimate'}
+};
+const VD_PRESETS = {
+  quirky:     { texture:'airy',         character:'quirky',        performance:'sprechgesang', postural:'through_smile' },
+  rapfix:     { texture:'gravelly',     character:'deadpan',       performance:'spoken_rap',   postural:'from_chest' },
+  intimate:   { texture:'breathy',      character:'confessional',  performance:'whispered',    processing:'close_mic',   postural:'sharing_secret' },
+  menacing:   { texture:'sandpaper',    character:'menacing',      performance:'gritted_teeth' },
+  triumphant: { texture:'rich_baritone',character:'confident',     performance:'belted',       postural:'from_chest' },
+  clear:      {}
+};
+function vdAutoOn() {
+  return !!(document.getElementById('vd-auto')?.checked);
+}
+function vdSetAuto(on) {
+  const cb = document.getElementById('vd-auto');
+  const pill = document.getElementById('vd-auto-pill');
+  if (cb) cb.checked = !!on;
+  if (pill) pill.classList.toggle('on', !!on);
+  VD_FAMILIES.forEach(f => {
+    const el = document.getElementById('vd-' + f);
+    if (el) el.disabled = !!on;
+  });
+  vdSyncPreview();
+}
+function vdGetStack() {
+  if (vdAutoOn()) return null;
+  const out = {};
+  VD_FAMILIES.forEach(f => {
+    const v = document.getElementById('vd-' + f)?.value;
+    if (v) out[f] = v;
+  });
+  return Object.keys(out).length ? out : null;
+}
+function vdApplyPreset(key) {
+  vdSetAuto(false);
+  VD_FAMILIES.forEach(f => {
+    const el = document.getElementById('vd-' + f);
+    if (el) el.value = '';
+  });
+  const preset = VD_PRESETS[key] || {};
+  Object.entries(preset).forEach(([fam, val]) => {
+    const el = document.getElementById('vd-' + fam);
+    if (el) el.value = val;
+  });
+  vdSyncPreview();
+}
+function vdSyncPreview() {
+  const prefixEl = document.getElementById('vd-preview-prefix');
+  const negEl = document.getElementById('vd-preview-neg');
+  if (!prefixEl) return;
+  if (vdAutoOn()) {
+    prefixEl.style.opacity = '.7';
+    prefixEl.textContent = '[Auto — picked from genre + mood at generate time]';
+    if (negEl) negEl.style.display = 'none';
+    return;
+  }
+  const stack = vdGetStack() || {};
+  const order = ['texture','character','performance','accent','postural','processing'];
+  const labels = order.map(f => stack[f] && VD_LABELS[f]?.[stack[f]]).filter(Boolean);
+  prefixEl.style.opacity = '1';
+  prefixEl.textContent = labels.length ? '[' + labels.join(', ') + ']' : '[— pick at least one descriptor or switch back to Auto —]';
+  if (negEl) negEl.style.display = 'none';
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const cb = document.getElementById('vd-auto');
+  const pill = document.getElementById('vd-auto-pill');
+  if (cb) cb.addEventListener('change', () => vdSetAuto(cb.checked));
+  if (pill) pill.addEventListener('click', e => {
+    if (e.target.tagName !== 'INPUT') { cb.checked = !cb.checked; vdSetAuto(cb.checked); }
+  });
+  vdSetAuto(true);
+});
+
+// ──────────────────────────────────────────────────────────────────────────
+// Lever #8 — Surprise Engine Picker
+// Intensity dial + force-include/exclude chips. Auto mode lets the brain pick
+// from genre+mood+lyrics. Three click states per chip: neutral → include →
+// exclude → neutral.
+// ──────────────────────────────────────────────────────────────────────────
+const SE_MOVES = [
+  // Mirror of _surprise-engine.js id+name. Order matters — drives chip layout.
+  { id:'drop',            name:'Beat Drop' },
+  { id:'build',           name:'Tension Build' },
+  { id:'breakdown',       name:'Breakdown' },
+  { id:'beat_switch',     name:'Beat Switch' },
+  { id:'half_time',       name:'Half-Time Flip' },
+  { id:'double_time',     name:'Double-Time Burst' },
+  { id:'tape_stop',       name:'Tape Stop' },
+  { id:'reverse_swell',   name:'Reverse Swell' },
+  { id:'glitch',          name:'Glitch / Stutter' },
+  { id:'key_change',      name:'Final-Chorus Key Change' },
+  { id:'silence_2bar',    name:'Silence (2 bars)' },
+  { id:'vocal_pause',     name:'Vocal Pause' },
+  { id:'breath_in',       name:'Audible Breath' },
+  { id:'beat_stops',      name:'Beat Stops (a cappella)' },
+  { id:'phone_call',      name:'Phone Call Interjection' },
+  { id:'voicemail',       name:'Voicemail Outro' },
+  { id:'off_mic_chatter', name:'Off-Mic Chatter' },
+  { id:'producer_tag',    name:'Producer Drop / Tag' },
+  { id:'crowd_cheer',     name:'Crowd Reaction' },
+  { id:'crowd_chant',     name:'Crowd Chant' },
+  { id:'street_ambient',  name:'Street Ambience' },
+  { id:'rain_room',       name:'Rain / Room Tone' },
+  { id:'subway_announce', name:'Subway / PA' },
+  { id:'tv_static',       name:'TV Static / Channel Flip' },
+  { id:'adlib_echo',      name:'Echo Ad-lib' },
+  { id:'adlib_panned',    name:'Panned Whisper Ad-lib' },
+  { id:'adlib_laugh',     name:'Laugh Ad-lib' },
+  { id:'whisper_to_shout',name:'Whisper → Shout Flip' },
+  { id:'spoken_interlude',name:'Spoken-Word Interlude' },
+  { id:'fakeout_outro',   name:'Fakeout Outro' },
+  { id:'a_cappella_open', name:'A Cappella Open' },
+  { id:'instrument_solo', name:'Counter-Instrument Solo' },
+];
+const SE_STATE = { intensity:'medium', autoMode:true, picks:new Set(), excludes:new Set() };
+function seAutoOn(){ return !!(document.getElementById('se-auto')?.checked); }
+function seSetAuto(on){
+  const cb = document.getElementById('se-auto');
+  const pill = document.getElementById('se-auto-pill');
+  if (cb) cb.checked = !!on;
+  if (pill) pill.classList.toggle('on', !!on);
+  SE_STATE.autoMode = !!on;
+}
+function seSetIntensity(level){
+  SE_STATE.intensity = level;
+  document.querySelectorAll('#se-intensity button').forEach(b => {
+    b.classList.toggle('on', b.dataset.int === level);
+  });
+}
+function seCycleMove(id){
+  // neutral → include → exclude → neutral
+  if (SE_STATE.picks.has(id)) {
+    SE_STATE.picks.delete(id);
+    SE_STATE.excludes.add(id);
+  } else if (SE_STATE.excludes.has(id)) {
+    SE_STATE.excludes.delete(id);
+  } else {
+    SE_STATE.picks.add(id);
+  }
+  seRenderMoves();
+}
+function seRenderMoves(){
+  const wrap = document.getElementById('se-moves');
+  if (!wrap) return;
+  wrap.innerHTML = SE_MOVES.map(m => {
+    const cls = SE_STATE.picks.has(m.id) ? ' on' : SE_STATE.excludes.has(m.id) ? ' excluded' : '';
+    return `<button type="button" class="se-move${cls}" data-id="${m.id}" onclick="seCycleMove('${m.id}')">${m.name}</button>`;
+  }).join('');
+}
+function seGetConfig(){
+  return {
+    intensity: SE_STATE.intensity,
+    autoMode:  SE_STATE.autoMode,
+    userPicks: Array.from(SE_STATE.picks),
+    userExcludes: Array.from(SE_STATE.excludes),
+  };
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const cb = document.getElementById('se-auto');
+  const pill = document.getElementById('se-auto-pill');
+  if (cb) cb.addEventListener('change', () => seSetAuto(cb.checked));
+  if (pill) pill.addEventListener('click', e => {
+    if (e.target.tagName !== 'INPUT') { cb.checked = !cb.checked; seSetAuto(cb.checked); }
+  });
+  seRenderMoves();
+});
+
 async function generateSong(){
   if (!S.user && !window.__soniqAdmin) {
     openAuth('Create your free account — 5 free songs every month');
@@ -11124,7 +11557,16 @@ async function generateSong(){
     graftGenre: typeof S.graftGenre === 'string' ? S.graftGenre : '',
     graftSection: ['verse','chorus','bridge'].includes(S.graftSection) ? S.graftSection : 'chorus',
     invertCounter: S.invertCounter === true,
-    platinum: _platinumOn && isPlatinumEligible()
+    platinum: _platinumOn && isPlatinumEligible(),
+    // Lever #7 — vocal character descriptors. autoMode=true (default) lets the
+    // brain pick from genre+mood+lyrics. When the user has picked a manual
+    // stack, send the explicit family map so the brain locks it into the
+    // Suno style prompt prefix + negative tag block.
+    vocalDescriptors: vdAutoOn() ? { autoMode: true } : (vdGetStack() || { autoMode: true }),
+    // Lever #8 — surprise / creativity engine. Picks human-attractor moves
+    // (drops, builds, pauses, phone calls, samples, etc.) and tells the brain
+    // exactly which Suno tags to embed and where.
+    surprise: seGetConfig()
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }

@@ -118,6 +118,49 @@ function getThisMonth() {
   return new Date().toISOString().slice(0, 7); // YYYY-MM
 }
 
+// Lever #8 — sanitise the surprise-engine config from the request body.
+// Defense-in-depth around _surprise-engine.js (which whitelists move ids
+// canonically). Caps userPicks/Excludes to 8 ids each, ids must be
+// snake_case alphanumerics. Intensity falls back to 'medium' on any
+// invalid string.
+const _SURPRISE_VALID_INTENSITY = new Set(['low','medium','high','wild']);
+const _SURPRISE_ID_RE = /^[a-z][a-z0-9_]{0,30}$/;
+function sanitizeSurprise(s) {
+  if (!s || typeof s !== 'object' || Array.isArray(s)) return undefined;
+  const out = {};
+  if (typeof s.intensity === 'string' && _SURPRISE_VALID_INTENSITY.has(s.intensity)) out.intensity = s.intensity;
+  if (s.autoMode === false) out.autoMode = false; // auto is the default
+  if (Array.isArray(s.userPicks)) {
+    out.userPicks = s.userPicks.filter(id => typeof id === 'string' && _SURPRISE_ID_RE.test(id)).slice(0, 8);
+  }
+  if (Array.isArray(s.userExcludes)) {
+    out.userExcludes = s.userExcludes.filter(id => typeof id === 'string' && _SURPRISE_ID_RE.test(id)).slice(0, 8);
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
+// Lever #7 — sanitise the vocal-descriptor stack from the request body.
+// The brain's _vocal-descriptors module is the canonical gate; this is
+// defense-in-depth so we never forward arbitrary strings or weird shapes.
+const _VOCAL_DESC_FAMILIES = ['texture','character','performance','accent','era','postural','processing'];
+const _VOCAL_DESC_SAFE = /^[A-Za-z0-9 _\-()'/]{1,40}$/;
+function sanitizeVocalDescriptors(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined;
+  const out = {};
+  for (const fam of _VOCAL_DESC_FAMILIES) {
+    const val = v[fam];
+    if (typeof val === 'string' && _VOCAL_DESC_SAFE.test(val)) out[fam] = val.trim();
+  }
+  if (v.autoMode === true) out.autoMode = true;
+  if (Array.isArray(v.negativeAdd)) {
+    out.negativeAdd = v.negativeAdd
+      .filter(s => typeof s === 'string' && _VOCAL_DESC_SAFE.test(s))
+      .map(s => s.trim().toLowerCase())
+      .slice(0, 10);
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 // free = 3 lifetime songs (trial); paid = monthly
 const PLAN_LIMITS = {
   free:                3,    // lifetime trial
@@ -623,6 +666,15 @@ module.exports = async function handler(req, res) {
         // Region whitelist — invalid → no region overlay (silent fallback)
         const VALID_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (p.region && !VALID_REGIONS.has(p.region)) p.region = '';
+        // Lever #7 — vocal descriptors. Sanitise the user-picked stack so the
+        // brain's selectVocalDescriptors() only ever sees safe strings. Any
+        // family slot not in this whitelist is dropped silently. This is
+        // defense-in-depth — the brain's _vocal-descriptors.js is the canonical
+        // gate. Free-text values pass through (cap'd at 40 chars, ASCII-only)
+        // so users can hand-type custom descriptors like "raspy cigarette
+        // baritone" if they want.
+        p.vocalDescriptors = sanitizeVocalDescriptors(p.vocalDescriptors);
+        p.surprise = sanitizeSurprise(p.surprise);
         // Emotional velocity whitelist — invalid → 'auto' (server resolves to genre default)
         const VALID_VELOCITY = new Set(['auto','slow_burn','standard_arc','cycling','whiplash','plateau_drift']);
         if (p.emotionalVelocity && !VALID_VELOCITY.has(p.emotionalVelocity)) p.emotionalVelocity = 'auto';
@@ -654,6 +706,10 @@ module.exports = async function handler(req, res) {
         if (lp.emotionalVelocity && !VALID_LUCKY_VELOCITY.has(lp.emotionalVelocity)) lp.emotionalVelocity = 'auto';
         const VALID_LUCKY_REGIONS = new Set(['ireland','uk','australia','japan','india_punjab','france','mexico','jamaica']);
         if (lp.region && !VALID_LUCKY_REGIONS.has(lp.region)) lp.region = '';
+        // Lever #7 — vocal descriptors flow through Lucky too.
+        lp.vocalDescriptors = sanitizeVocalDescriptors(lp.vocalDescriptors);
+        // Lever #8 — surprise engine for Lucky.
+        lp.surprise = sanitizeSurprise(lp.surprise);
         // Punchline-craft tool whitelist for Lucky — same set as the song path.
         // When unset, buildLuckyPrompt auto-picks 1-2 tools for thinking-artist genres.
         const VALID_LUCKY_PUNCHLINE = new Set([
