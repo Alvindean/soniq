@@ -507,6 +507,34 @@ module.exports = async function handler(req, res) {
       console.error('Edit prompt build failed:', err.message);
       return res.status(500).json({ error: 'Edit prompt error: ' + err.message });
     }
+  } else if (body.action === 'blend') {
+    // ── Song Blend (Wave 5) — two analyzed songs + per-dimension weights + twist ──
+    try {
+      const brain = require('./_brain');
+      const p = body.params || {};
+      if (!p.songA || !p.songA.title) { res.status(400).json({ error: 'songA required' }); return; }
+      if (!p.songB || !p.songB.title) { res.status(400).json({ error: 'songB required' }); return; }
+      // Server-side payload guard — clients only ever produce ~10kb DNA blobs;
+      // anything larger is either a client bug or a malicious request. Reject
+      // BEFORE we hand off to the prompt builder so we don't waste an LLM call.
+      const aLen = (p.songA.analysis || '').length;
+      const bLen = (p.songB.analysis || '').length;
+      if (aLen > 50000 || bLen > 50000) {
+        return res.status(413).json({ error: 'analysis_too_large', message: 'Each song analysis must be under 50KB.' });
+      }
+      p.plan = plan;
+      p.isAdmin = !!req._adminBypass;
+      const built = brain.buildSongBlendPrompt(p);
+      messages   = [{ role: 'user', content: built.prompt }];
+      system     = built.system;
+      // Bump from 4096 — blend output adds BLEND NOTES on top of the canonical
+      // 6-section production brief, and the per-dimension reasoning costs tokens.
+      // Audit warning W10: 4096 routinely truncates PLATFORM TIPS.
+      max_tokens = 6144;
+    } catch (err) {
+      console.error('Blend prompt build failed:', err.message);
+      return res.status(500).json({ error: 'Blend prompt error: ' + err.message });
+    }
   } else if (body.action === 'generate' || body.action === 'lucky') {
     try {
       const brain = require('./_brain');
