@@ -8348,6 +8348,187 @@ ${p.lyrics}${craftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNot
   return { prompt, system };
 }
 
+// ════════════════════════════════════════════════════════════════════════════
+// SONG BLEND — two analyzed songs + per-dimension blend weights + user twist
+// ────────────────────────────────────────────────────────────────────────────
+// Wave 5: Where Lucky blends GENRES, Song Blend blends two SPECIFIC SONGS.
+// The user analyzes Song A and Song B in the Analyzer, picks per-dimension
+// lean (hook / structure / lyric / vocal / production / bpm-key / mood),
+// adds a twist, and gets a hybrid that recognizably echoes both sources but
+// isn't a cover or a mash-up.
+//
+// Reuses the Wave 4 craft stack (firewall, metaphor balance, metaphor palette,
+// cross-style borrow when source genres differ) and the canonical TITLE / VERDICT
+// / HOOK ISOLATION / LYRICS / SONG PROMPT / PRODUCTION BRIEF output format.
+// ════════════════════════════════════════════════════════════════════════════
+
+function _blendWeightLabel(w, aTitle, bTitle) {
+  // Tri-state UI sends -1 / 0 / +1; we accept any number in [-1, 1] for future
+  // sliderization. Translate to natural-language directives the model can act on.
+  const n = Number(w);
+  if (!isFinite(n) || n === 0) return `BALANCED — equal weight from "${aTitle}" and "${bTitle}". Neither dominates.`;
+  if (n <= -0.5)               return `LEAN A — primarily "${aTitle}", with subtle "${bTitle}" inflection.`;
+  if (n < 0)                   return `SLIGHT A — mostly "${aTitle}" but blended with "${bTitle}".`;
+  if (n >= 0.5)                return `LEAN B — primarily "${bTitle}", with subtle "${aTitle}" inflection.`;
+  return `SLIGHT B — mostly "${bTitle}" but blended with "${aTitle}".`;
+}
+
+function buildSongBlendPrompt(params) {
+  const p = params || {};
+  const songA = p.songA || {};
+  const songB = p.songB || {};
+  const aTitle  = sanitizeInput(songA.title  || 'Song A', 120);
+  const aArtist = sanitizeInput(songA.artist || 'unknown', 80);
+  const aYear   = sanitizeInput(String(songA.year || ''), 12);
+  const aGenre  = sanitizeInput(songA.genre  || 'pop', 30);
+  const aDna    = sanitizeInput(songA.analysis || '', 12000);
+  const bTitle  = sanitizeInput(songB.title  || 'Song B', 120);
+  const bArtist = sanitizeInput(songB.artist || 'unknown', 80);
+  const bYear   = sanitizeInput(String(songB.year || ''), 12);
+  const bGenre  = sanitizeInput(songB.genre  || 'pop', 30);
+  const bDna    = sanitizeInput(songB.analysis || '', 12000);
+
+  const w = p.weights || {};
+  const dims = [
+    { key: 'hook',       label: 'HOOK ARCHITECTURE',     desc: 'the chorus shape, repeats, payoff line, melodic contour' },
+    { key: 'structure',  label: 'SECTION STRUCTURE',     desc: 'verse/pre/chorus order, bar counts, bridge placement, intro/outro logic' },
+    { key: 'lyric',      label: 'LYRIC REGISTER',        desc: 'vocabulary, imagery, persona, density, rhyme architecture' },
+    { key: 'vocal',      label: 'VOCAL DELIVERY',        desc: 'cadence, ad-libs, falsetto vs chest, melisma vs rap, breath patterns' },
+    { key: 'production', label: 'PRODUCTION DNA',        desc: 'instrument palette, drum pattern, FX signatures, mix character' },
+    { key: 'bpmKey',     label: 'TEMPO & KEY FEEL',      desc: 'BPM range, key center, time signature, harmonic palette' },
+    { key: 'mood',       label: 'EMOTIONAL TONE',        desc: 'overall feeling, tension/release, where it sits emotionally' }
+  ];
+  const dimLines = dims.map(d => `• ${d.label} (${d.desc}): ${_blendWeightLabel(w[d.key], aTitle, bTitle)}`).join('\n');
+
+  const twist        = sanitizeInput(p.twist || '', 600);
+  const targetGenre  = sanitizeInput(p.targetGenre || '', 30);
+  const targetMood   = sanitizeInput(p.targetMood  || '', 60);
+
+  // Resolve effective genre for craft directives. Priority: explicit override
+  // → otherwise the genre the dimension weights collectively lean toward
+  // → fall back to A's genre.
+  const totalLean = dims.reduce((acc, d) => acc + (Number(w[d.key]) || 0), 0);
+  const dominantGenre = targetGenre || (totalLean > 0 ? bGenre : aGenre);
+  const _dom = _normalizeGenreKey(dominantGenre);
+  const _other = _dom === _normalizeGenreKey(aGenre) ? bGenre : aGenre;
+  const fusionGenre = (_normalizeGenreKey(aGenre) !== _normalizeGenreKey(bGenre)) ? _other : null;
+
+  // Identify cross-genre case so the model is told explicitly to lean into the
+  // fusion — and so the cross-style borrow note (with named lineage artists)
+  // fires instead of staying silent.
+  const crossGenre = fusionGenre !== null;
+
+  // Reuse the full Wave 4 craft stack so the blend gets the same ceiling as a
+  // first-class generate. Tier defaults to 'radio' if unspecified — Song Blend
+  // users want a polished, stream-able hybrid, not an archival demo.
+  const lyricTier = p.lyricTier || 'radio';
+  const moodHint  = targetMood || (p.mood || '');
+  const craftNote        = buildLyricCraftNote(_dom, moodHint, twist);
+  const speedGearsNote   = buildSpeedGearsNote(_dom, moodHint, twist, false);
+  const lyricTierNote    = buildLyricTierNote(_dom, lyricTier);
+  const academicNote     = buildAcademicFrameworkNote(_dom, p.era);
+  const velocityNote     = buildEmotionalVelocityNote(_dom, p.emotionalVelocity);
+  const edgeNote         = buildEdgeNote(p.edgeMode, lyricTier, _dom);
+  const regionNote       = buildRegionNote(_dom, p.region);
+  const productionNote   = (typeof buildProductionNote === 'function')
+    ? buildProductionNote(_dom, moodHint, p.aggression, lyricTier)
+    : '';
+  const adlibNote        = buildAdlibNote(_dom);
+
+  const system = (typeof buildGenreAgentSystem === 'function' && GENRE_AGENTS && GENRE_AGENTS[_dom])
+    ? buildGenreAgentSystem(_dom).replace(/^You are a world-class .+? songwriter/, `You are a world-class ${_dom} songwriter & A&R-grade song-blend specialist`)
+    : 'You are an expert songwriter, neuroscientist of music, and AI music production specialist. Write complete, emotionally authentic, production-ready songs. Respond with the exact format requested. No extra commentary.';
+
+  const prompt = `Write a complete song that blends two specific reference songs into something new — not a cover, not a mash-up, but a hybrid that recognizably carries DNA from both sources while standing on its own.
+
+REFERENCE SONG A:
+Title: "${aTitle}" by ${aArtist}${aYear ? ' (' + aYear + ')' : ''}
+Genre: ${aGenre}
+Analysis / DNA:
+${aDna || '(no analysis provided)'}
+
+REFERENCE SONG B:
+Title: "${bTitle}" by ${bArtist}${bYear ? ' (' + bYear + ')' : ''}
+Genre: ${bGenre}
+Analysis / DNA:
+${bDna || '(no analysis provided)'}
+
+PER-DIMENSION BLEND DIRECTIVES — execute each precisely:
+${dimLines}
+
+${crossGenre ? `CROSS-GENRE BLEND: this hybrid spans two genres (${aGenre} ↔ ${bGenre}). Lean into the fusion — don't try to hide it. The cross-style metaphor palette below names the lineage artists who legitimately do this cross. Acknowledge the borrow in the lyric craftsmanship rather than sneaking it.` : `SAME-GENRE BLEND: both sources sit in ${aGenre}. The hybrid should feel like a third song in the same lineage — close enough to belong, distinct enough to be its own.`}
+
+${twist ? `USER TWIST — what's NEW (this is the user's creative direction; honour it):\n"${twist}"` : 'No user twist supplied — pick the most interesting hybrid angle suggested by the per-dimension blend.'}
+
+${targetGenre ? `TARGET GENRE OVERRIDE: ${targetGenre} (write the hybrid AS this genre, regardless of source genres).` : `EFFECTIVE GENRE: ${dominantGenre} (derived from the dimension weights — or rebalance if the lyrics naturally pull elsewhere).`}
+${targetMood ? `TARGET MOOD OVERRIDE: ${targetMood}` : ''}
+
+THE GOAL: when the listener hears this song, they should feel "oh — this carries that '${aTitle}' energy AND that '${bTitle}' feel". Both source DNAs should be detectable but neither should dominate beyond what the dimension dials specify. Avoid the two failure modes:
+  ✗ Frankenstein — verse from A, chorus from B, no cohesion
+  ✗ Generic average — both songs flattened into a beige middle that sounds like neither
+
+Instead — synthesize. Take A's hook architecture and apply it to B's emotional palette. Let A's drum pattern carry B's chord progression. Find the move that BOTH songs would have made if they'd collaborated.${craftNote}${speedGearsNote}${lyricTierNote}${velocityNote}${academicNote}${edgeNote}${regionNote}${adlibNote}${productionNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(_dom, fusionGenre)}
+
+Respond with EXACTLY this format — use these exact headers, nothing else:
+
+TITLE: [song title — if the title is in any language other than English, append an English translation in parentheses]
+
+VERDICT: [one sentence on why this blend works — name the specific move from each source and how they synthesize]
+
+BLEND NOTES:
+[Keep to 1-2 sentences. Name exactly which DNA you took from A, which from B, and where the user's twist landed. Be specific (e.g. "A's verse cadence + B's chord progression + twist's protagonist") — don't restate the brief.]
+
+HOOK ISOLATION:
+[Copy the chorus lyrics here ONLY — the hook in isolation for quick review]
+
+LYRICS:
+[Complete song lyrics using the standard bracket system:
+TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [Bridge] · [Outro]
+TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]
+TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [808 Bass] · [Build] · [Drop] · [Choir]
+PARENTHESES () = ad-libs only — never structural.]
+
+SONG PROMPT:
+⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. The reference songs above are FOR YOUR INSPIRATION only — the SONG PROMPT must use era/region/technique/vocal-quality descriptors, never the source artists' names.
+[Under 440 chars. Hybrid genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture. Same vocabulary as the TYPE 3 bracket tags in the lyrics.]
+
+PRODUCTION BRIEF:
+CORE PROMPT:
+[Exact copy of SONG PROMPT]
+
+TEMPO & KEY:
+[BPM range · Key · Time sig · Feel]
+
+ARRANGEMENT BLUEPRINT:
+[Section by section instrument/energy breakdown]
+
+VOCAL DIRECTION:
+[Delivery style per section]
+
+SONIC REFERENCES:
+[3 sonic reference points — no artist names]
+
+STRUCTURE MAP:
+[Bar-by-bar map: how many bars per section, where transitions land, dynamic shape across the song]
+
+DOPAMINE MAP:
+[Where the listener's attention gets rewarded — the drop, the surprise key change, the lyric reveal, etc. Name 3 specific moments and the trigger.]
+
+CHORD PROGRESSION:
+[Roman-numeral or letter-name progressions per section — verse / chorus / bridge if distinct]
+
+THEORY ANALYSIS:
+[Key center, modal interchange, harmonic devices specific to this hybrid — e.g. "borrows ♭VI from parallel minor in chorus, A's sample-loop modal stasis under B's functional harmony"]
+
+DIRECTOR NOTES:
+[3 director-level production decisions specific to this blend — what makes the hybrid land vs. what makes it feel Frankenstein]
+
+PLATFORM TIPS:
+[3 actionable tips for AI music platforms (Suno, Udio, Stable Audio)]`;
+
+  return { system, prompt };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // PROMPT INTELLIGENCE — Analyzes a generated song + score and returns
 // specific, actionable suggestions to improve the NEXT generation.
@@ -8759,7 +8940,9 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   // Wave 4k addition
   buildMetaphorBalanceNote,
   // Wave 4l additions
-  GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote };
+  GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote,
+  // Wave 5 addition — two-song blend
+  buildSongBlendPrompt };
 
 
 
