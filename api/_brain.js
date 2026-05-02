@@ -8529,7 +8529,15 @@ function buildSongBlendPrompt(params) {
 
   // Mode-specific framing — Mashup talks SURFACES, Influence talks MECHANISMS.
   const introBlock = (mode === 'influence')
-    ? `Study two reference songs at the MECHANISM level. Identify the scientific + musical principles that make each work. Then write a NEW song that applies those principles to the user's twist, target genre, and mood — without copying any specific lyrics, melodies, hooks, or chord progressions from either source.`
+    ? `Study two reference songs at the MECHANISM level. Identify the scientific + musical principles that make each work. Then write a NEW song that applies those principles to the user's twist, target genre, and mood — without copying any specific lyrics, melodies, hooks, or chord progressions from either source.
+
+⚠️ STRICT-FILTER RULE FOR INFLUENCE MODE — the Analysis blocks below contain
+quoted phrases, lyric snippets, and melodic descriptions from the source songs.
+DO NOT echo any quoted phrase, lyric line, melodic figure, or chord progression
+verbatim. Use the analyses ONLY to extract MECHANISMS (the why, not the what).
+If you find yourself wanting to write "she said" or "I'm running" because that's
+what the source did — choose different words that produce the SAME emotional
+mechanism. The output should pass a plagiarism check against both sources.`
     : `Write a complete song that blends two specific reference songs into something new — not a cover, not a mash-up, but a hybrid that recognizably carries DNA from both sources while standing on its own.`;
 
   const dimSectionTitle = (mode === 'influence')

@@ -527,10 +527,11 @@ module.exports = async function handler(req, res) {
       const built = brain.buildSongBlendPrompt(p);
       messages   = [{ role: 'user', content: built.prompt }];
       system     = built.system;
-      // Bump from 4096 — blend output adds BLEND NOTES on top of the canonical
-      // 6-section production brief, and the per-dimension reasoning costs tokens.
-      // Audit warning W10: 4096 routinely truncates PLATFORM TIPS.
-      max_tokens = 6144;
+      // Influence mode injects the 60-line INFLUENCE_FORMULA + demands the same
+      // 11 output sections, so its responses tilt longer than mashup. 6144 was
+      // borderline; 8192 gives headroom for both PLATFORM TIPS and full DIRECTOR
+      // NOTES on long influence outputs (audit Wave 5.1 W11).
+      max_tokens = (p.mode === 'influence') ? 8192 : 6144;
     } catch (err) {
       console.error('Blend prompt build failed:', err.message);
       return res.status(500).json({ error: 'Blend prompt error: ' + err.message });
