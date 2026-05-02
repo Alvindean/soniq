@@ -944,7 +944,8 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .blend-mode-pill:hover{color:var(--tx1);background:rgba(255,255,255,0.04)}
 .blend-mode-pill:focus-visible{outline:2px solid var(--cyan);outline-offset:1px}
 .blend-mode-pill.on{background:linear-gradient(135deg,var(--amber),var(--violet));color:#050505}
-.blend-mode-help{font-size:11px;color:var(--tx3);line-height:1.5;font-style:italic}
+/* Help text bumped to 12px on var(--tx2) for WCAG-AA contrast at small sizes. */
+.blend-mode-help{font-size:12px;color:var(--tx2);line-height:1.5;font-style:italic}
 
 .blend-dials{margin-top:6px;padding-top:14px;border-top:1px solid var(--b1)}
 .blend-dials-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--tx4);margin-bottom:10px}
@@ -966,6 +967,8 @@ body.craft-advanced .craft-basic-only{display:none !important}
   .blend-vs{display:none}
   .blend-clear{min-height:44px!important;min-width:44px!important;padding:6px 12px!important;font-size:13px!important}
   .blend-pill{min-height:44px;font-size:11px}
+  /* iOS HIG / WCAG 2.5.5 touch-target compliance for the mode toggle pills */
+  .blend-mode-pill{min-height:44px;font-size:13px;padding:9px 16px}
 }
 
 /* TTS speaker button (Wave 5) — uses existing .btn-sm chrome.
@@ -5496,7 +5499,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
             <button type="button" class="blend-mode-pill on" data-mode="mashup" aria-pressed="true" onclick="blendSetMode('mashup')" title="Literal hybrid — A's hook + B's chord progression, etc.">🔀 Mashup</button>
             <button type="button" class="blend-mode-pill" data-mode="influence" aria-pressed="false" onclick="blendSetMode('influence')" title="Extract the scientific + musical principles that make each song work, apply them to a brand-new song">🧠 Influence</button>
           </div>
-          <div id="blend-mode-help" class="blend-mode-help">Mashup: literal blend — surface elements from each song combine.</div>
+          <div id="blend-mode-help" class="blend-mode-help" role="status" aria-live="polite">Mashup: literal blend — surface elements from each song combine.</div>
         </div>
         <div class="blend-dials-title" id="blend-dials-title">Per-dimension blend — pick which song each lever leans toward</div>
         <!-- Filled in by buildBlendDials() -->
@@ -5532,7 +5535,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
                 <option value="afrobeats">Afrobeats</option>
                 <option value="kpop">K-Pop</option>
               </optgroup>
-              <optgroup label="Standard (no extended palette yet)">
+              <optgroup label="Standard (Influence mode recommended — palette-less in Mashup)">
                 <option value="neosoul">Neo-Soul</option>
                 <option value="gospel">Gospel</option>
                 <option value="folk">Folk</option>
@@ -5542,6 +5545,16 @@ body.craft-advanced .craft-basic-only{display:none !important}
                 <option value="reggae">Reggae</option>
                 <option value="blues">Blues</option>
                 <option value="punk">Punk</option>
+                <option value="brazilian">Brazilian</option>
+                <option value="amapiano">Amapiano</option>
+                <option value="dancehall">Dancehall</option>
+                <option value="bollywood">Bollywood</option>
+                <option value="arabesque">Arabesque</option>
+                <option value="mandopop">Mandopop</option>
+                <option value="children">Children's</option>
+                <option value="parody">Parody</option>
+                <option value="comedy">Comedy</option>
+                <option value="tvmusical">TV / Musical</option>
               </optgroup>
             </select>
           </div>
@@ -13903,28 +13916,36 @@ function speakText(text, opts) {
   opts = opts || {};
   if (typeof window === 'undefined' || !window.speechSynthesis) {
     if (typeof toast === 'function') toast('🔊 Text-to-speech not supported in this browser');
-    return { stop: function () {}, isSpeaking: function () { return false; } };
+    return { stop: function () {}, isSpeaking: function () { return false; }, isPending: function () { return false; } };
   }
   const btn = opts.button || null;
+  const clean = String(text || '').replace(/\[.*?\]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!clean) return { stop: function () {}, isSpeaking: function () { return false; }, isPending: function () { return false; } };
+  const wasActive = window.speechSynthesis.speaking || window.speechSynthesis.pending;
   // Toggle: if something is already speaking, cancel first.
-  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+  if (wasActive) {
     window.speechSynthesis.cancel();
     if (btn) btn.classList.remove('speaking');
   }
-  const clean = String(text || '').replace(/\[.*?\]/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!clean) return { stop: function () {}, isSpeaking: function () { return false; } };
   const u = new SpeechSynthesisUtterance(clean);
   u.lang  = opts.lang  || (navigator.language || 'en-US');
   u.rate  = opts.rate  || 1.0;
   u.pitch = opts.pitch || 1.0;
   u.volume= opts.volume|| 1.0;
   u.onstart = function () { if (btn) btn.classList.add('speaking'); };
-  u.onend   = function () { if (btn) btn.classList.remove('speaking'); };
-  u.onerror = function () { if (btn) btn.classList.remove('speaking'); };
-  window.speechSynthesis.speak(u);
+  u.onend   = function () { if (btn) btn.classList.remove('speaking'); if (typeof opts.onEnd === 'function') opts.onEnd(); };
+  u.onerror = function () { if (btn) btn.classList.remove('speaking'); if (typeof opts.onEnd === 'function') opts.onEnd(); };
+  // Webkit (Safari) is async on cancel — calling speak() synchronously after
+  // cancel can drop the new utterance. Defer 50ms when we just cancelled.
+  if (wasActive) {
+    setTimeout(function () { window.speechSynthesis.speak(u); }, 50);
+  } else {
+    window.speechSynthesis.speak(u);
+  }
   return {
     stop: function () { window.speechSynthesis.cancel(); if (btn) btn.classList.remove('speaking'); },
-    isSpeaking: function () { return window.speechSynthesis.speaking; }
+    isSpeaking: function () { return window.speechSynthesis.speaking; },
+    isPending: function () { return window.speechSynthesis.pending; }
   };
 }
 
@@ -13960,8 +13981,6 @@ const _BLEND_DIMS_INFLUENCE = [
   { key:'mood',       label:'Emotional Mechanism',  icon:'💫', help:'Cultural-function trigger — what NEED the song fulfilled' }
 ];
 function _blendDims() { return S.blend.mode === 'influence' ? _BLEND_DIMS_INFLUENCE : _BLEND_DIMS_MASHUP; }
-// Backwards-compat alias — old code may still reference _BLEND_DIMS.
-const _BLEND_DIMS = _BLEND_DIMS_MASHUP;
 
 function blendSetMode(mode) {
   if (mode !== 'mashup' && mode !== 'influence') return;
@@ -13988,6 +14007,13 @@ function blendSetMode(mode) {
 
 function _blendResearchPrompt(q) {
   // Mirrors the searchSong research format so the parsed fields line up.
+  // SUBSTYLE captures the SPECIFIC subgenre (Phonk / Drill / Boom-Bap / Trap /
+  // Mumble / Cloud-Rap / Crunk / Snap / G-Funk / Hyphy / Memphis / Plugg /
+  // Soul-Sample / Conscious-Rap for hiphop; Classic / Nu-Metal / Metalcore /
+  // Thrash / Death / Black / Doom / Power / Symphonic / Progressive / Djent /
+  // Melodic-Death for metal; Trap-Latino / Latin-Pop / Reggaeton-Old-School
+  // for latin; etc.). Without this the model only sees the bare genre and
+  // can't lean into substyle-specific craft.
   return `Research this song: "${q}"
 
 Provide a COMPLETE musicology analysis. If you recognize the song, draw from your full knowledge. If the query is ambiguous, pick the most famous version.
@@ -13997,7 +14023,8 @@ Return in EXACTLY this format:
 SONG: [Full title]
 ARTIST: [Artist name]
 YEAR: [Release year]
-GENRE: [Primary genre — single word: pop / hiphop / rnb / rock / country / edm / folk / metal / jazz / latin / reggaeton / kpop / afrobeats / altrock / neosoul / gospel / blues / punk / reggae]
+GENRE: [Primary genre — single word: pop / hiphop / rnb / rock / country / edm / folk / metal / jazz / latin / reggaeton / kpop / afrobeats / altrock / neosoul / gospel / blues / punk / reggae / brazilian / amapiano / dancehall / bollywood / arabesque / mandopop / children / parody / comedy / tvmusical]
+SUBSTYLE: [Specific subgenre within the genre — e.g. for hiphop: Phonk / Drill / Boom-Bap / Trap / Mumble-Rap / Cloud-Rap / Conscious-Hip-Hop / Crunk / Snap / G-Funk / Hyphy / Memphis-Rap / Plugg / Soul-Sample. For metal: Classic-Metal / Nu-Metal / Metalcore / Thrash / Death-Metal / Black-Metal / Doom-Metal / Power-Metal / Symphonic-Metal / Progressive-Metal / Djent / Melodic-Death-Metal. For pop: Synth-Pop / Indie-Pop / Bedroom-Pop / Dance-Pop / Disco-Pop / etc. For rock: Indie-Rock / Psychedelic-Rock / Garage-Rock / Post-Punk / Arena-Rock / Pop-Punk / etc. Be specific — write "none" only if the song is purely the umbrella genre.]
 STRUCTURE: [Section flow like V1→Pre-C→C→V2→Pre-C→C→Bridge→C]
 BPM: [Estimated BPM]
 KEY: [Musical key]
@@ -14065,20 +14092,27 @@ async function blendAnalyzeSlot(which) {
   cardEl.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Researching "' + escHtml(q) + '"…</span></div>';
   try {
     const raw = await callClaude(_blendResearchPrompt(q), 'You are a musicologist, neuroscientist, and hit songwriter. Provide detailed, actionable analysis.', 2400);
-    const songMatch   = raw.match(/SONG:\s*(.+)/);
-    const artistMatch = raw.match(/ARTIST:\s*(.+)/);
-    const yearMatch   = raw.match(/YEAR:\s*(\d+)/);
+    const songMatch     = raw.match(/SONG:\s*(.+)/i);
+    const artistMatch   = raw.match(/ARTIST:\s*(.+)/i);
+    const yearMatch     = raw.match(/YEAR:\s*(\d+)/i);
     // Capture the FULL genre label (was /(\w+)/ which truncated "Hip-Hop"→"hip")
-    const genreMatch  = raw.match(/GENRE:\s*(.+)/i);
-    const structMatch = raw.match(/STRUCTURE:\s*(.+)/);
-    const bpmMatch    = raw.match(/BPM:\s*[~≈]?\s*(?:approximately|approx\.?|around|about|~)?\s*(\d+)/i);
-    const keyMatch    = raw.match(/KEY:\s*([A-G](?:#|♯|b|♭)?(?:\s*(?:major|minor|maj|min|m(?:aj|in)?))?)/i);
+    const genreMatch    = raw.match(/GENRE:\s*(.+)/i);
+    // SUBSTYLE — captures the specific subgenre (Phonk / Drill / Nu-Metal etc.)
+    // Backend reads songA.substyle / songB.substyle and emits "Genre: hiphop / Phonk"
+    // in the prompt. Skip the literal "none" fallback.
+    const substyleMatch = raw.match(/SUBSTYLE:\s*(.+)/i);
+    const structMatch   = raw.match(/STRUCTURE:\s*(.+)/i);
+    const bpmMatch      = raw.match(/BPM:\s*[~≈]?\s*(?:approximately|approx\.?|around|about|~)?\s*(\d+)/i);
+    const keyMatch      = raw.match(/KEY:\s*([A-G](?:#|♯|b|♭)?(?:\s*(?:major|minor|maj|min|m(?:aj|in)?))?)/i);
+    let _substyleVal = substyleMatch ? substyleMatch[1].trim() : '';
+    if (/^none$/i.test(_substyleVal) || /^n\/a$/i.test(_substyleVal)) _substyleVal = '';
     const song = {
       title:    songMatch   ? songMatch[1].trim()   : q,
       artist:   artistMatch ? artistMatch[1].trim() : '',
       year:     yearMatch   ? yearMatch[1].trim()   : '',
       genre:    _normalizeBlendGenre(genreMatch ? genreMatch[1] : ''),
       genreRaw: genreMatch ? genreMatch[1].trim() : '',
+      substyle: _substyleVal,
       structure:structMatch ? structMatch[1].trim() : '',
       bpm:      bpmMatch    ? bpmMatch[1].trim()    : '',
       key:      keyMatch    ? keyMatch[1].trim()    : '',
@@ -14089,7 +14123,7 @@ async function blendAnalyzeSlot(which) {
       '<div class="blend-dna-head">' +
         '<div>' +
           '<div class="blend-dna-title">' + escHtml(song.title) + '</div>' +
-          '<div class="blend-dna-meta">' + escHtml(song.artist) + (song.year ? ' · ' + escHtml(song.year) : '') + (song.bpm ? ' · ' + escHtml(song.bpm) + ' BPM' : '') + (song.key ? ' · ' + escHtml(song.key) : '') + '</div>' +
+          '<div class="blend-dna-meta">' + escHtml(song.artist) + (song.year ? ' · ' + escHtml(song.year) : '') + (song.substyle ? ' · ' + escHtml(song.substyle) : '') + (song.bpm ? ' · ' + escHtml(song.bpm) + ' BPM' : '') + (song.key ? ' · ' + escHtml(song.key) : '') + '</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
           '<span class="bdg bdg-gold">' + escHtml(song.genre) + '</span>' +
@@ -14180,7 +14214,7 @@ function blendSwapAB() {
       '<div class="blend-dna-head">' +
         '<div>' +
           '<div class="blend-dna-title">' + escHtml(song.title) + '</div>' +
-          '<div class="blend-dna-meta">' + escHtml(song.artist) + (song.year ? ' · ' + escHtml(song.year) : '') + (song.bpm ? ' · ' + escHtml(song.bpm) + ' BPM' : '') + (song.key ? ' · ' + escHtml(song.key) : '') + '</div>' +
+          '<div class="blend-dna-meta">' + escHtml(song.artist) + (song.year ? ' · ' + escHtml(song.year) : '') + (song.substyle ? ' · ' + escHtml(song.substyle) : '') + (song.bpm ? ' · ' + escHtml(song.bpm) + ' BPM' : '') + (song.key ? ' · ' + escHtml(song.key) : '') + '</div>' +
         '</div>' +
         '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">' +
           '<span class="bdg bdg-gold">' + escHtml(song.genre) + '</span>' +
@@ -14216,17 +14250,23 @@ let _blendInflight = false;
 
 // TTS toggle for the blend output. Reads the lyrics aloud — bracket tags
 // like [Verse 1] / [Chorus] are stripped inside speakText() so they don't
-// get pronounced literally. Click again to stop.
+// get pronounced literally. Click again to stop. Checks both speaking AND
+// pending state so a fast double-click while the utterance is still queued
+// (Safari/Webkit) is treated as "stop", not "restart".
 let _blendTTSHandle = null;
 function blendToggleTTS(btn) {
-  if (_blendTTSHandle && _blendTTSHandle.isSpeaking && _blendTTSHandle.isSpeaking()) {
+  const isActive = _blendTTSHandle && (
+    (_blendTTSHandle.isSpeaking && _blendTTSHandle.isSpeaking()) ||
+    (_blendTTSHandle.isPending && _blendTTSHandle.isPending())
+  );
+  if (isActive) {
     _blendTTSHandle.stop();
     _blendTTSHandle = null;
     return;
   }
   const text = S._blendLyrics || S._blendRaw || '';
   if (!text) { toast('No lyrics to read'); return; }
-  _blendTTSHandle = speakText(text, { button: btn });
+  _blendTTSHandle = speakText(text, { button: btn, onEnd: function () { _blendTTSHandle = null; } });
 }
 
 async function blendGenerate() {
@@ -14254,13 +14294,17 @@ async function blendGenerate() {
     const raw = result?.text || '';
     // Parse out the canonical sections for copy buttons. Influence mode emits
     // an "INFLUENCE NOTES:" header; mashup emits "BLEND NOTES:". Match either.
-    const titleMatch  = raw.match(/(?:^|\n)TITLE:\s*(.+)/);
-    const verdictMatch= raw.match(/(?:^|\n)VERDICT:\s*([\s\S]*?)(?=\n\n|\n(?:BLEND|INFLUENCE) NOTES:|\nHOOK ISOLATION:)/);
-    const blendNotesMatch = raw.match(/(?:^|\n)(?:BLEND|INFLUENCE) NOTES:\s*([\s\S]*?)(?=\n\n[A-Z]|\nHOOK ISOLATION:)/);
-    const hookMatch   = raw.match(/(?:^|\n)HOOK ISOLATION:\s*([\s\S]*?)(?=\n\n[A-Z]|\nLYRICS:)/);
-    const lyricsMatch = raw.match(/(?:^|\n)LYRICS:\s*([\s\S]*?)(?=\n\n[A-Z]|\nSONG PROMPT:)/);
-    const promptMatch = raw.match(/(?:^|\n)SONG PROMPT:\s*([\s\S]*?)(?=\n\n[A-Z]|\nPRODUCTION BRIEF:)/);
-    const briefMatch  = raw.match(/(?:^|\n)PRODUCTION BRIEF:\s*([\s\S]*?)$/);
+    // /i case-insensitive so "Title:" / "Verdict:" capitalization variants don't
+    // break parsing. Lookaheads anchor on the NEXT KNOWN section header (not on
+    // a generic blank-line + capital heuristic, which truncated multi-paragraph
+    // notes — audit C5).
+    const titleMatch  = raw.match(/(?:^|\n)TITLE:\s*(.+)/i);
+    const verdictMatch= raw.match(/(?:^|\n)VERDICT:\s*([\s\S]*?)(?=\n(?:BLEND|INFLUENCE) NOTES:|\nHOOK ISOLATION:|\nLYRICS:|\nSONG PROMPT:|\nPRODUCTION BRIEF:|$)/i);
+    const blendNotesMatch = raw.match(/(?:^|\n)(?:BLEND|INFLUENCE) NOTES:\s*([\s\S]*?)(?=\nHOOK ISOLATION:|\nLYRICS:|\nSONG PROMPT:|\nPRODUCTION BRIEF:|$)/i);
+    const hookMatch   = raw.match(/(?:^|\n)HOOK ISOLATION:\s*([\s\S]*?)(?=\nLYRICS:|\nSONG PROMPT:|\nPRODUCTION BRIEF:|$)/i);
+    const lyricsMatch = raw.match(/(?:^|\n)LYRICS:\s*([\s\S]*?)(?=\nSONG PROMPT:|\nPRODUCTION BRIEF:|$)/i);
+    const promptMatch = raw.match(/(?:^|\n)SONG PROMPT:\s*([\s\S]*?)(?=\nPRODUCTION BRIEF:|$)/i);
+    const briefMatch  = raw.match(/(?:^|\n)PRODUCTION BRIEF:\s*([\s\S]*?)$/i);
     const title       = titleMatch ? titleMatch[1].trim() : 'Untitled Blend';
     const verdict     = verdictMatch ? verdictMatch[1].trim() : '';
     const blendNotes  = blendNotesMatch ? blendNotesMatch[1].trim() : '';
@@ -17734,7 +17778,21 @@ async function pasteBlendTwist() {
     if (!text.trim()) { toast('Clipboard is empty'); return; }
     const ta = document.getElementById('blend-twist');
     if (!ta) return;
-    ta.value = text;
+    // If the user already typed a twist, ask before clobbering it. Append on
+    // confirm-no, replace on confirm-yes. Skip if empty or if confirm is
+    // unavailable (server-side renders / unusual environments).
+    const hasContent = (ta.value || '').trim().length > 0;
+    if (hasContent && typeof confirm === 'function') {
+      const replace = confirm('Replace existing twist with clipboard contents?\n\n(Cancel = append to existing twist instead)');
+      if (replace) {
+        ta.value = text;
+      } else {
+        const sep = ta.value.endsWith('\n') ? '' : '\n';
+        ta.value = ta.value + sep + text;
+      }
+    } else {
+      ta.value = text;
+    }
     ta.focus();
     toast('✓ Pasted into twist');
   } catch(e) {
