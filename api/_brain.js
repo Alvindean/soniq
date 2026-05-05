@@ -903,7 +903,7 @@ const SUBSTYLE_SUNO = {
   // region / production language only — the LLM gets artist context via
   // style.agent text (system prompt), which never leaks to the SONG PROMPT.
   // Established era
-  'Lyrical/Conscious':     'lyrical conscious rap, jazz sample loops, live-band boom bap drums, warm vinyl texture, 88 BPM, conscious rap tradition, dense pocket mix, literary bars',
+  'Lyrical/Conscious':     'conscious rap, jazz sample loops, live-band boom bap drums, warm vinyl texture, 88 BPM, conscious rap tradition, conversational pocket, plain-spoken bars with weight',
   'Old School':            'old school hip-hop, 808 drum machine, record scratches, funk breakbeat, 102 BPM, 1985-era boom bap roots, golden-age block-party aesthetic',
   'UK Drill':              'UK drill, sliding 808 basslines, snappy off-beat snares, dark piano chords, 140 BPM, London drill flow, Tottenham/Peckham vocabulary, menacing minor key',
   'Afro-Rap':              'afro rap, amapiano log drum bass, talking drum percussion, Afrobeats groove, 105 BPM, modern West African hip-hop crossover, pidgin/Yoruba inflected',
@@ -963,7 +963,7 @@ const RAP_STYLE_ADLIBS = {
   'Conscious Trap':       ['(mm)','(pause)','(check it)','(listen)','(word)','(truth)','(real)','(breath)'],
   'Afro-Boom Bap':        ['(African chant)','sankofa','true','word','(tonal)','uh-huh','real','(djembe)'],
   'Jazz Rap Revival':     ['(scat)','doo bop','yeah yeah','(horn)','true that','mm','peace','(brush snare)'],
-  'Bay Area':             ['(hyphy)','hella','ghost ride','slap','yadada','beyotch','(Too Short)','yay area'],
+  'Bay Area':             ['(hyphy)','hella','ghost ride','slap','yadada','beyotch','(mobbed out)','yay area'],
   'Down South':           ['(drawl)','slatt','bussin','huh','what it do','fasho','trill','errybody'],
   'Crunk':                ['YEAH!','OKAY!','WHAT!','(SHOUTED)','TURN UP!','CRUNK!','SKEET!','OOOWWWW!'],
   'Chopped & Screwed':    ['(screwed)','(chopped)','(slowed)','sippin','leanin','(syrupy)','(pitch-down)','slow it down']
@@ -2150,11 +2150,11 @@ const LYRIC_TIERS = {
   },
   conscious: {
     label: 'Conscious',
-    description: 'Layered, purposeful — asks something of the listener and rewards a second listen',
-    vocabulary: 'Mix registers freely. Plain language can sit next to elevated word choice when it earns its place. Code-switch when it lands.',
-    rhyme: 'Three-syllable multis where natural. Internal rhymes inside the bar. Rhyme placement should reinforce meaning, not just close lines.',
-    references: 'About two specific references per 8 bars — historical, literary, religious, political, named details. Each reference does work; nothing is decoration.',
-    conceit: 'Two layered conceits or a controlling conceit + a counter-image. The song should have an emotional arc, not just a feeling.'
+    description: 'Substantive but accessible — the message lands on first listen and rewards a second one. Clarity over cleverness.',
+    vocabulary: 'Mostly plain conversational language. An elevated word is allowed only when it is the EXACT right word — never as a flex. If a simpler word works, use the simpler word.',
+    rhyme: 'Internal rhymes where they emerge naturally. Two-syllable multis are plenty — three-syllable multis only when they don\'t feel forced. Rhyme should reinforce meaning, not call attention to itself.',
+    references: 'Roughly one specific reference per 12-16 bars — and only when the reference does real work. No name-drop ladders. No reference-stacking. A single well-chosen detail beats four clever ones.',
+    conceit: 'ONE strong controlling image carried through the song. Layer it only if the layer earns its place. The song needs an emotional arc — not a riddle to decode.'
   },
   archival: {
     label: 'Archival',
@@ -4040,7 +4040,7 @@ const INTRO_ARCHETYPES = [
   { name: 'False-Start Tease',   rule: 'Appears to start with one vibe (slow, acoustic, intimate) for 4-8 bars, then RECONTEXTUALISES with a tempo/genre/key shift before the real verse 1. The fake-out is the hook. Examples: OutKast "Ms. Jackson" piano open then beat drop / Bohemian Rhapsody operatic to rock / Travis Scott "Sicko Mode" multi-section open / Drake "Nice for What" sample-then-beat.' },
   { name: 'Vamp Intro',          rule: '4-8 bars of the chorus chord progression as instrumental vamp before vocal enters. Establishes the harmonic landscape, lets the listener settle in. Pop/R&B/jazz classic. Examples: Beyoncé "Halo" piano vamp / Adele "Someone Like You" / classic Stevie Wonder catalog / Coldplay piano-vamp openers / Norah Jones "Don\'t Know Why".' },
   { name: 'Counted-In',          rule: 'Spoken count-in: "1, 2, 3, 4!" or "uh!" or "let\'s go!" before the band hits. Live-energy signature. Examples: Ramones "Blitzkrieg Bop" (Hey ho let\'s go) / Fall Out Boy "Sugar We\'re Goin Down" count-in / Rolling Stones / Beatles "I Saw Her Standing There" / James Brown "Get Up Off That Thing". Old-school but timeless.' },
-  { name: 'Producer-Tag',        rule: 'Producer tag opens the song (modern hip-hop / pop signature). The tag becomes part of the song\'s identity. Examples: DJ Khaled "WE THE BEST" / Tay Keith "Tay Keith fuck these niggas up" / Metro Boomin "If young Metro don\'t trust you" / Murda Beatz "Murda on the beat so it\'s not nice" / Mike WiLL "Ear Drummers". Tag-then-beat structure.' },
+  { name: 'Producer-Tag',        rule: 'A short verbal hype-tag opens the song before the beat lands (modern hip-hop / pop signature). The tag becomes part of the song\'s identity. Tag-then-beat structure. IMPORTANT: do NOT name any real producer or use any existing producer\'s canonical tag. Use a generic stylistic call-out — a confident hype phrase, a catchphrase tied to the song\'s topic, or a wordless shout (e.g. "(let\'s go!)", "(it\'s on!)", "(yeah!)", "(we up!)", or a 2-4 syllable phrase pulled from the song\'s own hook). The shape is the signature, not anyone\'s name.' },
   { name: 'Field-Recording',     rule: 'Open with ambient sound, found audio, or atmospheric texture — rain, traffic, birds, dialogue, news clip, phone ring, vinyl crackle. Sets a SCENE before the song begins. Examples: The Weeknd "House of Balloons" lighter flick / Frank Ocean "Pyramids" desert ambience / Pink Floyd "Money" cash register / Public Enemy news clips / Lana Del Rey vinyl crackle openings.' },
 ];
 
@@ -4883,12 +4883,20 @@ const LENGTH_BUDGETS = {
 function buildLengthBudgetNote(length) {
   const key = LENGTH_BUDGETS[length] ? length : 'medium';
   const b = LENGTH_BUDGETS[key];
+  // Parse the band ("2800–3600") so we can name the minimum and target
+  // explicitly. LLMs aim for the floor of a soft range — naming the minimum
+  // as a hard floor and the target as the upper end pushes the output up.
+  const m = String(b.chars).match(/(\d+)\D+(\d+)/);
+  const minChars = m ? m[1] : '2800';
+  const maxChars = m ? m[2] : '3600';
   return `\n\n📏 LENGTH TARGET — ${b.label.toUpperCase()} (${b.mins}):
-• CHARACTER BUDGET: aim ${b.chars} chars. Count EVERY character including [Section] tags, newlines, parentheses, ad-libs — everything between the LYRICS: header and the SONG PROMPT: header.
+• HARD FLOOR: ${minChars} chars MINIMUM. Songs shorter than ${minChars} chars are rejected — they feel half-finished and fail the user's length contract.
+• TARGET: aim ${maxChars} chars (the upper end of the band). Use the full structure, repeat the chorus the right number of times, give the bridge real bars, let the outro breathe.
+• COUNTING: count EVERY character between the LYRICS: header and the SONG PROMPT: header — [Section] tags, newlines, parentheses, ad-libs, all of it.
 • STRUCTURE FIT: ${b.sections}
-• HARD CEILING: 4900 chars (Suno truncates at 5000; the 100-char margin is non-negotiable). Going over silently LOSES bars — the end of your song gets cut off.
-• OVER-BUDGET FIX: cut repeated chorus/hook occurrences (keep first two + the final one, drop middle repeats), shorten the bridge, trim the outro, drop extra verses (V3/V4/V5 first).
-• COUNT your total character output BEFORE you emit the SONG PROMPT section. If over budget, rewrite before submitting.`;
+• UNDER-BUDGET FIX (most common failure — DO THIS BEFORE SUBMITTING): if you finished and you're under ${minChars}, you stopped too early. Add another chorus repeat with different ad-libs, extend the bridge by 4-8 bars, add a post-chorus vamp, lengthen the outro, or insert an additional verse. Do NOT submit a short song.
+• OVER-BUDGET FIX: only relevant if you're past ${maxChars}. Cut middle chorus repeats (keep first two + the final), shorten the bridge, trim the outro, drop V3/V4/V5 first.
+• Suno truncates at 5000 chars — leave a 100-char safety margin. But the FAR more common failure is undershooting, not overshooting. Fill the band.`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7170,8 +7178,8 @@ const RAP_STYLES = {
   },
   conscious: {
     label: 'Conscious Rap', category: 'established', era: '1990s–Present',
-    agent: 'You are a conscious rap philosopher-poet. Every bar serves a larger argument. You use hip-hop\'s full rhetorical toolkit — extended metaphor, irony, intertextual reference, call-and-response. Your job is to make the listener think harder than they expected to.',
-    defaults: { flow: 'on-beat', rhymeArch: 'internal', density: 'dense', vocabRegister: 'conscious-literary', persona: 'omniscient' }
+    agent: 'You are a conscious rap writer in the Common / Cole / Kendrick "Alright" tradition. The job is CLARITY, not cleverness. Plain language carrying real meaning beats dense wordplay every time. Say one true thing per bar — let the listener feel it before they unpack it. Conversational delivery. One strong image is worth more than three layered metaphors. Avoid showing off vocabulary. Avoid stacking references. The message must land on first listen.',
+    defaults: { flow: 'on-beat', rhymeArch: 'internal', density: 'medium', vocabRegister: 'street-coded', persona: 'first-person-raw' }
   },
   mumble: {
     label: 'Mumble Rap', category: 'established', era: '2015–Present',
@@ -7477,8 +7485,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Childlike Casio-style synth lead (the Swizz signature — playground melody on top of pounding drums), 808 sub-bass for impact, occasional horn stabs, sometimes soul samples, hand-claps featured prominently.',
     energy: 'Explosive but spacious — lots of room for the rapper. Each hit is impactful. Energy is "showtime" / "stadium-anthem" / Bronx-block-party.',
     referenceTracks: 'DMX "Ruff Ryders Anthem", Eve "What Y\'all Want", Ja Rule "Holla Holla", Beyoncé "Ring The Alarm", Cassidy "I\'m a Hustla", Jay-Z "On to the Next One", Busta Rhymes "Pass The Courvoisier"',
-    suno: 'swizz beatz production, pounding kick on 1 and 3, hand claps + snare on 2 and 4, childlike Casio-style synth lead, 808 sub-bass, horn stabs, 90 BPM, Bronx block-party stadium anthem, Show Me What You Got energy, no triplet hi-hats',
-    producerTag: '"(SHOWTIME!)" or "(Show me what you got)" Swizz-canonical producer-tag opening',
+    suno: 'pounding kick on 1 and 3, hand claps + snare on 2 and 4, childlike Casio-style synth lead, 808 sub-bass, horn stabs, 90 BPM, Bronx block-party stadium-anthem energy, no triplet hi-hats',
+    openerArchetype: 'stadium-shout opener — short hype phrase ("SHOWTIME!" / "Let\'s go!" energy) over the first kick. NO real producer name. Generic crowd-rallying call-out.',
     bestFor: 'anthem rap, posse cuts, hype tracks, showtime moments, off-the-top freestyles (the pound + space pairs PERFECTLY with improv — leaves room for the rapper to breathe and react)'
   },
   'Hit-Boy': {
@@ -7489,8 +7497,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Melodic synth leads (anthem-quality, sometimes orchestral string overlays), bass-as-melody (the bass plays a melodic line, not just sub-rumble), occasional gospel/soul samples (Nas King\'s Disease era), modern polished mix.',
     energy: 'Anthem-energy / victorious / confident. Production feels "trophy-room" — clean, mature, modern-classic. Works equally well for triumphant rap and reflective rap.',
     referenceTracks: 'Nas "Ultra Black" (King\'s Disease), Big Sean "Bounce Back", Jay-Z + Kanye "Niggas in Paris" (co-prod), Travis Scott "Goosebumps" (co-prod), Beyoncé "Drunk In Love" (co-prod), Big Sean "Detroit 2" album, Nipsey Hussle "Last Time That I Checc\'d", Nas + Hit-Boy "King\'s Disease II"',
-    suno: 'hit-boy production, clean knocking 808 kick, snappy layered snare, hi-hat rolls, melodic synth lead, bass-as-melody hook, 85 BPM, modern polished anthem-energy, victory-lap rap, Nas Kings Disease era',
-    producerTag: '"(Hit-Boy)" sotto-voce producer-tag opening',
+    suno: 'clean knocking 808 kick, snappy layered snare, hi-hat rolls, melodic synth lead, bass-as-melody hook, 85 BPM, modern polished anthem-energy, victory-lap rap',
+    openerArchetype: 'sotto-voce signature opener — quiet single-word imprint over the first kick (NO producer name); set the tone with restraint, then let the beat earn the volume.',
     bestFor: 'lyrical conscious rap, victory-lap tracks, mature reflective rap, modern anthem rap, off-the-top freestyles (the bass-melody-hook gives rappers a melodic line to ride)'
   },
   'Metro Boomin': {
@@ -7501,8 +7509,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Ambient pad textures (the Metro signature — atmospheric pads under the trap drums), dark melodic synth leads (often minor key), orchestral strings sometimes, bell-tone melodies, deep sub-bass.',
     energy: 'Dark, atmospheric, cinematic. Trap with depth. Maximum sub-bass — these beats are MEANT to shake. Modern-mafioso atmosphere.',
     referenceTracks: 'Future "Mask Off", Drake "Jumpman", Migos "Bad and Boujee", 21 Savage "Bank Account", Travis Scott "Goosebumps" (co-prod), Future + Drake "Life Is Good", The Weeknd "Heartless", 21 Savage + Metro "Without Warning"',
-    suno: 'metro boomin production, hard 808 trap kick, rolling triplet hi-hats, ambient pad textures, dark minor-key synth lead, atmospheric strings, 140 BPM half-time feel, Atlanta trap signature, deep sub-bass',
-    producerTag: '"(If young Metro don\'t trust you, I\'m gon\' shoot you)" Metro-canonical producer-tag opening',
+    suno: 'hard 808 trap kick, rolling triplet hi-hats, ambient pad textures, dark minor-key synth lead, atmospheric strings, 140 BPM half-time feel, Atlanta trap signature, deep sub-bass',
+    openerArchetype: 'dark cinematic intro — atmospheric pad swell, then 808 drop. NO real producer name in any tag. Optional brief whispered phrase as mood-setter, generic only.',
     bestFor: 'modern trap, drill-adjacent, atmospheric rap, dark cinematic, anthemic trap, mafioso modern'
   },
   'Pharrell Williams (Neptunes era)': {
@@ -7513,8 +7521,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Synth-bass-as-melody (the Neptunes signature — bass plays a hooky melodic figure), ARP arpeggio synth lines, falsetto-friendly mix (lots of high-end space for high vocal), minimal layering — every element earns its place.',
     energy: 'Bouncy, futurist, club-meets-art-school. Production feels weightless on top of tight rhythm. Famous for letting the SPACE between elements be a feature.',
     referenceTracks: 'Snoop Dogg "Drop It Like It\'s Hot", Clipse "Grindin\'", Kelis "Milkshake", Justin Timberlake "Like I Love You", Jay-Z "I Just Wanna Love U", Britney Spears "I\'m a Slave 4 U", Nelly + Kelly "Dilemma", Pusha T "Diet Coke"',
-    suno: 'pharrell williams neptunes era production, minimal pounding kick, dry hand claps + snare on 2-4, synth-bass-as-melody hooky bass figure, ARP arpeggio synth, falsetto-friendly mix, bouncy futurist art-school R&B-rap, 100 BPM, 2000s Neptunes signature, no hi-hat rolls',
-    producerTag: '"(Skateboard P)" or "(Neptunes)" Pharrell-canonical producer-tag opening',
+    suno: 'minimal pounding kick, dry hand claps + snare on 2-4, synth-bass-as-melody hooky bass figure, ARP arpeggio synth, falsetto-friendly mix, bouncy futurist art-school R&B-rap, 100 BPM, early-2000s minimalist-funk signature, no hi-hat rolls',
+    openerArchetype: 'minimal-funk count-in or single ARP-synth hit before the kick lands. NO real producer name. Lean on the SPACE between elements as the entry signature.',
     bestFor: 'art-school rap, futurist hip-hop, club-meets-thoughtful, falsetto-rap pairings, skater-rap, R&B-rap crossover'
   },
   'J Dilla': {
@@ -7525,8 +7533,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Soul samples (rare grooves chopped — the SP-1200 / MPC sample-flip aesthetic), warm dusty-vinyl texture, sometimes Rhodes piano or live keys, walking bass occasionally, NO synth leads (sample-driven only).',
     energy: 'Head-nod / cigarette-smoke / late-night-studio. The groove is the entire point — the drums sit BEHIND the beat, the listener leans in.',
     referenceTracks: 'Common "The Light", D\'Angelo "Send It On", The Pharcyde "Drop", Slum Village "Players", Erykah Badu "Didn\'t Cha Know", Q-Tip "Won\'t Trade", J Dilla "Donuts" album (entire), De La Soul "Stakes Is High"',
-    suno: 'j dilla production, off-grid drum programming, kick + snare brushed feel, head-nod groove, soul sample chopped (rare groove), warm dusty-vinyl texture, 90 BPM, 1990s-2000s sample-flip aesthetic, behind-the-beat',
-    producerTag: '"(Dilla)" sotto-voce producer-tag opening',
+    suno: 'off-grid drum programming (drums sit deliberately behind the metronome grid), kick + snare brushed feel, head-nod groove, soul sample chopped (rare groove), warm dusty-vinyl texture, 90 BPM, 1990s-2000s sample-flip aesthetic, behind-the-beat',
+    openerArchetype: 'sample-led intro — let the chopped soul loop play 2-4 bars solo before the drums enter. NO real producer name. The sample IS the signature.',
     bestFor: 'lyrical conscious rap, jazz-rap, neo-soul-rap crossover, late-night reflective rap, mature lyrical rap, head-nod-driven freestyles'
   },
   'The Alchemist': {
@@ -7537,8 +7545,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Soul / jazz / world-music sample loops (Alchemist is famous for OBSCURE sample sources — Italian library music, Greek folk, Turkish funk), atmospheric layered ambient samples, sometimes vinyl crackle deliberate, no synth leads.',
     energy: 'Cinematic, mafioso, cigarette-smoke-and-bourbon. Beats feel like film scores chopped into rap beats. Spacious — lots of room for dense rhyming.',
     referenceTracks: 'Mobb Deep "Hurt Niggas", Action Bronson "Easy Rider", Mach-Hommy "Pray for Haiti" (Alchemist co-prod), Boldy James "The Price of Tea in China" (Alchemist prod), Conway the Machine + Roc Marciano work, Freddie Gibbs + Alchemist "Alfredo" (full album)',
-    suno: 'the alchemist production, boom-bap kick + snare, warm vinyl drums, obscure soul jazz world-music sample loop, atmospheric ambient layer, 90 BPM, 1990s East Coast revival cinematic mafioso aesthetic, no trap hats',
-    producerTag: '"(Alchemist)" or sample-led intro Alchemist-canonical opening',
+    suno: 'boom-bap kick + snare, warm vinyl drums, obscure soul jazz world-music sample loop, atmospheric ambient layer, 90 BPM, 1990s East Coast revival cinematic mafioso aesthetic, no trap hats',
+    openerArchetype: 'sample-led cinematic intro — obscure dialogue clip, vinyl crackle, or solo sample loop for 2-4 bars before drums. NO real producer name.',
     bestFor: 'lyrical conscious rap, archival-tier rap, cinematic-storytelling rap, modern-mafioso, Griselda-adjacent'
   },
   // ─── VIRAL-LEANING PRODUCERS (Wave 4e — pair with Viral Mode) ──────────────
@@ -7550,8 +7558,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Dark melodic synth leads (often minor-key bell tones or pluck synths), sub-rumble bass, atmospheric pads sparse, occasional Memphis horror sample (the Three 6 Mafia lineage). Production is BUILT for body-movement on TikTok.',
     energy: 'Booming dance-floor menace. Built for instant-reaction movement. The "Tay Keith fuck these niggas up" producer-tag itself became a meme — the TAG IS the hook entry.',
     referenceTracks: 'BlocBoy JB + Drake "Look Alive", Drake "Nonstop", Megan Thee Stallion "Big Ole Freak", Eminem "Greatest", Pop Smoke "Welcome to the Party"',
-    suno: 'tay keith production, booming 808 kick + sliding 808 bass-glides, snappy snare on 2 and 4, rolling triplet hi-hats, dark minor-key synth lead, Memphis trap dance-floor menace, 130 BPM',
-    producerTag: '"(Tay Keith fuck these niggas up)" — the producer-tag IS the meme entry-point',
+    suno: 'booming 808 kick + sliding 808 bass-glides, snappy snare on 2 and 4, rolling triplet hi-hats, dark minor-key synth lead, Memphis trap dance-floor menace, 130 BPM',
+    openerArchetype: 'meme-style hype-shout opener — short hard-consonant phrase over the first kick (NO real producer name; use a generic dance-floor call-out or the song\'s own catchphrase).',
     bestFor: 'viral-mode hip-hop, modern trap, dance-floor rap, TikTok-bait songs, posse cuts. Pairs with Viral Mode for instant-hit architecture.'
   },
   'Jack Antonoff': {
@@ -7562,8 +7570,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: '80s synthesizer pads (the Antonoff signature — the "Bleachers" / Lana / Lorde production palette), warm Wurlitzer or Rhodes piano, occasional saxophone (Lana / Sabrina), driving electric bass line, bell-tone synth accents. Modern-pop polished mix that still sounds intimate.',
     energy: 'Anthem-pop with intimacy. The Antonoff signature is making MASSIVE pop hooks feel personal — the chorus belts but the verse breathes. Anti-bombastic — the production never overwhelms the vocal.',
     referenceTracks: 'Taylor Swift "Cruel Summer" / "Anti-Hero", Sabrina Carpenter "Espresso" / "Please Please Please", Lana Del Rey "The Greatest", Lorde "Solar Power", Olivia Rodrigo "deja vu", Bleachers entire catalog',
-    suno: 'jack antonoff production, crisp pop drum kit, 80s synthesizer pads, warm Wurlitzer piano, driving electric bass line, bell-tone synth accents, modern polished pop mix with intimacy, anthem chorus + intimate verse architecture, 105 BPM',
-    producerTag: '(Antonoff doesn\'t use a producer-tag — keep instrumental intro instead)',
+    suno: 'crisp pop drum kit, 80s synthesizer pads, warm Wurlitzer piano, driving electric bass line, bell-tone synth accents, modern polished pop mix with intimacy, anthem chorus + intimate verse architecture, 105 BPM',
+    openerArchetype: 'instrumental intro only — no vocal tag. 4-8 bars of the chorus chord progression as a Wurlitzer-and-synth-pad vamp before the first vocal enters.',
     bestFor: 'viral-mode pop, modern pop ballad, indie-pop with anthem hooks, Sabrina-style retro-pop, Taylor-style narrative-pop. Pairs with Viral Mode for the "Espresso" / "Anti-Hero" hook architecture.'
   },
   'Murda Beatz': {
@@ -7574,8 +7582,8 @@ const PRODUCER_TEMPLATES = {
     instrumentation: 'Sparse melodic synth leads (often single-note plucks or bell tones), deep sub-bass, sometimes orchestral string stabs, atmospheric pad textures sparse — Murda\'s production has SPACE that lets the rapper carry the song. Built for melodic rap.',
     energy: 'Modern trap with crossover-hit potential. Murda Beatz produces for rappers AND singers — his beats are MELODIC enough for sung hooks, hard enough for dense raps. The "Migos / Drake / Travis pop-trap" sweet spot.',
     referenceTracks: 'Migos "MotorSport", Drake "Nice for What", Travis Scott "Butterfly Effect", Cardi B "Money Bag", 6ix9ine "FEFE", Doja Cat "Tia Tamera", DaBaby "Suge"',
-    suno: 'murda beatz production, punchy 808 trap kick, snappy snare + clap on 2 and 4, rolling triplet hi-hats, sparse melodic synth lead, deep sub-bass, atmospheric pads, modern Atlanta trap melodic-rap crossover, 135 BPM half-time',
-    producerTag: '"(Murda on the beat so it\'s not nice)" Murda-canonical producer-tag opening — the tag is the hook entry',
+    suno: 'punchy 808 trap kick, snappy snare + clap on 2 and 4, rolling triplet hi-hats, sparse melodic synth lead, deep sub-bass, atmospheric pads, modern Atlanta trap melodic-rap crossover, 135 BPM half-time',
+    openerArchetype: 'melodic-trap hook entry — sparse synth-pluck motif for 2 bars, then drop the 808s with a single hype phrase (NO real producer name; generic call-out only).',
     bestFor: 'viral-mode hip-hop, melodic trap, pop-rap crossover, modern trap with sung hooks, posse cuts. Pairs with Viral Mode for "Nice for What" / "MotorSport" hit architecture.'
   }
 };
@@ -7637,21 +7645,20 @@ VIRAL ARTIST REFERENCE POINTS (study the modern viral architecture):
 • K-Pop:      BTS, BLACKPINK, NewJeans, LE SSERAFIM, IVE, Stray Kids, TWICE
 • Pop-Punk:   Olivia Rodrigo (rock-leaning), Machine Gun Kelly (Tickets to My Downfall), Yungblud, WILLOW
 
-VIRAL PRODUCER REFERENCES (modern hit-makers known for engineering virality):
-• Tay Keith (Drake "Nonstop", Megan, BlocBoy JB) — his "Tay Keith fuck these niggas up" tag became its own meme
-• Murda Beatz (Migos "MotorSport", Drake "Nice for What", Travis Scott)
-• Pierre Bourne (Playboi Carti, Lil Uzi Vert "XO TOUR Llif3")
-• Wheezy (Future "Mask Off"-era, Drake "Way 2 Sexy")
-• OZ + Cubeatz (Travis Scott "SICKO MODE", Kanye, Future)
-• Frank Dukes (Travis "ASTROWORLD", Cardi B "WAP", many viral hits)
-• Jack Antonoff (Taylor Swift, Sabrina Carpenter "Espresso", Lana, Olivia Rodrigo)
-• Max Martin (Backstreet/Britney/Katy/Taylor — universal pop hook architecture)
-• Andrew Watt (Post Malone, Justin Bieber, Olivia Rodrigo viral pop-punk era)
-• YoungKio (Old Town Road) — single beat that broke the genre wall
-• Tainy (Bad Bunny "MIA", Karol G, Latin viral architect)
-• London on da Track (Future, Drake "Behind Barz")
-• ATL Jacob (Future "WAIT FOR U")
-• Cole Bennett / Lyrical Lemonade visual-virality producer ecosystem
+VIRAL BEAT-DNA REFERENCES (study the production architecture behind these viral hits — describe the SOUND, never name a producer):
+• Memphis-trap meme architecture — booming 808 + sliding bass-glides + rolling triplet hats; signature production tag became the hook entry ("Nonstop", "Look Alive", "Big Ole Freak")
+• Melodic-trap crossover — punchy 808s + sparse synth plucks + atmospheric pads; built for sung hooks over hard drums ("MotorSport", "Nice for What", "Butterfly Effect")
+• Plugg / pluggnb signature — bell-tone melody loops, tuned 808s, sparse hi-hats, dreamy reverb wash ("XO TOUR Llif3", Carti-era plugg)
+• Atlanta-trap dark cinematic — deep sub-bass, ambient pad swells, minor-key synth leads, trap drum kit ("Mask Off", "Way 2 Sexy")
+• Beat-switch maximalism — multi-section production with hard mid-song key/tempo flips ("SICKO MODE" architecture)
+• Sample-flip viral hook — chopped vocal sample as the song's spine, drums built around it ("WAP", "Industry Baby")
+• Modern Antonoff-coded indie-pop — 80s synth pads, Wurlitzer piano, driving electric bass, intimate-verse-into-anthem-chorus ("Anti-Hero", "Espresso", "deja vu")
+• Universal-hook pop architecture — Max Martin-school chord-and-melody math: I-V-vi-IV with built-in singalong intervals (mainstream radio backbone)
+• Pop-punk revival production — distorted guitars, programmed pop drums, layered "woah-oh" group vocals ("good 4 u" era)
+• Genre-bender breakout — single-beat-as-genre-collision (banjo + trap drums on "Old Town Road" template)
+• Latin viral architecture — dembow-coded percussion, melodic Spanish hooks, mid-tempo crossover sweet spot ("MIA", Karol G crossover catalog)
+• Trap-soul melodic — sung-rap crossover with R&B chord motion under trap drums ("Behind Barz", "WAIT FOR U")
+• Visual-virality ecosystem — production engineered for short-clip visual content (TikTok / Reels / Shorts ready)
 
 ANTI-PATTERNS — what kills virality (avoid all of these):
 ✗ Long verse intros (over 20 seconds before hook lands)
@@ -7755,18 +7762,23 @@ function buildProducerTemplateNote(producerKey) {
   if (!producerKey) return '';
   const p = PRODUCER_TEMPLATES[producerKey];
   if (!p) return '';
+  // Output describes the STYLE only — never name the producer in the prompt.
+  // The producer key is internal taxonomy; the LLM and downstream Suno
+  // prompt see only the sonic-DNA fields (drums / instrumentation / energy /
+  // BPM / suno tag / opener archetype). Keeps us out of right-of-publicity
+  // territory and prevents Suno style filters from flagging real names.
   return `
 
-🎛️ PRODUCER BEAT TEMPLATE — ${p.label} (${p.era}, ${p.bpm} BPM):
+🎛️ BEAT TEMPLATE (${p.era}, ${p.bpm} BPM):
 • DRUMS: ${p.drumPattern}
 • INSTRUMENTATION: ${p.instrumentation}
 • ENERGY: ${p.energy}
 • REFERENCE TRACKS: ${p.referenceTracks}
 • SUNO PRODUCTION LOCK: ${p.suno}
-• PRODUCER-TAG OPENING: ${p.producerTag}
+• OPENER ARCHETYPE: ${p.openerArchetype}
 • PAIRS BEST WITH: ${p.bestFor}
 
-The beat MUST feel like ${p.label}'s production signature — not generic ${p.label}-influenced. Cite the producer-tag opening if appropriate to the song's intro.`;
+The beat MUST feel like this exact sonic-DNA — every drum, instrumentation, and energy field above is a hard constraint. Use the opener archetype if appropriate to the song's intro. Do NOT name any specific producer or artist in the lyrics, ad-libs, or SONG PROMPT — describe the SOUND, never the person.`;
 }
 
 function buildRapLabPrompt(params) {
