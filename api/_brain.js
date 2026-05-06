@@ -5578,7 +5578,7 @@ function buildSongPrompt(params) {
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
-    platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
+    platform = 'suno', avoidPatterns = [], avoidHookPatterns = [], avoidPhrases = [], dualPerspective = false, platinum = false,
     freestyleMode = false, breakRule = false, eraUndertone = '',
     offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
     producerTemplate = '',         // Wave 4d — producer beat template
@@ -5865,6 +5865,16 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   const avoidNote = avoidPatterns && avoidPatterns.length > 0
     ? `\n\nPATTERN AVOIDANCE: These opening lines were used recently — do NOT start any verse with similar phrasing or imagery: ${avoidPatterns.map(p => `"${p}"`).join(', ')}. Find a completely fresh entry point.`
     : '';
+  // ── Hook-opener avoidance — mirrors verse-1 opener tracking but for hooks.
+  // Stops the model from defaulting to the same chorus opening across the user's catalog.
+  const avoidHookNote = avoidHookPatterns && avoidHookPatterns.length > 0
+    ? `\n\nHOOK PATTERN AVOIDANCE: These hook/chorus opening lines were used in this user's recent songs — do NOT open any [Hook] or [Chorus] section with similar phrasing, structure, or imagery: ${avoidHookPatterns.map(p => `"${p}"`).join(', ')}. The hook is the song's signature — find a fresh first line every time.`
+    : '';
+  // ── Lyric phrase fingerprint — server-side history of distinctive lines from
+  // this user's last ~30 generated lines. Stops cross-song verbatim/paraphrase repetition.
+  const avoidPhrasesNote = avoidPhrases && avoidPhrases.length > 0
+    ? `\n\nLYRIC FINGERPRINT (cross-song uniqueness — non-negotiable): These lines have appeared in this user's recent songs. Do NOT reuse them verbatim, do NOT paraphrase them with synonyms, do NOT rebuild the same image with different words. Treat them as exhausted territory — go somewhere new:\n${avoidPhrases.map((p, i) => `${i+1}. "${p}"`).join('\n')}\nThe entire reason a writer has a catalog is that each song stakes out fresh ground. If a topic genuinely demands one of these images, find a new angle on it (different POV, different time of day, different sensory detail) — never recycle the line itself.`
+    : '';
 
   // ── Platform-specific instructions ─────────────────────────────────────
   const platformNotes = {
@@ -5970,7 +5980,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 

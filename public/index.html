@@ -9430,7 +9430,15 @@ const S={selectedGenre:'pop',
   dualPerspective: false,
   seedLine: '',
   recentOpenings: [],    // Track last 3 verse-1 opening lines for pattern avoidance
+  recentHookOpenings: [], // Track last 3 hook/chorus opening lines for pattern avoidance
 };
+// Rehydrate opener trackers from localStorage so cross-song uniqueness survives reloads
+try {
+  const _ro = localStorage.getItem('soniq_recent_openings');
+  if (_ro) S.recentOpenings = JSON.parse(_ro).slice(0, 3);
+  const _rho = localStorage.getItem('soniq_recent_hook_openings');
+  if (_rho) S.recentHookOpenings = JSON.parse(_rho).slice(0, 3);
+} catch(e) {}
 
 // ── ADMIN SESSION — synchronous check (must run before Supabase init) ──
 // Token is set on first visit with ?admin=PASSWORD and persisted in localStorage.
@@ -11543,6 +11551,7 @@ async function generateSong(){
     dualPerspective: S.dualPerspective || false,
     seedLine: S.seedLine || '',
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
+    avoidHookPatterns: S.recentHookOpenings ? [...S.recentHookOpenings] : [],
     aggression: S.selectedAggression || 'mid',
     freestyleMode: S.freestyleMode === true,
     // Wave 4i — Production Mode toggles. Server validates + applies genre gate
@@ -12092,6 +12101,28 @@ function parseSongResult(raw,genre,topic,prodData){
       S.recentOpenings.unshift(verse1Lines[0]);
       if (S.recentOpenings.length > 3) S.recentOpenings = S.recentOpenings.slice(0, 3);
     }
+    // Hook-opener tracker — same idea, applied to the song's signature line.
+    // Matches [Hook], [Chorus], [Hook 1], [Chorus 1] etc. Pulls the first
+    // non-empty line that isn't a [bracket-tag] or (parenthesised ad-lib).
+    const hookMatch = lyrics.match(/\[(?:Hook|Chorus)(?:\s*\d*)?\]([\s\S]*?)(?=\[|$)/i);
+    if (hookMatch) {
+      const hookLines = hookMatch[1].trim().split('\n')
+        .map(l => l.trim())
+        .filter(l => l && !/^\[[^\]]+\]$/.test(l) && !/^\([^)]+\)$/.test(l));
+      if (hookLines[0]) {
+        if (!S.recentHookOpenings) S.recentHookOpenings = [];
+        // Dedupe — only push if not already in the recent set
+        if (!S.recentHookOpenings.includes(hookLines[0])) {
+          S.recentHookOpenings.unshift(hookLines[0]);
+          if (S.recentHookOpenings.length > 3) S.recentHookOpenings = S.recentHookOpenings.slice(0, 3);
+        }
+      }
+    }
+    // Persist across sessions so the avoidance survives page reloads
+    try {
+      if (S.recentOpenings) localStorage.setItem('soniq_recent_openings', JSON.stringify(S.recentOpenings));
+      if (S.recentHookOpenings) localStorage.setItem('soniq_recent_hook_openings', JSON.stringify(S.recentHookOpenings));
+    } catch(e) {}
   }
   // Push the new song as a version too
   pushVersion('res');
@@ -15861,6 +15892,7 @@ async function applyCoachAndRegenerate() {
         ratio: 70
       },
       avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
+      avoidHookPatterns: S.recentHookOpenings ? [...S.recentHookOpenings] : [],
       edgeMode: window.__qfEdge === true,
       platinum: _platinumOn && isPlatinumEligible(),
       // The two new fields that turn this into a coach-driven rewrite:

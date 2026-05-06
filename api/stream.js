@@ -51,6 +51,87 @@ async function redisIncrExpire(key, ttl) {
   }
 }
 
+// ── Redis LIST helpers (lyric fingerprint) ────────────────────────────────
+// LRANGE key 0 N-1 → newest first (we LPUSH newest)
+async function redisLRange(key, count) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return [];
+  try {
+    const r = await fetch(`${UPSTASH_URL}/lrange/${encodeURIComponent(key)}/0/${count - 1}`, {
+      headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` }
+    });
+    const d = await r.json();
+    return Array.isArray(d.result) ? d.result : [];
+  } catch (e) {
+    console.error('Redis LRANGE error:', e.message);
+    return [];
+  }
+}
+// LPUSH multiple values, LTRIM to keep newest N, EXPIRE for self-cleanup.
+async function redisLPushTrim(key, values, keepN, ttlSeconds) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
+  if (!Array.isArray(values) || values.length === 0) return;
+  try {
+    // LPUSH expects values in reverse (each pushed to head individually)
+    await fetch(`${UPSTASH_URL}/pipeline`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${UPSTASH_TOKEN}` },
+      body: JSON.stringify([
+        ['LPUSH', key, ...values],
+        ['LTRIM', key, 0, keepN - 1],
+        ['EXPIRE', key, ttlSeconds],
+      ])
+    });
+  } catch (e) {
+    console.error('Redis LPUSH/LTRIM error:', e.message);
+  }
+}
+
+// ── Lyric fingerprint extractor ───────────────────────────────────────────
+// Pulls the most distinctive lines from a song (chorus first 4 + verse-1 first 2)
+// to feed back as "do not repeat these" on the next generation. Cleaned of
+// bracket tags, ad-lib parens, and trivial filler.
+function extractFingerprintLines(lyrics) {
+  if (!lyrics || typeof lyrics !== 'string') return [];
+  const out = [];
+  const cleanLine = (l) => l
+    .replace(/\([^)]*\)/g, '')   // strip parenthesised ad-libs
+    .replace(/\s+/g, ' ')
+    .trim();
+  const isUseful = (l) =>
+    l && l.length >= 12 && l.length <= 120 &&
+    !/^\[[^\]]+\]$/.test(l) &&
+    /[a-zA-Z]/.test(l);
+
+  // Chorus / Hook — first 4 useful lines
+  const hookMatch = lyrics.match(/\[(?:Hook|Chorus)(?:\s*\d*)?\]([\s\S]*?)(?=\[|$)/i);
+  if (hookMatch) {
+    const lines = hookMatch[1].split('\n').map(cleanLine).filter(isUseful).slice(0, 4);
+    out.push(...lines);
+  }
+  // Verse 1 — first 2 useful lines (the song's entry point matters most)
+  const v1Match = lyrics.match(/\[Verse\s*1?\]([\s\S]*?)(?=\[|$)/i);
+  if (v1Match) {
+    const lines = v1Match[1].split('\n').map(cleanLine).filter(isUseful).slice(0, 2);
+    out.push(...lines);
+  }
+  // Dedup + cap to 6 per song
+  return [...new Set(out)].slice(0, 6);
+}
+
+// Read up to N most recent fingerprint lines for this user.
+async function getLyricFingerprint(userId, count = 30) {
+  if (!userId) return [];
+  return await redisLRange(`soniq:lyricfp:u:${userId}`, count);
+}
+// Store fresh fingerprint lines extracted from the most recent generation.
+// Keeps newest 50 across all songs, expires after 90 days of no new generations.
+async function storeLyricFingerprint(userId, lyrics) {
+  if (!userId || !lyrics) return;
+  const lines = extractFingerprintLines(lyrics);
+  if (lines.length === 0) return;
+  await redisLPushTrim(`soniq:lyricfp:u:${userId}`, lines, 50, 90 * 24 * 3600);
+}
+
 async function redisHGetAll(key) {
   if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
   try {
@@ -116,6 +197,17 @@ function getTodayDate() {
 
 function getThisMonth() {
   return new Date().toISOString().slice(0, 7); // YYYY-MM
+}
+
+// Pattern-avoidance arrays (verse-1 openers, hook openers). Defense-in-depth
+// — caps to N entries of <=160 chars each, ASCII-printable only.
+function sanitizeAvoidArray(arr, maxN = 3) {
+  if (!Array.isArray(arr)) return [];
+  return arr
+    .filter(s => typeof s === 'string')
+    .map(s => s.replace(/[\x00-\x1f]/g, '').trim().slice(0, 160))
+    .filter(s => s.length >= 4)
+    .slice(0, maxN);
 }
 
 // Lever #8 — sanitise the surprise-engine config from the request body.
@@ -687,6 +779,15 @@ module.exports = async function handler(req, res) {
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           p.sunoLearning = await getSunoLearning(user.id, p.genre, p.mood);
         }
+        // Hook-opener avoidance from the client — sanitise the array
+        p.avoidHookPatterns = sanitizeAvoidArray(p.avoidHookPatterns, 3);
+        p.avoidPatterns      = sanitizeAvoidArray(p.avoidPatterns, 3);
+        // Lyric fingerprint — server-side cross-song uniqueness. Pulls the
+        // last ~30 distinctive lines this user has shipped. Skipped for
+        // anonymous/admin sessions where there's no real history.
+        if (user.id && user.id !== 'admin') {
+          p.avoidPhrases = await getLyricFingerprint(user.id, 30);
+        }
         if (p.genre === 'hiphop' && p.rapLabActive) {
           built = brain.buildRapLabPrompt(p);
         } else {
@@ -749,6 +850,12 @@ module.exports = async function handler(req, res) {
         const STUDIO_PLANS_SET = new Set(['studio','studio_annual','platinum','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
         if (req._adminBypass || STUDIO_PLANS_SET.has(plan)) {
           lp.sunoLearning = await getSunoLearning(user.id, lp.genre, lp.mood);
+        }
+        // Same uniqueness layer for Lucky
+        lp.avoidHookPatterns = sanitizeAvoidArray(lp.avoidHookPatterns, 3);
+        lp.avoidPatterns      = sanitizeAvoidArray(lp.avoidPatterns, 3);
+        if (user.id && user.id !== 'admin') {
+          lp.avoidPhrases = await getLyricFingerprint(user.id, 30);
         }
         built = brain.buildLuckyPrompt(lp);
       }
@@ -840,6 +947,16 @@ module.exports = async function handler(req, res) {
       redisIncrExpire(redisKey, ttl);
     }
   };
+  // Fire-and-forget: extract distinctive lines from this generation and push
+  // them onto the user's lyric fingerprint so the next song avoids them.
+  // Only fires for the buffered paths (where we have the full text); the raw
+  // streaming fallback paths skip storage to avoid stitching chunks together.
+  const recordFingerprint = (lyricText) => {
+    if (!user.id || user.id === 'admin' || !lyricText) return;
+    storeLyricFingerprint(user.id, lyricText).catch(e =>
+      console.error('Lyric fingerprint store failed:', e.message)
+    );
+  };
 
   const minScore   = PLAN_MIN_SCORES[plan] ?? 0;
   const maxRetries = PLAN_MAX_RETRIES[plan] ?? 0;
@@ -857,6 +974,7 @@ module.exports = async function handler(req, res) {
         if (score >= minScore) break;
       }
       recordUsage();
+      recordFingerprint(bestText);
       streamBuffered(bestText, bestScore, res);
       return;
     } catch (err) {
@@ -871,6 +989,7 @@ module.exports = async function handler(req, res) {
       const hookQuality  = serverHookScore(firstAttempt);
       if (hookQuality >= 60) {
         recordUsage();
+        recordFingerprint(firstAttempt);
         streamBuffered(firstAttempt, hookQuality, res);
         return;
       }
@@ -880,6 +999,7 @@ module.exports = async function handler(req, res) {
       const best = hookQuality2 > hookQuality ? secondAttempt : firstAttempt;
       const bestQ = Math.max(hookQuality, hookQuality2);
       recordUsage();
+      recordFingerprint(best);
       streamBuffered(best, bestQ, res);
       return;
     } catch (err) {
