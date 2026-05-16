@@ -372,6 +372,16 @@ No prose. No markdown fences.`;
       return res.status(500).json({ error: 'Brain returned empty prompt' });
     }
 
+    const t0 = Date.now();
+    console.log('[flow-song] start', {
+      userId: user && user.id,
+      plan: flowPlan,
+      platinum: flowAllowPlatinum,
+      genre: brainGenre,
+      promptChars: built.prompt.length,
+      hasAnthropic: !!(process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE),
+      hasOpenRouter: !!process.env.OPENROUTER_API_KEY,
+    });
     let lyrics;
     try {
       lyrics = await flowCallAI(
@@ -379,8 +389,14 @@ No prose. No markdown fences.`;
         built.system,
         4000,                    // brain prompts produce richer, longer songs
       );
+      console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
     } catch (e) {
-      return res.status(500).json({ error: e.message || 'Lyric generation failed' });
+      console.error('[flow-song] ai-fail', {
+        ms: Date.now() - t0,
+        msg: e && e.message,
+        stack: e && e.stack && e.stack.split('\n').slice(0,3).join(' | '),
+      });
+      return res.status(500).json({ error: (e && e.message) || 'Lyric generation failed' });
     }
 
     // Use the Suno prompt from the spec call — it's already grounded in
