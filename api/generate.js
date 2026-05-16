@@ -182,6 +182,39 @@ module.exports = async function handler(req, res) {
   // generate — flow-song increments usage on success, flow-spec is the
   // cheap classifier and only blocks at the gate.
   const flowMode = req.body && req.body.mode;
+
+  // Shared Flow AI caller — must live at handler scope so both the
+  // flow-spec/flow-song branch AND the flow-score branch can reach it.
+  // (Was previously nested inside the spec/song if-block, which made the
+  // function declaration's block-scoped hoist invisible from flow-score.)
+  async function flowCallAI(messages, system, max_tokens, budgetMs) {
+    // Tolerate the prod env var being named `Claude` instead of
+    // ANTHROPIC_API_KEY. Without this fallback, Anthropic primary is
+    // disabled and every call routes to OpenRouter only — which can push
+    // a 62KB brain prompt + 4000-token output past Vercel's 60s timeout.
+    const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
+    const ok = process.env.OPENROUTER_API_KEY;
+    if (!ak && !ok) throw new Error('No AI provider configured');
+    // Hard internal timeout — must return BEFORE Vercel's 60s axe.
+    // CRITICAL: clear the setTimeout when the AI call wins, otherwise the
+    // late-firing rejection becomes an unhandled promise rejection.
+    const limit = typeof budgetMs === 'number' ? budgetMs : 50000;
+    const withTimeout = function(promise){
+      let to;
+      const guard = new Promise((_, rej) => {
+        to = setTimeout(() => rej(new Error('AI timeout (' + limit + 'ms)')), limit);
+      });
+      guard.catch(() => {}); // belt-and-suspenders against late rejection
+      return Promise.race([promise, guard]).finally(() => clearTimeout(to));
+    };
+    try {
+      if (ak) return await withTimeout(callAnthropic(ak, messages, system, max_tokens));
+      return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
+    } catch (e) {
+      if (ok && ak) return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
+      throw e;
+    }
+  }
   if (flowMode === 'flow-spec' || flowMode === 'flow-song') {
     const flowConcept = (req.body.concept || '').trim();
     if (!flowConcept) return res.status(400).json({ error: 'concept is required' });
@@ -219,38 +252,6 @@ module.exports = async function handler(req, res) {
           ? 'Your 3 free songs are used. Upgrade to keep creating.'
           : 'Monthly limit reached. Upgrade for more songs.';
         return res.status(429).json({ error: 'limit_reached', message: hint, limit: flowLimit, plan: flowPlan });
-      }
-    }
-
-    async function flowCallAI(messages, system, max_tokens, budgetMs) {
-      // Tolerate the prod env var being named `Claude` instead of
-      // ANTHROPIC_API_KEY. Without this fallback, Anthropic primary is
-      // disabled and every call routes to OpenRouter only — which can push
-      // a 62KB brain prompt + 4000-token output past Vercel's 60s timeout.
-      const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
-      const ok = process.env.OPENROUTER_API_KEY;
-      if (!ak && !ok) throw new Error('No AI provider configured');
-      // Hard internal timeout — must return BEFORE Vercel's 60s axe.
-      // CRITICAL: clear the setTimeout when the AI call wins, otherwise the
-      // late-firing rejection becomes an unhandled promise rejection and
-      // poisons the warm lambda → FUNCTION_INVOCATION_FAILED on the next
-      // invocation.
-      const limit = typeof budgetMs === 'number' ? budgetMs : 50000;
-      const withTimeout = function(promise){
-        let to;
-        const guard = new Promise((_, rej) => {
-          to = setTimeout(() => rej(new Error('AI timeout (' + limit + 'ms)')), limit);
-        });
-        // Belt-and-suspenders: swallow late rejection if it fires anyway
-        guard.catch(() => {});
-        return Promise.race([promise, guard]).finally(() => clearTimeout(to));
-      };
-      try {
-        if (ak) return await withTimeout(callAnthropic(ak, messages, system, max_tokens));
-        return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
-      } catch (e) {
-        if (ok && ak) return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
-        throw e;
       }
     }
 
@@ -336,10 +337,10 @@ No prose. No markdown fences.`;
       return 'Emotional';
     }
 
-    let built;
+    let built, brainGenre, flowAllowPlatinum;
     try {
       const brain = require('./_brain.js');
-      const brainGenre = flowGenreToBrainKey(spec.genre);
+      brainGenre = flowGenreToBrainKey(spec.genre);
       const brainMood  = flowMoodToBrainMood(spec.mood || spec.moodArc?.end || 'emotional');
       // Embed the FlowSpec's nuance into the topic so the brain has the full
       // production picture — title, tempo, key, vocal, instrumentation,
@@ -362,7 +363,7 @@ No prose. No markdown fences.`;
       // Plan-gate platinum + premium quality to match stream.js. Free-tier
       // users still get Flow, just on the same brain budget Write gives them.
       const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
-      const flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
+      flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
       built = brain.buildSongPrompt({
         genre: brainGenre,
         topic: enrichedTopic,
