@@ -230,15 +230,26 @@ module.exports = async function handler(req, res) {
       const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
       const ok = process.env.OPENROUTER_API_KEY;
       if (!ak && !ok) throw new Error('No AI provider configured');
-      // Hard internal timeout — must return BEFORE Vercel's 60s axe, so the
-      // client gets a clean JSON error instead of an HTML 504.
+      // Hard internal timeout — must return BEFORE Vercel's 60s axe.
+      // CRITICAL: clear the setTimeout when the AI call wins, otherwise the
+      // late-firing rejection becomes an unhandled promise rejection and
+      // poisons the warm lambda → FUNCTION_INVOCATION_FAILED on the next
+      // invocation.
       const limit = typeof budgetMs === 'number' ? budgetMs : 50000;
-      const timeoutP = new Promise((_, rej) => setTimeout(() => rej(new Error('AI timeout (' + limit + 'ms)')), limit));
+      const withTimeout = function(promise){
+        let to;
+        const guard = new Promise((_, rej) => {
+          to = setTimeout(() => rej(new Error('AI timeout (' + limit + 'ms)')), limit);
+        });
+        // Belt-and-suspenders: swallow late rejection if it fires anyway
+        guard.catch(() => {});
+        return Promise.race([promise, guard]).finally(() => clearTimeout(to));
+      };
       try {
-        if (ak) return await Promise.race([callAnthropic(ak, messages, system, max_tokens), timeoutP]);
-        return await Promise.race([callOpenRouter(ok, messages, system, max_tokens), timeoutP]);
+        if (ak) return await withTimeout(callAnthropic(ak, messages, system, max_tokens));
+        return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
       } catch (e) {
-        if (ok && ak) return await Promise.race([callOpenRouter(ok, messages, system, max_tokens), timeoutP]);
+        if (ok && ak) return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
         throw e;
       }
     }
