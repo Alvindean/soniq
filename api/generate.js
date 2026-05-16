@@ -177,11 +177,39 @@ module.exports = async function handler(req, res) {
   // Flow piggybacks here to fit the 12-function Hobby cap. Two modes:
   //   { mode: 'flow-spec', concept } → { spec }
   //   { mode: 'flow-song', concept, spec } → { title, lyrics, sunoPrompt }
+  //
+  // Both modes participate in the SAME plan/rate-limit gate as normal
+  // generate — flow-song increments usage on success, flow-spec is the
+  // cheap classifier and only blocks at the gate.
   const flowMode = req.body && req.body.mode;
   if (flowMode === 'flow-spec' || flowMode === 'flow-song') {
     const flowConcept = (req.body.concept || '').trim();
     if (!flowConcept) return res.status(400).json({ error: 'concept is required' });
     if (flowConcept.length > 600) return res.status(400).json({ error: 'concept must be 600 chars or fewer' });
+
+    // Plan + rate-limit gate (mirrors the normal-flow block below)
+    let flowPlan = isAdmin ? 'studio' : 'free';
+    if (!isAdmin) {
+      try {
+        const { data: profile } = await supabase.from('profiles').select('plan').eq('id', user.id).single();
+        if (profile?.plan) flowPlan = profile.plan;
+      } catch (e) { /* fall through */ }
+      if (ADMIN_EMAILS.has(user.email)) { flowPlan = 'studio'; isAdmin = true; }
+    }
+    const flowLimit = PLAN_LIMITS[flowPlan] ?? 3;
+    const flowIsLifetime = flowPlan === 'free';
+    const flowRedisKey = flowIsLifetime
+      ? `soniq:ratelimit:lifetime:${user.id}`
+      : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+    if (!isAdmin && isFinite(flowLimit)) {
+      const cur = parseInt(await redisGet(flowRedisKey) || '0', 10);
+      if (cur >= flowLimit) {
+        const hint = flowIsLifetime
+          ? 'Your 3 free songs are used. Upgrade to keep creating.'
+          : 'Monthly limit reached. Upgrade for more songs.';
+        return res.status(429).json({ error: 'limit_reached', message: hint, limit: flowLimit, plan: flowPlan });
+      }
+    }
 
     async function flowCallAI(messages, system, max_tokens) {
       const ak = process.env.ANTHROPIC_API_KEY;
@@ -272,6 +300,11 @@ ${fusionLine}
 Write the lyrics now.`;
     try {
       const text = await flowCallAI([{ role: 'user', content: songPrompt }], songSystem, 1800);
+      // Charge the song against the user's monthly quota (same as normal generate)
+      if (!isAdmin && isFinite(flowLimit)) {
+        const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+        redisIncrExpire(flowRedisKey, ttl);
+      }
       return res.status(200).json({
         title: spec.title,
         lyrics: text.trim(),
