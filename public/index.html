@@ -5102,14 +5102,31 @@ body.craft-advanced .craft-basic-only{display:none !important}
       return h;
     }
 
-    // Refresh the cached session from Supabase if it's missing or stale —
-    // covers the "page just loaded, S.session not hydrated yet" race.
-    async function flowEnsureSession(){
-      var hasToken = window.S && window.S.session && window.S.session.access_token;
-      if (hasToken) return true;
+    function flowGetSupa(){
+      return (window.S && window.S.supabase) || window.supa || (window.supabase && window.supabase.auth ? window.supabase : null);
+    }
+
+    // Refresh the cached session from Supabase if missing OR stale.
+    // forceRefresh=true bypasses the cache and asks Supabase for a fresh
+    // access_token (used on a 401 retry).
+    async function flowEnsureSession(forceRefresh){
+      var supa = flowGetSupa();
+      if (!forceRefresh) {
+        var hasToken = window.S && window.S.session && window.S.session.access_token;
+        if (hasToken) return true;
+      }
+      if (!supa || !supa.auth) return false;
       try {
-        var supa = (window.S && window.S.supabase) || window.supa || (window.supabase && window.supabase.auth ? window.supabase : null);
-        if (supa && supa.auth && supa.auth.getSession) {
+        if (forceRefresh && supa.auth.refreshSession) {
+          var rr = await supa.auth.refreshSession();
+          var rsess = rr && rr.data && rr.data.session;
+          if (rsess && rsess.access_token) {
+            window.S = window.S || {};
+            window.S.session = rsess;
+            return true;
+          }
+        }
+        if (supa.auth.getSession) {
           var r = await supa.auth.getSession();
           var sess = r && r.data && r.data.session;
           if (sess && sess.access_token) {
@@ -5120,6 +5137,23 @@ body.craft-advanced .craft-basic-only{display:none !important}
         }
       } catch (e) { /* fall through */ }
       return false;
+    }
+
+    // Auth-aware POST: on 401 force a session refresh and retry ONCE.
+    async function flowAuthedPost(url, body, signal){
+      var doFetch = function(){
+        return fetch(url, { method: 'POST', headers: flowAuthHeaders(), body: JSON.stringify(body), signal: signal });
+      };
+      var r = await doFetch();
+      if (r.status === 401) {
+        var refreshed = await flowEnsureSession(true);
+        if (refreshed) {
+          r = await doFetch();
+        }
+      }
+      var data = null;
+      try { data = await r.json(); } catch(e){}
+      return { ok: r.ok, status: r.status, data: data };
     }
 
     // ── Main entry ───────────────────────────────────────────────────────
@@ -5151,16 +5185,15 @@ body.craft-advanced .craft-basic-only{display:none !important}
       if (songInFlight) { try { songInFlight.abort(); } catch(e){} }
       inFlight = new AbortController();
 
-      fetch('/api/generate', {
-        method: 'POST',
-        headers: flowAuthHeaders(),
-        body: JSON.stringify({ mode: 'flow-spec', concept: concept }),
-        signal: inFlight.signal,
-      })
-      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+      flowAuthedPost('/api/generate', { mode: 'flow-spec', concept: concept }, inFlight.signal)
       .then(function(res){
+        if (res.status === 401) {
+          if (typeof openAuth === 'function') openAuth('Sign in to use Flow');
+          throw new Error('Please sign in to use Flow');
+        }
         if (!res.ok || !res.data || !res.data.spec) {
-          throw new Error(res.data && res.data.error || 'Flow couldn\'t pick a spec');
+          var msg = (res.data && (res.data.message || res.data.error)) || 'Flow couldn\'t pick a spec';
+          throw new Error(msg);
         }
         var spec = res.data.spec;
         // Show reveal + spin reels to land on picked genres
@@ -5250,15 +5283,16 @@ body.craft-advanced .craft-basic-only{display:none !important}
       var hint = document.getElementById('flow-hint');
       songInFlight = new AbortController();
       startSongProgress();
-      fetch('/api/generate', {
-        method: 'POST',
-        headers: flowAuthHeaders(),
-        body: JSON.stringify({ mode: 'flow-song', concept: concept, spec: spec }),
-        signal: songInFlight.signal,
-      })
-      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+      flowAuthedPost('/api/generate', { mode: 'flow-song', concept: concept, spec: spec }, songInFlight.signal)
       .then(function(res){
-        if (!res.ok || !res.data) throw new Error(res.data && res.data.error || 'Song generation failed');
+        if (res.status === 401) {
+          if (typeof openAuth === 'function') openAuth('Sign in to use Flow');
+          throw new Error('Please sign in to use Flow');
+        }
+        if (!res.ok || !res.data) {
+          var msg = (res.data && (res.data.message || res.data.error)) || 'Song generation failed';
+          throw new Error(msg);
+        }
         var d = res.data;
         var out = document.getElementById('flow-out');
         if (out) out.style.display = 'block';
