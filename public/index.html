@@ -19794,21 +19794,41 @@ async function writeAllTracks() {
     if (writeBtn) { writeBtn.disabled = false; writeBtn.textContent = '✍️ Write All Tracks'; writeBtn.onclick = () => writeAllTracks(); }
   }
   out.innerHTML = results.map(r => `
-    <div style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+    <div class="alb-track-card" data-idx="${r.i}" data-style="${escHtml(r.style||'')}" data-lyrics="${escHtml(r.lyrics||'')}" data-title="${escHtml(r.title||'')}" style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
         <div>
           <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em">Track ${r.i+1} · ${r.ttype}</div>
-          <div style="font-size:17px;font-weight:800;margin-top:2px">"${r.title}"</div>
+          <div style="font-size:17px;font-weight:800;margin-top:2px">"${escHtml(r.title||'')}"</div>
         </div>
         <div style="display:flex;gap:6px">
-          <button class="btn btn-sm" onclick="safeCopy(this.closest('div[data-idx]')||document.querySelectorAll('#alb-tracks-written pre')[${r.i}]?.textContent||'')">Copy Lyrics</button>
-          <button class="btn btn-sm btn-gold" onclick="safeCopy('${r.style.replace(/'/g,"\\'")}','Style copied')">Copy Style</button>
+          <button class="btn btn-sm" onclick="copyAlbTrackField(this,'lyrics')">Copy Lyrics</button>
+          <button class="btn btn-sm btn-gold" onclick="copyAlbTrackField(this,'style')">Copy Prompt</button>
         </div>
       </div>
       <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${escHtml(r.lyrics||'')}</pre>
       <div class="styleout" style="font-size:11px">${escHtml(r.style||'')}</div>
     </div>`).join('');
   toast(`✓ ${results.length} tracks written`);
+}
+
+// Per-track copy helper for the Album tracks list. Reads from data-*
+// attributes on the closest .alb-track-card so we never have to inline-
+// escape user/model content into onclick attributes — the previous
+// approach broke whenever a track's style/lyrics contained a double quote.
+function copyAlbTrackField(btn, field) {
+  const card = btn && btn.closest('.alb-track-card');
+  if (!card) return;
+  const value = card.getAttribute('data-' + field) || '';
+  if (!value.trim()) {
+    if (typeof toast === 'function') toast('Nothing to copy on this track');
+    return;
+  }
+  const label = field === 'style' ? 'Prompt' : (field.charAt(0).toUpperCase() + field.slice(1));
+  if (typeof safeCopy === 'function') {
+    safeCopy(value, label + ' copied');
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(value).then(() => typeof toast === 'function' && toast(label + ' copied'));
+  }
 }
 
 const ALBUM_TYPE_TRACKS = {
