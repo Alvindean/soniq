@@ -390,6 +390,35 @@ No prose. No markdown fences.`;
       // fall through — keep the spec's generic prompt as fallback
     }
 
+    // Score the song through SONIQ's feedback brain so the user sees
+    // hook strength + dimensional grades before deciding to keep it.
+    let scoreData = null;
+    try {
+      const brain = require('./_brain.js');
+      const brainGenre = (function(g){
+        const s = String(g || '').toLowerCase();
+        if (s.includes('hip')||s.includes('rap')||s.includes('trap')) return 'hiphop';
+        if (s.includes('r&b')||s.includes('soul')||s.includes('neo')) return 'rnb';
+        if (s.includes('country')) return 'country';
+        if (s.includes('folk')||s.includes('singer')||s.includes('acoustic')) return 'folk';
+        if (s.includes('rock')||s.includes('metal')||s.includes('punk')) return 'rock';
+        if (s.includes('edm')||s.includes('electronic')||s.includes('synth')||s.includes('hyperpop')) return 'edm';
+        if (s.includes('blues')) return 'blues';
+        if (s.includes('jazz')) return 'jazz';
+        if (s.includes('gospel')) return 'gospel';
+        if (s.includes('reggae')) return 'reggae';
+        return 'pop';
+      })(spec.genre);
+      const fb = brain.buildFeedbackPrompt(lyrics, brainGenre, flowConcept);
+      const fbText = await flowCallAI(
+        [{ role: 'user', content: fb.prompt + '\n\nReturn ONLY a JSON object: {"hookScore":0-100,"dimensions":{"hook_strength":0-100,"emotional_arc":0-100,"specificity":0-100,"rhyme_scheme":0-100,"structure":0-100,"genre_authenticity":0-100,"opening_line":0-100,"bridge":0-100,"suno_readiness":0-100},"verdict":"one short sentence"}' }],
+        fb.system,
+        700,
+      );
+      const cleaned = fbText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      try { scoreData = JSON.parse(cleaned); } catch (e) { /* keep null */ }
+    } catch (e) { /* score is best-effort */ }
+
     // Charge the song against the user's monthly quota (same as normal generate)
     if (!isAdmin && isFinite(flowLimit)) {
       const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
@@ -400,6 +429,10 @@ No prose. No markdown fences.`;
       title: spec.title,
       lyrics: lyrics.trim(),
       sunoPrompt: sunoPrompt,
+      score: scoreData,         // { hookScore, dimensions, verdict } or null
+      genreKey: (function(g){   // for client-side editor handoff (S.luckyCurrentSong.genre uses brain key)
+        return spec.genre;
+      })(),
     });
   }
 

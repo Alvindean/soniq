@@ -4849,8 +4849,18 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="btn btn-sm" onclick="flowCopyTitle()" title="Copy the song title">📋 Title</button>
         <button class="btn btn-sm" onclick="flowCopyLyrics()" title="Copy lyrics">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="flowCopyPrompt()" title="Copy the style prompt">📋 Copy Prompt</button>
-        <button class="btn btn-sm" onclick="flowSendToWrite()" title="Send concept to the Write page">➡️ Send to Write</button>
         <button class="btn btn-sm" onclick="feelFlow()" title="Re-spin with the same concept">🔄 Remix</button>
+      </div>
+      <div class="flow-score-row" id="fres-score-row" style="display:none;margin-top:10px;align-items:center;gap:14px;flex-wrap:wrap">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:600">🎯 Hook Score</span>
+          <span id="fres-score-num" style="font-size:22px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums">—</span>
+        </div>
+        <span id="fres-verdict" style="font-size:12px;color:var(--tx2);font-style:italic;flex:1;min-width:200px"></span>
+      </div>
+      <div class="flow-prod-row" id="fres-prod-row" style="display:none;margin-top:12px;text-align:right">
+        <button class="btn btn-cyan btn-sm" onclick="flowContinueToProduction()" title="Continue to the Editor — get production brief, plugins, key, mastering target, visual prompt">🎛️ Continue to Production →</button>
+        <button class="btn btn-sm" onclick="flowSendToWrite()" title="Send concept to the Write page">➡️ Send to Write</button>
       </div>
     </div>
     <div class="quick-copy-bar visible" id="fres-quick-copy" style="display:flex;gap:8px;padding:10px 16px">
@@ -5307,7 +5317,19 @@ body.craft-advanced .craft-basic-only{display:none !important}
           bodyEl.innerHTML = '<pre id="fres-lyrics-text">'+(d.lyrics||'').replace(/</g,'&lt;')+'</pre>';
         }
         // Stash on window for save handler
-        window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt };
+        window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt, score: d.score };
+        // Render hook score if present
+        if (d.score && typeof d.score.hookScore === 'number') {
+          var sr = document.getElementById('fres-score-row');
+          var sn = document.getElementById('fres-score-num');
+          var vd = document.getElementById('fres-verdict');
+          if (sr) sr.style.display = 'flex';
+          if (sn) sn.textContent = Math.round(d.score.hookScore);
+          if (vd) vd.textContent = (d.score.verdict || '').slice(0, 240);
+        }
+        // Reveal the production-handoff row
+        var pr = document.getElementById('fres-prod-row');
+        if (pr) pr.style.display = 'block';
         finishSongProgress(true);
         if (btn) btn.disabled = false;
         if (btnTxt) btnTxt.textContent = 'Spin Flow';
@@ -5378,6 +5400,55 @@ body.craft-advanced .craft-basic-only{display:none !important}
         if (btn) { btn.textContent = '✓ Saved'; setTimeout(function(){ btn.textContent = '💾 Save'; }, 1800); }
       } catch(e){
         if (typeof toast === 'function') toast('Save failed — copied to clipboard instead');
+      }
+    };
+
+    // ── Continue to Production: hand the song off to the Editor ──────────
+    // Mirrors Lucky's openLuckyEditor pattern so the existing production
+    // pipeline (plugin toolkit, key, mastering target, visual + video prompts,
+    // mix blueprint, FX chain) lights up for Flow songs too.
+    window.flowContinueToProduction = function(){
+      var f = window.__flowLast;
+      if (!f || !f.lyrics) {
+        if (typeof toast === 'function') toast('Spin a song first');
+        return;
+      }
+      var song = {
+        title: f.title || 'Untitled',
+        lyrics: f.lyrics,
+        style: f.sunoPrompt || '',
+        genre: (f.spec && f.spec.genre) || '',
+        topic: f.concept || '',
+        mood: (f.spec && f.spec.mood) || '',
+        vocal: (f.spec && f.spec.vocal) || '',
+        tempo: (f.spec && f.spec.tempo) || null,
+        key: (f.spec && f.spec.key) || '',
+        instrumentation: (f.spec && f.spec.instrumentation) || [],
+        moodArc: (f.spec && f.spec.moodArc) || null,
+        structure: (f.spec && f.spec.structure) || '',
+        source: 'flow',
+        score: f.score || null,
+        ts: Date.now(),
+        id: 'flow_' + Date.now(),
+      };
+      try {
+        // Stash in BOTH the lucky and main-song slots so any editor pathway
+        // (which one is wired depends on where the user came from) finds it.
+        if (window.S) {
+          window.S.luckyCurrentSong = song;
+          window.S.currentSong = song;
+        }
+        if (typeof loadLyricsIntoEditor === 'function') {
+          loadLyricsIntoEditor(song.lyrics, song.title);
+        }
+        if (typeof navTo === 'function') {
+          navTo('editor');
+        } else if (typeof goPg === 'function') {
+          var editorBtn = document.querySelector('.sidebar-nav .sb-btn[onclick*="\'editor\'"]');
+          goPg('editor', editorBtn);
+        }
+      } catch (e) {
+        if (typeof toast === 'function') toast('Editor handoff failed — try Send to Write');
       }
     };
 
