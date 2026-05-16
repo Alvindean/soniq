@@ -212,7 +212,11 @@ module.exports = async function handler(req, res) {
     }
 
     async function flowCallAI(messages, system, max_tokens) {
-      const ak = process.env.ANTHROPIC_API_KEY;
+      // Tolerate the prod env var being named `Claude` instead of
+      // ANTHROPIC_API_KEY. Without this fallback, Anthropic primary is
+      // disabled and every call routes to OpenRouter only — which can push
+      // a 62KB brain prompt + 4000-token output past Vercel's 60s timeout.
+      const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
       const ok = process.env.OPENROUTER_API_KEY;
       if (!ak && !ok) throw new Error('No AI provider configured');
       try {
@@ -364,31 +368,11 @@ No prose. No markdown fences.`;
       return res.status(500).json({ error: e.message || 'Lyric generation failed' });
     }
 
-    // Build a song-specific Suno prompt from the FINAL lyrics so it
-    // references actual motifs, not just the abstract concept.
-    let sunoPrompt = spec.sunoPrompt || '';
-    try {
-      const sunoText = await flowCallAI(
-        [{ role: 'user', content:
-          `LYRICS:\n${lyrics.slice(0, 2400)}\n\n` +
-          `SPEC: ${spec.genre}${spec.fusion && spec.subGenre ? ' × ' + spec.subGenre : ''}, ` +
-          `${spec.tempo} BPM, ${spec.key}, ${spec.vocal}, ${spec.instrumentation.join(', ')}, ` +
-          `mood arc ${spec.moodArc.start} → ${spec.moodArc.end}.\n\n` +
-          `Write the Suno style prompt now.`
-        }],
-        `You write Suno-ready style prompts (comma-separated descriptors, NO lyrics, NO section markers). ` +
-        `Given a finished song and its spec, distil a 10-16 token prompt that captures: ` +
-        `(1) genre + fusion partner, (2) vocal archetype, (3) tempo, (4) key/mode, ` +
-        `(5) signature instrument from the palette, (6) one mood-arc descriptor, ` +
-        `(7) one production texture cue (lo-fi, polished, raw, cinematic, etc.). ` +
-        `Return only the comma-separated prompt. No prose. No quotes.`,
-        220,
-      );
-      const cleanedSuno = sunoText.trim().replace(/^["'`]+|["'`]+$/g, '').replace(/^\s*style prompt:\s*/i, '');
-      if (cleanedSuno && cleanedSuno.length < 360) sunoPrompt = cleanedSuno;
-    } catch (e) {
-      // fall through — keep the spec's generic prompt as fallback
-    }
+    // Use the Suno prompt from the spec call — it's already grounded in
+    // the same concept and avoids a second sequential AI call that was
+    // pushing flow-song past Vercel's 60s ceiling. A future improvement
+    // could move Suno-regen to a separate client-fired mode like flow-score.
+    const sunoPrompt = spec.sunoPrompt || '';
 
     // Score moved to a separate client-fired `flow-score` call to keep this
     // request under Vercel's 60s function timeout. The client renders the
