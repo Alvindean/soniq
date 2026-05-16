@@ -4841,7 +4841,6 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <div class="result-header">
       <div class="result-title-block">
         <div class="result-song-title" id="fres-title">—</div>
-        <div class="result-song-verdict" id="fres-verdict"></div>
         <div class="suno-chips" id="fres-suno-chips"></div>
       </div>
       <div class="result-acts">
@@ -4858,9 +4857,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
         </div>
         <span id="fres-verdict" style="font-size:12px;color:var(--tx2);font-style:italic;flex:1;min-width:200px"></span>
       </div>
-      <div class="flow-prod-row" id="fres-prod-row" style="display:none;margin-top:12px;text-align:right">
-        <button class="btn btn-cyan btn-sm" onclick="flowContinueToProduction()" title="Continue to the Editor — get production brief, plugins, key, mastering target, visual prompt">🎛️ Continue to Production →</button>
+      <div class="flow-prod-row" id="fres-prod-row" style="display:none;margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
         <button class="btn btn-sm" onclick="flowSendToWrite()" title="Send concept to the Write page">➡️ Send to Write</button>
+        <button class="btn btn-cyan btn-sm" onclick="flowContinueToProduction()" title="Continue to the Editor — get production brief, plugins, key, mastering target, visual prompt">🎛️ Continue to Production →</button>
       </div>
     </div>
     <div class="quick-copy-bar visible" id="fres-quick-copy" style="display:flex;gap:8px;padding:10px 16px">
@@ -4878,7 +4877,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     .flow-concept:focus{border-color:var(--amberline);background:var(--s3)}
     .flow-concept::placeholder{color:var(--tx4)}
     .flow-concept-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .flow-mic-btn{padding:8px 14px;border-radius:var(--r2);background:var(--s3);border:1px solid var(--b2);color:var(--tx2);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+    .flow-mic-btn{min-height:44px;padding:10px 16px;border-radius:var(--r2);background:var(--s3);border:1px solid var(--b2);color:var(--tx2);font-size:14px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:10px}
     .flow-mic-btn:hover{border-color:var(--amberline);color:var(--amber)}
     .flow-mic-btn.recording{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.55);color:#fca5a5}
     /* 3-bar audio-level meter, lives inside the mic button while recording */
@@ -5166,9 +5165,26 @@ body.craft-advanced .craft-basic-only{display:none !important}
       return { ok: r.ok, status: r.status, data: data };
     }
 
+    // ── Concept coach: lightweight client-side check ─────────────────────
+    // Encourages a more specific concept before the spin runs. Returns
+    // { ok: true } if concept is usable, { ok: false, hint } if too thin.
+    function flowConceptCheck(text){
+      var t = (text || '').trim();
+      if (t.length < 12) return { ok: false, hint: 'Add a few more words — what feeling are you chasing?' };
+      var words = t.split(/\s+/).filter(Boolean);
+      if (words.length < 4) return { ok: false, hint: 'A line or two works better than a single phrase.' };
+      // Sensory / specific-noun heuristic
+      var sensoryHints = /\b(see|saw|hear|heard|smell|smelled|taste|tasted|felt|hold|held|touch|night|morning|sun|rain|car|window|hand|room|street|river|sky|fire|smoke|tears?|breath|song|silence|mirror|glass|skin|bed|sheets?|door|stairs|kitchen|porch|highway|train|ocean|moon|stars?)\b/i;
+      if (!sensoryHints.test(t)) {
+        return { ok: true, soft: 'One sense detail or specific image will make it land harder.' };
+      }
+      return { ok: true };
+    }
+
     // ── Main entry ───────────────────────────────────────────────────────
     var inFlight = null;       // spec fetch controller
     var songInFlight = null;   // song fetch controller (audit fix: race)
+    var scoreInFlight = null;  // score fetch controller (audit fix: race)
     window.feelFlow = async function(){
       var concept = (ta && ta.value || '').trim();
       if (!concept) {
@@ -5176,12 +5192,26 @@ body.craft-advanced .craft-basic-only{display:none !important}
         else alert('Type or speak a concept first');
         return;
       }
+      // Concept coach gate — block on too-thin input, soft-hint on missing sensory detail
+      var coach = flowConceptCheck(concept);
+      if (!coach.ok) {
+        var hintEl = document.getElementById('flow-hint');
+        if (hintEl) hintEl.textContent = coach.hint;
+        if (typeof toast === 'function') toast(coach.hint);
+        return;
+      }
+
       // Hydrate session if missing (covers cold-start race)
       var hasSession = await flowEnsureSession();
       if (!hasSession && !window.__soniqAdmin) {
         if (typeof openAuth === 'function') openAuth('Sign in to use Flow — it costs the same as a normal song');
         else if (typeof toast === 'function') toast('Sign in to use Flow');
         return;
+      }
+      // Soft hint surfaces in the status line but doesn't block the spin
+      if (coach.soft) {
+        var sh = document.getElementById('flow-hint');
+        if (sh) sh.textContent = coach.soft;
       }
       var btn = document.getElementById('flow-btn');
       var btnTxt = document.getElementById('flow-btn-text');
@@ -5190,9 +5220,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       if (btnTxt) btnTxt.textContent = 'Spinning…';
       if (hint) hint.textContent = 'Reading your concept…';
 
-      // Abort any prior in-flight requests (spec AND song)
+      // Abort any prior in-flight requests (spec, song, AND score)
       if (inFlight) { try { inFlight.abort(); } catch(e){} }
       if (songInFlight) { try { songInFlight.abort(); } catch(e){} }
+      if (scoreInFlight) { try { scoreInFlight.abort(); } catch(e){} }
       inFlight = new AbortController();
 
       flowAuthedPost('/api/generate', { mode: 'flow-spec', concept: concept }, inFlight.signal)
@@ -5330,12 +5361,13 @@ body.craft-advanced .craft-basic-only{display:none !important}
           if (sr) sr.style.display = 'flex';
           if (sn) sn.textContent = '…';
           if (vd) vd.textContent = 'scoring…';
+          scoreInFlight = new AbortController();
           flowAuthedPost('/api/generate', {
             mode: 'flow-score',
             lyrics: d.lyrics,
             genre: (spec && spec.genre) || '',
             topic: concept,
-          }, null).then(function(sres){
+          }, scoreInFlight.signal).then(function(sres){
             if (sres.ok && sres.data && sres.data.score && typeof sres.data.score.hookScore === 'number') {
               window.__flowLast.score = sres.data.score;
               if (sn) sn.textContent = Math.round(sres.data.score.hookScore);

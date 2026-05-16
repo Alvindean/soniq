@@ -187,6 +187,17 @@ module.exports = async function handler(req, res) {
     if (!flowConcept) return res.status(400).json({ error: 'concept is required' });
     if (flowConcept.length > 1000) return res.status(400).json({ error: 'concept must be 1000 chars or fewer' });
 
+    // Per-user-per-minute cap on the unmetered support modes (flow-spec,
+    // flow-score) so they can't be spammed to drain AI credits.
+    if (!isAdmin && (flowMode === 'flow-spec' || flowMode === 'flow-score')) {
+      const burstKey = `soniq:flow:burst:${flowMode}:${user.id}:${Math.floor(Date.now()/60000)}`;
+      const burstCount = parseInt(await redisGet(burstKey) || '0', 10);
+      if (burstCount >= 12) {
+        return res.status(429).json({ error: 'rate_limit', message: 'Slow down — try again in a minute.' });
+      }
+      redisIncrExpire(burstKey, 90);
+    }
+
     // Plan + rate-limit gate (mirrors the normal-flow block below)
     let flowPlan = isAdmin ? 'studio' : 'free';
     if (!isAdmin) {
@@ -333,6 +344,10 @@ No prose. No markdown fences.`;
         `and ad-libs in parentheses on the same line (e.g. "I held my breath (uh) waiting for the light"). ` +
         `Use the genre's Suno tag conventions — the song must read like a finished production brief, not a draft.`;
 
+      // Plan-gate platinum + premium quality to match stream.js. Free-tier
+      // users still get Flow, just on the same brain budget Write gives them.
+      const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
+      const flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
       built = brain.buildSongPrompt({
         genre: brainGenre,
         topic: enrichedTopic,
@@ -341,12 +356,12 @@ No prose. No markdown fences.`;
         structure: 'standard',
         era: 'modern',
         length: 'medium',
-        quality: 'viral',
+        quality: flowAllowPlatinum ? 'viral' : 'high',
         bracketMode: 'suno',
         platform: 'suno',
-        platinum: true,         // use the full premium pipeline for Flow
+        platinum: flowAllowPlatinum,
         isAdmin: isAdmin,
-        plan: 'studio',
+        plan: flowPlan,
       });
     } catch (e) {
       console.error('[flow-song] brain.buildSongPrompt failed:', e && e.message);
@@ -414,11 +429,17 @@ No prose. No markdown fences.`;
         if (s.includes('reggae')) return 'reggae';
         return 'pop';
       })(sGenre);
-      const fb = brain.buildFeedbackPrompt(sLyrics, brainGenre, sTopic);
+      // Lightweight scorer — don't use the full 9-dimension feedback prompt,
+      // it overflows the 300-token budget and the JSON gets cut off. A tight
+      // 2-field rubric fits cleanly and parses every time.
       const fbText = await flowCallAI(
-        [{ role: 'user', content: fb.prompt + '\n\nReturn ONLY: {"hookScore":0-100,"verdict":"one short sentence"}' }],
-        fb.system,
-        300,
+        [{ role: 'user', content:
+          `Genre: ${brainGenre}\nConcept: ${sTopic}\n\nLYRICS:\n${sLyrics}\n\n` +
+          `Score this song's hook strength 0-100 (50=workable, 70=strong, 85=hit). ` +
+          `Return ONLY one JSON line: {"hookScore":<int>,"verdict":"<one sentence ≤140 chars: what works AND one specific thing to sharpen>"}`
+        }],
+        `You are SONIQ's hook coach. Honest, terse, one-shot scoring. Output strict JSON only — no markdown, no preamble.`,
+        180,
       );
       const cleaned = fbText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       let scoreData = null;
