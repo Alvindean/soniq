@@ -313,8 +313,9 @@ a{color:var(--amber);text-decoration:none}
 .sn-bottom{display:flex;flex-direction:column;align-items:center;gap:2px}
 .sn-badge{position:absolute;top:4px;right:4px;min-width:14px;height:14px;border-radius:99px;background:var(--amber);color:#08080a;font-size:9px;font-weight:700;text-align:center;line-height:14px;padding:0 3px}
 /* Mobile bottom nav */
-.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b1);padding:4px 8px;gap:2px;z-index:100}
-.mb-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:none;background:transparent;color:var(--tx4);font-size:9px;font-weight:600;cursor:pointer;border-radius:var(--r1)}
+.mobile-bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--s1);border-top:1px solid var(--b1);padding:4px 8px;gap:2px;z-index:100;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mobile-bottom-nav::-webkit-scrollbar{display:none}
+.mb-btn{flex:1 0 56px;min-width:56px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:none;background:transparent;color:var(--tx4);font-size:9px;font-weight:600;cursor:pointer;border-radius:var(--r1)}
 .mb-btn.on{color:var(--amber)}
 .mb-btn .ni{font-size:18px;line-height:1}
 @media(max-width:900px){
@@ -3156,11 +3157,13 @@ body.craft-advanced .craft-basic-only{display:none !important}
 <nav class="sidebar-nav" id="sidebar-nav" role="navigation" aria-label="Main navigation">
   <div class="sn-logo">IQ</div>
   <button class="sb-btn on" onclick="goPg('write',this)" title="Write"><span class="ni">✍️</span></button>
+  <button class="sb-btn" onclick="goPg('flow',this)" title="Flow — concept becomes a song"><span class="ni">✨</span></button>
   <button class="sb-btn" onclick="goPg('lucky',this)" title="Feel Lucky"><span class="ni">🎲</span></button>
   <button class="sb-btn" onclick="goPg('library',this)" title="Library"><span class="ni">📚</span><span id="nav-lib-count" class="sn-badge" style="display:none"></span></button>
   <button class="sb-btn" onclick="goPg('builder',this)" title="Builder"><span class="ni">🎛️</span></button>
   <button class="sb-btn" onclick="goPg('more',this)" title="More"><span class="ni">⚡</span></button>
   <button class="sb-btn" onclick="goPg('album',this)" title="Album"><span class="ni">🎼</span></button>
+  <button class="sb-btn" onclick="goPg('playlist',this)" title="Playlist"><span class="ni">🎧</span></button>
   <button class="sb-btn" onclick="goPg('campaign',this)" title="Campaign"><span class="ni">🚀</span></button>
   <button class="sb-btn" onclick="goPg('community',this)" id="nav-community-btn" title="Community"><span class="ni">🌐</span></button>
   <button class="sb-btn" onclick="goPg('blog',this)" id="nav-blog-btn" title="Blog"><span class="ni">📝</span></button>
@@ -3179,9 +3182,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
 <!-- MOBILE BOTTOM NAV -->
 <nav class="mobile-bottom-nav" id="mobile-nav" role="navigation" aria-label="Mobile navigation">
   <button class="mb-btn on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
+  <button class="mb-btn" onclick="goPg('flow',this)"><span class="ni">✨</span>Flow</button>
   <button class="mb-btn" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Lucky</button>
   <button class="mb-btn" onclick="goPg('library',this)"><span class="ni">📚</span>Library</button>
   <button class="mb-btn" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
+  <button class="mb-btn" onclick="goPg('playlist',this)"><span class="ni">🎧</span>Playlist</button>
   <button class="mb-btn" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
 </nav>
 
@@ -3237,10 +3242,38 @@ body.craft-advanced .craft-basic-only{display:none !important}
           <div class="topic-tool-row">
             <button class="mic-btn" id="mic-btn" onclick="toggleMic()" title="Speak your song concept">🎤 Mic</button>
             <button class="enhance-btn" id="enhance-btn" onclick="enhanceConcept()" title="AI-rewrite your concept">✦ Enhance</button>
+            <button class="enhance-btn" id="spark-toggle-btn" onclick="sparkToggle()" title="Turn a feeling into a song concept" style="background:linear-gradient(135deg,#f5c000,#ff8a3d);color:#0e0e14;border:none;font-weight:700">✨ Spark</button>
             <div class="topic-score-badge" id="topic-score-badge" title="Hook score after generation">
               <span class="tsb-label">Score</span>
               <span class="tsb-num" id="topic-score-num">—</span>
             </div>
+          </div>
+
+          <!-- ══ SPARK — CREATIVE TOPIC ENGINE ══ -->
+          <div id="spark-panel" style="display:none;margin-top:12px;padding:14px;background:linear-gradient(180deg,rgba(245,192,0,0.06),rgba(255,138,61,0.03));border:1px solid rgba(245,192,0,0.25);border-radius:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <div style="font-size:12px;font-weight:700;color:var(--amber);letter-spacing:.5px;text-transform:uppercase">✨ Spark — turn a feeling into a song</div>
+              <button onclick="sparkToggle()" style="background:none;border:none;color:var(--tx3);cursor:pointer;font-size:18px;line-height:1;padding:0">×</button>
+            </div>
+
+            <div style="font-size:11px;color:var(--tx3);margin-bottom:8px;line-height:1.5">Start from a feeling, not a blank page. Type whatever's actually in your head — messy is fine. Spark returns 4 song concepts you can hand straight to Writer.</div>
+
+            <textarea id="spark-feeling" rows="3" maxlength="1800" placeholder="e.g. 'I'm tired of being the strong one for everyone' · 'missing my mom but she's still alive' · 'the way it feels when you almost text someone'" style="width:100%;box-sizing:border-box;background:var(--s1);border:1px solid var(--b2);color:var(--tx1);border-radius:8px;padding:10px;font-size:13px;font-family:var(--font);resize:vertical;line-height:1.5"></textarea>
+
+            <div style="margin-top:10px">
+              <div style="font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px">Pick what's true (optional, tap any)</div>
+              <div id="spark-chips" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+            </div>
+
+            <div style="display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap">
+              <button id="spark-go-btn" onclick="sparkGenerate()" style="background:linear-gradient(135deg,#f5c000,#ff8a3d);color:#0e0e14;border:none;font-weight:700;padding:9px 18px;border-radius:8px;cursor:pointer;font-size:13px">✨ Spark 4 concepts</button>
+              <button onclick="sparkSurpriseMe()" style="background:var(--s2);border:1px solid var(--b2);color:var(--tx2);padding:9px 14px;border-radius:8px;cursor:pointer;font-size:12px">🎲 Surprise me</button>
+              <span id="spark-status" style="font-size:11px;color:var(--tx3);margin-left:auto"></span>
+            </div>
+
+            <div id="spark-echo" style="display:none;margin-top:14px;padding:10px 12px;background:var(--s1);border-left:3px solid var(--amber);border-radius:6px;font-size:13px;font-style:italic;color:var(--tx1);line-height:1.5"></div>
+
+            <div id="spark-seeds" style="display:none;margin-top:12px;flex-direction:column;gap:10px"></div>
           </div>
         </div>
         <div class="step-summary" id="step-1-summary"></div>
@@ -4742,6 +4775,320 @@ body.craft-advanced .craft-basic-only{display:none !important}
 <!-- ══════════════════════════════════
      FEEL LUCKY PAGE
 ══════════════════════════════════ -->
+<!-- ══════════════════════════════════
+     FLOW PAGE — concept-driven Lucky
+══════════════════════════════════ -->
+<div id="pg-flow" class="pg">
+  <div class="lucky-wrap">
+    <div class="lucky-eyebrow">Tell me the feeling · I pick the song</div>
+    <div class="lucky-headline">
+      <div class="hl-1">✨</div>
+      <div class="hl-2">Flow</div>
+    </div>
+    <div class="lucky-sub">Type or speak your concept. Flow picks the genre, mood, vocal and structure — then writes the song.</div>
+
+    <!-- Concept input -->
+    <div class="flow-concept-wrap">
+      <textarea
+        id="flow-concept"
+        class="flow-concept"
+        rows="3"
+        maxlength="600"
+        placeholder="e.g. touching the darkness — losing my brother, ending hopeful"
+        aria-label="Song concept"
+      ></textarea>
+      <div class="flow-concept-row">
+        <button class="btn btn-sm flow-mic-btn" id="flow-mic-btn" onclick="flowToggleMic()" title="Dictate concept" aria-label="Dictate concept">🎤 Speak</button>
+        <span class="flow-char-count" id="flow-char-count">0 / 600</span>
+      </div>
+    </div>
+
+    <!-- Spin wheel (slot machine, mirrors Lucky's) -->
+    <div id="flow-slots" class="lucky-slots">
+      <div class="slot-col" id="flow-slot-col-1">
+        <div class="slot-reel" id="flow-slot-reel-1"><div class="slot-item">—</div></div>
+      </div>
+      <div class="slot-x">×</div>
+      <div class="slot-col" id="flow-slot-col-2">
+        <div class="slot-reel" id="flow-slot-reel-2"><div class="slot-item">—</div></div>
+      </div>
+    </div>
+
+    <button class="lucky-cta" id="flow-btn" onclick="feelFlow()">
+      <span>✨</span>
+      <span id="flow-btn-text">Spin Flow</span>
+    </button>
+    <div class="lucky-hint" id="flow-hint">Flow chooses the best genre fusion for your concept, then writes the song</div>
+  </div>
+
+  <div id="flow-reveal" class="lucky-reveal" style="display:none">
+    <div class="lr-fusion" id="flow-fusion">—</div>
+    <div class="lr-meta" id="flow-meta"></div>
+    <div class="lr-params" id="flow-params"></div>
+  </div>
+
+  <div class="result-card" id="flow-out" style="display:none">
+    <div class="result-header">
+      <div class="result-title-block">
+        <div class="result-song-title" id="fres-title">—</div>
+        <div class="result-song-verdict" id="fres-verdict"></div>
+        <div class="suno-chips" id="fres-suno-chips"></div>
+      </div>
+      <div class="result-acts">
+        <button class="btn btn-cyan btn-sm" id="flow-save-btn" onclick="saveFlowToLib()">💾 Save</button>
+        <button class="btn btn-sm" onclick="copyTitle('fres')" title="Copy the song title">📋 Title</button>
+        <button class="btn btn-sm" onclick="cpField('fres-lyrics-text')" title="Copy lyrics">Copy Lyrics</button>
+        <button class="btn btn-sm" onclick="cpBriefPrompt('fres')" title="Copy the style prompt">📋 Copy Prompt</button>
+        <button class="btn btn-sm" onclick="flowSendToWrite()" title="Send concept to the Write page">➡️ Send to Write</button>
+        <button class="btn btn-sm" onclick="feelFlow()" title="Re-spin with the same concept">🔄 Remix</button>
+      </div>
+      <div class="song-progress-bar" id="fres-progress-bar">
+        <button class="spb-stop" onclick="stopGeneration('fres')" title="Cancel">✕ Stop</button>
+        <div class="spb-track"><div class="spb-fill" id="fres-progress-fill"></div></div>
+        <div class="spb-label"><span class="spb-pct" id="fres-progress-pct">0%</span><span class="spb-stage" id="fres-progress-stage"> · starting…</span></div>
+      </div>
+    </div>
+    <div class="copyright-strip" id="fres-copyright-strip" style="display:none"></div>
+    <div class="quick-copy-bar" id="fres-quick-copy">
+      <button class="qcb-btn qcb-primary" onclick="cpField('fres-lyrics-text')" title="Copy lyrics">📋 Copy Lyrics</button>
+      <button class="qcb-btn qcb-primary" onclick="cpBriefPrompt('fres')" title="Copy the song prompt">🎛 Copy Song Prompt</button>
+    </div>
+    <div class="result-body" id="fres-body"></div>
+  </div>
+
+  <style>
+    .flow-concept-wrap{margin:18px auto 12px;max-width:560px;display:flex;flex-direction:column;gap:8px}
+    .flow-concept{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:12px 14px;outline:none;resize:vertical;min-height:80px;line-height:1.55;font-family:var(--font);transition:border-color .15s}
+    .flow-concept:focus{border-color:var(--amberline);background:var(--s3)}
+    .flow-concept::placeholder{color:var(--tx4)}
+    .flow-concept-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .flow-mic-btn{padding:7px 12px;border-radius:var(--r2);background:var(--s3);border:1px solid var(--b2);color:var(--tx2);font-size:12px;cursor:pointer;transition:all .15s}
+    .flow-mic-btn:hover{border-color:var(--amberline);color:var(--amber)}
+    .flow-mic-btn.recording{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.5);color:#fca5a5;animation:flow-rec-pulse 1.4s ease-in-out infinite}
+    @keyframes flow-rec-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+    .flow-char-count{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
+    #flow-out .result-body{padding:16px 18px;background:var(--s2);border-top:1px solid var(--b1)}
+    #fres-body pre{white-space:pre-wrap;font-family:var(--font);font-size:14px;line-height:1.7;color:var(--tx1);margin:0}
+  </style>
+
+  <script>
+  (function(){
+    // ── Char counter ─────────────────────────────────────────────────────
+    var ta = document.getElementById('flow-concept');
+    var cc = document.getElementById('flow-char-count');
+    if (ta && cc) {
+      ta.addEventListener('input', function(){ cc.textContent = ta.value.length + ' / 600'; });
+    }
+
+    // ── Mic dictation (graceful fallback) ────────────────────────────────
+    var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var rec = null, listening = false;
+    var micBtn = document.getElementById('flow-mic-btn');
+    if (!Rec && micBtn) { micBtn.style.display = 'none'; }
+
+    window.flowToggleMic = function(){
+      if (!Rec) return;
+      if (listening) { try { rec.stop(); } catch(e){} return; }
+      if (!rec) {
+        rec = new Rec();
+        rec.lang = 'en-US';
+        rec.continuous = false;
+        rec.interimResults = false;
+        rec.onresult = function(e){
+          var t = '';
+          for (var i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
+          if (t && ta) {
+            ta.value = (ta.value ? ta.value.trim() + ' ' : '') + t.trim();
+            if (cc) cc.textContent = ta.value.length + ' / 600';
+          }
+        };
+        rec.onend = function(){ listening = false; if (micBtn) { micBtn.classList.remove('recording'); micBtn.textContent = '🎤 Speak'; } };
+        rec.onerror = function(){ listening = false; if (micBtn) { micBtn.classList.remove('recording'); micBtn.textContent = '🎤 Speak'; } };
+      }
+      try { rec.start(); listening = true; if (micBtn) { micBtn.classList.add('recording'); micBtn.textContent = '⏹ Stop'; } } catch(e){}
+    };
+
+    // ── Reel spin animation ──────────────────────────────────────────────
+    var GENRE_POOL = ['Indie Folk','Bedroom Pop','Dream-Pop','Neo-Soul','Alt-Country','Synthwave','Lo-Fi Hip-Hop','Drill','Trap-Soul','Future-Soul','Americana','Dark Folk','Shoegaze','Post-Punk','Ambient R&B','Indie Rock','Singer-Songwriter','Trip-Hop','Chillwave','Hyperpop','Soul','Acoustic Pop'];
+    function spinFlowReels(left, right, ms, onDone){
+      var r1 = document.getElementById('flow-slot-reel-1');
+      var r2 = document.getElementById('flow-slot-reel-2');
+      if (!r1 || !r2) { onDone && onDone(); return; }
+      var t0 = Date.now();
+      var iv = setInterval(function(){
+        var i = (Date.now() - t0) % GENRE_POOL.length;
+        var j = (Date.now() - t0 + 73) % GENRE_POOL.length;
+        r1.innerHTML = '<div class="slot-item">'+GENRE_POOL[Math.floor(i/3)%GENRE_POOL.length]+'</div>';
+        r2.innerHTML = '<div class="slot-item">'+GENRE_POOL[Math.floor(j/3)%GENRE_POOL.length]+'</div>';
+        if (Date.now() - t0 >= ms) {
+          clearInterval(iv);
+          r1.innerHTML = '<div class="slot-item">'+left+'</div>';
+          r2.innerHTML = '<div class="slot-item">'+right+'</div>';
+          onDone && onDone();
+        }
+      }, 60);
+    }
+
+    // ── Main entry ───────────────────────────────────────────────────────
+    var inFlight = null;
+    window.feelFlow = function(){
+      var concept = (ta && ta.value || '').trim();
+      if (!concept) {
+        if (typeof toast === 'function') toast('Type or speak a concept first');
+        else alert('Type or speak a concept first');
+        return;
+      }
+      if (window.S && !window.S.user && !window.__soniqAdmin) {
+        if (typeof openAuth === 'function') openAuth('Create your free account to use Flow');
+        return;
+      }
+      var btn = document.getElementById('flow-btn');
+      var btnTxt = document.getElementById('flow-btn-text');
+      var hint = document.getElementById('flow-hint');
+      if (btn) btn.disabled = true;
+      if (btnTxt) btnTxt.textContent = 'Spinning…';
+      if (hint) hint.textContent = 'Reading your concept…';
+
+      // Abort any prior in-flight spec
+      if (inFlight) { try { inFlight.abort(); } catch(e){} }
+      inFlight = new AbortController();
+
+      fetch('/api/flow-spec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ concept: concept }),
+        signal: inFlight.signal,
+      })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+      .then(function(res){
+        if (!res.ok || !res.data || !res.data.spec) {
+          throw new Error(res.data && res.data.error || 'Flow couldn\'t pick a spec');
+        }
+        var spec = res.data.spec;
+        // Show reveal + spin reels to land on picked genres
+        var reveal = document.getElementById('flow-reveal');
+        if (reveal) reveal.style.display = 'block';
+        var fusionEl = document.getElementById('flow-fusion');
+        var metaEl = document.getElementById('flow-meta');
+        var paramsEl = document.getElementById('flow-params');
+        if (fusionEl) fusionEl.textContent = spec.genre + (spec.subGenre ? ' × ' + spec.subGenre : '');
+        if (metaEl) metaEl.textContent = (spec.tempo ? spec.tempo + ' BPM · ' : '') + (spec.key || '') + (spec.vocal ? ' · ' + spec.vocal : '');
+        if (paramsEl) {
+          var pills = [
+            { l: spec.mood || 'mood', c: 'bdg-teal' },
+            { l: spec.vocal || 'vocal', c: 'bdg-v' },
+            { l: spec.structure || 'structure', c: 'bdg-green' },
+          ];
+          if (spec.instrumentation && spec.instrumentation.length) {
+            pills.push({ l: spec.instrumentation.slice(0,3).join(' · '), c: 'bdg-gold' });
+          }
+          paramsEl.innerHTML = pills.map(function(p){ return '<span class="lr-param bdg '+p.c+'">'+p.l+'</span>'; }).join('');
+        }
+        spinFlowReels(spec.genre, spec.subGenre || spec.mood || 'solo', 1200, function(){
+          if (btnTxt) btnTxt.textContent = 'Writing…';
+          if (hint) hint.textContent = 'Writing: ' + spec.genre + ' · "' + concept.slice(0, 60) + (concept.length > 60 ? '…' : '') + '"';
+          // Chain to /api/generate using picked spec
+          generateFlowSong(concept, spec);
+        });
+      })
+      .catch(function(err){
+        if (err && err.name === 'AbortError') return;
+        if (btn) btn.disabled = false;
+        if (btnTxt) btnTxt.textContent = 'Spin Flow';
+        if (hint) hint.textContent = (err && err.message) || 'Something went wrong — try again';
+      });
+    };
+
+    function generateFlowSong(concept, spec){
+      var btn = document.getElementById('flow-btn');
+      var btnTxt = document.getElementById('flow-btn-text');
+      var hint = document.getElementById('flow-hint');
+      fetch('/api/flow-song', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ concept: concept, spec: spec }),
+      })
+      .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
+      .then(function(res){
+        if (!res.ok || !res.data) throw new Error(res.data && res.data.error || 'Song generation failed');
+        var d = res.data;
+        var out = document.getElementById('flow-out');
+        if (out) out.style.display = 'block';
+        var titleEl = document.getElementById('fres-title');
+        var bodyEl = document.getElementById('fres-body');
+        var sunoEl = document.getElementById('fres-suno-chips');
+        if (titleEl) titleEl.textContent = d.title || spec.title || 'Untitled';
+        if (sunoEl && d.sunoPrompt) {
+          sunoEl.innerHTML = '<span class="suno-chip">'+d.sunoPrompt.replace(/</g,'&lt;')+'</span>';
+        }
+        if (bodyEl) {
+          bodyEl.innerHTML = '<pre id="fres-lyrics-text">'+(d.lyrics||'').replace(/</g,'&lt;')+'</pre>';
+        }
+        // Stash on window for save handler
+        window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt };
+        if (btn) btn.disabled = false;
+        if (btnTxt) btnTxt.textContent = 'Spin Flow';
+        if (hint) hint.textContent = 'Spin again for a different take, or save this one to your library';
+      })
+      .catch(function(err){
+        if (btn) btn.disabled = false;
+        if (btnTxt) btnTxt.textContent = 'Spin Flow';
+        if (hint) hint.textContent = (err && err.message) || 'Song generation failed — try again';
+      });
+    }
+
+    // ── Save to library ──────────────────────────────────────────────────
+    window.saveFlowToLib = function(){
+      var f = window.__flowLast;
+      if (!f) { if (typeof toast === 'function') toast('Spin a song first'); return; }
+      // Reuse existing save endpoint via supabase if available — defer to a
+      // lightweight save that mirrors saveLuckyToLib's contract.
+      try {
+        var payload = {
+          source: 'flow',
+          title: f.title || 'Untitled',
+          concept: f.concept,
+          lyrics: f.lyrics,
+          suno_prompt: f.sunoPrompt,
+          spec: f.spec,
+          created_at: new Date().toISOString(),
+        };
+        // Best-effort: pass through the existing track endpoint so the event
+        // is logged. Real persistence depends on the host save handler — if
+        // saveSongToLibrary exists in this app, call it.
+        if (typeof window.saveSongToLibrary === 'function') {
+          window.saveSongToLibrary(payload);
+        } else {
+          // Mirror to localStorage as a fallback shelf
+          var key = 'soniq:flow:saved';
+          var arr = [];
+          try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){}
+          arr.unshift(payload);
+          localStorage.setItem(key, JSON.stringify(arr.slice(0, 50)));
+        }
+        if (typeof toast === 'function') toast('💾 Saved to your library');
+        var btn = document.getElementById('flow-save-btn');
+        if (btn) { btn.textContent = '✓ Saved'; setTimeout(function(){ btn.textContent = '💾 Save'; }, 1800); }
+      } catch(e){
+        if (typeof toast === 'function') toast('Save failed — copied to clipboard instead');
+      }
+    };
+
+    // ── Send concept to Write page ───────────────────────────────────────
+    window.flowSendToWrite = function(){
+      var f = window.__flowLast;
+      var concept = (ta && ta.value || '').trim();
+      if (!concept && f) concept = f.concept;
+      if (typeof prefillConcept === 'function' && concept) prefillConcept(concept);
+      if (typeof goPg === 'function') {
+        var writeBtn = document.querySelector('.sidebar-nav .sb-btn[onclick*="\'write\'"]');
+        goPg('write', writeBtn);
+      }
+    };
+  })();
+  </script>
+</div>
+
 <div id="pg-lucky" class="pg">
 
   <div class="lucky-wrap">
@@ -5723,6 +6070,8 @@ body.craft-advanced .craft-basic-only{display:none !important}
           </div>
           <div class="blend-slot-search">
             <input id="blend-A-search" type="text" class="az-search-input" placeholder="Search Song A — e.g. Hotline Bling" aria-label="Search for Song A" onkeydown="if(event.key==='Enter')blendAnalyzeSlot('A')">
+            <button type="button" class="mic-btn" onclick="pasteBlendSong('A')" aria-label="Paste Song A from clipboard" title="Paste from clipboard" style="font-size:15px;padding:5px 9px">📋</button>
+            <button type="button" class="mic-btn" onclick="copyBlendSong('A')" aria-label="Copy Song A" title="Copy Song A name / DNA" style="font-size:15px;padding:5px 9px">⧉</button>
             <button type="button" class="mic-btn" id="blend-A-mic-btn" onclick="toggleMicFor('blend-A-mic-btn','blend-A-search','inline')" aria-label="Speak Song A name" title="Speak Song A name" style="font-size:15px;padding:5px 9px">🎤</button>
             <button type="button" class="az-search-btn" id="blend-A-btn" onclick="blendAnalyzeSlot('A')">🔬 Analyze</button>
           </div>
@@ -5736,6 +6085,8 @@ body.craft-advanced .craft-basic-only{display:none !important}
           </div>
           <div class="blend-slot-search">
             <input id="blend-B-search" type="text" class="az-search-input" placeholder="Search Song B — e.g. The Less I Know The Better" aria-label="Search for Song B" onkeydown="if(event.key==='Enter')blendAnalyzeSlot('B')">
+            <button type="button" class="mic-btn" onclick="pasteBlendSong('B')" aria-label="Paste Song B from clipboard" title="Paste from clipboard" style="font-size:15px;padding:5px 9px">📋</button>
+            <button type="button" class="mic-btn" onclick="copyBlendSong('B')" aria-label="Copy Song B" title="Copy Song B name / DNA" style="font-size:15px;padding:5px 9px">⧉</button>
             <button type="button" class="mic-btn" id="blend-B-mic-btn" onclick="toggleMicFor('blend-B-mic-btn','blend-B-search','inline')" aria-label="Speak Song B name" title="Speak Song B name" style="font-size:15px;padding:5px 9px">🎤</button>
             <button type="button" class="az-search-btn" id="blend-B-btn" onclick="blendAnalyzeSlot('B')">🔬 Analyze</button>
           </div>
@@ -6137,6 +6488,223 @@ body.craft-advanced .craft-basic-only{display:none !important}
   </div>
 
 </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     PLAYLIST PAGE  (CADENCE-wired)
+══════════════════════════════════ -->
+<div id="pg-playlist" class="pg">
+
+  <div class="album-hero">
+    <div class="album-hero-label">🎧 Playlist Engine</div>
+    <div class="album-hero-title">Niche-Targeted &amp; Vibe Playlists</div>
+    <div class="album-hero-sub">Build a playlist plan from a use-case mood OR a CADENCE discovery-arbitrage niche. Score the niche 0-100, get a track map, sonic palette, threshold-engineering plan, and 12-month revenue projection.</div>
+  </div>
+
+  <div class="album-form">
+
+    <!-- MODE TOGGLE -->
+    <label class="album-label">Playlist Mode</label>
+    <div class="album-lanes" id="playlist-mode-pills" style="margin-bottom:14px">
+      <span class="lane-pill on" data-pls-mode="niche" onclick="setPlaylistMode('niche')">🎯 CADENCE — Discovery Arbitrage</span>
+      <span class="lane-pill"      data-pls-mode="vibe"  onclick="setPlaylistMode('vibe')">🎧 Vibe / Use-case</span>
+    </div>
+
+    <div class="album-field">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <label class="album-label" id="pls-brief-label" style="margin:0">Niche / Cluster Brief</label>
+        <div style="display:flex;gap:6px">
+          <button class="mic-btn" id="pls-brief-mic-btn" onclick="toggleMicFor('pls-brief-mic-btn','pls-brief','lines')" title="Dictate the niche / vibe brief" style="font-size:15px;padding:3px 8px">🎤</button>
+        </div>
+      </div>
+      <textarea id="pls-brief" class="album-textarea" placeholder="e.g. 'Lofi watercolor-Ghibli ambient — orchestral pads with hand-drawn-feel imperfection, 60-80 BPM, no vocals. Target listener: late-night creative work / studying. US/UK English-speaking ambient audience.'"></textarea>
+    </div>
+
+    <div class="album-grid">
+      <div>
+        <label class="album-label">Primary Genre / Sonic Family</label>
+        <select id="pls-genre" class="album-select">
+          <optgroup label="── Core ──">
+            <option value="pop">Pop</option>
+            <option value="hiphop">Rap / Hip-Hop</option>
+            <option value="rnb">R&amp;B / Soul</option>
+            <option value="rock">Rock</option>
+            <option value="country">Country</option>
+            <option value="edm">EDM / Electronic</option>
+            <option value="jazz">Jazz</option>
+            <option value="folk">Folk</option>
+            <option value="metal">Metal</option>
+          </optgroup>
+          <optgroup label="── Soul / Spirit ──">
+            <option value="neosoul">Neo-Soul</option>
+            <option value="gospel">Gospel</option>
+            <option value="blues">Blues</option>
+          </optgroup>
+          <optgroup label="── Ambient / Lofi ──">
+            <option value="ambient">Ambient</option>
+            <option value="lofi">Lofi</option>
+          </optgroup>
+          <optgroup label="── Global ──">
+            <option value="latin">Latin</option>
+            <option value="reggaeton">Reggaeton</option>
+            <option value="reggae">Reggae</option>
+            <option value="afrobeats">Afrobeats</option>
+            <option value="kpop">K-Pop</option>
+          </optgroup>
+          <optgroup label="── Alternative ──">
+            <option value="altrock">Alt-Rock</option>
+            <option value="punk">Punk</option>
+            <option value="ss">Singer-Songwriter</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <label class="album-label">Playlist Length</label>
+        <select id="pls-type" class="album-select">
+          <option value="short">Short (10 tracks)</option>
+          <option value="medium" selected>Standard (20 tracks)</option>
+          <option value="long">Long (30 tracks)</option>
+          <option value="djset">DJ Set (15 tracks, BPM-curated)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- NICHE-MODE-ONLY FIELDS -->
+    <div id="pls-niche-fields">
+      <div class="album-grid">
+        <div>
+          <label class="album-label">Target BPM Range</label>
+          <select id="pls-bpm" class="album-select">
+            <option value="60-80">Slow (60-80 BPM)</option>
+            <option value="80-100" selected>Mid (80-100 BPM)</option>
+            <option value="100-120">Walking (100-120 BPM)</option>
+            <option value="120-140">Driving (120-140 BPM)</option>
+            <option value="140-160">Energetic (140-160 BPM)</option>
+            <option value="160-180">Aggressive (160-180 BPM)</option>
+          </select>
+        </div>
+        <div>
+          <label class="album-label">Target Country Mix</label>
+          <select id="pls-country" class="album-select">
+            <option value="us-uk">US + UK dominant ($0.0040+ avg)</option>
+            <option value="us-eu" selected>US + EU dominant ($0.0035-0.0040)</option>
+            <option value="mixed">Mixed incl. LatAm ($0.0025-0.0035)</option>
+            <option value="asia">Asia-dominant ($0.0015-0.0025)</option>
+          </select>
+        </div>
+      </div>
+      <label class="album-label">Algorithmic Goal — select all that apply</label>
+      <div class="album-lanes" id="playlist-niche-lanes">
+        <span class="lane-pill on" onclick="setPlsNicheLane(this,'daily-mix')">📻 Daily Mix Inclusion</span>
+        <span class="lane-pill"     onclick="setPlsNicheLane(this,'discover-weekly')">✨ Discover Weekly</span>
+        <span class="lane-pill"     onclick="setPlsNicheLane(this,'release-radar')">🎯 Release Radar</span>
+        <span class="lane-pill"     onclick="setPlsNicheLane(this,'sonic-cluster')">🔊 Sonic-cluster Lock</span>
+        <span class="lane-pill"     onclick="setPlsNicheLane(this,'threshold')">📈 1000-stream Threshold</span>
+      </div>
+    </div>
+
+    <!-- VIBE-MODE-ONLY FIELDS -->
+    <div id="pls-vibe-fields" style="display:none">
+      <label class="album-label">Use-case / Vibe — select all that apply</label>
+      <div class="album-lanes" id="playlist-vibe-lanes">
+        <span class="lane-pill on" onclick="setPlsVibeLane(this,'late-night')">🌙 Late Night</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'workout')">💪 Workout</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'focus')">🎯 Deep Focus</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'driving')">🚗 Driving</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'party')">🎉 Party</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'chill')">☁️ Chill / Wind-down</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'date')">💜 Date Night</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'wedding')">💍 Wedding</span>
+        <span class="lane-pill"     onclick="setPlsVibeLane(this,'sad')">💧 Sad / Cathartic</span>
+      </div>
+    </div>
+
+    <button class="album-gen-btn" id="pls-btn" onclick="generatePlaylistTheme()">
+      <span id="pls-btn-icon">🎯</span> <span id="pls-btn-label">Generate CADENCE Playlist Plan</span>
+    </button>
+  </div>
+
+  <!-- PLAYLIST OUTPUT -->
+  <div class="album-out" id="playlist-out">
+    <div class="album-out-hdr">
+      <div class="album-name" id="pls-name">—</div>
+      <div class="album-concept-tags" id="pls-tags"></div>
+    </div>
+    <div class="album-tabs">
+      <div class="album-tab on"      onclick="goPlsTab('concept',this)">📖 Concept</div>
+      <div class="album-tab"          onclick="goPlsTab('tracks',this)">🎵 Track Map</div>
+      <div class="album-tab"          onclick="goPlsTab('sonic',this)">🔊 Sonic Palette</div>
+      <div class="album-tab" id="pls-tab-cadence" onclick="goPlsTab('cadence',this)">📊 CADENCE Score</div>
+      <div class="album-tab"          onclick="goPlsTab('plan',this)">🗓 90-Day Plan</div>
+    </div>
+
+    <div id="pls-pane-concept" class="album-pane on">
+      <div class="album-section-title">Playlist Summary</div>
+      <div id="pls-summary" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title" id="pls-arc-title">Energy Curve</div>
+      <div id="pls-arc" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title" id="pls-motifs-title">Sonic Identity Anchors</div>
+      <ul id="pls-motifs" class="album-list"></ul>
+    </div>
+
+    <div id="pls-pane-tracks" class="album-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="album-section-title" style="margin-bottom:0">Track Map</div>
+        <button class="btn btn-sm btn-gold" onclick="writeAllPlaylistTracks()">✍️ Write All Tracks</button>
+      </div>
+      <div class="gap-map-grid" id="pls-track-types"></div>
+      <div id="pls-tracks-written" style="margin-top:14px"></div>
+    </div>
+
+    <div id="pls-pane-sonic" class="album-pane">
+      <div class="album-section-title">Sonic Palette</div>
+      <div id="pls-palette" class="album-palette" style="margin-bottom:16px"></div>
+      <div class="album-section-title">Production References</div>
+      <div id="pls-prod-refs" class="album-prose"></div>
+    </div>
+
+    <div id="pls-pane-cadence" class="album-pane">
+      <div class="album-section-title">CADENCE Niche Score</div>
+      <div id="pls-cadence-headline" style="display:flex;align-items:baseline;gap:10px;margin-bottom:12px">
+        <div id="pls-cadence-score" style="font-size:42px;font-weight:900;color:var(--violet);letter-spacing:-1px">—</div>
+        <div id="pls-cadence-verdict" style="font-size:13px;color:var(--tx2)"></div>
+      </div>
+      <div class="album-section-title">6-Factor Breakdown</div>
+      <ul id="pls-cadence-factors" class="album-list"></ul>
+      <div class="album-section-title" style="margin-top:14px">12-Month Revenue Projection (Spotify, US-mix)</div>
+      <div id="pls-cadence-revenue" class="album-prose"></div>
+    </div>
+
+    <div id="pls-pane-plan" class="album-pane">
+      <div class="album-section-title">90-Day Release Plan</div>
+      <div id="pls-plan-90" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title">Threshold-Engineering Moves</div>
+      <ul id="pls-plan-threshold" class="album-list"></ul>
+      <div class="album-section-title" style="margin-top:14px">Risk &amp; Disclosure Notes</div>
+      <div id="pls-plan-risk" class="album-prose"></div>
+    </div>
+
+    <!-- INSTANT EDIT -->
+    <div class="album-ie-box">
+      <div class="album-ie-label">⚡ Quick Playlist Edit — describe one or two changes</div>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap">
+        <div style="position:relative;flex:1">
+          <textarea class="album-ie-textarea" id="pls-ie-input" placeholder="e.g. 'Tighten the BPM range to 70-85' or 'Shift target country mix to US+UK only'" style="width:100%;box-sizing:border-box"></textarea>
+          <button class="mic-btn" style="position:absolute;bottom:8px;right:8px;font-size:13px;padding:3px 7px;opacity:.8" onclick="toggleMicFor('pls-ie-mic-btn','pls-ie-input','inline')" id="pls-ie-mic-btn" title="Speak your edit instruction">🎤</button>
+        </div>
+        <button class="btn btn-amber" id="pls-ie-btn" onclick="playlistInstantEdit()" style="align-self:flex-end;flex-shrink:0">⚡ Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AD SLOT -->
+  <div style="max-width:1000px;margin:24px auto 0;padding:0 20px">
+    <div style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:12px 20px;text-align:center">
+      <div style="font-size:10px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Sponsored</div>
+      <ins class="adsbygoogle" style="display:block;min-height:60px" data-ad-format="auto" data-full-width-responsive="true"></ins>
+    </div>
+  </div>
 
 </div>
 
@@ -8701,15 +9269,17 @@ const SUBSTYLE_BRACKETS={
   'Crunk':             { verse:'[8-bar Verse | Rapid | Punchy]',          hook:'[Hook | Screamed | Call and Response | Crunk]', extra:['[Crunk Break]','[Crowd Chant]'] },
   'Chopped & Screwed': { verse:'[16-bar Verse | Chopped | Slowed]',       hook:'[Hook | Chopped | Syrupy | Slow]',            extra:['[Screwed Break]','[Chopped Ad-libs]'] },
   'Trap':              { verse:'[12-bar Verse | Trap | Rap Verse]',        hook:'[Hook | Melodic | Auto-Tune]',               extra:['[Trap Break]','[Outro | Fade-Out]'] },
-  'Boom Bap':          { verse:'[16-bar Verse | Boom Bap | Dense]',       hook:'[Hook | Rapped | Chanted]',                  extra:['[Boom Bap Break]','[Outro]'] },
+  'Boom Bap':          { verse:'[16-bar Verse | Boom Bap | Dense]',       hook:'[Hook | Sung Melodic | Anthemic | Hooky]',   extra:['[Boom Bap Break]','[Outro]'] },
   'Melodic Rap':       { verse:'[16-bar Verse | Rap Verse | Melodic]',    hook:'[Hook | Sung | Melodic | Auto-Tune]',        extra:['[Bridge | Sung]','[Outro | Fade-Out]'] },
   'Drill':             { verse:'[16-bar Verse | Drill | Dark]',            hook:'[Hook | Melodic | Dark | Drill]',            extra:['[Drill Break]','[Outro]'] },
-  'East Coast':        { verse:'[16-bar Verse | Boom Bap | Lyrical]',     hook:'[Hook | Chanted | Anthemic]',                extra:['[Boom Bap Break]','[Outro]'] },
+  'East Coast':        { verse:'[16-bar Verse | Boom Bap | Lyrical]',     hook:'[Hook | Sung Melodic | Anthemic | Group Vocal]', extra:['[Boom Bap Break]','[Outro]'] },
   'Midwest':           { verse:'[16-bar Verse | Soulful | Rap Verse]',    hook:'[Hook | Sung | Soul | Chipmunk]',            extra:['[Soul Break]','[Outro Vamp]'] },
   'Cloud Rap':         { verse:'[16-bar Verse | Hazy | Slow Flow]',       hook:'[Hook | Ethereal | Whispered | Melodic]',    extra:['[Ambient Break]','[Outro | Fade-Out]'] },
   'Phonk':             { verse:'[16-bar Verse | Pitched-Down | Demonic Cadence]', hook:'[Hook | Distorted Chant | Memphis Slowed]', extra:['[Cowbell Break | 8 bars | Drift Section]','[Vocal Chop | Pitched-Down Memphis Sample]','[Outro | Distorted 808 Fade]'] },
-  'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Chanted | Anthemic | Conscious]',    extra:['[Spoken Word Bridge]','[Outro]'] },
-  'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Rapped | Classic]',                  extra:['[Scratch Break]','[Outro]'] },
+  'Lyrical/Conscious': { verse:'[16-bar Verse | Lyrical | Dense]',        hook:'[Hook | Sung Melodic | Conscious | Hooky]',  extra:['[Spoken Word Bridge]','[Outro]'] },
+  'Old School':        { verse:'[16-bar Verse | Old School | Boom Bap]',  hook:'[Hook | Sung-Chant Hybrid | Classic | Group Vocal]', extra:['[Scratch Break]','[Outro]'] },
+  'Jazz Rap':          { verse:'[16-bar Verse | Conversational | In-Pocket | Internal Rhyme]', hook:'[Hook | Spoken-Sung Chant | Group Chorus]', extra:['[Jazz Horn Break | Sampled Loop]','[Upright Bass Walk | 4 bars]','[Outro | Vinyl Crackle Fade | Ad-Libs]'] },
+  'Jazz Improv Rap':   { verse:'[16-bar Verse | Improv Mode | Archetype Pocket]', hook:'[Hook | Call-and-Response | Trade-Fours]', extra:['[Bebop Bridge | Triplet Runs | Chromatic Walk]','[Modal Bridge | Anchor-Concept Variations]','[Horn Trade | 4 bars Question | 4 bars Answer]','[Outro | Brush-Snare Fade]'] },
   // Neo-Soul
   'Classic Neo-Soul':  { verse:'[Verse | Groove-Led | Conversational]',     hook:'[Chorus | Soulful | Declaration]',          extra:['[Outro Vamp | Escalating Ad-libs]','[Bridge | Half-Time Feel]'] },
   'Hip-Hop Neo-Soul':  { verse:'[Verse | Rap-Soul | Dilla Feel]',            hook:'[Chorus | Sung | Soul]',                    extra:['[Rap Bridge | Bars]','[Outro Vamp]'] },
@@ -8892,6 +9462,8 @@ const SUBSTYLE_NOTES={
   'Midwest':     'Midwest DNA: Chicago soul samples (Kanye era), Twista hyperspeed flow, Detroit grit (Big Sean, Royce da 5\'9"), St. Louis bounce. Emotional vulnerability alongside street realism. Chipmunk soul samples. Suno style: "midwest rap, soul sample, chicago, 95 BPM, emotional, chipmunk soul". Artists: Kanye West, Twista, Common, Lupe Fiasco, Chance the Rapper, Big Sean.',
   'Cloud Rap':   'Cloud Rap DNA: Ethereal, atmospheric, lo-fi production. Hazy drum machines, woozy synth pads, reverb-drenched vocals. Existential/introspective themes, often melancholic. Very slow BPM 70-90. Mumbled delivery. Suno style: "cloud rap, ethereal, lo-fi, reverb, atmospheric synths, 80 BPM, dreamy". Artists: Lil B, Bladee, Yung Lean, Carti (early), Bones.',
   'Phonk':       'Phonk DNA: Memphis 1990s rap reborn for the TikTok era. Drift Phonk subtype (the dominant modern variant): aggressive cowbell-driven percussion at 140-160 BPM — gym, drift-car, gaming culture soundtrack. Slowed Phonk: chopped Memphis tempo at 75-90 BPM with screwed pitch. Production signatures: distorted 808s, lo-fi vinyl crackle, slowed/screwed Memphis vocal samples, demonic ad-libs. Vocals heavily processed — pitched-down, distorted, often demonic. Themes: drift culture, Memphis horror imagery, dark moods, gym aggression. Suno style: "phonk, distorted 808, cowbell, slowed memphis chant, dark vibe, 150 BPM, drift". Modern: Kordhell, DVRST, Phonky Town, MoneySign Suede, Dxrk. Origins: Three 6 Mafia, DJ Screw, DJ Spanish Fly, Tommy Wright III.',
+  'Jazz Improv Rap': 'Jazz Improv Rap DNA: Lyric architecture borrowed directly from jazz improvisation. Three modes (one per section, never blend mid-verse): Bebop (12-16 syll/bar, triplet runs on beats 2 & 4, chromatic vowel walks, one "outside" word per 4 bars, behind-the-beat 10-15ms feel), Call-and-Response (bars in pairs — call/response, echo or contradict, AABB/ABAB tight, ideal for hooks/bridges), Modal (one anchor — place/concept/feeling — every bar circles it, theme-and-variation, loose rhyme ABCA/ABAC, anchor holds the verse). Archetype layer (one per session): Biggie default (88-96 BPM behind-beat, 8-12 syll/bar, internal multis, story specificity, dark humor), Nas (90-100 BPM on-beat, 12-16 syll/bar, cinematic detail + reference layer, compression, third-person POV), Jay-Z (92-102 BPM conversational confidence, 10-14 syll/bar, end-rhyme-heavy multisyllabic, double-meanings, punchline-as-thesis), Andre 3000 (75-110 BPM tempo dislocation, 6-18 syll/bar wildly variable, modal-by-default, surrealist imagery, register shifts rap→sung→scat). Production: live or sampled jazz fusion at 85-95 BPM, behind-the-beat dusty drums, upright bass, muted trumpet, Rhodes piano, brushed snare. Distinct from Jazz Rap (sample-based MPC boom-bap) and Jazz Rap Revival (live-band reimagining) — Jazz Improv Rap foregrounds jazz-improv LOGIC INSIDE THE LYRIC ITSELF, with archetype-locked phrasing as the second axis. Suno style: "jazz improv rap, behind-the-beat dusty drums, upright bass, muted trumpet, Rhodes piano, brushed snare, 88 BPM, baritone laid-back delivery, no autotune, neo-soul jazz-fusion pocket".',
+  'Jazz Rap':    'Jazz Rap DNA: Native Tongues lineage — A Tribe Called Quest, De La Soul, Jungle Brothers, Black Sheep — extended through Digable Planets, Pete Rock & CL Smooth, Gang Starr, Guru\'s Jazzmatazz, The Roots, Black Star, Common, Mos Def, Brand Nubian, Souls of Mischief, Us3. 88-94 BPM head-nod pocket. Production signatures: chopped jazz samples (Roy Ayers, Lonnie Liston Smith, Bobbi Humphrey, Donald Byrd, Lou Donaldson, Cannonball Adderley), walking upright bass (sampled or live), brushed-snare or dusty MPC drums, Rhodes/Wurlitzer chord stabs, muted trumpet phrases, soft horn loops, vinyl crackle as texture not gimmick. Flow: conversational on-beat with dense internal rhyme — multisyllabic but never showy, the bar serves the groove. Cadence sits IN the pocket (not behind like cloud rap, not on-the-grid like trap). Themes: Afrocentric philosophy, daisy-age optimism, urban observation, cosmopolitan curiosity, art and literature references, cypher-as-conversation. Conscious without preaching — the warmth is structural. Hooks are spoken-sung chants, not melodic belting; often 4 lines repeated, sometimes a sampled jazz horn IS the hook. Distinct from Jazz Rap Revival — Revival uses LIVE jazz musicianship reimagining the form (Glasper, BADBADNOTGOOD, Kendrick TPAB), Jazz Rap proper uses SAMPLED jazz reconstructed through MPC/SP-1200 boom-bap drum architecture. Suno style: "jazz rap, chopped jazz sample loop, walking upright bass, brushed snare, muted trumpet, Rhodes piano stabs, dusty MPC drums, vinyl crackle, 92 BPM, Native Tongues era boom bap, head-nod pocket".',
   // Neo-Soul substyles
   'Classic Neo-Soul':    'Classic Neo-Soul DNA: D\'Angelo / Erykah Badu era. Warm Rhodes piano, upright or Fender bass, live drums with swing (slightly behind the beat). Head-nod groove mandatory. Vocals are conversational and improvised-feeling. Suno style: "neo-soul, Rhodes piano, live drums, swing, 90 BPM, warm vinyl, head-nod groove". Artists: D\'Angelo, Erykah Badu, Maxwell.',
   'Hip-Hop Neo-Soul':    'Hip-Hop Neo-Soul DNA: The Lauryn Hill / Common / J Dilla intersection. Boom bap or Dilla-off-beat drum programming under soulful vocal delivery. Rapped bridges or verses inside a sung structure. Sample-flipped soul. Suno style: "neo-soul, hip-hop drums, J Dilla beat, soul vocal, 85 BPM, vinyl warmth". Artists: Lauryn Hill, Common, Bilal, H.E.R.',
@@ -9031,7 +9603,7 @@ const SUBSTYLE_NOTES={
 const SUBSTYLES={
   country:['Outlaw Country','Bakersfield','Nashville Pop','Americana','Bluegrass','Bro-Country','Alt-Country','Texas / Red Dirt','Classic Honky-Tonk','Country Gospel','Country Rap','Country Blues'],
   kpop:['Girl Group','Boy Group','K-Pop Ballad','Dance Pop','Dark Concept','Bubblegum','Hip-Hop K-Pop','R&B K-Pop'],
-  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap','Phonk','Pop-Rap Crossover','Pop-Rap Rock'],
+  hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap','Phonk','Jazz Rap','Jazz Improv Rap','Pop-Rap Crossover','Pop-Rap Rock'],
   metal:['Classic Metal','Nu-Metal','Metalcore','Thrash','Death Metal','Black Metal','Doom Metal','Power Metal','Symphonic Metal','Progressive Metal','Djent','Melodic Death Metal','Screamo','Avant-Garde Metal'],
   latin:['Salsa','Bachata','Cumbia','Bossa Nova','Latin Pop','Latin Jazz','Mariachi'],
   reggaeton:['Perreo Clásico','Trap Latino','Reggaeton Romántico','Urbano Latino','Dembow Puro','Reggaeton Pop'],
@@ -9418,6 +9990,10 @@ const S={selectedGenre:'pop',
   selectedAgeGroup:'',
   albumLanes:['streaming'],
   albumData:null,
+  playlistMode:'niche',
+  playlistData:null,
+  playlistNicheLanes:['daily-mix'],
+  playlistVibeLanes:['late-night'],
   currentVersions:[],
   luckyVersions:[],
   luckyLockedGenres:[],
@@ -10088,6 +10664,8 @@ const RAP_STYLES_CLIENT = {
   analog_melodic:  { label:'Analog Melodic', category:'revisionist', era:'2000s × Now', teaser:'Melodic rap on warm analog production. No digital sheen.' },
   conscious_trap:  { label:'Conscious Trap', category:'revisionist', era:'Trap × Kendrick', teaser:'808s underneath philosophy. The contradiction IS the art.' },
   afro_boom_bap:   { label:'Afro-Boom Bap', category:'revisionist', era:'Africa × 1993', teaser:'West African tonal patterns applied to boom bap structure.' },
+  jazz_rap:        { label:'Jazz Rap', category:'established', era:'1989–present', teaser:'Native Tongues lineage. Chopped jazz samples, walking upright bass, head-nod pocket. Conscious without the sermon.' },
+  jazz_improv_rap: { label:'Jazz Improv Rap', category:'established', era:'1990s–present (live-improv lineage)', teaser:'Bebop / Call-Response / Modal lyric architecture × Biggie / Nas / Jay / Andre archetype. Jazz logic inside the bars, not just the beat.' },
   jazz_rap_revival:{ label:'Jazz Rap Revival', category:'revisionist', era:'1993 × Now', teaser:'Tribe-era craft with modern mixing and current subjects.' },
 };
 
@@ -10118,6 +10696,8 @@ const RAP_DIM_DEFAULTS = {
   analog_melodic:   { flow:'behind-beat',   rhymeArch:'slant',           density:'sparse',       vocabRegister:'minimal-phonetic',    persona:'first-person-raw' },
   conscious_trap:   { flow:'syncopated',    rhymeArch:'internal',        density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
   afro_boom_bap:    { flow:'on-beat',       rhymeArch:'chain',           density:'dense',        vocabRegister:'conscious-literary',  persona:'collective-we' },
+  jazz_rap:         { flow:'on-beat',       rhymeArch:'internal',        density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
+  jazz_improv_rap:  { flow:'behind-beat',   rhymeArch:'multi-syllabic',  density:'medium',       vocabRegister:'conscious-literary',  persona:'first-person-raw' },
   jazz_rap_revival: { flow:'behind-beat',   rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'omniscient' },
 };
 
@@ -10156,6 +10736,8 @@ const RAP_STYLE_ADLIBS_CLIENT = {
   'Analog Melodic':       ['(tape warmth)','mm','oh','(soft auto-tune)','yeah yeah','(hazy)','(rhodes)','whoa'],
   'Conscious Trap':       ['(mm)','(pause)','(check it)','(listen)','(word)','(truth)','(real)','(breath)'],
   'Afro-Boom Bap':        ['(African chant)','sankofa','true','word','(tonal)','uh-huh','real','(djembe)'],
+  'Jazz Rap':             ['(uh)','yeah yeah','check it','peace','one love','word','represent','(Native Tongues)'],
+  'Jazz Improv Rap':      ['(scat)','(brush snare)','yeah','uh','(horn answer)','one','two','(trade fours)'],
   'Jazz Rap Revival':     ['(scat)','doo bop','yeah yeah','(horn)','true that','mm','peace','(brush snare)'],
   'Bay Area':             ['(hyphy)','hella','ghost ride','slap','yadada','beyotch','(Too Short)','yay area'],
   'Down South':           ['(drawl)','slatt','bussin','huh','what it do','fasho','trill','errybody'],
@@ -10193,6 +10775,8 @@ const RAP_STYLE_SUNO_CLIENT = {
   'Analog Melodic':       'analog melodic rap, warm tape-saturated drums, Rhodes piano bed, 90 BPM, melodic auto-tuned flow over analog warmth, lo-fi pocket',
   'Conscious Trap':       'conscious trap, 808 bass under philosophical bars, live jazz horn accents, dark minor-key piano, 86 BPM, thoughtful literary trap, systemic-critique lyric register',
   'Afro-Boom Bap':        'afro boom bap, West African percussion layered over boom bap drums, chopped soul sample, upright bass, 91 BPM, modern UK/African conscious hip-hop, African tonal melody',
+  'Jazz Rap':             'jazz rap, chopped jazz sample loop, walking upright bass, brushed snare, muted trumpet, Rhodes piano stabs, dusty MPC drums, vinyl crackle, 92 BPM, Native Tongues era boom bap, head-nod pocket, conscious-conversational delivery',
+  'Jazz Improv Rap':      'jazz improv rap, behind-the-beat dusty drums, upright bass walks, muted trumpet, Rhodes piano, brushed snare, 88 BPM, baritone laid-back delivery, no autotune, neo-soul jazz-fusion pocket, archetype-driven phrasing, bebop-or-modal lyric architecture',
   'Jazz Rap Revival':     'jazz rap revival, live jazz band, upright bass walks, muted trumpet, brushed snare, 96 BPM, modern live-instrumentation hip-hop, 90s jazz-rap reimagined',
   'Bay Area':             'bay area hip-hop, hyphy, trunk music, 808 bass, hi-energy, Oakland rap, 100 BPM',
   'Down South':           'dirty south, slow rolling 808 bass, southern rap, deep drawl, 85 BPM',
@@ -11579,8 +12163,6 @@ async function generateSong(){
     // exactly which Suno tags to embed and where.
     surprise: seGetConfig()
   };
-  // Clear album context after use
-  if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
   const albumNote=S.albumTrack?`\n\nALBUM CONTEXT: This song is the "${S.albumTrack.type}" on the album "${S.albumTrack.album}". Its role: ${S.albumTrack.role}. The album's emotional arc: ${S.albumTrack.arc}. Write it so it fits cohesively within that album story.`:'';
   const hiphopNote=genre==='hiphop'?`\n\nHIP-HOP VERSE RULES (non-negotiable):
 - 1 bar = 1 line. Write EXACTLY the bar count in the structure (e.g. [16-bar Verse] = 16 lines, [12-bar Verse] = 12 lines, [8-bar Hook] = 8 lines).
@@ -11647,7 +12229,11 @@ async function generateSong(){
 - Lullaby rule: descending melody implied through falling imagery (stars coming down, moon settling, eyes getting heavy). Safety in every final line.`
   : '';
   // Clear album context after use so it doesn't carry over to next song
-  if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
+  if(S.albumTrack){
+    const _albBanner = document.getElementById('album-track-banner');
+    if (_albBanner) _albBanner.style.display = 'none';
+    S.albumTrack = null;
+  }
 
   // Build secondary style instructions
   const g2sel=document.getElementById('g-genre2');
@@ -18276,6 +18862,30 @@ async function pasteBlendTwist() {
   }
 }
 
+async function pasteBlendSong(slot) {
+  const inp = document.getElementById('blend-' + slot + '-search');
+  if (!inp) return;
+  try {
+    const text = (await navigator.clipboard.readText() || '').trim();
+    if (!text) { toast('Clipboard is empty'); return; }
+    inp.value = text.split(/\r?\n/)[0].slice(0, 200);
+    inp.focus();
+    toast('✓ Pasted into Song ' + slot);
+  } catch(e) {
+    inp.focus();
+    toast('Paste failed — use Ctrl+V / Cmd+V in the field');
+  }
+}
+
+function copyBlendSong(slot) {
+  const analyzed = S.blend && S.blend['song' + slot];
+  if (analyzed && analyzed.title) { copyBlendDna(slot); return; }
+  const inp = document.getElementById('blend-' + slot + '-search');
+  const txt = (inp?.value || '').trim();
+  if (!txt) { toast('Nothing to copy — type or analyze a song first'); return; }
+  safeCopy(txt, 'Song ' + slot + ' copied');
+}
+
 // CAMPAIGN MODE
 // ═══════════════════════════════════════════════════════
 async function generateCampaign() {
@@ -18537,8 +19147,8 @@ function updateMoodHint(){
 // ALBUM ENGINE
 // ═══════════════════════════════════════════════════════
 function goAlbTab(id, el) {
-  document.querySelectorAll('.album-pane').forEach(p => p.classList.remove('on'));
-  document.querySelectorAll('.album-tab').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('#pg-album .album-pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('#pg-album .album-tab').forEach(b => b.classList.remove('on'));
   const pane = document.getElementById('alb-pane-' + id);
   if (pane) pane.classList.add('on');
   if (el) el.classList.add('on');
@@ -18846,6 +19456,481 @@ async function albumInstantEdit() {
     inp.value = '';
   } catch(e) { toast('⚠️ ' + e.message); }
   btnDone('alb-ie-btn');
+}
+
+// ═══════════════════════════════════════════════════════
+// PLAYLIST ENGINE  (CADENCE-wired niche mode + Vibe mode)
+// ═══════════════════════════════════════════════════════
+
+const PLAYLIST_TYPE_TRACKS = {
+  short:  { label: 'Short Playlist',    count: 10 },
+  medium: { label: 'Standard Playlist', count: 20 },
+  long:   { label: 'Long Playlist',     count: 30 },
+  djset:  { label: 'DJ Set',             count: 15 }
+};
+
+// Slot taxonomy differs between niche (algorithm-targeted) and vibe (mood-driven) modes.
+const PLAYLIST_SLOTS_NICHE = ['HOOK TRACK','NICHE LOCK','ALGORITHM LURE','BPM PIVOT','DEEP CUT','THRESHOLD CROSSER','OUTLIER','SONIC ANCHOR','SKIP-RESISTANT MID','CLOSER'];
+const PLAYLIST_SLOTS_VIBE  = ['OPENER','MOOD LOCK','GROOVE TRACK','ENERGY LIFT','EMOTIONAL PEAK','OUTLIER','COOL DOWN','CLOSER'];
+
+const PLAYLIST_ROLE_META = {
+  // Niche / CADENCE
+  'HOOK TRACK':         {icon:'🎣', why:'Front-loaded retention — passes the 30-second skip test'},
+  'NICHE LOCK':         {icon:'🔒', why:'Core sonic identity track — defines the algorithmic cluster'},
+  'ALGORITHM LURE':     {icon:'🧲', why:'High save-rate / low skip-rate — feeds Discover Weekly inclusion'},
+  'BPM PIVOT':          {icon:'⏱️', why:'Sits at the BPM edge — bridges into adjacent algorithm clusters'},
+  'DEEP CUT':           {icon:'🔍', why:'Rewards completion — boosts session-length signal'},
+  'THRESHOLD CROSSER':  {icon:'📈', why:'Engineered to clear the 1,000-stream-in-12-months pay threshold'},
+  'OUTLIER':            {icon:'🌶️', why:'Controlled variation — prevents algorithmic over-clustering'},
+  'SONIC ANCHOR':       {icon:'⚓', why:'Reinforces the sonic-fit signature for the niche'},
+  'SKIP-RESISTANT MID': {icon:'🛡️', why:'Mid-playlist anti-skip track — protects retention curve'},
+  'CLOSER':             {icon:'🌙', why:'Resolution track — drives positive last-impression signal'},
+  // Vibe
+  'OPENER':         {icon:'🚀', why:'Sets the mood inside the first 15 seconds'},
+  'MOOD LOCK':      {icon:'🎯', why:'Defines the use-case feel — the playlist\'s identity track'},
+  'GROOVE TRACK':   {icon:'🎶', why:'Body-movement anchor — keeps energy mid-tier'},
+  'ENERGY LIFT':    {icon:'⚡', why:'Lifts the curve — prevents stagnation'},
+  'EMOTIONAL PEAK': {icon:'💥', why:'Highest emotional moment — the share-worthy centerpiece'},
+  'COOL DOWN':      {icon:'☁️', why:'Eases out of intensity — sets up the closer'}
+};
+const PLAYLIST_DEFAULT_META = {icon:'🎵', why:'Supports the playlist arc'};
+
+const PLAYLIST_NICHE_LANE_LABELS = {
+  'daily-mix':       'Daily Mix Inclusion',
+  'discover-weekly': 'Discover Weekly',
+  'release-radar':   'Release Radar',
+  'sonic-cluster':   'Sonic-cluster Lock',
+  'threshold':       '1000-stream Threshold'
+};
+const PLAYLIST_VIBE_LANE_LABELS = {
+  'late-night':'Late Night','workout':'Workout','focus':'Deep Focus','driving':'Driving',
+  'party':'Party','chill':'Chill / Wind-down','date':'Date Night','wedding':'Wedding','sad':'Sad / Cathartic'
+};
+
+// Per-country avg payout, used for the projection helper. Sourced from
+// streaming-economics rate-card-2026.md.
+const PLAYLIST_COUNTRY_RATE = {
+  'us-uk': 0.0042,
+  'us-eu': 0.0038,
+  'mixed': 0.0030,
+  'asia':  0.0020
+};
+
+function setPlaylistMode(mode) {
+  // Race guard — don't let mode flip mid-generation
+  if (S._playlistGenerating) { toast('Hold on — playlist is generating'); return; }
+  S.playlistMode = (mode === 'vibe') ? 'vibe' : 'niche';
+  document.querySelectorAll('#playlist-mode-pills [data-pls-mode]').forEach(el => {
+    const isOn = el.dataset.plsMode === S.playlistMode;
+    el.classList.toggle('on', isOn);
+    el.setAttribute('role', 'button');
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('aria-pressed', String(isOn));
+  });
+  const isNiche = S.playlistMode === 'niche';
+  const nicheFields = document.getElementById('pls-niche-fields');
+  const vibeFields  = document.getElementById('pls-vibe-fields');
+  // Toggle both display and aria-hidden + the `hidden` attr (covers AT that
+  // ignores display:none on focusable descendants).
+  const setHidden = (el, hidden) => {
+    if (!el) return;
+    el.style.display = hidden ? 'none' : '';
+    if (hidden) el.setAttribute('hidden', ''); else el.removeAttribute('hidden');
+    el.setAttribute('aria-hidden', String(hidden));
+  };
+  setHidden(nicheFields, !isNiche);
+  setHidden(vibeFields,  isNiche);
+  // Update labels and CTA
+  const briefLabel  = document.getElementById('pls-brief-label');
+  const arcTitle    = document.getElementById('pls-arc-title');
+  const motifsTitle = document.getElementById('pls-motifs-title');
+  const btnIcon     = document.getElementById('pls-btn-icon');
+  const btnLabel    = document.getElementById('pls-btn-label');
+  const cadenceTab  = document.getElementById('pls-tab-cadence');
+  if (briefLabel)  briefLabel.textContent  = isNiche ? 'Niche / Cluster Brief'           : 'Use-case / Vibe Brief';
+  if (arcTitle)    arcTitle.textContent    = isNiche ? 'Energy Curve & Retention Arc'    : 'Energy Curve';
+  if (motifsTitle) motifsTitle.textContent = isNiche ? 'Sonic Identity Anchors'           : 'Recurring Vibes';
+  if (btnIcon)     btnIcon.textContent     = isNiche ? '🎯' : '🎧';
+  if (btnLabel)    btnLabel.textContent    = isNiche ? 'Generate CADENCE Playlist Plan' : 'Generate Vibe Playlist';
+  setHidden(cadenceTab, !isNiche);
+  const planTab = document.querySelector('.album-tab[onclick*="goPlsTab(\'plan\'"]');
+  setHidden(planTab, !isNiche);
+}
+
+function setPlsNicheLane(el, lane) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) {
+    if (!S.playlistNicheLanes.includes(lane)) S.playlistNicheLanes.push(lane);
+  } else {
+    S.playlistNicheLanes = S.playlistNicheLanes.filter(l => l !== lane);
+    if (!S.playlistNicheLanes.length) { S.playlistNicheLanes.push(lane); el.classList.add('on'); }
+  }
+}
+function setPlsVibeLane(el, lane) {
+  el.classList.toggle('on');
+  if (el.classList.contains('on')) {
+    if (!S.playlistVibeLanes.includes(lane)) S.playlistVibeLanes.push(lane);
+  } else {
+    S.playlistVibeLanes = S.playlistVibeLanes.filter(l => l !== lane);
+    if (!S.playlistVibeLanes.length) { S.playlistVibeLanes.push(lane); el.classList.add('on'); }
+  }
+}
+
+function goPlsTab(id, el) {
+  document.querySelectorAll('#pg-playlist .album-pane').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('#pg-playlist .album-tab').forEach(b => b.classList.remove('on'));
+  const pane = document.getElementById('pls-pane-' + id);
+  if (pane) pane.classList.add('on');
+  if (el) el.classList.add('on');
+}
+
+// CADENCE prompt block — injected into niche-mode generation. Pulls from
+// discovery-arbitrage/niche-scoring-formula.md and streaming-economics/rate-card-2026.md.
+function buildCadenceContextBlock() {
+  return `
+You are operating as the CADENCE engine — the streaming-arbitrage analyst.
+
+NICHE SCORING FORMULA (score 0-100 across these 6 factors):
+1. Sonic distinctiveness (25 pts) — can the algorithm cluster this confidently? Distinctive identity = 25, broad genre bucket = 10, no identity = 0.
+2. Audience size (20 pts) — top-20-artist median monthly listeners. 50K+ = 20, 10-50K = 15, 1-10K = 8, <1K = 0.
+3. Country-mix economics (15 pts) — US/UK/AUS = 15 ($0.0040+), US+EU = 11, mixed-LatAm = 7, Asia-dominant = 3.
+4. Producer competition (15 pts, INVERTED) — 1-5 active producers = 15, 6-15 = 11, 16-30 = 7, 31-50 = 3, 50+ = 0.
+5. Content fit (15 pts) — strong visual/Tidemark match = 15, workable = 11, weak = 7, none = 3.
+6. Disclosure compliance (10 pts) — neutral/beneficial = 10, neutral = 7, resistant = 4, requires impersonation = 0 (KILL).
+
+Viability gates: 60+ = viable, 75+ = high-conviction. Factor-6 score of 0 kills the play regardless.
+
+2026 SPOTIFY RATE CARD:
+- Per-stream avg (US-mix): $0.0039 — pool 70/30
+- Threshold: 1,000 streams in rolling 12 months OR earns $0
+- ~87% of catalog is below threshold
+- DDEX AI disclosure recommended; unauthorized voice cloning = removed
+
+PROJECTION RULE: when projecting revenue, use the per-country avg rate, multiply by streams-above-threshold across the playlist, and apply 2026 dilution factor 0.96 to forward-looking annual numbers.
+`.trim();
+}
+
+async function generatePlaylistTheme() {
+  const mode  = S.playlistMode || 'niche';
+  const brief = document.getElementById('pls-brief')?.value?.trim() || '';
+  const genre = document.getElementById('pls-genre')?.value || 'pop';
+  const type  = document.getElementById('pls-type')?.value || 'medium';
+  const isNiche = mode === 'niche';
+
+  const playlistDef = PLAYLIST_TYPE_TRACKS[type] || PLAYLIST_TYPE_TRACKS.medium;
+  const slotPool = isNiche ? PLAYLIST_SLOTS_NICHE : PLAYLIST_SLOTS_VIBE;
+  // Repeat slot pool to fill the requested track count
+  const slotPlan = [];
+  for (let i = 0; i < playlistDef.count; i++) slotPlan.push(slotPool[i % slotPool.length]);
+  const trackTypesTemplate = slotPlan.map(s => `${s} | [description] | [retention/emotional role]`).join('\n');
+
+  let modeContext = '';
+  let extraSections = '';
+  if (isNiche) {
+    const bpm     = document.getElementById('pls-bpm')?.value || '80-100';
+    const country = document.getElementById('pls-country')?.value || 'us-eu';
+    const lanes   = (S.playlistNicheLanes || []).map(l => PLAYLIST_NICHE_LANE_LABELS[l] || l).join(', ') || 'Daily Mix Inclusion';
+    modeContext = `${buildCadenceContextBlock()}
+
+PLAYLIST BRIEF — CADENCE/discovery-arbitrage mode:
+- Niche / sonic identity: ${brief || '(infer from primary genre)'}
+- Primary genre family: ${genre}
+- Target BPM range: ${bpm}
+- Target country mix: ${country} (use this rate when projecting)
+- Algorithmic goals: ${lanes}
+- Track count: ${playlistDef.count}
+`;
+    extraSections = `
+CADENCE SCORE: [total]/100
+CADENCE VERDICT: [one sentence — abort / borderline / viable / high-conviction]
+CADENCE FACTORS:
+- Sonic distinctiveness: [score]/25 — [reason]
+- Audience size: [score]/20 — [reason]
+- Country-mix economics: [score]/15 — [reason]
+- Producer competition: [score]/15 — [reason]
+- Content fit: [score]/15 — [reason]
+- Disclosure compliance: [score]/10 — [reason]
+
+REVENUE PROJECTION:
+[2-3 sentences with concrete numbers — assume target country rate, ${playlistDef.count} tracks, realistic threshold-clearing rate, apply 0.96 2026 dilution multiplier]
+
+90-DAY PLAN:
+[3-4 sentences — release cadence, content-engine pairing, threshold engineering moves, when to validate vs scale]
+
+THRESHOLD MOVES:
+- [move 1 — concrete and specific]
+- [move 2 — concrete and specific]
+- [move 3 — concrete and specific]
+- [move 4 — concrete and specific]
+
+RISK NOTES:
+[2-3 sentences — disclosure, platform spam-detection, distributor termination risk, voice-cloning red lines]
+`;
+  } else {
+    const lanes = (S.playlistVibeLanes || []).map(l => PLAYLIST_VIBE_LANE_LABELS[l] || l).join(', ') || 'Late Night';
+    modeContext = `
+PLAYLIST BRIEF — Vibe / use-case mode:
+- Vibe / use-case: ${lanes}
+- User brief: ${brief || '(infer from use-case)'}
+- Primary genre family: ${genre}
+- Track count: ${playlistDef.count}
+
+You are a curator-songwriter building a vibe playlist. The job is mood-coherence and use-case fit, not algorithm targeting. Energy curve must match how a real listener uses this — opening, sustain, peak, wind-down.
+`;
+  }
+
+  const prompt = `${modeContext}
+
+Respond with EXACTLY this format:
+PLAYLIST NAME: [name]
+TAGS: [3-4 comma-separated concept tags]
+SUMMARY:
+[2-3 sentence playlist summary]
+
+ARC:
+[2-3 sentence energy curve / retention arc]
+
+MOTIFS:
+- [sonic anchor / vibe motif 1]
+- [motif 2]
+- [motif 3]
+
+TRACK TYPES:
+${trackTypesTemplate}
+
+SONIC PALETTE:
+[color name] | [sound description]
+[color name] | [sound description]
+[color name] | [sound description]
+
+PRODUCTION STYLE:
+[2 sentences on production direction]
+${extraSections}`;
+
+  btnLoad('pls-btn', 'Generating…');
+  S._playlistGenerating = true;
+  // Disable mode pills while generating to prevent mid-stream pane mismatch
+  document.querySelectorAll('#playlist-mode-pills [data-pls-mode]').forEach(el => {
+    el.style.pointerEvents = 'none';
+    el.style.opacity = '.55';
+  });
+  const out = document.getElementById('playlist-out');
+  if (out) { out.style.display = 'block'; out.classList.add('visible'); }
+  // Clear any prior run's state so a partial / failed regeneration can't leave
+  // the user wired to stale Write-All / Apply-Edit buttons.
+  S.playlistData = null;
+  ['pls-tags','pls-summary','pls-arc','pls-motifs','pls-track-types','pls-tracks-written',
+   'pls-palette','pls-prod-refs','pls-cadence-factors','pls-cadence-revenue',
+   'pls-plan-90','pls-plan-threshold','pls-plan-risk'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '';
+  });
+  const _scoreReset = document.getElementById('pls-cadence-score');
+  if (_scoreReset) { _scoreReset.textContent = '—'; _scoreReset.style.color = ''; }
+  const _verdictReset = document.getElementById('pls-cadence-verdict');
+  if (_verdictReset) _verdictReset.textContent = '';
+  document.getElementById('pls-name').textContent = isNiche ? 'Generating CADENCE plan…' : 'Generating playlist concept…';
+
+  try {
+    let raw = '';
+    await callClaudeStream(prompt,
+      isNiche
+        ? 'You are the CADENCE engine — a senior streaming-arbitrage analyst. Be specific, numerical, and honest. If the math does not work, say so.'
+        : 'You are a senior playlist curator and songwriter. Be specific and use-case-driven.',
+      (chunk, full) => { raw = full; });
+
+    const sec = (key) => {
+      // Match content up to the next ALL-CAPS section header (which can start
+      // with a digit, e.g. "90-DAY PLAN:") or end of string.
+      const re = new RegExp(key + ':\\s*([\\s\\S]*?)(?=\\n[A-Z0-9][A-Z0-9 &\\/\\-]+:|$)');
+      const m = raw.match(re);
+      return m ? m[1].trim() : '';
+    };
+    const name = raw.match(/PLAYLIST NAME:\s*(.+)/)?.[1]?.trim() || 'Untitled Playlist';
+    const tagsRaw = raw.match(/TAGS:\s*(.+)/)?.[1]?.trim() || '';
+    const summary = sec('SUMMARY');
+    const arc = sec('ARC');
+    const motifsRaw = sec('MOTIFS');
+    const trackTypesRaw = sec('TRACK TYPES');
+    const paletteRaw = sec('SONIC PALETTE');
+    const prodStyle = sec('PRODUCTION STYLE');
+
+    document.getElementById('pls-name').textContent = name;
+    document.getElementById('pls-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${escHtml(t.trim())}</span>`).join('');
+    document.getElementById('pls-summary').textContent = summary;
+    document.getElementById('pls-arc').textContent = arc;
+    document.getElementById('pls-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+
+    const trackList = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
+      const [ttype,desc,role] = l.split('|').map(s=>s.trim());
+      return {ttype:ttype||'', desc:desc||'', role:role||''};
+    });
+    document.getElementById('pls-track-types').innerHTML = trackList.map((tr,i)=>{
+      const meta = PLAYLIST_ROLE_META[tr.ttype.toUpperCase()] || PLAYLIST_DEFAULT_META;
+      return `<div class="gap-role"><div class="gap-role-icon">${meta.icon}</div><div class="gap-role-body"><div class="gap-role-name">${escHtml(tr.ttype)}</div><div class="gap-role-desc">${escHtml(tr.desc)} — ${escHtml(tr.role)}</div></div><button class="gap-write-btn" onclick="writePlaylistTrack(${i})">✦ Write This Track</button></div>`;
+    }).join('');
+
+    const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
+    document.getElementById('pls-palette').innerHTML = paletteRaw.split('\n').filter(l=>l.includes('|')).map((l,i)=>{
+      const [label,desc] = l.split('|').map(s=>s.trim());
+      const col = PALETTE_COLORS[i % PALETTE_COLORS.length];
+      return `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:6px"><div style="width:14px;height:14px;border-radius:50%;background:${col};flex-shrink:0"></div><div><div style="font-size:12px;font-weight:700;color:var(--tx1)">${escHtml(label||'')}</div><div style="font-size:11px;color:var(--tx3)">${escHtml(desc||'')}</div></div></div>`;
+    }).join('');
+    document.getElementById('pls-prod-refs').textContent = prodStyle;
+
+    let cadenceData = null;
+    if (isNiche) {
+      const score = parseInt(raw.match(/CADENCE SCORE:\s*(\d+)/i)?.[1] || '0', 10);
+      const verdict = raw.match(/CADENCE VERDICT:\s*(.+)/i)?.[1]?.trim() || '';
+      const factorsRaw = sec('CADENCE FACTORS');
+      const revenue = sec('REVENUE PROJECTION');
+      const plan90 = sec('90-DAY PLAN');
+      const thresholdRaw = sec('THRESHOLD MOVES');
+      const risk = sec('RISK NOTES');
+
+      document.getElementById('pls-cadence-score').textContent = score || '—';
+      document.getElementById('pls-cadence-verdict').textContent = verdict;
+      // Color-code score
+      const scoreEl = document.getElementById('pls-cadence-score');
+      scoreEl.style.color = score >= 75 ? 'var(--green,#3ee896)' : score >= 60 ? 'var(--amber)' : 'var(--red,#ff6b6b)';
+      document.getElementById('pls-cadence-factors').innerHTML = factorsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+      document.getElementById('pls-cadence-revenue').textContent = revenue;
+      document.getElementById('pls-plan-90').textContent = plan90;
+      document.getElementById('pls-plan-threshold').innerHTML = thresholdRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+      document.getElementById('pls-plan-risk').textContent = risk;
+      cadenceData = { score, verdict, factors: factorsRaw, revenue, plan90, threshold: thresholdRaw, risk };
+    }
+
+    S.playlistData = {
+      name, summary, arc, motifs: motifsRaw, trackTypes: trackTypesRaw, trackList,
+      palette: paletteRaw, prodStyle, genre, type, mode,
+      lanes: isNiche ? S.playlistNicheLanes.slice() : S.playlistVibeLanes.slice(),
+      bpm: isNiche ? document.getElementById('pls-bpm')?.value : null,
+      country: isNiche ? document.getElementById('pls-country')?.value : null,
+      cadence: cadenceData
+    };
+    toast(isNiche ? '🎯 CADENCE plan generated!' : '🎧 Playlist concept generated!');
+    out.scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch (e) {
+    document.getElementById('pls-name').textContent = 'Error';
+    document.getElementById('pls-summary').innerHTML = apiErrHtml(e.message);
+    // Stale state was already cleared up-front; nothing else to undo.
+  }
+  S._playlistGenerating = false;
+  document.querySelectorAll('#playlist-mode-pills [data-pls-mode]').forEach(el => {
+    el.style.pointerEvents = '';
+    el.style.opacity = '';
+  });
+  btnDone('pls-btn');
+}
+
+function writePlaylistTrack(index) {
+  const pls = S.playlistData;
+  const tr  = pls?.trackList?.[index];
+  if (!tr) { toast('Generate a playlist concept first'); return; }
+
+  // Reuse the album-track context plumbing — generateSong() already injects this
+  // server-side via _brain.js, and the banner UI already exists.
+  S.albumTrack = {
+    album: pls.name,           // displayed as the parent project name
+    type:  tr.ttype,
+    desc:  tr.desc,
+    role:  tr.role,
+    arc:   pls.arc || ''
+  };
+
+  const topicEl = document.getElementById('g-topic');
+  if (topicEl) topicEl.value = `${tr.desc} — ${tr.role}`;
+
+  const genreKey = pls.genre || 'pop';
+  S.selectedGenre = genreKey;
+  document.querySelectorAll('#genre-grid .gp').forEach(g => {
+    g.classList.toggle('on', g.dataset.genre === genreKey);
+  });
+
+  const banner = document.getElementById('album-track-banner');
+  const bannerText = document.getElementById('album-track-banner-text');
+  if (banner && bannerText) {
+    bannerText.textContent = `✦ Writing ${tr.ttype} for "${pls.name}" (playlist) — click Generate when ready`;
+    banner.style.display = 'flex';
+  }
+
+  const nb = Array.from(document.querySelectorAll('.nb')).find(b => /pg-write/.test(b.getAttribute('onclick') || ''));
+  if (nb) goPg('write', nb); else goPg('write');
+
+  setTimeout(() => document.getElementById('gen-btn')?.scrollIntoView({behavior:'smooth', block:'center'}), 300);
+  toast(`✦ "${tr.ttype}" loaded — hit Generate!`);
+}
+
+async function writeAllPlaylistTracks() {
+  const pls = S.playlistData;
+  if (!pls?.trackList?.length) { toast('Generate a playlist concept first, then come back here'); return; }
+  const writeBtn = document.querySelector('[onclick="writeAllPlaylistTracks()"]');
+  if (writeBtn) { writeBtn.disabled = true; writeBtn.textContent = '⏳ Writing…'; }
+  S.cancelAllPlaylistTracks = false;
+  if (writeBtn) writeBtn.onclick = () => { S.cancelAllPlaylistTracks = true; writeBtn.textContent = 'Cancelling…'; };
+  toast(`Writing ${pls.trackList.length} tracks — est. ${pls.trackList.length * 4}s`);
+  const out = document.getElementById('pls-tracks-written');
+  out.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Writing all tracks…</span></div>';
+  const results = [];
+  try {
+    for (let i = 0; i < pls.trackList.length; i++) {
+      if (S.cancelAllPlaylistTracks) break;
+      const tr = pls.trackList[i];
+      out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${pls.trackList.length}: ${tr.ttype}…`;
+      try {
+        const prompt = `Write a complete, production-ready song for this playlist track.\n\nPlaylist: "${pls.name}" (${pls.mode === 'niche' ? 'CADENCE/discovery-arbitrage' : 'vibe/use-case'} playlist)\nSlot role: ${tr.ttype}\nDescription: ${tr.desc}\nGenre family: ${pls.genre || 'pop'}\nEnergy/retention arc: ${pls.arc || 'part of a cohesive playlist'}\nTrack position: ${i+1} of ${pls.trackList.length}\n${pls.bpm ? 'Target BPM range: '+pls.bpm+'\n' : ''}\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds (skip-test critical for ${pls.mode === 'niche' ? 'algorithm signal' : 'use-case retention'})\n- Every line specific — no vague emotions, no clichés\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style]`;
+        const rawTr = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
+        const title  = parseSection(rawTr,'TITLE','LYRICS');
+        const lyrics = parseSection(rawTr,'LYRICS','SONG PROMPT');
+        const style  = parseSection(rawTr,'SONG PROMPT', null);
+        results.push({i, ttype:tr.ttype, title, lyrics, style});
+      } catch(e) {
+        results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
+      }
+    }
+  } finally {
+    if (writeBtn) { writeBtn.disabled = false; writeBtn.textContent = '✍️ Write All Tracks'; writeBtn.onclick = () => writeAllPlaylistTracks(); }
+  }
+  // Stash results so inline onclicks can pull lyrics/style by index — avoids
+  // string-interpolating multi-line content into onclick attribute literals.
+  S._playlistWriteResults = results;
+  out.innerHTML = results.map(r => `
+    <div style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div>
+          <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em">Track ${r.i+1} · ${escHtml(r.ttype)}</div>
+          <div style="font-size:17px;font-weight:800;margin-top:2px">"${escHtml(r.title||'')}"</div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="safeCopy(S._playlistWriteResults?.[${r.i}]?.lyrics||'','Lyrics copied')">Copy Lyrics</button>
+          <button class="btn btn-sm btn-gold" onclick="safeCopy(S._playlistWriteResults?.[${r.i}]?.style||'','Style copied')">Copy Style</button>
+        </div>
+      </div>
+      <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${escHtml(r.lyrics||'')}</pre>
+      <div class="styleout" style="font-size:11px">${escHtml(r.style||'')}</div>
+    </div>`).join('');
+  toast(`✓ ${results.length} tracks written`);
+}
+
+async function playlistInstantEdit() {
+  const inp = document.getElementById('pls-ie-input');
+  const instruction = inp?.value?.trim();
+  if (!instruction) { toast('Describe your edit first'); return; }
+  if (!S.playlistData) { toast('Generate a playlist concept first'); return; }
+  btnLoad('pls-ie-btn', '⚡ Applying…');
+  try {
+    const raw = await callClaude(
+      `Playlist: "${S.playlistData.name}" (${S.playlistData.genre}, ${S.playlistData.mode} mode)\nSummary: ${S.playlistData.summary}\n\nApply this change: "${instruction}"\n\nReturn revised SUMMARY and ARC only:\nSUMMARY:\n[revised]\n\nARC:\n[revised]`,
+      'You are a senior playlist strategist. Apply edits precisely.', 300);
+    const newSummary = raw.match(/SUMMARY:\s*([\s\S]*?)(?=ARC:|$)/i)?.[1]?.trim() || '';
+    const newArc = raw.match(/ARC:\s*([\s\S]*?)$/i)?.[1]?.trim() || '';
+    if (newSummary) { document.getElementById('pls-summary').textContent = newSummary; S.playlistData.summary = newSummary; }
+    if (newArc) { document.getElementById('pls-arc').textContent = newArc; S.playlistData.arc = newArc; }
+    toast('⚡ Playlist updated!');
+    inp.value = '';
+  } catch(e) { toast('⚠️ ' + e.message); }
+  btnDone('pls-ie-btn');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -19286,6 +20371,339 @@ async function enhanceConcept() {
     toast('⚠️ ' + e.message, 5000);
   }
   btnDone('enhance-btn');
+}
+
+// ═══════════════════════════════════════════════════════
+// SPARK — CREATIVE TOPIC ENGINE (client)
+// Feeling → 4 song-concept seeds → handoff to Writer
+// ═══════════════════════════════════════════════════════
+const SPARK_CHIPS = {
+  Feeling: ['longing','relief','defiance','tender','weary','wonder','restless','grateful','jealous','reckoning'],
+  Scene:   ['2am drive','empty bar','old house','kitchen sink','parking lot','bathroom mirror','passenger seat','front porch'],
+  Stakes:  ['almost-lost','first time','last chance','secret kept','line crossed','they don\'t know yet'],
+  Sound:   ['warm/lo-fi','cathartic','skeletal','anthemic','hushed','off-kilter','swung','close-mic']
+};
+
+const SPARK_SURPRISE_PROMPTS = [
+  'the way it feels when you almost text someone',
+  'I\'m tired of being the strong one for everyone',
+  'missing my mom but she\'s still alive',
+  'I love them and I can\'t do this anymore',
+  'driving home from work and not turning the music on',
+  'the part of myself I left in my hometown',
+  'pretending I\'m fine in a group chat',
+  'the silence after a long argument',
+  'realizing I\'ve become the person I used to avoid',
+  'the friend I should have called'
+];
+
+const SPARK_STATE = { selectedChips: new Set(), lastResult: null, lastFeeling: '', regenInFlight: new Set(), savedIds: {} };
+
+async function sparkLogEvent(eventType, extra) {
+  if (!S.session?.access_token) return; // telemetry is best-effort, auth-only
+  try {
+    const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.session.access_token };
+    const payload = Object.assign({ action: 'spark_event', event_type: eventType }, extra || {});
+    await fetch('/api/track', { method: 'POST', headers, body: JSON.stringify(payload) });
+  } catch (e) { /* silent */ }
+}
+
+function sparkRenderChips() {
+  const host = document.getElementById('spark-chips');
+  if (!host) return;
+  host.innerHTML = '';
+  Object.entries(SPARK_CHIPS).forEach(([group, items]) => {
+    const groupEl = document.createElement('div');
+    groupEl.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-right:8px;margin-bottom:4px';
+    const lab = document.createElement('span');
+    lab.style.cssText = 'font-size:9px;font-weight:700;color:var(--tx3);letter-spacing:.5px;text-transform:uppercase;margin-right:3px';
+    lab.textContent = group;
+    groupEl.appendChild(lab);
+    items.forEach(t => {
+      const chip = document.createElement('span');
+      chip.textContent = t;
+      chip.dataset.val = t;
+      chip.style.cssText = 'font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid var(--b2);background:var(--s2);color:var(--tx2);cursor:pointer;user-select:none;transition:all .12s';
+      chip.onclick = () => {
+        if (SPARK_STATE.selectedChips.has(t)) {
+          SPARK_STATE.selectedChips.delete(t);
+          chip.style.background = 'var(--s2)';
+          chip.style.borderColor = 'var(--b2)';
+          chip.style.color = 'var(--tx2)';
+        } else {
+          SPARK_STATE.selectedChips.add(t);
+          chip.style.background = 'rgba(245,192,0,0.15)';
+          chip.style.borderColor = 'var(--amber)';
+          chip.style.color = 'var(--amber)';
+        }
+      };
+      groupEl.appendChild(chip);
+    });
+    host.appendChild(groupEl);
+  });
+}
+
+function sparkToggle() {
+  const panel = document.getElementById('spark-panel');
+  if (!panel) return;
+  const open = panel.style.display === 'none' || !panel.style.display;
+  panel.style.display = open ? 'block' : 'none';
+  if (open) {
+    if (!document.getElementById('spark-chips').children.length) sparkRenderChips();
+    const ta = document.getElementById('spark-feeling');
+    if (ta && !ta.value) ta.focus();
+  }
+}
+
+function sparkSurpriseMe() {
+  const ta = document.getElementById('spark-feeling');
+  if (!ta) return;
+  const pick = SPARK_SURPRISE_PROMPTS[Math.floor(Math.random() * SPARK_SURPRISE_PROMPTS.length)];
+  ta.value = pick;
+  ta.focus();
+}
+
+async function sparkGenerate() {
+  const ta = document.getElementById('spark-feeling');
+  const feeling = (ta?.value || '').trim();
+  if (feeling.length < 5) { toast('Type a few more words — Spark needs something to sharpen'); return; }
+
+  const btn = document.getElementById('spark-go-btn');
+  const status = document.getElementById('spark-status');
+  const echoEl = document.getElementById('spark-echo');
+  const seedsEl = document.getElementById('spark-seeds');
+
+  if (btn) { btn.disabled = true; btn.textContent = '✨ Sparking…'; }
+  if (status) status.textContent = 'reading your feeling…';
+  echoEl.style.display = 'none';
+  seedsEl.style.display = 'none';
+  seedsEl.innerHTML = '';
+
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
+
+  const payload = {
+    action: 'spark_generate',
+    feeling,
+    chips: Array.from(SPARK_STATE.selectedChips),
+    genre_hint: S.selectedGenre || '',
+    n: 4
+  };
+
+  try {
+    const r = await fetch('/api/track', { method: 'POST', headers, body: JSON.stringify(payload) });
+    const data = await r.json();
+    if (!r.ok) {
+      const msg = data?.message || data?.error || 'Spark failed';
+      if (r.status === 401) { toast('Sign in to spark song ideas'); openAuth?.(); }
+      else if (r.status === 429) toast('⚠️ ' + msg, 5000);
+      else toast('⚠️ ' + msg, 5000);
+      return;
+    }
+    if (data.safety_floor) {
+      sparkRenderSafetyFloor(data);
+      return;
+    }
+    SPARK_STATE.lastResult = data;
+    SPARK_STATE.lastFeeling = feeling;
+    SPARK_STATE.savedIds = {};
+    sparkRenderResult(data);
+    sparkLogEvent('generated', { source_feeling: feeling, seed_count: (data.seeds || []).length });
+  } catch (e) {
+    toast('⚠️ ' + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '✨ Spark 4 concepts'; }
+    if (status) status.textContent = '';
+  }
+}
+
+async function sparkRegenerateOne(i) {
+  const data = SPARK_STATE.lastResult;
+  if (!data || !data.seeds || !data.seeds[i]) return;
+  if (SPARK_STATE.regenInFlight.has(i)) return;
+  SPARK_STATE.regenInFlight.add(i);
+
+  const cardEl = document.getElementById('spark-seed-card-' + i);
+  if (cardEl) cardEl.style.opacity = '0.5';
+
+  const excludeTitles = data.seeds.map(s => s.title).filter(Boolean);
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
+
+  try {
+    const r = await fetch('/api/track', {
+      method: 'POST', headers,
+      body: JSON.stringify({
+        action: 'spark_generate',
+        feeling: SPARK_STATE.lastFeeling,
+        chips: Array.from(SPARK_STATE.selectedChips),
+        genre_hint: S.selectedGenre || '',
+        regenerate: true,
+        exclude_titles: excludeTitles
+      })
+    });
+    const result = await r.json();
+    if (!r.ok || !result.seeds || !result.seeds[0]) {
+      toast('⚠️ ' + (result?.message || result?.error || 'Regen failed'));
+      return;
+    }
+    data.seeds[i] = result.seeds[0];
+    sparkRenderResult(data);
+    sparkLogEvent('regenerated', { seed_title: result.seeds[0].title, seed_genre: result.seeds[0].suggested_genre, source_feeling: SPARK_STATE.lastFeeling });
+  } catch (e) {
+    toast('⚠️ ' + e.message);
+  } finally {
+    SPARK_STATE.regenInFlight.delete(i);
+  }
+}
+
+async function sparkSaveSeed(i) {
+  const data = SPARK_STATE.lastResult;
+  if (!data || !data.seeds || !data.seeds[i]) return;
+  if (!S.session?.access_token) { toast('Sign in to save seeds'); openAuth?.(); return; }
+  const s = data.seeds[i];
+  try {
+    const r = await fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + S.session.access_token },
+      body: JSON.stringify({ action: 'spark_save', seed: s, source_feeling: SPARK_STATE.lastFeeling })
+    });
+    const result = await r.json();
+    if (!r.ok) { toast('⚠️ ' + (result?.error || 'Save failed')); return; }
+    SPARK_STATE.savedIds[i] = result.seed?.id || true;
+    sparkRenderResult(data);
+    toast('💾 Saved to your library');
+    sparkLogEvent('saved', { seed_title: s.title, seed_genre: s.suggested_genre, seed_register: s.register, source_feeling: SPARK_STATE.lastFeeling });
+  } catch (e) { toast('⚠️ ' + e.message); }
+}
+
+function sparkRenderSafetyFloor(data) {
+  const echoEl = document.getElementById('spark-echo');
+  const seedsEl = document.getElementById('spark-seeds');
+  echoEl.style.display = 'block';
+  echoEl.innerHTML = `<div style="font-style:normal;line-height:1.6">
+    <div style="font-weight:700;color:var(--amber);margin-bottom:6px">A pause, gently.</div>
+    <div style="margin-bottom:10px">${escHtml(data.echo || '')}</div>
+    ${data.resources ? `<div style="font-size:12px;color:var(--tx2);background:var(--s1);padding:10px;border-radius:6px;margin-top:8px">
+      <div style="margin-bottom:4px"><b>Crisis Text Line:</b> ${escHtml(data.resources.crisis_text || 'Text HOME to 741741')}</div>
+      <div style="margin-bottom:4px"><b>988 Lifeline:</b> ${escHtml(data.resources.lifeline || 'Call or text 988')}</div>
+      <div style="opacity:.8;margin-top:6px">${escHtml(data.resources.note || '')}</div>
+    </div>` : ''}
+  </div>`;
+  seedsEl.style.display = 'none';
+}
+
+function sparkRenderResult(data) {
+  const echoEl = document.getElementById('spark-echo');
+  const seedsEl = document.getElementById('spark-seeds');
+
+  if (data.echo) {
+    echoEl.style.display = 'block';
+    echoEl.innerHTML = `<span style="color:var(--amber);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:4px">echo</span>${escHtml(data.echo)}`;
+  }
+
+  const seeds = data.seeds || [];
+  if (!seeds.length) { toast('Spark returned no seeds — try again'); return; }
+
+  seedsEl.style.display = 'flex';
+  seedsEl.innerHTML = '';
+
+  seeds.forEach((s, i) => {
+    const card = document.createElement('div');
+    card.id = 'spark-seed-card-' + i;
+    card.style.cssText = 'padding:14px;background:var(--s1);border:1px solid var(--b2);border-radius:10px;transition:border-color .15s,opacity .2s';
+    card.onmouseover = () => card.style.borderColor = 'var(--amber)';
+    card.onmouseout = () => card.style.borderColor = 'var(--b2)';
+    const saved = !!SPARK_STATE.savedIds[i];
+    card.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px">
+        <div style="flex:1">
+          <div style="font-size:10px;font-weight:700;color:var(--amber);letter-spacing:.5px;text-transform:uppercase;margin-bottom:4px">Concept ${i+1}${s.suggested_genre ? ' · ' + escHtml(s.suggested_genre) : ''}${s.register ? ' · ' + escHtml(s.register) : ''}</div>
+          <div style="font-size:16px;font-weight:800;color:var(--tx1);line-height:1.25">${escHtml(s.title || 'Untitled')}</div>
+        </div>
+      </div>
+      ${s.emotional_core ? `<div style="font-size:12px;color:var(--tx2);margin-bottom:8px;line-height:1.5">${escHtml(s.emotional_core)}</div>` : ''}
+      ${s.the_turn ? `<div style="font-size:11px;color:var(--tx3);margin-bottom:8px;line-height:1.5"><b style="color:var(--tx2)">Turn:</b> ${escHtml(s.the_turn)}</div>` : ''}
+      ${s.anchor_image ? `<div style="font-size:11px;color:var(--tx3);margin-bottom:6px;line-height:1.5"><b style="color:var(--tx2)">Anchor:</b> ${escHtml(s.anchor_image)}</div>` : ''}
+      ${s.second_image ? `<div style="font-size:11px;color:var(--tx3);margin-bottom:8px;line-height:1.5"><b style="color:var(--tx2)">Second image:</b> ${escHtml(s.second_image)}</div>` : ''}
+      ${s.hook_fragment ? `<div style="font-size:13px;color:var(--tx1);background:rgba(245,192,0,0.08);border-left:2px solid var(--amber);padding:8px 10px;border-radius:4px;font-style:italic;margin-bottom:10px;line-height:1.5;white-space:pre-wrap">${escHtml(s.hook_fragment)}</div>` : ''}
+      ${s.why_this_works ? `<div style="font-size:10px;color:var(--tx3);margin-bottom:10px;line-height:1.5"><b>why this works:</b> ${escHtml(s.why_this_works)}</div>` : ''}
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <button onclick="sparkUseSeed(${i})" style="background:linear-gradient(135deg,#f5c000,#ff8a3d);color:#0e0e14;border:none;font-weight:700;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:12px">▶ Use this concept</button>
+        <button onclick="sparkRegenerateOne(${i})" title="Regenerate just this card" style="background:var(--s2);border:1px solid var(--b2);color:var(--tx2);padding:7px 12px;border-radius:6px;cursor:pointer;font-size:11px">✨ Another</button>
+        <button onclick="sparkSaveSeed(${i})" ${saved ? 'disabled' : ''} title="Save to your library" style="background:${saved ? 'var(--s3)' : 'var(--s2)'};border:1px solid var(--b2);color:${saved ? 'var(--amber)' : 'var(--tx2)'};padding:7px 12px;border-radius:6px;cursor:${saved ? 'default' : 'pointer'};font-size:11px">${saved ? '✓ Saved' : '💾 Save'}</button>
+        <button onclick="sparkCopyHook(${i})" style="background:var(--s2);border:1px solid var(--b2);color:var(--tx2);padding:7px 12px;border-radius:6px;cursor:pointer;font-size:11px">📋 Copy hook</button>
+        <button onclick="sparkSkipSeed(${i})" title="Mark not interesting (helps Spark learn)" style="background:none;border:none;color:var(--tx3);padding:7px 10px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:auto">Skip</button>
+      </div>
+    `;
+    seedsEl.appendChild(card);
+  });
+}
+
+function sparkSkipSeed(i) {
+  const data = SPARK_STATE.lastResult;
+  if (!data || !data.seeds || !data.seeds[i]) return;
+  const s = data.seeds[i];
+  sparkLogEvent('skipped', { seed_title: s.title, seed_genre: s.suggested_genre, seed_register: s.register, source_feeling: SPARK_STATE.lastFeeling });
+  const cardEl = document.getElementById('spark-seed-card-' + i);
+  if (cardEl) { cardEl.style.opacity = '0.35'; cardEl.style.pointerEvents = 'none'; }
+}
+
+function sparkUseSeed(i) {
+  const data = SPARK_STATE.lastResult;
+  if (!data || !data.seeds || !data.seeds[i]) return;
+  const s = data.seeds[i];
+
+  // Build the topic textarea content from the seed — emotional_core + anchor.
+  // Keep it short enough for the existing topic box, prose-shaped.
+  const parts = [];
+  if (s.title) parts.push(s.title.toUpperCase() + ' — ' + (s.emotional_core || ''));
+  else if (s.emotional_core) parts.push(s.emotional_core);
+  if (s.anchor_image) parts.push('Scene: ' + s.anchor_image);
+  if (s.the_turn) parts.push('The turn: ' + s.the_turn);
+  if (s.hook_fragment) parts.push('Hook seed: ' + s.hook_fragment.replace(/\n/g, ' / '));
+  const composed = parts.filter(Boolean).join('\n');
+
+  const topicEl = document.getElementById('g-topic');
+  if (topicEl) {
+    topicEl.value = composed;
+    topicEl.style.transition = 'background .3s';
+    topicEl.style.background = 'rgba(245,192,0,0.12)';
+    setTimeout(() => { topicEl.style.background = ''; }, 900);
+    if (typeof onTopicInput === 'function') onTopicInput();
+  }
+
+  // Try to select the suggested genre — onGenreChange is tolerant of bad keys.
+  if (s.suggested_genre && typeof onGenreChange === 'function') {
+    const guess = String(s.suggested_genre).toLowerCase().replace(/[^a-z]/g, '');
+    // Try the seed value first, then a few common aliases
+    const aliases = { 'indiefolk':'ss','singersongwriter':'ss','folk':'ss','rock':'altrock','indie':'altrock','rap':'hiphop','randb':'neosoul','rnb':'neosoul','soul':'neosoul' };
+    const tryKey = aliases[guess] || guess;
+    const gridBtn = document.querySelector(`#genre-grid .gp[data-gid="${tryKey}"]`);
+    if (gridBtn) onGenreChange(tryKey);
+  }
+
+  sparkLogEvent('used', { seed_title: s.title, seed_genre: s.suggested_genre, seed_register: s.register, source_feeling: SPARK_STATE.lastFeeling });
+
+  sparkToggle();
+  toast('✨ Concept loaded — pick mood + hit Generate');
+  // Scroll back to the generate button area
+  setTimeout(() => {
+    const gen = document.getElementById('gen-btn');
+    if (gen) gen.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 200);
+}
+
+function sparkCopyHook(i) {
+  const data = SPARK_STATE.lastResult;
+  if (!data || !data.seeds || !data.seeds[i]) return;
+  const hook = data.seeds[i].hook_fragment || '';
+  if (!hook) { toast('No hook to copy'); return; }
+  try {
+    navigator.clipboard.writeText(hook);
+    toast('📋 Hook copied');
+    sparkLogEvent('copied_hook', { seed_title: data.seeds[i].title, seed_genre: data.seeds[i].suggested_genre });
+  } catch { toast('Copy failed'); }
 }
 
 async function generateSynopsis() {
