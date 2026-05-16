@@ -173,6 +173,148 @@ module.exports = async function handler(req, res) {
     user = u;
   }
 
+  // ── Flow dispatch ──────────────────────────────────────────────
+  // Flow piggybacks here to fit the 12-function Hobby cap. Two modes:
+  //   { mode: 'flow-spec', concept } → { spec }
+  //   { mode: 'flow-song', concept, spec } → { title, lyrics, sunoPrompt }
+  //
+  // Both modes participate in the SAME plan/rate-limit gate as normal
+  // generate — flow-song increments usage on success, flow-spec is the
+  // cheap classifier and only blocks at the gate.
+  const flowMode = req.body && req.body.mode;
+  if (flowMode === 'flow-spec' || flowMode === 'flow-song') {
+    const flowConcept = (req.body.concept || '').trim();
+    if (!flowConcept) return res.status(400).json({ error: 'concept is required' });
+    if (flowConcept.length > 600) return res.status(400).json({ error: 'concept must be 600 chars or fewer' });
+
+    // Plan + rate-limit gate (mirrors the normal-flow block below)
+    let flowPlan = isAdmin ? 'studio' : 'free';
+    if (!isAdmin) {
+      try {
+        const { data: profile } = await supabase.from('profiles').select('plan').eq('id', user.id).single();
+        if (profile?.plan) flowPlan = profile.plan;
+      } catch (e) { /* fall through */ }
+      if (ADMIN_EMAILS.has(user.email)) { flowPlan = 'studio'; isAdmin = true; }
+    }
+    const flowLimit = PLAN_LIMITS[flowPlan] ?? 3;
+    const flowIsLifetime = flowPlan === 'free';
+    const flowRedisKey = flowIsLifetime
+      ? `soniq:ratelimit:lifetime:${user.id}`
+      : `soniq:ratelimit:monthly:${user.id}:${getThisMonth()}`;
+    if (!isAdmin && isFinite(flowLimit)) {
+      const cur = parseInt(await redisGet(flowRedisKey) || '0', 10);
+      if (cur >= flowLimit) {
+        const hint = flowIsLifetime
+          ? 'Your 3 free songs are used. Upgrade to keep creating.'
+          : 'Monthly limit reached. Upgrade for more songs.';
+        return res.status(429).json({ error: 'limit_reached', message: hint, limit: flowLimit, plan: flowPlan });
+      }
+    }
+
+    async function flowCallAI(messages, system, max_tokens) {
+      const ak = process.env.ANTHROPIC_API_KEY;
+      const ok = process.env.OPENROUTER_API_KEY;
+      if (!ak && !ok) throw new Error('No AI provider configured');
+      try {
+        if (ak) return await callAnthropic(ak, messages, system, max_tokens);
+        return await callOpenRouter(ok, messages, system, max_tokens);
+      } catch (e) {
+        if (ok && ak) return await callOpenRouter(ok, messages, system, max_tokens);
+        throw e;
+      }
+    }
+
+    if (flowMode === 'flow-spec') {
+      const SPEC_SYSTEM = `You are a senior music producer and A&R. Given a songwriter's concept, return the optimal song spec as JSON.
+
+Think across the full landscape of popular music — fusion-aware (dream-pop, neo-soul, indie folk, dark americana, ambient r&b, drill, bedroom pop, lo-fi hip-hop, post-punk, shoegaze, synth-pop, future-soul, etc.).
+
+Rules:
+- Match the concept's emotional weight.
+- Tempo fits vocal phrasing (ballads 60-84, mid 84-110, drive 110-140, dance 120-180).
+- Vocal: 3-6 words, specific.
+- Instrumentation: 3-5 distinct items.
+- Mood arc shows movement OR explicitly says it stays still.
+- Title: 1-6 evocative words. No subtitles. No quotes.
+- sunoPrompt: 8-14 comma-separated style descriptors. NO lyrics.
+- Fusion: set fusion=true and subGenre when blending. Else fusion=false, subGenre=null.
+
+Return ONLY valid JSON:
+{"title":"...","genre":"...","subGenre":null,"fusion":false,"tempo":72,"key":"A minor","vocal":"...","instrumentation":["...","...","..."],"mood":"...","moodArc":{"start":"...","end":"..."},"structure":"V1 → C → V2 → C → B → C","sunoPrompt":"..."}
+
+No prose. No markdown fences.`;
+      try {
+        const text = await flowCallAI(
+          [{ role: 'user', content: 'CONCEPT:\n' + flowConcept + '\n\nReturn the FlowSpec JSON now.' }],
+          SPEC_SYSTEM,
+          800,
+        );
+        const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+        let spec;
+        try { spec = JSON.parse(cleaned); }
+        catch (e) { return res.status(502).json({ error: 'Model returned invalid JSON', detail: cleaned.slice(0, 200) }); }
+        if (!spec.title || !spec.genre || !spec.tempo || !spec.key || !spec.vocal ||
+            !Array.isArray(spec.instrumentation) || spec.instrumentation.length === 0 ||
+            !spec.moodArc || !spec.moodArc.start || !spec.moodArc.end ||
+            !spec.structure || !spec.sunoPrompt) {
+          return res.status(502).json({ error: 'Spec was incomplete — try a more specific concept' });
+        }
+        return res.status(200).json({ spec });
+      } catch (e) {
+        return res.status(500).json({ error: e.message || 'Spec generation failed' });
+      }
+    }
+
+    // mode === 'flow-song'
+    const spec = req.body.spec;
+    if (!spec || !spec.title || !spec.genre || !spec.tempo || !spec.key || !spec.vocal ||
+        !Array.isArray(spec.instrumentation) || spec.instrumentation.length === 0 ||
+        !spec.moodArc || !spec.moodArc.start || !spec.moodArc.end || !spec.structure) {
+      return res.status(400).json({ error: 'spec is missing required fields' });
+    }
+    const fusionLine = spec.fusion && spec.subGenre
+      ? `Fusion: blend ${spec.genre} with ${spec.subGenre}. Honor both traditions in the lyric.`
+      : '';
+    const songSystem = `You are a professional songwriter writing for a specific, fully-spec'd song.
+Rules:
+- Honor the spec exactly: tempo, key, vocal archetype, instrumentation and mood arc shape phrasing.
+- Use section markers like [Verse 1], [Chorus], [Bridge] — match the genre's structural convention.
+- Lyrics must be singable at the given tempo.
+- Mood must move from arc start to end across the song.
+- Avoid clichés. Earn the imagery.
+- Return ONLY the lyrics. No title line. No commentary. No markdown fences.`;
+    const songPrompt = `CONCEPT:
+${flowConcept}
+
+SPEC:
+Title: ${spec.title}
+Genre: ${spec.genre}${spec.fusion && spec.subGenre ? ' × ' + spec.subGenre : ''}
+Tempo: ${spec.tempo} BPM
+Key: ${spec.key}
+Vocal: ${spec.vocal}
+Instrumentation: ${spec.instrumentation.join(', ')}
+Mood arc: ${spec.moodArc.start} → ${spec.moodArc.end}
+Structure: ${spec.structure}
+${fusionLine}
+
+Write the lyrics now.`;
+    try {
+      const text = await flowCallAI([{ role: 'user', content: songPrompt }], songSystem, 1800);
+      // Charge the song against the user's monthly quota (same as normal generate)
+      if (!isAdmin && isFinite(flowLimit)) {
+        const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+        redisIncrExpire(flowRedisKey, ttl);
+      }
+      return res.status(200).json({
+        title: spec.title,
+        lyrics: text.trim(),
+        sunoPrompt: spec.sunoPrompt || '',
+      });
+    } catch (e) {
+      return res.status(500).json({ error: e.message || 'Lyric generation failed' });
+    }
+  }
+
   // ── Plan lookup + rate limiting ─────────────────────────────────
   let plan = isAdmin ? 'studio' : 'free';
   if (!isAdmin) {
