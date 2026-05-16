@@ -4953,10 +4953,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       if (inFlight) { try { inFlight.abort(); } catch(e){} }
       inFlight = new AbortController();
 
-      fetch('/api/flow', {
+      fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'spec', concept: concept }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (window.S && window.S.authToken || '') },
+        body: JSON.stringify({ mode: 'flow-spec', concept: concept }),
         signal: inFlight.signal,
       })
       .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
@@ -5003,10 +5003,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       var btn = document.getElementById('flow-btn');
       var btnTxt = document.getElementById('flow-btn-text');
       var hint = document.getElementById('flow-hint');
-      fetch('/api/flow', {
+      fetch('/api/generate', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mode: 'song', concept: concept, spec: spec }),
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (window.S && window.S.authToken || '') },
+        body: JSON.stringify({ mode: 'flow-song', concept: concept, spec: spec }),
       })
       .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
       .then(function(res){
