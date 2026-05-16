@@ -10315,6 +10315,12 @@ const S={selectedGenre:'pop',
   recentOpenings: [],    // Track last 3 verse-1 opening lines for pattern avoidance
   recentHookOpenings: [], // Track last 3 hook/chorus opening lines for pattern avoidance
 };
+// Expose S to other <script> blocks (e.g. the Flow IIFE) — top-level `const`
+// in a classic script is script-scoped, NOT a window property. Without this,
+// window.S is undefined from sibling script tags and any feature that reads
+// window.S.session.access_token to build an Authorization header silently
+// sends no token and the server returns 401 auth_required.
+window.S = S;
 // Rehydrate opener trackers from localStorage so cross-song uniqueness survives reloads
 try {
   const _ro = localStorage.getItem('soniq_recent_openings');
