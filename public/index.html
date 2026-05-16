@@ -4797,10 +4797,20 @@ body.craft-advanced .craft-basic-only{display:none !important}
         placeholder="e.g. touching the darkness — losing my brother, ending hopeful"
         aria-label="Song concept"
       ></textarea>
+      <div class="flow-interim" id="flow-interim" aria-live="polite"></div>
       <div class="flow-concept-row">
-        <button class="btn btn-sm flow-mic-btn" id="flow-mic-btn" onclick="flowToggleMic()" title="Dictate concept" aria-label="Dictate concept">🎤 Speak</button>
+        <button class="btn btn-sm flow-mic-btn" id="flow-mic-btn" onclick="flowToggleMic()" title="Dictate concept — click again to stop" aria-label="Dictate concept">
+          <span id="flow-mic-icon">🎤</span>
+          <span id="flow-mic-label">Speak</span>
+          <span class="flow-meter" id="flow-meter" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
         <span class="flow-char-count" id="flow-char-count">0 / 600</span>
       </div>
+    </div>
+    <!-- Song-generation progress bar — visible while flow-song is in flight -->
+    <div class="song-progress-bar" id="fres-progress-bar" aria-live="polite">
+      <div class="spb-track"><div class="spb-fill" id="fres-progress-fill"></div></div>
+      <div class="spb-label"><span id="fres-progress-stage">starting…</span><span class="spb-pct" id="fres-progress-pct">0%</span></div>
     </div>
 
     <!-- Spin wheel (slot machine, mirrors Lucky's) -->
@@ -4843,7 +4853,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="btn btn-sm" onclick="feelFlow()" title="Re-spin with the same concept">🔄 Remix</button>
       </div>
     </div>
-    <div class="quick-copy-bar visible" id="fres-quick-copy">
+    <div class="quick-copy-bar visible" id="fres-quick-copy" style="display:flex;gap:8px;padding:10px 16px">
       <button class="qcb-btn qcb-primary" onclick="flowCopyLyrics()" title="Copy lyrics">📋 Copy Lyrics</button>
       <button class="qcb-btn qcb-primary" onclick="flowCopyPrompt()" title="Copy the song prompt">🎛 Copy Song Prompt</button>
     </div>
@@ -4851,19 +4861,31 @@ body.craft-advanced .craft-basic-only{display:none !important}
   </div>
 
   <style>
-    .flow-concept-wrap{margin:18px auto 12px;width:100%;max-width:720px;display:flex;flex-direction:column;gap:8px;padding:0 16px;box-sizing:border-box}
-    @media(min-width:901px){#pg-flow .lucky-wrap{max-width:760px}}
-    .flow-concept{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:12px 14px;outline:none;resize:vertical;min-height:80px;line-height:1.55;font-family:var(--font);transition:border-color .15s}
+    #pg-flow{display:flex;flex-direction:column;align-items:center;text-align:center}
+    #pg-flow .lucky-wrap{margin:0 auto;width:100%;max-width:760px;display:flex;flex-direction:column;align-items:center;text-align:center}
+    .flow-concept-wrap{margin:18px auto 12px;width:100%;max-width:720px;display:flex;flex-direction:column;gap:8px;padding:0 16px;box-sizing:border-box;text-align:left}
+    .flow-concept{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:12px 14px;outline:none;resize:vertical;min-height:90px;line-height:1.55;font-family:var(--font);transition:border-color .15s;box-sizing:border-box}
     .flow-concept:focus{border-color:var(--amberline);background:var(--s3)}
     .flow-concept::placeholder{color:var(--tx4)}
-    .flow-concept-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .flow-mic-btn{padding:7px 12px;border-radius:var(--r2);background:var(--s3);border:1px solid var(--b2);color:var(--tx2);font-size:12px;cursor:pointer;transition:all .15s}
+    .flow-concept-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+    .flow-mic-btn{padding:8px 14px;border-radius:var(--r2);background:var(--s3);border:1px solid var(--b2);color:var(--tx2);font-size:12px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
     .flow-mic-btn:hover{border-color:var(--amberline);color:var(--amber)}
-    .flow-mic-btn.recording{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.5);color:#fca5a5;animation:flow-rec-pulse 1.4s ease-in-out infinite}
-    @keyframes flow-rec-pulse{0%,100%{opacity:1}50%{opacity:.55}}
+    .flow-mic-btn.recording{background:rgba(239,68,68,.15);border-color:rgba(239,68,68,.55);color:#fca5a5}
+    /* 3-bar audio-level meter, lives inside the mic button while recording */
+    .flow-meter{display:none;align-items:flex-end;gap:3px;height:14px;margin-left:2px}
+    .flow-mic-btn.recording .flow-meter{display:inline-flex}
+    .flow-meter span{width:3px;background:#fca5a5;border-radius:2px;height:30%;transition:height 60ms linear}
     .flow-char-count{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
+    /* Live interim transcript hint shown beneath textarea while listening */
+    .flow-interim{font-size:12px;color:var(--amber);min-height:1.2em;font-style:italic;opacity:.85}
     #flow-out .result-body{padding:16px 18px;background:var(--s2);border-top:1px solid var(--b1)}
     #fres-body pre{white-space:pre-wrap;font-family:var(--font);font-size:14px;line-height:1.7;color:var(--tx1);margin:0}
+    /* Song-generation progress bar (shown while flow-song is in flight) */
+    #fres-progress-bar{display:none;margin:14px auto 0;max-width:560px;text-align:left}
+    #fres-progress-bar.active{display:block}
+    #fres-progress-bar .spb-track{height:6px;background:var(--s3);border-radius:99px;overflow:hidden;border:1px solid var(--b2)}
+    #fres-progress-bar .spb-fill{height:100%;background:linear-gradient(90deg,var(--amber),#ffd75e);border-radius:99px;width:0%;transition:width .4s ease-out}
+    #fres-progress-bar .spb-label{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
   </style>
 
   <script>
@@ -4875,32 +4897,151 @@ body.craft-advanced .craft-basic-only{display:none !important}
       ta.addEventListener('input', function(){ cc.textContent = ta.value.length + ' / 600'; });
     }
 
-    // ── Mic dictation (graceful fallback) ────────────────────────────────
+    // ── Mic dictation: continuous + live interim + 3-bar audio meter ────
     var Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
-    var rec = null, listening = false;
+    var rec = null, listening = false, userStopped = false;
+    var committedBaseline = '';     // text in textarea when this session began
+    var committedAppend = '';       // finalized text picked up across restarts
     var micBtn = document.getElementById('flow-mic-btn');
+    var micIcon = document.getElementById('flow-mic-icon');
+    var micLabel = document.getElementById('flow-mic-label');
+    var interimEl = document.getElementById('flow-interim');
+    var meterBars = document.querySelectorAll('#flow-meter span');
     if (!Rec && micBtn) { micBtn.style.display = 'none'; }
+
+    // Web Audio analyser for the live level meter
+    var audioCtx = null, analyser = null, micStream = null, meterRAF = null;
+
+    function stopMeter(){
+      if (meterRAF) { cancelAnimationFrame(meterRAF); meterRAF = null; }
+      if (micStream) { try { micStream.getTracks().forEach(function(t){ t.stop(); }); } catch(e){} micStream = null; }
+      if (audioCtx) { try { audioCtx.close(); } catch(e){} audioCtx = null; }
+      analyser = null;
+      if (meterBars) meterBars.forEach(function(b){ b.style.height = '30%'; });
+    }
+
+    function startMeter(){
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) return;
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+        micStream = stream;
+        var Ctx = window.AudioContext || window.webkitAudioContext;
+        if (!Ctx) return;
+        audioCtx = new Ctx();
+        var src = audioCtx.createMediaStreamSource(stream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 64;
+        src.connect(analyser);
+        var data = new Uint8Array(analyser.frequencyBinCount);
+        function tick(){
+          if (!analyser) return;
+          analyser.getByteFrequencyData(data);
+          // Split frequency range into 3 bands for the 3 bars
+          var bands = [0, 0, 0], counts = [0, 0, 0];
+          for (var i = 0; i < data.length; i++) {
+            var b = i < data.length / 3 ? 0 : i < (2 * data.length / 3) ? 1 : 2;
+            bands[b] += data[i]; counts[b]++;
+          }
+          for (var k = 0; k < 3; k++) {
+            var avg = counts[k] ? bands[k] / counts[k] : 0;
+            var pct = Math.max(25, Math.min(100, (avg / 255) * 220));
+            if (meterBars[k]) meterBars[k].style.height = pct + '%';
+          }
+          meterRAF = requestAnimationFrame(tick);
+        }
+        tick();
+      }).catch(function(){ /* user denied or no mic — meter just stays flat */ });
+    }
+
+    function setMicUI(on){
+      if (!micBtn) return;
+      if (on) {
+        micBtn.classList.add('recording');
+        if (micIcon) micIcon.textContent = '⏹';
+        if (micLabel) micLabel.textContent = 'Stop';
+      } else {
+        micBtn.classList.remove('recording');
+        if (micIcon) micIcon.textContent = '🎤';
+        if (micLabel) micLabel.textContent = 'Speak';
+        if (interimEl) interimEl.textContent = '';
+      }
+    }
+
+    function buildRec(){
+      var r = new Rec();
+      r.lang = 'en-US';
+      r.continuous = true;
+      r.interimResults = true;
+      r.onresult = function(e){
+        var interim = '';
+        for (var i = e.resultIndex; i < e.results.length; i++) {
+          var res = e.results[i];
+          if (res.isFinal) {
+            committedAppend = (committedAppend ? committedAppend + ' ' : '') + res[0].transcript.trim();
+          } else {
+            interim += res[0].transcript;
+          }
+        }
+        // Write committed + interim into the textarea so user sees words appear LIVE
+        var full = committedBaseline;
+        if (committedAppend) full = (full ? full.trim() + ' ' : '') + committedAppend;
+        var live = (full ? full.trim() + ' ' : '') + interim.trim();
+        if (ta) {
+          ta.value = live.slice(0, 600);
+          if (cc) cc.textContent = ta.value.length + ' / 600';
+        }
+        if (interimEl) interimEl.textContent = interim ? '… ' + interim.trim() : '';
+      };
+      // Browsers stop SpeechRecognition after silence even in continuous mode.
+      // Auto-restart UNLESS the user explicitly clicked Stop.
+      r.onend = function(){
+        if (userStopped) {
+          listening = false;
+          setMicUI(false);
+          stopMeter();
+        } else if (listening) {
+          // Bake current interim into committed before restart so nothing is lost
+          committedBaseline = ta ? ta.value : committedBaseline;
+          committedAppend = '';
+          try { r.start(); } catch(e) { listening = false; setMicUI(false); stopMeter(); }
+        }
+      };
+      r.onerror = function(ev){
+        // 'no-speech' is normal — let onend handle the restart.
+        // Hard errors stop the session.
+        if (ev && (ev.error === 'not-allowed' || ev.error === 'service-not-allowed' || ev.error === 'aborted')) {
+          userStopped = true;
+          listening = false;
+          setMicUI(false);
+          stopMeter();
+        }
+      };
+      return r;
+    }
 
     window.flowToggleMic = function(){
       if (!Rec) return;
-      if (listening) { try { rec.stop(); } catch(e){} return; }
-      if (!rec) {
-        rec = new Rec();
-        rec.lang = 'en-US';
-        rec.continuous = false;
-        rec.interimResults = false;
-        rec.onresult = function(e){
-          var t = '';
-          for (var i=0;i<e.results.length;i++) t += e.results[i][0].transcript;
-          if (t && ta) {
-            ta.value = (ta.value ? ta.value.trim() + ' ' : '') + t.trim();
-            if (cc) cc.textContent = ta.value.length + ' / 600';
-          }
-        };
-        rec.onend = function(){ listening = false; if (micBtn) { micBtn.classList.remove('recording'); micBtn.textContent = '🎤 Speak'; } };
-        rec.onerror = function(){ listening = false; if (micBtn) { micBtn.classList.remove('recording'); micBtn.textContent = '🎤 Speak'; } };
+      if (listening) {
+        userStopped = true;
+        listening = false;
+        try { rec.stop(); } catch(e){}
+        setMicUI(false);
+        stopMeter();
+        return;
       }
-      try { rec.start(); listening = true; if (micBtn) { micBtn.classList.add('recording'); micBtn.textContent = '⏹ Stop'; } } catch(e){}
+      // Start a fresh session
+      userStopped = false;
+      committedBaseline = ta ? ta.value : '';
+      committedAppend = '';
+      rec = buildRec();
+      try {
+        rec.start();
+        listening = true;
+        setMicUI(true);
+        startMeter();
+      } catch(e){
+        listening = false;
+        setMicUI(false);
+      }
     };
 
     // ── Reel spin animation ──────────────────────────────────────────────
@@ -4996,11 +5137,59 @@ body.craft-advanced .craft-basic-only{display:none !important}
       });
     };
 
+    // Song progress driver — simulates progress over ~25s so the user sees
+    // the bar advance smoothly while the model is writing. Jumps to 100% on
+    // response, then fades out.
+    var progressTimer = null;
+    function startSongProgress(){
+      var bar = document.getElementById('fres-progress-bar');
+      var fill = document.getElementById('fres-progress-fill');
+      var pct = document.getElementById('fres-progress-pct');
+      var stage = document.getElementById('fres-progress-stage');
+      if (!bar || !fill || !pct || !stage) return;
+      bar.classList.add('active');
+      var p = 0;
+      var stages = [
+        [0, 'warming up the band'],
+        [15, 'shaping the verses'],
+        [40, 'finding the hook'],
+        [65, 'tightening the chorus'],
+        [85, 'polishing the bridge'],
+      ];
+      fill.style.width = '0%';
+      pct.textContent = '0%';
+      stage.textContent = stages[0][1];
+      if (progressTimer) clearInterval(progressTimer);
+      progressTimer = setInterval(function(){
+        // Asymptote toward 92% over ~25s — never hit 100 until the response lands
+        p = p + Math.max(0.4, (92 - p) * 0.045);
+        if (p >= 92) p = 92;
+        fill.style.width = p.toFixed(1) + '%';
+        pct.textContent = Math.floor(p) + '%';
+        for (var i = stages.length - 1; i >= 0; i--) {
+          if (p >= stages[i][0]) { stage.textContent = stages[i][1]; break; }
+        }
+      }, 400);
+    }
+    function finishSongProgress(success){
+      if (progressTimer) { clearInterval(progressTimer); progressTimer = null; }
+      var bar = document.getElementById('fres-progress-bar');
+      var fill = document.getElementById('fres-progress-fill');
+      var pct = document.getElementById('fres-progress-pct');
+      var stage = document.getElementById('fres-progress-stage');
+      if (!bar || !fill || !pct || !stage) return;
+      fill.style.width = '100%';
+      pct.textContent = '100%';
+      stage.textContent = success ? 'done' : 'stopped';
+      setTimeout(function(){ bar.classList.remove('active'); }, 900);
+    }
+
     function generateFlowSong(concept, spec){
       var btn = document.getElementById('flow-btn');
       var btnTxt = document.getElementById('flow-btn-text');
       var hint = document.getElementById('flow-hint');
       songInFlight = new AbortController();
+      startSongProgress();
       fetch('/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + (window.S && window.S.session && window.S.session.access_token || '') },
@@ -5025,11 +5214,14 @@ body.craft-advanced .craft-basic-only{display:none !important}
         }
         // Stash on window for save handler
         window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt };
+        finishSongProgress(true);
         if (btn) btn.disabled = false;
         if (btnTxt) btnTxt.textContent = 'Spin Flow';
         if (hint) hint.textContent = 'Spin again for a different take, or save this one to your library';
       })
       .catch(function(err){
+        if (err && err.name === 'AbortError') return; // newer spin took over
+        finishSongProgress(false);
         if (btn) btn.disabled = false;
         if (btnTxt) btnTxt.textContent = 'Spin Flow';
         if (hint) hint.textContent = (err && err.message) || 'Song generation failed — try again';
