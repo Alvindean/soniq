@@ -5108,7 +5108,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
       var hasToken = window.S && window.S.session && window.S.session.access_token;
       if (hasToken) return true;
       try {
-        var supa = window.supa || window.supabase || (window.S && window.S.supa);
+        var supa = (window.S && window.S.supabase) || window.supa || (window.supabase && window.supabase.auth ? window.supabase : null);
         if (supa && supa.auth && supa.auth.getSession) {
           var r = await supa.auth.getSession();
           var sess = r && r.data && r.data.session;
