@@ -5149,6 +5149,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
     }
 
     // Auth-aware POST: on 401 force a session refresh and retry ONCE.
+    // Captures the raw response text when JSON parse fails so the catch
+    // handler can surface the actual error (Vercel HTML 504, etc.) instead
+    // of a cryptic generic message.
     async function flowAuthedPost(url, body, signal){
       var doFetch = function(){
         return fetch(url, { method: 'POST', headers: flowAuthHeaders(), body: JSON.stringify(body), signal: signal });
@@ -5161,8 +5164,12 @@ body.craft-advanced .craft-basic-only{display:none !important}
         }
       }
       var data = null;
-      try { data = await r.json(); } catch(e){}
-      return { ok: r.ok, status: r.status, data: data };
+      var rawText = '';
+      try {
+        rawText = await r.text();
+        try { data = JSON.parse(rawText); } catch(e){}
+      } catch(e){}
+      return { ok: r.ok, status: r.status, data: data, rawText: rawText };
     }
 
     // ── Concept coach: lightweight client-side check ─────────────────────
@@ -5331,8 +5338,19 @@ body.craft-advanced .craft-basic-only{display:none !important}
           throw new Error('Please sign in to use Flow');
         }
         if (!res.ok || !res.data) {
-          var msg = (res.data && (res.data.message || res.data.error)) || 'Song generation failed';
-          throw new Error(msg);
+          // Surface the actual server response so the user (and dev) can see
+          // exactly what failed — Vercel 504 HTML, raw error string, etc.
+          var dbg = '[HTTP ' + res.status + '] ';
+          if (res.data && (res.data.message || res.data.error)) {
+            dbg += (res.data.message || res.data.error);
+          } else if (res.rawText) {
+            // Strip HTML tags + take first 200 chars
+            dbg += res.rawText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+          } else {
+            dbg += 'Song generation failed';
+          }
+          console.error('[flow-song] server error:', { status: res.status, data: res.data, rawText: res.rawText && res.rawText.slice(0, 500) });
+          throw new Error(dbg);
         }
         var d = res.data;
         var out = document.getElementById('flow-out');
