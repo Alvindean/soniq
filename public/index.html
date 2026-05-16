@@ -4863,8 +4863,16 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
     </div>
     <div class="quick-copy-bar visible" id="fres-quick-copy" style="display:flex;gap:8px;padding:10px 16px">
-      <button class="qcb-btn qcb-primary" onclick="flowCopyLyrics()" title="Copy lyrics">📋 Copy Lyrics</button>
-      <button class="qcb-btn qcb-primary" onclick="flowCopyPrompt()" title="Copy the song prompt">🎛 Copy Song Prompt</button>
+      <button class="qcb-btn qcb-primary" onclick="flowCopyLyrics()" title="Copy lyrics only">📋 Copy Lyrics</button>
+      <button class="qcb-btn qcb-primary" onclick="flowCopyPrompt()" title="Copy the Suno style prompt">🎛 Copy Song Prompt</button>
+      <button class="qcb-btn" onclick="flowCopyArrangement()" title="Copy the arrangement blueprint">🎚 Copy Arrangement</button>
+    </div>
+    <div class="flow-tabs" id="fres-tabs" style="display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--b1);margin-top:4px">
+      <button class="flow-tab on" data-tab="lyrics" onclick="flowSwitchTab('lyrics')">Lyrics</button>
+      <button class="flow-tab"    data-tab="prompt" onclick="flowSwitchTab('prompt')">Song Prompt</button>
+      <button class="flow-tab"    data-tab="arrangement" onclick="flowSwitchTab('arrangement')">Arrangement</button>
+      <button class="flow-tab"    data-tab="vocal" onclick="flowSwitchTab('vocal')">Vocal</button>
+      <button class="flow-tab"    data-tab="references" onclick="flowSwitchTab('references')">References</button>
     </div>
     <div class="result-body" id="fres-body"></div>
   </div>
@@ -4889,6 +4897,12 @@ body.craft-advanced .craft-basic-only{display:none !important}
     .flow-interim{font-size:12px;color:var(--amber);min-height:1.2em;font-style:italic;opacity:.85}
     #flow-out .result-body{padding:16px 18px;background:var(--s2);border-top:1px solid var(--b1)}
     #fres-body pre{white-space:pre-wrap;font-family:var(--font);font-size:14px;line-height:1.7;color:var(--tx1);margin:0}
+    .flow-tab{background:transparent;border:none;color:var(--tx3);font-size:12px;font-weight:600;padding:10px 14px;cursor:pointer;border-bottom:2px solid transparent;transition:color .15s,border-color .15s;letter-spacing:.02em}
+    .flow-tab:hover{color:var(--tx1)}
+    .flow-tab.on{color:var(--amber);border-bottom-color:var(--amber)}
+    .flow-section{display:none;white-space:pre-wrap;font-family:var(--font);font-size:14px;line-height:1.7;color:var(--tx1);padding:16px 0}
+    .flow-section.on{display:block}
+    .flow-section.muted{color:var(--tx3);font-style:italic}
     /* Song-generation progress bar (shown while flow-song is in flight) */
     #fres-progress-bar{display:none;margin:14px auto 0;max-width:560px;text-align:left}
     #fres-progress-bar.active{display:block}
@@ -5385,14 +5399,34 @@ body.craft-advanced .craft-basic-only{display:none !important}
         var bodyEl = document.getElementById('fres-body');
         var sunoEl = document.getElementById('fres-suno-chips');
         if (titleEl) titleEl.textContent = d.title || spec.title || 'Untitled';
-        if (sunoEl && d.sunoPrompt) {
-          sunoEl.innerHTML = '<span class="suno-chip">'+d.sunoPrompt.replace(/</g,'&lt;')+'</span>';
+        // Parse the brain's response into tabs: lyrics + per-section briefs.
+        var parsed = flowParseBrain(d.lyrics || '');
+        var sunoPrompt = parsed.corePrompt || d.sunoPrompt || '';
+        if (sunoEl && sunoPrompt) {
+          sunoEl.innerHTML = '<span class="suno-chip">'+sunoPrompt.replace(/</g,'&lt;')+'</span>';
         }
         if (bodyEl) {
-          bodyEl.innerHTML = '<pre id="fres-lyrics-text">'+(d.lyrics||'').replace(/</g,'&lt;')+'</pre>';
+          bodyEl.innerHTML =
+            '<div class="flow-section on" id="fres-sec-lyrics"><pre id="fres-lyrics-text">'      + flowEsc(parsed.lyrics) + '</pre></div>' +
+            '<div class="flow-section" id="fres-sec-prompt">'                                    + (parsed.corePrompt ? flowEsc(parsed.corePrompt) : '<span class="muted">No song prompt found in this response.</span>') + '</div>' +
+            '<div class="flow-section" id="fres-sec-arrangement">'                               + (parsed.arrangement ? flowEsc(parsed.arrangement) : '<span class="muted">No arrangement blueprint in this response.</span>') + '</div>' +
+            '<div class="flow-section" id="fres-sec-vocal">'                                     + (parsed.vocal ? flowEsc(parsed.vocal) : '<span class="muted">No vocal direction in this response.</span>') + '</div>' +
+            '<div class="flow-section" id="fres-sec-references">'                                + (parsed.references ? flowEsc(parsed.references) : '<span class="muted">No sonic references in this response.</span>') + '</div>';
         }
-        // Stash on window for save handler
-        window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt };
+        // Reset to the Lyrics tab on each new spin
+        document.querySelectorAll('.flow-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab') === 'lyrics'); });
+        // Stash on window for save handler (lyrics field is now ONLY lyrics)
+        window.__flowLast = {
+          concept: concept,
+          spec: spec,
+          title: d.title || spec.title,
+          lyrics: parsed.lyrics,
+          sunoPrompt: sunoPrompt,
+          arrangement: parsed.arrangement,
+          vocal: parsed.vocal,
+          references: parsed.references,
+          rawResponse: d.lyrics,
+        };
         // Reveal the production-handoff row
         var pr = document.getElementById('fres-prod-row');
         if (pr) pr.style.display = 'block';
@@ -5435,6 +5469,51 @@ body.craft-advanced .craft-basic-only{display:none !important}
       });
     }
 
+    // ── Brain-response parsing: split lyrics from labelled sections ──────
+    // The brain emits LYRICS followed by uppercase-keyed sections like
+    // "CORE PROMPT:", "ARRANGEMENT BLUEPRINT:", "VOCAL DIRECTION:",
+    // "SONIC REFERENCES:", "PLATFORM TIPS:". Anything before the first
+    // such header is treated as lyrics.
+    function flowParseBrain(raw){
+      var text = String(raw || '');
+      var SECT = /\n[A-Z][A-Z &\/]+:\s*\n?/;
+      var firstHeader = text.search(SECT);
+      var lyrics = firstHeader === -1 ? text : text.slice(0, firstHeader);
+      lyrics = lyrics.trim();
+      // Use the existing parseBriefSection global if available
+      var pick = function(key){
+        if (typeof parseBriefSection === 'function') return parseBriefSection(text, key);
+        var idx = text.indexOf(key + ':');
+        if (idx === -1) return '';
+        var start = idx + key.length + 1;
+        var next = text.slice(start).search(/\n[A-Z][A-Z &]+:/);
+        return text.slice(start, next === -1 ? text.length : start + next).trim();
+      };
+      return {
+        lyrics: lyrics,
+        corePrompt:  pick('CORE PROMPT')      || pick('SONG PROMPT')    || pick('STYLE PROMPT'),
+        arrangement: pick('ARRANGEMENT BLUEPRINT') || pick('ARRANGEMENT'),
+        tempoKey:    pick('TEMPO & KEY')      || pick('TEMPO'),
+        vocal:       pick('VOCAL DIRECTION')  || pick('VOCAL'),
+        references:  pick('SONIC REFERENCES') || pick('REFERENCES'),
+      };
+    }
+
+    function flowEsc(s){
+      return String(s || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    window.flowSwitchTab = function(tab){
+      document.querySelectorAll('.flow-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab') === tab); });
+      document.querySelectorAll('.flow-section').forEach(function(s){
+        s.classList.toggle('on', s.id === 'fres-sec-' + tab);
+      });
+    };
+
     // ── Flow-aware copy helpers (read from __flowLast, not Lucky state) ──
     function flowCopyText(text, label){
       if (!text) { if (typeof toast === 'function') toast('Nothing to copy yet'); return; }
@@ -5456,6 +5535,15 @@ body.craft-advanced .craft-basic-only{display:none !important}
     window.flowCopyTitle = function(){ var f = window.__flowLast; if (f) flowCopyText(f.title || '', 'Title'); };
     window.flowCopyLyrics = function(){ var f = window.__flowLast; if (f) flowCopyText(f.lyrics || '', 'Lyrics'); };
     window.flowCopyPrompt = function(){ var f = window.__flowLast; if (f) flowCopyText(f.sunoPrompt || '', 'Prompt'); };
+    window.flowCopyArrangement = function(){
+      var f = window.__flowLast;
+      if (!f) return;
+      var parts = [];
+      if (f.arrangement) parts.push('ARRANGEMENT BLUEPRINT:\n' + f.arrangement);
+      if (f.vocal) parts.push('VOCAL DIRECTION:\n' + f.vocal);
+      if (f.references) parts.push('SONIC REFERENCES:\n' + f.references);
+      flowCopyText(parts.join('\n\n'), 'Arrangement');
+    };
 
     // ── Save to library ──────────────────────────────────────────────────
     window.saveFlowToLib = function(){
