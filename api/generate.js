@@ -296,15 +296,10 @@ No prose. No markdown fences.`;
       }
     }
 
-    // mode === 'flow-song' — pipe spec through the SONIQ brain so the
-    // lyrics get the same genre-specific structure / ad-libs / fills /
-    // Suno tags that Write and Lucky produce.
-    const spec = req.body.spec;
-    if (!spec || !spec.title || !spec.genre || !spec.tempo || !spec.key || !spec.vocal ||
-        !Array.isArray(spec.instrumentation) || spec.instrumentation.length === 0 ||
-        !spec.moodArc || !spec.moodArc.start || !spec.moodArc.end || !spec.structure) {
-      return res.status(400).json({ error: 'spec is missing required fields' });
-    }
+    // mode === 'flow-song' — ONE AI call. Concept → SONIQ brain → finished song.
+    // No upstream spec call. The brain handles genre/mood/structure from the
+    // concept text directly using lightweight heuristics below.
+    const spec = req.body.spec || {};
 
     // Map Flow's natural-language genre to a brain genre key.
     function flowGenreToBrainKey(g) {
@@ -340,25 +335,20 @@ No prose. No markdown fences.`;
     let built, brainGenre, flowAllowPlatinum;
     try {
       const brain = require('./_brain.js');
-      brainGenre = flowGenreToBrainKey(spec.genre);
-      const brainMood  = flowMoodToBrainMood(spec.mood || spec.moodArc?.end || 'emotional');
-      // Embed the FlowSpec's nuance into the topic so the brain has the full
-      // production picture — title, tempo, key, vocal, instrumentation,
-      // mood arc, fusion partner. The brain uses topic verbatim downstream.
-      const fusionTag = spec.fusion && spec.subGenre ? ` × ${spec.subGenre}` : '';
+      // Derive genre + mood directly from the concept text (and any
+      // optional spec hints the client passed). No upstream AI spec call.
+      brainGenre = flowGenreToBrainKey(spec.genre || flowConcept);
+      const brainMood = flowMoodToBrainMood(
+        spec.mood || (spec.moodArc && spec.moodArc.end) || flowConcept
+      );
+      // Topic = the concept itself, with a brief production cue so the
+      // brain emits section markers, ad-libs in parens, and Suno tags.
       const enrichedTopic =
         `${flowConcept}\n\n` +
-        `[Flow spec — honor every line]\n` +
-        `Working title: ${spec.title}\n` +
-        `Fusion: ${spec.genre}${fusionTag}\n` +
-        `Tempo: ${spec.tempo} BPM · Key: ${spec.key}\n` +
-        `Vocal archetype: ${spec.vocal}\n` +
-        `Instrumentation palette: ${spec.instrumentation.join(', ')}\n` +
-        `Mood arc: ${spec.moodArc.start} → ${spec.moodArc.end}\n` +
-        `Structure cue: ${spec.structure}\n` +
-        `Add real [Bridge], [Pre-Chorus], instrumental cues like [Guitar Solo] or [Drum Fill] where the genre calls for them, ` +
+        `Add real [Verse], [Pre-Chorus], [Chorus], [Bridge] markers, ` +
+        `instrumental cues like [Guitar Solo] or [Drum Fill] when the genre calls for them, ` +
         `and ad-libs in parentheses on the same line (e.g. "I held my breath (uh) waiting for the light"). ` +
-        `Use the genre's Suno tag conventions — the song must read like a finished production brief, not a draft.`;
+        `Use the genre's Suno tag conventions — the song must read like a finished production brief.`;
 
       // Plan-gate platinum + premium quality to match stream.js. Free-tier
       // users still get Flow, just on the same brain budget Write gives them.
@@ -368,7 +358,7 @@ No prose. No markdown fences.`;
         genre: brainGenre,
         topic: enrichedTopic,
         mood: brainMood,
-        vocal: spec.vocal,
+        vocal: spec.vocal || 'any',
         structure: 'standard',
         era: 'modern',
         length: 'medium',
@@ -403,7 +393,7 @@ No prose. No markdown fences.`;
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        2800,                    // calibrated: complete song with brain extras, well under Vercel's 60s ceiling
+        2000,                    // tightened — brain emits a full song in ~1500-1800 tokens, headroom gives Vercel breathing room
         50000,                   // hard 50s internal timeout — fails clean before Vercel kills the function
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
@@ -433,7 +423,7 @@ No prose. No markdown fences.`;
     }
 
     return res.status(200).json({
-      title: spec.title,
+      title: spec.title || (flowConcept.split(/[.,—–\-]/)[0] || 'Untitled').trim().slice(0, 60),
       lyrics: lyrics.trim(),
       sunoPrompt: sunoPrompt,
     });

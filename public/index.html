@@ -5233,50 +5233,76 @@ body.craft-advanced .craft-basic-only{display:none !important}
       if (scoreInFlight) { try { scoreInFlight.abort(); } catch(e){} }
       inFlight = new AbortController();
 
-      flowAuthedPost('/api/generate', { mode: 'flow-spec', concept: concept }, inFlight.signal)
-      .then(function(res){
-        if (res.status === 401) {
-          if (typeof openAuth === 'function') openAuth('Sign in to use Flow');
-          throw new Error('Please sign in to use Flow');
-        }
-        if (!res.ok || !res.data || !res.data.spec) {
-          var msg = (res.data && (res.data.message || res.data.error)) || 'Flow couldn\'t pick a spec';
-          throw new Error(msg);
-        }
-        var spec = res.data.spec;
-        // Show reveal + spin reels to land on picked genres
-        var reveal = document.getElementById('flow-reveal');
-        if (reveal) reveal.style.display = 'block';
-        var fusionEl = document.getElementById('flow-fusion');
-        var metaEl = document.getElementById('flow-meta');
-        var paramsEl = document.getElementById('flow-params');
-        if (fusionEl) fusionEl.textContent = spec.genre + (spec.subGenre ? ' × ' + spec.subGenre : '');
-        if (metaEl) metaEl.textContent = (spec.tempo ? spec.tempo + ' BPM · ' : '') + (spec.key || '') + (spec.vocal ? ' · ' + spec.vocal : '');
-        if (paramsEl) {
-          var pills = [
-            { l: spec.mood || 'mood', c: 'bdg-teal' },
-            { l: spec.vocal || 'vocal', c: 'bdg-v' },
-            { l: spec.structure || 'structure', c: 'bdg-green' },
-          ];
-          if (spec.instrumentation && spec.instrumentation.length) {
-            pills.push({ l: spec.instrumentation.slice(0,3).join(' · '), c: 'bdg-gold' });
-          }
-          paramsEl.innerHTML = pills.map(function(p){ return '<span class="lr-param bdg '+p.c+'">'+p.l+'</span>'; }).join('');
-        }
-        spinFlowReels(spec.genre, spec.subGenre || spec.mood || 'solo', 1200, function(){
-          if (btnTxt) btnTxt.textContent = 'Writing…';
-          if (hint) hint.textContent = 'Writing: ' + spec.genre + ' · "' + concept.slice(0, 60) + (concept.length > 60 ? '…' : '') + '"';
-          // Chain to /api/generate using picked spec
-          generateFlowSong(concept, spec);
-        });
-      })
-      .catch(function(err){
-        if (err && err.name === 'AbortError') return;
-        if (btn) btn.disabled = false;
-        if (btnTxt) btnTxt.textContent = 'Spin Flow';
-        if (hint) hint.textContent = (err && err.message) || 'Something went wrong — try again';
-      });
+      // ONE AI call — no upstream spec round trip. Quick client-side
+      // genre/mood pick from the concept text just to drive the reveal
+      // animation; the server brain does its own genre/mood resolution
+      // from the same concept.
+      var localSpec = flowQuickSpec(concept);
+      var reveal = document.getElementById('flow-reveal');
+      if (reveal) reveal.style.display = 'block';
+      var fusionEl = document.getElementById('flow-fusion');
+      var metaEl   = document.getElementById('flow-meta');
+      var paramsEl = document.getElementById('flow-params');
+      if (fusionEl) fusionEl.textContent = localSpec.genre;
+      if (metaEl)   metaEl.textContent   = localSpec.tempo + ' BPM · ' + localSpec.key + ' · ' + localSpec.vocal;
+      if (paramsEl) {
+        var pills = [
+          { l: localSpec.mood,    c: 'bdg-teal'  },
+          { l: localSpec.vocal,   c: 'bdg-v'     },
+          { l: 'V → C → V → C → B → C', c: 'bdg-green' },
+        ];
+        paramsEl.innerHTML = pills.map(function(p){ return '<span class="lr-param bdg '+p.c+'">'+p.l+'</span>'; }).join('');
+      }
+      spinFlowReels(localSpec.genre, localSpec.mood, 900, function(){});
+
+      if (btnTxt) btnTxt.textContent = 'Writing…';
+      if (hint) hint.textContent = 'Writing: ' + localSpec.genre + ' · "' + concept.slice(0, 60) + (concept.length > 60 ? '…' : '') + '"';
+      // Fire the song call directly — concept goes straight to the brain.
+      generateFlowSong(concept, localSpec);
     };
+
+    // Lightweight client-side genre/mood pick for the reveal UI only.
+    // The server brain reads the concept itself and may choose differently;
+    // these are just animation values so the reels have something to land on.
+    function flowQuickSpec(text){
+      var t = (text || '').toLowerCase();
+      var genre = 'Pop';
+      if (/\b(rap|trap|drill|bars?|hip.?hop)\b/.test(t)) genre = 'Hip-Hop';
+      else if (/\b(country|whiskey|truck|small town|highway)\b/.test(t)) genre = 'Country';
+      else if (/\b(rock|guitar|electric|loud|amp)\b/.test(t)) genre = 'Rock';
+      else if (/\b(r&b|rnb|soul|smooth|silk|velvet)\b/.test(t)) genre = 'R&B';
+      else if (/\b(folk|acoustic|campfire|fingerpicked)\b/.test(t)) genre = 'Indie Folk';
+      else if (/\b(synth|edm|electronic|neon|club|dance)\b/.test(t)) genre = 'Synthwave';
+      else if (/\b(gospel|church|hymn|praise)\b/.test(t)) genre = 'Gospel';
+      else if (/\b(blues|delta|harmonica)\b/.test(t)) genre = 'Blues';
+      else if (/\b(jazz|saxophone|swing|bebop)\b/.test(t)) genre = 'Jazz';
+      else if (/\b(dark|haunt|ghost|black|night|grave|funeral)\b/.test(t)) genre = 'Dark Folk';
+      else if (/\b(dream|hazy|drift|float|cloud|mist)\b/.test(t)) genre = 'Dream-Pop';
+      else if (/\b(neon|80s|retro|laser|cyber)\b/.test(t)) genre = 'Synthwave';
+      var mood = 'Emotional';
+      if (/\b(hope|hopeful|uplift|inspir|triumph|rise|win)\b/.test(t)) mood = 'Hopeful';
+      else if (/\b(sad|melanchol|grief|sorrow|loss|cry|tears?|miss|gone|lost)\b/.test(t)) mood = 'Melancholic';
+      else if (/\b(dark|brood|sinister|ominous|haunt|cold)\b/.test(t)) mood = 'Dark';
+      else if (/\b(angry|rage|defian|rebellious|fight|burn)\b/.test(t)) mood = 'Defiant';
+      else if (/\b(calm|peace|tender|gentle|soft|quiet)\b/.test(t)) mood = 'Peaceful';
+      else if (/\b(nostalg|reflect|wistful|memory|remember)\b/.test(t)) mood = 'Nostalgic';
+      else if (/\b(play|fun|joy|euphor|dance|smile)\b/.test(t)) mood = 'Playful';
+      else if (/\b(longing|yearn|chase|reach|need|want)\b/.test(t)) mood = 'Longing';
+      // Rough tempo pick based on mood
+      var tempo = 96;
+      if (mood === 'Melancholic' || mood === 'Peaceful') tempo = 74;
+      else if (mood === 'Defiant' || mood === 'Playful') tempo = 124;
+      else if (mood === 'Dark') tempo = 84;
+      else if (mood === 'Hopeful') tempo = 104;
+      var vocal = 'expressive vocal';
+      if (genre === 'Hip-Hop') vocal = 'rhythmic flow';
+      else if (genre === 'R&B') vocal = 'soulful tenor';
+      else if (genre === 'Indie Folk' || genre === 'Dark Folk') vocal = 'breathy singer-songwriter';
+      else if (genre === 'Country') vocal = 'warm storyteller';
+      else if (genre === 'Rock') vocal = 'gritty rasp';
+      var key = mood === 'Hopeful' || mood === 'Playful' ? 'C major' : 'A minor';
+      return { genre: genre, mood: mood, tempo: tempo, vocal: vocal, key: key };
+    }
 
     // Song progress driver — simulates progress over ~25s so the user sees
     // the bar advance smoothly while the model is writing. Jumps to 100% on
