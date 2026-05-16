@@ -265,54 +265,142 @@ No prose. No markdown fences.`;
       }
     }
 
-    // mode === 'flow-song'
+    // mode === 'flow-song' — pipe spec through the SONIQ brain so the
+    // lyrics get the same genre-specific structure / ad-libs / fills /
+    // Suno tags that Write and Lucky produce.
     const spec = req.body.spec;
     if (!spec || !spec.title || !spec.genre || !spec.tempo || !spec.key || !spec.vocal ||
         !Array.isArray(spec.instrumentation) || spec.instrumentation.length === 0 ||
         !spec.moodArc || !spec.moodArc.start || !spec.moodArc.end || !spec.structure) {
       return res.status(400).json({ error: 'spec is missing required fields' });
     }
-    const fusionLine = spec.fusion && spec.subGenre
-      ? `Fusion: blend ${spec.genre} with ${spec.subGenre}. Honor both traditions in the lyric.`
-      : '';
-    const songSystem = `You are a professional songwriter writing for a specific, fully-spec'd song.
-Rules:
-- Honor the spec exactly: tempo, key, vocal archetype, instrumentation and mood arc shape phrasing.
-- Use section markers like [Verse 1], [Chorus], [Bridge] — match the genre's structural convention.
-- Lyrics must be singable at the given tempo.
-- Mood must move from arc start to end across the song.
-- Avoid clichés. Earn the imagery.
-- Return ONLY the lyrics. No title line. No commentary. No markdown fences.`;
-    const songPrompt = `CONCEPT:
-${flowConcept}
 
-SPEC:
-Title: ${spec.title}
-Genre: ${spec.genre}${spec.fusion && spec.subGenre ? ' × ' + spec.subGenre : ''}
-Tempo: ${spec.tempo} BPM
-Key: ${spec.key}
-Vocal: ${spec.vocal}
-Instrumentation: ${spec.instrumentation.join(', ')}
-Mood arc: ${spec.moodArc.start} → ${spec.moodArc.end}
-Structure: ${spec.structure}
-${fusionLine}
+    // Map Flow's natural-language genre to a brain genre key.
+    function flowGenreToBrainKey(g) {
+      const s = String(g || '').toLowerCase();
+      if (s.includes('hip') || s.includes('rap') || s.includes('trap') || s.includes('drill')) return 'hiphop';
+      if (s.includes('r&b') || s.includes('rnb') || s.includes('soul') || s.includes('neo')) return 'rnb';
+      if (s.includes('country') || s.includes('americana') || s.includes('bluegrass')) return 'country';
+      if (s.includes('folk') || s.includes('singer') || s.includes('acoustic') || s.includes('indie folk')) return 'folk';
+      if (s.includes('metal') || s.includes('punk') || s.includes('grunge') || s.includes('hard rock')) return 'rock';
+      if (s.includes('rock') || s.includes('alternative') || s.includes('indie rock') || s.includes('shoegaze') || s.includes('post-punk')) return 'rock';
+      if (s.includes('edm') || s.includes('electronic') || s.includes('house') || s.includes('techno') || s.includes('trance') || s.includes('hyperpop') || s.includes('synth')) return 'edm';
+      if (s.includes('blues')) return 'blues';
+      if (s.includes('jazz')) return 'jazz';
+      if (s.includes('gospel') || s.includes('worship') || s.includes('christian')) return 'gospel';
+      if (s.includes('reggae') || s.includes('dancehall') || s.includes('dub')) return 'reggae';
+      if (s.includes('latin') || s.includes('salsa') || s.includes('bachata') || s.includes('reggaeton')) return 'latin';
+      if (s.includes('kpop') || s.includes('k-pop')) return 'kpop';
+      return 'pop';
+    }
+    function flowMoodToBrainMood(m) {
+      const s = String(m || '').toLowerCase();
+      if (/hope|uplift|inspir|triumph/.test(s)) return 'Hopeful';
+      if (/sad|melanchol|grief|sorrow|loss/.test(s)) return 'Melancholic';
+      if (/dark|brood|sinister|ominous/.test(s)) return 'Dark';
+      if (/angry|rage|defian|rebellious/.test(s)) return 'Defiant';
+      if (/calm|peace|tender|gentle/.test(s)) return 'Peaceful';
+      if (/nostalg|reflect|wistful/.test(s)) return 'Nostalgic';
+      if (/play|fun|joy|euphor/.test(s)) return 'Playful';
+      if (/longing|yearn/.test(s)) return 'Longing';
+      return 'Emotional';
+    }
 
-Write the lyrics now.`;
+    let built;
     try {
-      const text = await flowCallAI([{ role: 'user', content: songPrompt }], songSystem, 1800);
-      // Charge the song against the user's monthly quota (same as normal generate)
-      if (!isAdmin && isFinite(flowLimit)) {
-        const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
-        redisIncrExpire(flowRedisKey, ttl);
-      }
-      return res.status(200).json({
-        title: spec.title,
-        lyrics: text.trim(),
-        sunoPrompt: spec.sunoPrompt || '',
+      const brain = require('./_brain.js');
+      const brainGenre = flowGenreToBrainKey(spec.genre);
+      const brainMood  = flowMoodToBrainMood(spec.mood || spec.moodArc?.end || 'emotional');
+      // Embed the FlowSpec's nuance into the topic so the brain has the full
+      // production picture — title, tempo, key, vocal, instrumentation,
+      // mood arc, fusion partner. The brain uses topic verbatim downstream.
+      const fusionTag = spec.fusion && spec.subGenre ? ` × ${spec.subGenre}` : '';
+      const enrichedTopic =
+        `${flowConcept}\n\n` +
+        `[Flow spec — honor every line]\n` +
+        `Working title: ${spec.title}\n` +
+        `Fusion: ${spec.genre}${fusionTag}\n` +
+        `Tempo: ${spec.tempo} BPM · Key: ${spec.key}\n` +
+        `Vocal archetype: ${spec.vocal}\n` +
+        `Instrumentation palette: ${spec.instrumentation.join(', ')}\n` +
+        `Mood arc: ${spec.moodArc.start} → ${spec.moodArc.end}\n` +
+        `Structure cue: ${spec.structure}\n` +
+        `Add real [Bridge], [Pre-Chorus], instrumental cues like [Guitar Solo] or [Drum Fill] where the genre calls for them, ` +
+        `and ad-libs in parentheses on the same line (e.g. "I held my breath (uh) waiting for the light"). ` +
+        `Use the genre's Suno tag conventions — the song must read like a finished production brief, not a draft.`;
+
+      built = brain.buildSongPrompt({
+        genre: brainGenre,
+        topic: enrichedTopic,
+        mood: brainMood,
+        vocal: spec.vocal,
+        structure: 'standard',
+        era: 'modern',
+        length: 'medium',
+        quality: 'viral',
+        bracketMode: 'suno',
+        platform: 'suno',
+        platinum: true,         // use the full premium pipeline for Flow
+        isAdmin: isAdmin,
+        plan: 'studio',
       });
+    } catch (e) {
+      console.error('[flow-song] brain.buildSongPrompt failed:', e && e.message);
+      return res.status(500).json({ error: 'Failed to build song prompt' });
+    }
+
+    if (!built || !built.prompt || !built.system) {
+      return res.status(500).json({ error: 'Brain returned empty prompt' });
+    }
+
+    let lyrics;
+    try {
+      lyrics = await flowCallAI(
+        [{ role: 'user', content: built.prompt }],
+        built.system,
+        4000,                    // brain prompts produce richer, longer songs
+      );
     } catch (e) {
       return res.status(500).json({ error: e.message || 'Lyric generation failed' });
     }
+
+    // Build a song-specific Suno prompt from the FINAL lyrics so it
+    // references actual motifs, not just the abstract concept.
+    let sunoPrompt = spec.sunoPrompt || '';
+    try {
+      const sunoText = await flowCallAI(
+        [{ role: 'user', content:
+          `LYRICS:\n${lyrics.slice(0, 2400)}\n\n` +
+          `SPEC: ${spec.genre}${spec.fusion && spec.subGenre ? ' × ' + spec.subGenre : ''}, ` +
+          `${spec.tempo} BPM, ${spec.key}, ${spec.vocal}, ${spec.instrumentation.join(', ')}, ` +
+          `mood arc ${spec.moodArc.start} → ${spec.moodArc.end}.\n\n` +
+          `Write the Suno style prompt now.`
+        }],
+        `You write Suno-ready style prompts (comma-separated descriptors, NO lyrics, NO section markers). ` +
+        `Given a finished song and its spec, distil a 10-16 token prompt that captures: ` +
+        `(1) genre + fusion partner, (2) vocal archetype, (3) tempo, (4) key/mode, ` +
+        `(5) signature instrument from the palette, (6) one mood-arc descriptor, ` +
+        `(7) one production texture cue (lo-fi, polished, raw, cinematic, etc.). ` +
+        `Return only the comma-separated prompt. No prose. No quotes.`,
+        220,
+      );
+      const cleanedSuno = sunoText.trim().replace(/^["'`]+|["'`]+$/g, '').replace(/^\s*style prompt:\s*/i, '');
+      if (cleanedSuno && cleanedSuno.length < 360) sunoPrompt = cleanedSuno;
+    } catch (e) {
+      // fall through — keep the spec's generic prompt as fallback
+    }
+
+    // Charge the song against the user's monthly quota (same as normal generate)
+    if (!isAdmin && isFinite(flowLimit)) {
+      const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+      redisIncrExpire(flowRedisKey, ttl);
+    }
+
+    return res.status(200).json({
+      title: spec.title,
+      lyrics: lyrics.trim(),
+      sunoPrompt: sunoPrompt,
+    });
   }
 
   // ── Plan lookup + rate limiting ─────────────────────────────────
