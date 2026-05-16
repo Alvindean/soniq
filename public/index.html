@@ -5317,19 +5317,34 @@ body.craft-advanced .craft-basic-only{display:none !important}
           bodyEl.innerHTML = '<pre id="fres-lyrics-text">'+(d.lyrics||'').replace(/</g,'&lt;')+'</pre>';
         }
         // Stash on window for save handler
-        window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt, score: d.score };
-        // Render hook score if present
-        if (d.score && typeof d.score.hookScore === 'number') {
+        window.__flowLast = { concept: concept, spec: spec, title: d.title, lyrics: d.lyrics, sunoPrompt: d.sunoPrompt };
+        // Reveal the production-handoff row
+        var pr = document.getElementById('fres-prod-row');
+        if (pr) pr.style.display = 'block';
+        // Fire the score request async — never blocks the song from rendering.
+        // Show "scoring..." placeholder; render once it lands; hide on failure.
+        (function(){
           var sr = document.getElementById('fres-score-row');
           var sn = document.getElementById('fres-score-num');
           var vd = document.getElementById('fres-verdict');
           if (sr) sr.style.display = 'flex';
-          if (sn) sn.textContent = Math.round(d.score.hookScore);
-          if (vd) vd.textContent = (d.score.verdict || '').slice(0, 240);
-        }
-        // Reveal the production-handoff row
-        var pr = document.getElementById('fres-prod-row');
-        if (pr) pr.style.display = 'block';
+          if (sn) sn.textContent = '…';
+          if (vd) vd.textContent = 'scoring…';
+          flowAuthedPost('/api/generate', {
+            mode: 'flow-score',
+            lyrics: d.lyrics,
+            genre: (spec && spec.genre) || '',
+            topic: concept,
+          }, null).then(function(sres){
+            if (sres.ok && sres.data && sres.data.score && typeof sres.data.score.hookScore === 'number') {
+              window.__flowLast.score = sres.data.score;
+              if (sn) sn.textContent = Math.round(sres.data.score.hookScore);
+              if (vd) vd.textContent = (sres.data.score.verdict || '').slice(0, 240);
+            } else if (sr) {
+              sr.style.display = 'none';
+            }
+          }).catch(function(){ if (sr) sr.style.display = 'none'; });
+        })();
         finishSongProgress(true);
         if (btn) btn.disabled = false;
         if (btnTxt) btnTxt.textContent = 'Spin Flow';

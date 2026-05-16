@@ -390,9 +390,30 @@ No prose. No markdown fences.`;
       // fall through — keep the spec's generic prompt as fallback
     }
 
-    // Score the song through SONIQ's feedback brain so the user sees
-    // hook strength + dimensional grades before deciding to keep it.
-    let scoreData = null;
+    // Score moved to a separate client-fired `flow-score` call to keep this
+    // request under Vercel's 60s function timeout. The client renders the
+    // song immediately, then asynchronously requests the score.
+
+    // Charge the song against the user's monthly quota (same as normal generate)
+    if (!isAdmin && isFinite(flowLimit)) {
+      const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
+      redisIncrExpire(flowRedisKey, ttl);
+    }
+
+    return res.status(200).json({
+      title: spec.title,
+      lyrics: lyrics.trim(),
+      sunoPrompt: sunoPrompt,
+    });
+  }
+
+  // mode === 'flow-score' — async scoring fired separately by the client
+  // after the song lands. Tight 600-token budget so it never times out.
+  if (flowMode === 'flow-score') {
+    const sLyrics = String(req.body.lyrics || '').slice(0, 6000);
+    const sGenre  = String(req.body.genre || 'pop');
+    const sTopic  = String(req.body.topic || '').slice(0, 400);
+    if (!sLyrics) return res.status(400).json({ error: 'lyrics required' });
     try {
       const brain = require('./_brain.js');
       const brainGenre = (function(g){
@@ -408,32 +429,23 @@ No prose. No markdown fences.`;
         if (s.includes('gospel')) return 'gospel';
         if (s.includes('reggae')) return 'reggae';
         return 'pop';
-      })(spec.genre);
-      const fb = brain.buildFeedbackPrompt(lyrics, brainGenre, flowConcept);
+      })(sGenre);
+      const fb = brain.buildFeedbackPrompt(sLyrics, brainGenre, sTopic);
       const fbText = await flowCallAI(
-        [{ role: 'user', content: fb.prompt + '\n\nReturn ONLY a JSON object: {"hookScore":0-100,"dimensions":{"hook_strength":0-100,"emotional_arc":0-100,"specificity":0-100,"rhyme_scheme":0-100,"structure":0-100,"genre_authenticity":0-100,"opening_line":0-100,"bridge":0-100,"suno_readiness":0-100},"verdict":"one short sentence"}' }],
+        [{ role: 'user', content: fb.prompt + '\n\nReturn ONLY: {"hookScore":0-100,"verdict":"one short sentence"}' }],
         fb.system,
-        700,
+        300,
       );
       const cleaned = fbText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-      try { scoreData = JSON.parse(cleaned); } catch (e) { /* keep null */ }
-    } catch (e) { /* score is best-effort */ }
-
-    // Charge the song against the user's monthly quota (same as normal generate)
-    if (!isAdmin && isFinite(flowLimit)) {
-      const ttl = flowIsLifetime ? 10 * 365 * 24 * 3600 : 32 * 24 * 3600;
-      redisIncrExpire(flowRedisKey, ttl);
+      let scoreData = null;
+      try { scoreData = JSON.parse(cleaned); } catch (e) {}
+      if (!scoreData || typeof scoreData.hookScore !== 'number') {
+        return res.status(502).json({ error: 'Score parse failed' });
+      }
+      return res.status(200).json({ score: scoreData });
+    } catch (e) {
+      return res.status(500).json({ error: e.message || 'Scoring failed' });
     }
-
-    return res.status(200).json({
-      title: spec.title,
-      lyrics: lyrics.trim(),
-      sunoPrompt: sunoPrompt,
-      score: scoreData,         // { hookScore, dimensions, verdict } or null
-      genreKey: (function(g){   // for client-side editor handoff (S.luckyCurrentSong.genre uses brain key)
-        return spec.genre;
-      })(),
-    });
   }
 
   // ── Plan lookup + rate limiting ─────────────────────────────────
