@@ -4793,7 +4793,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
         id="flow-concept"
         class="flow-concept"
         rows="3"
-        maxlength="600"
+        maxlength="1000"
         placeholder="e.g. touching the darkness — losing my brother, ending hopeful"
         aria-label="Song concept"
       ></textarea>
@@ -4804,7 +4804,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           <span id="flow-mic-label">Speak</span>
           <span class="flow-meter" id="flow-meter" aria-hidden="true"><span></span><span></span><span></span></span>
         </button>
-        <span class="flow-char-count" id="flow-char-count">0 / 600</span>
+        <span class="flow-char-count" id="flow-char-count">0 / 1000</span>
       </div>
     </div>
     <!-- Song-generation progress bar — visible while flow-song is in flight -->
@@ -4894,7 +4894,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     var ta = document.getElementById('flow-concept');
     var cc = document.getElementById('flow-char-count');
     if (ta && cc) {
-      ta.addEventListener('input', function(){ cc.textContent = ta.value.length + ' / 600'; });
+      ta.addEventListener('input', function(){ cc.textContent = ta.value.length + ' / 1000'; });
     }
 
     // ── Mic dictation: continuous + live interim + 3-bar audio meter ────
@@ -4911,6 +4911,27 @@ body.craft-advanced .craft-basic-only{display:none !important}
 
     // Web Audio analyser for the live level meter
     var audioCtx = null, analyser = null, micStream = null, meterRAF = null;
+
+    // 4-second silence auto-submit
+    var silenceTimer = null;
+    var SILENCE_MS = 4000;
+    function resetSilenceTimer(){
+      if (silenceTimer) clearTimeout(silenceTimer);
+      if (!listening) return;
+      silenceTimer = setTimeout(function(){
+        if (!listening) return;
+        // Only auto-submit if there's actual content to spin
+        if (!ta || !ta.value.trim()) return;
+        // Stop the mic, then fire feelFlow()
+        userStopped = true;
+        listening = false;
+        try { rec && rec.stop(); } catch(e){}
+        setMicUI(false);
+        stopMeter();
+        if (interimEl) interimEl.textContent = '';
+        if (typeof window.feelFlow === 'function') window.feelFlow();
+      }, SILENCE_MS);
+    }
 
     function stopMeter(){
       if (meterRAF) { cancelAnimationFrame(meterRAF); meterRAF = null; }
@@ -4986,10 +5007,12 @@ body.craft-advanced .craft-basic-only{display:none !important}
         if (committedAppend) full = (full ? full.trim() + ' ' : '') + committedAppend;
         var live = (full ? full.trim() + ' ' : '') + interim.trim();
         if (ta) {
-          ta.value = live.slice(0, 600);
-          if (cc) cc.textContent = ta.value.length + ' / 600';
+          ta.value = live.slice(0, 1000);
+          if (cc) cc.textContent = ta.value.length + ' / 1000';
         }
         if (interimEl) interimEl.textContent = interim ? '… ' + interim.trim() : '';
+        // Reset the 4s silence countdown on every transcript event
+        resetSilenceTimer();
       };
       // Browsers stop SpeechRecognition after silence even in continuous mode.
       // Auto-restart UNLESS the user explicitly clicked Stop.
@@ -5023,6 +5046,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
       if (listening) {
         userStopped = true;
         listening = false;
+        if (silenceTimer) { clearTimeout(silenceTimer); silenceTimer = null; }
         try { rec.stop(); } catch(e){}
         setMicUI(false);
         stopMeter();
@@ -5038,6 +5062,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
         listening = true;
         setMicUI(true);
         startMeter();
+        resetSilenceTimer();
       } catch(e){
         listening = false;
         setMicUI(false);

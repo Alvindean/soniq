@@ -185,7 +185,7 @@ module.exports = async function handler(req, res) {
   if (flowMode === 'flow-spec' || flowMode === 'flow-song') {
     const flowConcept = (req.body.concept || '').trim();
     if (!flowConcept) return res.status(400).json({ error: 'concept is required' });
-    if (flowConcept.length > 600) return res.status(400).json({ error: 'concept must be 600 chars or fewer' });
+    if (flowConcept.length > 1000) return res.status(400).json({ error: 'concept must be 1000 chars or fewer' });
 
     // Plan + rate-limit gate (mirrors the normal-flow block below)
     let flowPlan = isAdmin ? 'studio' : 'free';
