@@ -222,7 +222,7 @@ module.exports = async function handler(req, res) {
       }
     }
 
-    async function flowCallAI(messages, system, max_tokens) {
+    async function flowCallAI(messages, system, max_tokens, budgetMs) {
       // Tolerate the prod env var being named `Claude` instead of
       // ANTHROPIC_API_KEY. Without this fallback, Anthropic primary is
       // disabled and every call routes to OpenRouter only — which can push
@@ -230,11 +230,15 @@ module.exports = async function handler(req, res) {
       const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
       const ok = process.env.OPENROUTER_API_KEY;
       if (!ak && !ok) throw new Error('No AI provider configured');
+      // Hard internal timeout — must return BEFORE Vercel's 60s axe, so the
+      // client gets a clean JSON error instead of an HTML 504.
+      const limit = typeof budgetMs === 'number' ? budgetMs : 50000;
+      const timeoutP = new Promise((_, rej) => setTimeout(() => rej(new Error('AI timeout (' + limit + 'ms)')), limit));
       try {
-        if (ak) return await callAnthropic(ak, messages, system, max_tokens);
-        return await callOpenRouter(ok, messages, system, max_tokens);
+        if (ak) return await Promise.race([callAnthropic(ak, messages, system, max_tokens), timeoutP]);
+        return await Promise.race([callOpenRouter(ok, messages, system, max_tokens), timeoutP]);
       } catch (e) {
-        if (ok && ak) return await callOpenRouter(ok, messages, system, max_tokens);
+        if (ok && ak) return await Promise.race([callOpenRouter(ok, messages, system, max_tokens), timeoutP]);
         throw e;
       }
     }
@@ -387,7 +391,8 @@ No prose. No markdown fences.`;
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        4000,                    // brain prompts produce richer, longer songs
+        2800,                    // calibrated: complete song with brain extras, well under Vercel's 60s ceiling
+        50000,                   // hard 50s internal timeout — fails clean before Vercel kills the function
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
     } catch (e) {
@@ -456,6 +461,7 @@ No prose. No markdown fences.`;
         }],
         `You are SONIQ's hook coach. Honest, terse, one-shot scoring. Output strict JSON only — no markdown, no preamble.`,
         180,
+        20000,
       );
       const cleaned = fbText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
       let scoreData = null;
