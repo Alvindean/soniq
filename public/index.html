@@ -4953,10 +4953,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       if (inFlight) { try { inFlight.abort(); } catch(e){} }
       inFlight = new AbortController();
 
-      fetch('/api/flow-spec', {
+      fetch('/api/flow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ concept: concept }),
+        body: JSON.stringify({ mode: 'spec', concept: concept }),
         signal: inFlight.signal,
       })
       .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
@@ -5003,10 +5003,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       var btn = document.getElementById('flow-btn');
       var btnTxt = document.getElementById('flow-btn-text');
       var hint = document.getElementById('flow-hint');
-      fetch('/api/flow-song', {
+      fetch('/api/flow', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ concept: concept, spec: spec }),
+        body: JSON.stringify({ mode: 'song', concept: concept, spec: spec }),
       })
       .then(function(r){ return r.json().then(function(d){ return { ok: r.ok, data: d }; }); })
       .then(function(res){
