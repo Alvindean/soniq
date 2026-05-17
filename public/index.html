@@ -5470,17 +5470,13 @@ body.craft-advanced .craft-basic-only{display:none !important}
     }
 
     // ── Brain-response parsing: split lyrics from labelled sections ──────
-    // The brain emits LYRICS followed by uppercase-keyed sections like
-    // "CORE PROMPT:", "ARRANGEMENT BLUEPRINT:", "VOCAL DIRECTION:",
-    // "SONIC REFERENCES:", "PLATFORM TIPS:". Anything before the first
-    // such header is treated as lyrics.
+    // The brain emits LYRICS first (with [Verse]/[Chorus]/[Bridge] markers),
+    // followed by labelled production sections (CORE PROMPT, ARRANGEMENT
+    // BLUEPRINT, VOCAL DIRECTION, SONIC REFERENCES, PLATFORM TIPS, TEMPO).
+    // We look ONLY for known headers so accidental TITLE:/GENRE:/etc. lines
+    // inside the lyrics don't truncate the body.
     function flowParseBrain(raw){
       var text = String(raw || '');
-      var SECT = /\n[A-Z][A-Z &\/]+:\s*\n?/;
-      var firstHeader = text.search(SECT);
-      var lyrics = firstHeader === -1 ? text : text.slice(0, firstHeader);
-      lyrics = lyrics.trim();
-      // Use the existing parseBriefSection global if available
       var pick = function(key){
         if (typeof parseBriefSection === 'function') return parseBriefSection(text, key);
         var idx = text.indexOf(key + ':');
@@ -5489,6 +5485,22 @@ body.craft-advanced .craft-basic-only{display:none !important}
         var next = text.slice(start).search(/\n[A-Z][A-Z &]+:/);
         return text.slice(start, next === -1 ? text.length : start + next).trim();
       };
+      // Locate the lyric end: the earliest known-section header.
+      var KNOWN = ['CORE PROMPT','SONG PROMPT','STYLE PROMPT','ARRANGEMENT BLUEPRINT','ARRANGEMENT','VOCAL DIRECTION','SONIC REFERENCES','PLATFORM TIPS','TEMPO & KEY','TEMPO','PRODUCTION'];
+      var cutAt = text.length;
+      for (var k = 0; k < KNOWN.length; k++) {
+        var idx = text.indexOf('\n' + KNOWN[k] + ':');
+        if (idx === -1) idx = text.indexOf(KNOWN[k] + ':');  // start of doc
+        if (idx > -1 && idx < cutAt) cutAt = idx;
+      }
+      var lyrics = text.slice(0, cutAt).trim();
+      // If parsing gave us nothing meaningful (no [Verse]/[Chorus] markers,
+      // or extremely short), fall back to the entire raw response so the
+      // user never sees an empty Lyrics tab.
+      var looksLikeLyrics = /\[(Verse|Chorus|Hook|Bridge|Pre[- ]Chorus|Intro|Outro|Refrain)/i.test(lyrics);
+      if (!looksLikeLyrics || lyrics.length < 80) {
+        lyrics = text.trim();
+      }
       return {
         lyrics: lyrics,
         corePrompt:  pick('CORE PROMPT')      || pick('SONG PROMPT')    || pick('STYLE PROMPT'),

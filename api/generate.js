@@ -343,12 +343,18 @@ No prose. No markdown fences.`;
       );
       // Topic = the concept itself, with a brief production cue so the
       // brain emits section markers, ad-libs in parens, and Suno tags.
+      // STRICT: no artist names anywhere in the output. Use style
+      // descriptors only (genre, instrumentation, vocal texture, era,
+      // production style). Naming real artists in a Suno prompt creates
+      // legal + commercial risk and the user explicitly disallowed it.
       const enrichedTopic =
         `${flowConcept}\n\n` +
-        `Add real [Verse], [Pre-Chorus], [Chorus], [Bridge] markers, ` +
-        `instrumental cues like [Guitar Solo] or [Drum Fill] when the genre calls for them, ` +
-        `and ad-libs in parentheses on the same line (e.g. "I held my breath (uh) waiting for the light"). ` +
-        `Use the genre's Suno tag conventions — the song must read like a finished production brief.`;
+        `Write the song now. Requirements:\n` +
+        `- Add real [Verse], [Pre-Chorus], [Chorus], [Bridge] markers, plus instrumental cues like [Guitar Solo] or [Drum Fill] when the genre calls for them.\n` +
+        `- Ad-libs in parentheses on the same line (e.g. "I held my breath (uh) waiting for the light").\n` +
+        `- After the lyrics, output the CORE PROMPT, ARRANGEMENT BLUEPRINT, VOCAL DIRECTION, and SONIC REFERENCES sections.\n` +
+        `- DO NOT name any real artists, bands, producers, or song titles in the CORE PROMPT or any prompt-facing section. Use style descriptors only (genre, sub-genre, instrumentation, vocal texture, era, production style, BPM, key, mood). The "SONIC REFERENCES" section may describe the FEEL of an era/scene/movement, but must NOT name a specific artist or song.\n` +
+        `- The lyrics must be a complete singable song — at least 3 verses, a chorus, and a bridge. Never just an outline.`;
 
       // Plan-gate platinum + premium quality to match stream.js. Free-tier
       // users still get Flow, just on the same brain budget Write gives them.
@@ -393,7 +399,7 @@ No prose. No markdown fences.`;
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        2000,                    // tightened — brain emits a full song in ~1500-1800 tokens, headroom gives Vercel breathing room
+        2800,                    // restored — 2000 was truncating some songs to just the title; brain needs ~2200-2500 for full song + production sections
         50000,                   // hard 50s internal timeout — fails clean before Vercel kills the function
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
@@ -410,7 +416,18 @@ No prose. No markdown fences.`;
     // the same concept and avoids a second sequential AI call that was
     // pushing flow-song past Vercel's 60s ceiling. A future improvement
     // could move Suno-regen to a separate client-fired mode like flow-score.
-    const sunoPrompt = spec.sunoPrompt || '';
+    // Also scrub anything that looks like an artist-name reference from
+    // both the spec prompt AND the brain's CORE PROMPT block in the lyrics.
+    const scrubArtistRefs = (s) => String(s || '')
+      .replace(/\b(?:like|à la|a la|in the style of|reminiscent of|à la|feat\.?|featuring|inspired by)\s+[A-Z][A-Za-z0-9.'’&\- ]{1,40}/g, '')
+      .replace(/\b[A-Z][A-Za-z0-9.'’\-]+(?:\s+[A-Z][A-Za-z0-9.'’\-]+){0,2}\s+(?:vibes?|sound|feel|energy|era)\b/g, (m) => m.replace(/^[A-Z][A-Za-z0-9.'’\-]+(?:\s+[A-Z][A-Za-z0-9.'’\-]+){0,2}\s+/, ''))
+      .replace(/\s+,/g, ',')
+      .replace(/,\s*,/g, ',')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    let sunoPrompt = scrubArtistRefs(spec.sunoPrompt || '');
+    // Also scrub the CORE PROMPT block embedded in the lyrics response
+    lyrics = lyrics.replace(/(CORE PROMPT:\s*\n?)([^\n]+(?:\n[^\nA-Z][^\n]*)*)/i, (full, header, body) => header + scrubArtistRefs(body));
 
     // Score moved to a separate client-fired `flow-score` call to keep this
     // request under Vercel's 60s function timeout. The client renders the
