@@ -19792,7 +19792,35 @@ async function writeAllTracks() {
       const tr = alb.trackList[i];
       out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
       try {
-        const prompt = `Write a complete, production-ready song for this album track.\n\nAlbum: "${alb.name}"\nTrack role: ${tr.ttype}\nDescription: ${tr.desc}\nAlbum genre: ${alb.genre || 'pop'}\nAlbum arc context: ${alb.arc || 'part of a cohesive album'}\nTrack position: ${i+1} of ${alb.trackList.length}\n\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds\n- Every line specific — no vague emotions, no clichés\n- Dynamic contrast verse vs chorus\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style + counter-melody device]`;
+        const prompt = `Write a complete, production-ready song for this album track.
+
+Album: "${alb.name}"
+Track role: ${tr.ttype}
+Track inspiration (use as flavor, NOT literal subject): ${tr.desc}
+Album genre: ${alb.genre || 'pop'}
+Album thematic universe: ${alb.arc || 'part of a cohesive album'}
+Track position: ${i+1} of ${alb.trackList.length}
+
+INTERPRETATION RULES — important:
+- The album theme is a SHARED MOOD AND TEXTURE across all ${alb.trackList.length} tracks, NOT a literal subject to repeat.
+- Each track must tell ITS OWN specific story, character, moment, image, or feeling that LIVES INSIDE the theme's world — never just restate the theme.
+- Think of the album theme like a film's color palette: every scene has its own plot, but they all share the look. Don't write the logline into every song.
+- Use the theme to set tone, register, vocabulary range, and emotional center of gravity. Then let THIS TRACK live as a distinct moment.
+- If track ${i+1} is the OPENER it can hint at the theme broadly; if it's a DEEP CUT or INTERLUDE it can wander far from the literal theme; if it's the CLOSER it can resolve the theme. Calibrate by track role.
+
+Song rules:
+- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]
+- Hook within first 30 seconds
+- Every line specific — concrete images, specific nouns, no clichés
+- Dynamic contrast verse vs chorus
+- DO NOT name any real artists, bands, producers, or song titles in the SONG PROMPT. Use style descriptors only (genre, sub-genre, instrumentation, vocal texture, era, production style, BPM, key, mood).
+
+Respond with EXACTLY:
+TITLE: [title]
+LYRICS:
+[full lyrics]
+SONG PROMPT:
+[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style + counter-melody device; NO artist names]`;
         const raw = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
         const title  = parseSection(raw,'TITLE','LYRICS');
         const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
