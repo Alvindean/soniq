@@ -303,22 +303,186 @@ No prose. No markdown fences.`;
     const spec = req.body.spec || {};
 
     // Map Flow's natural-language genre to a brain genre key.
+    // ── Weighted-score genre classifier (replaces priority-ordered chain) ──
+    // Fixes the "Americana outlaw soul → R&B" class of bugs. A priority
+    // chain returns whichever genre's keyword appears first in the chain,
+    // not the genre with strongest evidence. This scores all genres in
+    // parallel, applies anti-token suppression, AND-gates fusion genres,
+    // and returns the highest scorer.
+    //
+    // Each taxonomy entry maps to a `brainKey` that the SONIQ brain knows
+    // about (pop / hiphop / rnb / country / folk / rock / edm / blues /
+    // jazz / gospel / reggae / latin / kpop). The richer `key` and `label`
+    // are passed into the prompt so the model writes the correct subtype.
+    const FLOW_GENRE_TAXONOMY = [
+      // Americana / Outlaw Country (the bug input) ────────────────────
+      { key:'americana', brainKey:'country', label:'Americana',
+        tokens:{ 5:['americana','outlaw country','alt-country','alt.country'],
+                 3:['outlaw','appalachia','holler','dust bowl','southern gothic'],
+                 1:['rust','creek','porch','diesel','whiskey'] },
+        antiTokens:[] },
+      { key:'outlaw_country', brainKey:'country', label:'Outlaw Country',
+        tokens:{ 5:['outlaw country','waylon','willie nelson'],
+                 3:['outlaw','prison','renegade'] }, antiTokens:[] },
+      { key:'country', brainKey:'country', label:'Country',
+        tokens:{ 5:['country','honky-tonk','honky tonk','nashville','bluegrass'],
+                 3:['truck','beer','dirt road','tailgate','boots','hometown'],
+                 1:['fiddle','banjo'] } },
+      // Folk family ────────────────────────────────────────────────────
+      { key:'dark_folk', brainKey:'folk', label:'Dark Folk',
+        tokens:{ 5:['dark folk','gothic americana','neofolk'],
+                 3:['southern gothic','funeral folk','grave','raven'] } },
+      { key:'indie_folk', brainKey:'folk', label:'Indie Folk',
+        tokens:{ 5:['indie folk','singer-songwriter','singer songwriter'],
+                 3:['fingerpicked','campfire','journal','bedroom guitar'],
+                 1:['acoustic'] } },
+      { key:'folk', brainKey:'folk', label:'Folk',
+        tokens:{ 5:['folk','traditional ballad'],
+                 3:['mountain','protest song','sea shanty'] } },
+      // R&B / Soul family — "soul" alone is WEAK and gets suppressed by
+      // americana/country/gospel context ──────────────────────────────
+      { key:'trap_soul', brainKey:'rnb', label:'Trap-Soul',
+        requires:[['trap'],['soul','moody','slow burn']],
+        tokens:{ 5:['trap soul','trap-soul'] } },
+      { key:'neo_soul', brainKey:'rnb', label:'Neo-Soul',
+        tokens:{ 5:['neo-soul','neo soul'],
+                 3:['rhodes','fender rhodes'] } },
+      { key:'rnb', brainKey:'rnb', label:'R&B',
+        tokens:{ 5:['r&b','rnb','rhythm and blues','contemporary r&b'],
+                 3:['silk','velvet'] },
+        weakAlone:{ 1:['soul','smooth'] },
+        antiTokens:['americana','outlaw','country','gospel','folk'] },
+      // Hip-Hop family ─────────────────────────────────────────────────
+      { key:'drill', brainKey:'hiphop', label:'Drill',
+        tokens:{ 5:['drill','uk drill','ny drill','chicago drill'] } },
+      { key:'phonk', brainKey:'hiphop', label:'Phonk',
+        tokens:{ 5:['phonk','drift phonk','memphis phonk'] } },
+      { key:'trap', brainKey:'hiphop', label:'Trap',
+        tokens:{ 5:['trap'],
+                 3:['808','hi-hat roll','atlanta trap'] },
+        antiTokens:['soul','rnb','r&b'] },
+      { key:'boom_bap', brainKey:'hiphop', label:'Boom Bap',
+        tokens:{ 5:['boom bap','boombap'],
+                 3:['90s rap','golden era','sp-1200','dilla','premier'] } },
+      { key:'conscious_rap', brainKey:'hiphop', label:'Conscious Rap',
+        tokens:{ 5:['conscious rap','lyrical rap','backpack rap'] } },
+      { key:'hiphop', brainKey:'hiphop', label:'Hip-Hop',
+        tokens:{ 5:['hip-hop','hiphop','hip hop','rap'],
+                 3:['emcee','bars','flow','freestyle','cypher'] } },
+      // Rock family ────────────────────────────────────────────────────
+      { key:'post_punk', brainKey:'rock', label:'Post-Punk',
+        tokens:{ 5:['post-punk','post punk','goth rock','deathrock'] } },
+      { key:'shoegaze', brainKey:'rock', label:'Shoegaze',
+        tokens:{ 5:['shoegaze','blackgaze'],
+                 3:['wall of sound','reverb wall'] } },
+      { key:'math_rock', brainKey:'rock', label:'Math Rock',
+        tokens:{ 5:['math rock','math-rock'],
+                 3:['polyrhythm','7/8','odd meter','time signature'] } },
+      { key:'metal', brainKey:'rock', label:'Metal',
+        tokens:{ 5:['metal','death metal','black metal','doom metal','djent'],
+                 3:['blast beat','growl'] } },
+      { key:'punk', brainKey:'rock', label:'Punk',
+        tokens:{ 5:['punk','hardcore punk','oi punk'] } },
+      { key:'rock', brainKey:'rock', label:'Rock',
+        tokens:{ 5:['rock','alt-rock','alternative rock','indie rock','classic rock','hard rock'],
+                 3:['riff','amp','distortion','marshall','guitar solo'] } },
+      // Electronic family ──────────────────────────────────────────────
+      { key:'synthwave', brainKey:'edm', label:'Synthwave',
+        tokens:{ 5:['synthwave','retrowave','outrun','vaporwave','darkwave'],
+                 3:['80s neon','miami vice','laser','retro-future'] } },
+      { key:'hyperpop', brainKey:'edm', label:'Hyperpop',
+        tokens:{ 5:['hyperpop','glitchpop','digicore'],
+                 3:['chopped pitched','bitcrush','100 gecs'] } },
+      { key:'dream_pop', brainKey:'edm', label:'Dream-Pop',
+        tokens:{ 5:['dream pop','dreampop','ethereal wave'],
+                 3:['hazy','drift','float','mist'] } },
+      { key:'lofi', brainKey:'edm', label:'Lo-Fi Hip-Hop',
+        tokens:{ 5:['lo-fi','lofi','lo fi','chillhop','study beats','jazzhop'],
+                 3:['vinyl crackle','tape warble'] } },
+      { key:'house', brainKey:'edm', label:'House',
+        tokens:{ 5:['house music','deep house','tech house','techno'],
+                 3:['four-on-floor','128 bpm'] } },
+      { key:'edm', brainKey:'edm', label:'EDM',
+        tokens:{ 5:['edm','electronic dance','trance','drum and bass','dnb'],
+                 3:['drop','build-up','synth'] } },
+      // Gospel / Soul / Blues / Jazz ──────────────────────────────────
+      { key:'gospel_house', brainKey:'gospel', label:'Gospel-House',
+        requires:[['gospel'],['house']],
+        tokens:{ 5:['gospel house','gospel-house','soulful house'] } },
+      { key:'gospel', brainKey:'gospel', label:'Gospel',
+        tokens:{ 5:['gospel','choir','hymn','praise & worship'],
+                 3:['church','sunday','hallelujah'] } },
+      { key:'blues', brainKey:'blues', label:'Blues',
+        tokens:{ 5:['blues','delta blues','chicago blues'],
+                 3:['harmonica','slide guitar','12-bar'] } },
+      { key:'jazz', brainKey:'jazz', label:'Jazz',
+        tokens:{ 5:['jazz','bebop','hard bop','modal jazz','jazz fusion'],
+                 3:['saxophone','swing','improv'] } },
+      // Latin / World / Reggae ────────────────────────────────────────
+      { key:'amapiano', brainKey:'latin', label:'Amapiano',
+        tokens:{ 5:['amapiano','log drum'] } },
+      { key:'afrobeats', brainKey:'latin', label:'Afrobeats',
+        tokens:{ 5:['afrobeats','afro-pop','afroswing','naija'] } },
+      { key:'reggaeton', brainKey:'latin', label:'Reggaeton',
+        tokens:{ 5:['reggaeton','perreo','dembow'] } },
+      { key:'cumbia', brainKey:'latin', label:'Cumbia',
+        tokens:{ 5:['cumbia','sonidero'] } },
+      { key:'bossa_nova', brainKey:'jazz', label:'Bossa Nova',
+        tokens:{ 5:['bossa nova','brazilian jazz','mpb'] } },
+      { key:'latin', brainKey:'latin', label:'Latin',
+        tokens:{ 5:['latin','salsa','bachata','merengue','mariachi'] } },
+      { key:'dancehall', brainKey:'reggae', label:'Dancehall',
+        tokens:{ 5:['dancehall','riddim','bashment'] } },
+      { key:'reggae', brainKey:'reggae', label:'Reggae',
+        tokens:{ 5:['reggae','roots reggae','dub'],
+                 3:['one drop','kingston','jah'] } },
+      // K-Pop, Bedroom Pop ────────────────────────────────────────────
+      { key:'kpop', brainKey:'pop', label:'K-Pop',
+        tokens:{ 5:['k-pop','kpop','korean pop'] } },
+      { key:'bedroom_pop', brainKey:'pop', label:'Bedroom Pop',
+        tokens:{ 5:['bedroom pop','lo-fi pop'],
+                 3:['tape hiss','demo aesthetic'] } },
+      { key:'indie_pop', brainKey:'pop', label:'Indie Pop',
+        tokens:{ 5:['indie pop','indie-pop','twee'] } },
+      { key:'pop', brainKey:'pop', label:'Pop',
+        tokens:{ 5:['pop','top 40','mainstream pop'],
+                 3:['hook','anthem','radio'] } },
+    ];
+
+    function flowClassifyGenre(text) {
+      const t = ' ' + String(text || '').toLowerCase() + ' ';
+      const scores = [];
+      for (const g of FLOW_GENRE_TAXONOMY) {
+        // AND-gated fusion genres: all groups must hit at least one token
+        if (g.requires) {
+          const allHit = g.requires.every(group => group.some(tok => t.includes(tok)));
+          if (!allHit) continue;
+        }
+        let s = 0;
+        const addAll = (table) => {
+          for (const w in table) {
+            for (const tok of table[w]) {
+              // simple substring with whitespace boundary
+              if (t.includes(' ' + tok + ' ') || t.includes(' ' + tok) || t.includes(tok + ' ') || t.includes(tok)) s += Number(w);
+            }
+          }
+        };
+        addAll(g.tokens || {});
+        addAll(g.weakAlone || {});
+        if (g.antiTokens && g.antiTokens.some(a => t.includes(a))) s *= 0.5;
+        if (s > 0) scores.push({ key:g.key, brainKey:g.brainKey, label:g.label, score:s });
+      }
+      scores.sort((a,b) => b.score - a.score);
+      if (!scores.length) return { brainKey:'pop', label:'Pop', key:'pop', fusion:null };
+      const top = scores[0];
+      const fusion = scores[1] && scores[1].score >= top.score * 0.7 && scores[1].brainKey !== top.brainKey
+        ? scores[1] : null;
+      return { ...top, fusion };
+    }
+
+    // Back-compat wrapper for existing call sites that just want the brain key.
     function flowGenreToBrainKey(g) {
-      const s = String(g || '').toLowerCase();
-      if (s.includes('hip') || s.includes('rap') || s.includes('trap') || s.includes('drill')) return 'hiphop';
-      if (s.includes('r&b') || s.includes('rnb') || s.includes('soul') || s.includes('neo')) return 'rnb';
-      if (s.includes('country') || s.includes('americana') || s.includes('bluegrass')) return 'country';
-      if (s.includes('folk') || s.includes('singer') || s.includes('acoustic') || s.includes('indie folk')) return 'folk';
-      if (s.includes('metal') || s.includes('punk') || s.includes('grunge') || s.includes('hard rock')) return 'rock';
-      if (s.includes('rock') || s.includes('alternative') || s.includes('indie rock') || s.includes('shoegaze') || s.includes('post-punk')) return 'rock';
-      if (s.includes('edm') || s.includes('electronic') || s.includes('house') || s.includes('techno') || s.includes('trance') || s.includes('hyperpop') || s.includes('synth')) return 'edm';
-      if (s.includes('blues')) return 'blues';
-      if (s.includes('jazz')) return 'jazz';
-      if (s.includes('gospel') || s.includes('worship') || s.includes('christian')) return 'gospel';
-      if (s.includes('reggae') || s.includes('dancehall') || s.includes('dub')) return 'reggae';
-      if (s.includes('latin') || s.includes('salsa') || s.includes('bachata') || s.includes('reggaeton')) return 'latin';
-      if (s.includes('kpop') || s.includes('k-pop')) return 'kpop';
-      return 'pop';
+      return flowClassifyGenre(g).brainKey;
     }
     function flowMoodToBrainMood(m) {
       const s = String(m || '').toLowerCase();
@@ -337,7 +501,10 @@ No prose. No markdown fences.`;
     // The brain's 62KB super-prompt was burning OpenRouter credits and
     // pushing Vercel's 60s budget. Production data still flows through
     // the Editor when the user clicks "Continue to Production".
-    const brainGenre = flowGenreToBrainKey(spec.genre || flowConcept);
+    const flowClassification = flowClassifyGenre(spec.genre || flowConcept);
+    const brainGenre = flowClassification.brainKey;
+    const flowGenreLabel = flowClassification.label;       // e.g. "Americana"
+    const flowFusionLabel = flowClassification.fusion ? flowClassification.fusion.label : null;
     const brainMood  = flowMoodToBrainMood(spec.mood || (spec.moodArc && spec.moodArc.end) || flowConcept);
     const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
     const flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
@@ -355,10 +522,10 @@ Rules:
 - Return ONLY the lyrics. No title line. No commentary. No production notes. No "CORE PROMPT". No "ARRANGEMENT". No markdown fences. Just the lyrics.`,
       prompt: `CONCEPT: ${flowConcept}
 
-GENRE: ${brainGenre}
+GENRE: ${flowGenreLabel}${flowFusionLabel ? ' × ' + flowFusionLabel + ' (fusion — honor both traditions)' : ''}
 MOOD: ${brainMood}
 ${spec.vocal ? 'VOCAL: ' + spec.vocal + '\n' : ''}${spec.tempo ? 'TEMPO: ' + spec.tempo + ' BPM\n' : ''}${spec.key ? 'KEY: ' + spec.key + '\n' : ''}
-Write the full 3-minute song now. Lyrics only.`,
+Write the full 3-minute song now. Lyrics only. The genre above is the SUBTYPE — write the song in that specific tradition (e.g. "Americana" is dust-and-pickup-truck specificity with soul-vocal phrasing, NOT generic R&B; "Trap-Soul" is moody 808s with R&B vocal hooks, NOT generic trap; "Dark Folk" is southern gothic imagery, NOT generic folk). Match the subtype's vocabulary, instrumentation references, and cadence.`,
     };
 
     const t0 = Date.now();

@@ -5279,21 +5279,74 @@ body.craft-advanced .craft-basic-only{display:none !important}
     // Lightweight client-side genre/mood pick for the reveal UI only.
     // The server brain reads the concept itself and may choose differently;
     // these are just animation values so the reels have something to land on.
+    // Client mirror of the server's weighted-score classifier. Same
+    // taxonomy shape (collapsed) so the reveal pills line up with what
+    // the server actually writes. Server is authoritative; this is just
+    // for the slot-machine animation.
+    var FLOW_CLIENT_TAXONOMY = [
+      { label:'Americana',     w5:['americana','outlaw country','alt-country'], w3:['outlaw','appalachia','holler','dust bowl','southern gothic'], w1:['rust','creek','porch','diesel','whiskey'] },
+      { label:'Outlaw Country',w5:['outlaw country'], w3:['outlaw','renegade','prison'] },
+      { label:'Country',       w5:['country','honky-tonk','nashville','bluegrass'], w3:['truck','beer','dirt road','tailgate','boots','hometown'], w1:['fiddle','banjo'] },
+      { label:'Dark Folk',     w5:['dark folk','gothic americana'], w3:['southern gothic','funeral folk','grave','raven','haunted'] },
+      { label:'Indie Folk',    w5:['indie folk','singer-songwriter','fingerpicked'], w3:['campfire','journal','bedroom guitar'], w1:['acoustic'] },
+      { label:'Folk',          w5:['folk','ballad'], w3:['mountain','protest','sea shanty'] },
+      { label:'Trap-Soul',     w5:['trap soul','trap-soul'], requires:[['trap'],['soul','moody','slow burn']] },
+      { label:'Neo-Soul',      w5:['neo-soul','neo soul'], w3:['rhodes'] },
+      { label:'R&B',           w5:['r&b','rnb','rhythm and blues'], w3:['silk','velvet'], weak:['soul','smooth'], anti:['americana','outlaw','country','gospel','folk'] },
+      { label:'Drill',         w5:['drill','uk drill','ny drill'] },
+      { label:'Phonk',         w5:['phonk','drift phonk','memphis phonk'] },
+      { label:'Trap',          w5:['trap'], w3:['808','hi-hat roll','atlanta'], anti:['soul','r&b','rnb'] },
+      { label:'Boom Bap',      w5:['boom bap','boombap'], w3:['90s rap','golden era','dilla'] },
+      { label:'Conscious Rap', w5:['conscious rap','lyrical rap'] },
+      { label:'Hip-Hop',       w5:['hip-hop','hiphop','hip hop','rap'], w3:['emcee','bars','flow','freestyle','cypher'] },
+      { label:'Post-Punk',     w5:['post-punk','post punk','goth rock'] },
+      { label:'Shoegaze',      w5:['shoegaze','blackgaze'], w3:['wall of sound'] },
+      { label:'Math Rock',     w5:['math rock'], w3:['polyrhythm','odd meter'] },
+      { label:'Metal',         w5:['metal','death metal','black metal','doom'], w3:['blast beat','growl'] },
+      { label:'Punk',          w5:['punk','hardcore punk'] },
+      { label:'Rock',          w5:['rock','alt-rock','indie rock','classic rock'], w3:['riff','amp','distortion','guitar solo'] },
+      { label:'Synthwave',     w5:['synthwave','retrowave','outrun','vaporwave','darkwave'], w3:['80s neon','miami vice','laser','retro-future'] },
+      { label:'Hyperpop',      w5:['hyperpop','glitchpop','digicore'], w3:['bitcrush','100 gecs'] },
+      { label:'Dream-Pop',     w5:['dream pop','dreampop'], w3:['hazy','drift','float','mist'] },
+      { label:'Lo-Fi Hip-Hop', w5:['lo-fi','lofi','chillhop','study beats'], w3:['vinyl crackle'] },
+      { label:'House',         w5:['house music','deep house','tech house','techno'], w3:['four-on-floor'] },
+      { label:'EDM',           w5:['edm','electronic dance','trance','drum and bass','dnb'], w3:['drop','build-up'] },
+      { label:'Gospel-House',  w5:['gospel house','gospel-house','soulful house'], requires:[['gospel'],['house']] },
+      { label:'Gospel',        w5:['gospel','choir','hymn','praise'], w3:['church','sunday','hallelujah'] },
+      { label:'Blues',         w5:['blues','delta blues'], w3:['harmonica','slide guitar','12-bar'] },
+      { label:'Jazz',          w5:['jazz','bebop','hard bop','modal jazz','jazz fusion'], w3:['saxophone','swing'] },
+      { label:'Bossa Nova',    w5:['bossa nova','brazilian jazz'] },
+      { label:'Amapiano',      w5:['amapiano','log drum'] },
+      { label:'Afrobeats',     w5:['afrobeats','afro-pop','afroswing'] },
+      { label:'Reggaeton',     w5:['reggaeton','perreo','dembow'] },
+      { label:'Latin',         w5:['latin','salsa','bachata','merengue','mariachi'] },
+      { label:'Dancehall',     w5:['dancehall','riddim'] },
+      { label:'Reggae',        w5:['reggae','dub','roots reggae'], w3:['one drop','kingston','jah'] },
+      { label:'K-Pop',         w5:['k-pop','kpop','korean pop'] },
+      { label:'Bedroom Pop',   w5:['bedroom pop','lo-fi pop'], w3:['tape hiss'] },
+      { label:'Indie Pop',     w5:['indie pop','twee'] },
+      { label:'Pop',           w5:['pop','top 40','mainstream pop'], w3:['hook','anthem','radio'] },
+    ];
+
     function flowQuickSpec(text){
-      var t = (text || '').toLowerCase();
-      var genre = 'Pop';
-      if (/\b(rap|trap|drill|bars?|hip.?hop)\b/.test(t)) genre = 'Hip-Hop';
-      else if (/\b(country|whiskey|truck|small town|highway)\b/.test(t)) genre = 'Country';
-      else if (/\b(rock|guitar|electric|loud|amp)\b/.test(t)) genre = 'Rock';
-      else if (/\b(r&b|rnb|soul|smooth|silk|velvet)\b/.test(t)) genre = 'R&B';
-      else if (/\b(folk|acoustic|campfire|fingerpicked)\b/.test(t)) genre = 'Indie Folk';
-      else if (/\b(synth|edm|electronic|neon|club|dance)\b/.test(t)) genre = 'Synthwave';
-      else if (/\b(gospel|church|hymn|praise)\b/.test(t)) genre = 'Gospel';
-      else if (/\b(blues|delta|harmonica)\b/.test(t)) genre = 'Blues';
-      else if (/\b(jazz|saxophone|swing|bebop)\b/.test(t)) genre = 'Jazz';
-      else if (/\b(dark|haunt|ghost|black|night|grave|funeral)\b/.test(t)) genre = 'Dark Folk';
-      else if (/\b(dream|hazy|drift|float|cloud|mist)\b/.test(t)) genre = 'Dream-Pop';
-      else if (/\b(neon|80s|retro|laser|cyber)\b/.test(t)) genre = 'Synthwave';
+      var t = ' ' + (text || '').toLowerCase() + ' ';
+      var scored = [];
+      for (var i = 0; i < FLOW_CLIENT_TAXONOMY.length; i++) {
+        var g = FLOW_CLIENT_TAXONOMY[i];
+        if (g.requires) {
+          var allHit = g.requires.every(function(group){ return group.some(function(tok){ return t.indexOf(tok) > -1; }); });
+          if (!allHit) continue;
+        }
+        var s = 0;
+        if (g.w5) g.w5.forEach(function(tok){ if (t.indexOf(tok) > -1) s += 5; });
+        if (g.w3) g.w3.forEach(function(tok){ if (t.indexOf(tok) > -1) s += 3; });
+        if (g.w1) g.w1.forEach(function(tok){ if (t.indexOf(tok) > -1) s += 1; });
+        if (g.weak) g.weak.forEach(function(tok){ if (t.indexOf(tok) > -1) s += 1; });
+        if (g.anti && g.anti.some(function(a){ return t.indexOf(a) > -1; })) s *= 0.5;
+        if (s > 0) scored.push({ label: g.label, score: s });
+      }
+      scored.sort(function(a,b){ return b.score - a.score; });
+      var genre = scored.length ? scored[0].label : 'Pop';
       var mood = 'Emotional';
       if (/\b(hope|hopeful|uplift|inspir|triumph|rise|win)\b/.test(t)) mood = 'Hopeful';
       else if (/\b(sad|melanchol|grief|sorrow|loss|cry|tears?|miss|gone|lost)\b/.test(t)) mood = 'Melancholic';
@@ -5310,11 +5363,18 @@ body.craft-advanced .craft-basic-only{display:none !important}
       else if (mood === 'Dark') tempo = 84;
       else if (mood === 'Hopeful') tempo = 104;
       var vocal = 'expressive vocal';
-      if (genre === 'Hip-Hop') vocal = 'rhythmic flow';
-      else if (genre === 'R&B') vocal = 'soulful tenor';
-      else if (genre === 'Indie Folk' || genre === 'Dark Folk') vocal = 'breathy singer-songwriter';
-      else if (genre === 'Country') vocal = 'warm storyteller';
-      else if (genre === 'Rock') vocal = 'gritty rasp';
+      if (/Hip-Hop|Trap|Drill|Phonk|Boom Bap|Conscious Rap/.test(genre)) vocal = 'rhythmic flow';
+      else if (/Trap-Soul|Neo-Soul|R&B/.test(genre)) vocal = 'soulful tenor';
+      else if (/Indie Folk|Dark Folk|Folk|Bedroom Pop|Singer-Songwriter/.test(genre)) vocal = 'breathy singer-songwriter';
+      else if (/Americana|Outlaw Country|Country/.test(genre)) vocal = 'gritty storyteller, southern rasp';
+      else if (/Metal|Punk|Hardcore/.test(genre)) vocal = 'aggressive shout';
+      else if (/Rock|Post-Punk|Shoegaze|Math Rock/.test(genre)) vocal = 'gritty rasp';
+      else if (/Gospel/.test(genre)) vocal = 'powerful gospel runs';
+      else if (/Blues/.test(genre)) vocal = 'weathered blues holler';
+      else if (/Jazz|Bossa Nova/.test(genre)) vocal = 'smoky conversational';
+      else if (/Reggaeton|Dancehall|Reggae/.test(genre)) vocal = 'laid-back patois flow';
+      else if (/Synthwave|Dream-Pop/.test(genre)) vocal = 'reverb-soaked airy';
+      else if (/Hyperpop/.test(genre)) vocal = 'pitched-up glitchy';
       var key = mood === 'Hopeful' || mood === 'Playful' ? 'C major' : 'A minor';
       return { genre: genre, mood: mood, tempo: tempo, vocal: vocal, key: key };
     }
