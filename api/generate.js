@@ -559,6 +559,68 @@ No prose. No markdown fences.`;
     const lockDirective = GENRE_LOCK[flowGenreLabel] || '';
     const fusionLockDirective = flowFusionLabel ? (GENRE_LOCK[flowFusionLabel] || '') : '';
 
+    // Pull the SONIQ brain's per-genre library into Flow's prompt — the
+    // ADLIB_BIBLE / GENRE_BIBLE / VOCAL_STACK_PROFILES already encode 30+
+    // genres' worth of vocabulary, structure rules, ad-lib libraries,
+    // counter-melody devices, and rule-breaker outliers. Inject only the
+    // sections relevant to the detected genre (and the fusion partner if
+    // applicable). Keeps the prompt under 4KB instead of the full 62KB.
+    let brainLibBlock = '';
+    try {
+      const brain = require('./_brain.js');
+      const buildBrainBlock = (key, label) => {
+        const gb = brain.GENRE_BIBLE && brain.GENRE_BIBLE[key];
+        const ab = brain.ADLIB_BIBLE && brain.ADLIB_BIBLE[key];
+        const vp = brain.VOCAL_STACK_PROFILES && brain.VOCAL_STACK_PROFILES[key];
+        const bp = brain.BREATH_PROFILES && brain.BREATH_PROFILES[key];
+        if (!gb && !ab && !vp && !bp) return '';
+        const parts = [`──── ${label} (${key}) ────`];
+        if (gb && gb.dna) parts.push('DNA: ' + gb.dna);
+        if (gb && gb.structure) parts.push('STRUCTURE: ' + gb.structure);
+        if (gb && gb.keys && gb.keys.length) parts.push('CORE RULES:\n- ' + gb.keys.join('\n- '));
+        if (gb && gb.counter && gb.counter.device) {
+          parts.push('COUNTER-MELODY: ' + gb.counter.device + ' — ' + (gb.counter.does || ''));
+        }
+        if (gb && gb.vocables) {
+          parts.push('VOCABLES (brain canonical): ' + gb.vocables.sounds + ' — placement: ' + (gb.vocables.notes || gb.vocables.when || ''));
+        }
+        if (ab) {
+          const adlibLine = 'AD-LIBS (use these — do NOT invent new ones for this genre): '
+            + ab.sounds.map(s => `(${s})`).join(' ')
+            + ' | placement: ' + (ab.placement || '')
+            + ' | density: ' + (ab.density || 'medium')
+            + (ab.example ? ' | example: ' + ab.example : '')
+            + (ab.outro ? ' | outro: ' + ab.outro : '');
+          parts.push(adlibLine);
+        }
+        if (vp) {
+          const v = vp;
+          const vocalLine = 'VOCAL STACK: '
+            + (v.lead ? 'lead = ' + v.lead + '; ' : '')
+            + (v.harmony ? 'harmony = ' + v.harmony + '; ' : '')
+            + (v.adlib ? 'ad-lib = ' + v.adlib + '; ' : '')
+            + (v.notes ? 'notes = ' + v.notes : '');
+          parts.push(vocalLine);
+        }
+        if (bp && (bp.technique || bp.notes)) {
+          parts.push('BREATH/PHRASING: ' + (bp.technique || '') + (bp.notes ? ' — ' + bp.notes : ''));
+        }
+        if (gb && gb.outliers && gb.outliers.length) {
+          const o = gb.outliers[0];
+          if (o && o.song && o.rule) {
+            parts.push('RULE-BREAKER REFERENCE (do not name in lyrics, study the move): ' + o.song + ' — ' + o.rule);
+          }
+        }
+        return parts.join('\n');
+      };
+      const primaryBlock = buildBrainBlock(brainGenre, flowGenreLabel);
+      const fusionBlock = flowClassification.fusion ? buildBrainBlock(flowClassification.fusion.brainKey, flowClassification.fusion.label) : '';
+      brainLibBlock = [primaryBlock, fusionBlock].filter(Boolean).join('\n\n');
+    } catch (e) {
+      // brain unavailable — proceed without it, the GENRE_LOCK still carries the weight
+      console.error('[flow-song] brain library extract failed:', e && e.message);
+    }
+
     // Build a deterministic Suno-ready style prompt from the classification
     // so the user always has SOMETHING in the "Song Prompt" tab — no extra
     // AI call required.
@@ -601,14 +663,7 @@ Use ~3-6 of these across the song to mark emotional dynamics. Example:
   [hushed] and watch the smoke crawl up the cabinet
 
 AD-LIBS — IN PARENTHESES, ON THE SAME LINE AS THE HOST LINE:
-Never on their own line. Genre-appropriate vocables:
-- Hip-Hop / Trap: (uh) (yeah) (let's go) (ayy) (skrrt) (woo)
-- R&B / Neo-Soul: (oh) (mm) (yeah) (oh baby) (woo)
-- Country / Americana: (mm) (oh) (yeah) (Lord)
-- Gospel: (hallelujah) (yes Lord) (oh) (sing it)
-- Rock: (yeah) (whoa) (alright) (come on)
-- Folk: (oh) (mm) — sparse, only at section pivots
-Example: "I held my breath (uh) waiting for the light (yeah)"
+Never on their own line. The BRAIN LIBRARY block below gives you the canonical ad-lib palette for this exact genre — use that palette, not your own invention. Density and placement rules come from the brain too. Example: "I held my breath (uh) waiting for the light (yeah)"
 
 ═══ SONG MOVEMENT (BAKE THIS INTO THE LYRICS) ═══
 
@@ -627,7 +682,7 @@ Each section must MOVE the song forward — no copy-paste verses, no recycled im
 ═══ LYRICAL DEPTH ═══
 
 - Every line specific: concrete images, particular nouns (a "Dodge with the bumper wired on" beats "an old car"; a "kitchen counter coffee ring" beats "a memory")
-- No clichés: "fire / desire", "soul / control", "rain / pain", "heart / apart"
+- Clichés are NOT banned — they're limited and twisted. If you reach for "fire / desire", twist it: "cigarette fire on the porch", "desire in the bones of the house". A straight cliché is allowed at most once per song, and only if it's load-bearing for the emotional spine. Recycled cliché rhyme pairs ("rain/pain", "heart/apart") used flat = rejected. The SAME pairs used creatively (rain that "tastes like the medicine cabinet") = welcome.
 - Internal rhyme welcome but never forced
 - Mood arc must travel — V1 emotional state ≠ Bridge state ≠ Final Chorus state
 - DO NOT name real artists, bands, producers, or songs anywhere
@@ -643,9 +698,9 @@ Return ONLY the lyrics with section tags, movement cues, feel cues, and inline a
 GENRE GUIDE: ${lockDirective}
 ${fusionLockDirective ? 'FUSION PARTNER GUIDE: ' + fusionLockDirective + '\n' : ''}MOOD: ${brainMood}
 ${spec.vocal ? 'VOCAL ARCHETYPE: ' + spec.vocal + '\n' : ''}${spec.tempo ? 'TEMPO: ' + spec.tempo + ' BPM\n' : ''}${spec.key ? 'KEY: ' + spec.key + '\n' : ''}
-CONCEPT: ${flowConcept}
+${brainLibBlock ? '═══ BRAIN LIBRARY (genre-canonical: ad-libs, vocables, structure, counter-melody, vocal stack) ═══\n' + brainLibBlock + '\n\n' : ''}CONCEPT: ${flowConcept}
 
-Write the full 3-minute ${flowGenreLabel} song now, in the tradition described above. First line MUST be "[Verse 1]". Every section MUST be tagged. Lyrics only.`,
+Write the full 3-minute ${flowGenreLabel} song now, in the tradition described above. Use the BRAIN LIBRARY's ad-lib palette and vocable placement rules — they are authoritative for this genre. First line MUST be "[Verse 1]". Every section MUST be tagged. Lyrics only.`,
     };
 
     const t0 = Date.now();
