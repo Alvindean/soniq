@@ -368,7 +368,7 @@ No prose. No markdown fences.`;
         vocal: spec.vocal || 'any',
         structure: 'standard',
         era: 'modern',
-        length: 'medium',
+        length: 'short',                        // tighter output = faster, fewer timeouts in Flow
         quality: flowAllowPlatinum ? 'viral' : 'high',
         bracketMode: 'suno',
         platform: 'suno',
@@ -400,7 +400,7 @@ No prose. No markdown fences.`;
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        2800,
+        2200,                    // shorter output = ~5-8s faster, fewer timeouts
         55000,
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
@@ -410,7 +410,13 @@ No prose. No markdown fences.`;
         msg: e && e.message,
         stack: e && e.stack && e.stack.split('\n').slice(0,3).join(' | '),
       });
-      return res.status(500).json({ error: (e && e.message) || 'Lyric generation failed' });
+      // No usage was incremented yet (that happens further down only on success),
+      // so the user is not charged. Surface that to them in the error.
+      return res.status(500).json({
+        error: (e && e.message) || 'Lyric generation failed',
+        notCharged: true,
+        message: 'No song generated — you were not charged. Try again.',
+      });
     }
 
     // Use the Suno prompt from the spec call — it's already grounded in
