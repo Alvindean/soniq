@@ -996,6 +996,72 @@ const LYRIC_CRAFT_UNIVERSAL = {
     genres: 'all'
   },
 
+  punchlineSimile: {
+    label: 'PUNCHLINE SIMILE',
+    short: `Hip-hop dense-simile mode for boast / battle / confidence verses. Target ~1 simile per bar. Every simile from a DIFFERENT domain (basketball, illness, magic, war, drugs, religion, weather, geography, food, finance) so the listener never gets stuck in one image-world. Unified by SENTIMENT — dominance, threat, swagger — not by vocabulary. Each line states the same feeling with a new vehicle. Reference cadence: "stay number one like I'm in my prime / come through in the clutch, call it Kobe time / [...] I'm magic on this track with nothing up my sleeve / the illest player in the game, no HIV / Saran wrapping verses so that shit can't breathe." Same sentiment (I'm the best), seven different domains in eight bars. East Coast battle tradition — Big Pun, Jay-Z, Eminem freestyle era, Lloyd Banks punchline run, prime Cassidy. Pair with rhymePocket for the canonical effect.`,
+    genres: ['hiphop']
+  },
+
+  rhymePocket: {
+    label: 'RHYME POCKET',
+    short: `Lock ONE end-rhyme vowel for exactly 4 bars (AAAA), then SWITCH to a new vowel for the next 4. The most common, most accessible rap-craft unit — Jay-Z, Big Pun, Biggie, Eminem signature. The lock creates momentum and audible payoff; the switch keeps the verse from going stale. Example sequence: bar 1 "prime" → bar 2 "time" → bar 3 "pine" → bar 4 "line" (long-i lock), then bar 5 "leave" → bar 6 "sleeve" → bar 7 "HIV" → bar 8 "breathe" (long-e lock), then short-i for 4, then long-oo for 4. Distinct from 'vowel-chain' (one vowel for 8-16 bars, Eminem signature — denser but harder for casual listeners). Distinct from 'multi-syllabic' (3+ syllable rhyme clusters — denser still, Big Pun signature). Pocket-4 is the audible-on-first-listen cousin. Best paired with punchlineSimile so each bar lands TWICE — once on the rhyme, once on the image.`,
+    genres: ['hiphop']
+  },
+
+  phoneticMorph: {
+    label: 'PHONETIC MORPH',
+    short: `DELIBERATELY distort a word's pronunciation just enough that ONE small bend lands MULTIPLE craft layers at once — rhyme + simile + entendre + surface meaning, all from a single morphed syllable. Distinct from homophonePun (which exploits EXISTING sound-twins like peace/piece). Phonetic morph MANUFACTURES the homophone by bending pronunciation on the fly. Hip-hop: "skeeting on his beat like it was nuthin' to it" — "nothing → nuthin' → nuttin'" makes (1) -it rhyme land, (2) simile feel idiomatic, (3) sexual entendre activate, (4) surface meaning remain. "fastly" (non-word) bent to rhyme with "classy". "drawls" = drawers (Southern morph carrying rhyme + sexual + winter-image). Pop wordplay songs (Taylor Swift "Bad Blood" / Olivia Rodrigo) bend pronunciation for hook lock-in. Comedy/novelty songs (Weird Al, Lonely Island) phonetic-morph for joke timing. Country novelty ("She thinks my tractor's sexy"). Apex practitioners: Eminem (mom's spaghetti / vomit phonetic shadow), Jay-Z (I'm not a businessman, I'm a business, man — comma-placement morph), Lil Wayne, MF DOOM. The craft is choosing WHICH word to bend so the morph carries the maximum number of simultaneous payloads.`,
+    genres: ['hiphop', 'pop', 'country']
+  },
+
+  idiomFlip: {
+    label: 'IDIOM FLIP',
+    short: `Take a dead cliché and either literalize it, weaponize it, or extend it past its normal scope. The audience hears the cliché coming, then the bar pivots so the LITERAL reading is also true. Hip-hop: "I'm a pit on the loose, off the chain, and off the name" (off-the-chain dead idiom + literal pit bull). "I'm the shit around here, no bathroom stall." "Big coat, no drawls." Country/folk: traditional sayings flipped — "the early bird gets the worm, but I'm a night owl who eats the early bird." Blues: proverbs inverted — Robert Johnson "crossroads" tradition. Pop: hooks that turn a phrase ("you're so vain, you probably think this song is about you"). Rock: anthemic cliché-as-threat ("you only get one shot"). The dead phrase wakes up because the literal reading is suddenly active. CRAFT TEST: if you can remove the literal-payload word and the bar still reads as cliché, the flip failed.`,
+    genres: ['hiphop', 'country', 'blues', 'folk', 'pop', 'rock', 'rnb']
+  },
+
+  referenceCompression: {
+    label: 'REFERENCE COMPRESSION',
+    short: `Use a single brand / name / code / cultural object as compressed shorthand for a whole feeling, claim, or scene. The listener decompresses from cultural knowledge — the vehicle is a NAME, not an analogy. Distinct from simile ("like Superman") and metaphor ("I AM the storm") — the reference is dropped as a noun and lets the listener fill in the meaning. Hip-hop examples: "Hoover" (vacuum → oral skill), "Superman" (Clark Kent transformation), "5150" (psychiatric hold), "Christmas present" (tight), "Kobe in the 4th". Country: brand-heavy world-building — Wrangler, Chevy, Marlboro, Patrón, the Mississippi, the Ryman. R&B/pop: "Tiffany blue," "Lambo doors," "Hennessy nights." Folk: place-names as compression (Tom Waits' Frank's Wild Years, Springsteen's Mansion on the Hill). The craft is choosing a reference SHARED by the target audience and PRECISE in its compression. Generic ("legend," "the bar," "the truck") fails; specific ("Kobe in the 4th," "Yuengling at the Iron Horse") lands. References compound — a single line can stack a brand, a place, and a name, each carrying a paragraph of meaning.`,
+    genres: ['hiphop', 'country', 'rnb', 'pop', 'folk', 'rock']
+  },
+
+  stackedPunchlines: {
+    label: 'STACKED PUNCHLINES',
+    short: `Pack multiple independent payloads into a single bar so the line lands two, three, or four times instead of once. Most writers fire one payload per bar; the apex move is three. Hip-hop: "I'm a pit on the loose, off the chain, and off the name" — persona + idiom-flip + brand-drop. "So much ice on the watch, I'm watching time freeze" — ice-as-jewelry + ice-as-cold + watch-as-noun + watch-as-verb + time-freeze. Country: "she got Friday on her lips, Sunday in her eyes, and Monday in the bills she can't pay" (day-of-week stack carrying lifestyle + emotion + finance). Pop/rock: hooks that stack micro-images (Tom Petty "she was an American girl, raised on promises"). Theatrical/musical: rhymed-couplet stacking (Sondheim's "Not Getting Married Today"). Stacking only works if each clause is independently strong — three weak payloads is worse than one strong one. CRAFT TEST: can each clause be quoted in isolation and still hit? If yes, the stack works. Pair with rhymePocket (hip-hop) or hook structure (pop) so the rhyme lands AT the last clause, leaving the listener on the strongest payload.`,
+    genres: ['hiphop', 'pop', 'rock', 'country', 'tvmusical']
+  },
+
+  concessionFlip: {
+    label: 'CONCESSION FLIP',
+    short: `Voice the listener's likely objection or criticism IN THE BAR, then immediately neutralize or invert it. Rhetorical move — not phonetic, not imagistic — pure structural craft. Hip-hop apex: "I'm so cocky, I know, but you'd be cocky too if you was blessed with this flow." Jay-Z "I'm not a businessman, I'm a business, man." Drake "Started from the bottom now we're here." Folk/country (confessional tradition): "I know I'm a mess, but I'm YOUR mess." "I ain't proud of where I been, but it got me here." R&B: "Yeah I'm too much — but you knew that when you signed up." Country: "I drink too much, smoke too much, love too much — but I love you the same." Pop: anticipating the breakup line ("I'm sorry I'm not perfect" → followed by reasons why imperfection is the point). The move works because it disarms the listener — by saying the critique FIRST, the singer steals the listener's exit ramp. The listener has to either accept the reframe or concede the point. CRAFT TEST: would the bar still work without the concession? If yes, the concession was decoration; the flip should be load-bearing.`,
+    genres: ['hiphop', 'folk', 'country', 'rnb', 'pop', 'blues']
+  },
+
+  themeCluster: {
+    label: 'THEME CLUSTER',
+    short: `LOCK one super-domain across an entire pocket and walk through its SUB-domains bar by bar — the opposite move from punchlineSimile (which jumps super-domains). Example: sports as super-domain → "Jumping off the ledge head first, no splash though / Judges say ten, easy win, perfect pass-flow / Head and shoulder stretch, game-winning catch / Boy, I'll be running this track like I'm Carmelita Jeter" — diving → Olympic judging → football → track, all sports. War → guns, knives, bombs, generals in sequence. Religion → priests, sins, prayers, hell. Food → cuisines or courses. The craft is exhaustive immersion: by bar 4 the listener is FULLY inside the super-domain and the punchlines hit harder because the lexicon is loaded. CRAFT TEST: can you remove any one bar and have the cluster still feel complete? If a bar is interchangeable, the cluster is shallow — pick MORE SPECIFIC sub-domains. Pairs with rhymePocket so the super-domain locks for exactly 4 bars before pivoting. Lloyd Banks, Cassidy, Big Pun "Twinz", Wu-Tang chess-as-life clusters, Kendrick "Alright" struggle-cluster.`,
+    genres: ['hiphop']
+  },
+
+  personaDrop: {
+    label: 'PERSONA DROP',
+    short: `Name yourself in the bar — usually 3rd person — as a brand assertion or a way to voice your own critics/observers. The reference IS the rapper. Examples: "Black Ice will show up and shut down your show" (3rd-person brand drop). "They're like, whoa, slow down, Al, you're killing them" (1st-name as observer voicing). Jay-Z/Hov/Hova multi-name signature. Eminem/Slim Shady/Marshall — different name = different persona payload. MF DOOM/Viktor Vaughn/Metal Fingers/King Geedorah. Tyler/Wolf/Igor/Sir Baudelaire. Kendrick/K-Dot/Kung Fu Kenny. The craft has two flavors: (1) BRAND assertion — say your name like it's a force ("when Hov dropped Reasonable Doubt..."); (2) MULTIPLICITY — different name signals different mental mode in the song. Listeners track this — the name-drop is a structural marker. CRAFT TEST: would the bar work with "I" instead of the name? If yes, the persona drop wasn't earning its place. The name should carry meaning the pronoun can't.`,
+    genres: ['hiphop']
+  },
+
+  metaReference: {
+    label: 'META REFERENCE',
+    short: `Bar acknowledges the song-as-recording, the freestyle-as-broadcast, the rapper-as-product, or the listener-as-audience IN the bar itself — fourth-wall break. Reference: "I'm an entrepreneur, so that tape's for sale" — subverts "gentleman won't tell" by monetizing the tell. Other apex moves: Jay-Z "I dumb down for my audience, double my dollars" (admits the artistic concession to the listener). MF DOOM "Just remember ALL CAPS when you spell the man name." OutKast "Y'all don't want to hear me, you just want to dance." Kendrick "DAMN." entire album commenting on its own reception. The craft is breaking the song's own frame to comment on it — the listener gets pulled out of the diegetic boast and into the meta-layer. Works because it disarms suspicion: by admitting the artifice, the rapper claims more authority. Pair sparingly — too many meta-references collapse the song into commentary. One per verse, maximum two per song.`,
+    genres: ['hiphop', 'pop', 'rock', 'folk']
+  },
+
+  anaphora: {
+    label: 'ANAPHORA',
+    short: `Repeat the SAME syntactic frame at the start of consecutive lines, varying only the payload. The repetition compounds the meaning — each iteration raises the stakes or deepens the theme. Hip-hop: "So much ice on the watch, I'm watching time freeze / So much game in my DNA, I'm starting my own league / So much dick in your girl, we look like Siamese twins" — "So much X" carries three escalating boasts. Jay-Z "Big Pimpin'" anaphora-on-greed. Future "Mask Off" anaphora-on-substance. Kendrick "DNA" anaphora-on-identity. Gospel: "So much glory / so much grace / so much mercy" — anaphora compounds praise. Country list-songs: "There's a tear in my beer, there's a hole in my heart, there's a song on the jukebox no one's playing" — anaphora compounds loss. Folk: Springsteen "Born in the U.S.A." chorus anaphora. Blues: classic AAB structure IS anaphora at line level (line 1 = line 2, then turn). Rock: U2 "One love, one blood, one life." Pop: Taylor Swift "All Too Well" anaphora compounds memory. The craft is choosing the FRAME that's frictionless enough to repeat 3+ times but RICH enough that each repetition can carry a different payload. CRAFT TEST: if the frame feels mechanical by the third repetition, the frame was wrong. Pick a frame that gets STRONGER with repetition, not weaker.`,
+    genres: 'all'
+  },
+
   metaphor: {
     label: 'METAPHOR',
     short: `Direct substitution — no "like/as." "You ARE the storm." Must be earned — no generic imagery. Use the genre's home vocabulary (blues=crossroads/river, country=road/fire, gospel=light/shepherd, hip-hop=game/throne/block) OR introduce one fresh metaphor per song, never both.`,

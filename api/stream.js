@@ -268,7 +268,7 @@ const PLAN_LIMITS = {
 };
 
 // Emails that always get Studio plan + unlimited access (no admin token needed)
-const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com']);
+const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'amdesousa.exo@gmail.com']);
 
 // Plans that use monthly counting (free uses lifetime)
 const MONTHLY_LIMIT_PLANS = new Set([

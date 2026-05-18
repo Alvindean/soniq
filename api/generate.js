@@ -53,7 +53,7 @@ function getThisMonth() {
 }
 
 // Emails that always get Studio plan + unlimited access
-const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com']);
+const ADMIN_EMAILS = new Set(['thealvindean@gmail.com', 'lamusicproducers8@gmail.com', 'amdesousa.exo@gmail.com']);
 
 // Must match stream.js exactly — generate.js is a fallback path for the same users
 const PLAN_LIMITS = {
@@ -107,7 +107,6 @@ async function callOpenRouter(apiKey, messages, system, max_tokens) {
   const orMsgs = system ? [{role:'system',content:system}, ...messages] : messages;
   let r = await orRequest(apiKey, orMsgs, max_tokens);
 
-  // On 402, extract the affordable token count and retry once
   if (r.status === 402) {
     const t = await r.text();
     const match = t.match(/can only afford (\d+)/);
@@ -188,30 +187,32 @@ module.exports = async function handler(req, res) {
   // (Was previously nested inside the spec/song if-block, which made the
   // function declaration's block-scoped hoist invisible from flow-score.)
   async function flowCallAI(messages, system, max_tokens, budgetMs) {
-    // Tolerate the prod env var being named `Claude` instead of
-    // ANTHROPIC_API_KEY. Without this fallback, Anthropic primary is
-    // disabled and every call routes to OpenRouter only — which can push
-    // a 62KB brain prompt + 4000-token output past Vercel's 60s timeout.
     const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
     const ok = process.env.OPENROUTER_API_KEY;
     if (!ak && !ok) throw new Error('No AI provider configured');
-    // Hard internal timeout — must return BEFORE Vercel's 60s axe.
-    // CRITICAL: clear the setTimeout when the AI call wins, otherwise the
-    // late-firing rejection becomes an unhandled promise rejection.
-    const limit = typeof budgetMs === 'number' ? budgetMs : 50000;
-    const withTimeout = function(promise){
+    const limit = typeof budgetMs === 'number' ? budgetMs : 55000;
+    const tStart = Date.now();
+    const withTimeout = function(promise, ms){
       let to;
       const guard = new Promise((_, rej) => {
-        to = setTimeout(() => rej(new Error('AI timeout (' + limit + 'ms)')), limit);
+        to = setTimeout(() => rej(new Error('AI timeout (' + ms + 'ms)')), ms);
       });
-      guard.catch(() => {}); // belt-and-suspenders against late rejection
+      guard.catch(() => {});
       return Promise.race([promise, guard]).finally(() => clearTimeout(to));
     };
+    // Give the primary attempt ~55% of the budget so the fallback has real
+    // time to run. Before: Anthropic burned the whole 50s, OpenRouter fallback
+    // ran against a fresh 50s timer but Vercel killed the lambda at 60s — so
+    // the fallback effectively never completed and users got AI timeout.
+    const primaryMs = ak && ok ? Math.floor(limit * 0.55) : limit;
     try {
-      if (ak) return await withTimeout(callAnthropic(ak, messages, system, max_tokens));
-      return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
+      if (ak) return await withTimeout(callAnthropic(ak, messages, system, max_tokens), primaryMs);
+      return await withTimeout(callOpenRouter(ok, messages, system, max_tokens), limit);
     } catch (e) {
-      if (ok && ak) return await withTimeout(callOpenRouter(ok, messages, system, max_tokens));
+      const remaining = limit - (Date.now() - tStart) - 500;
+      if (ok && ak && remaining > 5000) {
+        return await withTimeout(callOpenRouter(ok, messages, system, max_tokens), remaining);
+      }
       throw e;
     }
   }
@@ -399,8 +400,8 @@ No prose. No markdown fences.`;
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        2800,                    // restored — 2000 was truncating some songs to just the title; brain needs ~2200-2500 for full song + production sections
-        50000,                   // hard 50s internal timeout — fails clean before Vercel kills the function
+        2800,
+        55000,
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
     } catch (e) {

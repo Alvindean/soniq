@@ -36,7 +36,8 @@ const ADMIN_EMAILS = new Set(_envEmails.length ? _envEmails : [
   'lamusicproducers8@gmail.com',
   'alvin@nuwavmedia.com',
   'rainfiremusic@gmail.com',
-  'eric@warkershall.com'
+  'eric@warkershall.com',
+  'amdesousa.exo@gmail.com'
 ]);
 
 // ---------------------------------------------------------------------------

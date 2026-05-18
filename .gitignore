@@ -3,7 +3,20 @@ node_modules/
 .vercel/
 .env
 .env.local
+.env.test
+.env.*
 *.log
+
+# Local dev scripts & dumps — never commit
+test-*.js
+verify-admin-user.js
+create-admin-user.js
+inspect-punchline-prompt.js
+dump-paste-ready.js
+patch-*.js
+SYSTEM_PROMPT.txt
+USER_PROMPT.txt
+punchline-prompt-dump.txt
 # Proprietary IP documentation — local only, never push
 ip-docs/
 
