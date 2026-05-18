@@ -509,23 +509,93 @@ No prose. No markdown fences.`;
     const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
     const flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
 
+    // Genre-specific vocabulary + sound guidance — embedded in the prompt
+    // so the model can't drift to an adjacent genre based on a single token
+    // in the concept. The LOCK section makes the genre non-negotiable.
+    const GENRE_LOCK = {
+      'Americana':       'rusted-pickup-truck / Appalachian-creek / front-porch-whiskey imagery; weathered storyteller voice; soul-vocal PHRASING over country/folk roots — NOT R&B; instruments: acoustic guitar, pedal steel, dobro, upright bass, brushed snare, mandolin; 78-100 BPM; minor or modal keys; gritty male/female lead, often with harmony stack',
+      'Outlaw Country':  'prison-letter / dust-road / devil-on-my-shoulder imagery; renegade defiance; instruments: telecaster, walking bass, train-beat drums, fiddle, harmonica; 92-118 BPM; A minor or D major; weathered baritone lead',
+      'Country':         'small-town specificity (gas station names, county roads, county fair); first-person storyteller; instruments: acoustic guitar, fiddle, pedal steel, banjo, tight rhythm section; 96-130 BPM; major keys with the IV chord; warm vocal',
+      'Dark Folk':       'southern gothic imagery (raven, hymn, grave, creek baptism); minor-key dread; instruments: fingerpicked acoustic, droning cello, hand drums, distant pump organ; 68-86 BPM; A minor or D Dorian; haunted breathy vocal',
+      'Indie Folk':      'first-person diary specificity; fingerpicked acoustic; instruments: nylon-string or steel-string acoustic, brushed snare, light upright bass, occasional violin; 70-95 BPM; major or modal keys; intimate breathy vocal',
+      'Folk':            'storyteller narrative, communal feel; instruments: acoustic guitar, banjo, harmonica, simple percussion; 90-120 BPM; major keys; conversational vocal',
+      'Trap-Soul':       'moody nocturnal R&B over trap drums; instruments: spacious 808s, hi-hat rolls, lush sub-bass, melodic synth pad, sparse piano; 70-85 BPM half-time; minor keys; falsetto-laced R&B vocal',
+      'Neo-Soul':        'jazz-soul progressions, lush chord voicings; instruments: Rhodes piano, fretless bass, brush drums, vintage guitar, Hammond B3; 75-95 BPM; minor 9th and 11th chords; conversational soulful vocal with runs',
+      'R&B':             'contemporary R&B production; instruments: glossy synths, programmed drums, 808 sub, vocal stacks; 70-95 BPM; minor keys; sultry tenor or alto lead with airy ad-libs',
+      'Drill':           'gritty street narrative, slide-808 menace; instruments: heavy sliding 808s, sparse hi-hats with skittering rolls, dark minor synth, no melody; 138-148 BPM; minor; deadpan flow',
+      'Phonk':           'Memphis horror imagery, drift-car aesthetic; instruments: distorted 808, cowbell pattern, slowed Memphis chants, lo-fi vinyl crackle, demonic ad-libs; 140-160 BPM; minor; pitched-down delivery',
+      'Trap':            'Atlanta trap signature — 808 melodies, triplet hats, drip imagery; instruments: 808 bass, hi-hat rolls, dark synth lead, vocal ad-libs; 130-150 BPM half-time; minor; melodic mumble or sharp staccato delivery',
+      'Boom Bap':        '90s golden-era boom bap; instruments: SP-1200/MPC drums, walking upright bass loop, chopped jazz/soul sample, scratch hook; 88-96 BPM; punchy snare on the 2 and 4; lyrical conversational delivery',
+      'Conscious Rap':   'social-political weight, specific narrative detail; instruments: live or sampled soul/jazz, warm sub bass, head-nodding drums; 85-95 BPM; pocket-driven; thoughtful spoken-cadence flow',
+      'Hip-Hop':         'genre-spanning rap — boom-bap drums or modern trap as fits; rhyme-dense with internal rhyme; instruments: drums + bass + sample/melody hook; 85-100 BPM',
+      'Post-Punk':       'angular guitars, claustrophobic mood; instruments: chorused-out clean guitar, melodic prominent bass, motorik drums, cold reverb; 115-145 BPM; minor; deadpan baritone delivery',
+      'Shoegaze':        'wall-of-sound fuzz with melodic chord changes buried under reverb; instruments: heavily distorted shimmer-reverb guitar, dreamy synth, motorik drums, soft buried vocal; 88-115 BPM; warm major or modal',
+      'Math Rock':       'odd time signatures, polyrhythmic interplay; instruments: clean tapped guitar, off-grid drums, melodic bass; tempo varies wildly; complex; conversational vocal',
+      'Metal':           'heavy palm-muted riffs, double-bass drums; instruments: drop-tuned guitar, distorted bass, blast-beat or galloping drums; 90-160 BPM; minor; growl or clean wail vocal',
+      'Punk':            '1-2-3-4 power chord, fast 3-chord progressions; instruments: distorted guitar, driving bass, kick-snare punk beat; 160-200 BPM; major or power chords; shouted vocal',
+      'Rock':            'guitar-forward arrangement; instruments: distorted electric guitar, bass guitar, full drum kit, optional piano/organ; 100-140 BPM; major or minor; confident lead vocal',
+      'Synthwave':       '80s neon-night driving aesthetic; instruments: gated reverb snares, FM bass, arpeggiated synth, hi-tom fills; 100-126 BPM; major or minor; airy vocal with chorus',
+      'Hyperpop':        'pitched-up bitcrushed mania; instruments: glitched 808, pitched-up vocal stacks, sugar-rush synth, sudden tempo shifts; 140-180 BPM; major; manic high-register vocal',
+      'Dream-Pop':       'hazy reverb-soaked melodies; instruments: shimmer-reverb guitar, soft synth pad, light drums, airy bass; 90-110 BPM; major or modal; breathy female lead',
+      'Lo-Fi Hip-Hop':   'sample-based head-nod beats; instruments: vinyl-crackle drum loop, chopped piano/Rhodes sample, simple bass; 75-90 BPM; minor; spoken-word or no vocal',
+      'House':           'four-on-the-floor groove; instruments: kick on every beat, hi-hat on offbeat, deep bass, soulful chord stab, vocal hook; 120-128 BPM; major or minor; soulful diva-style vocal',
+      'EDM':             'big-room build/drop; instruments: supersaw lead, sub-heavy drop, snare buildup, vocal chops; 128-140 BPM; major; vocal hook then instrumental drop',
+      'Gospel-House':    'church-organ stab over 4/4 house pump; instruments: Hammond B3, four-on-floor drums, gospel choir stack, hand claps; 122-128 BPM; major; testimony-style soulful vocal',
+      'Gospel':          'praise & worship testimony; instruments: piano, Hammond B3, bass, drums, choir; 75-115 BPM; major; powerful run-laden vocal',
+      'Blues':           '12-bar form, call-and-response phrasing; instruments: electric guitar with bends, walking bass, shuffle drums, harmonica; 70-110 BPM; dominant 7th progressions; weathered holler',
+      'Jazz':            'sophisticated chord substitutions; instruments: piano or guitar comping, walking upright bass, brushed drums, optional horns; 90-130 BPM; modal or ii-V-I; smoky conversational vocal',
+      'Bossa Nova':      'Brazilian samba-jazz; instruments: nylon-string guitar with the bossa pattern, soft brush drums, melodic bass, optional muted trumpet; 110-130 BPM; major 7th chords; intimate breathy vocal',
+      'Amapiano':        'log-drum-driven SA house; instruments: log drum bass, shaker, soft kick, jazz piano, vocal chants; 110-115 BPM; minor; smooth groove with talk-singing',
+      'Afrobeats':       'syncopated polyrhythmic groove; instruments: log drum or shekere, talking drum, melodic synth, vocal harmony stack; 100-115 BPM; major or modal; melodic patois-tinged vocal',
+      'Reggaeton':       'dembow rhythm; instruments: dembow pattern (boom-ch-boom-chick), 808 bass, plucky synth, vocal ad-libs; 90-100 BPM; minor; rhythmic Spanish flow',
+      'Latin':           'broad Latin — depends on subtype; instruments: nylon guitar, congas, brass, accordion; tempo varies by subtype',
+      'Dancehall':       'reggae-derived bashment; instruments: digital reggae riddim, heavy bass, vocal ad-libs; 90-110 BPM; minor; patois delivery',
+      'Reggae':          'one-drop drum pattern, offbeat skank; instruments: offbeat rhythm guitar, prominent bass, one-drop drums, optional Hammond bubble; 70-90 BPM; major or minor; conscious lyrical content',
+      'K-Pop':           'maximalist pop with genre-jumping section transitions; instruments: pop production with EDM/hip-hop/R&B section swaps, vocal stacks, rap break; 90-130 BPM; major; multi-voice arrangement',
+      'Bedroom Pop':     'demo-aesthetic intimacy; instruments: tape-saturated everything, simple drum machine, picked guitar or keys, soft synth; 80-105 BPM; major; close-mic-ed soft vocal',
+      'Indie Pop':       'twee jangle or polished indie; instruments: chorused clean guitar, simple bass, light drums, optional synth, vocal hook; 100-130 BPM; major; bright wistful vocal',
+      'Pop':             'radio-ready hook focus; instruments: programmed drums, pop bass, synth or piano, vocal stacks; 100-128 BPM; major; clean lead with stacked harmony',
+    };
+    const lockDirective = GENRE_LOCK[flowGenreLabel] || '';
+    const fusionLockDirective = flowFusionLabel ? (GENRE_LOCK[flowFusionLabel] || '') : '';
+
+    // Build a deterministic Suno-ready style prompt from the classification
+    // so the user always has SOMETHING in the "Song Prompt" tab — no extra
+    // AI call required.
+    const sunoPromptParts = [];
+    sunoPromptParts.push(flowGenreLabel.toLowerCase());
+    if (flowFusionLabel) sunoPromptParts.push('blended with ' + flowFusionLabel.toLowerCase());
+    if (spec.tempo) sunoPromptParts.push(spec.tempo + ' BPM');
+    if (spec.key) sunoPromptParts.push(spec.key);
+    if (spec.vocal) sunoPromptParts.push(spec.vocal);
+    // Lift the instrument hints out of the lock string (everything between "instruments:" and ";")
+    const instMatch = lockDirective.match(/instruments?:\s*([^;]+)/i);
+    if (instMatch) sunoPromptParts.push(instMatch[1].trim());
+    sunoPromptParts.push(brainMood.toLowerCase());
+    const generatedSunoPrompt = sunoPromptParts.filter(Boolean).join(', ');
+
     const built = {
       system: `You are a world-class songwriter. Write ONE complete, performance-ready 3-minute song.
 
-Rules:
-- Length: roughly 3 minutes — verse / pre-chorus (if appropriate) / chorus / verse / pre-chorus / chorus / bridge / final chorus / outro. ~48-72 lines total.
-- Use section markers on their own lines: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Add [Hook], [Drop], [Refrain] only if the genre demands it.
-- Ad-libs in parentheses ON THE SAME LINE as their host line (e.g. "I held my breath (uh) waiting for the light"). Don't put ad-libs on their own line.
-- Every line must be specific — concrete images, particular nouns, the actual texture of the moment. No "fire / desire", no "soul / control", no clichés.
-- Match the genre's structural conventions (a country song should sound country, a trap song should sound trap, a folk song should sound folk).
+NON-NEGOTIABLE FORMAT RULES:
+- MUST start with the marker [Verse 1] on its own line. No title, no preamble, no commentary — just [Verse 1] on line 1, then the verse.
+- Use section markers on their own lines: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Final Chorus], [Outro]. Every section must be marked. Add [Hook], [Drop], [Refrain] only when the genre traditionally uses them.
+- Length: roughly 3 minutes — verse → pre-chorus (if appropriate) → chorus → verse → pre-chorus → chorus → bridge → final chorus → outro. ~48-72 lyric lines total.
+- Ad-libs in parentheses ON THE SAME LINE as their host line. Example: "I held my breath (uh) waiting for the light". NEVER put ad-libs on their own line.
+- Every lyric line must be specific — concrete images, particular nouns, the actual texture of the moment. No "fire / desire", no "soul / control", no clichés.
 - DO NOT name real artists, bands, producers, or songs anywhere.
-- Return ONLY the lyrics. No title line. No commentary. No production notes. No "CORE PROMPT". No "ARRANGEMENT". No markdown fences. Just the lyrics.`,
-      prompt: `CONCEPT: ${flowConcept}
 
-GENRE: ${flowGenreLabel}${flowFusionLabel ? ' × ' + flowFusionLabel + ' (fusion — honor both traditions)' : ''}
-MOOD: ${brainMood}
-${spec.vocal ? 'VOCAL: ' + spec.vocal + '\n' : ''}${spec.tempo ? 'TEMPO: ' + spec.tempo + ' BPM\n' : ''}${spec.key ? 'KEY: ' + spec.key + '\n' : ''}
-Write the full 3-minute song now. Lyrics only. The genre above is the SUBTYPE — write the song in that specific tradition (e.g. "Americana" is dust-and-pickup-truck specificity with soul-vocal phrasing, NOT generic R&B; "Trap-Soul" is moody 808s with R&B vocal hooks, NOT generic trap; "Dark Folk" is southern gothic imagery, NOT generic folk). Match the subtype's vocabulary, instrumentation references, and cadence.`,
+GENRE LOCK — THIS IS NOT NEGOTIABLE:
+The song MUST be in this genre. Do not drift to an adjacent style based on stray words in the concept. If the genre below is "Americana" you are writing an AMERICANA song — not R&B, not pop, not generic country. If you write the wrong genre this output is rejected.
+
+Return ONLY the lyrics with section markers. No title line. No commentary. No production notes. No "CORE PROMPT". No "ARRANGEMENT". No markdown fences.`,
+      prompt: `GENRE LOCK: ${flowGenreLabel}${flowFusionLabel ? ' × ' + flowFusionLabel + ' (fusion — honor BOTH traditions; do not collapse to just one)' : ''}
+GENRE GUIDE: ${lockDirective}
+${fusionLockDirective ? 'FUSION PARTNER GUIDE: ' + fusionLockDirective + '\n' : ''}MOOD: ${brainMood}
+${spec.vocal ? 'VOCAL ARCHETYPE: ' + spec.vocal + '\n' : ''}${spec.tempo ? 'TEMPO: ' + spec.tempo + ' BPM\n' : ''}${spec.key ? 'KEY: ' + spec.key + '\n' : ''}
+CONCEPT: ${flowConcept}
+
+Write the full 3-minute ${flowGenreLabel} song now, in the tradition described above. First line MUST be "[Verse 1]". Every section MUST be tagged. Lyrics only.`,
     };
 
     const t0 = Date.now();
@@ -575,7 +645,7 @@ Write the full 3-minute song now. Lyrics only. The genre above is the SUBTYPE �
       .replace(/,\s*,/g, ',')
       .replace(/\s{2,}/g, ' ')
       .trim();
-    let sunoPrompt = scrubArtistRefs(spec.sunoPrompt || '');
+    let sunoPrompt = scrubArtistRefs(spec.sunoPrompt || generatedSunoPrompt || '');
     // Also scrub the CORE PROMPT block embedded in the lyrics response
     lyrics = lyrics.replace(/(CORE PROMPT:\s*\n?)([^\n]+(?:\n[^\nA-Z][^\n]*)*)/i, (full, header, body) => header + scrubArtistRefs(body));
 
