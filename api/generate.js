@@ -333,57 +333,33 @@ No prose. No markdown fences.`;
       return 'Emotional';
     }
 
-    let built, brainGenre, flowAllowPlatinum;
-    try {
-      const brain = require('./_brain.js');
-      // Derive genre + mood directly from the concept text (and any
-      // optional spec hints the client passed). No upstream AI spec call.
-      brainGenre = flowGenreToBrainKey(spec.genre || flowConcept);
-      const brainMood = flowMoodToBrainMood(
-        spec.mood || (spec.moodArc && spec.moodArc.end) || flowConcept
-      );
-      // Topic = the concept itself, with a brief production cue so the
-      // brain emits section markers, ad-libs in parens, and Suno tags.
-      // STRICT: no artist names anywhere in the output. Use style
-      // descriptors only (genre, instrumentation, vocal texture, era,
-      // production style). Naming real artists in a Suno prompt creates
-      // legal + commercial risk and the user explicitly disallowed it.
-      const enrichedTopic =
-        `${flowConcept}\n\n` +
-        `Write the song now. Requirements:\n` +
-        `- Add real [Verse], [Pre-Chorus], [Chorus], [Bridge] markers, plus instrumental cues like [Guitar Solo] or [Drum Fill] when the genre calls for them.\n` +
-        `- Ad-libs in parentheses on the same line (e.g. "I held my breath (uh) waiting for the light").\n` +
-        `- After the lyrics, output the CORE PROMPT, ARRANGEMENT BLUEPRINT, VOCAL DIRECTION, and SONIC REFERENCES sections.\n` +
-        `- DO NOT name any real artists, bands, producers, or song titles in the CORE PROMPT or any prompt-facing section. Use style descriptors only (genre, sub-genre, instrumentation, vocal texture, era, production style, BPM, key, mood). The "SONIC REFERENCES" section may describe the FEEL of an era/scene/movement, but must NOT name a specific artist or song.\n` +
-        `- The lyrics must be a complete singable song — at least 3 verses, a chorus, and a bridge. Never just an outline.`;
+    // Flow song: ONE direct AI call, lyrics only, no production brief.
+    // The brain's 62KB super-prompt was burning OpenRouter credits and
+    // pushing Vercel's 60s budget. Production data still flows through
+    // the Editor when the user clicks "Continue to Production".
+    const brainGenre = flowGenreToBrainKey(spec.genre || flowConcept);
+    const brainMood  = flowMoodToBrainMood(spec.mood || (spec.moodArc && spec.moodArc.end) || flowConcept);
+    const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
+    const flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
 
-      // Plan-gate platinum + premium quality to match stream.js. Free-tier
-      // users still get Flow, just on the same brain budget Write gives them.
-      const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
-      flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
-      built = brain.buildSongPrompt({
-        genre: brainGenre,
-        topic: enrichedTopic,
-        mood: brainMood,
-        vocal: spec.vocal || 'any',
-        structure: 'standard',
-        era: 'modern',
-        length: 'short',                        // tighter output = faster, fewer timeouts in Flow
-        quality: flowAllowPlatinum ? 'viral' : 'high',
-        bracketMode: 'suno',
-        platform: 'suno',
-        platinum: flowAllowPlatinum,
-        isAdmin: isAdmin,
-        plan: flowPlan,
-      });
-    } catch (e) {
-      console.error('[flow-song] brain.buildSongPrompt failed:', e && e.message);
-      return res.status(500).json({ error: 'Failed to build song prompt' });
-    }
+    const built = {
+      system: `You are a world-class songwriter. Write ONE complete, performance-ready 3-minute song.
 
-    if (!built || !built.prompt || !built.system) {
-      return res.status(500).json({ error: 'Brain returned empty prompt' });
-    }
+Rules:
+- Length: roughly 3 minutes — verse / pre-chorus (if appropriate) / chorus / verse / pre-chorus / chorus / bridge / final chorus / outro. ~48-72 lines total.
+- Use section markers on their own lines: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]. Add [Hook], [Drop], [Refrain] only if the genre demands it.
+- Ad-libs in parentheses ON THE SAME LINE as their host line (e.g. "I held my breath (uh) waiting for the light"). Don't put ad-libs on their own line.
+- Every line must be specific — concrete images, particular nouns, the actual texture of the moment. No "fire / desire", no "soul / control", no clichés.
+- Match the genre's structural conventions (a country song should sound country, a trap song should sound trap, a folk song should sound folk).
+- DO NOT name real artists, bands, producers, or songs anywhere.
+- Return ONLY the lyrics. No title line. No commentary. No production notes. No "CORE PROMPT". No "ARRANGEMENT". No markdown fences. Just the lyrics.`,
+      prompt: `CONCEPT: ${flowConcept}
+
+GENRE: ${brainGenre}
+MOOD: ${brainMood}
+${spec.vocal ? 'VOCAL: ' + spec.vocal + '\n' : ''}${spec.tempo ? 'TEMPO: ' + spec.tempo + ' BPM\n' : ''}${spec.key ? 'KEY: ' + spec.key + '\n' : ''}
+Write the full 3-minute song now. Lyrics only.`,
+    };
 
     const t0 = Date.now();
     console.log('[flow-song] start', {
@@ -400,8 +376,8 @@ No prose. No markdown fences.`;
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        2200,                    // shorter output = ~5-8s faster, fewer timeouts
-        55000,
+        1800,                    // 3-min song fits in 1500-1800 tokens; no production brief tail
+        40000,                   // tighter internal timeout (was 55s) — abort & refund 15s earlier on slow upstream
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
     } catch (e) {
