@@ -4842,7 +4842,12 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <div class="result-header">
       <div class="result-title-block">
         <div class="result-song-title" id="fres-title">—</div>
+        <div class="fres-verdict-line" id="fres-verdict-line" style="display:none"></div>
         <div class="suno-chips" id="fres-suno-chips"></div>
+      </div>
+      <div class="fres-hook-card" id="fres-hook-card" style="display:none">
+        <div class="fres-hook-label">♥ Hook</div>
+        <div class="fres-hook-lines" id="fres-hook-lines"></div>
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="flow-save-btn" onclick="saveFlowToLib()">💾 Save</button>
@@ -4862,10 +4867,6 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="btn btn-sm" onclick="flowSendToWrite()" title="Send concept to the Write page">➡️ Send to Write</button>
         <button class="btn btn-cyan btn-sm" onclick="flowContinueToProduction()" title="Continue to the Editor — get production brief, plugins, key, mastering target, visual prompt">🎛️ Continue to Production →</button>
       </div>
-    </div>
-    <div class="quick-copy-bar visible" id="fres-quick-copy" style="display:flex;gap:8px;padding:10px 16px">
-      <button class="qcb-btn qcb-primary" onclick="flowCopyLyrics()" title="Copy lyrics only">📋 Copy Lyrics</button>
-      <button class="qcb-btn qcb-primary" onclick="flowCopyPrompt()" title="Copy the Suno style prompt">🎛 Copy Song Prompt</button>
     </div>
     <div class="flow-tabs" id="fres-tabs" style="display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--b1);margin-top:4px">
       <button class="flow-tab on" data-tab="lyrics" onclick="flowSwitchTab('lyrics')">Lyrics</button>
@@ -4900,6 +4901,12 @@ body.craft-advanced .craft-basic-only{display:none !important}
     .flow-section{display:none;white-space:pre-wrap;font-family:var(--font);font-size:14px;line-height:1.7;color:var(--tx1);padding:16px 0}
     .flow-section.on{display:block}
     .flow-section.muted{color:var(--tx3);font-style:italic}
+    /* Verdict subtitle under title */
+    .fres-verdict-line{font-style:italic;color:var(--tx2);font-size:13px;line-height:1.55;margin-top:6px;max-width:62ch}
+    /* Hook Isolation callout */
+    .fres-hook-card{margin:14px 0 6px;padding:14px 18px;background:var(--s3);border:1px solid var(--b1);border-left:3px solid var(--amber);border-radius:var(--r2)}
+    .fres-hook-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:700;margin-bottom:6px}
+    .fres-hook-lines{font-size:15px;line-height:1.65;color:var(--tx1);white-space:pre-wrap;font-weight:500;margin:0}
     /* Song-generation progress bar (shown while flow-song is in flight) */
     #fres-progress-bar{display:none;margin:14px auto 0;max-width:560px;text-align:left}
     #fres-progress-bar.active{display:block}
@@ -5455,17 +5462,36 @@ body.craft-advanced .craft-basic-only{display:none !important}
         var titleEl = document.getElementById('fres-title');
         var bodyEl = document.getElementById('fres-body');
         var sunoEl = document.getElementById('fres-suno-chips');
-        if (titleEl) titleEl.textContent = d.title || spec.title || 'Untitled';
-        // Parse the brain's response into tabs: lyrics + per-section briefs.
+        // Parse the brain's response into the full Lucky-grade section set.
         var parsed = flowParseBrain(d.lyrics || '');
-        var sunoPrompt = parsed.corePrompt || d.sunoPrompt || '';
+        // CLEAN title — prefer parsed TITLE: section, fall back to spec/server,
+        // never leave the markdown # header in front of it.
+        var cleanTitle = (parsed.title || d.title || spec.title || 'Untitled').replace(/["""]/g,'').trim();
+        if (titleEl) titleEl.textContent = cleanTitle;
+        // Verdict subtitle
+        var verdictLine = document.getElementById('fres-verdict-line');
+        if (verdictLine) {
+          if (parsed.verdict) { verdictLine.textContent = parsed.verdict; verdictLine.style.display = 'block'; }
+          else { verdictLine.style.display = 'none'; }
+        }
+        // Hook isolation callout
+        var hookCard = document.getElementById('fres-hook-card');
+        var hookLines = document.getElementById('fres-hook-lines');
+        if (hookCard && hookLines) {
+          if (parsed.hookIsolation) { hookLines.textContent = parsed.hookIsolation; hookCard.style.display = 'block'; }
+          else { hookCard.style.display = 'none'; }
+        }
+        // Song prompt (Suno-ready style string)
+        var sunoPrompt = parsed.songPrompt || d.sunoPrompt || '';
         if (sunoEl && sunoPrompt) {
           sunoEl.innerHTML = '<span class="suno-chip">'+sunoPrompt.replace(/</g,'&lt;')+'</span>';
+        } else if (sunoEl) {
+          sunoEl.innerHTML = '';
         }
         if (bodyEl) {
           bodyEl.innerHTML =
-            '<div class="flow-section on" id="fres-sec-lyrics"><pre id="fres-lyrics-text">'      + flowEsc(parsed.lyrics) + '</pre></div>' +
-            '<div class="flow-section" id="fres-sec-prompt">'                                    + (parsed.corePrompt ? flowEsc(parsed.corePrompt) : (d.sunoPrompt ? flowEsc(d.sunoPrompt) : '<span class="muted">Song prompt unavailable for this spin.</span>')) + '</div>';
+            '<div class="flow-section on" id="fres-sec-lyrics"><pre id="fres-lyrics-text">' + flowEsc(parsed.lyrics) + '</pre></div>' +
+            '<div class="flow-section" id="fres-sec-prompt"><pre id="fres-prompt-text">' + (sunoPrompt ? flowEsc(sunoPrompt) : '') + '</pre></div>';
         }
         // Reset to the Lyrics tab on each new spin
         document.querySelectorAll('.flow-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab') === 'lyrics'); });
@@ -5473,7 +5499,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
         window.__flowLast = {
           concept: concept,
           spec: spec,
-          title: d.title || spec.title,
+          title: cleanTitle,
+          verdict: parsed.verdict,
+          hookIsolation: parsed.hookIsolation,
           lyrics: parsed.lyrics,
           sunoPrompt: sunoPrompt,
           arrangement: parsed.arrangement,
@@ -5523,45 +5551,57 @@ body.craft-advanced .craft-basic-only{display:none !important}
       });
     }
 
-    // ── Brain-response parsing: split lyrics from labelled sections ──────
-    // The brain emits LYRICS first (with [Verse]/[Chorus]/[Bridge] markers),
-    // followed by labelled production sections (CORE PROMPT, ARRANGEMENT
-    // BLUEPRINT, VOCAL DIRECTION, SONIC REFERENCES, PLATFORM TIPS, TEMPO).
-    // We look ONLY for known headers so accidental TITLE:/GENRE:/etc. lines
-    // inside the lyrics don't truncate the body.
+    // ── Brain-response parsing — uses the global parseSection that Lucky uses ──
+    // Brain output sections (Lucky-grade): TITLE, VERDICT, HOOK ISOLATION,
+    // LYRICS, SONG PROMPT, plus the production brief tail (ARRANGEMENT
+    // BLUEPRINT, VOCAL DIRECTION, etc.) which we ignore on the Flow side
+    // (the Editor renders those on Continue to Production).
     function flowParseBrain(raw){
       var text = String(raw || '');
-      var pick = function(key){
-        if (typeof parseBriefSection === 'function') return parseBriefSection(text, key);
+      var section = function(key, nextKey){
+        if (typeof parseSection === 'function') return (parseSection(text, key, nextKey) || '').trim();
+        // Fallback if global is missing
         var idx = text.indexOf(key + ':');
         if (idx === -1) return '';
         var start = idx + key.length + 1;
-        var next = text.slice(start).search(/\n[A-Z][A-Z &]+:/);
-        return text.slice(start, next === -1 ? text.length : start + next).trim();
+        var end = nextKey ? text.indexOf(nextKey + ':', start) : -1;
+        return text.slice(start, end > -1 ? end : text.length).trim();
       };
-      // Locate the lyric end: the earliest known-section header.
-      var KNOWN = ['CORE PROMPT','SONG PROMPT','STYLE PROMPT','ARRANGEMENT BLUEPRINT','ARRANGEMENT','VOCAL DIRECTION','SONIC REFERENCES','PLATFORM TIPS','TEMPO & KEY','TEMPO','PRODUCTION'];
-      var cutAt = text.length;
-      for (var k = 0; k < KNOWN.length; k++) {
-        var idx = text.indexOf('\n' + KNOWN[k] + ':');
-        if (idx === -1) idx = text.indexOf(KNOWN[k] + ':');  // start of doc
-        if (idx > -1 && idx < cutAt) cutAt = idx;
+      var title = section('TITLE', 'VERDICT');
+      var verdict = section('VERDICT', 'HOOK ISOLATION') || section('VERDICT', 'LYRICS');
+      var hookIsolation = section('HOOK ISOLATION', 'LYRICS');
+      var lyrics = section('LYRICS', 'SONG PROMPT');
+      var songPrompt = section('SONG PROMPT', 'PRODUCTION BRIEF') || section('SONG PROMPT', 'ARRANGEMENT BLUEPRINT') || section('CORE PROMPT', 'ARRANGEMENT BLUEPRINT');
+      var arrangement = section('ARRANGEMENT BLUEPRINT', 'VOCAL DIRECTION') || section('ARRANGEMENT', 'VOCAL');
+      var vocal = section('VOCAL DIRECTION', 'SONIC REFERENCES') || section('VOCAL', 'SONIC');
+      var references = section('SONIC REFERENCES', 'PLATFORM TIPS') || section('SONIC REFERENCES', 'COUNTER');
+      // Fallbacks so nothing is empty if the model used a different layout
+      if (!lyrics) {
+        // Last-ditch: take everything between first [Verse] / [Intro] and the SONG PROMPT line
+        var firstTag = text.search(/\[(Intro|Verse|Pre[- ]Chorus|Chorus|Hook|Bridge|Refrain|Outro)/i);
+        if (firstTag > -1) {
+          var endIdx = text.indexOf('SONG PROMPT:', firstTag);
+          if (endIdx === -1) endIdx = text.indexOf('PRODUCTION BRIEF:', firstTag);
+          lyrics = text.slice(firstTag, endIdx > -1 ? endIdx : text.length).trim();
+        } else {
+          lyrics = text.trim();
+        }
       }
-      var lyrics = text.slice(0, cutAt).trim();
-      // If parsing gave us nothing meaningful (no [Verse]/[Chorus] markers,
-      // or extremely short), fall back to the entire raw response so the
-      // user never sees an empty Lyrics tab.
-      var looksLikeLyrics = /\[(Verse|Chorus|Hook|Bridge|Pre[- ]Chorus|Intro|Outro|Refrain)/i.test(lyrics);
-      if (!looksLikeLyrics || lyrics.length < 80) {
-        lyrics = text.trim();
+      // Strip any markdown title line ("# Some Title") that sometimes precedes TITLE:
+      if (!title) {
+        var mdMatch = text.match(/^#\s*(.+?)$/m);
+        if (mdMatch) title = mdMatch[1].replace(/["""]/g,'').trim();
       }
       return {
+        title: title,
+        verdict: verdict,
+        hookIsolation: hookIsolation,
         lyrics: lyrics,
-        corePrompt:  pick('CORE PROMPT')      || pick('SONG PROMPT')    || pick('STYLE PROMPT'),
-        arrangement: pick('ARRANGEMENT BLUEPRINT') || pick('ARRANGEMENT'),
-        tempoKey:    pick('TEMPO & KEY')      || pick('TEMPO'),
-        vocal:       pick('VOCAL DIRECTION')  || pick('VOCAL'),
-        references:  pick('SONIC REFERENCES') || pick('REFERENCES'),
+        corePrompt: songPrompt,                // alias kept for legacy callers
+        songPrompt: songPrompt,
+        arrangement: arrangement,
+        vocal: vocal,
+        references: references,
       };
     }
 
