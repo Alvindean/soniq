@@ -711,18 +711,26 @@ No prose. No markdown fences.`;
     // the same concept and avoids a second sequential AI call that was
     // pushing flow-song past Vercel's 60s ceiling. A future improvement
     // could move Suno-regen to a separate client-fired mode like flow-score.
-    // Also scrub anything that looks like an artist-name reference from
-    // both the spec prompt AND the brain's CORE PROMPT block in the lyrics.
+    // Scrub two kinds of noise from any user-facing prompt text:
+    //   1. Real artist-name references the model occasionally slips in
+    //      ("like X", "in the style of Y", "X vibes")
+    //   2. Meta / compliance lines the brain asks the model to include
+    //      ("⚠️ SUNO COMPLIANCE CHECK: Zero artist names below", any
+    //      line starting with ⚠️, "COMPLIANCE:" / "RULES:" / "DO NOT")
     const scrubArtistRefs = (s) => String(s || '')
+      // Strip whole lines that are model-facing compliance reminders
+      .replace(/^[ \t]*⚠️[^\n]*\n?/gm, '')
+      .replace(/^[ \t]*(?:SUNO COMPLIANCE|COMPLIANCE CHECK|COMPLIANCE|RULES|DO NOT|REMEMBER|NOTE TO MODEL)[^\n]*\n?/gmi, '')
       .replace(/\b(?:like|à la|a la|in the style of|reminiscent of|à la|feat\.?|featuring|inspired by)\s+[A-Z][A-Za-z0-9.'’&\- ]{1,40}/g, '')
       .replace(/\b[A-Z][A-Za-z0-9.'’\-]+(?:\s+[A-Z][A-Za-z0-9.'’\-]+){0,2}\s+(?:vibes?|sound|feel|energy|era)\b/g, (m) => m.replace(/^[A-Z][A-Za-z0-9.'’\-]+(?:\s+[A-Z][A-Za-z0-9.'’\-]+){0,2}\s+/, ''))
+      .replace(/\n{3,}/g, '\n\n')
       .replace(/\s+,/g, ',')
       .replace(/,\s*,/g, ',')
-      .replace(/\s{2,}/g, ' ')
+      .replace(/[ \t]{2,}/g, ' ')
       .trim();
     let sunoPrompt = scrubArtistRefs(spec.sunoPrompt || generatedSunoPrompt || '');
-    // Also scrub the CORE PROMPT block embedded in the lyrics response
-    lyrics = lyrics.replace(/(CORE PROMPT:\s*\n?)([^\n]+(?:\n[^\nA-Z][^\n]*)*)/i, (full, header, body) => header + scrubArtistRefs(body));
+    // Also scrub the CORE PROMPT / SONG PROMPT block embedded in the lyrics response
+    lyrics = lyrics.replace(/((?:CORE|SONG) PROMPT:\s*\n?)([^\n]+(?:\n[^\nA-Z][^\n]*)*)/i, (full, header, body) => header + scrubArtistRefs(body));
 
     // Score moved to a separate client-fired `flow-score` call to keep this
     // request under Vercel's 60s function timeout. The client renders the

@@ -5572,6 +5572,17 @@ body.craft-advanced .craft-basic-only{display:none !important}
       var hookIsolation = section('HOOK ISOLATION', 'LYRICS');
       var lyrics = section('LYRICS', 'SONG PROMPT');
       var songPrompt = section('SONG PROMPT', 'PRODUCTION BRIEF') || section('SONG PROMPT', 'ARRANGEMENT BLUEPRINT') || section('CORE PROMPT', 'ARRANGEMENT BLUEPRINT');
+      // Strip compliance/meta noise lines from the Suno prompt before the
+      // user ever sees or copies it. The brain occasionally has the model
+      // append "⚠️ SUNO COMPLIANCE CHECK: Zero artist names below" — that
+      // belongs in the model's working memory, not the user's clipboard.
+      if (songPrompt) {
+        songPrompt = songPrompt
+          .replace(/^[ \t]*⚠️[^\n]*\n?/gm, '')
+          .replace(/^[ \t]*(?:SUNO COMPLIANCE|COMPLIANCE CHECK|COMPLIANCE|RULES|DO NOT|REMEMBER|NOTE TO MODEL)[^\n]*\n?/gmi, '')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+      }
       var arrangement = section('ARRANGEMENT BLUEPRINT', 'VOCAL DIRECTION') || section('ARRANGEMENT', 'VOCAL');
       var vocal = section('VOCAL DIRECTION', 'SONIC REFERENCES') || section('VOCAL', 'SONIC');
       var references = section('SONIC REFERENCES', 'PLATFORM TIPS') || section('SONIC REFERENCES', 'COUNTER');
