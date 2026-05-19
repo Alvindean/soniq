@@ -636,72 +636,42 @@ No prose. No markdown fences.`;
     sunoPromptParts.push(brainMood.toLowerCase());
     const generatedSunoPrompt = sunoPromptParts.filter(Boolean).join(', ');
 
-    const built = {
-      system: `You are a world-class songwriter. Write ONE complete, performance-ready 3-minute song. The song must read like a finished production brief — every section, movement, feel cue, and ad-lib baked into the lyrics themselves via brackets and parentheses.
+    // ═══════════════════════════════════════════════════════════════
+    // PRIMARY PATH: call the SONIQ brain's buildSongPrompt — same engine
+    // Lucky and Write use. This injects buildGenreAgentSystem(genre) as
+    // the system prompt ("You are a world-class [genre] songwriter")
+    // which is the structural anchor that prevents genre drift, plus
+    // SUBSTYLE_LOCK + PRODUCTION_LOCK + TYPE 3 bracket mandate baked in.
+    // length: 'short' keeps the response within Vercel's 60s budget.
+    // ═══════════════════════════════════════════════════════════════
+    let built;
+    try {
+      const brain = require('./_brain.js');
+      built = brain.buildSongPrompt({
+        genre: brainGenre,
+        topic: flowConcept,
+        mood: brainMood,
+        vocal: spec.vocal || 'any',
+        structure: 'standard',
+        era: 'modern',
+        length: 'short',
+        quality: flowAllowPlatinum ? 'viral' : 'high',
+        bracketMode: 'suno',
+        platform: 'suno',
+        platinum: flowAllowPlatinum,
+        lyricTier: flowAllowPlatinum ? 'street' : 'radio',
+        isAdmin: isAdmin,
+        plan: flowPlan,
+      });
+      if (!built || !built.system || !built.prompt) throw new Error('Brain returned empty prompt');
+    } catch (brainErr) {
+      console.error('[flow-song] brain.buildSongPrompt failed, falling back to lean prompt:', brainErr && brainErr.message);
+      // Lean fallback ONLY if brain require fails. Keeps Flow alive even
+      // if _brain.js has a load-time issue.
+      built = { system: 'You are a world-class songwriter. Write ONE complete, performance-ready 3-minute song.',
+                prompt: `Write a complete 3-minute ${flowGenreLabel} song about: ${flowConcept}\n\nFirst line MUST be [Verse 1]. Tag every section. Lyrics only.` };
+    }
 
-═══ NON-NEGOTIABLE FORMAT RULES ═══
-
-LINE 1: must be \`[Verse 1]\` exactly. No title, no preamble, no commentary.
-
-SECTION TAGS (each on its own line, capitalized as shown):
-[Intro] · [Verse 1] · [Verse 2] · [Verse 3] · [Pre-Chorus] · [Chorus] · [Hook] · [Refrain] · [Bridge] · [Final Chorus] · [Vamp] · [Outro]
-Genre-specific additions when traditional:
-- EDM/House: [Build-Up] · [Drop] · [Breakdown]
-- Hip-Hop: [Hook] (replaces [Chorus]) · [Beat Switch]
-- Gospel: [Vamp] · [Call and Response]
-- Rock: [Guitar Solo] · [Drum Fill]
-- Country/Folk: [Acoustic Break]
-
-INSTRUMENTAL / MOVEMENT CUES (own line, sparingly, only where the genre demands):
-[Guitar Solo] · [Bass Drop] · [Drum Fill] · [Strings Enter] · [Synth Lead] · [Horn Stab] · [Pedal Steel Solo] · [Acoustic Break] · [Beat Switch] · [A cappella] · [Drop Out] · [Crescendo] · [Half-Time] · [Double-Time]
-
-FEEL / DYNAMICS CUES (inline, in lowercase brackets, immediately before the line they modify):
-[whispered] · [belted] · [half-time] · [hushed] · [doubled] · [harmony stack] · [layered] · [reverb tail] · [pull back] · [crescendo] · [pushed]
-Use ~3-6 of these across the song to mark emotional dynamics. Example:
-  [Chorus]
-  [belted] I burn the letters in the kitchen sink
-  [hushed] and watch the smoke crawl up the cabinet
-
-AD-LIBS — IN PARENTHESES, ON THE SAME LINE AS THE HOST LINE:
-Never on their own line. The BRAIN LIBRARY block below gives you the canonical ad-lib palette for this exact genre — use that palette, not your own invention. Density and placement rules come from the brain too. Example: "I held my breath (uh) waiting for the light (yeah)"
-
-═══ SONG MOVEMENT (BAKE THIS INTO THE LYRICS) ═══
-
-The 3-minute arc:
-1. Verse 1 — set scene, ground the listener in a specific image/place/character (4-8 lines)
-2. Pre-Chorus (genre-permitting) — tension lift (2-4 lines)
-3. Chorus — emotional payoff, the line they will sing back (4-6 lines, repeatable)
-4. Verse 2 — escalate or pivot the story (4-8 lines)
-5. Pre-Chorus → Chorus repeat
-6. Bridge — reframe, surprise, or KEY CHANGE moment (3-6 lines)
-7. Final Chorus — bigger, often with a layered/belted dynamic cue
-8. Outro — wind down, fade, or button
-
-Each section must MOVE the song forward — no copy-paste verses, no recycled imagery, no chorus that says nothing different the second time.
-
-═══ LYRICAL DEPTH ═══
-
-- Every line specific: concrete images, particular nouns (a "Dodge with the bumper wired on" beats "an old car"; a "kitchen counter coffee ring" beats "a memory")
-- Clichés are NOT banned — they're limited and twisted. If you reach for "fire / desire", twist it: "cigarette fire on the porch", "desire in the bones of the house". A straight cliché is allowed at most once per song, and only if it's load-bearing for the emotional spine. Recycled cliché rhyme pairs ("rain/pain", "heart/apart") used flat = rejected. The SAME pairs used creatively (rain that "tastes like the medicine cabinet") = welcome.
-- Internal rhyme welcome but never forced
-- Mood arc must travel — V1 emotional state ≠ Bridge state ≠ Final Chorus state
-- DO NOT name real artists, bands, producers, or songs anywhere
-
-═══ GENRE LOCK — NON-NEGOTIABLE ═══
-
-The song MUST be in the specified genre. Do not drift to an adjacent style based on stray words in the concept. If the genre is "Americana" you are writing an AMERICANA song with all Americana conventions (instrumentation references in feel cues, vocal phrasing, vocabulary register) — not R&B, not pop, not generic country.
-
-═══ OUTPUT ═══
-
-Return ONLY the lyrics with section tags, movement cues, feel cues, and inline ad-libs. No title line. No commentary. No production notes. No "CORE PROMPT". No "ARRANGEMENT". No markdown fences. The brackets and parentheses ARE the production language baked into the song.`,
-      prompt: `GENRE LOCK: ${flowGenreLabel}${flowFusionLabel ? ' × ' + flowFusionLabel + ' (fusion — honor BOTH traditions; do not collapse to just one)' : ''}
-GENRE GUIDE: ${lockDirective}
-${fusionLockDirective ? 'FUSION PARTNER GUIDE: ' + fusionLockDirective + '\n' : ''}MOOD: ${brainMood}
-${spec.vocal ? 'VOCAL ARCHETYPE: ' + spec.vocal + '\n' : ''}${spec.tempo ? 'TEMPO: ' + spec.tempo + ' BPM\n' : ''}${spec.key ? 'KEY: ' + spec.key + '\n' : ''}
-${brainLibBlock ? '═══ BRAIN LIBRARY (genre-canonical: ad-libs, vocables, structure, counter-melody, vocal stack) ═══\n' + brainLibBlock + '\n\n' : ''}CONCEPT: ${flowConcept}
-
-Write the full 3-minute ${flowGenreLabel} song now, in the tradition described above. Use the BRAIN LIBRARY's ad-lib palette and vocable placement rules — they are authoritative for this genre. First line MUST be "[Verse 1]". Every section MUST be tagged. Lyrics only.`,
-    };
 
     const t0 = Date.now();
     console.log('[flow-song] start', {
