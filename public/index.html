@@ -4858,6 +4858,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
       <div class="flow-score-row" id="fres-score-row" style="display:none;margin-top:10px;align-items:center;gap:14px;flex-wrap:wrap">
         <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:600">🎵 Song Score</span>
+          <span id="fres-song-score-num" style="font-size:22px;font-weight:800;color:var(--cyan,#22d3ee);font-variant-numeric:tabular-nums">—</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--tx3);font-weight:600">🎯 Hook Score</span>
           <span id="fres-score-num" style="font-size:22px;font-weight:800;color:var(--amber);font-variant-numeric:tabular-nums">—</span>
         </div>
@@ -5304,6 +5308,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
       { label:'Hip-Hop',       w5:['hip-hop','hiphop','hip hop','rap'], w3:['emcee','bars','flow','freestyle','cypher'] },
       { label:'Post-Punk',     w5:['post-punk','post punk','goth rock'] },
       { label:'Shoegaze',      w5:['shoegaze','blackgaze'], w3:['wall of sound'] },
+      { label:'Slowcore',      w5:['slowcore','sadcore','slow-core'], w3:['glacial tempo','sparse slow rock','funeral pace'] },
       { label:'Math Rock',     w5:['math rock'], w3:['polyrhythm','odd meter'] },
       { label:'Metal',         w5:['metal','death metal','black metal','doom'], w3:['blast beat','growl'] },
       { label:'Punk',          w5:['punk','hardcore punk'] },
@@ -5513,30 +5518,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
         var pr = document.getElementById('fres-prod-row');
         if (pr) pr.style.display = 'block';
         // Fire the score request async — never blocks the song from rendering.
-        // Show "scoring..." placeholder; render once it lands; hide on failure.
-        (function(){
-          var sr = document.getElementById('fres-score-row');
-          var sn = document.getElementById('fres-score-num');
-          var vd = document.getElementById('fres-verdict');
-          if (sr) sr.style.display = 'flex';
-          if (sn) sn.textContent = '…';
-          if (vd) vd.textContent = 'scoring…';
-          scoreInFlight = new AbortController();
-          flowAuthedPost('/api/generate', {
-            mode: 'flow-score',
-            lyrics: d.lyrics,
-            genre: (spec && spec.genre) || '',
-            topic: concept,
-          }, scoreInFlight.signal).then(function(sres){
-            if (sres.ok && sres.data && sres.data.score && typeof sres.data.score.hookScore === 'number') {
-              window.__flowLast.score = sres.data.score;
-              if (sn) sn.textContent = Math.round(sres.data.score.hookScore);
-              if (vd) vd.textContent = (sres.data.score.verdict || '').slice(0, 240);
-            } else if (sr) {
-              sr.style.display = 'none';
-            }
-          }).catch(function(){ if (sr) sr.style.display = 'none'; });
-        })();
+        // Show "scoring..." placeholder; render once it lands; on failure show
+        // a "Retry score" button so the user can re-fire the request (the old
+        // code hid the row forever with no way back).
+        flowRunScore(d.lyrics, (spec && spec.genre) || '', concept);
         finishSongProgress(true);
         if (btn) btn.disabled = false;
         if (btnTxt) btnTxt.textContent = 'Spin Flow';
@@ -5548,6 +5533,62 @@ body.craft-advanced .craft-basic-only{display:none !important}
         if (btn) btn.disabled = false;
         if (btnTxt) btnTxt.textContent = 'Spin Flow';
         if (hint) hint.textContent = (err && err.message) || 'Song generation failed — try again';
+      });
+    }
+
+    // ── Flow score fetch — reusable so failure can be retried ───────────────
+    // Renders a "scoring…" placeholder, fills in the numbers on success, and
+    // on failure leaves the row visible with a "Retry score" button that
+    // re-fires this exact request. Never hides the row permanently.
+    function flowRunScore(lyrics, genre, topic){
+      var sr = document.getElementById('fres-score-row');
+      var sn = document.getElementById('fres-score-num');
+      var ssn = document.getElementById('fres-song-score-num');
+      var vd = document.getElementById('fres-verdict');
+      if (!sr) return;
+      sr.style.display = 'flex';
+      // Clear any stale retry button from a previous failed attempt.
+      var oldRetry = document.getElementById('fres-score-retry');
+      if (oldRetry && oldRetry.parentNode) oldRetry.parentNode.removeChild(oldRetry);
+      if (sn) sn.textContent = '…';
+      if (ssn) ssn.textContent = '…';
+      if (vd) { vd.textContent = 'scoring…'; vd.style.display = ''; }
+      var fail = function(){
+        if (sn) sn.textContent = '—';
+        if (ssn) ssn.textContent = '—';
+        if (vd) vd.textContent = 'Score unavailable';
+        if (document.getElementById('fres-score-retry')) return;
+        var retry = document.createElement('button');
+        retry.id = 'fres-score-retry';
+        retry.type = 'button';
+        retry.className = 'btn btn-sm';
+        retry.textContent = '↻ Retry score';
+        retry.title = 'Re-run the song score';
+        retry.onclick = function(){ flowRunScore(lyrics, genre, topic); };
+        sr.appendChild(retry);
+      };
+      scoreInFlight = new AbortController();
+      flowAuthedPost('/api/generate', {
+        mode: 'flow-score',
+        lyrics: lyrics,
+        genre: genre || '',
+        topic: topic || '',
+      }, scoreInFlight.signal).then(function(sres){
+        if (sres.ok && sres.data && sres.data.score && typeof sres.data.score.hookScore === 'number') {
+          if (window.__flowLast) window.__flowLast.score = sres.data.score;
+          if (sn) sn.textContent = Math.round(sres.data.score.hookScore);
+          if (ssn) ssn.textContent = Math.round(
+            typeof sres.data.score.songScore === 'number'
+              ? sres.data.score.songScore
+              : sres.data.score.hookScore
+          );
+          if (vd) vd.textContent = (sres.data.score.verdict || '').slice(0, 240);
+        } else {
+          fail();
+        }
+      }).catch(function(err){
+        if (err && err.name === 'AbortError') return; // newer spin took over
+        fail();
       });
     }
 
@@ -5663,39 +5704,57 @@ body.craft-advanced .craft-basic-only{display:none !important}
     };
 
     // ── Save to library ──────────────────────────────────────────────────
+    // Persists through the SAME real path as saveLuckyToLib: builds a song
+    // object, dedupes by id against S.library, unshifts it, and calls
+    // persistLib() (which writes localStorage + refreshes badges/feeds).
+    // The old code called a non-existent window.saveSongToLibrary and
+    // silently fell through to a dead localStorage shelf.
     window.saveFlowToLib = function(){
       var f = window.__flowLast;
       if (!f) { if (typeof toast === 'function') toast('Spin a song first'); return; }
-      // Reuse existing save endpoint via supabase if available — defer to a
-      // lightweight save that mirrors saveLuckyToLib's contract.
+      if (!f.lyrics) { if (typeof toast === 'function') toast('Spin a song first'); return; }
+      var St = window.S;
+      if (!St || !Array.isArray(St.library) || typeof persistLib !== 'function') {
+        if (typeof toast === 'function') toast('Save failed — library unavailable');
+        return;
+      }
       try {
-        var payload = {
+        // Stable id so re-saving the same Flow song updates rather than dupes.
+        if (!f.__libId) f.__libId = Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        var existing = St.library.findIndex(function(s){ return s && s.id === f.__libId; });
+        var song = {
+          id: existing >= 0 ? St.library[existing].id : f.__libId,
           source: 'flow',
           title: f.title || 'Untitled',
-          concept: f.concept,
+          topic: f.concept || '',
+          genre: (f.spec && f.spec.genre) || '',
+          mood: (f.spec && f.spec.mood) || '',
+          vocal: f.vocal || '',
+          verdict: f.verdict || '',
           lyrics: f.lyrics,
-          suno_prompt: f.sunoPrompt,
-          spec: f.spec,
-          created_at: new Date().toISOString(),
+          style: f.sunoPrompt || '',
+          brief: f.rawResponse || '',
+          structure: (f.spec && f.spec.structure) || '',
+          arrangement: f.arrangement || '',
+          references: f.references || '',
+          score: f.score || null,
+          ts: Date.now(),
         };
-        // Best-effort: pass through the existing track endpoint so the event
-        // is logged. Real persistence depends on the host save handler — if
-        // saveSongToLibrary exists in this app, call it.
-        if (typeof window.saveSongToLibrary === 'function') {
-          window.saveSongToLibrary(payload);
+        if (existing >= 0) {
+          St.library[existing] = song;
+          if (typeof toast === 'function') toast('✓ Song updated in library');
         } else {
-          // Mirror to localStorage as a fallback shelf
-          var key = 'soniq:flow:saved';
-          var arr = [];
-          try { arr = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){}
-          arr.unshift(payload);
-          localStorage.setItem(key, JSON.stringify(arr.slice(0, 50)));
+          St.library.unshift(song);
+          if (typeof toast === 'function') toast('✓ Saved to your library');
+          if (typeof trackEvent === 'function') trackEvent('song_saved', { genre: song.genre, topic: song.topic });
         }
-        if (typeof toast === 'function') toast('💾 Saved to your library');
+        if (St.library.length > 200) St.library = St.library.slice(0, 200);
+        persistLib();
         var btn = document.getElementById('flow-save-btn');
         if (btn) { btn.textContent = '✓ Saved'; setTimeout(function(){ btn.textContent = '💾 Save'; }, 1800); }
       } catch(e){
-        if (typeof toast === 'function') toast('Save failed — copied to clipboard instead');
+        console.error('Flow save failed:', e);
+        if (typeof toast === 'function') toast('Save failed — please try again');
       }
     };
 
@@ -7124,6 +7183,8 @@ body.craft-advanced .craft-basic-only{display:none !important}
       <div id="alb-summary" class="album-prose" style="margin-bottom:14px"></div>
       <div class="album-section-title">Emotional &amp; Narrative Arc</div>
       <div id="alb-arc" class="album-prose" style="margin-bottom:14px"></div>
+      <div id="alb-commercial-wrap" class="album-section-title" style="display:none">Commercial Angle</div>
+      <div id="alb-commercial" class="album-prose" style="margin-bottom:14px;display:none"></div>
       <div class="album-section-title">Recurring Motifs</div>
       <ul id="alb-motifs" class="album-list"></ul>
     </div>
@@ -10297,7 +10358,7 @@ const SUBSTYLES={
   metal:['Classic Metal','Nu-Metal','Metalcore','Thrash','Death Metal','Black Metal','Doom Metal','Power Metal','Symphonic Metal','Progressive Metal','Djent','Melodic Death Metal','Screamo','Avant-Garde Metal'],
   latin:['Salsa','Bachata','Cumbia','Bossa Nova','Latin Pop','Latin Jazz','Mariachi'],
   reggaeton:['Perreo Clásico','Trap Latino','Reggaeton Romántico','Urbano Latino','Dembow Puro','Reggaeton Pop'],
-  altrock:['Shoegaze','Post-Punk','Grunge','Indie Rock','Lo-Fi','Art Rock','Emo','Math Rock','Post-Grunge','Adult Alt-Rock','Reggae-Rock'],
+  altrock:['Shoegaze','Slowcore','Post-Punk','Grunge','Indie Rock','Lo-Fi','Art Rock','Emo','Math Rock','Post-Grunge','Adult Alt-Rock','Reggae-Rock'],
   punk:['Classic Punk','Pop-Punk','Post-Punk','Hardcore','Ska-Punk','Anti-Folk'],
   blues:['Chicago Blues','Delta Blues','Texas Blues','Jump Blues','Soul Blues'],
   reggae:['Roots Reggae','Dancehall','Ska','Rocksteady','Dub','Lovers Rock'],
@@ -12928,7 +12989,11 @@ async function generateSong(){
 - Never condescend — wonder and imagination are universal emotions. Write UP to children's curiosity, not DOWN to limited vocabulary.
 - Lullaby rule: descending melody implied through falling imagery (stars coming down, moon settling, eyes getting heavy). Safety in every final line.`
   : '';
-  // Clear album context after use so it doesn't carry over to next song
+  // Clear album context after use so it doesn't carry over to next song.
+  // Capture the album track index first so the finished song can flow back
+  // into S.albumData.trackList once generation completes.
+  let _albumWriteBackIndex = (S.albumTrack && typeof S.albumTrack.trackIndex === 'number')
+    ? S.albumTrack.trackIndex : null;
   if(S.albumTrack){
     const _albBanner = document.getElementById('album-track-banner');
     if (_albBanner) _albBanner.style.display = 'none';
@@ -13092,7 +13157,7 @@ VIDEO PROMPT:
     }
     S.genController = null;
     finishSongProgress('res');
-    parseSongResult(raw, genreLabel, topic, genProdData);
+    parseSongResult(raw, genreLabel, topic, genProdData, _albumWriteBackIndex);
     if (S.currentSong) {
       if (S._pendingSunoSettings) { S.currentSong.sunoSettings = S._pendingSunoSettings; S._pendingSunoSettings = null; }
       if (vocal && !S.currentSong.vocal) S.currentSong.vocal = vocal;
@@ -13310,7 +13375,7 @@ function trimLyricsToSunoLimit(lyrics) {
   return { lyrics: out, trimmed: true };
 }
 
-function parseSongResult(raw,genre,topic,prodData){
+function parseSongResult(raw,genre,topic,prodData,albumWriteBackIndex){
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
   // Defensive verdict parse: try multiple downstream markers so we never
   // fall through to end-of-string and pack the whole dump into verdict.
@@ -13457,6 +13522,21 @@ function parseSongResult(raw,genre,topic,prodData){
   onboardingPostGenerate();
   // Auto-save to server (fire-and-forget — localStorage remains primary)
   autoSaveSongToServer(S.currentSong);
+
+  // FIX 4 — flow a "Write This Track" result back into its album slot.
+  // writeAlbumTrack() recorded the index on S.albumTrack.trackIndex;
+  // generateSong() snapshotted it before S.albumTrack was cleared and
+  // passes it in as albumWriteBackIndex (null for ordinary generations).
+  if (albumWriteBackIndex != null && S.albumData?.trackList?.[albumWriteBackIndex]) {
+    const _slot = S.albumData.trackList[albumWriteBackIndex];
+    _slot.title   = title;
+    _slot.lyrics  = lyrics;
+    _slot.style   = songPrompt;
+    _slot.written = true;
+    if (typeof renderAlbumTrackList === 'function') renderAlbumTrackList();
+    toast('✓ Track written back to album slot ' + (albumWriteBackIndex + 1));
+  }
+
 }
 
 // ─── ONBOARDING PROGRESS HELPERS (defined here so generateSong can always call them) ──
@@ -17216,7 +17296,7 @@ async function applyCoachAndRegenerate() {
     // including all the brain's structured output (verdict, brief, structure,
     // chords, dopamine map, etc.). The chip renderer + library save inherit
     // automatically via the existing post-stream wiring.
-    parseSongResult(raw, GENRE_LABELS[genre] || genre, topic, genProdData);
+    parseSongResult(raw, GENRE_LABELS[genre] || genre, topic, genProdData, null);
     if (S.currentSong) {
       if (result.meta?.sunoSettings) S.currentSong.sunoSettings = result.meta.sunoSettings;
       if (lyricTier) S.currentSong.lyricTier = lyricTier;
@@ -19864,13 +19944,34 @@ function setLane(el, lane) {
   }
 }
 
+// Renders the album track-list UI from S.albumData.trackList. Extracted so
+// both album generation and the "Write This Track" write-back can refresh it;
+// tracks with .written=true show a ✓ Written badge instead of looking empty.
+function renderAlbumTrackList() {
+  const host = document.getElementById('alb-track-types');
+  if (!host) return;
+  const list = S.albumData?.trackList || [];
+  host.innerHTML = list.map((tr,i)=>
+    `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${escHtml(tr.ttype)}${tr.written?' <span style="font-size:10px;color:var(--green,#3ee896);font-weight:700">✓ WRITTEN</span>':''}</div><div class="gap-role-desc">${escHtml(tr.written&&tr.title?('"'+tr.title+'"'):(tr.desc+' — '+tr.role))}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">${tr.written?'✦ Rewrite':'✦ Write This Track'}</button></div>`
+  ).join('');
+}
+
 function writeAlbumTrack(index) {
   const alb = S.albumData;
   const tr  = alb?.trackList?.[index];
   if (!tr) { toast('Generate an album concept first'); return; }
 
-  // Store context so generateSong() can inject it
-  S.albumTrack = { album: alb.name, type: tr.ttype, desc: tr.desc, role: tr.role, arc: alb.arc || '' };
+  // Per-track spec — regenerate if this album predates the spec system
+  // (older S.albumData still in memory from a prior session).
+  const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, index, alb.trackList.length);
+
+  // Store context so generateSong() can inject it through the brain's albumNote.
+  // trackIndex lets generateSong() write the finished song back into the album slot.
+  S.albumTrack = {
+    album: alb.name, type: tr.ttype, desc: tr.desc, role: tr.role, arc: alb.arc || '',
+    craft: spec.craft, energy: spec.energy, bpm: spec.bpm, key: spec.key,
+    trackIndex: index,
+  };
 
   // Pre-fill the Write page
   const topicEl = document.getElementById('g-topic');
@@ -19882,6 +19983,14 @@ function writeAlbumTrack(index) {
   document.querySelectorAll('#genre-grid .gp').forEach(g => {
     g.classList.toggle('on', g.dataset.genre === genreKey);
   });
+
+  // Apply this track's length tier so the song scales to its album role
+  // (an interlude stays short, a closer runs long).
+  if (spec.length) {
+    S.selectedLength = spec.length;
+    document.querySelectorAll('#length-pills .lpill').forEach(p =>
+      p.classList.toggle('on', p.dataset.val === spec.length));
+  }
 
   // Show banner on the write page
   const banner = document.getElementById('album-track-banner');
@@ -19911,45 +20020,60 @@ async function writeAllTracks() {
   const out = document.getElementById('alb-tracks-written');
   out.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Writing all tracks…</span></div>';
   const results = [];
+  const written = [];  // cross-track memory — titles + opening lines already used
   try {
     for (let i = 0; i < alb.trackList.length; i++) {
       if (S.cancelAllTracks) break;
       const tr = alb.trackList[i];
       out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
       try {
-        const prompt = `Write a complete, production-ready song for this album track.
-
-Album: "${alb.name}"
-Track role: ${tr.ttype}
-Track inspiration (use as flavor, NOT literal subject): ${tr.desc}
-Album genre: ${alb.genre || 'pop'}
-Album thematic universe: ${alb.arc || 'part of a cohesive album'}
-Track position: ${i+1} of ${alb.trackList.length}
-
-INTERPRETATION RULES — important:
-- The album theme is a SHARED MOOD AND TEXTURE across all ${alb.trackList.length} tracks, NOT a literal subject to repeat.
-- Each track must tell ITS OWN specific story, character, moment, image, or feeling that LIVES INSIDE the theme's world — never just restate the theme.
-- Think of the album theme like a film's color palette: every scene has its own plot, but they all share the look. Don't write the logline into every song.
-- Use the theme to set tone, register, vocabulary range, and emotional center of gravity. Then let THIS TRACK live as a distinct moment.
-- If track ${i+1} is the OPENER it can hint at the theme broadly; if it's a DEEP CUT or INTERLUDE it can wander far from the literal theme; if it's the CLOSER it can resolve the theme. Calibrate by track role.
-
-Song rules:
-- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]
-- Hook within first 30 seconds
-- Every line specific — concrete images, specific nouns, no clichés
-- Dynamic contrast verse vs chorus
-- DO NOT name any real artists, bands, producers, or song titles in the SONG PROMPT. Use style descriptors only (genre, sub-genre, instrumentation, vocal texture, era, production style, BPM, key, mood).
-
-Respond with EXACTLY:
-TITLE: [title]
-LYRICS:
-[full lyrics]
-SONG PROMPT:
-[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style + counter-melody device; NO artist names]`;
-        const raw = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
+        // Per-track spec — regenerate if this album predates the spec system.
+        const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, alb.trackList.length);
+        // Cross-track avoid-list: every prior track this run, so track i never
+        // reuses a sibling's title, hook or central image.
+        const sib = written.length
+          ? written.map((w,n)=>`  ${n+1}. "${w.title}" — opening line: ${w.opening}`).join('\n')
+          : '(this is the first track — nothing to avoid yet)';
+        // FIX 2 — route the bulk path through the brain, the same engine the
+        // single-track Generate button uses. We build a per-track songParams
+        // and call callServerStream('generate', ...) so buildSongPrompt() does
+        // the heavy lifting. The per-track spec + cross-track avoid-list ride
+        // along inside songParams.albumTrack (consumed by the brain's
+        // albumNote: craft/energy/bpm/key/siblings).
+        const songParams = {
+          genre: alb.genre || 'pop',
+          topic: `Track ${i+1} (${tr.ttype}) of the album "${alb.name}". ${tr.desc || ''}`.trim(),
+          mood: 'Emotional',
+          vocal: 'Lead vocal',
+          structure: spec.structure || 'standard',
+          lyricTier: 'street',
+          era: S.selectedEra || 'modern',
+          length: spec.length || 'medium',
+          quality: S.quality || 'high',
+          theoryLevel: S.theoryLevel || 'standard',
+          mode: 'auto',
+          hookStyle: 'auto',
+          bracketMode: S.bracketMode || 'suno',
+          platform: S.platform || 'suno',
+          albumTrack: {
+            type: tr.ttype || '',
+            album: alb.name || '',
+            role: tr.role || tr.ttype || '',
+            arc: alb.arc || 'part of a cohesive album',
+            craft: spec.craft || '',
+            energy: spec.energy,
+            bpm: spec.bpm,
+            key: spec.key,
+            siblings: sib
+          }
+        };
+        const raw = (await callServerStream('generate', songParams, null, null)).text;
         const title  = parseSection(raw,'TITLE','LYRICS');
         const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
         const style  = parseSection(raw,'SONG PROMPT', null);
+        // Feed this track into the cross-track memory for later iterations.
+        const opening = (lyrics||'').split('\n').map(s=>s.trim()).filter(s=>s && !/^\[/.test(s))[0] || '(no lyric)';
+        written.push({ title: title || `Track ${i+1}`, opening: opening.slice(0,90) });
         results.push({i, ttype:tr.ttype, title, lyrics, style});
       } catch(e) {
         results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
@@ -19958,8 +20082,11 @@ SONG PROMPT:
   } finally {
     if (writeBtn) { writeBtn.disabled = false; writeBtn.textContent = '✍️ Write All Tracks'; writeBtn.onclick = () => writeAllTracks(); }
   }
-  out.innerHTML = results.map(r => `
-    <div class="alb-track-card" data-idx="${r.i}" data-style="${escHtml(r.style||'')}" data-lyrics="${escHtml(r.lyrics||'')}" data-title="${escHtml(r.title||'')}" style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+  out.innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn btn-sm btn-gold" onclick="saveAllAlbTracks(this)">💾 Save All to Library</button>
+    </div>` + results.map(r => `
+    <div class="alb-track-card" data-idx="${r.i}" data-genre="${escHtml(alb.genre||'pop')}" data-ttype="${escHtml(r.ttype||'')}" data-style="${escHtml(r.style||'')}" data-lyrics="${escHtml(r.lyrics||'')}" data-title="${escHtml(r.title||'')}" style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
         <div>
           <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em">Track ${r.i+1} · ${r.ttype}</div>
@@ -19967,13 +20094,71 @@ SONG PROMPT:
         </div>
         <div style="display:flex;gap:6px">
           <button class="btn btn-sm" onclick="copyAlbTrackField(this,'lyrics')">Copy Lyrics</button>
-          <button class="btn btn-sm btn-gold" onclick="copyAlbTrackField(this,'style')">Copy Prompt</button>
+          <button class="btn btn-sm" onclick="copyAlbTrackField(this,'style')">Copy Prompt</button>
+          <button class="btn btn-sm btn-gold" onclick="saveAlbTrackToLib(this)">💾 Save</button>
         </div>
       </div>
       <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${escHtml(r.lyrics||'')}</pre>
       <div class="styleout" style="font-size:11px">${escHtml(r.style||'')}</div>
     </div>`).join('');
   toast(`✓ ${results.length} tracks written`);
+}
+
+// FIX 3 — persist a bulk-generated album track to the client-side library.
+// Builds a song object in the same shape saveLuckyToLib() uses, then runs the
+// real S.library + persistLib() path. Reads content from the card's data-*
+// attributes so no lyric content is string-interpolated into onclick.
+function saveAlbTrackFromData(d) {
+  if (!d || !(d.lyrics || '').trim()) { toast('Nothing to save on this track'); return false; }
+  const song = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    title:  d.title || 'Untitled Album Track',
+    topic:  d.ttype || '',
+    lyrics: d.lyrics || '',
+    style:  d.style || '',
+    genre:  d.genre || 'pop',
+    mood:   '',
+    ts: Date.now(),
+  };
+  S.library.unshift(song);
+  if (S.library.length > 200) S.library = S.library.slice(0, 200);
+  persistLib();
+  return true;
+}
+
+function saveAlbTrackToLib(btn) {
+  const card = btn && btn.closest('.alb-track-card');
+  if (!card) return;
+  const d = {
+    title:  card.getAttribute('data-title')  || '',
+    lyrics: card.getAttribute('data-lyrics') || '',
+    style:  card.getAttribute('data-style')  || '',
+    genre:  card.getAttribute('data-genre')  || 'pop',
+    ttype:  card.getAttribute('data-ttype')  || '',
+  };
+  if (saveAlbTrackFromData(d)) {
+    toast('✓ Saved to library');
+    btn.textContent = '✓ Saved';
+    btn.disabled = true;
+  }
+}
+
+function saveAllAlbTracks(btn) {
+  const cards = document.querySelectorAll('#alb-tracks-written .alb-track-card');
+  if (!cards.length) { toast('No tracks to save'); return; }
+  let saved = 0;
+  cards.forEach(card => {
+    const d = {
+      title:  card.getAttribute('data-title')  || '',
+      lyrics: card.getAttribute('data-lyrics') || '',
+      style:  card.getAttribute('data-style')  || '',
+      genre:  card.getAttribute('data-genre')  || 'pop',
+      ttype:  card.getAttribute('data-ttype')  || '',
+    };
+    if (saveAlbTrackFromData(d)) saved++;
+  });
+  toast(`✓ Saved ${saved} track${saved !== 1 ? 's' : ''} to library`);
+  if (btn) { btn.textContent = '✓ All Saved'; btn.disabled = true; }
 }
 
 // Per-track copy helper for the Album tracks list. Reads from data-*
@@ -20019,6 +20204,75 @@ const ALBUM_TYPE_TRACKS = {
   }
 };
 
+// Per-track sonic spec — gives every album track a distinct tempo, key,
+// energy, form and craft mandate. Without this, every track inherited the
+// same genre/mood/tempo/structure and only the lyric topic changed, so the
+// album came out as one song twelve times. The role drives the band; the
+// track index spreads keys and jitters BPM so even two tracks of the same
+// role differ.
+const ROLE_SPEC = {
+  'OPENER':          {bpm:[90,115],  structure:'standard',     length:'medium', energy:6,  craft:"Set the album's sonic world — mid-energy, inviting, establishes tone. Not the biggest moment."},
+  'INTRO':           {bpm:[68,92],   structure:'minimal',      length:'short',  energy:3,  craft:'Short atmospheric scene-setter — sparse, can run under 90 seconds, establishes mood before the first full song.'},
+  'LEAD SINGLE':     {bpm:[100,128], structure:'hookfirst',    length:'short',  energy:8,  craft:'The most accessible track — simple vocabulary, universal image, a hook a stranger repeats after one listen.'},
+  'FEEL-GOOD ANTHEM':{bpm:[112,132], structure:'standard',     length:'medium', energy:8,  craft:'Bright, uplifting, communal — major-key feel, big singalong chorus.'},
+  'BALLAD':          {bpm:[58,76],   structure:'storytelling', length:'long',   energy:3,  craft:'Slow, intimate, vulnerable — sparse arrangement, vocal-forward. The emotional low point; let it breathe.'},
+  'MID-TEMPO BANGER':{bpm:[95,112],  structure:'standard',     length:'medium', energy:6,  craft:'Groove-driven mid-tempo — pocket and rhythm carry it, not melody.'},
+  'STATEMENT TRACK': {bpm:[84,108],  structure:'epic',         length:'long',   energy:7,  craft:"The album's artistic mission statement — denser lyrics, bigger arrangement, takes risks."},
+  'INTERLUDE':       {bpm:[60,88],   structure:'minimal',      length:'short',  energy:2,  craft:'Palette cleanser — under 90 seconds, sparse or near-instrumental, can break song form entirely. Texture over structure.'},
+  'DEEP CUT':        {bpm:[80,108],  structure:'storytelling', length:'medium', energy:5,  craft:'For devoted listeners — denser, weirder, more specific. Permission to alienate the casual listener.'},
+  'ENERGY TRACK':    {bpm:[126,150], structure:'hookfirst',    length:'medium', energy:9,  craft:'High-energy release — fast, loud, relentless. The live-show moment.'},
+  'CLUB / DANCE':    {bpm:[120,128], structure:'epic',         length:'long',   energy:9,  craft:'Dancefloor-built — four-on-the-floor pulse, extended instrumental / drop sections.'},
+  'COLLABORATION':   {bpm:[95,120],  structure:'standard',     length:'medium', energy:7,  craft:'Written as a two-voice track — a guest verse with a distinctly different POV and cadence from the main artist.'},
+  'FAN FAVORITE':    {bpm:[85,110],  structure:'standard',     length:'medium', energy:6,  craft:'Emotionally quotable — a chorus line fans put in their bios.'},
+  'CHAPTER OPENER':  {bpm:[86,112],  structure:'standard',     length:'medium', energy:6,  craft:'Opens a new narrative chapter — shift the scene and the energy from the prior track.'},
+  'RISING ACTION':   {bpm:[105,126], structure:'standard',     length:'medium', energy:7,  craft:'Builds narrative tension toward the climax — escalating energy.'},
+  'TURNING POINT':   {bpm:[90,116],  structure:'storytelling', length:'long',   energy:7,  craft:'The pivot — the moment everything changes. A tonal shift mid-song is encouraged.'},
+  'CLIMAX TRACK':    {bpm:[112,140], structure:'epic',         length:'long',   energy:10, craft:"The album's peak — biggest arrangement, highest stakes, maximum intensity."},
+  'RESOLUTION':      {bpm:[70,92],   structure:'storytelling', length:'medium', energy:4,  craft:'Releases tension — calmer, reflective, the payoff after the climax.'},
+  'REPRISE':         {bpm:[64,90],   structure:'minimal',      length:'short',  energy:3,  craft:"A callback — recognisably echoes an earlier track's motif, recontextualised. Keep it short."},
+  'CLOSER':          {bpm:[60,84],   structure:'epic',         length:'long',   energy:4,  craft:'The final word — slow-to-mid, resolves the album emotionally. The last feeling the listener carries out.'},
+};
+const _TRACK_KEY_POOL = ['C major','A minor','G major','E minor','D major','B minor','F major','D minor','A major','F-sharp minor','E major','C-sharp minor','B-flat major','G minor'];
+const _STRUCTURE_LABEL = {standard:'verse–chorus song', hookfirst:'hook-first — chorus leads', storytelling:'narrative / storytelling', minimal:'sparse, minimal — may break form', epic:'epic / multi-section'};
+const _LENGTH_LABEL = {short:'~2 min, tight', medium:'~3 min, standard', long:'~4 min, full structure', extended:'~5 min, epic'};
+// Playlist slot spec — playlists use their own slot taxonomy (algorithm/niche
+// slots + vibe slots), distinct from album roles. buildTrackSpec consults this
+// after ROLE_SPEC so playlist tracks also get per-slot tempo/form/craft.
+// OPENER and CLOSER are shared — ROLE_SPEC's versions cover them.
+const PLAYLIST_SLOT_SPEC = {
+  'HOOK TRACK':        {bpm:[105,125], structure:'hookfirst',    length:'short',  energy:8, craft:'Front-loaded — the hook must land inside the first 10 seconds to beat the skip test.'},
+  'NICHE LOCK':        {bpm:[100,118], structure:'standard',     length:'medium', energy:6, craft:"The purest expression of the playlist's micro-genre — the sonic-fit anchor."},
+  'ALGORITHM LURE':    {bpm:[108,124], structure:'hookfirst',    length:'short',  energy:7, craft:'Engineered for saves — an irresistible, replayable hook with a clean loop point.'},
+  'BPM PIVOT':         {bpm:[122,140], structure:'standard',     length:'medium', energy:7, craft:'Sits at the tempo edge of the cluster — bridges toward an adjacent algorithm pocket.'},
+  'DEEP CUT':          {bpm:[86,108],  structure:'storytelling', length:'medium', energy:5, craft:'Rewards full listens — denser, slower-burn, boosts session-length signal.'},
+  'THRESHOLD CROSSER': {bpm:[100,120], structure:'hookfirst',    length:'medium', energy:7, craft:'Maximum mainstream accessibility — built to clear the 1,000-stream pay threshold.'},
+  'OUTLIER':           {bpm:[70,150],  structure:'storytelling', length:'medium', energy:6, craft:"Controlled variation — deliberately breaks the cluster's pattern to prevent over-clustering."},
+  'SONIC ANCHOR':      {bpm:[100,115], structure:'standard',     length:'medium', energy:6, craft:'Reinforces the signature sound — the track the algorithm fingerprints the niche by.'},
+  'SKIP-RESISTANT MID':{bpm:[105,120], structure:'hookfirst',    length:'medium', energy:7, craft:'A mid-playlist track with no dead air — protects the retention curve.'},
+  'MOOD LOCK':         {bpm:[90,112],  structure:'standard',     length:'medium', energy:5, craft:"Defines the use-case feel — the playlist's identity track."},
+  'GROOVE TRACK':      {bpm:[100,118], structure:'standard',     length:'medium', energy:6, craft:'Body-movement anchor — pocket-forward, keeps energy mid-tier.'},
+  'ENERGY LIFT':       {bpm:[118,138], structure:'hookfirst',    length:'medium', energy:8, craft:'Lifts the energy curve — prevents mid-playlist stagnation.'},
+  'EMOTIONAL PEAK':    {bpm:[85,110],  structure:'epic',         length:'long',   energy:8, craft:'The highest emotional moment — the share-worthy centrepiece.'},
+  'COOL DOWN':         {bpm:[66,88],   structure:'minimal',      length:'short',  energy:3, craft:'Eases out of intensity — sparse, sets up the closer.'},
+};
+function buildTrackSpec(role, i, total) {
+  const _k = String(role||'').toUpperCase().trim();
+  const base = ROLE_SPEC[_k] || PLAYLIST_SLOT_SPEC[_k]
+    || {bpm:[90,115], structure:'standard', length:'medium', energy:6, craft:'Give this track a distinct tempo, image and energy from its neighbours.'};
+  const [lo,hi] = base.bpm;
+  // Deterministic per-index jitter inside the role's BPM band.
+  const bpm = lo + ((i*37) % (hi - lo + 1));
+  // Stride through the key pool so adjacent tracks sit far apart tonally.
+  const key = _TRACK_KEY_POOL[(i*5) % _TRACK_KEY_POOL.length];
+  return {
+    bpm, key, energy: base.energy,
+    structure: base.structure, length: base.length,
+    formLabel: _STRUCTURE_LABEL[base.structure] || base.structure,
+    lengthLabel: _LENGTH_LABEL[base.length] || base.length,
+    craft: base.craft,
+  };
+}
+
 async function generateAlbumTheme() {
   const brief = document.getElementById('alb-brief')?.value?.trim() || '';
   const genre = document.getElementById('alb-genre')?.value || 'pop';
@@ -20044,6 +20298,9 @@ SUMMARY:
 
 ARC:
 [2-3 sentence emotional and narrative arc]
+
+COMMERCIAL ANGLE:
+[one sentence — the single sharpest commercial hook for this album: who buys it, why it sells, and the lane it dominates]
 
 MOTIFS:
 - [motif 1]
@@ -20074,6 +20331,7 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     const name = raw.match(/ALBUM NAME:\s*(.+)/)?.[1]?.trim() || 'Untitled Album';
     const tagsRaw = raw.match(/TAGS:\s*(.+)/)?.[1]?.trim() || '';
     const summary = sec('SUMMARY','ARC'), arc = sec('ARC','MOTIFS');
+    const commercial = sec('COMMERCIAL ANGLE','MOTIFS');
     const motifsRaw = sec('MOTIFS','TRACK TYPES'), trackTypesRaw = sec('TRACK TYPES','SONIC PALETTE');
     const paletteRaw = sec('SONIC PALETTE','PRODUCTION STYLE'), prodStyle = sec('PRODUCTION STYLE','VISUAL DIRECTION');
     const visual = sec('VISUAL DIRECTION','POSSIBLE TITLES');
@@ -20083,17 +20341,30 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     document.getElementById('alb-tags').innerHTML = tagsRaw.split(',').map(t => `<span class="album-concept-tag">${escHtml(t.trim())}</span>`).join('');
     document.getElementById('alb-summary').textContent = summary;
     document.getElementById('alb-arc').textContent = arc;
+    // FIX 8 — commercial-fit one-liner. Shown only when the model returned it.
+    const _comEl = document.getElementById('alb-commercial');
+    const _comWrap = document.getElementById('alb-commercial-wrap');
+    if (_comEl && _comWrap) {
+      if (commercial) {
+        _comEl.textContent = commercial;
+        _comEl.style.display = ''; _comWrap.style.display = '';
+      } else {
+        _comEl.style.display = 'none'; _comWrap.style.display = 'none';
+      }
+    }
     document.getElementById('alb-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
 
-    const trackList = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
+    const _trackLines = trackTypesRaw.split('\n').filter(l=>l.includes('|'));
+    const trackList = _trackLines.map((l,i)=>{
       const [ttype,desc,role] = l.split('|').map(s=>s.trim());
-      return {ttype:ttype||'', desc:desc||'', role:role||''};
+      // Attach the per-track sonic spec (bpm/key/structure/length/energy/craft)
+      // so every track is generated with distinct musical parameters.
+      const spec = buildTrackSpec(ttype||'', i, _trackLines.length);
+      return {ttype:ttype||'', desc:desc||'', role:role||'', ...spec};
     });
     S.albumData = S.albumData || {};
     S.albumData.trackList = trackList;
-    document.getElementById('alb-track-types').innerHTML = trackList.map((tr,i)=>
-      `<div class="gap-role"><div class="gap-role-icon">🎵</div><div class="gap-role-body"><div class="gap-role-name">${escHtml(tr.ttype)}</div><div class="gap-role-desc">${escHtml(tr.desc)} — ${escHtml(tr.role)}</div></div><button class="gap-write-btn" onclick="writeAlbumTrack(${i})">✦ Write This Track</button></div>`
-    ).join('');
+    renderAlbumTrackList();
 
     const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
     document.getElementById('alb-palette').innerHTML = paletteRaw.split('\n').filter(l=>l.includes('|')).map((l,i)=>{
@@ -20105,7 +20376,7 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
     document.getElementById('alb-visual').textContent = visual;
     document.getElementById('alb-titles').innerHTML = titlesRaw.split('|').map(t=>`<div class="gap-role" style="cursor:pointer" onclick="document.getElementById('alb-name').textContent=this.querySelector('.gap-role-name').textContent;toast('Title updated!')"><div class="gap-role-body"><div class="gap-role-name">${escHtml(t.trim())}</div></div></div>`).join('');
 
-    S.albumData = {name, summary, arc, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes, type};
+    S.albumData = {name, summary, arc, commercial, motifs:motifsRaw, trackTypes:trackTypesRaw, trackList:S.albumData?.trackList||[], palette:paletteRaw, visual, titles:titlesRaw, genre, lanes, type};
     toast('🎼 Album concept generated!');
     out.scrollIntoView({behavior:'smooth', block:'nearest'});
   } catch(e) {
@@ -20509,9 +20780,13 @@ ${extraSections}`;
     document.getElementById('pls-arc').textContent = arc;
     document.getElementById('pls-motifs').innerHTML = motifsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
 
-    const trackList = trackTypesRaw.split('\n').filter(l=>l.includes('|')).map(l=>{
+    const _trackLines = trackTypesRaw.split('\n').filter(l=>l.includes('|'));
+    const trackList = _trackLines.map((l,i)=>{
       const [ttype,desc,role] = l.split('|').map(s=>s.trim());
-      return {ttype:ttype||'', desc:desc||'', role:role||''};
+      // Attach the per-track sonic spec so every playlist track is generated
+      // with distinct musical parameters (bpm/key/structure/length/energy).
+      const spec = buildTrackSpec(ttype||'', i, _trackLines.length);
+      return {ttype:ttype||'', desc:desc||'', role:role||'', ...spec};
     });
     document.getElementById('pls-track-types').innerHTML = trackList.map((tr,i)=>{
       const meta = PLAYLIST_ROLE_META[tr.ttype.toUpperCase()] || PLAYLIST_DEFAULT_META;
@@ -20579,12 +20854,16 @@ function writePlaylistTrack(index) {
 
   // Reuse the album-track context plumbing — generateSong() already injects this
   // server-side via _brain.js, and the banner UI already exists.
+  // Per-track spec — regenerate if this playlist predates the spec system.
+  const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, index, pls.trackList.length);
+
   S.albumTrack = {
     album: pls.name,           // displayed as the parent project name
     type:  tr.ttype,
     desc:  tr.desc,
     role:  tr.role,
-    arc:   pls.arc || ''
+    arc:   pls.arc || '',
+    craft: spec.craft, energy: spec.energy, bpm: spec.bpm, key: spec.key
   };
 
   const topicEl = document.getElementById('g-topic');
@@ -20595,6 +20874,13 @@ function writePlaylistTrack(index) {
   document.querySelectorAll('#genre-grid .gp').forEach(g => {
     g.classList.toggle('on', g.dataset.genre === genreKey);
   });
+
+  // Apply this slot's length tier so the song scales to its playlist role.
+  if (spec.length) {
+    S.selectedLength = spec.length;
+    document.querySelectorAll('#length-pills .lpill').forEach(p =>
+      p.classList.toggle('on', p.dataset.val === spec.length));
+  }
 
   const banner = document.getElementById('album-track-banner');
   const bannerText = document.getElementById('album-track-banner-text');
@@ -20621,17 +20907,57 @@ async function writeAllPlaylistTracks() {
   const out = document.getElementById('pls-tracks-written');
   out.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Writing all tracks…</span></div>';
   const results = [];
+  const written = [];  // cross-track memory for this playlist run
   try {
     for (let i = 0; i < pls.trackList.length; i++) {
       if (S.cancelAllPlaylistTracks) break;
       const tr = pls.trackList[i];
       out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${pls.trackList.length}: ${tr.ttype}…`;
       try {
-        const prompt = `Write a complete, production-ready song for this playlist track.\n\nPlaylist: "${pls.name}" (${pls.mode === 'niche' ? 'CADENCE/discovery-arbitrage' : 'vibe/use-case'} playlist)\nSlot role: ${tr.ttype}\nDescription: ${tr.desc}\nGenre family: ${pls.genre || 'pop'}\nEnergy/retention arc: ${pls.arc || 'part of a cohesive playlist'}\nTrack position: ${i+1} of ${pls.trackList.length}\n${pls.bpm ? 'Target BPM range: '+pls.bpm+'\n' : ''}\nSong rules:\n- Use section tags: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n- Hook within first 30 seconds (skip-test critical for ${pls.mode === 'niche' ? 'algorithm signal' : 'use-case retention'})\n- Every line specific — no vague emotions, no clichés\n\nRespond with EXACTLY:\nTITLE: [title]\nLYRICS:\n[full lyrics]\nSONG PROMPT:\n[under 440 chars, Suno-optimised, genre + instruments (4-5) + BPM + vocal style]`;
-        const rawTr = await callClaude(prompt, 'You are a world-class songwriter. Respond with only the requested format.', 1800);
+        // Per-track spec — regenerate if this playlist predates the spec system.
+        const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, pls.trackList.length);
+        const sib = written.length
+          ? written.map((w,n)=>`  ${n+1}. "${w.title}" — opening line: ${w.opening}`).join('\n')
+          : '(this is the first track — nothing to avoid yet)';
+        // FIX 2 — route the bulk playlist path through the brain, same engine
+        // as the single-track Generate button. Per-track spec + cross-track
+        // avoid-list ride along inside songParams.albumTrack, consumed by the
+        // brain's albumNote (craft/energy/bpm/key/siblings).
+        const _plKind = pls.mode === 'niche' ? 'CADENCE / discovery-arbitrage' : 'vibe / use-case';
+        const _plCraft = `${spec.craft || ''}${pls.bpm ? ` Keep tempo within the playlist cluster: ${pls.bpm}.` : ''}`.trim();
+        const songParams = {
+          genre: pls.genre || 'pop',
+          topic: `Track ${i+1} (slot: ${tr.ttype}) of the ${_plKind} playlist "${pls.name}". ${tr.desc || ''}`.trim(),
+          mood: 'Emotional',
+          vocal: 'Lead vocal',
+          structure: spec.structure || 'standard',
+          lyricTier: 'street',
+          era: S.selectedEra || 'modern',
+          length: spec.length || 'medium',
+          quality: S.quality || 'high',
+          theoryLevel: S.theoryLevel || 'standard',
+          mode: 'auto',
+          hookStyle: 'auto',
+          bracketMode: S.bracketMode || 'suno',
+          platform: S.platform || 'suno',
+          albumTrack: {
+            type: tr.ttype || '',
+            album: pls.name || '',
+            role: tr.role || tr.ttype || '',
+            arc: pls.arc || 'part of a cohesive playlist',
+            craft: _plCraft,
+            energy: spec.energy,
+            bpm: spec.bpm,
+            key: spec.key,
+            siblings: sib
+          }
+        };
+        const rawTr = (await callServerStream('generate', songParams, null, null)).text;
         const title  = parseSection(rawTr,'TITLE','LYRICS');
         const lyrics = parseSection(rawTr,'LYRICS','SONG PROMPT');
         const style  = parseSection(rawTr,'SONG PROMPT', null);
+        const opening = (lyrics||'').split('\n').map(s=>s.trim()).filter(s=>s && !/^\[/.test(s))[0] || '(no lyric)';
+        written.push({ title: title || `Track ${i+1}`, opening: opening.slice(0,90) });
         results.push({i, ttype:tr.ttype, title, lyrics, style});
       } catch(e) {
         results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
@@ -20643,7 +20969,10 @@ async function writeAllPlaylistTracks() {
   // Stash results so inline onclicks can pull lyrics/style by index — avoids
   // string-interpolating multi-line content into onclick attribute literals.
   S._playlistWriteResults = results;
-  out.innerHTML = results.map(r => `
+  out.innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn btn-sm btn-gold" onclick="saveAllPlsTracks(this)">💾 Save All to Library</button>
+    </div>` + results.map(r => `
     <div style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
         <div>
@@ -20652,13 +20981,53 @@ async function writeAllPlaylistTracks() {
         </div>
         <div style="display:flex;gap:6px">
           <button class="btn btn-sm" onclick="safeCopy(S._playlistWriteResults?.[${r.i}]?.lyrics||'','Lyrics copied')">Copy Lyrics</button>
-          <button class="btn btn-sm btn-gold" onclick="safeCopy(S._playlistWriteResults?.[${r.i}]?.style||'','Style copied')">Copy Style</button>
+          <button class="btn btn-sm" onclick="safeCopy(S._playlistWriteResults?.[${r.i}]?.style||'','Style copied')">Copy Style</button>
+          <button class="btn btn-sm btn-gold" onclick="savePlsTrackToLib(${r.i},this)">💾 Save</button>
         </div>
       </div>
       <pre style="font-family:var(--mono);font-size:12px;line-height:2;color:var(--tx2);white-space:pre-wrap;background:var(--s4);border:1px solid var(--b1);border-radius:var(--r1);padding:12px;margin-bottom:8px">${escHtml(r.lyrics||'')}</pre>
       <div class="styleout" style="font-size:11px">${escHtml(r.style||'')}</div>
     </div>`).join('');
   toast(`✓ ${results.length} tracks written`);
+}
+
+// FIX 3 — persist a bulk-generated playlist track to the client-side library.
+// Pulls content from S._playlistWriteResults by index (never interpolates
+// lyric content into onclick) and runs the real S.library + persistLib() path.
+function savePlsTrackFromResult(r) {
+  if (!r || !(r.lyrics || '').trim()) { toast('Nothing to save on this track'); return false; }
+  const genre = S.playlistData?.genre || 'pop';
+  const song = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    title:  r.title || 'Untitled Playlist Track',
+    topic:  r.ttype || '',
+    lyrics: r.lyrics || '',
+    style:  r.style || '',
+    genre:  genre,
+    mood:   '',
+    ts: Date.now(),
+  };
+  S.library.unshift(song);
+  if (S.library.length > 200) S.library = S.library.slice(0, 200);
+  persistLib();
+  return true;
+}
+
+function savePlsTrackToLib(idx, btn) {
+  const r = S._playlistWriteResults?.[idx];
+  if (savePlsTrackFromResult(r)) {
+    toast('✓ Saved to library');
+    if (btn) { btn.textContent = '✓ Saved'; btn.disabled = true; }
+  }
+}
+
+function saveAllPlsTracks(btn) {
+  const results = S._playlistWriteResults || [];
+  if (!results.length) { toast('No tracks to save'); return; }
+  let saved = 0;
+  results.forEach(r => { if (savePlsTrackFromResult(r)) saved++; });
+  toast(`✓ Saved ${saved} track${saved !== 1 ? 's' : ''} to library`);
+  if (btn) { btn.textContent = '✓ All Saved'; btn.disabled = true; }
 }
 
 async function playlistInstantEdit() {

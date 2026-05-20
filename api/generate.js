@@ -174,17 +174,17 @@ module.exports = async function handler(req, res) {
 
   // ── Flow dispatch ──────────────────────────────────────────────
   // Flow piggybacks here to fit the 12-function Hobby cap. Two modes:
-  //   { mode: 'flow-spec', concept } → { spec }
   //   { mode: 'flow-song', concept, spec } → { title, lyrics, sunoPrompt }
+  //   { mode: 'flow-score', lyrics, genre, topic } → { score }
   //
   // Both modes participate in the SAME plan/rate-limit gate as normal
-  // generate — flow-song increments usage on success, flow-spec is the
-  // cheap classifier and only blocks at the gate.
+  // generate — flow-song increments usage on success, flow-score is the
+  // cheap async scorer and only blocks at the burst cap.
   const flowMode = req.body && req.body.mode;
 
   // Shared Flow AI caller — must live at handler scope so both the
-  // flow-spec/flow-song branch AND the flow-score branch can reach it.
-  // (Was previously nested inside the spec/song if-block, which made the
+  // flow-song branch AND the flow-score branch can reach it.
+  // (Was previously nested inside the song if-block, which made the
   // function declaration's block-scoped hoist invisible from flow-score.)
   async function flowCallAI(messages, system, max_tokens, budgetMs) {
     const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
@@ -216,21 +216,14 @@ module.exports = async function handler(req, res) {
       throw e;
     }
   }
-  if (flowMode === 'flow-spec' || flowMode === 'flow-song') {
+  if (flowMode === 'flow-song') {
     const flowConcept = (req.body.concept || '').trim();
     if (!flowConcept) return res.status(400).json({ error: 'concept is required' });
     if (flowConcept.length > 1000) return res.status(400).json({ error: 'concept must be 1000 chars or fewer' });
 
-    // Per-user-per-minute cap on the unmetered support modes (flow-spec,
-    // flow-score) so they can't be spammed to drain AI credits.
-    if (!isAdmin && (flowMode === 'flow-spec' || flowMode === 'flow-score')) {
-      const burstKey = `soniq:flow:burst:${flowMode}:${user.id}:${Math.floor(Date.now()/60000)}`;
-      const burstCount = parseInt(await redisGet(burstKey) || '0', 10);
-      if (burstCount >= 12) {
-        return res.status(429).json({ error: 'rate_limit', message: 'Slow down — try again in a minute.' });
-      }
-      redisIncrExpire(burstKey, 90);
-    }
+    // flow-song is metered by the plan/rate-limit gate below — no burst cap
+    // needed. The unmetered flow-score mode has its own burst cap in its
+    // dedicated branch further down.
 
     // Plan + rate-limit gate (mirrors the normal-flow block below)
     let flowPlan = isAdmin ? 'studio' : 'free';
@@ -253,47 +246,6 @@ module.exports = async function handler(req, res) {
           ? 'Your 3 free songs are used. Upgrade to keep creating.'
           : 'Monthly limit reached. Upgrade for more songs.';
         return res.status(429).json({ error: 'limit_reached', message: hint, limit: flowLimit, plan: flowPlan });
-      }
-    }
-
-    if (flowMode === 'flow-spec') {
-      const SPEC_SYSTEM = `You are a senior music producer and A&R. Given a songwriter's concept, return the optimal song spec as JSON.
-
-Think across the full landscape of popular music — fusion-aware (dream-pop, neo-soul, indie folk, dark americana, ambient r&b, drill, bedroom pop, lo-fi hip-hop, post-punk, shoegaze, synth-pop, future-soul, etc.).
-
-Rules:
-- Match the concept's emotional weight.
-- Tempo fits vocal phrasing (ballads 60-84, mid 84-110, drive 110-140, dance 120-180).
-- Vocal: 3-6 words, specific.
-- Instrumentation: 3-5 distinct items.
-- Mood arc shows movement OR explicitly says it stays still.
-- Title: 1-6 evocative words. No subtitles. No quotes.
-- sunoPrompt: 8-14 comma-separated style descriptors. NO lyrics.
-- Fusion: set fusion=true and subGenre when blending. Else fusion=false, subGenre=null.
-
-Return ONLY valid JSON:
-{"title":"...","genre":"...","subGenre":null,"fusion":false,"tempo":72,"key":"A minor","vocal":"...","instrumentation":["...","...","..."],"mood":"...","moodArc":{"start":"...","end":"..."},"structure":"V1 → C → V2 → C → B → C","sunoPrompt":"..."}
-
-No prose. No markdown fences.`;
-      try {
-        const text = await flowCallAI(
-          [{ role: 'user', content: 'CONCEPT:\n' + flowConcept + '\n\nReturn the FlowSpec JSON now.' }],
-          SPEC_SYSTEM,
-          800,
-        );
-        const cleaned = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-        let spec;
-        try { spec = JSON.parse(cleaned); }
-        catch (e) { return res.status(502).json({ error: 'Model returned invalid JSON', detail: cleaned.slice(0, 200) }); }
-        if (!spec.title || !spec.genre || !spec.tempo || !spec.key || !spec.vocal ||
-            !Array.isArray(spec.instrumentation) || spec.instrumentation.length === 0 ||
-            !spec.moodArc || !spec.moodArc.start || !spec.moodArc.end ||
-            !spec.structure || !spec.sunoPrompt) {
-          return res.status(502).json({ error: 'Spec was incomplete — try a more specific concept' });
-        }
-        return res.status(200).json({ spec });
-      } catch (e) {
-        return res.status(500).json({ error: e.message || 'Spec generation failed' });
       }
     }
 
@@ -375,6 +327,9 @@ No prose. No markdown fences.`;
       { key:'shoegaze', brainKey:'rock', label:'Shoegaze',
         tokens:{ 5:['shoegaze','blackgaze'],
                  3:['wall of sound','reverb wall'] } },
+      { key:'slowcore', brainKey:'rock', label:'Slowcore',
+        tokens:{ 5:['slowcore','sadcore','slow-core'],
+                 3:['glacial tempo','sparse slow rock','funeral pace'] } },
       { key:'math_rock', brainKey:'rock', label:'Math Rock',
         tokens:{ 5:['math rock','math-rock'],
                  3:['polyrhythm','7/8','odd meter','time signature'] } },
@@ -662,6 +617,14 @@ No prose. No markdown fences.`;
         lyricTier: flowAllowPlatinum ? 'street' : 'radio',
         isAdmin: isAdmin,
         plan: flowPlan,
+        // Flow omits the craft dropdowns Lucky's path exposes — auto-set
+        // server-side so flow-song songs get the same quality levers.
+        //   emotionalVelocity: 'auto' → brain resolves to the genre default.
+        //   surprise: {} object → brain's selectSurpriseMoves runs in full
+        //     auto mode (genre/mood-scored move picks). Same shape Lucky and
+        //     Write pass; absent fields default safely inside the engine.
+        emotionalVelocity: 'auto',
+        surprise: { intensity: 'medium', autoMode: true },
       });
       if (!built || !built.system || !built.prompt) throw new Error('Brain returned empty prompt');
     } catch (brainErr) {
@@ -689,7 +652,7 @@ No prose. No markdown fences.`;
         [{ role: 'user', content: built.prompt }],
         built.system,
         1800,                    // 3-min song fits in 1500-1800 tokens; no production brief tail
-        40000,                   // tighter internal timeout (was 55s) — abort & refund 15s earlier on slow upstream
+        55000,                   // sit just under Vercel's 60s ceiling: a song generation runs ~35-40s, and after a fast primary-provider failure the fallback needs the near-full budget — a tighter cap aborts slow-but-valid completions and 500s
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
     } catch (e) {
@@ -774,15 +737,17 @@ No prose. No markdown fences.`;
       })(sGenre);
       // Lightweight scorer — don't use the full 9-dimension feedback prompt,
       // it overflows the 300-token budget and the JSON gets cut off. A tight
-      // 2-field rubric fits cleanly and parses every time.
+      // 3-field rubric fits cleanly and parses every time.
       const fbText = await flowCallAI(
         [{ role: 'user', content:
           `Genre: ${brainGenre}\nConcept: ${sTopic}\n\nLYRICS:\n${sLyrics}\n\n` +
-          `Score this song's hook strength 0-100 (50=workable, 70=strong, 85=hit). ` +
-          `Return ONLY one JSON line: {"hookScore":<int>,"verdict":"<one sentence ≤140 chars: what works AND one specific thing to sharpen>"}`
+          `Score this song on two axes, 0-100 each (50=workable, 70=strong, 85=hit):\n` +
+          `- hookScore: chorus/hook strength — memorability, payoff, sing-along potential.\n` +
+          `- songScore: overall song quality — structure, lyric craft, concept execution, prompt-readiness.\n` +
+          `Return ONLY one JSON line: {"hookScore":<int>,"songScore":<int>,"verdict":"<one sentence ≤140 chars: what works AND one specific thing to sharpen>"}`
         }],
-        `You are SONIQ's hook coach. Honest, terse, one-shot scoring. Output strict JSON only — no markdown, no preamble.`,
-        180,
+        `You are SONIQ's song coach. Honest, terse, one-shot scoring. Output strict JSON only — no markdown, no preamble.`,
+        240,
         20000,
       );
       const cleaned = fbText.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
@@ -790,6 +755,11 @@ No prose. No markdown fences.`;
       try { scoreData = JSON.parse(cleaned); } catch (e) {}
       if (!scoreData || typeof scoreData.hookScore !== 'number') {
         return res.status(502).json({ error: 'Score parse failed' });
+      }
+      // songScore is new — if the model omitted it, fall back to hookScore so
+      // the client always has a number to render rather than dashes.
+      if (typeof scoreData.songScore !== 'number') {
+        scoreData.songScore = scoreData.hookScore;
       }
       return res.status(200).json({ score: scoreData });
     } catch (e) {

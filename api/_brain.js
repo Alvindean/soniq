@@ -527,6 +527,7 @@ const SUBSTYLE_NOTES={
   'Video Game OST':       'Video Game OST DNA: Looping-friendly structures (8-bar or 16-bar loops that sit under gameplay indefinitely). Memorable melodic motif that becomes the game\'s sonic identity. Genre varies by setting (orchestral for fantasy, synthwave for cyberpunk, chiptune for retro). Dynamic layering — verses add/remove instruments to match gameplay intensity. Suno style: "video game soundtrack, looping-friendly, memorable melodic motif, dynamic layering, orchestral or synthwave or chiptune by setting, cinematic".',
   // Alt-Rock substyles
   'Shoegaze':            'Shoegaze DNA: Wall-of-sound guitars drenched in reverb, chorus, and flange. Vocals buried deep in the mix as another texture — sung into the effect chain, not over it. Drowsy mid-tempo 90-120 BPM. Emotional fog over specific words — felt more than understood. Dynamic shifts are textural (more layers, more feedback), not quiet-loud. Suno style: "shoegaze, wall of reverb guitars, chorus pedal, buried dreamy vocals, 100 BPM, hazy textures, atmospheric". Artists: My Bloody Valentine, Slowdive, Ride, Cocteau Twins, DIIV, Beach House.',
+  'Slowcore':            'Slowcore DNA: Glacial tempo (50-75 BPM) — the slowest rock there is. Silence is an instrument: vast space between every note and word, nothing rushed, nothing filled. Hushed, intimate, near-whispered vocals sitting close to the mic. Minimal drums (brushes or none), sparse clean guitar, simple unhurried bass. Emotional weight comes from restraint and stillness, NOT quiet-loud dynamics — grief, numbness, depression, quiet endurance. Dry, close, unglossed production where every breath and string-squeak is audible. Lyrics: spare, plain-spoken, devastating in their understatement — never ornate. Suno style: "slowcore, glacial tempo, sparse clean guitar, brushed drums, hushed intimate vocals, 60 BPM, vast space, melancholic stillness, dry close production". Artists: Low, Codeine, Red House Painters, Duster, Bedhead, Mojave 3.',
   'Post-Punk':           'Post-Punk DNA: Angular jagged guitars, driving melodic bass (bass IS the melody), tight mechanical drums. Detached declamatory vocals — half-spoken, emotionally controlled. Cold urban atmosphere, alienation and anxiety themes. 120-140 BPM. Minor key tonality. Suno style: "post-punk, driving melodic bass, angular guitars, tight mechanical drums, 130 BPM, cold detached vocals, Joy Division feel". Artists: Joy Division, The Cure, Interpol, Gang of Four, Wire, Siouxsie and the Banshees.',
   'Grunge':              'Grunge DNA: Heavy distorted power chords, sludgy Seattle guitar tone. Quiet-loud-quiet dynamics WITHIN one song — whispered verse explodes into screamed chorus. 90-120 BPM. Vulnerable, disaffected, self-loathing themes. Raw unpolished production, no gloss. Suno style: "grunge, distorted guitars, sludgy power chords, quiet loud dynamics, 100 BPM, raw Seattle production". Artists: Nirvana, Pearl Jam, Soundgarden, Alice in Chains, Mudhoney, Screaming Trees.',
   'Indie Rock':          'Indie Rock DNA: Jangly clean or lightly overdriven guitars, live-band feel, melodic bass carrying counter-melody. Conversational-to-emotional vocal delivery — unfussed, honest. 110-140 BPM. Lyrically literary, conversational, or wry. Unpolished but intentional production. Suno style: "indie rock, jangly guitars, live band, 125 BPM, melodic bass, conversational vocals, warm". Artists: The Strokes, Arctic Monkeys, Vampire Weekend, Modest Mouse, Pavement, Wilco, Spoon.',
@@ -726,6 +727,7 @@ const SUBSTYLE_SUNO = {
   'Mass Choir':         'mass choir gospel, 40+ voices SATB stacked, Hammond B3, lead vocalist call response, 95 BPM, traditional mass-choir celebration, SATB stacked arrangement',
   // Alt-Rock
   'Shoegaze':           'shoegaze, wall of reverb guitars, chorus pedal, buried dreamy vocals, 100 BPM, hazy textures, atmospheric',
+  'Slowcore':           'slowcore, glacial tempo, sparse clean guitar, brushed drums, hushed intimate vocals, 60 BPM, vast space, melancholic stillness, dry close production',
   'Post-Punk':          'post-punk, driving melodic bass, angular guitars, tight mechanical drums, 130 BPM, cold detached vocals',
   'Grunge':             'grunge, distorted guitars, sludgy power chords, quiet loud dynamics, 100 BPM, raw Seattle production',
   'Indie Rock':         'indie rock, jangly guitars, live band, 125 BPM, melodic bass, conversational vocals, warm',
@@ -4941,28 +4943,33 @@ Method: ${v.method}`;
 // safety margin); each tier picks a target band BELOW that ceiling so shorter
 // songs come out shorter and longer songs use more of the budget.
 const LENGTH_BUDGETS = {
-  short:    { label: 'Short',    mins: '~2 min',  chars: '1800–2500', sections: '~2 verses + chorus + optional bridge. Trim everything that doesn\'t earn its place.' },
-  medium:   { label: 'Medium',   mins: '~3 min',  chars: '2800–3600', sections: 'standard verse → chorus → verse → chorus → bridge → final chorus.' },
-  long:     { label: 'Long',     mins: '~4 min',  chars: '3600–4400', sections: 'full structure with extended bridge or 3rd verse. Earn the runtime.' },
-  extended: { label: 'Extended', mins: '~5+ min', chars: '4400–4900', sections: 'epic / beat-switch / multi-movement (Sicko Mode-style). NEVER cross 4900.' },
+  short:    { label: 'Short',    mins: '~2 min',  chars: '1800–2500',
+    blueprint: '2 verses · 2 choruses · NO bridge · intro/outro optional and short. ~4-5 sections total.' },
+  medium:   { label: 'Medium',   mins: '~3 min',  chars: '2800–3600',
+    blueprint: '2 verses · 3 choruses · 1 bridge · intro/outro optional. ~6-7 sections total.' },
+  long:     { label: 'Long',     mins: '~4 min',  chars: '3600–4400',
+    blueprint: '3 verses · 3-4 choruses · 1 full bridge · 1 intro + 1 outro. ~8-9 sections total.' },
+  extended: { label: 'Extended', mins: '~5+ min', chars: '4400–4900',
+    blueprint: '4 verses · 4-5 choruses · 1-2 bridges · intro + interlude + outro · optional beat-switch movement. ~11+ sections total. NEVER cross 4900 chars.' },
 };
+// The length tier drives the SECTION COUNT — a concrete structural instruction
+// the model honours reliably — not just a character budget, which the model
+// self-counts and ignores. Without this, every tier converged on the model's
+// default ~3-min section count and the length pill did nothing.
 function buildLengthBudgetNote(length) {
   const key = LENGTH_BUDGETS[length] ? length : 'medium';
   const b = LENGTH_BUDGETS[key];
-  // Parse the band ("2800–3600") so we can name the minimum and target
-  // explicitly. LLMs aim for the floor of a soft range — naming the minimum
-  // as a hard floor and the target as the upper end pushes the output up.
+  // Parse the band ("2800–3600") so we can name the minimum and target.
   const m = String(b.chars).match(/(\d+)\D+(\d+)/);
   const minChars = m ? m[1] : '2800';
   const maxChars = m ? m[2] : '3600';
-  return `\n\n📏 LENGTH TARGET — ${b.label.toUpperCase()} (${b.mins}):
-• HARD FLOOR: ${minChars} chars MINIMUM. Songs shorter than ${minChars} chars are rejected — they feel half-finished and fail the user's length contract.
-• TARGET: aim ${maxChars} chars (the upper end of the band). Use the full structure, repeat the chorus the right number of times, give the bridge real bars, let the outro breathe.
-• COUNTING: count EVERY character between the LYRICS: header and the SONG PROMPT: header — [Section] tags, newlines, parentheses, ad-libs, all of it.
-• STRUCTURE FIT: ${b.sections}
-• UNDER-BUDGET FIX (most common failure — DO THIS BEFORE SUBMITTING): if you finished and you're under ${minChars}, you stopped too early. Add another chorus repeat with different ad-libs, extend the bridge by 4-8 bars, add a post-chorus vamp, lengthen the outro, or insert an additional verse. Do NOT submit a short song.
-• OVER-BUDGET FIX: only relevant if you're past ${maxChars}. Cut middle chorus repeats (keep first two + the final), shorten the bridge, trim the outro, drop V3/V4/V5 first.
-• Suno truncates at 5000 chars — leave a 100-char safety margin. But the FAR more common failure is undershooting, not overshooting. Fill the band.`;
+  return `\n\n📏 LENGTH TARGET — ${b.label.toUpperCase()} (${b.mins}) — this is the AUTHORITY on song scale:
+• SECTION BLUEPRINT — write EXACTLY this many sections: ${b.blueprint}
+• This OVERRIDES the section count implied by the "Structure:" line above. Keep that line's arrangement SHAPE and section ORDER, but scale the COUNT of verses/choruses/bridges to match this blueprint. The user picked ${b.label} on purpose — a song that lands on the same section count regardless of tier has ignored this control.
+• CHAR BAND: aim ${minChars}–${maxChars} chars of lyrics (everything between the LYRICS: and SONG PROMPT: headers). ${minChars} is the floor — under it reads half-finished.
+• UNDER-BUDGET FIX: if you finished short, you dropped a section from the blueprint — add the missing verse/chorus/bridge. Do NOT pad existing sections with filler lines.
+• OVER-BUDGET FIX: only if past ${maxChars} chars — trim the outro and middle chorus repeats, never drop a blueprint section.
+• Suno truncates at 5000 chars — never exceed 4900.`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -5714,9 +5721,18 @@ ${chosenOutliers.length ? `- Include these harmonic outliers:\n${chosenOutliers.
     ? `\n\nARTIST VOICE: ${voice.name ? `Write as ${voice.name}.` : ''} ${voice.influences ? `Lyric influences: ${voice.influences}.` : ''} ${voice.forbidden ? `NEVER use these phrases: ${voice.forbidden}.` : ''}`
     : '';
 
-  // Album context
+  // Album context — carries the per-track spec so each track diverges from
+  // its siblings. A bare "fits cohesively" note made every track converge on
+  // the shared theme; this adds the track's own job, sonic spec and an
+  // explicit do-not-reuse list of sibling tracks.
   const albumNote = albumTrack
-    ? `\n\nALBUM CONTEXT: This song is the "${albumTrack.type}" on the album "${albumTrack.album}". Its role: ${albumTrack.role}. The album's emotional arc: ${albumTrack.arc}. Write it so it fits cohesively within that album story.`
+    ? `\n\nALBUM CONTEXT: This is the "${albumTrack.type}" track on the album "${albumTrack.album}". Role on the album: ${albumTrack.role}. The album's emotional arc: ${albumTrack.arc}.`
+      + (albumTrack.craft ? `\nTHIS TRACK'S JOB: ${albumTrack.craft}` : '')
+      + ((albumTrack.bpm || albumTrack.key || albumTrack.energy)
+          ? `\nSONIC SPEC — make this track audibly distinct from its siblings:${albumTrack.bpm ? ' tempo ~' + albumTrack.bpm + ' BPM;' : ''}${albumTrack.key ? ' key ' + albumTrack.key + ';' : ''}${albumTrack.energy ? ' energy ' + albumTrack.energy + '/10.' : ''}`
+          : '')
+      + (albumTrack.siblings ? `\nALREADY ON THIS ALBUM — do NOT reuse these titles, their hook phrases, or their central images:\n${albumTrack.siblings}` : '')
+      + `\nFit the album's shared world, but this track must stand on its own — a DIFFERENT story, image, tempo feel and emotional register from its sibling tracks. Cohesion is shared texture, NOT a repeated subject.`
     : '';
 
   // Age group note
