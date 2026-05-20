@@ -1008,6 +1008,32 @@ module.exports = async function handler(req, res) {
     }
   }
 
+  // OpenRouter is the primary streaming provider (funded, working account).
+  // Anthropic is the fallback — only tried if OpenRouter fails pre-stream.
+  if (openrouterKey) {
+    try {
+      await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
+      recordUsage();
+      res.write(`data: ${JSON.stringify({done: true})}\n\n`);
+      return res.end();
+    } catch (err) {
+      // Connection terminated mid-stream — transient, can't cleanly fall back
+      // (the response stream is already dirty), so end here.
+      const isTerminated = err.message === 'terminated' || err.message.includes('terminated');
+      if (isTerminated) {
+        res.write(`data: ${JSON.stringify({error: 'Connection dropped mid-stream — please try again.'})}\n\n`);
+        return res.end();
+      }
+      // CREDITS_LOW is raised pre-stream — safe to fall back to Anthropic.
+      if (err.message === 'CREDITS_LOW' && !anthropicKey) {
+        res.write(`data: ${JSON.stringify({error: 'OpenRouter credit balance too low — add credits at openrouter.ai/settings/credits.'})}\n\n`);
+        return res.end();
+      }
+      console.error('OpenRouter stream failed, trying fallback:', err.message);
+      errors.push('OpenRouter: ' + (err.message === 'CREDITS_LOW' ? 'credit balance too low' : err.message));
+    }
+  }
+
   if (anthropicKey) {
     try {
       await streamAnthropic(anthropicKey, messages, system, max_tokens, res);
@@ -1016,35 +1042,7 @@ module.exports = async function handler(req, res) {
       return res.end();
     } catch (err) {
       console.error('Anthropic stream failed:', err.message);
-      // Surface auth errors immediately — no point trying OpenRouter if key is wrong
-      if (err.message.includes('401') || err.message.includes('invalid') || err.message.includes('authentication')) {
-        const keyHint = body?.userKey ? 'Your API key' : 'ANTHROPIC_API_KEY in Vercel env vars';
-        res.write(`data: ${JSON.stringify({error: `API key rejected — check ${keyHint} is correct and active.`})}\n\n`);
-        return res.end();
-      }
       errors.push('Anthropic: ' + err.message);
-    }
-  }
-
-  if (openrouterKey) {
-    try {
-      await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
-      recordUsage();
-      res.write(`data: ${JSON.stringify({done: true})}\n\n`);
-      return res.end();
-    } catch (err) {
-      if (err.message === 'CREDITS_LOW') {
-        res.write(`data: ${JSON.stringify({error: 'OpenRouter credit balance too low — add credits at openrouter.ai/settings/credits.'})}\n\n`);
-        return res.end();
-      }
-      // Connection terminated mid-stream — transient, safe to retry
-      const isTerminated = err.message === 'terminated' || err.message.includes('terminated');
-      if (isTerminated) {
-        res.write(`data: ${JSON.stringify({error: 'Connection dropped mid-stream — please try again.'})}\n\n`);
-        return res.end();
-      }
-      console.error('OpenRouter stream failed:', err.message);
-      errors.push('OpenRouter: ' + err.message);
     }
   }
 

@@ -200,18 +200,17 @@ module.exports = async function handler(req, res) {
       guard.catch(() => {});
       return Promise.race([promise, guard]).finally(() => clearTimeout(to));
     };
-    // Give the primary attempt ~55% of the budget so the fallback has real
-    // time to run. Before: Anthropic burned the whole 50s, OpenRouter fallback
-    // ran against a fresh 50s timer but Vercel killed the lambda at 60s — so
-    // the fallback effectively never completed and users got AI timeout.
-    const primaryMs = ak && ok ? Math.floor(limit * 0.55) : limit;
+    // OpenRouter is the primary provider — the funded, working account. It
+    // gets the full budget: a real generation runs ~37-40s and a split would
+    // abort slow-but-valid completions. Anthropic is the fallback — it only
+    // fires if OpenRouter errors fast, leaving real time on the clock.
     try {
-      if (ak) return await withTimeout(callAnthropic(ak, messages, system, max_tokens), primaryMs);
-      return await withTimeout(callOpenRouter(ok, messages, system, max_tokens), limit);
+      if (ok) return await withTimeout(callOpenRouter(ok, messages, system, max_tokens), limit);
+      return await withTimeout(callAnthropic(ak, messages, system, max_tokens), limit);
     } catch (e) {
       const remaining = limit - (Date.now() - tStart) - 500;
-      if (ok && ak && remaining > 5000) {
-        return await withTimeout(callOpenRouter(ok, messages, system, max_tokens), remaining);
+      if (ak && ok && remaining > 5000) {
+        return await withTimeout(callAnthropic(ak, messages, system, max_tokens), remaining);
       }
       throw e;
     }
@@ -883,29 +882,29 @@ module.exports = async function handler(req, res) {
     }
   };
 
-  // Try Anthropic first, then OpenRouter as fallback
-  if (anthropicKey) {
-    try {
-      const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
-      recordUsage();
-      return res.status(200).json({content:[{type:'text', text}]});
-    } catch(err) {
-      console.error('Anthropic failed, trying fallback:', err.message);
-      errors.push('Anthropic: ' + err.message);
-    }
-  }
-
+  // Try OpenRouter first (the funded primary), then Anthropic as fallback
   if (openrouterKey) {
     try {
       const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
       recordUsage();
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
-      if (err.message === 'CREDITS_LOW') {
+      if (err.message === 'CREDITS_LOW' && !anthropicKey) {
         return res.status(402).json({error: 'Your OpenRouter credit balance is too low. Add credits at openrouter.ai/settings/credits to continue.'});
       }
-      console.error('OpenRouter failed:', err.message);
-      errors.push('OpenRouter: ' + err.message);
+      console.error('OpenRouter failed, trying fallback:', err.message);
+      errors.push('OpenRouter: ' + (err.message === 'CREDITS_LOW' ? 'credit balance too low' : err.message));
+    }
+  }
+
+  if (anthropicKey) {
+    try {
+      const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
+      recordUsage();
+      return res.status(200).json({content:[{type:'text', text}]});
+    } catch(err) {
+      console.error('Anthropic failed:', err.message);
+      errors.push('Anthropic: ' + err.message);
     }
   }
 
