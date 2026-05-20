@@ -19963,7 +19963,7 @@ function writeAlbumTrack(index) {
 
   // Per-track spec — regenerate if this album predates the spec system
   // (older S.albumData still in memory from a prior session).
-  const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, index, alb.trackList.length);
+  const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, index, alb.trackList.length, 'album');
 
   // Store context so generateSong() can inject it through the brain's albumNote.
   // trackIndex lets generateSong() write the finished song back into the album slot.
@@ -20028,7 +20028,7 @@ async function writeAllTracks() {
       out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
       try {
         // Per-track spec — regenerate if this album predates the spec system.
-        const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, alb.trackList.length);
+        const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, alb.trackList.length, 'album');
         // Cross-track avoid-list: every prior track this run, so track i never
         // reuses a sibling's title, hook or central image.
         const sib = written.length
@@ -20255,9 +20255,16 @@ const PLAYLIST_SLOT_SPEC = {
   'EMOTIONAL PEAK':    {bpm:[85,110],  structure:'epic',         length:'long',   energy:8, craft:'The highest emotional moment — the share-worthy centrepiece.'},
   'COOL DOWN':         {bpm:[66,88],   structure:'minimal',      length:'short',  energy:3, craft:'Eases out of intensity — sparse, sets up the closer.'},
 };
-function buildTrackSpec(role, i, total) {
+function buildTrackSpec(role, i, total, kind) {
   const _k = String(role||'').toUpperCase().trim();
-  const base = ROLE_SPEC[_k] || PLAYLIST_SLOT_SPEC[_k]
+  // Album roles and playlist slots share a few keys — DEEP CUT, plus the
+  // intentionally-shared OPENER / CLOSER. Resolve against the CALLER's own
+  // taxonomy first: kind:'playlist' checks PLAYLIST_SLOT_SPEC first so a
+  // playlist DEEP CUT gets the playlist spec instead of silently inheriting
+  // the album one (ROLE_SPEC used to be consulted first unconditionally).
+  const base = (kind === 'playlist'
+      ? (PLAYLIST_SLOT_SPEC[_k] || ROLE_SPEC[_k])
+      : (ROLE_SPEC[_k] || PLAYLIST_SLOT_SPEC[_k]))
     || {bpm:[90,115], structure:'standard', length:'medium', energy:6, craft:'Give this track a distinct tempo, image and energy from its neighbours.'};
   const [lo,hi] = base.bpm;
   // Deterministic per-index jitter inside the role's BPM band.
@@ -20359,7 +20366,7 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
       const [ttype,desc,role] = l.split('|').map(s=>s.trim());
       // Attach the per-track sonic spec (bpm/key/structure/length/energy/craft)
       // so every track is generated with distinct musical parameters.
-      const spec = buildTrackSpec(ttype||'', i, _trackLines.length);
+      const spec = buildTrackSpec(ttype||'', i, _trackLines.length, 'album');
       return {ttype:ttype||'', desc:desc||'', role:role||'', ...spec};
     });
     S.albumData = S.albumData || {};
@@ -20785,7 +20792,7 @@ ${extraSections}`;
       const [ttype,desc,role] = l.split('|').map(s=>s.trim());
       // Attach the per-track sonic spec so every playlist track is generated
       // with distinct musical parameters (bpm/key/structure/length/energy).
-      const spec = buildTrackSpec(ttype||'', i, _trackLines.length);
+      const spec = buildTrackSpec(ttype||'', i, _trackLines.length, 'playlist');
       return {ttype:ttype||'', desc:desc||'', role:role||'', ...spec};
     });
     document.getElementById('pls-track-types').innerHTML = trackList.map((tr,i)=>{
@@ -20855,7 +20862,7 @@ function writePlaylistTrack(index) {
   // Reuse the album-track context plumbing — generateSong() already injects this
   // server-side via _brain.js, and the banner UI already exists.
   // Per-track spec — regenerate if this playlist predates the spec system.
-  const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, index, pls.trackList.length);
+  const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, index, pls.trackList.length, 'playlist');
 
   S.albumTrack = {
     album: pls.name,           // displayed as the parent project name
@@ -20915,7 +20922,7 @@ async function writeAllPlaylistTracks() {
       out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${pls.trackList.length}: ${tr.ttype}…`;
       try {
         // Per-track spec — regenerate if this playlist predates the spec system.
-        const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, pls.trackList.length);
+        const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, pls.trackList.length, 'playlist');
         const sib = written.length
           ? written.map((w,n)=>`  ${n+1}. "${w.title}" — opening line: ${w.opening}`).join('\n')
           : '(this is the first track — nothing to avoid yet)';

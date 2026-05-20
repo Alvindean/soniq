@@ -607,7 +607,7 @@ module.exports = async function handler(req, res) {
         mood: brainMood,
         vocal: spec.vocal || 'any',
         structure: 'standard',
-        era: 'modern',
+        era: 'current',
         length: 'short',
         quality: flowAllowPlatinum ? 'viral' : 'high',
         bracketMode: 'suno',

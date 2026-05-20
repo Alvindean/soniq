@@ -5669,9 +5669,21 @@ function buildSongPrompt(params) {
 
   const genreLabel = GENRE_LABELS[genre] || genre;
   // Freestyle = bars-only override regardless of genre
-  const structStr = freestyleMode
+  // The length tier's section blueprint is the authority on song scale — the
+  // SHORT tier mandates NO bridge. When it does, strip any [Bridge] section
+  // from the displayed structure so the "Structure:" line and the LENGTH
+  // blueprint stop contradicting each other (flow-song pairs structure
+  // 'standard' — which names a [Bridge] — with length 'short').
+  const _noBridgeTier = /\bNO bridge\b/i.test((LENGTH_BUDGETS[length] || {}).blueprint || '');
+  let structStr = freestyleMode
     ? '[Intro | optional, beat only] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
     : (STRUCTURES[structure] || STRUCTURES.standard);
+  if (_noBridgeTier && !freestyleMode && /\[Bridge/i.test(structStr)) {
+    structStr = structStr
+      .replace(/\s*(?:→|->)\s*\[Bridge[^\]]*\]/gi, '')
+      .replace(/^\s*\[Bridge[^\]]*\]\s*(?:→|->)\s*/i, '')
+      .trim();
+  }
   const freestyleSongLock = freestyleMode ? `
 
 🎤 FREESTYLE MODE — HARD STRUCTURAL OVERRIDE (non-negotiable, supersedes the genre's default structure):
@@ -5817,7 +5829,7 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   const _counterLine   = _gsd.bridge?.counter   ? `\nCounter-melody role: ${_gsd.bridge.counter}` : '';
   const _examplesLine  = _gsd.bridge?.examples  ? `\nReal-world models: ${_gsd.bridge.examples}`  : '';
 
-  const bridgeNote = `\n\nBRIDGE ARCHITECTURE — "${_ba.name}" [${genreLabel}]:${_harmonicLine}${_counterLine}
+  const bridgeNote = _noBridgeTier ? '' : `\n\nBRIDGE ARCHITECTURE — "${_ba.name}" [${genreLabel}]:${_harmonicLine}${_counterLine}
 Energy arc: ${_ba.energy} · Bars: ${_ba.bars}
 Delivery: ${_ba.delivery}
 Lyric approach: ${_ba.lyric}
@@ -5960,7 +5972,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
 
   // ── Platform-specific instructions ─────────────────────────────────────
   const platformNotes = {
-    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 200 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
+    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 440 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
     udio:   'PLATFORM: Udio — Section tags work differently: Udio responds well to emotional descriptors in brackets, e.g. [Verse - melancholic], [Chorus - anthemic]. Keep SONG PROMPT under 300 characters. Udio prefers genre descriptors over instrument lists.',
     stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
   };
@@ -6441,6 +6453,20 @@ function buildCrossoverNote(g1, g2) {
   return lines.join('\n');
 }
 
+// Build-time artist-name scrub for Suno production tags. SUBSTYLE_SUNO tags
+// occasionally carry an artist reference via the "<Name> style" idiom (e.g.
+// "Jonathan Coulton style"). The PRODUCTION LOCK below orders the model to
+// reproduce these tags VERBATIM, which collides with the SUNO COMPLIANCE rule
+// forbidding artist names — so strip those segments at build time instead of
+// trusting the model to resolve the contradiction.
+function _scrubSunoTagArtists(tag) {
+  return String(tag || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s && !/^[A-Z][\w.'-]*(?:\s+[\w.'-]+){0,3}\s+style$/.test(s))
+    .join(', ');
+}
+
 function buildLuckyPrompt(params) {
   const keys = Object.keys(FUSION_DATA);
   const rawG1 = params && params.g1 ? sanitizeInput(params.g1, 50) : null;
@@ -6541,7 +6567,7 @@ function buildLuckyPrompt(params) {
   const luckySubstyleNote = luckySubstyle && SUBSTYLE_NOTES[luckySubstyle]
     ? `\n\nSUBSTYLE LOCK — ${luckySubstyle} (from ${luckySubstyleSource}):\n${SUBSTYLE_NOTES[luckySubstyle]}`
     : '';
-  const luckySubstyleSunoTag = luckySubstyle && SUBSTYLE_SUNO[luckySubstyle] ? SUBSTYLE_SUNO[luckySubstyle] : null;
+  const luckySubstyleSunoTag = luckySubstyle && SUBSTYLE_SUNO[luckySubstyle] ? _scrubSunoTagArtists(SUBSTYLE_SUNO[luckySubstyle]) : null;
   const luckySubstyleSunoLock = luckySubstyleSunoTag
     ? `\n\n⚠️ PRODUCTION LOCK — ${luckySubstyle}: The SONG PROMPT must contain these exact production tags: "${luckySubstyleSunoTag}" — do NOT substitute generic ${luckySubstyleSource} production tags.`
     : '';
@@ -6617,8 +6643,7 @@ function buildLuckyPrompt(params) {
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
 ${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(g1, g2)}
 
-Fusion style: ${fd?.name || g1 + ' × ' + g2}
-${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
+Fusion style: ${fd?.name || g1 + ' × ' + g2}. Blend both genres authentically.
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
