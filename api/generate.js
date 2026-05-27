@@ -8,6 +8,7 @@ const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const { createClient } = require('@supabase/supabase-js');
+const { validatePhrase: _laValidatePhrase } = require('./_loop_anchor');
 
 function getSupabaseClient(token) {
   const url = process.env.SUPABASE_URL;
@@ -252,6 +253,59 @@ module.exports = async function handler(req, res) {
     // No upstream spec call. The brain handles genre/mood/structure from the
     // concept text directly using lightweight heuristics below.
     const spec = req.body.spec || {};
+
+    // User exclude / avoid styles — applies to every genre. Mirrors the
+    // sanitisation in stream.js: ASCII-only, 40 chars max, 10 entries max,
+    // de-duped, "no " prefix stripped (the engine adds it back). Accepts
+    // either body.exclude (array or comma-separated string) or
+    // body.vocalDescriptors.negativeAdd from the front-end VD picker.
+    function _flowParseExcludes(src) {
+      if (!src) return [];
+      const arr = Array.isArray(src)
+        ? src
+        : (typeof src === 'string' ? src.split(/[,\n]/) : []);
+      const safe = /^[a-z0-9 _\-()'/]{1,40}$/;
+      return arr
+        .map(s => String(s || '').trim().toLowerCase().replace(/^no\s+/, ''))
+        .filter(s => s && safe.test(s))
+        .filter((s, i, a) => a.indexOf(s) === i)
+        .slice(0, 10);
+    }
+    const flowExclude = _flowParseExcludes(
+      req.body.exclude
+      || (req.body.vocalDescriptors && req.body.vocalDescriptors.negativeAdd)
+    );
+
+    // Optional loop-anchor phrase — turns a single phrase into the song's
+    // load-bearing center. Brain handles transform selection.
+    const _flowParseAnchor = function(src) {
+      if (!src || typeof src !== 'string') return null;
+      const phrase = src.trim().slice(0, 80);
+      if (!phrase || phrase.length < 2) return null;
+      if (!/^[\x20-\x7E]+$/.test(phrase)) return null;
+      // Reject prompt-injection patterns before they reach the brain.
+      if (/(>>>|<<<|\bsystem\s*:|\bassistant\s*:|\buser\s*:|\bignore\s+previous\s+instructions\b|\boverride\s*:|```)/i.test(phrase)) return null;
+      // Enforce the syllable/quality contract that the UI advertises.
+      const result = _laValidatePhrase(phrase);
+      if (!result || !result.ok) return null;
+      return result.normalized || phrase;
+    };
+    // Plan gate — Loop Anchor is a Pro+ feature. Free + founding_t2 + legacy
+    // starter/creator are locked out. Strip silently if the user submits the
+    // field without entitlement (defense-in-depth — UI also locks the input).
+    const _LOOP_ANCHOR_PLANS = new Set([
+      'pro','pro_annual',
+      'studio','studio_annual',
+      'founding','founding_t1','founding_t1_annual',
+    ]);
+    const flowAnchorEntitled = isAdmin || _LOOP_ANCHOR_PLANS.has(flowPlan);
+    const flowAnchorPhrase = flowAnchorEntitled
+      ? _flowParseAnchor(
+          req.body.loopAnchorPhrase
+          || (req.body.loopAnchor && req.body.loopAnchor.phrase)
+          || ''
+        )
+      : null;
 
     // Map Flow's natural-language genre to a brain genre key.
     // ── Weighted-score genre classifier (replaces priority-ordered chain) ──
@@ -588,6 +642,15 @@ module.exports = async function handler(req, res) {
     const instMatch = lockDirective.match(/instruments?:\s*([^;]+)/i);
     if (instMatch) sunoPromptParts.push(instMatch[1].trim());
     sunoPromptParts.push(brainMood.toLowerCase());
+    // User excludes — surface in the deterministic Suno prompt too so Suno
+    // itself sees the "(avoid: …)" hint, not just the vocal-descriptor
+    // negative-tag block at the end.
+    if (flowExclude.length) {
+      sunoPromptParts.push('avoid: ' + flowExclude.join(', '));
+    }
+    if (flowAnchorPhrase) {
+      sunoPromptParts.push('anchor phrase looped: "' + flowAnchorPhrase + '"');
+    }
     const generatedSunoPrompt = sunoPromptParts.filter(Boolean).join(', ');
 
     // ═══════════════════════════════════════════════════════════════
@@ -624,14 +687,27 @@ module.exports = async function handler(req, res) {
         //     Write pass; absent fields default safely inside the engine.
         emotionalVelocity: 'auto',
         surprise: { intensity: 'medium', autoMode: true },
+        // Forward user excludes to the brain so they get merged into the
+        // resolved genre profile's negative tag list inside _vocal-descriptors.js
+        // (works for every genre — the merge is genre-agnostic).
+        vocalDescriptors: flowExclude.length
+          ? { autoMode: true, negativeAdd: flowExclude }
+          : { autoMode: true },
+        loopAnchor: flowAnchorPhrase ? { phrase: flowAnchorPhrase } : undefined,
       });
       if (!built || !built.system || !built.prompt) throw new Error('Brain returned empty prompt');
     } catch (brainErr) {
       console.error('[flow-song] brain.buildSongPrompt failed, falling back to lean prompt:', brainErr && brainErr.message);
       // Lean fallback ONLY if brain require fails. Keeps Flow alive even
       // if _brain.js has a load-time issue.
+      const _avoidLine = flowExclude.length
+        ? `\n\nSTRICTLY AVOID these styles/sounds/techniques anywhere in the lyrics, production hints, or section tags: ${flowExclude.join(', ')}.`
+        : '';
+      const _anchorLine = flowAnchorPhrase
+        ? `\n\nThe phrase "${flowAnchorPhrase}" MUST appear in the chorus verbatim and loop in the outro.`
+        : '';
       built = { system: 'You are a world-class songwriter. Write ONE complete, performance-ready 3-minute song.',
-                prompt: `Write a complete 3-minute ${flowGenreLabel} song about: ${flowConcept}\n\nFirst line MUST be [Verse 1]. Tag every section. Lyrics only.` };
+                prompt: `Write a complete 3-minute ${flowGenreLabel} song about: ${flowConcept}\n\nFirst line MUST be [Verse 1]. Tag every section. Lyrics only.${_avoidLine}${_anchorLine}` };
     }
 
 

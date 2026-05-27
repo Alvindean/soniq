@@ -285,8 +285,9 @@ function selectSurpriseMoves({
 
 /**
  * buildSurpriseNote — directive appended to song prompts. Tells the LLM
- * EXACTLY which Suno tags to embed in the lyrics body, where to put them,
- * and why.
+ * EXACTLY which Suno tags to embed inline in the lyrics body, where to
+ * put them, and why. Moves are baked into the lyric via Suno bracket tags
+ * ONLY — no separate "Surprise Notes" footer block.
  */
 function buildSurpriseNote(result) {
   if (!result || !result.moves || !result.moves.length) return '';
@@ -299,18 +300,15 @@ function buildSurpriseNote(result) {
   return `
 
 🎲 SURPRISE / CREATIVITY MOVES (Lever #8 — kills linearity, makes the song feel human):
-This song MUST contain the following ${result.moves.length} surprise move${result.moves.length > 1 ? 's' : ''}. Embed each one inside the LYRICS body at the section indicated, using the EXACT Suno tag/syntax shown. These are not optional — they are what separates a linear AI song from one that lands.
+This song MUST contain the following ${result.moves.length} surprise move${result.moves.length > 1 ? 's' : ''}. Embed each one INLINE inside the LYRICS body at the section indicated, using the EXACT Suno tag/syntax shown. These are not optional — they are what separates a linear AI song from one that lands.
 
 ${lines}
 
 Rules:
-- Place each move's Suno tag on its OWN line inside the relevant section, OR on the line immediately before the lyric it modifies.
+- Place each move's Suno tag on its OWN line inside the relevant section, OR on the line immediately before the lyric it modifies. Suno's parser reads bracket tags like [Beat Drop], [Tape Stop], [Vocal Pause] as production cues automatically.
 - Parenthesised dialogue/sample lines render as background voices/samples — write them in character (production note: a phone-call line should sound like a real friend's tone, not generic copy).
 - If two moves want the same section, prefer the higher one in this list and place the other in an adjacent section.
-- Add a single SURPRISE NOTES block right after the LYRICS body listing each move you placed and its bar position, e.g.:
-  SURPRISE NOTES:
-  • [Drop] — bar 32, just before final chorus
-  • (phone rings — "yo, where you at?") — between Verse 1 and Verse 2
+- DO NOT add a "Surprise Notes" / "SURPRISE NOTES" / "Moves Used" footer or section at the end of the lyrics. DO NOT list the moves anywhere outside the lyric body. The bracket tags inline ARE the documentation — they are what Suno reads and what the user sees.
 - The Full prompt in SONG PROMPT must reference the surprise moves at the END (e.g. "...with beat drop, voicemail outro, audible breath before final chorus") so Suno knows to render them.`;
 }
 

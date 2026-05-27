@@ -799,10 +799,12 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .syl-ok{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
 .syl-warn{background:var(--amberbg);color:var(--amber);border:1px solid var(--amberline)}
 .syl-over{background:var(--redbg);color:var(--red);border:1px solid var(--redline)}
-.ll-regen{background:transparent;border:none;color:var(--tx4);font-size:13px;padding:3px 5px;border-radius:4px;opacity:0;transition:all 0.15s;flex-shrink:0}
-.lline:hover .ll-regen{opacity:1}
-.ll-regen:hover{color:var(--amber);background:var(--amberbg)}
-.ll-regen:disabled{opacity:0.5;cursor:not-allowed}
+.ll-regen,.ll-act{background:transparent;border:none;color:var(--tx4);font-size:13px;padding:3px 5px;border-radius:4px;opacity:0;transition:all 0.15s;flex-shrink:0}
+.lline:hover .ll-regen,.lline:hover .ll-act{opacity:1}
+.ll-regen:focus-visible,.ll-act:focus-visible{opacity:1;color:var(--amber);outline:2px solid var(--amber);outline-offset:1px}
+.ll-regen:hover,.ll-act:hover{color:var(--amber);background:var(--amberbg)}
+.ll-act-del:hover{color:var(--red);background:var(--redbg)}
+.ll-regen:disabled,.ll-act:disabled{opacity:0.5;cursor:not-allowed}
 
 /* ── PROMPT BUILDER ── */
 .pbsec{margin-bottom:22px}
@@ -1081,7 +1083,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
   /* Mobile touch targets — WCAG 44px minimum */
   .btn-xs,.btn-sm,.vp-copy-btn,.brief-copy-btn,.sync-copy-all-btn{min-height:44px;min-width:44px;display:inline-flex;align-items:center;justify-content:center}
   .otab{min-height:44px;display:inline-flex;align-items:center}
-  .ll-regen{min-height:44px;min-width:44px;opacity:1}
+  .ll-regen,.ll-act{min-height:44px;min-width:44px;opacity:1}
 }
 
 /* ── CONCEPT ENHANCE ── */
@@ -3392,6 +3394,45 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="craft-upsell-cta" type="button" onclick="if(typeof openUpgradeModal==='function'){openUpgradeModal();}else{toast('Upgrade to Pro for advanced craft tools')}">Upgrade</button>
       </div>
 
+      <!-- ══ LOOP ANCHOR PANEL — phrase the song rotates around ══ -->
+      <!-- Pro+ feature. Plans entitled: pro, pro_annual, studio, studio_annual,
+           founding, founding_t1, founding_t1_annual. Free + founding_t2 see the
+           card with a locked overlay + upgrade CTA. Gating mirrors backend
+           LOOP_ANCHOR_PLANS in stream.js + generate.js. -->
+      <div class="la-card" id="la-card" style="position:relative;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1);letter-spacing:.02em">
+            Loop Anchor — phrase the song rotates around
+            <span class="la-badge" style="display:inline-block;margin-left:6px;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:700;letter-spacing:.06em;background:linear-gradient(135deg,#f5c000,#ff8a00);color:#08080a;text-transform:uppercase">Pro+</span>
+            <span style="font-size:10px;color:var(--tx3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px">Optional. Works for every genre.</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:stretch">
+          <input type="text" id="la-phrase" maxlength="80" autocomplete="off"
+            placeholder="e.g. tell me where it hurts • started from the bottom • you used to call me"
+            oninput="laValidate()"
+            style="flex:1;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:10px 12px;outline:none;font-family:var(--font)" />
+          <button type="button" id="la-suggest" onclick="laRunSuggest()" title="Suggest from your concept / topic" aria-label="Suggest anchor phrase from your concept"
+            style="background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx2);font-size:11px;font-weight:700;padding:0 12px;cursor:pointer;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;font-family:var(--font)"
+            onmouseover="this.style.color='var(--tx1)'" onmouseout="this.style.color='var(--tx2)'">
+            💡 Suggest
+          </button>
+        </div>
+        <div id="la-feedback" style="font-size:11px;color:var(--tx3);margin-top:6px;min-height:14px"></div>
+        <div id="la-preview" style="display:none;font-size:11px;color:var(--tx2);margin-top:4px"></div>
+        <div id="la-suggestions" style="display:none;margin-top:8px;padding:8px;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2)">
+          <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Suggestions from your concept</div>
+          <div id="la-suggestions-list" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+        </div>
+        <!-- Locked-state overlay — shown when plan is not entitled. laRefreshGate() toggles. -->
+        <div id="la-lock" role="button" tabindex="0" aria-label="Upgrade to unlock Loop Anchor" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();laOpenUpgrade();}" style="display:none;position:absolute;inset:0;border-radius:var(--r2);background:rgba(8,8,10,0.78);backdrop-filter:blur(2px);align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer;text-align:center;padding:16px" onclick="laOpenUpgrade()">
+          <div style="font-size:22px">🔒</div>
+          <div style="font-size:13px;font-weight:700;color:var(--tx1)">Loop Anchor is a Pro feature</div>
+          <div style="font-size:11px;color:var(--tx3);max-width:280px;line-height:1.4">Turn any phrase into the song's center — looped in chorus, post-chorus, and outro, with verses orbiting it. Works in every genre.</div>
+          <div style="margin-top:4px;padding:7px 14px;border-radius:var(--r2);background:linear-gradient(135deg,#f5c000,#ff8a00);color:#08080a;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Upgrade to unlock</div>
+        </div>
+      </div>
+
       <!-- ══ VOCAL CHARACTER PICKER (Lever #7) ══ -->
       <!-- Picks WHO is singing, not just what. Texture/character/performance go
            into the Suno style prompt prefix; accent/postural are optional polish.
@@ -3587,6 +3628,19 @@ body.craft-advanced .craft-basic-only{display:none !important}
               <option value="pitched_down">pitched-down demon</option>
               <option value="close_mic">close-mic intimate</option>
             </select>
+          </div>
+        </div>
+        <div class="vd-exclude-row" style="margin-top:10px">
+          <label for="vd-exclude" style="display:block;font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">
+            Avoid / Exclude styles
+            <span style="text-transform:none;font-weight:400;color:var(--tx3);letter-spacing:0">— comma-separated tags. Works for every genre.</span>
+          </label>
+          <input type="text" id="vd-exclude" maxlength="400" autocomplete="off"
+            placeholder="e.g. autotune, mumble flow, trap drums, 808 bass, melisma"
+            oninput="vdSyncPreview()"
+            style="width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:8px 12px;outline:none;font-family:var(--font)" />
+          <div style="font-size:10px;color:var(--tx4);margin-top:4px">
+            Up to 10 tags · 40 chars each · merged into the genre's built-in negative tags and into the Suno AVOID block.
           </div>
         </div>
         <div class="vd-preview-label">Live preview — what gets sent to Suno</div>
@@ -5440,7 +5494,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
       var hint = document.getElementById('flow-hint');
       songInFlight = new AbortController();
       startSongProgress();
-      flowAuthedPost('/api/generate', { mode: 'flow-song', concept: concept, spec: spec }, songInFlight.signal)
+      flowAuthedPost('/api/generate', { mode: 'flow-song', concept: concept, spec: spec, loopAnchorPhrase: (typeof laGetPhrase === 'function' ? laGetPhrase() : '') || undefined }, songInFlight.signal)
       .then(function(res){
         if (res.status === 401) {
           if (typeof openAuth === 'function') openAuth('Sign in to use Flow');
@@ -5877,6 +5931,32 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
     </div>
 
+    <!-- ══ LOOP ANCHOR PANEL (Lucky) — phrase the Lucky song rotates around ══ -->
+    <!-- Mirrors the Write-side card at index.html ~3402. Shared helpers
+         (laValidate, laGetPhrase, laRefreshGate) take a scope arg of 'lucky'
+         to drive these suffixed IDs. Pro+ gated via shared LA_ENTITLED_PLANS. -->
+    <div class="la-card" id="la-card-lucky" style="position:relative;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1);letter-spacing:.02em">
+          Loop Anchor — phrase the song rotates around
+          <span style="display:inline-block;margin-left:6px;padding:2px 7px;border-radius:99px;font-size:9px;font-weight:700;letter-spacing:.06em;background:linear-gradient(135deg,#f5c000,#ff8a00);color:#08080a;text-transform:uppercase">Pro+</span>
+          <span style="font-size:10px;color:var(--tx3);font-weight:400;text-transform:none;letter-spacing:0;margin-left:4px">Optional. Works for every genre.</span>
+        </div>
+      </div>
+      <input type="text" id="la-phrase-lucky" maxlength="80" autocomplete="off"
+        placeholder="e.g. tell me where it hurts • started from the bottom"
+        oninput="laValidate('lucky')"
+        style="width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:10px 12px;outline:none;font-family:var(--font)" />
+      <div id="la-feedback-lucky" style="font-size:11px;color:var(--tx3);margin-top:6px;min-height:14px"></div>
+      <div id="la-preview-lucky" style="display:none;font-size:11px;color:var(--tx2);margin-top:4px"></div>
+      <div id="la-lock-lucky" role="button" tabindex="0" aria-label="Upgrade to unlock Loop Anchor" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();laOpenUpgrade();}" style="display:none;position:absolute;inset:0;border-radius:var(--r2);background:rgba(8,8,10,0.78);backdrop-filter:blur(2px);align-items:center;justify-content:center;flex-direction:column;gap:8px;cursor:pointer;text-align:center;padding:16px" onclick="laOpenUpgrade()">
+        <div style="font-size:22px">🔒</div>
+        <div style="font-size:13px;font-weight:700;color:var(--tx1)">Loop Anchor is a Pro feature</div>
+        <div style="font-size:11px;color:var(--tx3);max-width:280px;line-height:1.4">Turn any phrase into the song's center — looped in chorus, post-chorus, and outro. Works in every genre.</div>
+        <div style="margin-top:4px;padding:7px 14px;border-radius:var(--r2);background:linear-gradient(135deg,#f5c000,#ff8a00);color:#08080a;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase">Upgrade to unlock</div>
+      </div>
+    </div>
+
     <button class="lucky-cta" id="lucky-btn" onclick="feelLucky()">
       <span>🎲</span>
       <span id="lucky-btn-text">Surprise Me</span>
@@ -6103,9 +6183,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
 ══════════════════════════════════ -->
 <div id="pg-editor" class="pg">
   <div class="card">
-    <div class="ctitle">✏️ Lyric Editor <span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:4px">— live syllable counter · click any line to edit · 🔄 to regenerate</span></div>
+    <div class="ctitle">✏️ Lyric Editor <span style="font-size:11px;color:var(--tx3);font-weight:400;margin-left:4px">— live syllable counter · click a line to edit · 🔄 regenerate · ＋ add · 🗑 delete</span></div>
     <div class="sylguide">
-      <div class="sgi"><div class="sgd" style="background:var(--green)"></div>6–10 syllables (chorus ideal)</div>
+      <div class="sgi"><div class="sgd" style="background:var(--green)"></div>Up to 10 syllables (chorus ideal)</div>
       <div class="sgi"><div class="sgd" style="background:var(--amber)"></div>11–13 syllables (verse ok)</div>
       <div class="sgi"><div class="sgd" style="background:var(--red)"></div>14+ syllables (AI may drift)</div>
     </div>
@@ -6113,13 +6193,24 @@ body.craft-advanced .craft-basic-only{display:none !important}
       <div class="edstats">Lines: <span id="ed-total">0</span> &nbsp;·&nbsp; Avg syllables: <span id="ed-avg">0</span> &nbsp;·&nbsp; Over limit: <span id="ed-over" style="color:var(--red)">0</span></div>
       <div style="display:flex;gap:6px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">📋 Copy</button>
+        <button class="btn btn-sm btn-gold" onclick="saveEdited()" title="Save this edited version to your library">💾 Save</button>
         <button class="btn btn-sm btn-amber" onclick="showPasteModal()" title="Paste lyrics from clipboard">📥 Paste</button>
         <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
-        <button class="btn" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
+        <button class="btn btn-sm" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
       <div style="text-align:center;padding:48px 20px;color:var(--tx4);font-size:13px">Generate a song on the Write page, then click <strong style="color:var(--tx2)">✏️ Edit</strong> to load it here for syllable editing, or click <strong style="color:var(--tx2)">Paste Lyrics</strong> to load any lyrics.</div>
+    </div>
+    <div id="ed-style-wrap" style="display:none;margin-top:14px;border-top:1px solid var(--b1);padding-top:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap">
+        <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em">🎛️ Production Prompt <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--tx4)">— Suno style for this song</span></div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm" onclick="refreshEditorStyle()" id="ed-style-refresh" title="Update the production prompt to fit your edited lyrics">🔄 Refresh</button>
+          <button class="btn btn-sm btn-gold" onclick="copyEditorStyle()" title="Copy the production / Suno style prompt">📋 Copy Style</button>
+        </div>
+      </div>
+      <div id="ed-style-text" class="styleout"></div>
     </div>
   </div>
   <div class="card" id="paste-modal" style="display:none">
@@ -11271,9 +11362,30 @@ function cpVideoPrompt(prefix){
   if(!text){toast('No video prompt — generate a song first');return;}
   safeCopy(text,'Video prompt copied — paste into Runway, Sora, or Kling');
 }
-function countSyl(word){word=word.toLowerCase().replace(/[^a-z]/g,'');if(!word)return 0;if(word.length<=3)return 1;word=word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');word=word.replace(/^y/,'');const m=word.match(/[aeiouy]{1,2}/g);return m?m.length:1;}
+function countSyl(word){
+  word=word.toLowerCase().replace(/[^a-z]/g,'');
+  if(!word)return 0;
+  if(word.length<=3)return 1;
+  // -ed is its own syllable after t/d ("wanted","started") — silent elsewhere
+  // ("played","jumped"). -es is its own syllable after a sibilant ("watches",
+  // "races","boxes") — silent elsewhere ("makes","hopes"). Leaving a pronounced
+  // suffix in place lets the vowel scan count it; stripping a silent one avoids
+  // an over-count.
+  if(!/(?:s|x|z|c|g|ch|sh)es$/.test(word)&&!/[td]ed$/.test(word)){
+    word=word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/,'');
+  }
+  word=word.replace(/^y/,'');
+  const m=word.match(/[aeiouy]{1,2}/g);
+  return m?m.length:1;
+}
 function lineSyl(line){return line.replace(/\[.*?\]/g,'').trim().split(/\s+/).filter(Boolean).reduce((s,w)=>s+countSyl(w),0);}
-function sylCls(n,chorus){if(n<=0)return'syl-ok';if(n>=14)return'syl-over';if(chorus&&n<=10)return'syl-ok';if(!chorus&&n<=13)return'syl-ok';return'syl-warn';}
+function sylCls(n,chorus){
+  // Bands match the on-screen legend: up to 10 green, 11-13 amber, 14+ red.
+  if(n<=0)return'syl-ok';
+  if(n>=14)return'syl-over';
+  if(n>=11)return'syl-warn';
+  return'syl-ok';
+}
 
 
 // ── SONG CARD OVERFLOW MENU TOGGLES ──
@@ -12341,7 +12453,7 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [], viralMode: S.viralMode === true, sampleHookMode: S.sampleHookMode === true, producerTemplate: typeof S.producerTemplate === 'string' ? S.producerTemplate : ''}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [], viralMode: S.viralMode === true, sampleHookMode: S.sampleHookMode === true, producerTemplate: typeof S.producerTemplate === 'string' ? S.producerTemplate : '', loopAnchor: (function(){ const p = (typeof laGetPhrase === 'function') ? laGetPhrase('lucky') : ''; return p ? { phrase: p } : undefined; })()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal).then(text => ({ text, prodData: null, sunoSettings: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
@@ -12633,6 +12745,289 @@ function regenerateSong(prefix) {
 }
 
 // ──────────────────────────────────────────────────────────────────────────
+// Loop Anchor — phrase the song rotates around
+// One short phrase (2-8 syllables) that loops in chorus + post-chorus + outro.
+// Verses orbit it. Live validator checks syllable count, person, abstractness,
+// phonetic density, and proper nouns. Payload field: loopAnchor.phrase.
+// ──────────────────────────────────────────────────────────────────────────
+function laCountSyllables(s) {
+  // Simple vowel-group heuristic. Lowercase, strip non-letters, count vowel-groups.
+  const w = (s || '').toLowerCase().replace(/[^a-z\s]/g, ' ').trim();
+  if (!w) return 0;
+  let n = 0;
+  for (const word of w.split(/\s+/)) {
+    const groups = word.match(/[aeiouy]+/g);
+    let c = groups ? groups.length : 0;
+    if (word.endsWith('e') && c > 1) c--; // silent-e
+    if (c === 0) c = 1;
+    n += c;
+  }
+  return n;
+}
+
+function laGetPhrase(scope) {
+  // scope === 'lucky' targets the Lucky page card (#la-phrase-lucky);
+  // any falsy/empty value targets the default Write-side card (#la-phrase).
+  const suffix = scope ? '-' + scope : '';
+  const el = document.getElementById('la-phrase' + suffix);
+  if (!el || el.disabled) return '';
+  return el.value.trim().slice(0, 80);
+}
+
+// Plans entitled to the Loop Anchor feature. Mirrors LOOP_ANCHOR_PLANS in
+// stream.js + generate.js. Keep this list in sync if backend changes.
+const LA_ENTITLED_PLANS = new Set([
+  'pro','pro_annual',
+  'studio','studio_annual',
+  'founding','founding_t1','founding_t1_annual',
+]);
+function laIsEntitled() {
+  if (window.__soniqAdmin === true) return true;
+  const p = (S && S.plan) || 'free';
+  return LA_ENTITLED_PLANS.has(p);
+}
+function laRefreshGate() {
+  // Called whenever S.plan changes (sign-in, plan refresh, admin toggle).
+  // Locked plans see the overlay; entitled plans see the input.
+  // Refreshes BOTH the Write-side card (no suffix) and the Lucky-side card
+  // (-lucky suffix). If a card isn't on the page, the early-return per scope
+  // handles it cleanly.
+  const ok = laIsEntitled();
+  ['', 'lucky'].forEach(function(scope){
+    const suffix = scope ? '-' + scope : '';
+    const card  = document.getElementById('la-card'  + suffix);
+    const input = document.getElementById('la-phrase' + suffix);
+    const lock  = document.getElementById('la-lock'  + suffix);
+    if (!card || !input || !lock) return;
+    if (ok) {
+      lock.style.display = 'none';
+      input.disabled = false;
+      card.classList.remove('la-locked');
+    } else {
+      lock.style.display = 'flex';
+      input.disabled = true;
+      input.value = ''; // clear any value the user typed before plan synced
+      card.classList.add('la-locked');
+      const fb = document.getElementById('la-feedback' + suffix); if (fb) fb.textContent = '';
+      const pv = document.getElementById('la-preview'  + suffix); if (pv) { pv.style.display = 'none'; pv.textContent = ''; }
+    }
+  });
+}
+function laOpenUpgrade() {
+  // Click handler on the lock overlay. Prefer the existing upgrade flow if
+  // one is present; otherwise fall back to the pricing section/landing page.
+  if (typeof openUpgradeModal === 'function') return openUpgradeModal('loop_anchor');
+  if (typeof goPlsTab === 'function') { try { goPlsTab('plan'); return; } catch(_){} }
+  window.location.href = '/landing.html#pricing';
+}
+document.addEventListener('DOMContentLoaded', laRefreshGate);
+
+function laValidate(scope) {
+  // scope === 'lucky' targets the Lucky page card; falsy/empty targets Write.
+  const suffix = scope ? '-' + scope : '';
+  const fb = document.getElementById('la-feedback' + suffix);
+  const pv = document.getElementById('la-preview'  + suffix);
+  const phrase = laGetPhrase(scope);
+  if (!phrase) {
+    if (fb) { fb.textContent = ''; fb.style.color = 'var(--tx3)'; }
+    if (pv) { pv.style.display = 'none'; pv.textContent = ''; }
+    return null;
+  }
+  const syl = laCountSyllables(phrase);
+  const issues = [];
+  if (syl < 2)  issues.push('too short (' + syl + ' syllable)');
+  if (syl > 8)  issues.push('too long (' + syl + ' syllables — max 8)');
+  if (/(\b)(she|he|they|them|him|her|his|hers)(\b)/i.test(phrase)) issues.push('third-person — prefer first/second person');
+  if (/(\b)(sad|happy|lonely|scared|hopeful|nice)(\b)/i.test(phrase)) issues.push('abstract emotion word — use concrete imagery');
+  const hasConsonant = /[tkpsbdg]|sh|ch/i.test(phrase);
+  const hasOpenVowel = /[aoieu]/i.test(phrase);
+  if (!hasConsonant) issues.push('missing strong consonant');
+  if (!hasOpenVowel) issues.push('missing open vowel');
+  // Proper-noun check: any capitalized word that's NOT the first word
+  const words = phrase.split(/\s+/);
+  for (let i = 1; i < words.length; i++) {
+    if (/^[A-Z][a-z]+$/.test(words[i])) { issues.push('possible proper noun "' + words[i] + '"'); break; }
+  }
+  const ok = issues.length === 0 && syl >= 2 && syl <= 8;
+  if (fb) {
+    if (ok) {
+      fb.style.color = '#5fcb6c';
+      fb.textContent = '✓ ' + syl + ' syllables — anchor looks strong';
+    } else {
+      fb.style.color = '#f5a623';
+      fb.textContent = '⚠ ' + syl + ' syllables — ' + issues.join('; ');
+    }
+  }
+  if (pv) {
+    pv.style.display = 'block';
+    pv.textContent = 'Anchor will loop in chorus + post-chorus + outro — verses will orbit it.';
+  }
+  return phrase;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// Loop Anchor — "Suggest from my concept"
+// Pure client-side heuristic. Extracts up to 3 candidate anchor phrases from
+// a freeform concept/topic blob, scores them by anchor-fitness (quoted >
+// repeated > vocative-stem > clause), penalizes third-person + abstract
+// emotion words, applies the same syllable + phonetic gate as laValidate.
+// No AI call. No external deps.
+// ──────────────────────────────────────────────────────────────────────────
+function laSuggestFromConcept(text) {
+  if (!text || typeof text !== 'string') return [];
+  // Hard caps — prevent O(N²) n-gram blowup on pathological input.
+  // Reasonable concepts are short; anything beyond this is either spam or abuse.
+  if (text.length > 4000) text = text.slice(0, 4000);
+  const _laMaxWords = 400;
+  const _laWordCheck = text.split(/\s+/).length;
+  if (_laWordCheck > _laMaxWords) {
+    // Truncate to first N words — keeps the relevant signal, drops the tail
+    text = text.split(/\s+/).slice(0, _laMaxWords).join(' ');
+  }
+  const candidates = [];
+  const norm = text.toLowerCase().trim();
+
+  // SIGNAL 1 (highest priority): quoted strings — "tell me where it hurts"
+  // Single quotes, double quotes, smart quotes. These are the strongest anchors.
+  const quoteRegex = /["“'‘]([^"”'’]{4,60})["”'’]/g;
+  let m;
+  while ((m = quoteRegex.exec(text)) !== null) {
+    candidates.push({ phrase: m[1].toLowerCase(), score: 100, source: 'quoted' });
+  }
+
+  // SIGNAL 2: vocative / direct-address phrases — "tell me X", "where is Y", "you used to Z"
+  // Strong because they imply a refrain. Match common stems.
+  const stems = [
+    /\b(tell me [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(let me [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(show me [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(give me [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(you used to [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(i used to [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(don['’]?t [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(call me [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(i ain['’]?t [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(started from [a-z\s']{2,30}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(if you [a-z\s']{2,25}?)(?=[\.,;!?\n]|$)/gi,
+    /\b(i'?m gonna [a-z\s']{2,25}?)(?=[\.,;!?\n]|$)/gi,
+  ];
+  for (const re of stems) {
+    let mm;
+    while ((mm = re.exec(text)) !== null) {
+      const phrase = mm[1].trim().toLowerCase();
+      candidates.push({ phrase, score: 75, source: 'stem' });
+    }
+  }
+
+  // SIGNAL 3: repeated phrases — any 3-7 word sequence that appears 2+ times
+  // wins automatically. Repetition IS anchor logic.
+  const words = norm.replace(/[^a-z'\s]/g, ' ').split(/\s+/).filter(Boolean);
+  for (let len = 3; len <= 7; len++) {
+    const counts = {};
+    for (let i = 0; i <= words.length - len; i++) {
+      const slice = words.slice(i, i + len).join(' ');
+      counts[slice] = (counts[slice] || 0) + 1;
+    }
+    for (const [slice, c] of Object.entries(counts)) {
+      if (c >= 2) candidates.push({ phrase: slice, score: 90 + c, source: 'repeated' });
+    }
+  }
+
+  // SIGNAL 4: short imperative/declarative clauses split on commas/periods
+  // Sentences or clauses 3-8 words long — fallback when nothing else matches.
+  const clauses = text.split(/[\.,;!?\n]+/).map(s => s.trim()).filter(Boolean);
+  for (const c of clauses) {
+    const wc = c.split(/\s+/).length;
+    if (wc >= 3 && wc <= 8) {
+      candidates.push({ phrase: c.toLowerCase(), score: 40, source: 'clause' });
+    }
+  }
+
+  // Penalize phrases that violate universal anchor rules.
+  const filtered = [];
+  const seen = new Set();
+  for (const c of candidates) {
+    const p = c.phrase.trim().replace(/\s+/g, ' ');
+    if (!p || seen.has(p)) continue;
+    seen.add(p);
+    const syl = (typeof laCountSyllables === 'function') ? laCountSyllables(p) : 0;
+    if (syl < 2 || syl > 8) continue;
+    // Third-person penalty
+    if (/\b(she|he|they|them|him|her|his|hers)\b/i.test(p)) c.score -= 25;
+    // Abstract emotion penalty
+    if (/\b(sad|happy|lonely|scared|hopeful|nice|good|bad)\b/i.test(p)) c.score -= 20;
+    // Length sweet spot bonus (3-5 syllables)
+    if (syl >= 3 && syl <= 5) c.score += 10;
+    filtered.push({ phrase: p, score: c.score, source: c.source, syllables: syl });
+  }
+
+  filtered.sort((a, b) => b.score - a.score);
+  // Final-final filter: must have at least one strong consonant + one open vowel
+  const final = filtered.filter(c => /[tkpsbdg]|sh|ch/i.test(c.phrase) && /[aoieu]/i.test(c.phrase));
+  return final.slice(0, 3);
+}
+
+function laRunSuggest(scope) {
+  scope = scope || '';
+  const suffix = scope ? '-' + scope : '';
+  if (typeof laIsEntitled === 'function' && !laIsEntitled()) {
+    if (typeof laOpenUpgrade === 'function') laOpenUpgrade();
+    return;
+  }
+  // Pull source text — prefer the visible page's concept/topic input.
+  // Try Flow's concept first, then the Write topic input, then any other
+  // common id. If nothing matches, fall back to any visible textarea.
+  // For the 'lucky' scope, also try lucky-side concept inputs first.
+  const sources = scope === 'lucky'
+    ? ['lucky-concept','lucky-topic','flow-concept','flow-concept-input','topic-input','topic-text','concept','la-source']
+    : ['flow-concept','flow-concept-input','topic-input','topic-text','concept','la-source'];
+  let text = '';
+  for (const id of sources) {
+    const el = document.getElementById(id);
+    if (el && (el.value || el.textContent)) {
+      text = (el.value || el.textContent).trim();
+      if (text) break;
+    }
+  }
+  // Last-resort: look for any visible textarea on the current page with substantial content
+  if (!text) {
+    const tas = Array.from(document.querySelectorAll('textarea,input[type="text"]'))
+      .filter(e => e.offsetParent !== null && e.id !== ('la-phrase' + suffix) && (e.value || '').trim().length > 20);
+    if (tas.length) text = tas[0].value.trim();
+  }
+  const list = document.getElementById('la-suggestions-list' + suffix);
+  const wrap = document.getElementById('la-suggestions' + suffix);
+  if (!list || !wrap) return;
+  list.innerHTML = '';
+  if (!text) {
+    wrap.style.display = 'block';
+    list.innerHTML = '<div style="font-size:11px;color:var(--tx3)">Type a concept or topic first, then click Suggest.</div>';
+    return;
+  }
+  const cands = laSuggestFromConcept(text);
+  if (!cands.length) {
+    wrap.style.display = 'block';
+    list.innerHTML = '<div style="font-size:11px;color:var(--tx3)">No clean anchor candidates yet — try a longer/richer concept, or type your own.</div>';
+    return;
+  }
+  for (const c of cands) {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.setAttribute('style', 'background:var(--s2);border:1px solid var(--b2);border-radius:99px;color:var(--tx1);font-size:12px;padding:6px 12px;cursor:pointer;font-family:var(--font);transition:all .12s');
+    chip.onmouseover = function(){ this.style.background = 'var(--amber)'; this.style.color = '#08080a'; };
+    chip.onmouseout = function(){ this.style.background = 'var(--s2)'; this.style.color = 'var(--tx1)'; };
+    chip.textContent = c.phrase + ' (' + c.syllables + ' syl)';
+    chip.onclick = function(){
+      const inp = document.getElementById('la-phrase' + suffix);
+      if (inp) { inp.value = c.phrase; if (typeof laValidate === 'function') laValidate(scope); }
+      wrap.style.display = 'none';
+    };
+    list.appendChild(chip);
+  }
+  wrap.style.display = 'block';
+}
+
+// ──────────────────────────────────────────────────────────────────────────
 // Lever #7 — Vocal Character Picker
 // Reads the four/five family selects + Auto toggle into the request body.
 // Presets one-shot the most useful stacks (Quirky, Whiny-Rap Fix, Intimate…).
@@ -12671,13 +13066,32 @@ function vdSetAuto(on) {
   });
   vdSyncPreview();
 }
+function vdGetNegativeAdd() {
+  // Comma-separated user excludes. Engine cap = 10 entries × 40 chars; we
+  // sanitize client-side too so the preview matches what the server keeps.
+  const raw = document.getElementById('vd-exclude')?.value || '';
+  if (!raw.trim()) return [];
+  return raw.split(',')
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean)
+    .filter(s => /^[a-z0-9 _\-()'/]{1,40}$/.test(s))
+    .filter((s, i, a) => a.indexOf(s) === i)
+    .slice(0, 10);
+}
 function vdGetStack() {
-  if (vdAutoOn()) return null;
+  // Negatives are orthogonal to Auto mode — the user can keep Auto vocal
+  // family picking ON and still hand-block specific styles. Return a stack
+  // whenever EITHER families OR negatives are non-empty.
   const out = {};
-  VD_FAMILIES.forEach(f => {
-    const v = document.getElementById('vd-' + f)?.value;
-    if (v) out[f] = v;
-  });
+  if (!vdAutoOn()) {
+    VD_FAMILIES.forEach(f => {
+      const v = document.getElementById('vd-' + f)?.value;
+      if (v) out[f] = v;
+    });
+  }
+  const neg = vdGetNegativeAdd();
+  if (neg.length) out.negativeAdd = neg;
+  if (vdAutoOn() && neg.length) out.autoMode = true; // keep auto family picking, just add excludes
   return Object.keys(out).length ? out : null;
 }
 function vdApplyPreset(key) {
@@ -12697,18 +13111,28 @@ function vdSyncPreview() {
   const prefixEl = document.getElementById('vd-preview-prefix');
   const negEl = document.getElementById('vd-preview-neg');
   if (!prefixEl) return;
+  const neg = vdGetNegativeAdd();
   if (vdAutoOn()) {
     prefixEl.style.opacity = '.7';
     prefixEl.textContent = '[Auto — picked from genre + mood at generate time]';
-    if (negEl) negEl.style.display = 'none';
-    return;
+  } else {
+    const stack = vdGetStack() || {};
+    const order = ['texture','character','performance','accent','postural','processing'];
+    const labels = order.map(f => stack[f] && VD_LABELS[f]?.[stack[f]]).filter(Boolean);
+    prefixEl.style.opacity = '1';
+    prefixEl.textContent = labels.length
+      ? '[' + labels.join(', ') + ']'
+      : '[— pick at least one descriptor or switch back to Auto —]';
   }
-  const stack = vdGetStack() || {};
-  const order = ['texture','character','performance','accent','postural','processing'];
-  const labels = order.map(f => stack[f] && VD_LABELS[f]?.[stack[f]]).filter(Boolean);
-  prefixEl.style.opacity = '1';
-  prefixEl.textContent = labels.length ? '[' + labels.join(', ') + ']' : '[— pick at least one descriptor or switch back to Auto —]';
-  if (negEl) negEl.style.display = 'none';
+  if (negEl) {
+    if (neg.length) {
+      negEl.style.display = 'block';
+      negEl.textContent = 'AVOID: [' + neg.map(n => n.startsWith('no ') ? n : 'no ' + n).join(', ') + ']';
+    } else {
+      negEl.style.display = 'none';
+      negEl.textContent = '';
+    }
+  }
 }
 document.addEventListener('DOMContentLoaded', () => {
   const cb = document.getElementById('vd-auto');
@@ -12914,11 +13338,23 @@ async function generateSong(){
     graftSection: ['verse','chorus','bridge'].includes(S.graftSection) ? S.graftSection : 'chorus',
     invertCounter: S.invertCounter === true,
     platinum: _platinumOn && isPlatinumEligible(),
+    // Loop Anchor — short phrase (2-8 syl) the song rotates around. Loops in
+    // chorus + post-chorus + outro; verses orbit it. Optional; omitted entirely
+    // when the input is empty so it stays backwards-compatible.
+    loopAnchor: (function(){
+      const p = (typeof laGetPhrase === 'function') ? laGetPhrase() : '';
+      return p ? { phrase: p } : undefined;
+    })(),
     // Lever #7 — vocal character descriptors. autoMode=true (default) lets the
     // brain pick from genre+mood+lyrics. When the user has picked a manual
     // stack, send the explicit family map so the brain locks it into the
     // Suno style prompt prefix + negative tag block.
-    vocalDescriptors: vdAutoOn() ? { autoMode: true } : (vdGetStack() || { autoMode: true }),
+    // Lever #7 — vocal character descriptors. vdGetStack() returns the
+    // user's family picks AND/OR their AVOID list (negativeAdd). It now
+    // returns a stack whenever the user has supplied excludes, even when
+    // Auto mode is on — Auto only controls family-stack picking, excludes
+    // are orthogonal and apply to every genre via _vocal-descriptors.js.
+    vocalDescriptors: (vdGetStack() || (vdAutoOn() ? { autoMode: true } : { autoMode: true })),
     // Lever #8 — surprise / creativity engine. Picks human-attractor moves
     // (drops, builds, pauses, phone calls, samples, etc.) and tells the brain
     // exactly which Suno tags to embed and where.
@@ -14322,11 +14758,21 @@ function clearLib(){
 // LYRIC EDITOR + SYLLABLE COUNTER
 // ═══════════════════════════════════════════════════════
 function loadLyricsIntoEditor(lyrics,title){
-  // Save current editor content as a version before replacing
+  // Normalize line endings first — CRLF input (Windows clipboard, many AI
+  // outputs) would otherwise leave a stray \r on every line, which breaks
+  // same-line propagation and corrupts copied/saved lyrics.
+  lyrics=(lyrics||'').replace(/\r\n?/g,'\n');
+  // Save current editor content as a version before replacing. editorSong.lyrics
+  // is kept live by syncEditorSong(), so this snapshots the edited text.
   if (S.editorSong && S.editorSong.lyrics) {
     vhAddVersion(S.editorSong.title, S.editorSong.lyrics, S.editorSong.genre, 'Auto-save');
   }
-  S.editorSong = { title: title || '', lyrics, genre: S.currentSong?.genre || '', topic: S.currentSong?.topic || '' };
+  S.editorSong = {
+    title: title || '', lyrics,
+    genre: S.currentSong?.genre || '', topic: S.currentSong?.topic || '',
+    mood:  S.currentSong?.mood  || '', style: S.currentSong?.style || '',
+    brief: S.currentSong?.brief || ''
+  };
   S.editorLines=lyrics.split('\n').map(l=>({text:l,isTag:/^\[/.test(l.trim()),isEmpty:!l.trim()}));
   renderEditor();
   document.getElementById('paste-modal').style.display='none';
@@ -14357,8 +14803,8 @@ function renderEditor(){
 
   S.editorLines.forEach((line,i)=>{
     if(line.isEmpty){
-      // Close open section before gap
-      if(sectionOpen){html+='</div></div>';sectionOpen=false;}
+      // Keep the section open across blank lines — emit the gap inside it so a
+      // mid-section blank line doesn't orphan the lines that follow it.
       html+='<div style="height:8px"></div>';
       return;
     }
@@ -14366,7 +14812,7 @@ function renderEditor(){
       // Close any previous open section
       if(sectionOpen){html+='</div></div>';sectionOpen=false;}
       chorus=/chorus|hook/i.test(line.text);
-      html+=`<div class="lsection" style="margin-top:10px"><div class="lstag">${line.text}</div><div class="ls-lines">`;
+      html+=`<div class="lsection" style="margin-top:10px"><div class="lstag">${escHtml(line.text)}</div><div class="ls-lines">`;
       sectionOpen=true;
       return;
     }
@@ -14377,10 +14823,20 @@ function renderEditor(){
       <input class="ll-input" type="text" value="${escaped}" oninput="updLine(${i},this.value)" onblur="commitLine(${i},this.value)" data-chorus="${chorus}" data-orig="${escaped}"/>
       <span class="ll-syl ${cls}" id="syl${i}">${syl>0?syl:'—'}</span>
       <button class="ll-regen" id="reg${i}" onclick="regenLine(${i})" title="Regenerate this line">🔄</button>
+      <button class="ll-act" onclick="insertLineAfter(${i})" title="Insert a line below">＋</button>
+      <button class="ll-act ll-act-del" onclick="deleteLine(${i})" title="Delete this line">🗑</button>
     </div>`;
   });
   // Close final open section
   if(sectionOpen){html+='</div></div>';}
+  // Surface the production / Suno style prompt below the lyrics
+  const _stWrap=document.getElementById('ed-style-wrap');
+  const _stText=document.getElementById('ed-style-text');
+  const _st=((S.editorSong&&S.editorSong.style)||'').trim();
+  if(_stWrap&&_stText){
+    _stWrap.style.display='block';
+    _stText.textContent=_st||'No production prompt yet — tap 🔄 Refresh to derive one from the lyrics.';
+  }
   body.innerHTML=html||'<div style="text-align:center;padding:60px 24px;color:var(--tx4)"><div style="font-size:36px;margin-bottom:10px">✏️</div><div style="font-size:15px;font-weight:600;color:var(--tx3);margin-bottom:6px">No lyrics loaded</div><div style="font-size:12px;margin-bottom:16px">Generate a song first, then open the Editor to refine your lyrics</div><button class="btn btn-amber" onclick="navTo(\'write\')" style="font-size:13px">✍️ Go Write a Song</button></div>';
   updEdStats();
 }
@@ -14392,27 +14848,46 @@ function updLine(i,v){
   const el=document.getElementById('syl'+i);
   if(el){el.textContent=syl>0?syl:'—';el.className='ll-syl '+cls;}
   updEdStats();
+  syncEditorSong();
 }
 function commitLine(i,v){
-  // Propagate change to all other lines that had the same original text
   const inp=document.querySelector(`#ll${i} .ll-input`);
   const origText=inp?.dataset?.orig||'';
-  // Only propagate if the line actually changed
-  if(!origText||v===origText)return;
-  let updated=0;
-  S.editorLines.forEach((line,j)=>{
-    if(j===i||line.isTag||line.isEmpty)return;
-    if(line.text===origText){
-      line.text=v;
-      const other=document.querySelector(`#ll${j} .ll-input`);
-      if(other){other.value=v;other.dataset.orig=v;}
-      updLine(j,v);
-      updated++;
+  // Nothing changed — keep data-orig in sync and bail.
+  if(!origText||v===origText){if(inp)inp.dataset.orig=v;return;}
+  // Re-classify if the line crossed the tag / blank boundary — e.g. the user
+  // typed "[Bridge]" to add a section, or cleared a line. Re-render so it
+  // shows as a section header / gap instead of a plain line.
+  const _ln=S.editorLines[i];
+  if(_ln){
+    const nowTag=/^\[/.test((v||'').trim()), nowEmpty=!(v||'').trim();
+    if(_ln.isTag!==nowTag||_ln.isEmpty!==nowEmpty){
+      _ln.text=v;_ln.isTag=nowTag;_ln.isEmpty=nowEmpty;
+      if(inp)inp.dataset.orig=v;
+      syncEditorSong();renderEditor();return;
     }
-  });
+  }
+  let updated=0;
+  // Propagate an identical-line edit ONLY across chorus/hook sections, where
+  // repetition is intentional. Verse duplicates (a callback, "yeah", "oh") are
+  // left alone so an edit never silently rewrites an unrelated line.
+  if(inp?.dataset?.chorus==='true'){
+    S.editorLines.forEach((line,j)=>{
+      if(j===i||line.isTag||line.isEmpty)return;
+      const other=document.querySelector(`#ll${j} .ll-input`);
+      if(other?.dataset?.chorus!=='true')return;
+      if(line.text===origText){
+        line.text=v;
+        if(other){other.value=v;other.dataset.orig=v;}
+        updLine(j,v);
+        updated++;
+      }
+    });
+  }
   // Update orig on the edited input too
   if(inp)inp.dataset.orig=v;
-  if(updated>0)toast(`🔄 Updated ${updated} matching line${updated>1?'s':''}`);
+  syncEditorSong();
+  if(updated>0)toast(`🔄 Updated ${updated} matching chorus line${updated>1?'s':''}`);
 }
 function updEdStats(){
   const lines=S.editorLines.filter(l=>!l.isTag&&!l.isEmpty&&l.text.trim());
@@ -14424,28 +14899,65 @@ function updEdStats(){
 }
 async function regenLine(i){
   const line=S.editorLines[i];
+  if(!line||line.isTag||line.isEmpty)return;
   let tag='[Verse]';
   for(let j=i;j>=0;j--){if(S.editorLines[j]?.isTag){tag=S.editorLines[j].text;break;}}
   const ctx=S.editorLines.slice(Math.max(0,i-2),i+3).filter(l=>!l.isTag&&!l.isEmpty).map(l=>l.text).join('\n');
-  const sylTarget=lineSyl(line.text);
+  // Aim at the section's ideal band — if the current line is over-length,
+  // don't ask the model to reproduce the bad count.
+  const isChorus=/chorus|hook/i.test(tag);
+  const curSyl=lineSyl(line.text);
+  const sylTarget=curSyl>=14?(isChorus?9:12):(curSyl||(isChorus?8:11));
+  const song=S.editorSong||S.currentSong||{};
 
   const regBtn=document.getElementById('reg'+i);
   if(regBtn)regBtn.disabled=true;
   const sylEl=document.getElementById('syl'+i);
   if(sylEl){sylEl.textContent='…';sylEl.className='ll-syl syl-warn';}
 
+  const instruction=`Rewrite ONLY this one line from the ${tag} section: "${line.text}"\n`+
+    `- Keep it close to ${sylTarget} syllables\n`+
+    `- Match the rhyme scheme and flow of these surrounding lines:\n${ctx}\n`+
+    `- Make it more vivid, specific, and singable\n`+
+    `- Stay true to the section type and the song's genre and voice\n`+
+    `Do not change any other line.`;
+  const isVercel=window.location.protocol==='https:'&&!window.location.hostname.includes('localhost');
+
   try{
-    const result=await callClaude(
-      `Section: ${tag}\nContext lines:\n${ctx}\n\nLine to improve: "${line.text}"\n\nWrite ONE replacement line. Requirements:\n- Same approximate syllable count (target: ${sylTarget} syllables)\n- Matches rhyme scheme and flow of context\n- More evocative, specific, or punchy\n- Stays true to the section type\n\nRespond with ONLY the new line, nothing else. No quotes, no explanation.`,
-      'You are an expert lyricist. Write only the requested lyric line with no extra text.'
-    );
-    const newLine=result.trim().replace(/^["']|["']$/g,'');
+    let result='';
+    if(isVercel){
+      // Brain-backed: routes through /api/stream so the full GENRE_BIBLE,
+      // structure rules, scales and craft toolkit shape the new line.
+      const r=await callServerStream('regen-line',{
+        instruction,
+        lyrics:S.editorLines.map(l=>l.text).join('\n'),
+        genre:song.genre||'pop',
+        title:song.title||'',
+        topic:song.topic||'',
+        mood:song.mood||'',
+        style:song.style||'',
+        brief:song.brief||''
+      });
+      result=(r&&r.text)||'';
+    }else{
+      // Local dev — no server proxy; call the model directly with context.
+      result=await callClaude(
+        `Section: ${tag}\nGenre: ${song.genre||'pop'}\n\n`+instruction,
+        'You are an expert lyricist. Write only the requested lyric line with no extra text.'
+      );
+    }
+    const newLine=((result||'').trim().split('\n').map(s=>s.trim()).filter(Boolean)[0]||'').replace(/^["']|["']$/g,'');
+    if(!newLine)throw new Error('empty response from model');
     S.editorLines[i].text=newLine;
     const inp=document.querySelector(`#ll${i} .ll-input`);
-    if(inp)inp.value=newLine;
+    if(inp){inp.value=newLine;inp.dataset.orig=newLine;} // keep data-orig in sync
     updLine(i,newLine);
+    syncEditorSong();
     toast('✓ Line regenerated');
-  }catch(e){toast('⚠️ Regen failed: '+e.message,3000);}
+  }catch(e){
+    toast('⚠️ Regen failed: '+e.message,3000);
+    updLine(i,S.editorLines[i].text); // restore the syllable badge (was showing '…')
+  }
   if(regBtn)regBtn.disabled=false;
 }
 function showPasteModal(){
@@ -14462,24 +14974,87 @@ function loadPasted(){
   ta.value='';
   toast('✓ Lyrics loaded into editor');
 }
+function syncEditorSong(){
+  // Keep S.editorSong.lyrics in lockstep with the live editor lines so the
+  // version-history auto-save, Coach, and Save all see the edited text — not
+  // the stale pre-edit lyrics captured at load time.
+  if(S.editorSong)S.editorSong.lyrics=S.editorLines.map(l=>l.text).join('\n');
+}
 function copyEdited(){const text=S.editorLines.map(l=>l.text).join('\n');safeCopy(text,'Edited lyrics copied');}
+function copyEditorStyle(){
+  const t=((S.editorSong&&S.editorSong.style)||'').trim();
+  if(!t){toast('No production prompt yet — tap 🔄 Refresh first');return;}
+  safeCopy(t,'Production prompt copied');
+}
+async function refreshEditorStyle(){
+  // Surgically update the production prompt to fit the EDITED lyrics — the
+  // lyrics themselves are never sent for rewrite, never touched.
+  syncEditorSong();
+  const song=S.editorSong||{};
+  const lyrics=(song.lyrics||'').trim();
+  if(!lyrics){toast('Load or paste lyrics first');return;}
+  const cur=(song.style||'').trim();
+  const btn=document.getElementById('ed-style-refresh');
+  const txt=document.getElementById('ed-style-text');
+  const prev=txt?txt.textContent:'';
+  if(btn){btn.disabled=true;btn.textContent='⏳ …';}
+  if(txt)txt.textContent=cur?'Updating production prompt to fit your edits…':'Deriving production prompt from the lyrics…';
+  const sys='You are a music production assistant. You refine Suno/Udio style prompts to match a song. You NEVER write, quote, or modify song lyrics.';
+  const prompt=(cur
+    ? `A songwriter edited the lyrics of a ${song.genre||'pop'} song. Update the existing PRODUCTION PROMPT so it still fits — but change ONLY the parts that genuinely need to change.\n\nRULES:\n- Keep genre, instrumentation and BPM exactly as-is unless the edited lyrics clearly demand otherwise.\n- Only adjust mood / energy / vocal-delivery / dynamics descriptors that the lyric edits actually affect.\n- If nothing needs changing, return the prompt unchanged.\n- Do NOT rewrite, quote or output the lyrics.\n- Keep it under 440 characters, comma-separated, Suno-optimised.\n\nEXISTING PRODUCTION PROMPT:\n${cur}\n\nCURRENT (EDITED) LYRICS:\n${lyrics}`
+    : `Derive a Suno/Udio PRODUCTION PROMPT for this ${song.genre||'pop'} song from its lyrics.\n\nRULES:\n- Comma-separated descriptors: genre, 4-5 instruments, BPM, tempo feel, vocal style, mood.\n- Under 440 characters, Suno-optimised.\n- Do NOT rewrite, quote or output the lyrics.\n\nLYRICS:\n${lyrics}`)
+    +`\n\nReturn ONLY the production prompt — one block of comma-separated descriptors, nothing else.`;
+  try{
+    const result=await callClaude(prompt,sys,300);
+    let np=(result||'').trim().replace(/^["']|["']$/g,'').replace(/\s*\n+\s*/g,' ').trim();
+    if(!np)throw new Error('empty response from model');
+    if(np.length>440)np=np.slice(0,440).trim();
+    S.editorSong.style=np;
+    if(txt)txt.textContent=np;
+    toast(cur?'✓ Production prompt updated':'✓ Production prompt derived');
+  }catch(e){
+    if(txt)txt.textContent=prev;
+    toast('⚠️ Refresh failed: '+e.message,3000);
+  }
+  if(btn){btn.disabled=false;btn.textContent='🔄 Refresh';}
+}
+function deleteLine(i){
+  if(!S.editorLines||!S.editorLines[i])return;
+  S.editorLines.splice(i,1);
+  // Never leave the editor with zero lines.
+  if(!S.editorLines.length)S.editorLines.push({text:'',isTag:false,isEmpty:false});
+  syncEditorSong();
+  renderEditor();
+}
+function insertLineAfter(i){
+  if(!S.editorLines)return;
+  S.editorLines.splice(i+1,0,{text:'',isTag:false,isEmpty:false});
+  syncEditorSong();
+  renderEditor();
+  // Focus the freshly inserted line so the user can type straight away.
+  setTimeout(()=>{const inp=document.querySelector(`#ll${i+1} .ll-input`);if(inp)inp.focus();},30);
+}
 function saveEdited(){
+  syncEditorSong();
   const lyrics=S.editorLines.map(l=>l.text).join('\n');
+  if(!lyrics.trim()){toast('Nothing to save yet — load or paste lyrics first');return;}
+  const src=S.editorSong||S.currentSong||{};
   const song={
     id:Date.now(),
-    title:(S.currentSong?.title||'Song')+' (edited)',
-    genre:S.currentSong?.genre||'',
-    topic:S.currentSong?.topic||'',
+    title:(src.title||'Song')+' (edited)',
+    genre:src.genre||'',
+    topic:src.topic||'',
     lyrics,
-    style:S.currentSong?.style||'',
-    brief:S.currentSong?.brief||'',
-    structure:S.currentSong?.structure||'',
-    dopamine:S.currentSong?.dopamine||'',
-    notes:S.currentSong?.notes||'',
+    style:src.style||'',
+    brief:src.brief||'',
+    structure:src.structure||'',
+    dopamine:src.dopamine||'',
+    notes:src.notes||'',
     ts:Date.now()
   };
   S.library.unshift(song);
   persistLib();
+  vhAddVersion(src.title||'Song',lyrics,src.genre||'','Saved edit');
   toast('✓ Edited version saved to library');
 }
 
@@ -24372,6 +24947,9 @@ function updateWriterSidebar() {
       const opPlan = document.getElementById('op-plan');
       if (opPlan) opPlan.textContent = planBadge.textContent;
     }
+    // Refresh Loop Anchor gate whenever the plan changes — sign-in, upgrade,
+    // admin toggle. laRefreshGate is idempotent.
+    if (typeof laRefreshGate === 'function') laRefreshGate();
   } catch(e) { /* non-critical sidebar update */ }
 }
 
