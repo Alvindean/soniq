@@ -11,6 +11,7 @@ const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const { createClient } = require('@supabase/supabase-js');
+const { validatePhrase: _laValidatePhrase } = require('./_loop_anchor');
 
 function getSupabaseClient(token) {
   const url = process.env.SUPABASE_URL;
@@ -251,6 +252,44 @@ function sanitizeVocalDescriptors(v) {
       .slice(0, 10);
   }
   return Object.keys(out).length ? out : undefined;
+}
+
+// Lever — loop-anchor phrase. Sanitise the user-supplied phrase that the
+// brain will treat as the song's load-bearing center. Brain owns transform
+// selection (selectAnchorTransform); the API layer only forwards the
+// trimmed phrase. Defense-in-depth: printable ASCII only, 2–80 chars, so
+// the brain never sees control chars or arbitrary unicode.
+const _LOOP_ANCHOR_SAFE = /^[\x20-\x7E]{2,80}$/;
+// Hard prompt-injection blocklist. Loop Anchor phrases that contain any of
+// these tokens are rejected outright — they're either trying to escape the
+// brain's prompt scaffolding (>>>, <<<, fenced code) or impersonate a chat
+// role (system:, assistant:, user:, ignore previous instructions, override:).
+const _LOOP_ANCHOR_INJECT_RE = /(>>>|<<<|\bsystem\s*:|\bassistant\s*:|\buser\s*:|\bignore\s+previous\s+instructions\b|\boverride\s*:|```)/i;
+// Plans entitled to the Loop Anchor feature. Pro + Studio + early founders +
+// legacy founding. founding_t2 ($9.99 entry tier) is intentionally excluded —
+// Loop Anchor is the upgrade hook from t2 → Pro. Free is locked out entirely.
+const LOOP_ANCHOR_PLANS = new Set([
+  'pro','pro_annual',
+  'studio','studio_annual',
+  'founding','founding_t1','founding_t1_annual',
+]);
+function sanitizeLoopAnchor(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined;
+  if (typeof v.phrase !== 'string') return undefined;
+  const phrase = v.phrase.trim().slice(0, 80);
+  if (!phrase || !_LOOP_ANCHOR_SAFE.test(phrase)) return undefined;
+  // Defense-in-depth: reject prompt-injection patterns before they reach the
+  // brain (UI is not the only entry point — direct API callers exist).
+  if (_LOOP_ANCHOR_INJECT_RE.test(phrase)) return undefined;
+  // Enforce the syllable/quality contract that the UI advertises. Without
+  // this, the API silently accepted "lalalalalalalalalalala" and similar
+  // junk that the UI would have blocked.
+  const result = _laValidatePhrase(phrase);
+  if (!result || !result.ok) return undefined;
+  return { phrase: result.normalized || phrase };
+}
+function isLoopAnchorEntitled(plan, isAdmin) {
+  return !!isAdmin || LOOP_ANCHOR_PLANS.has(plan);
 }
 
 // free = 3 lifetime songs (trial); paid = monthly
@@ -642,6 +681,30 @@ module.exports = async function handler(req, res) {
       console.error('Edit prompt build failed:', err.message);
       return res.status(500).json({ error: 'Edit prompt error: ' + err.message });
     }
+  } else if (body.action === 'regen-line') {
+    // ── Single-line regeneration — brain-backed (full GENRE_BIBLE + song
+    //    context via buildEditPrompt) but constrained to return ONE line. ──
+    try {
+      const brain = require('./_brain');
+      const p = body.params || {};
+      if (!p.lyrics)      { res.status(400).json({ error: 'lyrics required' }); return; }
+      if (!p.instruction) { res.status(400).json({ error: 'instruction required' }); return; }
+      p.plan = plan;
+      p.isAdmin = !!req._adminBypass;
+      const built = brain.buildEditPrompt(p);
+      messages   = [{ role: 'user', content: built.prompt }];
+      // buildEditPrompt's system ends with a "return the COMPLETE revised
+      // lyrics" contract. Append a hard override so this request yields
+      // exactly one rewritten line and nothing else.
+      system     = built.system + '\n\n=== OUTPUT OVERRIDE (this request only) ===\n'
+        + 'Disregard the "complete revised lyrics" instruction above. You are rewriting exactly ONE line. '
+        + 'Return ONLY that single rewritten line as plain text — no [Section] tags, no quotes, '
+        + 'no surrounding lines, no markdown, no commentary. One line. Nothing else.';
+      max_tokens = 256;
+    } catch (err) {
+      console.error('Regen-line prompt build failed:', err.message);
+      return res.status(500).json({ error: 'Regen-line prompt error: ' + err.message });
+    }
   } else if (body.action === 'blend') {
     // ── Song Blend (Wave 5) — two analyzed songs + per-dimension weights + twist ──
     try {
@@ -766,6 +829,12 @@ module.exports = async function handler(req, res) {
         // so users can hand-type custom descriptors like "raspy cigarette
         // baritone" if they want.
         p.vocalDescriptors = sanitizeVocalDescriptors(p.vocalDescriptors);
+        p.loopAnchor = sanitizeLoopAnchor(p.loopAnchor);
+        // Plan gate — strip Loop Anchor for plans below Pro tier. Defense-
+        // in-depth: the UI already locks the input, but the API must enforce.
+        if (p.loopAnchor && !isLoopAnchorEntitled(plan, req._adminBypass)) {
+          p.loopAnchor = undefined;
+        }
         p.surprise = sanitizeSurprise(p.surprise);
         // Emotional velocity whitelist — invalid → 'auto' (server resolves to genre default)
         const VALID_VELOCITY = new Set(['auto','slow_burn','standard_arc','cycling','whiplash','plateau_drift']);
@@ -809,6 +878,10 @@ module.exports = async function handler(req, res) {
         if (lp.region && !VALID_LUCKY_REGIONS.has(lp.region)) lp.region = '';
         // Lever #7 — vocal descriptors flow through Lucky too.
         lp.vocalDescriptors = sanitizeVocalDescriptors(lp.vocalDescriptors);
+        lp.loopAnchor = sanitizeLoopAnchor(lp.loopAnchor);
+        if (lp.loopAnchor && !isLoopAnchorEntitled(plan, req._adminBypass)) {
+          lp.loopAnchor = undefined;
+        }
         // Lever #8 — surprise engine for Lucky.
         lp.surprise = sanitizeSurprise(lp.surprise);
         // Punchline-craft tool whitelist for Lucky — same set as the song path.
@@ -961,8 +1034,10 @@ module.exports = async function handler(req, res) {
   const minScore   = PLAN_MIN_SCORES[plan] ?? 0;
   const maxRetries = PLAN_MAX_RETRIES[plan] ?? 0;
 
-  // Paid plans with score guarantee: buffer, score, retry if needed
-  if (anthropicKey && minScore > 0) {
+  // Paid plans with score guarantee: buffer, score, retry if needed.
+  // Skipped for regen-line — scoring a one-line output as a full song would
+  // always fail the threshold and burn retry calls.
+  if (anthropicKey && minScore > 0 && body.action !== 'regen-line') {
     let bestText = '', bestScore = 0, attempts = 0;
     const totalAttempts = maxRetries + 1;
     try {
@@ -982,8 +1057,9 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // Free plan: 1 structural retry if hook is clearly missing (uses no AI — pure regex check)
-  if (anthropicKey && plan === 'free') {
+  // Free plan: 1 structural retry if hook is clearly missing (uses no AI — pure
+  // regex check). Skipped for regen-line — a single line has no hook to score.
+  if (anthropicKey && plan === 'free' && body.action !== 'regen-line') {
     try {
       const firstAttempt = await generateBuffered(anthropicKey, messages, system, max_tokens);
       const hookQuality  = serverHookScore(firstAttempt);

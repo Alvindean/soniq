@@ -6,6 +6,7 @@
 
 const { selectVocalDescriptors, buildVocalDescriptorNote } = require('./_vocal-descriptors');
 const { selectSurpriseMoves, buildSurpriseNote } = require('./_surprise-engine');
+const { validatePhrase, selectAnchorTransform, buildLoopAnchorNote } = require('./_loop_anchor');
 
 const GENRE_BIBLE={
   hiphop:{
@@ -4917,15 +4918,263 @@ function _normalizeGenreKey(genre) {
   return _FUSION_KEY_MAP[genre] || genre;
 }
 
-function buildAdlibNote(genre) {
+// ═══════════════════════════════════════════════════════════════════════════
+// MOOD_ADLIB_OVERLAYS — vibe-gated ad-lib policy.
+// Applies to EVERY genre. The genre profile is the base; the mood overlay
+// removes vibe-incompatible ad-libs (e.g. skrrt on a sad Toronto trap track),
+// injects mood-appropriate substitutes, and can override density/placement.
+// Keys are buckets; the resolver below maps free-text moods → buckets.
+// When a mood resolves to NO bucket, the genre profile is emitted unchanged
+// (backward-compatible).
+// ═══════════════════════════════════════════════════════════════════════════
+const MOOD_ADLIB_OVERLAYS = {
+  sad: {
+    ban: ['skrrt','skrrrt','skrt','let\'s go','woo','bands','yessir','throw your hands up',
+          'demon time','grrah','splash','brr','brrap','opps','gang','no cap','slide',
+          'yee','yeee','whoop whoop','hella','go dumb','ghost ride','thizzin','turf',
+          'oi','bruv','fam','innit','hallelujah','amen','glory','yes lord','jah','irie',
+          'woohoo','yay','¡fuego!','¡vamos!','¡dale!','¡wepa!','¡eso!','dale','wepa','olé',
+          'one love','let it light up','it\'s on','ride out','up!','ayy!','let\'s go!','what it is',
+          'check it','c\'mon son','one-two','aiyyo','ya don\'t stop','word up','def','fresh'],
+    add: ['mmm','oh','ahh','hmm','sigh'],
+    densityOverride: 'minimal — 1-2 moments per song, end-of-phrase only',
+    placementOverride: 'end of phrases as exhales; never bar-end punctuation; outro fades to silence',
+    toneNote: 'The vibe is grief, not celebration — every ad-lib must read as an involuntary breath, not a performative shout.',
+  },
+  melancholy: {
+    ban: ['skrrt','skrrrt','skrt','let\'s go','woo','bands','yessir','hella','demon time',
+          'grrah','splash','brr','opps','gang','woohoo','yay','hallelujah','glory','amen',
+          'one love','¡fuego!','¡vamos!','¡dale!','dale','wepa','yee','yeee','whoop whoop'],
+    add: ['mmm','oh','hmm'],
+    densityOverride: 'low — sparse, reflective',
+    placementOverride: 'between phrases as breath, never as punctuation',
+    toneNote: 'Wistful, not loud. Ad-libs are unspoken thoughts surfacing — restraint is the texture.',
+  },
+  romantic: {
+    ban: ['skrrt','skrrrt','skrt','oi','bruv','brr','brrap','grrah','demon time','opps','gang',
+          'splash','no cap','yee','whoop whoop','hella','go dumb','let\'s go','bands',
+          'screamed','shouted','feedback noise','grr','ahhh','yay','woohoo'],
+    add: ['mmm','ah','ooh','baby','oh'],
+    densityOverride: 'low-medium — intimate, never showy',
+    placementOverride: 'breath between lines, post-chorus sigh, outro vamp soft',
+    toneNote: 'Sensual restraint. No hype tags. Every ad-lib reads like a held breath, not a crowd cue.',
+  },
+  sensual: {
+    ban: ['skrrt','let\'s go','woo','bands','oi','brr','gang','opps','demon time','grrah',
+          'splash','hella','¡fuego!','¡vamos!','hallelujah','glory','amen','yay','woohoo'],
+    add: ['mmm','ooh','ah','baby'],
+    densityOverride: 'low-medium — slow burn',
+    placementOverride: 'end-of-line exhale, bridge build, outro vamp',
+    toneNote: 'Smoke and silk. Every ad-lib slows the line down rather than accenting it.',
+  },
+  angry: {
+    ban: ['la-la-la','na-na-na','do-do-do','woohoo','yay','baby','mmm baby','ooh-ah-yeah',
+          'one love','irie','bless','la-la','sweet','tender'],
+    add: ['grrah','ahhh','huh','go!','yeah!'],
+    densityOverride: 'high — aggressive punctuation',
+    placementOverride: 'bar-end punctuation, breakdown shouts, drop entry',
+    toneNote: 'Coiled menace or open rage. Ad-libs are exhaled threats, not party calls.',
+  },
+  dark: {
+    ban: ['la-la-la','na-na-na','do-do-do','woohoo','yay','hallelujah','amen','glory',
+          'one love','bless','baby','ooh-ah-yeah','la-la','irie','sweet'],
+    add: ['ahhh','grr','huh','(whispered)','(pitched down)'],
+    densityOverride: 'low — menacing, sparse',
+    placementOverride: 'bar-end punctuation, breakdown entry, never outro singalong',
+    toneNote: 'Cold, low, deliberate. No light textures — ad-libs are shadow not gloss.',
+  },
+  hype: {
+    ban: [],
+    add: ['woo!','let\'s go!','ayy!','yeah!'],
+    densityOverride: 'maximum — every 2 bars, pre-drop, drop, post-drop',
+    placementOverride: 'every section, especially drop entries and outro chants',
+    toneNote: 'Maximum density permitted — the song wants the crowd response baked in.',
+  },
+  party: {
+    ban: ['mmm','sigh','(whispered)','hmm','la-la-la'],
+    add: ['woo!','let\'s go!','¡dale!','ayy!'],
+    densityOverride: 'high',
+    placementOverride: 'pre-chorus lift, post-chorus crowd release, outro vamp',
+    toneNote: 'Communal energy. Ad-libs are crowd ignitors — no intimate textures.',
+  },
+  triumphant: {
+    ban: ['sigh','(whispered)','mmm','ahh'],
+    add: ['hallelujah','glory','yes!','yeah!','woo!'],
+    densityOverride: 'maximum on the final chorus + outro',
+    placementOverride: 'final chorus climax, outro extended vamp',
+    toneNote: 'Earned victory. Ad-libs are the choir behind the win — go big, never small.',
+  },
+  reflective: {
+    ban: ['skrrt','skrrrt','let\'s go','woo','hella','brr','gang','demon time','opps','¡fuego!',
+          'yay','woohoo','whoop whoop','splash','yee','yeee','bands'],
+    add: ['mmm','oh','hmm'],
+    densityOverride: 'low',
+    placementOverride: 'bridge build, between phrases as inner monologue',
+    toneNote: 'The song is thinking out loud. No hype tags — the ad-libs are subliminal.',
+  },
+  vulnerable: {
+    ban: ['skrrt','let\'s go','woo','bands','oi','brr','gang','demon time','opps','grrah',
+          'splash','hella','¡fuego!','¡vamos!','yay','woohoo','hallelujah'],
+    add: ['mmm','oh','sigh','hmm'],
+    densityOverride: 'minimal',
+    placementOverride: 'between phrases, outro fade',
+    toneNote: 'Confessional. Ad-libs are the cracks in the voice — never bravado.',
+  },
+  playful: {
+    ban: ['hallelujah','amen','glory','yes lord','grrah','demon time','opps','brr','skrrt',
+          'screamed','feedback noise'],
+    add: ['yay','woohoo','la-la-la','na-na-na'],
+    densityOverride: 'high — light',
+    placementOverride: 'post-chorus singalong, outro group chant',
+    toneNote: 'Buoyant. Ad-libs are jokes between friends — no solemn or aggressive textures.',
+  },
+  nostalgic: {
+    ban: ['skrrt','let\'s go','woo','bands','demon time','opps','grrah','hella','¡fuego!',
+          'whoop whoop','yay','woohoo'],
+    add: ['mmm','oh','la-la-la','hmm'],
+    densityOverride: 'low-medium',
+    placementOverride: 'verse story turns, bridge build, outro fade',
+    toneNote: 'Looking back through warm glass. Ad-libs are softly remembered, never shouted.',
+  },
+  anxious: {
+    ban: ['woo','let\'s go','yay','woohoo','hallelujah','glory','la-la-la','baby','sweet',
+          'one love','irie'],
+    add: ['huh','(breath)','hmm','ahh'],
+    densityOverride: 'medium — uneven, restless',
+    placementOverride: 'mid-line interruptions, off-beat punctuation, breath cuts',
+    toneNote: 'Held tension. Ad-libs read as nervous tics — short, clipped, unresolved.',
+  },
+  defiant: {
+    ban: ['mmm','sigh','baby','la-la-la','na-na-na','la-la','sweet','tender'],
+    add: ['yeah!','huh','grrah','let\'s go!'],
+    densityOverride: 'high',
+    placementOverride: 'bar-end punctuation, drop entry, breakdown',
+    toneNote: 'Defiance is loud and concentrated — no soft textures, every ad-lib stakes ground.',
+  },
+};
+
+// Mood-bucket resolver. Accepts free-text mood from any UI/path (single mood,
+// "+" or "/" joined moods, or null). Returns the array of bucket keys that
+// apply — multiple buckets can stack (e.g. "dark hype" → ['dark','hype'];
+// later buckets override earlier on conflicts).
+const _MOOD_BUCKET_KEYWORDS = {
+  sad:         ['sad','heartbreak','heartbroken','grief','grieving','mourning','lonely','crying','tears','blue','sorrow','depress','depression','despair','hopeless'],
+  melancholy:  ['melancholy','melancholic','wistful','pensive','bittersweet','rueful','solemn','yearning'],
+  romantic:    ['romantic','love','loving','tender','affectionate','devoted','adoring','smitten','infatuated'],
+  sensual:     ['sensual','sultry','seductive','sexy','smoky','smooth','bedroom','intimate'],
+  angry:       ['angry','anger','furious','rage','enraged','hostile','vindictive','wrathful','livid','pissed'],
+  dark:        ['dark','sinister','menacing','ominous','evil','demonic','villain','grim','bleak','haunted','shadow','phonk'],
+  hype:        ['hype','hyped','pumped','amped','turnt','energetic','energy','high-energy','rowdy','wild'],
+  party:       ['party','club','dance','festive','celebratory','celebration','turnup','turn up','festival'],
+  triumphant:  ['triumphant','victorious','victory','anthemic','epic','heroic','stadium','transcendent','glory','soaring'],
+  reflective:  ['reflective','introspective','contemplative','thoughtful','meditative','philosophical','conscious','pondering'],
+  vulnerable:  ['vulnerable','exposed','raw','fragile','tender','confessional','intimate-vulnerable','aching'],
+  playful:     ['playful','fun','silly','goofy','quirky','whimsical','cheeky','mischievous','lighthearted','upbeat','joyful','happy','cheerful'],
+  nostalgic:   ['nostalgic','nostalgia','wistful-nostalgic','retro-feeling','remembering','reminiscent','throwback-feeling'],
+  anxious:     ['anxious','anxiety','nervous','paranoid','uneasy','tense','restless','jittery','panicked','dread'],
+  defiant:     ['defiant','rebellious','fierce','unapologetic','bold','assertive','confrontational','combative'],
+};
+function _classifyMoodBuckets(moodStr) {
+  if (!moodStr || typeof moodStr !== 'string') return [];
+  const lower = moodStr.toLowerCase();
+  const hits = new Set();
+  for (const [bucket, keywords] of Object.entries(_MOOD_BUCKET_KEYWORDS)) {
+    if (keywords.some(k => lower.includes(k))) hits.add(bucket);
+  }
+  // "dark hype" should keep both — but if both sad and hype hit, sad wins
+  // (a sad song can't simultaneously max-density crowd-chant). Resolve the
+  // most common conflict pair here; leave other coexistences (dark + hype,
+  // angry + defiant, romantic + sensual) intact.
+  if (hits.has('sad') && hits.has('hype')) hits.delete('hype');
+  if (hits.has('vulnerable') && hits.has('hype')) hits.delete('hype');
+  if (hits.has('melancholy') && hits.has('party')) hits.delete('party');
+  return Array.from(hits);
+}
+
+// Compose the active mood overlay by merging buckets in order. Later buckets
+// override densityOverride / placementOverride; bans + adds union together.
+function _composeMoodOverlay(buckets) {
+  if (!buckets || !buckets.length) return null;
+  const banSet = new Set();
+  const addSet = new Set();
+  let density = null, placement = null;
+  const toneNotes = [];
+  for (const b of buckets) {
+    const o = MOOD_ADLIB_OVERLAYS[b];
+    if (!o) continue;
+    (o.ban || []).forEach(x => banSet.add(x.toLowerCase()));
+    (o.add || []).forEach(x => addSet.add(x));
+    if (o.densityOverride)   density   = o.densityOverride;
+    if (o.placementOverride) placement = o.placementOverride;
+    if (o.toneNote) toneNotes.push(o.toneNote);
+  }
+  return {
+    ban: Array.from(banSet),
+    add: Array.from(addSet),
+    density,
+    placement,
+    toneNote: toneNotes.join(' '),
+    buckets,
+  };
+}
+
+function buildAdlibNote(genre, mood, substyle) {
   const a = ADLIB_BIBLE[_normalizeGenreKey(genre)];
   if (!a) return '';
-  const sounds = a.sounds.slice(0, 4).map(s => `(${s})`).join(' ');
+
+  // Pool = genre base sounds + (optional) substyle-specific ad-libs from
+  // RAP_STYLE_ADLIBS. The substyle bank covers Trap (skrrt etc.), Drill,
+  // Boom Bap, UK Drill, Hyphy, Bay Area, Down South, Phonk, Memphis, etc.
+  // It applies wherever the substyle label is recognized — works for all
+  // genres that map into RAP_STYLE_ADLIBS via hiphop substyles.
+  let pool = Array.from(a.sounds);
+  const substyleBank = (substyle && typeof substyle === 'string' && typeof RAP_STYLE_ADLIBS === 'object')
+    ? RAP_STYLE_ADLIBS[substyle] : null;
+  if (Array.isArray(substyleBank)) {
+    for (const s of substyleBank) {
+      if (!pool.some(p => p.toLowerCase() === String(s).toLowerCase())) pool.push(s);
+    }
+  }
+
+  // Mood gate — universal across every genre.
+  const buckets = _classifyMoodBuckets(mood);
+  const overlay = _composeMoodOverlay(buckets);
+  let banned = [];
+  if (overlay) {
+    // Filter: drop any pool entry whose normalized form contains a banned
+    // substring. Banned tokens are stored lowercased and stripped of parens.
+    const norm = s => String(s).toLowerCase().replace(/[()]/g, '').trim();
+    const isBanned = s => {
+      const n = norm(s);
+      return overlay.ban.some(b => n === b || n.includes(b));
+    };
+    banned = pool.filter(isBanned);
+    pool = pool.filter(s => !isBanned(s));
+    // Prepend mood-add sounds (de-duped, capped so the pool stays usable).
+    for (let i = overlay.add.length - 1; i >= 0; i--) {
+      const s = overlay.add[i];
+      if (!pool.some(p => p.toLowerCase() === s.toLowerCase())) pool.unshift(s);
+    }
+  }
+
+  const density   = (overlay && overlay.density)   || a.density;
+  const placement = (overlay && overlay.placement) || a.placement;
+  const sounds = pool.slice(0, 6).map(s => `(${s})`).join(' ');
+  const banLine = (overlay && banned.length)
+    ? `\nMOOD GATE — DO NOT USE (vibe-incompatible for this song): ${banned.map(s => `(${s})`).join(' ')}`
+    : '';
+  const toneLine = (overlay && overlay.toneNote)
+    ? `\nVibe tone: ${overlay.toneNote}`
+    : '';
+  const bucketLine = (overlay && overlay.buckets.length)
+    ? `\nResolved mood buckets: ${overlay.buckets.join(', ')}`
+    : '';
+
   return `\n\nAD-LIBS (Suno parentheses syntax — use throughout):
-Sounds: ${sounds} — ${a.placement}
-Density: ${a.density}
+Sounds: ${sounds} — ${placement}
+Density: ${density}
 Example: ${a.example}
-Outro: ${a.outro}
+Outro: ${a.outro}${bucketLine}${toneLine}${banLine}
 Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line = spotlight moment.`;
 }
 
@@ -5669,9 +5918,21 @@ function buildSongPrompt(params) {
 
   const genreLabel = GENRE_LABELS[genre] || genre;
   // Freestyle = bars-only override regardless of genre
-  const structStr = freestyleMode
+  // The length tier's section blueprint is the authority on song scale — the
+  // SHORT tier mandates NO bridge. When it does, strip any [Bridge] section
+  // from the displayed structure so the "Structure:" line and the LENGTH
+  // blueprint stop contradicting each other (flow-song pairs structure
+  // 'standard' — which names a [Bridge] — with length 'short').
+  const _noBridgeTier = /\bNO bridge\b/i.test((LENGTH_BUDGETS[length] || {}).blueprint || '');
+  let structStr = freestyleMode
     ? '[Intro | optional, beat only] → [Verse 1 | continuous bars, no hook] → [Verse 2 | continuous bars, no hook] → [Verse 3 | continuous bars, no hook] → [Outro | bars trail off]'
     : (STRUCTURES[structure] || STRUCTURES.standard);
+  if (_noBridgeTier && !freestyleMode && /\[Bridge/i.test(structStr)) {
+    structStr = structStr
+      .replace(/\s*(?:→|->)\s*\[Bridge[^\]]*\]/gi, '')
+      .replace(/^\s*\[Bridge[^\]]*\]\s*(?:→|->)\s*/i, '')
+      .trim();
+  }
   const freestyleSongLock = freestyleMode ? `
 
 🎤 FREESTYLE MODE — HARD STRUCTURAL OVERRIDE (non-negotiable, supersedes the genre's default structure):
@@ -5817,7 +6078,7 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   const _counterLine   = _gsd.bridge?.counter   ? `\nCounter-melody role: ${_gsd.bridge.counter}` : '';
   const _examplesLine  = _gsd.bridge?.examples  ? `\nReal-world models: ${_gsd.bridge.examples}`  : '';
 
-  const bridgeNote = `\n\nBRIDGE ARCHITECTURE — "${_ba.name}" [${genreLabel}]:${_harmonicLine}${_counterLine}
+  const bridgeNote = _noBridgeTier ? '' : `\n\nBRIDGE ARCHITECTURE — "${_ba.name}" [${genreLabel}]:${_harmonicLine}${_counterLine}
 Energy arc: ${_ba.energy} · Bars: ${_ba.bars}
 Delivery: ${_ba.delivery}
 Lyric approach: ${_ba.lyric}
@@ -5960,7 +6221,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
 
   // ── Platform-specific instructions ─────────────────────────────────────
   const platformNotes = {
-    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 200 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
+    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 440 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
     udio:   'PLATFORM: Udio — Section tags work differently: Udio responds well to emotional descriptors in brackets, e.g. [Verse - melancholic], [Chorus - anthemic]. Keep SONG PROMPT under 300 characters. Udio prefers genre descriptors over instrument lists.',
     stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
   };
@@ -5981,7 +6242,9 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   const velocityNote = buildEmotionalVelocityNote(genre, params.emotionalVelocity);
 
   const platinumNote = platinum ? buildTopTierNote(genre) : '';
-  const adlibNote = buildAdlibNote(genre);
+  // Mood-gated ad-libs — applies to every genre. Sad songs lose hype tags
+  // (skrrt/woo/let's go), party songs lose subdued tags (mmm/sigh), etc.
+  const adlibNote = buildAdlibNote(genre, mood, substyle);
   const vocalStackNote = buildVocalStackNote(genre);
   // Lever #7 — vocal character descriptors (texture / character / performance / accent / era / postural / processing).
   // Picks the WHO of the voice and locks it into the Suno style prompt prefix + negative tag block.
@@ -5993,6 +6256,19 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
     autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
   });
   const vocalDescriptorNote = buildVocalDescriptorNote(_vocalDescStack);
+  // Lever #9 — loop-anchor system. Locks an exact 5-9 syllable phrase into the
+  // chorus so Suno's lyric parser hooks onto it. The brain owns transform
+  // selection (genre/substyle/mood → loop style + Suno style prefix + placement
+  // recipe). Caller passes only { phrase: string }; we validate + select here.
+  // When phrase is absent/invalid, buildLoopAnchorNote returns '' so the
+  // injection is a zero-op and the brain behaves identically to today.
+  const _loopAnchorActive = !!(params.loopAnchor && params.loopAnchor.phrase);
+  const loopAnchorNote = _loopAnchorActive
+    ? buildLoopAnchorNote({ phrase: params.loopAnchor.phrase, genre, substyle, mood })
+    : '';
+  const _loopAnchorTransform = _loopAnchorActive
+    ? selectAnchorTransform({ genre, substyle, mood })
+    : null;
   // Lever #8 — surprise engine. Picks 1-4 human-attractor moves (drops, builds,
   // pauses, phone-call interjections, off-mic chatter, found-sound samples,
   // beat switches, key changes, vocal flips) that the LLM must embed in the
@@ -6156,7 +6432,7 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]${vocalStackNote}${vocalDescriptorNote}${surpriseNote}
+5. [tip 5]${vocalStackNote}${loopAnchorNote}${vocalDescriptorNote}${surpriseNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
@@ -6441,6 +6717,20 @@ function buildCrossoverNote(g1, g2) {
   return lines.join('\n');
 }
 
+// Build-time artist-name scrub for Suno production tags. SUBSTYLE_SUNO tags
+// occasionally carry an artist reference via the "<Name> style" idiom (e.g.
+// "Jonathan Coulton style"). The PRODUCTION LOCK below orders the model to
+// reproduce these tags VERBATIM, which collides with the SUNO COMPLIANCE rule
+// forbidding artist names — so strip those segments at build time instead of
+// trusting the model to resolve the contradiction.
+function _scrubSunoTagArtists(tag) {
+  return String(tag || '')
+    .split(',')
+    .map(s => s.trim())
+    .filter(s => s && !/^[A-Z][\w.'-]*(?:\s+[\w.'-]+){0,3}\s+style$/.test(s))
+    .join(', ');
+}
+
 function buildLuckyPrompt(params) {
   const keys = Object.keys(FUSION_DATA);
   const rawG1 = params && params.g1 ? sanitizeInput(params.g1, 50) : null;
@@ -6464,7 +6754,7 @@ function buildLuckyPrompt(params) {
   const length    = (params && params.length) ? sanitizeInput(params.length, 20) : 'medium';
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const lengthBudgetNote = buildLengthBudgetNote(length);
-  const adlibNote = buildAdlibNote(g1);
+  const adlibNote = buildAdlibNote(g1, mood, params.substyle);
   const vocalStackNote = buildVocalStackNote(g1);
   // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
   // overrides flow through params.vocalDescriptors when supplied)
@@ -6475,6 +6765,17 @@ function buildLuckyPrompt(params) {
     autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
   });
   const luckyVocalDescriptorNote = buildVocalDescriptorNote(_luckyVocalDescStack);
+  // Lever #9 — loop-anchor system for Lucky (mirrors Writer integration).
+  // Same gating: empty/invalid phrase → empty note → zero-op injection.
+  // Uses g1 (primary fusion genre) so transform selection lands in a genre
+  // the loop-anchor module recognises.
+  const _luckyLoopAnchorActive = !!(params.loopAnchor && params.loopAnchor.phrase);
+  const luckyLoopAnchorNote = _luckyLoopAnchorActive
+    ? buildLoopAnchorNote({ phrase: params.loopAnchor.phrase, genre: g1, substyle: params.substyle || '', mood })
+    : '';
+  const _luckyLoopAnchorTransform = _luckyLoopAnchorActive
+    ? selectAnchorTransform({ genre: g1, substyle: params.substyle || '', mood })
+    : null;
   // Lever #8 — surprise engine for Lucky (mirrors Writer behaviour)
   const _luckySurpriseResult = selectSurpriseMoves({
     genre: g1, mood, lyrics: topic || '',
@@ -6541,7 +6842,7 @@ function buildLuckyPrompt(params) {
   const luckySubstyleNote = luckySubstyle && SUBSTYLE_NOTES[luckySubstyle]
     ? `\n\nSUBSTYLE LOCK — ${luckySubstyle} (from ${luckySubstyleSource}):\n${SUBSTYLE_NOTES[luckySubstyle]}`
     : '';
-  const luckySubstyleSunoTag = luckySubstyle && SUBSTYLE_SUNO[luckySubstyle] ? SUBSTYLE_SUNO[luckySubstyle] : null;
+  const luckySubstyleSunoTag = luckySubstyle && SUBSTYLE_SUNO[luckySubstyle] ? _scrubSunoTagArtists(SUBSTYLE_SUNO[luckySubstyle]) : null;
   const luckySubstyleSunoLock = luckySubstyleSunoTag
     ? `\n\n⚠️ PRODUCTION LOCK — ${luckySubstyle}: The SONG PROMPT must contain these exact production tags: "${luckySubstyleSunoTag}" — do NOT substitute generic ${luckySubstyleSource} production tags.`
     : '';
@@ -6617,8 +6918,7 @@ function buildLuckyPrompt(params) {
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
 ${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(g1, g2)}
 
-Fusion style: ${fd?.name || g1 + ' × ' + g2}
-${fd?.name ? 'Fusion style: ' + fd.name : 'Blend both genres authentically.'}
+Fusion style: ${fd?.name || g1 + ' × ' + g2}. Blend both genres authentically.
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
@@ -6687,7 +6987,7 @@ DIRECTOR NOTES:
 2. [tip 2]
 3. [tip 3]
 4. [tip 4]
-5. [tip 5]${vocalStackNote}${luckyVocalDescriptorNote}${luckySurpriseNote}
+5. [tip 5]${vocalStackNote}${luckyLoopAnchorNote}${luckyVocalDescriptorNote}${luckySurpriseNote}
 
 COUNTERMELODY:
 DEVICE: [specific counter-melodic instrument/voice]
@@ -8057,7 +8357,7 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
-- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop')}${buildProductionNote('hiphop', mood, params && params.aggression, params && params.lyricTier)}
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop', mood, style && style.label)}${buildProductionNote('hiphop', mood, params && params.aggression, params && params.lyricTier)}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
@@ -8683,7 +8983,7 @@ function buildSongBlendPrompt(params) {
   const productionNote   = (typeof buildProductionNote === 'function')
     ? buildProductionNote(_dom, moodHint, p.aggression, lyricTier)
     : '';
-  const adlibNote        = buildAdlibNote(_dom);
+  const adlibNote        = buildAdlibNote(_dom, moodHint, p && p.substyle);
 
   const system = (typeof buildGenreAgentSystem === 'function' && GENRE_AGENTS && GENRE_AGENTS[_dom])
     ? buildGenreAgentSystem(_dom).replace(/^You are a world-class .+? songwriter/, `You are a world-class ${_dom} songwriter & A&R-grade song-blend specialist`)
