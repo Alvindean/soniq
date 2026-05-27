@@ -4865,7 +4865,15 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <!-- Song-generation progress bar — visible while flow-song is in flight -->
     <div class="song-progress-bar" id="fres-progress-bar" aria-live="polite">
       <div class="spb-track"><div class="spb-fill" id="fres-progress-fill"></div></div>
-      <div class="spb-label"><span id="fres-progress-stage">starting…</span><span class="spb-pct" id="fres-progress-pct">0%</span></div>
+      <div class="spb-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span><span id="fres-progress-stage">starting…</span> · <span class="spb-pct" id="fres-progress-pct">0%</span></span>
+        <button type="button" id="flow-stop-btn" onclick="flowStopSong()" aria-label="Stop generation — no credit used"
+          style="background:rgba(245,80,80,0.12);border:1px solid rgba(245,80,80,0.45);color:#f55050;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:99px;cursor:pointer;font-family:var(--font);transition:all .12s;white-space:nowrap"
+          onmouseover="this.style.background='rgba(245,80,80,0.22)';this.style.color='#fff'"
+          onmouseout="this.style.background='rgba(245,80,80,0.12)';this.style.color='#f55050'">
+          ◼ Stop · no credit
+        </button>
+      </div>
     </div>
 
     <!-- Spin wheel (slot machine, mirrors Lucky's) -->
@@ -5267,6 +5275,42 @@ body.craft-advanced .craft-basic-only{display:none !important}
     // ── Main entry ───────────────────────────────────────────────────────
     var inFlight = null;       // spec fetch controller
     var songInFlight = null;   // song fetch controller (audit fix: race)
+
+    // Stop the in-flight Flow song generation without burning a usage credit.
+    // The server only increments usage after the AI call returns successfully
+    // (api/generate.js — redisIncrExpire runs post-callOpenRouter/callAnthropic),
+    // so aborting the fetch from the client = the request never reaches the
+    // increment line. Safe to cancel any time before the response arrives.
+    function flowStopSong() {
+      try {
+        if (songInFlight) { try { songInFlight.abort(); } catch(_){} songInFlight = null; }
+        // Also kill any sibling flight (spec/score) just in case
+        if (typeof inFlight !== 'undefined' && inFlight) { try { inFlight.abort(); } catch(_){} }
+        if (typeof scoreInFlight !== 'undefined' && scoreInFlight) { try { scoreInFlight.abort(); } catch(_){} }
+      } catch(_) {}
+      // Reset progress bar
+      var pb = document.getElementById('fres-progress-bar');
+      if (pb) pb.classList.remove('active');
+      var fill = document.getElementById('fres-progress-fill');
+      if (fill) { fill.style.width = '0%'; fill.classList.remove('done'); }
+      var stage = document.getElementById('fres-progress-stage');
+      if (stage) stage.textContent = 'stopped';
+      // Re-enable Spin button + reset its label
+      var btn = document.getElementById('flow-btn');
+      var btnTxt = document.getElementById('flow-btn-text');
+      var hint = document.getElementById('flow-hint');
+      if (btn) btn.disabled = false;
+      if (btnTxt) btnTxt.textContent = 'Spin Flow';
+      if (hint) hint.textContent = 'Stopped — no credit used. Tweak your concept and spin again.';
+      // Hide the in-flight reveal panel so it doesn't look mid-generation
+      var reveal = document.getElementById('flow-reveal');
+      if (reveal) reveal.style.display = 'none';
+      // Toast — fallback to hint line if toast helper isn't defined
+      if (typeof toast === 'function') toast('Stopped — no credit used');
+    }
+    // Expose for inline onclick + console use
+    window.flowStopSong = flowStopSong;
+
     var scoreInFlight = null;  // score fetch controller (audit fix: race)
     window.feelFlow = async function(){
       var concept = (ta && ta.value || '').trim();

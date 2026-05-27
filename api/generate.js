@@ -8,7 +8,7 @@ const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
 const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const { createClient } = require('@supabase/supabase-js');
-const { validatePhrase: _laValidatePhrase } = require('./_loop_anchor');
+const { validatePhrase: _laValidatePhrase, selectAnchorTransform: _laSelectAnchorTransform } = require('./_loop_anchor');
 
 function getSupabaseClient(token) {
   const url = process.env.SUPABASE_URL;
@@ -633,6 +633,25 @@ module.exports = async function handler(req, res) {
     // so the user always has SOMETHING in the "Song Prompt" tab — no extra
     // AI call required.
     const sunoPromptParts = [];
+    // Loop-anchor audio transform leads the prompt when active — the bracket-
+    // tagged motif (e.g. "[chopped soul vocal sample, pitched +5 semitones,
+    // vinyl crackle, MPC swing]") is the song's primary sonic identity and
+    // Suno reads bracketed style tokens at the front with the highest weight.
+    let _laTransform = null;
+    if (flowAnchorPhrase) {
+      try {
+        _laTransform = _laSelectAnchorTransform({
+          genre: brainGenre,
+          substyle: spec && spec.substyle,
+          mood: brainMood,
+        });
+        // Lead with the audio-transform bracket string (verbatim, including
+        // brackets — Suno parses these as production tags).
+        if (_laTransform && _laTransform.sunoStylePrefix) {
+          sunoPromptParts.push(_laTransform.sunoStylePrefix);
+        }
+      } catch (_) { /* fall through — non-fatal if module load fails */ }
+    }
     sunoPromptParts.push(flowGenreLabel.toLowerCase());
     if (flowFusionLabel) sunoPromptParts.push('blended with ' + flowFusionLabel.toLowerCase());
     if (spec.tempo) sunoPromptParts.push(spec.tempo + ' BPM');
@@ -648,8 +667,13 @@ module.exports = async function handler(req, res) {
     if (flowExclude.length) {
       sunoPromptParts.push('avoid: ' + flowExclude.join(', '));
     }
-    if (flowAnchorPhrase) {
-      sunoPromptParts.push('anchor phrase looped: "' + flowAnchorPhrase + '"');
+    // Reinforce the loop anchor mid-prompt AND describe what loops. Stronger
+    // than a generic "looped:" tail — Suno needs the phrase + the motif role
+    // expressed in plain English alongside the bracket-token lead.
+    if (flowAnchorPhrase && _laTransform) {
+      sunoPromptParts.push('vocal phrase "' + flowAnchorPhrase + '" loops as the central motif throughout — intro stab, every chorus, post-chorus chop, outro vamp');
+    } else if (flowAnchorPhrase) {
+      sunoPromptParts.push('vocal phrase "' + flowAnchorPhrase + '" loops as the central motif throughout');
     }
     const generatedSunoPrompt = sunoPromptParts.filter(Boolean).join(', ');
 
