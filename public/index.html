@@ -4862,18 +4862,15 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <span class="flow-char-count" id="flow-char-count">0 / 1000</span>
       </div>
     </div>
-    <!-- Song-generation progress bar — visible while flow-song is in flight -->
+    <!-- Song-generation progress bar — visible while flow-song is in flight.
+         Stop button matches the shared spb-stop pattern used by Write + Lucky
+         (res/lres). flowStopSong() owns the Flow-specific abort + UI reset
+         because Flow uses its own AbortController triplet (songInFlight,
+         inFlight, scoreInFlight) outside the S.* namespace. -->
     <div class="song-progress-bar" id="fres-progress-bar" aria-live="polite">
+      <button class="spb-stop" onclick="flowStopSong()" title="Cancel this generation — no credit used">✕ Stop</button>
       <div class="spb-track"><div class="spb-fill" id="fres-progress-fill"></div></div>
-      <div class="spb-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-        <span><span id="fres-progress-stage">starting…</span> · <span class="spb-pct" id="fres-progress-pct">0%</span></span>
-        <button type="button" id="flow-stop-btn" onclick="flowStopSong()" aria-label="Stop generation — no credit used"
-          style="background:rgba(245,80,80,0.12);border:1px solid rgba(245,80,80,0.45);color:#f55050;font-size:11px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:6px 12px;border-radius:99px;cursor:pointer;font-family:var(--font);transition:all .12s;white-space:nowrap"
-          onmouseover="this.style.background='rgba(245,80,80,0.22)';this.style.color='#fff'"
-          onmouseout="this.style.background='rgba(245,80,80,0.12)';this.style.color='#f55050'">
-          ◼ Stop · no credit
-        </button>
-      </div>
+      <div class="spb-label"><span id="fres-progress-stage">starting…</span><span class="spb-pct" id="fres-progress-pct">0%</span></div>
     </div>
 
     <!-- Spin wheel (slot machine, mirrors Lucky's) -->
