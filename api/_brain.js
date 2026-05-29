@@ -9378,6 +9378,12 @@ const BREATH_PROFILES = {
   comedy:    {priority:['phrase_plan','support','quick_inhale','release'],note:'Comic timing is breath timing. The pause before the punchline is a breath mark.'},
   children:  {priority:['diaphragmatic','vowel_open','support','release'],note:"Children's singing feels effortless when you breathe from the belly."},
   tvmusical: {priority:['support','compression','vowel_open','phrase_plan'],note:'Theatrical delivery demands full breath support. Mark breaths like an actor marks pauses.'},
+  dancehall: {priority:['rap_pocket','quick_inhale','support','recovery'],note:'Dancehall toasting rides the riddim; catch breaths in the offbeat gaps, never on the one.'},
+  amapiano:  {priority:['diaphragmatic','phrase_plan','support','quick_inhale'],note:'Amapiano breathes with the log-drum bounce; inhale off the beat and keep it relaxed.'},
+  brazilian: {priority:['diaphragmatic','phrase_plan','resonance','release'],note:'Bossa/samba phrasing is conversational and soft; breathe like speaking and let phrases trail.'},
+  bollywood: {priority:['support','diaphragmatic','vowel_open','resonance'],note:'Bollywood melisma demands full support; never start an antara run on a half-breath.'},
+  arabesque: {priority:['support','diaphragmatic','resonance','phrase_plan'],note:'Arabesque mawwal cries are free-meter; plan the breath before each long quarter-tone bend.'},
+  mandopop:  {priority:['phrase_plan','support','vowel_open','recovery'],note:'Mandopop precision wants pre-planned breath marks; keep the tone clean and unstrained.'},
 };
 function buildSingerNotesInstruction(genre, isRap) {
   const profile = BREATH_PROFILES[genre] || BREATH_PROFILES.pop;
