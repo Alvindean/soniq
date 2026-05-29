@@ -4862,8 +4862,13 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <span class="flow-char-count" id="flow-char-count">0 / 1000</span>
       </div>
     </div>
-    <!-- Song-generation progress bar — visible while flow-song is in flight -->
+    <!-- Song-generation progress bar — visible while flow-song is in flight.
+         Stop button matches the shared spb-stop pattern used by Write + Lucky
+         (res/lres). flowStopSong() owns the Flow-specific abort + UI reset
+         because Flow uses its own AbortController triplet (songInFlight,
+         inFlight, scoreInFlight) outside the S.* namespace. -->
     <div class="song-progress-bar" id="fres-progress-bar" aria-live="polite">
+      <button class="spb-stop" onclick="flowStopSong()" title="Cancel this generation — no credit used">✕ Stop</button>
       <div class="spb-track"><div class="spb-fill" id="fres-progress-fill"></div></div>
       <div class="spb-label"><span id="fres-progress-stage">starting…</span><span class="spb-pct" id="fres-progress-pct">0%</span></div>
     </div>
@@ -5267,6 +5272,42 @@ body.craft-advanced .craft-basic-only{display:none !important}
     // ── Main entry ───────────────────────────────────────────────────────
     var inFlight = null;       // spec fetch controller
     var songInFlight = null;   // song fetch controller (audit fix: race)
+
+    // Stop the in-flight Flow song generation without burning a usage credit.
+    // The server only increments usage after the AI call returns successfully
+    // (api/generate.js — redisIncrExpire runs post-callOpenRouter/callAnthropic),
+    // so aborting the fetch from the client = the request never reaches the
+    // increment line. Safe to cancel any time before the response arrives.
+    function flowStopSong() {
+      try {
+        if (songInFlight) { try { songInFlight.abort(); } catch(_){} songInFlight = null; }
+        // Also kill any sibling flight (spec/score) just in case
+        if (typeof inFlight !== 'undefined' && inFlight) { try { inFlight.abort(); } catch(_){} }
+        if (typeof scoreInFlight !== 'undefined' && scoreInFlight) { try { scoreInFlight.abort(); } catch(_){} }
+      } catch(_) {}
+      // Reset progress bar
+      var pb = document.getElementById('fres-progress-bar');
+      if (pb) pb.classList.remove('active');
+      var fill = document.getElementById('fres-progress-fill');
+      if (fill) { fill.style.width = '0%'; fill.classList.remove('done'); }
+      var stage = document.getElementById('fres-progress-stage');
+      if (stage) stage.textContent = 'stopped';
+      // Re-enable Spin button + reset its label
+      var btn = document.getElementById('flow-btn');
+      var btnTxt = document.getElementById('flow-btn-text');
+      var hint = document.getElementById('flow-hint');
+      if (btn) btn.disabled = false;
+      if (btnTxt) btnTxt.textContent = 'Spin Flow';
+      if (hint) hint.textContent = 'Stopped — no credit used. Tweak your concept and spin again.';
+      // Hide the in-flight reveal panel so it doesn't look mid-generation
+      var reveal = document.getElementById('flow-reveal');
+      if (reveal) reveal.style.display = 'none';
+      // Toast — fallback to hint line if toast helper isn't defined
+      if (typeof toast === 'function') toast('Stopped — no credit used');
+    }
+    // Expose for inline onclick + console use
+    window.flowStopSong = flowStopSong;
+
     var scoreInFlight = null;  // score fetch controller (audit fix: race)
     window.feelFlow = async function(){
       var concept = (ta && ta.value || '').trim();
@@ -5542,10 +5583,15 @@ body.craft-advanced .craft-basic-only{display:none !important}
         }
         // Song prompt (Suno-ready style string)
         var sunoPrompt = parsed.songPrompt || d.sunoPrompt || '';
-        if (sunoEl && sunoPrompt) {
-          sunoEl.innerHTML = '<span class="suno-chip">'+sunoPrompt.replace(/</g,'&lt;')+'</span>';
-        } else if (sunoEl) {
-          sunoEl.innerHTML = '';
+        var flowExcludeArr = Array.isArray(d.excludeStyles) ? d.excludeStyles : [];
+        if (sunoEl) {
+          var chipsHtml = '';
+          if (sunoPrompt) chipsHtml += '<span class="suno-chip">'+sunoPrompt.replace(/</g,'&lt;')+'</span>';
+          if (flowExcludeArr.length) {
+            var exStr = flowExcludeArr.join(', ');
+            chipsHtml += '<span class="suno-chip suno-chip--exclude" data-ex="'+escHtml(exStr)+'" onclick="safeCopy(this.getAttribute(\'data-ex\'),\'Exclude styles copied - paste into Suno Exclude Styles box\')" title="Suno Exclude Styles - click to copy: '+escHtml(exStr)+'" style="cursor:pointer"><span class="suno-chip-icon">🚫</span><span class="suno-chip-label">Exclude</span><span class="suno-chip-value">'+flowExcludeArr.length+' tag'+(flowExcludeArr.length>1?'s':'')+' · copy</span></span>';
+          }
+          sunoEl.innerHTML = chipsHtml;
         }
         if (bodyEl) {
           bodyEl.innerHTML =
@@ -5563,6 +5609,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           hookIsolation: parsed.hookIsolation,
           lyrics: parsed.lyrics,
           sunoPrompt: sunoPrompt,
+          excludeStyles: flowExcludeArr,
           arrangement: parsed.arrangement,
           vocal: parsed.vocal,
           references: parsed.references,
@@ -5787,6 +5834,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           verdict: f.verdict || '',
           lyrics: f.lyrics,
           style: f.sunoPrompt || '',
+          excludeStyles: f.excludeStyles || [],
           brief: f.rawResponse || '',
           structure: (f.spec && f.spec.structure) || '',
           arrangement: f.arrangement || '',
@@ -14172,6 +14220,22 @@ function renderSunoChips(prefix, song) {
       <span class="suno-chip-icon">🔒</span>
       <span class="suno-chip-label">Style Influence</span>
       <span class="suno-chip-value">Studio</span>
+    </span>`);
+  }
+
+  // Exclude Styles chip — copyable, shown to everyone. Suno's reliable way to
+  // exclude a sound is its separate Exclude Styles box, NOT prose in the prompt.
+  // Click copies the per-song list (genre defaults + your typed excludes +
+  // the genre's vocal anti-defaults).
+  const _excludeList = (s && Array.isArray(s.excludeStyles) && s.excludeStyles.length)
+    ? s.excludeStyles
+    : (Array.isArray(song.excludeStyles) ? song.excludeStyles : []);
+  if (_excludeList.length) {
+    const _excludeStr = _excludeList.join(', ');
+    parts.push(`<span class="suno-chip suno-chip--exclude" data-ex="${escHtml(_excludeStr)}" onclick="safeCopy(this.getAttribute('data-ex'),'Exclude styles copied - paste into Suno Exclude Styles box')" title="Suno Exclude Styles - click to copy: ${escHtml(_excludeStr)}" style="cursor:pointer">
+      <span class="suno-chip-icon">🚫</span>
+      <span class="suno-chip-label">Exclude</span>
+      <span class="suno-chip-value">${_excludeList.length} tag${_excludeList.length > 1 ? 's' : ''} · copy</span>
     </span>`);
   }
 

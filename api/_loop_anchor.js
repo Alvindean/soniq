@@ -81,6 +81,34 @@ const TRANSFORMS = {
     audioTransform: 'Pitch the phrase down 4 semitones, loop it under tape saturation. Cowbell on the offbeat, 808 heavily sidechained.',
     referenceTrack: 'DJ Smokey — Memphis lift',
   },
+  lofi_dusty: {
+    loopStyle: 'lofi_dusty',
+    sunoStylePrefix: '[dusty pitched-down vocal loop, vinyl crackle, tape hiss, low-pass filter, no sharp transients]',
+    bucket: 'sustain_refrain',
+    audioTransform: 'Pitch the phrase down slightly and loop it low and warm under vinyl crackle and tape hiss. Low-pass the top end, soften every transient — no bright attacks. Head-nod, hazy, behind-the-beat.',
+    referenceTrack: 'lo-fi hip-hop head-nod tradition',
+  },
+  rock_anthem: {
+    loopStyle: 'rock_anthem',
+    sunoStylePrefix: '[double-tracked lead vocal, gang-vocal hook layer, driven guitar doubling the melody, live room drums]',
+    bucket: 'sustain_refrain',
+    audioTransform: 'Double-track the hook vocal; gang vocals join on the final chorus. Distorted guitar doubles the vocal contour. Live room drums, no chops.',
+    referenceTrack: 'stadium-rock anthem tradition',
+  },
+  metal_chant: {
+    loopStyle: 'metal_chant',
+    sunoStylePrefix: '[layered gang chant, palm-muted guitar chug under the phrase, double-kick, no melodic FX]',
+    bucket: 'call_response',
+    audioTransform: 'Layered gang chant on the phrase over a palm-muted chug. Double-kick locks the grid. No autotune, no melodic processing.',
+    referenceTrack: 'groove-metal chant tradition',
+  },
+  reggae_riddim: {
+    loopStyle: 'reggae_riddim',
+    sunoStylePrefix: '[one-drop riddim, offbeat skank guitar, dub delay throw on the phrase tail, deep bass]',
+    bucket: 'call_response',
+    audioTransform: 'Phrase rides the one-drop. Skank guitar on the offbeat; a dub delay throws the last word into the next bar. Bass carries the root.',
+    referenceTrack: 'roots-reggae riddim tradition',
+  },
   cloud_loop: {
     loopStyle: 'cloud_loop',
     sunoStylePrefix: '[reverbed mumble loop, hazy delay, ethereal pad bed]',
@@ -461,7 +489,7 @@ function _classifyLoopStyle({ genre, substyle }) {
     if (/Gospel-?House|House/i.test(s)) return 'house_filter_sweep';
     if (/Garage|2-?step|Future Garage/i.test(s)) return 'burial_stretch';
     if (/Amapiano/i.test(s)) return 'amapiano_logdrum';
-    if (/Lo-?fi/i.test(s)) return 'hyperpop_glitch';
+    if (/Lo-?fi/i.test(s)) return 'lofi_dusty';
   }
 
   // Genre defaults.
@@ -482,6 +510,9 @@ function _classifyLoopStyle({ genre, substyle }) {
     case 'kpop':      return 'kpop_postchorus';
     case 'altrock':   return 'altrock_singalong';
     case 'punk':      return 'punk_chant';
+    case 'rock':      return 'rock_anthem';
+    case 'metal':     return 'metal_chant';
+    case 'reggae':    return 'reggae_riddim';
     case 'jazz':      return 'jazz_scat_anchor';
     case 'blues':     return 'blues_call_response';
     case 'hyperpop':  return 'hyperpop_glitch';
@@ -563,21 +594,50 @@ exports.buildLoopAnchorNote = function buildLoopAnchorNote({ phrase, genre, subs
 
   return `
 
-🔁 LOOP ANCHOR LOCK (this phrase is the LOAD-BEARING center of the song):
+🔁 LOOP ANCHOR LOCK (this phrase is the LOAD-BEARING center of the song — lyric AND music):
 
 ANCHOR PHRASE (verbatim, do NOT paraphrase, do NOT translate, do NOT reword):
 >>> ${safe} <<<
 
-Rules — non-negotiable:
+═══════════════════════════════════════════════════════════════
+🎵 MUSICAL LOOP MANDATE — equal priority to the lyric side
+═══════════════════════════════════════════════════════════════
+The anchor is NOT just a lyric refrain. It is the song's signature AUDIO MOTIF
+— a vocal sample that Suno must loop, chop, pitch, and reinforce as the central
+production element. Treat the audio side with the same weight as genre and BPM.
+
+LEAD TOKENS — the SONG PROMPT / "Full prompt" MUST begin with this exact bracket-tagged
+audio-transform string, before genre, before BPM, before mood. This is the song's
+primary sonic identity tag:
+${tx.sunoStylePrefix}
+
+REINFORCEMENT — the same SONG PROMPT must reference the looped vocal motif AGAIN
+later in the string, using phrasing like:
+"vocal phrase '${safe}' loops as the central motif throughout — appears at intro
+stab, every chorus, post-chorus chop, and outro vamp"
+
+PRODUCTION DIRECTION (plain English — for the engineer notes section):
+${tx.audioTransform}
+
+INLINE BRACKET TAGS — the lyric body MUST carry these production cues at the
+exact sections listed below so Suno's parser locks the loop into the audio
+arrangement (not just sings the words):
+- Top of [Intro]:        [Vocal stab: "${safe}"]
+- Top of [Chorus]:       [Hook Loop: "${safe}"]
+- Top of [Post-Chorus]:  [Chop & loop "${safe}" — pitched/filtered per transform]
+- Top of [Bridge]:       [Loop strips out — phrase returns at bar 4]
+- Top of [Outro]:        [Loop vamps with ad-libs — fade or abrupt cut per transform]
+
+SUNO PROMPT SELF-CHECK — before finalizing, read the SONG PROMPT aloud. Does it
+scream "this vocal phrase loops as the hook"? If you can't HEAR the loop in the
+prompt, rewrite it. The audio side is failing if the loop only lives in the lyrics.
+
+═══════════════════════════════════════════════════════════════
+
+LYRIC SIDE rules — non-negotiable:
 - The phrase appears verbatim in EVERY one of these sections: ${zones}.
 - The phrase is the gravitational center. Verses, bridge, and outro all orbit it — they justify it, defer to it, or strip away to make its return hit harder.
 - Reference track for craft (do NOT name in lyrics, do NOT mention to the user — this is a craft anchor only): ${tx.referenceTrack}.
-
-AUDIO TRANSFORM — append this verbatim to the FRONT of the Suno style/Full prompt:
-${tx.sunoStylePrefix}
-
-Production direction (plain English — translate into the engineer-style notes section of the prompt):
-${tx.audioTransform}
 
 Section architecture (bucket: ${tx.bucket}):
 - VERSES: ${tx.lyricArchitecture.verses}
@@ -587,7 +647,8 @@ Section architecture (bucket: ${tx.bucket}):
 Hard constraints:
 - Do NOT substitute synonyms for the anchor phrase. The exact characters above are the loop.
 - Do NOT bury the phrase inside a longer line on its placement zones — it must land as the dominant hook on every required zone.
-- If a section's lyric content forces a contradiction with the architecture above, prefer the architecture — rewrite the section, do not break the loop.`;
+- If a section's lyric content forces a contradiction with the architecture above, prefer the architecture — rewrite the section, do not break the loop.
+- If the SONG PROMPT does NOT lead with the LEAD TOKENS above, that is a hard failure — rewrite the SONG PROMPT before returning.`;
 };
 
 // ── Internal namespace for QA/tests ──────────────────────────────────────────

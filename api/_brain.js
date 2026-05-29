@@ -144,7 +144,7 @@ const GENRE_BIBLE={
   neosoul:{
     dna:'D\'Angelo, Erykah Badu, Lauryn Hill, Bilal, Maxwell — the collision of classic soul (raw emotion, live instrumentation, vulnerability) and hip-hop production aesthetics (head-nodding groove, layered samples, lo-fi warmth). Neo-soul is anti-formula: it breathes, it drags beats deliberately, it leaves space. Vocals are instruments — improvised runs, ad-libs that ARE the lyric. Production feels human and imperfect on purpose.',
     structure:'Loose and groove-led. Hook is not always the loudest moment — sometimes the vocal vamp in the outro IS the song. Intros are often long instrumental grooves before the vocal enters (8-16 bars). Bridges frequently go to a half-time feel. Songs end on extended vamps, not hard stops.',
-    suno:'"neo-soul, Rhodes piano, Fender bass, warm vinyl warmth, head-nod groove, live drums with swing, 85-95 BPM" for classic. "neo-soul, 90s hip-hop drums, soul vocals, Dilla-style off-beat, warm, soulful" for hip-hop adjacent. "neo-soul ballad, piano, strings, intimate, vulnerability" for slow. Always specify "live feel, swing" — not quantized.',
+    suno:'"neo-soul, Rhodes piano, Fender bass, warm vinyl warmth, head-nod groove, live drums with swing, 85-95 BPM" for classic. "neo-soul, 90s hip-hop drums, soul vocals, drunk-swing off-grid drums, warm, soulful" for hip-hop adjacent. "neo-soul ballad, piano, strings, intimate, vulnerability" for slow. Always specify "live feel, swing" — not quantized.',
     keys:[
       'Groove before hook: the beat must make the listener nod before the vocal arrives. Never rush the entrance',
       'Imperfection is the aesthetic: slightly late snares (J Dilla feel), crackle, room sound, breath in the mic',
@@ -165,7 +165,7 @@ const GENRE_BIBLE={
   gospel:{
     dna:'Music as spiritual encounter — not performance but worship, testimony, and collective catharsis. Call-and-response at its DNA core: leader calls, congregation answers. The song builds to a moment of release (the "shout") where emotion overflows technique. Three traditions: Traditional Gospel (Thomas Dorsey, Mahalia Jackson — piano, choir, testimony), Contemporary Gospel (Kirk Franklin — pop production, hip-hop rhythms, mass choir), Worship/CCM (Chris Tomlin, Hillsong — arena rock, CCLI, corporate worship). Each has distinct rules.',
     structure:'Gospel resists fixed structure because it serves the Spirit — the song goes where the moment leads. Typically: Verse (testimony/setup) → Pre-Chorus (tension building) → Chorus (declaration) → Bridge (the highest emotional point — often repeated 4-8x as the choir vamps) → Outro Vamp (where the real church happens — this section can last minutes). Never cut the outro vamp short.',
-    suno:'"traditional gospel, Hammond B3 organ, choir, piano, hand claps, call and response, soul" for classic. "contemporary gospel, Kirk Franklin style, hip-hop beat, mass choir, full production, celebratory" for modern. "worship ballad, piano, strings, intimate, congregational, 75 BPM" for CCM/worship. "southern gospel, acoustic, quartet, harmonies" for country gospel.',
+    suno:'"traditional gospel, Hammond B3 organ, choir, piano, hand claps, call and response, soul" for classic. "contemporary gospel, urban-contemporary choir-led, hip-hop beat, mass choir, full production, celebratory" for modern. "worship ballad, piano, strings, intimate, congregational, 75 BPM" for CCM/worship. "southern gospel, acoustic, quartet, harmonies" for country gospel.',
     keys:[
       'Call-and-response is structural, not decorative — write the congregation\'s response line as carefully as the lead',
       'The bridge is the climax, not the chorus — in gospel the bridge is repeated and escalated until the room breaks open',
@@ -4590,10 +4590,10 @@ const SUBSTYLE_FX_OVERRIDES = {
 const MOOD_PRODUCTION_OVERLAYS = {
   sad:          { reverb: 'longer, wetter plate or hall (2.5s+)', dynamics: 'preserve quietness, no over-limiting', notes: 'space and air carry the emotion' },
   melancholic:  { reverb: 'long washy plate', dynamics: 'preserve dynamics', notes: 'distance and reverb tails over brightness' },
-  angry:        { compression: 'harder bus + parallel', distortion: 'add saturation on drums and bass', dynamics: 'crushed', notes: 'in-your-face, abrasive' },
-  defiant:      { compression: 'harder', distortion: 'subtle', notes: 'aggressive but controlled' },
+  angry:        { compression: 'parallel bus comp 6-8 dB GR + fast-attack FET on drums', distortion: 'tape/transistor drive on drum+bass bus, +3 dB harmonic grit', dynamics: 'crushed to a wall, DR 5-6', notes: 'abrasive, in-your-face, transients clipped' },
+  defiant:      { compression: 'VCA bus 4-5 dB GR, mid-forward', distortion: 'light saturation on snare and vocal around 2 kHz', dynamics: 'tight, controlled punch', notes: 'forward and hard but not crushed' },
   romantic:     { reverb: 'warm chamber', dynamics: 'preserve breath', notes: 'intimate, close, warm' },
-  hopeful:      { reverb: 'bright hall', dynamics: 'standard', notes: 'open, lifted high-end' },
+  hopeful:      { reverb: 'bright hall 1.8-2.2s, +2 dB air shelf at 14 kHz on tails', dynamics: 'open, transient-preserved', eq: 'lifted high end, clean low-mids around 300 Hz', notes: 'expansive, rising brightness' },
   dark:         { reverb: 'long dark plate, low-pass tails', dynamics: 'compressed', notes: 'low-mid focus, scoop highs, smoke' },
   'dark brooding':{ reverb: 'long dark plate, low-pass tails', dynamics: 'compressed', notes: 'low-mid focus, scoop highs, smoke' },
   euphoric:     { reverb: 'wide hall, long tails', dynamics: 'pumped', notes: 'maximum stereo, heavy sidechain pump' },
@@ -4612,10 +4612,19 @@ const MOOD_PRODUCTION_OVERLAYS = {
   rebellious:   { compression: 'harder bus, FET on drums', distortion: 'saturation on guitars/bass', dynamics: 'tight', notes: 'edge and attitude — slight grit' },
   tender:       { reverb: 'soft warm chamber', dynamics: 'preserve breath, micro-dynamics audible', notes: 'intimate, close-mic, gentle handling' },
   playful:      { compression: 'punchy on transients', dynamics: 'bouncy', notes: 'bright, airy, lighthearted attack' },
+  cinematic:    { reverb: 'scoring-stage hall 3-4s, pre-delay 40ms', dynamics: 'wide DR 12+, no limiting', eq: 'sub bed at 30-50 Hz, lush highs at 8 kHz', notes: 'trailer-scale dynamics, quiet-to-huge swells' },
+  dreamy:       { reverb: 'shimmer/ambient bath 4-6s + reverse pre-verb', delay: 'modulated 1/4 note, high-cut at 4 kHz', eq: 'soft high roll-off, no harsh transients', notes: 'washed, smeared, anti-punch' },
+  aggressive:   { compression: 'parallel + bus limiting maxed', distortion: 'clip/saturate drums and lead', dynamics: 'crushed, DR 5', notes: 'wall-of-sound, hard transients' },
+  anthemic:     { reverb: 'arena hall 2.5s on vocal + gang-vocal room', dynamics: 'big but punchy', eq: 'presence at 3-4 kHz, wide stereo', notes: 'crowd-scale, hands-up lift' },
+  ethereal:     { reverb: 'cathedral + shimmer, near-infinite tails', dynamics: 'breathing, micro-dynamics audible', eq: 'airy top, scooped low-mids', notes: 'weightless, floating, vast space' },
+  epic:         { reverb: 'huge scoring hall 3s, choir tails', dynamics: 'expansive with big swells', eq: 'sub power + bright brass top', notes: 'monumental, orchestral scale' },
+  hype:         { compression: 'punchy transient-forward bus', distortion: 'light drum saturation', dynamics: 'bouncy and loud', notes: 'high-energy, club-loud, forward momentum' },
+  chaotic:      { compression: 'aggressive, pumping', distortion: 'bitcrush + clip on multiple buses', dynamics: 'jagged, unpredictable swells', notes: 'unstable, glitchy, maximal' },
 };
 
 const AGGRESSION_PRODUCTION_OVERLAYS = {
   mellow: { compression: '1 step softer', reverb: '1 step wetter', distortion: 'none', loudness: '−2 dB vs genre baseline', notes: 'preserve breath, dynamic range, intimate close-mic feel' },
+  mid:    { compression: 'genre baseline', reverb: 'baseline', distortion: 'none', loudness: 'genre baseline', notes: 'genre-default intensity' },
   heat:   { compression: '1 step harder', reverb: 'baseline', distortion: 'subtle saturation on drums', loudness: '+1 dB vs baseline', notes: 'present and forward, harder transients' },
   rage:   { compression: 'parallel + bus limiting maxed', reverb: 'drier (1 step less)', distortion: 'aggressive saturation/clipping on drums and lead', loudness: '+3 dB vs baseline', notes: 'in-your-face, distorted, compressed to a wall' },
 };
@@ -4669,7 +4678,11 @@ function buildProductionNote(genre, mood, aggression, lyricTier) {
   }
 
   const aggrKey = String(aggression || '').trim().toLowerCase();
-  const aggrOverlay = (genre === 'hiphop' && AGGRESSION_PRODUCTION_OVERLAYS[aggrKey]) ? AGGRESSION_PRODUCTION_OVERLAYS[aggrKey] : null;
+  // Aggression dial applies to all intensity-bearing genres, not just hip-hop.
+  // The overlay text is genre-neutral; the UI passes aggression for hip-hop today,
+  // so widening the gate is safe and forward-compatible for other genres.
+  const AGGR_OVERLAY_GENRES = new Set(['hiphop','rock','metal','punk','edm','reggaeton','altrock','dancehall','afrobeats']);
+  const aggrOverlay = (AGGR_OVERLAY_GENRES.has(genre) && AGGRESSION_PRODUCTION_OVERLAYS[aggrKey]) ? AGGRESSION_PRODUCTION_OVERLAYS[aggrKey] : null;
 
   const tierKey = String(lyricTier || '').trim().toLowerCase();
   const tierOverlay = TIER_PRODUCTION_OVERLAYS[tierKey];
@@ -4870,6 +4883,48 @@ const ADLIB_BIBLE = {
     example: 'Theme: "(Da-da-da!) [show name]"; Musical: "(Yes!) I want it! (I want it!)"',
     outro: 'character leitmotif returns; theme is instantly singable on exit',
   },
+  dancehall: {
+    sounds: ['bam', 'wha', 'zeen', 'rrrr', 'pull up', 'simma', 'braap'],
+    placement: 'toasting punch-ins between bars, riddim drop callouts, outro DJ chat',
+    density: 'high — toasting ad-libs ARE the delivery',
+    example: '"Gyal dem a call (bam!) pull up di riddim (braap!)"',
+    outro: '(pull up! pull up!) (braap braap!) over riddim, DJ chats to fade',
+  },
+  amapiano: {
+    sounds: ['sho', 'yebo', 'eish', 'wena', 'aw', 'heita', 'log drum!'],
+    placement: 'over the log-drum groove, vocal-chop responses, outro groove vamp',
+    density: 'medium — conversational, rides the groove not the bar',
+    example: '"Phakela (sho!) groove deep (yebo!)" — laid over log-drum bounce',
+    outro: '(sho! yebo!) chopped-vocal stabs loop over log drum, fades',
+  },
+  brazilian: {
+    sounds: ['ô', 'êh', 'vai', 'iaiá', 'ô-ô', 'olha'],
+    placement: 'samba refrão call-response, bossa breath-sighs, outro roda singalong',
+    density: 'medium (samba) / minimal (bossa)',
+    example: '"Mais um samba (ô!) pro coração (êh!)"',
+    outro: '(ô-ô-ô) roda group singalong over cavaquinho, fades',
+  },
+  bollywood: {
+    sounds: ['aa-aa', 'ho', 'arre', 'o-ho', 'haaye', 'sa-re-ga'],
+    placement: 'antara melisma runs, mukhda call-response, outro alaap',
+    density: 'high — melismatic runs between lines',
+    example: '"Dil mera (aa-aa-aa) le gaya (haaye!)"',
+    outro: '(aa-aa-aa) sustained alaap melisma over strings, fades',
+  },
+  arabesque: {
+    sounds: ['aman', 'ah', 'ya leyl', 'of', 'vay', 'ah-ah'],
+    placement: 'mawwal free-meter cries before the beat, taksim response, outro lament',
+    density: 'low-medium — emotive cries, not rhythmic',
+    example: '"Aman aman (ah...) ya leyl (of!)" — quarter-tone bend on the cry',
+    outro: '(aman... ya leyl...) free-meter vocal lament fades',
+  },
+  mandopop: {
+    sounds: ['oh', 'wo', 'la', 'ah', 'na-na', 'mm'],
+    placement: 'pre-chorus lift, polished post-chorus sweetener, outro harmony',
+    density: 'medium — clean and precise, never gritty',
+    example: '"Wo de xin (oh) wei ni (wo-oh)"',
+    outro: '(la-la-la) (oh-oh) layered clean harmony, polished fade',
+  },
 };
 
 // Vocal stacking per genre: how many layers in each section
@@ -4899,6 +4954,12 @@ const VOCAL_STACK_PROFILES = {
   comedy:    { verse: 'single (sincere)', chorus: 'single (commitment)', finalChorus: 'single (straight-faced)', method: 'Sincere production makes the joke land harder' },
   children:  { verse: 'single (warm)', chorus: 'double (big and friendly)', finalChorus: 'group stack (everyone joins)', method: 'Final chorus group sound models communal participation for children' },
   tvmusical: { verse: 'single (character voice)', chorus: 'character + harmony', finalChorus: 'company stack (cast joins)', method: 'Stack builds as more characters join; climax is everyone together' },
+  dancehall: { verse: 'single (toaster)', chorus: 'double + backing chant', finalChorus: 'double + crew chant layer', method: 'Crew chants and riddim callouts do the stacking; keep the lead dry and forward' },
+  amapiano:  { verse: 'single (laid-back)', chorus: 'double + vocal chops', finalChorus: 'double + chopped-vocal stack', method: 'Chopped vocal samples layer the groove; lead stays conversational' },
+  brazilian: { verse: 'single (intimate)', chorus: 'double + roda harmony', finalChorus: 'group singalong layer', method: 'Communal roda harmony on the refrão; bossa stays single and breathy' },
+  bollywood: { verse: 'single lead', chorus: 'double + answer voice', finalChorus: 'lead + chorus melisma stack', method: 'Call-response answer voice and melisma runs build the layers' },
+  arabesque: { verse: 'single (free meter)', chorus: 'single (space is sacred)', finalChorus: 'single + strings answer', method: 'Never stack the cry; the strings/oud answer the voice' },
+  mandopop:  { verse: 'single + breathy double', chorus: 'doubled + clean harmony', finalChorus: '4-layer polished stack', method: 'Pristine layered harmony; precise, never gritty' },
 };
 
 // Maps FUSION_DATA capitalized/hyphenated genre tokens → ADLIB_BIBLE keys
@@ -5468,7 +5529,8 @@ const PRODUCTION_ARCHETYPES = {
   'acoustic-roots':  { label: 'Acoustic / Roots', genres: ['folk','country','blues','reggae'], kit: 'Acoustic guitar, upright bass, brushed drums, harmonica', tempo: '65–110 BPM', signature: 'Natural reverb, tape warmth, chord voicing on acoustic, no samples' },
   'club-dance':      { label: 'Club / Dance', genres: ['edm','latin','reggaeton','afrobeats','kpop'], kit: 'Kick-dominant, synth bass, stabs, high percussion', tempo: '120–135 BPM', signature: 'Four-on-the-floor kick, percussive groove, breakdown/drop structure' },
   'gospel-choir':    { label: 'Gospel / Choir', genres: ['gospel','rnb','neosoul'], kit: 'Hammond organ, choir, live piano, gospel drums', tempo: '70–100 BPM', signature: 'Call-and-response, organ swells, choir harmonics, building intensity' },
-  'punk-garage':     { label: 'Punk / Garage', genres: ['punk','metal','rock'], kit: 'Distorted guitar, raw drums, bass overdrive', tempo: '140–200 BPM', signature: 'Raw recording, minimal production, energy over perfection' },
+  'punk-garage':     { label: 'Punk / Garage', genres: ['punk','rock'], kit: 'Distorted guitar, raw drums, bass overdrive', tempo: '140–200 BPM', signature: 'Raw recording, minimal production, energy over perfection' },
+  'metal-wall':      { label: 'Metal Wall', genres: ['metal'], kit: 'Double-tracked hi-gain guitars, triggered kick, tight snare', tempo: '140–220 BPM', signature: 'Hard-panned rhythm guitars, scooped mids, gated tightness, crushing bus limiter' },
   'latin-urban':     { label: 'Latin Urban', genres: ['latin','reggaeton'], kit: 'Dembow rhythm, brass, synth bass, clave percussion', tempo: '95–105 BPM', signature: 'Clave pattern, brass hits, rhythmic syncopation, urban production meets live instruments' },
 };
 
@@ -6283,10 +6345,12 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   });
   const surpriseNote = buildSurpriseNote(_surpriseResult);
 
+  // NOTE: describe the ENERGY, never name artists. Artist names here can bleed
+  // into the generated SONG PROMPT and trip Suno's no-artist-name policy.
   const _aggrMap = {
-    mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
-    heat:   'Heat — elevated intensity, confrontational urgency in every bar. The verse should feel like it is building toward something that could explode. Think Kendrick "HUMBLE." / Future menace / City Girls unapologetic. Every line has a point to prove.',
-    rage:   'Rage — maximum aggression throughout. Every line hits like a threat or a demand. No softness, no hesitation — pure unfiltered force. Think Eminem "Till I Collapse," DMX bark, early Chief Keef cold menace, NF uncontained fury.'
+    mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Intimate confessional register, close-mic and understated, reflective.',
+    heat:   'Heat — elevated intensity, confrontational urgency in every bar. The verse should feel like it is building toward something that could explode. Menacing momentum, unapologetic swagger, every line has a point to prove.',
+    rage:   'Rage — maximum aggression throughout. Every line hits like a threat or a demand. No softness, no hesitation — pure unfiltered force. Barked cadence, cold menace, uncontained fury.'
   };
   const aggressionNote = genre === 'hiphop' && _aggrMap[aggression] ? `\n\nAGGRESSION LEVEL — ${_aggrMap[aggression]}` : '';
 
@@ -6384,7 +6448,7 @@ BPM: [range, e.g. 95-100]
 Vocal: [vocal descriptor — no artist names]
 Texture: [production texture in 5-8 words — no artist names]
 Counter-melody: [counter-melody device]
-Full prompt: [assemble all of the above into one ready-to-paste string under 440 characters — ABSOLUTELY NO artist names, band names, or "[Name] style" references]
+Full prompt: [assemble all of the above into one ready-to-paste string under ${platform === 'udio' ? 300 : 440} characters — ABSOLUTELY NO artist names, band names, or "[Name] style" references]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -6930,6 +6994,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
+- GENRE PURITY: every Chorus MUST contain ≥1 inline TYPE 3 production tag (e.g. [Drop], [808 Bass], [Build], [Swell]) placed INSIDE the lyric body, not as a section header. No production tag in a chorus = rewrite it.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}${luckyProductionNote}
 
 Respond with EXACTLY this format:
@@ -6946,14 +7011,14 @@ LYRICS:
 
 TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [Bridge] · [Outro]
 TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]
-TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [808 Bass] · [Build] · [Drop] · [Choir]
+TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [Build] · [Drop] · [Swell] · [Choir] · [808 Bass] · [Steel Guitar]
 PARENTHESES () = ad-libs only — never structural. Every word must earn its place.]
 
 SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. Suno rejects prompts that name artists. If a PRODUCTION LOCK above contains any artist name, STRIP IT and replace with era/region/technique/vocal-quality descriptors.
   BAD: "Drake style, Taylor Swift vocal", "E-40 energy", "Kirk Franklin choir"
   GOOD: "auto-tuned intimate pop vocal", "Bay Area hyphy slang", "celebratory hip-hop gospel choir"
-[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
+[First strip any artist name from the PRODUCTION LOCK. Under 440 chars (Suno; drop to 300 for Udio). Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -8357,6 +8422,7 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
+- Every Hook/Chorus MUST contain ≥1 inline TYPE 3 production tag (e.g. [808 Bass], [Beat Switch], [Drop]) inside the lyric body. No production tag in a hook = rewrite it.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop', mood, style && style.label)}${buildProductionNote('hiphop', mood, params && params.aggression, params && params.lyricTier)}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
@@ -8385,7 +8451,7 @@ SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, rapper names, or "[Name] style" references anywhere in the SONG PROMPT. Suno rejects prompts naming artists. If the PRODUCTION LOCK above contains any artist names (e.g. "E-40", "Jay-Z", "Kendrick Lamar"), STRIP THEM and replace with region/era/technique descriptors.
   BAD: "E-40 Mac Dre vocabulary, Keak da Sneak energy"
   GOOD: "Bay Area hyphy slang, Oakland scraper-bass vocabulary, hella-energy ad-libs"
-[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}Under 440 chars. ${style.label} style descriptors, specific production elements, BPM range, vocal texture, key sonic signatures.]
+[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}Under 440 chars. ${style.label} style descriptors, specific production elements, BPM range, vocal texture, key sonic signatures. Reuse the same production vocabulary as the inline TYPE 3 tags.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -9062,7 +9128,7 @@ LYRICS:
 [Complete song lyrics using the standard bracket system:
 TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [Bridge] · [Outro]
 TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]
-TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [808 Bass] · [Build] · [Drop] · [Choir]
+TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [Build] · [Drop] · [Swell] · [Choir] · [808 Bass] · [Steel Guitar]
 PARENTHESES () = ad-libs only — never structural.]
 
 SONG PROMPT:
@@ -9315,6 +9381,12 @@ const BREATH_PROFILES = {
   comedy:    {priority:['phrase_plan','support','quick_inhale','release'],note:'Comic timing is breath timing. The pause before the punchline is a breath mark.'},
   children:  {priority:['diaphragmatic','vowel_open','support','release'],note:"Children's singing feels effortless when you breathe from the belly."},
   tvmusical: {priority:['support','compression','vowel_open','phrase_plan'],note:'Theatrical delivery demands full breath support. Mark breaths like an actor marks pauses.'},
+  dancehall: {priority:['rap_pocket','quick_inhale','support','recovery'],note:'Dancehall toasting rides the riddim; catch breaths in the offbeat gaps, never on the one.'},
+  amapiano:  {priority:['diaphragmatic','phrase_plan','support','quick_inhale'],note:'Amapiano breathes with the log-drum bounce; inhale off the beat and keep it relaxed.'},
+  brazilian: {priority:['diaphragmatic','phrase_plan','resonance','release'],note:'Bossa/samba phrasing is conversational and soft; breathe like speaking and let phrases trail.'},
+  bollywood: {priority:['support','diaphragmatic','vowel_open','resonance'],note:'Bollywood melisma demands full support; never start an antara run on a half-breath.'},
+  arabesque: {priority:['support','diaphragmatic','resonance','phrase_plan'],note:'Arabesque mawwal cries are free-meter; plan the breath before each long quarter-tone bend.'},
+  mandopop:  {priority:['phrase_plan','support','vowel_open','recovery'],note:'Mandopop precision wants pre-planned breath marks; keep the tone clean and unstrained.'},
 };
 function buildSingerNotesInstruction(genre, isRap) {
   const profile = BREATH_PROFILES[genre] || BREATH_PROFILES.pop;
@@ -9429,11 +9501,22 @@ const STRUCTURE_SUNO_MODIFIERS = {
 // Core formula. Blends base + mood + structure + optional learning overlay.
 // `userLearning` shape: { sampleSize, avgWeirdness, avgStyleInfluence, excludeHits }
 // When sampleSize >= 3, learning overlays with weight = min(0.5, sampleSize/20).
-function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier }) {
+function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes }) {
   const base = SUNO_GEN_SETTINGS_BASE[genre] || SUNO_GEN_SETTINGS_BASE.pop;
   let weirdness = base.weirdness;
   let styleInfluence = base.styleInfluence;
-  const excludes = new Set(base.exclude);
+  // Per-song Suno "Exclude Styles" value. Insertion order = priority (user
+  // excludes first so they survive the 10-item cap, then genre defaults, then
+  // the genre's vocal anti-defaults). Strip any leading "no " — the Exclude
+  // Styles box already means "exclude these" — lowercase, 40-char clamp.
+  const _normEx = (e) => String(e).replace(/^no\s+/i, '').trim().toLowerCase().slice(0, 40);
+  const excludes = new Set();
+  (Array.isArray(userExcludes) ? userExcludes : []).forEach(e => { const c = _normEx(e); if (c) excludes.add(c); });
+  (base.exclude || []).forEach(e => excludes.add(e));
+  try {
+    const _vd = selectVocalDescriptors({ genre, mood, autoMode: true });
+    ((_vd && _vd.negative_list) || []).forEach(e => { const c = _normEx(e); if (c) excludes.add(c); });
+  } catch (_) { /* vocal resolver optional — genre defaults still carry the exclude */ }
 
   // Word-boundary mood match (same pattern as anti-cliche / speed-gears)
   const moodNorm = ' ' + (mood || '').toLowerCase().replace(/[-_]/g,' ').replace(/\s+/g,' ').trim() + ' ';
