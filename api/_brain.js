@@ -5529,7 +5529,8 @@ const PRODUCTION_ARCHETYPES = {
   'acoustic-roots':  { label: 'Acoustic / Roots', genres: ['folk','country','blues','reggae'], kit: 'Acoustic guitar, upright bass, brushed drums, harmonica', tempo: '65–110 BPM', signature: 'Natural reverb, tape warmth, chord voicing on acoustic, no samples' },
   'club-dance':      { label: 'Club / Dance', genres: ['edm','latin','reggaeton','afrobeats','kpop'], kit: 'Kick-dominant, synth bass, stabs, high percussion', tempo: '120–135 BPM', signature: 'Four-on-the-floor kick, percussive groove, breakdown/drop structure' },
   'gospel-choir':    { label: 'Gospel / Choir', genres: ['gospel','rnb','neosoul'], kit: 'Hammond organ, choir, live piano, gospel drums', tempo: '70–100 BPM', signature: 'Call-and-response, organ swells, choir harmonics, building intensity' },
-  'punk-garage':     { label: 'Punk / Garage', genres: ['punk','metal','rock'], kit: 'Distorted guitar, raw drums, bass overdrive', tempo: '140–200 BPM', signature: 'Raw recording, minimal production, energy over perfection' },
+  'punk-garage':     { label: 'Punk / Garage', genres: ['punk','rock'], kit: 'Distorted guitar, raw drums, bass overdrive', tempo: '140–200 BPM', signature: 'Raw recording, minimal production, energy over perfection' },
+  'metal-wall':      { label: 'Metal Wall', genres: ['metal'], kit: 'Double-tracked hi-gain guitars, triggered kick, tight snare', tempo: '140–220 BPM', signature: 'Hard-panned rhythm guitars, scooped mids, gated tightness, crushing bus limiter' },
   'latin-urban':     { label: 'Latin Urban', genres: ['latin','reggaeton'], kit: 'Dembow rhythm, brass, synth bass, clave percussion', tempo: '95–105 BPM', signature: 'Clave pattern, brass hits, rhythmic syncopation, urban production meets live instruments' },
 };
 
@@ -6993,6 +6994,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse lower energy than chorus
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
+- GENRE PURITY: every Chorus MUST contain ≥1 inline TYPE 3 production tag (e.g. [Drop], [808 Bass], [Build], [Swell]) placed INSIDE the lyric body, not as a section header. No production tag in a chorus = rewrite it.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}${luckyProductionNote}
 
 Respond with EXACTLY this format:
@@ -7016,7 +7018,7 @@ SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. Suno rejects prompts that name artists. If a PRODUCTION LOCK above contains any artist name, STRIP IT and replace with era/region/technique/vocal-quality descriptors.
   BAD: "Drake style, Taylor Swift vocal", "E-40 energy", "Kirk Franklin choir"
   GOOD: "auto-tuned intimate pop vocal", "Bay Area hyphy slang", "celebratory hip-hop gospel choir"
-[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
+[First strip any artist name from the PRODUCTION LOCK. Under 440 chars (Suno; drop to 300 for Udio). Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -8420,6 +8422,7 @@ SONGWRITING RULES:
 - Metaphors must be specific — no generic imagery
 - Hook within 30 seconds
 - Last chorus must feel bigger than the first
+- Every Hook/Chorus MUST contain ≥1 inline TYPE 3 production tag (e.g. [808 Bass], [Beat Switch], [Drop]) inside the lyric body. No production tag in a hook = rewrite it.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop', mood, style && style.label)}${buildProductionNote('hiphop', mood, params && params.aggression, params && params.lyricTier)}
 
 ${buildLyricCraftNote('hiphop', mood, topic)}
@@ -8448,7 +8451,7 @@ SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, rapper names, or "[Name] style" references anywhere in the SONG PROMPT. Suno rejects prompts naming artists. If the PRODUCTION LOCK above contains any artist names (e.g. "E-40", "Jay-Z", "Kendrick Lamar"), STRIP THEM and replace with region/era/technique descriptors.
   BAD: "E-40 Mac Dre vocabulary, Keak da Sneak energy"
   GOOD: "Bay Area hyphy slang, Oakland scraper-bass vocabulary, hella-energy ad-libs"
-[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}Under 440 chars. ${style.label} style descriptors, specific production elements, BPM range, vocal texture, key sonic signatures.]
+[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}Under 440 chars. ${style.label} style descriptors, specific production elements, BPM range, vocal texture, key sonic signatures. Reuse the same production vocabulary as the inline TYPE 3 tags.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
