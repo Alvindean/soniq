@@ -81,6 +81,34 @@ const TRANSFORMS = {
     audioTransform: 'Pitch the phrase down 4 semitones, loop it under tape saturation. Cowbell on the offbeat, 808 heavily sidechained.',
     referenceTrack: 'DJ Smokey — Memphis lift',
   },
+  lofi_dusty: {
+    loopStyle: 'lofi_dusty',
+    sunoStylePrefix: '[dusty pitched-down vocal loop, vinyl crackle, tape hiss, low-pass filter, no sharp transients]',
+    bucket: 'sustain_refrain',
+    audioTransform: 'Pitch the phrase down slightly and loop it low and warm under vinyl crackle and tape hiss. Low-pass the top end, soften every transient — no bright attacks. Head-nod, hazy, behind-the-beat.',
+    referenceTrack: 'lo-fi hip-hop head-nod tradition',
+  },
+  rock_anthem: {
+    loopStyle: 'rock_anthem',
+    sunoStylePrefix: '[double-tracked lead vocal, gang-vocal hook layer, driven guitar doubling the melody, live room drums]',
+    bucket: 'sustain_refrain',
+    audioTransform: 'Double-track the hook vocal; gang vocals join on the final chorus. Distorted guitar doubles the vocal contour. Live room drums, no chops.',
+    referenceTrack: 'stadium-rock anthem tradition',
+  },
+  metal_chant: {
+    loopStyle: 'metal_chant',
+    sunoStylePrefix: '[layered gang chant, palm-muted guitar chug under the phrase, double-kick, no melodic FX]',
+    bucket: 'call_response',
+    audioTransform: 'Layered gang chant on the phrase over a palm-muted chug. Double-kick locks the grid. No autotune, no melodic processing.',
+    referenceTrack: 'groove-metal chant tradition',
+  },
+  reggae_riddim: {
+    loopStyle: 'reggae_riddim',
+    sunoStylePrefix: '[one-drop riddim, offbeat skank guitar, dub delay throw on the phrase tail, deep bass]',
+    bucket: 'call_response',
+    audioTransform: 'Phrase rides the one-drop. Skank guitar on the offbeat; a dub delay throws the last word into the next bar. Bass carries the root.',
+    referenceTrack: 'roots-reggae riddim tradition',
+  },
   cloud_loop: {
     loopStyle: 'cloud_loop',
     sunoStylePrefix: '[reverbed mumble loop, hazy delay, ethereal pad bed]',
@@ -461,7 +489,7 @@ function _classifyLoopStyle({ genre, substyle }) {
     if (/Gospel-?House|House/i.test(s)) return 'house_filter_sweep';
     if (/Garage|2-?step|Future Garage/i.test(s)) return 'burial_stretch';
     if (/Amapiano/i.test(s)) return 'amapiano_logdrum';
-    if (/Lo-?fi/i.test(s)) return 'hyperpop_glitch';
+    if (/Lo-?fi/i.test(s)) return 'lofi_dusty';
   }
 
   // Genre defaults.
@@ -482,6 +510,9 @@ function _classifyLoopStyle({ genre, substyle }) {
     case 'kpop':      return 'kpop_postchorus';
     case 'altrock':   return 'altrock_singalong';
     case 'punk':      return 'punk_chant';
+    case 'rock':      return 'rock_anthem';
+    case 'metal':     return 'metal_chant';
+    case 'reggae':    return 'reggae_riddim';
     case 'jazz':      return 'jazz_scat_anchor';
     case 'blues':     return 'blues_call_response';
     case 'hyperpop':  return 'hyperpop_glitch';

@@ -280,6 +280,16 @@ function selectSurpriseMoves({
     }
   }
 
+  // Structural-move guarantee — when picking 2+ moves, ensure at least one is an
+  // arrangement change (drop/build/beat-switch/etc.), not only texture/dialogue
+  // overlays (phone call, ambience, ad-libs). Texture-only picks "feel human" but
+  // don't kill linearity, which is the whole point of this lever.
+  const STRUCTURAL = new Set(['drop','build','breakdown','beat_switch','half_time','double_time','tape_stop','reverse_swell','glitch','key_change','beat_stops','whisper_to_shout','instrument_solo']);
+  if (cap >= 2 && picked.length >= 1 && !picked.some(m => STRUCTURAL.has(m.id))) {
+    const swap = scored.find(({ m }) => STRUCTURAL.has(m.id) && !picked.includes(m));
+    if (swap) picked[picked.length - 1] = swap.m;
+  }
+
   return { moves: picked, count: picked.length, intensity, source: forcedIds.size ? 'auto+lyric' : 'auto' };
 }
 

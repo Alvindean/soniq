@@ -23,6 +23,7 @@ const TEXTURE = {
   woody:'woody', metallic:'metallic', glassy:'glassy', feathered:'feathered',
   rich_baritone:'rich baritone', paper_thin:'paper-thin',
   whiskey_soaked:'whiskey-soaked', cigarette_burned:'cigarette-burned',
+  warm:'warm',
 };
 
 // ── B. Character / Persona ───────────────────────────────────────────────────
@@ -192,6 +193,12 @@ const GENRE_PROFILES = {
   comedy:    { texture: 'reedy', character: 'quirky', performance: 'sprechgesang', optional: ['theatrical','through_smile','vaudevillian'], negative: [] },
   children:  { texture: 'honeyed', character: 'innocent', performance: 'sing_song', optional: ['through_smile'], negative: ['no autotune','no dark vocal'] },
   tvmusical: { texture: 'rich_baritone', character: 'theatrical', performance: 'belted', optional: ['vaudevillian','showtuney'], negative: [] },
+  dancehall: { texture: 'chesty', character: 'confident', performance: 'chanted', optional: ['patois','sneering'], negative: ['no melodic melisma'] },
+  amapiano:  { texture: 'velvety', character: 'confident', performance: 'conversational', optional: ['from_chest','longing'], negative: [] },
+  brazilian: { texture: 'breathy', character: 'seductive', performance: 'crooned', optional: ['wistful','longing'], negative: ['no belting'] },
+  bollywood: { texture: 'honeyed', character: 'theatrical', performance: 'belted', optional: ['longing','from_chest'], negative: [] },
+  arabesque: { texture: 'reedy', character: 'world_weary', performance: 'recitative', optional: ['longing','from_chest'], negative: ['no autotune'] },
+  mandopop:  { texture: 'silken', character: 'vulnerable', performance: 'crooned', optional: ['longing','from_head'], negative: [] },
 };
 
 // ── Mood overlays — nudge the default stack ──────────────────────────────────
@@ -368,18 +375,26 @@ function selectVocalDescriptors({
 function buildVocalDescriptorNote(stackResult) {
   if (!stackResult || !stackResult.suno_prefix) return '';
   const prefix = stackResult.suno_prefix;
-  const neg = stackResult.negative;
+  // Anti-default vocal qualities, expressed as a PROSE avoid directive — NEVER as
+  // a bracketed [no x] token in the Full prompt. Suno parses inline/bracketed
+  // negatives ("[no autotune]") as POSITIVE style tokens, so pasting them would
+  // SUMMON the very sound we're excluding. Strip the leading "no " for the prose.
+  const negProse = (stackResult.negative_list || [])
+    .map(n => String(n).replace(/^no\s+/i, '').trim())
+    .filter(Boolean)
+    .join(', ');
   return `
 
 🎙️ VOCAL DESCRIPTOR LOCK (Lever #7 — controls WHO is singing, not just what):
 The "Vocal:" field in the SONG PROMPT and the FIRST tokens of the "Full prompt" MUST start with this descriptor stack, character-for-character:
 
-${prefix}${neg ? '\nNEGATIVE TAGS (append at the end of the Full prompt — these block Suno from drifting back to its melodic-default fallback):\n' + neg : ''}
+${prefix}${negProse ? '\nAVOID these vocal qualities — keep them OUT of the vocal line and the Full prompt entirely. Do NOT write them as [no …] / "avoid:" tags anywhere in the prompt (Suno reads bracketed negatives as POSITIVE tokens and would ADD them). To hard-exclude, the user places them in Suno\'s separate Exclude Styles field: ' + negProse : ''}
 
 Rules:
-- Do NOT translate, summarise, or rephrase the bracketed terms — they are precision tags Suno's vocal model reads directly.
+- Do NOT translate, summarise, or rephrase the bracketed descriptor terms — they are precision tags Suno's vocal model reads directly.
 - Do NOT insert artist names. The bracket above is already Suno-policy-safe.
-- The descriptor stack ALWAYS appears BEFORE genre/instrument tokens in the Full prompt.${neg ? '\n- The negative tag block ALWAYS appears LAST in the Full prompt, after the genre/BPM/instrument descriptors.' : ''}
+- The descriptor stack ALWAYS appears BEFORE genre/instrument tokens in the Full prompt.
+- NEVER place a [no …] or "avoid:" negative inside the Full prompt or style string — Suno treats those as things to ADD. Negatives belong only in Suno's Exclude Styles field.
 - If the lyric content forces a contradiction (e.g. a whispered intimate verse inside an otherwise belted song), add an inline [Whispered] / [Spoken] DELIVERY tag on that section — do NOT change the global descriptor stack.`;
 }
 

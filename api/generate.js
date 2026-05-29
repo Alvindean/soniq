@@ -526,7 +526,7 @@ module.exports = async function handler(req, res) {
       'Country':         'small-town specificity (gas station names, county roads, county fair); first-person storyteller; instruments: acoustic guitar, fiddle, pedal steel, banjo, tight rhythm section; 96-130 BPM; major keys with the IV chord; warm vocal',
       'Dark Folk':       'southern gothic imagery (raven, hymn, grave, creek baptism); minor-key dread; instruments: fingerpicked acoustic, droning cello, hand drums, distant pump organ; 68-86 BPM; A minor or D Dorian; haunted breathy vocal',
       'Indie Folk':      'first-person diary specificity; fingerpicked acoustic; instruments: nylon-string or steel-string acoustic, brushed snare, light upright bass, occasional violin; 70-95 BPM; major or modal keys; intimate breathy vocal',
-      'Folk':            'storyteller narrative, communal feel; instruments: acoustic guitar, banjo, harmonica, simple percussion; 90-120 BPM; major keys; conversational vocal',
+      'Folk':            'storyteller narrative, communal feel; instruments: fingerpicked acoustic guitar, banjo, harmonica, upright bass, hand percussion; 90-120 BPM; major or Mixolydian; conversational close-mic vocal',
       'Trap-Soul':       'moody nocturnal R&B over trap drums; instruments: spacious 808s, hi-hat rolls, lush sub-bass, melodic synth pad, sparse piano; 70-85 BPM half-time; minor keys; falsetto-laced R&B vocal',
       'Neo-Soul':        'jazz-soul progressions, lush chord voicings; instruments: Rhodes piano, fretless bass, brush drums, vintage guitar, Hammond B3; 75-95 BPM; minor 9th and 11th chords; conversational soulful vocal with runs',
       'R&B':             'contemporary R&B production; instruments: glossy synths, programmed drums, 808 sub, vocal stacks; 70-95 BPM; minor keys; sultry tenor or alto lead with airy ad-libs',
@@ -535,15 +535,15 @@ module.exports = async function handler(req, res) {
       'Trap':            'Atlanta trap signature — 808 melodies, triplet hats, drip imagery; instruments: 808 bass, hi-hat rolls, dark synth lead, vocal ad-libs; 130-150 BPM half-time; minor; melodic mumble or sharp staccato delivery',
       'Boom Bap':        '90s golden-era boom bap; instruments: SP-1200/MPC drums, walking upright bass loop, chopped jazz/soul sample, scratch hook; 88-96 BPM; punchy snare on the 2 and 4; lyrical conversational delivery',
       'Conscious Rap':   'social-political weight, specific narrative detail; instruments: live or sampled soul/jazz, warm sub bass, head-nodding drums; 85-95 BPM; pocket-driven; thoughtful spoken-cadence flow',
-      'Hip-Hop':         'genre-spanning rap — boom-bap drums or modern trap as fits; rhyme-dense with internal rhyme; instruments: drums + bass + sample/melody hook; 85-100 BPM',
+      'Hip-Hop':         'genre-spanning rap, boom-bap or modern trap as fits; rhyme-dense with internal rhyme; instruments: punchy kick-snare or trap 808s, hi-hats, chopped sample or synth hook, sub-bass; 85-100 BPM; minor keys; rhyme-dense flow with ad-libs in parens',
       'Post-Punk':       'angular guitars, claustrophobic mood; instruments: chorused-out clean guitar, melodic prominent bass, motorik drums, cold reverb; 115-145 BPM; minor; deadpan baritone delivery',
       'Shoegaze':        'wall-of-sound fuzz with melodic chord changes buried under reverb; instruments: heavily distorted shimmer-reverb guitar, dreamy synth, motorik drums, soft buried vocal; 88-115 BPM; warm major or modal',
-      'Math Rock':       'odd time signatures, polyrhythmic interplay; instruments: clean tapped guitar, off-grid drums, melodic bass; tempo varies wildly; complex; conversational vocal',
+      'Math Rock':       'odd time signatures (5/8, 7/8), tapped clean-tone interplay; instruments: bright clean tapped guitars, syncopated off-grid drums, melodic bass; 130-170 BPM; major or Lydian; conversational vocal',
       'Metal':           'heavy palm-muted riffs, double-bass drums; instruments: drop-tuned guitar, distorted bass, blast-beat or galloping drums; 90-160 BPM; minor; growl or clean wail vocal',
       'Punk':            '1-2-3-4 power chord, fast 3-chord progressions; instruments: distorted guitar, driving bass, kick-snare punk beat; 160-200 BPM; major or power chords; shouted vocal',
       'Rock':            'guitar-forward arrangement; instruments: distorted electric guitar, bass guitar, full drum kit, optional piano/organ; 100-140 BPM; major or minor; confident lead vocal',
       'Synthwave':       '80s neon-night driving aesthetic; instruments: gated reverb snares, FM bass, arpeggiated synth, hi-tom fills; 100-126 BPM; major or minor; airy vocal with chorus',
-      'Hyperpop':        'pitched-up bitcrushed mania; instruments: glitched 808, pitched-up vocal stacks, sugar-rush synth, sudden tempo shifts; 140-180 BPM; major; manic high-register vocal',
+      'Hyperpop':        'pitched-up bitcrushed mania; instruments: glitched 808, pitched-up vocal stacks, sidechained supersaw, bitcrush, formant-shifted vocal chops, sudden tempo shifts; 140-180 BPM; major; manic high-register vocal',
       'Dream-Pop':       'hazy reverb-soaked melodies; instruments: shimmer-reverb guitar, soft synth pad, light drums, airy bass; 90-110 BPM; major or modal; breathy female lead',
       'Lo-Fi Hip-Hop':   'sample-based head-nod beats; instruments: vinyl-crackle drum loop, chopped piano/Rhodes sample, simple bass; 75-90 BPM; minor; spoken-word or no vocal',
       'House':           'four-on-the-floor groove; instruments: kick on every beat, hi-hat on offbeat, deep bass, soulful chord stab, vocal hook; 120-128 BPM; major or minor; soulful diva-style vocal',
@@ -556,12 +556,12 @@ module.exports = async function handler(req, res) {
       'Amapiano':        'log-drum-driven SA house; instruments: log drum bass, shaker, soft kick, jazz piano, vocal chants; 110-115 BPM; minor; smooth groove with talk-singing',
       'Afrobeats':       'syncopated polyrhythmic groove; instruments: log drum or shekere, talking drum, melodic synth, vocal harmony stack; 100-115 BPM; major or modal; melodic patois-tinged vocal',
       'Reggaeton':       'dembow rhythm; instruments: dembow pattern (boom-ch-boom-chick), 808 bass, plucky synth, vocal ad-libs; 90-100 BPM; minor; rhythmic Spanish flow',
-      'Latin':           'broad Latin — depends on subtype; instruments: nylon guitar, congas, brass, accordion; tempo varies by subtype',
+      'Latin':           'broad Latin; instruments: nylon guitar, congas and bongo, brass stabs, accordion; clave-driven; 95-110 BPM; major keys; warm melodic Spanish vocal',
       'Dancehall':       'reggae-derived bashment; instruments: digital reggae riddim, heavy bass, vocal ad-libs; 90-110 BPM; minor; patois delivery',
       'Reggae':          'one-drop drum pattern, offbeat skank; instruments: offbeat rhythm guitar, prominent bass, one-drop drums, optional Hammond bubble; 70-90 BPM; major or minor; conscious lyrical content',
-      'K-Pop':           'maximalist pop with genre-jumping section transitions; instruments: pop production with EDM/hip-hop/R&B section swaps, vocal stacks, rap break; 90-130 BPM; major; multi-voice arrangement',
+      'K-Pop':           'maximalist genre-jumping pop; instruments: supersaw synths, punchy programmed drums, 808 sub, EDM drop and trap hi-hat section swaps, dense vocal stacks, rap break; 90-130 BPM; major; multi-voice arrangement',
       'Bedroom Pop':     'demo-aesthetic intimacy; instruments: tape-saturated everything, simple drum machine, picked guitar or keys, soft synth; 80-105 BPM; major; close-mic-ed soft vocal',
-      'Indie Pop':       'twee jangle or polished indie; instruments: chorused clean guitar, simple bass, light drums, optional synth, vocal hook; 100-130 BPM; major; bright wistful vocal',
+      'Indie Pop':       'jangly indie pop; instruments: chorused clean jangle guitar, melodic bass, tight live drums, tambourine, optional analog synth; 108-132 BPM; major; bright wistful vocal with harmony',
       'Pop':             'radio-ready hook focus; instruments: programmed drums, pop bass, synth or piano, vocal stacks; 100-128 BPM; major; clean lead with stacked harmony',
     };
     const lockDirective = GENRE_LOCK[flowGenreLabel] || '';
@@ -654,28 +654,59 @@ module.exports = async function handler(req, res) {
     }
     sunoPromptParts.push(flowGenreLabel.toLowerCase());
     if (flowFusionLabel) sunoPromptParts.push('blended with ' + flowFusionLabel.toLowerCase());
+    // BPM / key: prefer explicit spec, else pull from the genre lock so the
+    // front-loaded string always carries tempo + key (Suno weights these high).
+    const _lockBpm = (lockDirective.match(/(\d+\s*-\s*\d+|\d+)\s*BPM/i) || [])[1];
+    const _lockKey = (lockDirective.match(/\b([A-G][#b]?\s*(?:minor|major|modal|Dorian|Mixolydian|Lydian))\b/i) || [])[1];
     if (spec.tempo) sunoPromptParts.push(spec.tempo + ' BPM');
+    else if (_lockBpm) sunoPromptParts.push(_lockBpm.replace(/\s+/g, '') + ' BPM');
     if (spec.key) sunoPromptParts.push(spec.key);
-    if (spec.vocal) sunoPromptParts.push(spec.vocal);
-    // Lift the instrument hints out of the lock string (everything between "instruments:" and ";")
+    else if (_lockKey) sunoPromptParts.push(_lockKey.trim());
+    // Instruments BEFORE vocal — instruments are more sound-defining, so they
+    // earn the higher front-loaded weight. Dedup the instrument list against
+    // the loop-anchor bracket prefix so tokens (e.g. "pedal steel",
+    // "vinyl crackle") aren't printed twice and diluted.
     const instMatch = lockDirective.match(/instruments?:\s*([^;]+)/i);
-    if (instMatch) sunoPromptParts.push(instMatch[1].trim());
+    if (instMatch) {
+      let inst = instMatch[1].trim();
+      if (_laTransform && _laTransform.sunoStylePrefix) {
+        const seen = _laTransform.sunoStylePrefix.toLowerCase();
+        inst = inst.split(',').map(s => s.trim())
+          .filter(tok => tok && !seen.includes(tok.toLowerCase().split(/\s+/)[0]))
+          .join(', ');
+      }
+      if (inst) sunoPromptParts.push(inst);
+    }
+    if (spec.vocal) sunoPromptParts.push(spec.vocal);
     sunoPromptParts.push(brainMood.toLowerCase());
-    // User excludes — surface in the deterministic Suno prompt too so Suno
-    // itself sees the "(avoid: …)" hint, not just the vocal-descriptor
-    // negative-tag block at the end.
-    if (flowExclude.length) {
-      sunoPromptParts.push('avoid: ' + flowExclude.join(', '));
+    // User excludes are deliberately NOT pushed into this positive style string.
+    // Suno parses "avoid: x" as POSITIVE tokens — an inline "avoid: autotune"
+    // SUMMONS autotune. Excludes flow only through the sanitized excludeStyles
+    // field (vocalDescriptors.negativeAdd → _brain.js) and the brain _avoidLine.
+    // Reinforce the loop anchor — phrase + motif role in plain English.
+    if (flowAnchorPhrase) {
+      sunoPromptParts.push('vocal phrase "' + flowAnchorPhrase + '" loops as the central motif');
     }
-    // Reinforce the loop anchor mid-prompt AND describe what loops. Stronger
-    // than a generic "looped:" tail — Suno needs the phrase + the motif role
-    // expressed in plain English alongside the bracket-token lead.
-    if (flowAnchorPhrase && _laTransform) {
-      sunoPromptParts.push('vocal phrase "' + flowAnchorPhrase + '" loops as the central motif throughout — intro stab, every chorus, post-chorus chop, outro vamp');
-    } else if (flowAnchorPhrase) {
-      sunoPromptParts.push('vocal phrase "' + flowAnchorPhrase + '" loops as the central motif throughout');
+    // Atomize instrument/mood lists, dedup tokens, drop empties; keep
+    // structured parts (bracket prefix, "vocal phrase …") whole.
+    const _seenTok = new Set();
+    let generatedSunoPrompt = sunoPromptParts
+      .filter(Boolean)
+      .flatMap(p => (p.startsWith('[') || p.startsWith('vocal phrase'))
+        ? [p]
+        : p.split(',').map(s => s.trim()))
+      .filter(tok => { const k = tok.toLowerCase(); if (!tok || _seenTok.has(k)) return false; _seenTok.add(k); return true; })
+      .join(', ');
+    // Cap the style string — Suno front-loads, so trailing tokens dilute the
+    // genre/BPM/instrument signal. Generous cap (only trims genuine bloat);
+    // never cut mid-token.
+    const SUNO_MAX = 300;
+    if (generatedSunoPrompt.length > SUNO_MAX) {
+      const toks = generatedSunoPrompt.split(', ');
+      let out = '';
+      for (const t of toks) { if ((out ? out + ', ' + t : t).length > SUNO_MAX) break; out = out ? out + ', ' + t : t; }
+      generatedSunoPrompt = out || generatedSunoPrompt.slice(0, SUNO_MAX);
     }
-    const generatedSunoPrompt = sunoPromptParts.filter(Boolean).join(', ');
 
     // ═══════════════════════════════════════════════════════════════
     // PRIMARY PATH: call the SONIQ brain's buildSongPrompt — same engine
