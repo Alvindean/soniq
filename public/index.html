@@ -5583,10 +5583,15 @@ body.craft-advanced .craft-basic-only{display:none !important}
         }
         // Song prompt (Suno-ready style string)
         var sunoPrompt = parsed.songPrompt || d.sunoPrompt || '';
-        if (sunoEl && sunoPrompt) {
-          sunoEl.innerHTML = '<span class="suno-chip">'+sunoPrompt.replace(/</g,'&lt;')+'</span>';
-        } else if (sunoEl) {
-          sunoEl.innerHTML = '';
+        var flowExcludeArr = Array.isArray(d.excludeStyles) ? d.excludeStyles : [];
+        if (sunoEl) {
+          var chipsHtml = '';
+          if (sunoPrompt) chipsHtml += '<span class="suno-chip">'+sunoPrompt.replace(/</g,'&lt;')+'</span>';
+          if (flowExcludeArr.length) {
+            var exStr = flowExcludeArr.join(', ');
+            chipsHtml += '<span class="suno-chip suno-chip--exclude" data-ex="'+escHtml(exStr)+'" onclick="safeCopy(this.getAttribute(\'data-ex\'),\'Exclude styles copied - paste into Suno Exclude Styles box\')" title="Suno Exclude Styles - click to copy: '+escHtml(exStr)+'" style="cursor:pointer"><span class="suno-chip-icon">🚫</span><span class="suno-chip-label">Exclude</span><span class="suno-chip-value">'+flowExcludeArr.length+' tag'+(flowExcludeArr.length>1?'s':'')+' · copy</span></span>';
+          }
+          sunoEl.innerHTML = chipsHtml;
         }
         if (bodyEl) {
           bodyEl.innerHTML =
@@ -5604,6 +5609,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           hookIsolation: parsed.hookIsolation,
           lyrics: parsed.lyrics,
           sunoPrompt: sunoPrompt,
+          excludeStyles: flowExcludeArr,
           arrangement: parsed.arrangement,
           vocal: parsed.vocal,
           references: parsed.references,
@@ -5828,6 +5834,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
           verdict: f.verdict || '',
           lyrics: f.lyrics,
           style: f.sunoPrompt || '',
+          excludeStyles: f.excludeStyles || [],
           brief: f.rawResponse || '',
           structure: (f.spec && f.spec.structure) || '',
           arrangement: f.arrangement || '',
@@ -14213,6 +14220,22 @@ function renderSunoChips(prefix, song) {
       <span class="suno-chip-icon">🔒</span>
       <span class="suno-chip-label">Style Influence</span>
       <span class="suno-chip-value">Studio</span>
+    </span>`);
+  }
+
+  // Exclude Styles chip — copyable, shown to everyone. Suno's reliable way to
+  // exclude a sound is its separate Exclude Styles box, NOT prose in the prompt.
+  // Click copies the per-song list (genre defaults + your typed excludes +
+  // the genre's vocal anti-defaults).
+  const _excludeList = (s && Array.isArray(s.excludeStyles) && s.excludeStyles.length)
+    ? s.excludeStyles
+    : (Array.isArray(song.excludeStyles) ? song.excludeStyles : []);
+  if (_excludeList.length) {
+    const _excludeStr = _excludeList.join(', ');
+    parts.push(`<span class="suno-chip suno-chip--exclude" data-ex="${escHtml(_excludeStr)}" onclick="safeCopy(this.getAttribute('data-ex'),'Exclude styles copied - paste into Suno Exclude Styles box')" title="Suno Exclude Styles - click to copy: ${escHtml(_excludeStr)}" style="cursor:pointer">
+      <span class="suno-chip-icon">🚫</span>
+      <span class="suno-chip-label">Exclude</span>
+      <span class="suno-chip-value">${_excludeList.length} tag${_excludeList.length > 1 ? 's' : ''} · copy</span>
     </span>`);
   }
 

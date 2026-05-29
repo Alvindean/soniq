@@ -835,10 +835,25 @@ module.exports = async function handler(req, res) {
       redisIncrExpire(flowRedisKey, ttl);
     }
 
+    // Per-song Suno "Exclude Styles" value — genre defaults + the user's typed
+    // excludes + the genre's vocal anti-defaults. Surfaced so the user can paste
+    // it straight into Suno's Exclude Styles box (the reliable way to exclude,
+    // vs. a prose AVOID line in the prompt that Suno may ignore).
+    let flowExcludeStyles = [];
+    try {
+      flowExcludeStyles = require('./_brain.js').buildSunoSettings({
+        genre: brainGenre,
+        mood: brainMood,
+        substyle: spec && spec.substyle,
+        userExcludes: flowExclude,
+      }).excludeStyles || [];
+    } catch (_) { /* non-fatal — omit the exclude field if the brain is unavailable */ }
+
     return res.status(200).json({
       title: spec.title || (flowConcept.split(/[.,—–\-]/)[0] || 'Untitled').trim().slice(0, 60),
       lyrics: lyrics.trim(),
       sunoPrompt: sunoPrompt,
+      excludeStyles: flowExcludeStyles,
     });
   }
 

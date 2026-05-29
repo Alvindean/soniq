@@ -9501,11 +9501,22 @@ const STRUCTURE_SUNO_MODIFIERS = {
 // Core formula. Blends base + mood + structure + optional learning overlay.
 // `userLearning` shape: { sampleSize, avgWeirdness, avgStyleInfluence, excludeHits }
 // When sampleSize >= 3, learning overlays with weight = min(0.5, sampleSize/20).
-function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier }) {
+function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes }) {
   const base = SUNO_GEN_SETTINGS_BASE[genre] || SUNO_GEN_SETTINGS_BASE.pop;
   let weirdness = base.weirdness;
   let styleInfluence = base.styleInfluence;
-  const excludes = new Set(base.exclude);
+  // Per-song Suno "Exclude Styles" value. Insertion order = priority (user
+  // excludes first so they survive the 10-item cap, then genre defaults, then
+  // the genre's vocal anti-defaults). Strip any leading "no " — the Exclude
+  // Styles box already means "exclude these" — lowercase, 40-char clamp.
+  const _normEx = (e) => String(e).replace(/^no\s+/i, '').trim().toLowerCase().slice(0, 40);
+  const excludes = new Set();
+  (Array.isArray(userExcludes) ? userExcludes : []).forEach(e => { const c = _normEx(e); if (c) excludes.add(c); });
+  (base.exclude || []).forEach(e => excludes.add(e));
+  try {
+    const _vd = selectVocalDescriptors({ genre, mood, autoMode: true });
+    ((_vd && _vd.negative_list) || []).forEach(e => { const c = _normEx(e); if (c) excludes.add(c); });
+  } catch (_) { /* vocal resolver optional — genre defaults still carry the exclude */ }
 
   // Word-boundary mood match (same pattern as anti-cliche / speed-gears)
   const moodNorm = ' ' + (mood || '').toLowerCase().replace(/[-_]/g,' ').replace(/\s+/g,' ').trim() + ' ';

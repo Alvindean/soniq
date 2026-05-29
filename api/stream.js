@@ -954,7 +954,8 @@ module.exports = async function handler(req, res) {
         rapStyle: sunoParams.rapStyle,
         aggression: sunoParams.aggression,
         lyricTier: sunoParams.lyricTier,
-        userLearning: sunoParams.sunoLearning
+        userLearning: sunoParams.sunoLearning,
+        userExcludes: (sunoParams.vocalDescriptors && sunoParams.vocalDescriptors.negativeAdd) || sunoParams.exclude
       });
       const lyricTier = sunoParams.lyricTier || 'street';
       const metaObj = { ...(built.meta || {}), prodData, sunoSettings, lyricTier };
