@@ -459,25 +459,40 @@ module.exports = async function handler(req, res) {
 
     function flowClassifyGenre(text) {
       const t = ' ' + String(text || '').toLowerCase() + ' ';
+      // Match a token only when it's flanked by non-alphanumerics (or string
+      // edge) — a real word boundary. The old bare substring test fired "rap"
+      // inside "the-rap-y" and "rock" inside "rocket", which mis-classified
+      // ordinary words and made "trap soul" spuriously fuse (rap ⊂ trap).
+      // `t` is already space-padded at both ends. Token-internal punctuation
+      // (r&b, hip-hop, lo-fi, 808) is fine — only the edges are checked.
+      const hasToken = (tok) => {
+        let i = t.indexOf(tok);
+        while (i !== -1) {
+          const before = i === 0 ? ' ' : t[i - 1];
+          const after = (i + tok.length >= t.length) ? ' ' : t[i + tok.length];
+          if (!/[a-z0-9]/.test(before) && !/[a-z0-9]/.test(after)) return true;
+          i = t.indexOf(tok, i + 1);
+        }
+        return false;
+      };
       const scores = [];
       for (const g of FLOW_GENRE_TAXONOMY) {
         // AND-gated fusion genres: all groups must hit at least one token
         if (g.requires) {
-          const allHit = g.requires.every(group => group.some(tok => t.includes(tok)));
+          const allHit = g.requires.every(group => group.some(tok => hasToken(tok)));
           if (!allHit) continue;
         }
         let s = 0;
         const addAll = (table) => {
           for (const w in table) {
             for (const tok of table[w]) {
-              // simple substring with whitespace boundary
-              if (t.includes(' ' + tok + ' ') || t.includes(' ' + tok) || t.includes(tok + ' ') || t.includes(tok)) s += Number(w);
+              if (hasToken(tok)) s += Number(w);
             }
           }
         };
         addAll(g.tokens || {});
         addAll(g.weakAlone || {});
-        if (g.antiTokens && g.antiTokens.some(a => t.includes(a))) s *= 0.5;
+        if (g.antiTokens && g.antiTokens.some(a => hasToken(a))) s *= 0.5;
         if (s > 0) scores.push({ key:g.key, brainKey:g.brainKey, label:g.label, score:s });
       }
       scores.sort((a,b) => b.score - a.score);
@@ -509,10 +524,39 @@ module.exports = async function handler(req, res) {
     // The brain's 62KB super-prompt was burning OpenRouter credits and
     // pushing Vercel's 60s budget. Production data still flows through
     // the Editor when the user clicks "Continue to Production".
-    const flowClassification = flowClassifyGenre(spec.genre || flowConcept);
+    // Classify the user's ACTUAL concept text — it carries the subgenre and
+    // fusion signal ("drill type beat", "hip hop AND rock"). The client's
+    // spec.genre is a single collapsed label (reveal-animation only) and was
+    // SHADOWING the concept here — which is exactly why Flow defaulted to one
+    // generic parent genre with no subtype and never detected fusions. Fall
+    // back to the client hint only when the concept names no genre at all.
+    const _conceptClass = flowClassifyGenre(flowConcept);
+    const flowClassification = (_conceptClass.score > 0)
+      ? _conceptClass
+      : flowClassifyGenre(spec.genre || flowConcept);
     const brainGenre = flowClassification.brainKey;
-    const flowGenreLabel = flowClassification.label;       // e.g. "Americana"
+    let flowGenreLabel = flowClassification.label;         // e.g. "Drill", "Americana"
     const flowFusionLabel = flowClassification.fusion ? flowClassification.fusion.label : null;
+
+    // SUBGENRE RESOLUTION — when the concept names only a broad parent genre
+    // ("hip hop") with no subtype, pick a specific subgenre for variety so Flow
+    // stops writing generic parent-genre songs. An explicit subgenre in the
+    // concept, or an explicit client substyle, always wins.
+    const FLOW_BARE_PARENTS = new Set(['Hip-Hop','Rock','Pop','R&B','Country','Folk','EDM','Jazz','Latin','Reggae']);
+    const flowPickSubstyle = (brainKey, excludeLabel) => {
+      const subs = FLOW_GENRE_TAXONOMY.filter(g =>
+        g.brainKey === brainKey && g.label !== excludeLabel && !g.requires && !FLOW_BARE_PARENTS.has(g.label));
+      return subs.length ? subs[Math.floor(Math.random() * subs.length)].label : '';
+    };
+    let flowSubstyle = (spec && spec.substyle) || '';
+    if (!flowSubstyle) {
+      flowSubstyle = FLOW_BARE_PARENTS.has(flowGenreLabel)
+        ? flowPickSubstyle(brainGenre, flowGenreLabel)   // broad parent → pick a subtype for variety
+        : flowGenreLabel;                                 // concept already named a subtype
+    }
+    // When we upgraded a bare parent to a concrete subtype, surface it in the
+    // user-facing label too (drives GENRE_LOCK, the Suno string, and the reveal).
+    if (flowSubstyle && FLOW_BARE_PARENTS.has(flowGenreLabel)) flowGenreLabel = flowSubstyle;
     const brainMood  = flowMoodToBrainMood(spec.mood || (spec.moodArc && spec.moodArc.end) || flowConcept);
     const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual','pro','pro_annual']);
     const flowAllowPlatinum = isAdmin || PLATINUM_PLANS.has(flowPlan);
@@ -721,6 +765,15 @@ module.exports = async function handler(req, res) {
       const brain = require('./_brain.js');
       built = brain.buildSongPrompt({
         genre: brainGenre,
+        // Subgenre drives the brain's SUBSTYLE_NOTES + SUBSTYLE_LOCK so the
+        // lyrics/structure reflect the actual subtype (Drill/Boom Bap/Phonk/…),
+        // not a generic parent-genre song.
+        substyle: flowSubstyle,
+        // Cross-genre fusion ("hip hop and rock") → secondary-genre blend so
+        // the brain folds in the other genre's DNA instead of ignoring it.
+        blend: flowClassification.fusion
+          ? { genre2: flowClassification.fusion.brainKey, ratio: 65 }
+          : {},
         topic: flowConcept,
         mood: brainMood,
         vocal: spec.vocal || 'any',
@@ -848,7 +901,7 @@ module.exports = async function handler(req, res) {
       flowExcludeStyles = require('./_brain.js').buildSunoSettings({
         genre: brainGenre,
         mood: brainMood,
-        substyle: spec && spec.substyle,
+        substyle: flowSubstyle,
         userExcludes: flowExclude,
       }).excludeStyles || [];
     } catch (_) { /* non-fatal — omit the exclude field if the brain is unavailable */ }
@@ -858,6 +911,10 @@ module.exports = async function handler(req, res) {
       lyrics: lyrics.trim(),
       sunoPrompt: sunoPrompt,
       excludeStyles: flowExcludeStyles,
+      // Resolved genre so the UI can show the real subgenre/fusion the brain
+      // wrote (not the client's coarse reveal-animation guess).
+      genre: flowGenreLabel,
+      fusion: flowFusionLabel || null,
     });
   }
 

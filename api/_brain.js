@@ -953,7 +953,7 @@ const RAP_STYLE_ADLIBS = {
   'Afro-Rap':             ['O YO!','EHEN!','NA WETIN!','MAKE I TELL YOU','(laughter)','ODESHI!','BROKE WASH','(drum break)'],
   'Latin Rap':            ['¡DALE!','¡WEPA!','¡ESO!','BRR','JEJE','QUE LO QUE','¡FUEGO!','¡VAMOS!'],
   'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
-  'Phonk':                ['(pitched down)','(demonic)','yea hoe','triple six','(drawl)','aaagh','(slowed)','(screwed)'],
+  'Phonk':                ['(pitched down)','(demonic)','mane','ride out','(drawl)','aaagh','(slowed)','(screwed)'],  // NOTE: no artist refs — "yea hoe"/"triple six" are Three 6 Mafia signatures Suno rejects; use generic Memphis vernacular instead
   'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
   'Hustle / Grind':       ['still up','on my grind','long road','(grinding)','no sleep','up first','no days off','get it'],
   'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
@@ -3808,10 +3808,26 @@ function buildBlendNote(primaryGenre, blend) {
 
   if (blend.genre2) {
     const g2Label = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[blend.genre2]) || blend.genre2;
-    blocks.push(`SECONDARY GENRE: ${g2Label} (${secondaryPct}% influence)
-- Borrow ${g2Label}'s rhythmic feel, instrument palette, and production texture
-- The primary genre (${ratio}%) keeps its structural backbone (verse/chorus shape, hook placement, length)
-- Where the two genres conflict (e.g. tempo), the primary wins; where they can layer (e.g. instrumentation), let ${g2Label} color the mix`);
+    // Pull the curated fusion entry (Rap-Rock, Blues-Rock, Arena Pop, …) so the
+    // blend carries REAL construction guidance, not a generic "color the mix"
+    // nudge. _resolveFusionKey is order/case tolerant.
+    let fd = null;
+    try { const fk = _resolveFusionKey(primaryGenre, blend.genre2); fd = fk ? FUSION_DATA[fk] : null; } catch (_) {}
+    // One structural moment the secondary genre is allowed to OWN, so the fusion
+    // shapes the song's construction — not just its lyric texture.
+    const g2 = String(blend.genre2).toLowerCase();
+    const structClaim =
+      /rock|metal|punk|blues/.test(g2)            ? 'a guitar-solo / instrumental-break section, and a louder, heavier final chorus' :
+      /edm|house|electronic|techno|trance/.test(g2)? 'a build-and-drop that replaces or launches one chorus' :
+      /jazz/.test(g2)                              ? 'an improvised instrumental solo section' :
+      /gospel|soul/.test(g2)                       ? 'a call-and-response vamp-out section' :
+      /latin|reggae|afro|amapiano|dancehall/.test(g2)? 'a percussion-break / instrumental-groove section' :
+      /country|folk/.test(g2)                      ? 'an acoustic, storyteller bridge' :
+                                                     'one signature instrumental or arrangement moment';
+    blocks.push(`SECONDARY GENRE: ${g2Label} (${secondaryPct}% influence)${fd && fd.name ? ' — ' + fd.name : ''}
+- Borrow ${g2Label}'s rhythmic feel, instrument palette, and production texture${fd && fd.tip ? '\n- FUSION PLAYBOOK: ' + fd.tip : ''}${fd && fd.artists ? '\n- Lineage (study the SOUND, never name an artist in the lyrics): ' + fd.artists : ''}
+- The primary (${ratio}%) owns section ORDER, COUNT and the hook; ${g2Label} OWNS one construction moment: ${structClaim}
+- Where the two conflict (e.g. tempo) the primary wins; where they layer (instrumentation, vocal delivery, that one section) let ${g2Label} genuinely take over — the seam must be AUDIBLE, not buried`);
   }
 
   if (blend.style2) {
@@ -3833,7 +3849,7 @@ INTEGRATION: ${bible.integration}`);
     }
   }
 
-  return `\n\n🎨 SECONDARY STYLE BLEND — primary ${ratio}% / secondary ${secondaryPct}%:\n\n${blocks.join('\n\n')}\n\nThe blend ratio is approximate — the primary genre always wins on structure and length; the secondary leaks into vocal delivery, lyric texture, and production color.`;
+  return `\n\n🎨 SECONDARY STYLE BLEND — primary ${ratio}% / secondary ${secondaryPct}%:\n\n${blocks.join('\n\n')}\n\nThe ratio is approximate: the primary genre anchors section order, length and the hook; the secondary genre claims its ONE construction moment plus vocal/texture/production color — so the fusion is heard in the song's build, not just implied in the words.`;
 }
 
 const STRUCTURES={

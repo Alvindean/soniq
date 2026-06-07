@@ -4980,6 +4980,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
           <span id="flow-mic-label">Speak</span>
           <span class="flow-meter" id="flow-meter" aria-hidden="true"><span></span><span></span><span></span></span>
         </button>
+        <button type="button" class="flow-reset-pill" id="flow-reset-pill" onclick="flowReset()" title="Clear the concept and result — start over from scratch" aria-label="Start over">
+          <span aria-hidden="true">↺</span> Start over
+        </button>
         <span class="flow-char-count" id="flow-char-count">0 / 1000</span>
       </div>
     </div>
@@ -5083,6 +5086,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
     .flow-mic-btn.recording .flow-meter{display:inline-flex}
     .flow-meter span{width:3px;background:#fca5a5;border-radius:2px;height:30%;transition:height 60ms linear}
     .flow-char-count{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
+    /* Reset pill — clears concept + reveal + result, aborts in-flight, starts fresh */
+    .flow-reset-pill{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:99px;background:var(--s3);border:1px solid var(--b2);color:var(--tx3);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;min-height:32px;line-height:1}
+    .flow-reset-pill:hover{border-color:var(--amberline);color:var(--amber);background:var(--s4)}
+    .flow-reset-pill:focus-visible{outline:2px solid var(--amber);outline-offset:1px}
+    .flow-reset-pill:active{transform:scale(.96)}
     /* Live interim transcript hint shown beneath textarea while listening */
     .flow-interim{font-size:12px;color:var(--amber);min-height:1.2em;font-style:italic;opacity:.85}
     #flow-out .result-body{padding:16px 18px;background:var(--s2);border-top:1px solid var(--b1)}
@@ -5437,6 +5445,53 @@ body.craft-advanced .craft-basic-only{display:none !important}
     // Expose for inline onclick + console use
     window.flowStopSong = flowStopSong;
 
+    // Full reset — clear the concept, reveal, result, tabs, and any in-flight
+    // request, returning Flow to its first-run state. Wired to the "Start over"
+    // pill. Silent on the abort (this is a clear, not a stop) so the user
+    // doesn't see a misleading "no credit used" toast.
+    function flowReset() {
+      try { if (songInFlight) { songInFlight.abort(); songInFlight = null; } } catch(_){}
+      try { if (typeof inFlight !== 'undefined' && inFlight) { inFlight.abort(); } } catch(_){}
+      try { if (typeof scoreInFlight !== 'undefined' && scoreInFlight) { scoreInFlight.abort(); } } catch(_){}
+      // Concept input + counters
+      var ta = document.getElementById('flow-concept');
+      if (ta) ta.value = '';
+      var cc = document.getElementById('flow-char-count');
+      if (cc) cc.textContent = '0 / 1000';
+      var interim = document.getElementById('flow-interim');
+      if (interim) interim.textContent = '';
+      // Result card — hide + empty so Save/Copy can't grab stale content
+      var out = document.getElementById('flow-out');
+      if (out) out.style.display = 'none';
+      var body = document.getElementById('fres-body');
+      if (body) body.innerHTML = '';
+      // Tabs back to Lyrics; hide the optional Arrangement/Vocal/References tabs
+      document.querySelectorAll('.flow-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab') === 'lyrics'); });
+      ['arrangement','vocal','references'].forEach(function(id){ var b = document.getElementById('fres-tab-' + id); if (b) b.style.display = 'none'; });
+      // Reveal panel + its resolved-genre label
+      var reveal = document.getElementById('flow-reveal');
+      if (reveal) reveal.style.display = 'none';
+      var fus = document.getElementById('flow-fusion');
+      if (fus) fus.textContent = '—';
+      // Progress bar
+      var pb = document.getElementById('fres-progress-bar');
+      if (pb) pb.classList.remove('active');
+      var fill = document.getElementById('fres-progress-fill');
+      if (fill) fill.style.width = '0%';
+      // Button + hint back to first-run copy
+      var btn = document.getElementById('flow-btn');
+      var btnTxt = document.getElementById('flow-btn-text');
+      var hint = document.getElementById('flow-hint');
+      if (btn) btn.disabled = false;
+      if (btnTxt) btnTxt.textContent = 'Spin Flow';
+      if (hint) hint.textContent = 'Flow chooses the best genre fusion for your concept, then writes the song';
+      // Drop stashed last result
+      try { window.__flowLast = null; } catch(_) {}
+      if (ta) { try { ta.focus(); } catch(_){} }
+      if (typeof toast === 'function') toast('Flow cleared — start fresh');
+    }
+    window.flowReset = flowReset;
+
     var scoreInFlight = null;  // score fetch controller (audit fix: race)
     window.feelFlow = async function(){
       var concept = (ta && ta.value || '').trim();
@@ -5579,6 +5634,22 @@ body.craft-advanced .craft-basic-only{display:none !important}
       }
       scored.sort(function(a,b){ return b.score - a.score; });
       var genre = scored.length ? scored[0].label : 'Pop';
+      // Variety: when only a broad PARENT genre is detected, roll a specific
+      // subgenre (mirrors the server) so the reveal — and the user's read on
+      // the song — isn't the same generic label spin after spin.
+      var FLOW_PARENT_SUBS = {
+        'Hip-Hop':['Trap','Boom Bap','Drill','Phonk','Conscious Rap','Lo-Fi Hip-Hop'],
+        'Rock':['Post-Punk','Shoegaze','Math Rock','Punk'],
+        'Pop':['Synthwave','Hyperpop','Dream-Pop','Indie Pop','Bedroom Pop'],
+        'R&B':['Neo-Soul','Trap-Soul'],
+        'Country':['Americana','Outlaw Country'],
+        'Folk':['Indie Folk','Dark Folk'],
+        'EDM':['House','Synthwave','Lo-Fi Hip-Hop']
+      };
+      if (FLOW_PARENT_SUBS[genre]) {
+        var _subs = FLOW_PARENT_SUBS[genre];
+        genre = _subs[Math.floor(Math.random() * _subs.length)];
+      }
       var mood = 'Emotional';
       if (/\b(hope|hopeful|uplift|inspir|triumph|rise|win)\b/.test(t)) mood = 'Hopeful';
       else if (/\b(sad|melanchol|grief|sorrow|loss|cry|tears?|miss|gone|lost)\b/.test(t)) mood = 'Melancholic';
@@ -5587,28 +5658,31 @@ body.craft-advanced .craft-basic-only{display:none !important}
       else if (/\b(calm|peace|tender|gentle|soft|quiet)\b/.test(t)) mood = 'Peaceful';
       else if (/\b(nostalg|reflect|wistful|memory|remember)\b/.test(t)) mood = 'Nostalgic';
       else if (/\b(play|fun|joy|euphor|dance|smile)\b/.test(t)) mood = 'Playful';
-      else if (/\b(longing|yearn|chase|reach|need|want)\b/.test(t)) mood = 'Longing';
+      else if (/\b(longing|yearn|yearning|aching|pining|crave|craving)\b/.test(t)) mood = 'Longing';
       // Rough tempo pick based on mood
       var tempo = 96;
       if (mood === 'Melancholic' || mood === 'Peaceful') tempo = 74;
       else if (mood === 'Defiant' || mood === 'Playful') tempo = 124;
       else if (mood === 'Dark') tempo = 84;
       else if (mood === 'Hopeful') tempo = 104;
-      var vocal = 'expressive vocal';
-      if (/Hip-Hop|Trap|Drill|Phonk|Boom Bap|Conscious Rap/.test(genre)) vocal = 'rhythmic flow';
-      else if (/Trap-Soul|Neo-Soul|R&B/.test(genre)) vocal = 'soulful tenor';
-      else if (/Indie Folk|Dark Folk|Folk|Bedroom Pop|Singer-Songwriter/.test(genre)) vocal = 'breathy singer-songwriter';
-      else if (/Americana|Outlaw Country|Country/.test(genre)) vocal = 'gritty storyteller, southern rasp';
-      else if (/Metal|Punk|Hardcore/.test(genre)) vocal = 'aggressive shout';
-      else if (/Rock|Post-Punk|Shoegaze|Math Rock/.test(genre)) vocal = 'gritty rasp';
-      else if (/Gospel/.test(genre)) vocal = 'powerful gospel runs';
-      else if (/Blues/.test(genre)) vocal = 'weathered blues holler';
-      else if (/Jazz|Bossa Nova/.test(genre)) vocal = 'smoky conversational';
-      else if (/Reggaeton|Dancehall|Reggae/.test(genre)) vocal = 'laid-back patois flow';
-      else if (/Synthwave|Dream-Pop/.test(genre)) vocal = 'reverb-soaked airy';
-      else if (/Hyperpop/.test(genre)) vocal = 'pitched-up glitchy';
+      // Subgenre-specific vocal so the reveal stops showing the same string for
+      // every rap song. Falls back to family regex, then a generic default.
+      var VOCAL_MAP = {
+        'Drill':'menacing deadpan drill flow','Boom Bap':'head-nod boom-bap cadence','Trap':'auto-tuned melodic trap flow','Phonk':'pitched-down demonic chant','Conscious Rap':'lyrical conversational flow','Lo-Fi Hip-Hop':'laid-back lo-fi rap','Hip-Hop':'rhythmic rap flow',
+        'Trap-Soul':'falsetto-laced croon','Neo-Soul':'warm soulful runs','R&B':'silky soulful tenor',
+        'Americana':'gritty southern storyteller','Outlaw Country':'weathered outlaw baritone','Country':'warm country drawl',
+        'Indie Folk':'intimate breathy singer-songwriter','Dark Folk':'haunted hushed vocal','Folk':'plainspoken narrator',
+        'Metal':'aggressive scream','Punk':'snotty shouted','Post-Punk':'detached baritone','Shoegaze':'buried dreamy vocal','Math Rock':'angular clean vocal','Rock':'gritty rasp',
+        'Gospel':'powerful gospel runs','Blues':'weathered blues holler','Jazz':'smoky conversational','Bossa Nova':'soft bossa whisper',
+        'Reggaeton':'bouncy urbano flow','Dancehall':'patois toasting','Reggae':'laid-back conscious vocal',
+        'Synthwave':'reverb-soaked airy','Dream-Pop':'gauzy ethereal','Hyperpop':'pitched-up glitchy','House':'soulful house hook','K-Pop':'polished multi-voice','Bedroom Pop':'soft tape-warm vocal','Indie Pop':'bright wistful','Amapiano':'chant-and-adlib','Afrobeats':'melodic afro-croon','Latin':'passionate latin lead','Pop':'clean radio lead'
+      };
+      var vocal = VOCAL_MAP[genre] || 'expressive vocal';
       var key = mood === 'Hopeful' || mood === 'Playful' ? 'C major' : 'A minor';
-      return { genre: genre, mood: mood, tempo: tempo, vocal: vocal, key: key };
+      // Pass the rolled subgenre as substyle so the SERVER writes the same
+      // subtype the reveal shows (server prefers spec.substyle) — keeps the
+      // reveal and the actual song consistent instead of each rolling its own.
+      return { genre: genre, substyle: genre, mood: mood, tempo: tempo, vocal: vocal, key: key };
     }
 
     // Song progress driver — simulates progress over ~25s so the user sees
@@ -5697,6 +5771,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
         // never leave the markdown # header in front of it.
         var cleanTitle = (parsed.title || d.title || spec.title || 'Untitled').replace(/["""]/g,'').trim();
         if (titleEl) titleEl.textContent = cleanTitle;
+        // Replace the reveal's coarse animation label with the genre/fusion the
+        // server actually resolved (subgenre + "× secondary" when a fusion fired).
+        var fusionLabelEl = document.getElementById('flow-fusion');
+        if (fusionLabelEl && d.genre) fusionLabelEl.textContent = d.genre + (d.fusion ? ' × ' + d.fusion : '');
         // Verdict subtitle
         var verdictLine = document.getElementById('fres-verdict-line');
         if (verdictLine) {
