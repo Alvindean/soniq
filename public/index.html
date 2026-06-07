@@ -6113,7 +6113,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
         pluginToolkit: '',
         mixBlueprint: '',
         masteringTarget: '',
-        genre: (f.spec && f.spec.genre) || '',
+        // Store the brain genre KEY (not the display label) so coach-regenerate
+        // and any Write-path reuse pass a genre the server recognizes; keep the
+        // subgenre label as substyle so its flavor survives.
+        genre: (typeof genreLabelToKey === 'function' ? genreLabelToKey((f.spec && f.spec.genre) || '') : ((f.spec && f.spec.genre) || 'pop')),
+        substyle: (f.spec && (f.spec.substyle || f.spec.genre)) || '',
         topic: f.concept || '',
         mood: (f.spec && f.spec.mood) || '',
         vocal: (f.spec && f.spec.vocal) || '',
@@ -18485,6 +18489,49 @@ function closeCoach() {
   try { if (window._coachReturnFocus && window._coachReturnFocus.focus) window._coachReturnFocus.focus(); } catch(_) {}
 }
 
+// Normalize a genre LABEL or subgenre ("Hip-Hop", "Trap", "Drill") to the brain
+// genre KEY the generate path + server genre-gate expect ("hiphop"). Flow stores
+// a display label on S.currentSong.genre, so coach-regenerate (and any reuse of a
+// Flow song) was sending an unrecognized genre — the free-plan gate blocked it and
+// the brain fell back to a generic prompt, yielding "just a title, no song prompt".
+function genreLabelToKey(g){
+  if(!g) return 'pop';
+  const k = String(g).toLowerCase().trim();
+  const KEYS = new Set(['pop','hiphop','rnb','rock','country','edm','folk','latin','metal','jazz','ss','altrock','reggae','afrobeats','blues','kpop','punk','reggaeton','neosoul','gospel','children','parody','comedy','tvmusical','amapiano','dancehall','brazilian','bollywood','arabesque','mandopop']);
+  if(KEYS.has(k)) return k;
+  const kn = k.replace(/[\s\-_/&.]+/g,'');
+  const MAP = {
+    hiphop:'hiphop',hiphopmusic:'hiphop',rap:'hiphop',trap:'hiphop',drill:'hiphop',phonk:'hiphop',boombap:'hiphop',consciousrap:'hiphop',lofihiphop:'hiphop',melodicrap:'hiphop',
+    trapsoul:'rnb',rb:'rnb',randb:'rnb',rhythmandblues:'rnb',contemporaryrb:'rnb',neosoul:'neosoul',
+    americana:'country',outlawcountry:'country',
+    indiefolk:'folk',darkfolk:'folk',singersongwriter:'ss',
+    postpunk:'rock',shoegaze:'rock',slowcore:'rock',mathrock:'rock',altrock:'altrock',indierock:'rock',classicrock:'rock',hardrock:'rock',
+    synthwave:'edm',hyperpop:'edm',dreampop:'pop',lofi:'edm',house:'edm',deephouse:'edm',techhouse:'edm',techno:'edm',
+    kpop:'kpop',bedroompop:'pop',indiepop:'pop',
+    gospelhouse:'gospel',bossanova:'jazz',cumbia:'latin',salsa:'latin',bachata:'latin'
+  };
+  if(MAP[kn]) return MAP[kn];
+  if(/hip|rap|trap|drill|phonk/.test(k)) return 'hiphop';
+  if(/punk/.test(k)) return 'punk';
+  if(/metal/.test(k)) return 'metal';
+  if(/shoegaze|postpunk|mathrock|slowcore/.test(kn) || /\brock\b/.test(k)) return 'rock';
+  if(/soul|r&b|rnb/.test(k)) return 'rnb';
+  if(/country|americana/.test(k)) return 'country';
+  if(/folk/.test(k)) return 'folk';
+  if(/jazz/.test(k)) return 'jazz';
+  if(/gospel/.test(k)) return 'gospel';
+  if(/house|edm|techno|trance|synth|dnb|dubstep/.test(k)) return 'edm';
+  if(/reggaeton|perreo|dembow/.test(k)) return 'reggaeton';
+  if(/dancehall/.test(k)) return 'dancehall';
+  if(/reggae/.test(k)) return 'reggae';
+  if(/amapiano/.test(k)) return 'amapiano';
+  if(/afro/.test(k)) return 'afrobeats';
+  if(/latin|salsa|bachata|cumbia|mariachi/.test(k)) return 'latin';
+  if(/kpop|korean/.test(k)) return 'kpop';
+  return 'pop';
+}
+window.genreLabelToKey = genreLabelToKey;
+
 function resetCoach() {
   document.getElementById('coach-idle').style.display = 'block';
   document.getElementById('coach-loading').style.display = 'none';
@@ -18527,7 +18574,13 @@ async function applyCoachAndRegenerate() {
     // never re-enters topic/genre/mood — those carry from the import or the
     // previous generation. Form fields layer on top (lyric tier, region, etc.)
     // exactly as they would for a fresh generate.
-    const genre = song.genre || 'pop';
+    // Defensive: normalize to a brain genre KEY. A Flow-sourced song may carry a
+    // display label ("Hip-Hop"/"Trap") which the server genre-gate + brain don't
+    // recognize — that produced "just a title, no song prompt". Keep the original
+    // label as the substyle so the subgenre flavor survives.
+    const _rawGenre = song.genre || 'pop';
+    const genre = (typeof genreLabelToKey === 'function') ? genreLabelToKey(_rawGenre) : _rawGenre;
+    const _genreWasLabel = String(_rawGenre).toLowerCase() !== String(genre).toLowerCase();
     const topic = song.topic || song.title || 'reflection';
     const mood = song.mood || 'Emotional';
     const vocal = song.vocal || (document.getElementById('g-vocal')?.value) || 'any';
@@ -18550,7 +18603,7 @@ async function applyCoachAndRegenerate() {
       quality: S.quality || 'high',
       theoryLevel: S.theoryLevel || 'standard',
       mode: 'auto',
-      substyle: S.substyle || song.substyle || '',
+      substyle: S.substyle || song.substyle || (_genreWasLabel ? _rawGenre : ''),
       hookStyle: S.hookStyle || 'auto',
       bracketMode: S.bracketMode || 'suno',
       voice: {
