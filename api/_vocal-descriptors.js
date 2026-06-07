@@ -116,6 +116,41 @@ const PROCESSING = {
   reversed:'reversed-phrasing', close_mic:'close-mic intimate',
 };
 
+// ── I. Pitch / Register / Tuning (THE "unique artist" lever) ─────────────────
+// Controls the actual PITCH of the voice — natural range, octave/formant shifts
+// to morph perceived size/age/gender, and the auto-tune style. This is the
+// single biggest knob for making one genre sound like many different artists.
+const PITCH = {
+  // Natural register
+  deep_baritone:'deep baritone register',
+  baritone:'baritone register',
+  tenor:'tenor register',
+  high_tenor:'high-tenor register',
+  countertenor:'countertenor / male-falsetto register',
+  alto:'alto register',
+  mezzo:'mezzo-soprano register',
+  soprano:'soprano register',
+  // Octave / interval shift (post-pitch)
+  octave_up:'pitched up an octave',
+  octave_down:'pitched down an octave',
+  fifth_up:'pitched up a fifth',
+  // Formant shift — changes perceived size/age WITHOUT moving the note
+  formant_up:'formant-shifted up, brighter younger timbre',
+  formant_down:'formant-shifted down, bigger darker timbre',
+  // Gender / timbre bend (pitch + formant together)
+  feminized:'feminized timbre, pitched and formant-shifted up',
+  masculinized:'masculinized timbre, pitched and formant-shifted down',
+  androgynous:'androgynous, gender-ambiguous timbre',
+  // Tuning / correction style
+  hard_autotune:'hard auto-tune, robotic quantized pitch',
+  melodic_autotune:'melodic auto-tune with pitch glides',
+  subtle_tune:'subtle transparent pitch correction',
+  natural_pitch:'natural untuned pitch',
+  // Layering
+  octave_stack:'octave-stacked lead, doubled an octave up',
+  detuned_double:'detuned double-tracked, chorused pitch',
+};
+
 // ── Conflict table — never co-emit these pairs ───────────────────────────────
 const CONFLICTS = [
   ['raspy','silken'], ['raspy','honeyed'], ['raspy','velvety'], ['gravelly','silken'],
@@ -226,6 +261,64 @@ const MOOD_OVERLAYS = {
   epic:        { add_character: 'triumphant', add_performance: 'belted' },
 };
 
+// ── Genre pitch pools ────────────────────────────────────────────────────────
+// `default` = the genre's canonical register (cohesion); `pool` = the spread we
+// roll from in auto mode so each song can sound like a DIFFERENT artist while
+// staying genre-true. Auto-tune options are stripped at runtime for genres whose
+// profile carries a "no autotune" negative. Resolved profile key (incl. hip-hop
+// substyles) is tried first, then the bare genre, then pop.
+const GENRE_PITCH = {
+  hiphop:           { default:'tenor',            pool:['tenor','baritone','deep_baritone','high_tenor','melodic_autotune','hard_autotune','octave_stack'] },
+  hiphop_trap:      { default:'melodic_autotune', pool:['melodic_autotune','hard_autotune','tenor','high_tenor','octave_stack'] },
+  hiphop_drill:     { default:'baritone',         pool:['baritone','deep_baritone','tenor','formant_down'] },
+  hiphop_boombap:   { default:'tenor',            pool:['tenor','baritone','deep_baritone','natural_pitch'] },
+  hiphop_battle:    { default:'baritone',         pool:['baritone','tenor','deep_baritone','natural_pitch'] },
+  hiphop_conscious: { default:'tenor',            pool:['tenor','baritone','natural_pitch','deep_baritone'] },
+  hiphop_westcoast: { default:'tenor',            pool:['tenor','baritone','melodic_autotune','high_tenor'] },
+  rnb:              { default:'tenor',            pool:['tenor','high_tenor','countertenor','alto','melodic_autotune','subtle_tune'] },
+  neosoul:          { default:'tenor',            pool:['tenor','high_tenor','alto','countertenor','natural_pitch'] },
+  pop:              { default:'tenor',            pool:['tenor','alto','mezzo','soprano','subtle_tune','melodic_autotune'] },
+  kpop:             { default:'alto',             pool:['alto','soprano','mezzo','high_tenor','formant_up','melodic_autotune'] },
+  rock:             { default:'tenor',            pool:['tenor','baritone','high_tenor','natural_pitch'] },
+  altrock:          { default:'tenor',            pool:['tenor','baritone','high_tenor','natural_pitch'] },
+  punk:             { default:'tenor',            pool:['tenor','baritone','natural_pitch'] },
+  metal:            { default:'baritone',         pool:['baritone','deep_baritone','tenor','natural_pitch'] },
+  country:          { default:'baritone',         pool:['baritone','tenor','deep_baritone','natural_pitch'] },
+  folk:             { default:'tenor',            pool:['tenor','alto','baritone','natural_pitch'] },
+  ss:               { default:'tenor',            pool:['tenor','alto','high_tenor','natural_pitch'] },
+  blues:            { default:'baritone',         pool:['baritone','tenor','deep_baritone','natural_pitch'] },
+  jazz:             { default:'tenor',            pool:['tenor','alto','mezzo','baritone','natural_pitch'] },
+  reggae:           { default:'tenor',            pool:['tenor','baritone','natural_pitch'] },
+  reggaeton:        { default:'tenor',            pool:['tenor','baritone','melodic_autotune','hard_autotune'] },
+  afrobeats:        { default:'tenor',            pool:['tenor','high_tenor','melodic_autotune','subtle_tune'] },
+  amapiano:         { default:'tenor',            pool:['tenor','baritone','alto','subtle_tune'] },
+  dancehall:        { default:'tenor',            pool:['tenor','baritone','melodic_autotune'] },
+  latin:            { default:'baritone',         pool:['baritone','tenor','high_tenor'] },
+  edm:              { default:'alto',             pool:['alto','soprano','mezzo','formant_up','melodic_autotune','octave_up'] },
+  gospel:           { default:'baritone',         pool:['baritone','deep_baritone','soprano','alto','natural_pitch'] },
+  tvmusical:        { default:'baritone',         pool:['baritone','tenor','soprano','mezzo','alto'] },
+  children:         { default:'soprano',          pool:['soprano','alto','formant_up'] },
+};
+const AUTOTUNE_PITCH = new Set(['hard_autotune','melodic_autotune','subtle_tune']);
+function _resolvePitch(resolvedKey, genre, overridePitch, negativeList) {
+  const noAuto = (negativeList || []).some(n => /no\s*auto[\s-]?tune/i.test(n));
+  if (overridePitch) {
+    const k = String(overridePitch).toLowerCase().trim().replace(/\s+/g, '_');
+    if (noAuto && AUTOTUNE_PITCH.has(k)) return 'natural_pitch';
+    return k;
+  }
+  const cfg = GENRE_PITCH[resolvedKey] || GENRE_PITCH[genre] || GENRE_PITCH.pop;
+  let pool = (cfg.pool || [cfg.default]).slice();
+  if (noAuto) pool = pool.filter(p => !AUTOTUNE_PITCH.has(p));
+  if (!pool.length) pool = ['natural_pitch'];
+  // Genre default gets extra weight (cohesion) unless it's an auto-tune option a
+  // no-autotune genre forbids; the rest of the pool provides per-artist variety.
+  let def = cfg.default;
+  if (noAuto && AUTOTUNE_PITCH.has(def)) def = pool[0];
+  const weighted = [def, def, ...pool];
+  return weighted[Math.floor(Math.random() * weighted.length)];
+}
+
 // ── Lyric content scan — light heuristic ─────────────────────────────────────
 // Pulls signals out of free-text lyrics OR topic to nudge the stack.
 const LYRIC_SIGNALS = [
@@ -325,10 +418,17 @@ function selectVocalDescriptors({
     }
   }
 
-  // Build ordered stack — texture, character, performance always; optionals only
-  // when present + non-conflicting with already-picked entries.
-  const order = ['texture','character','performance','accent','era','postural','processing'];
-  const families = { texture:TEXTURE, character:CHARACTER, performance:PERFORMANCE,
+  // Pitch / register / tuning — the unique-artist lever. Override wins in manual
+  // mode; otherwise roll from the genre pitch pool (auto mode varies it per song
+  // so the same genre can sound like many different artists). Auto-tune options
+  // are stripped for genres whose profile forbids it.
+  const _overridePitch = (!autoMode && overrides && overrides.pitch) ? overrides.pitch : '';
+  picked.pitch = _resolvePitch(resolvedKey, genre, _overridePitch, profile.negative);
+
+  // Build ordered stack — pitch leads (it defines WHO is singing), then texture,
+  // character, performance; optionals only when present + non-conflicting.
+  const order = ['pitch','texture','character','performance','accent','era','postural','processing'];
+  const families = { pitch:PITCH, texture:TEXTURE, character:CHARACTER, performance:PERFORMANCE,
                      accent:ACCENT, era:ERA, postural:POSTURAL, processing:PROCESSING };
 
   const stack = [];
@@ -341,7 +441,7 @@ function selectVocalDescriptors({
     if (!label) continue;
     stack.push({ family: fam, key, label });
     usedKeys.add(key);
-    if (stack.length >= 7) break;
+    if (stack.length >= 8) break;
   }
 
   // Suno prefix — title-cased, comma-joined, square-bracketed.
@@ -402,6 +502,6 @@ module.exports = {
   selectVocalDescriptors,
   buildVocalDescriptorNote,
   // Exported families let the UI render the picker without duplicating the taxonomy.
-  TEXTURE, CHARACTER, PERFORMANCE, ACCENT, ERA, EMOTION, POSTURAL, PROCESSING,
-  GENRE_PROFILES, MOOD_OVERLAYS,
+  TEXTURE, CHARACTER, PERFORMANCE, ACCENT, ERA, EMOTION, POSTURAL, PROCESSING, PITCH,
+  GENRE_PROFILES, GENRE_PITCH, MOOD_OVERLAYS,
 };
