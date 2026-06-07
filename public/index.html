@@ -18416,8 +18416,10 @@ let _coachLyrics = '';
 let _coachGenre = '';
 let _coachTopic = '';
 let _coachFeedback = '';
+let _coachSource = '';   // 'editor' | 'write' — where Coach was opened from, so the rewrite lands back there
 
 function openCoach(source) {
+  _coachSource = source === 'editor' ? 'editor' : 'write';
   let song, lyrics;
   if (source === 'editor') {
     // Always use live editor lines so edits are reflected
@@ -18490,8 +18492,14 @@ async function applyCoachAndRegenerate() {
   if (btn) { btn.disabled = true; btn.textContent = '✨ Regenerating…'; }
 
   try {
-    // Close coach modal so the user sees the result card during streaming
+    // Close coach modal so the user sees the result card during streaming.
     closeCoach();
+    // The result card (#gen-out) lives on the Write page, but Coach can be
+    // launched from the Editor — without this jump the rewrite streamed into a
+    // hidden page and looked broken ("where did my song go?"). Route Editor-
+    // initiated rewrites to Write so the streaming + final result are visible;
+    // the Editor picks up the new S.currentSong whenever it's reopened.
+    if (_coachSource === 'editor' && typeof navTo === 'function') navTo('write');
 
     // Build params from the loaded song + Soniq's full craft system. The user
     // never re-enters topic/genre/mood — those carry from the import or the
