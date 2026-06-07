@@ -5966,14 +5966,17 @@ body.craft-advanced .craft-basic-only{display:none !important}
         var mdMatch = text.match(/^#\s*(.+?)$/m);
         if (mdMatch) title = mdMatch[1].replace(/["""]/g,'').trim();
       }
+      // Scrub the "live"=crowd trap from everything the user sees/pastes/sings:
+      // lyric bracket tags ([Live Drums]→[Real Drums]), the Suno style string,
+      // and the arrangement/vocal briefs.
       return {
         title: title,
         verdict: verdict,
         hookIsolation: hookIsolation,
-        lyrics: lyrics,
-        corePrompt: songPrompt,                // alias kept for legacy callers
-        songPrompt: songPrompt,
-        arrangement: arrangement,
+        lyrics: (typeof sunoSafeLive === 'function' ? sunoSafeLive(lyrics) : lyrics),
+        corePrompt: (typeof sunoSafeLive === 'function' ? sunoSafeLive(songPrompt) : songPrompt),
+        songPrompt: (typeof sunoSafeLive === 'function' ? sunoSafeLive(songPrompt) : songPrompt),
+        arrangement: (typeof sunoSafeLive === 'function' ? sunoSafeLive(arrangement) : arrangement),
         vocal: vocal,
         references: references,
       };
@@ -11574,9 +11577,28 @@ function cpField(id){const el=document.getElementById(id);if(!el)return;const tx
 // full budget — we only trim if we actually exceed it. Filler-removal
 // and dedupe still run because they never remove signal.
 const SUNO_STYLE_MAX = 990; // 10-char safety under Suno's 1000
+// "live" trap: Suno reads a bare "live" as a LIVE AUDIENCE (crowd noise + echoey
+// arena/outdoor reverb), so "live drums" gives a crowd instead of a real kit.
+// Convert live-INSTRUMENTATION to real/organic synonyms; leave crowd/audience/
+// concert intent (and "live performance/recording/sound") untouched so the
+// intentional Live-version variant still gets its crowd.
+function sunoSafeLive(text){
+  if(!text) return text;
+  return String(text).replace(/\blive[\s-]+(drum kit|drum loop|drums?|drummers?|band|bass|guitar|horns?|strings?|piano|keys|percussion|instrumentation|instruments?|room|pocket|groove|feel)\b/gi, function(m, w){
+    var lw = w.toLowerCase(), rep;
+    if(lw === 'band') rep = 'real band';
+    else if(lw === 'instrumentation') rep = 'organic instrumentation';
+    else if(lw.indexOf('instrument') === 0) rep = 'real instruments';
+    else if(lw.indexOf('drummer') === 0) rep = 'session ' + lw;
+    else if(lw === 'room') rep = 'warm room';
+    else rep = 'real ' + lw; // drums, drum kit/loop, bass, guitar, horns, strings, piano, keys, percussion, pocket, groove, feel
+    return (m[0] === 'L') ? rep.charAt(0).toUpperCase() + rep.slice(1) : rep;
+  });
+}
 function compressSunoPrompt(raw){
   if(!raw) return '';
   let s = String(raw);
+  s = sunoSafeLive(s);
   s = s.replace(/\r/g,'').replace(/\n+/g,', ').replace(/\s{2,}/g,' ').trim();
   // strip filler phrases (these carry zero signal for a style prompt)
   const fillers = [
