@@ -3525,6 +3525,44 @@ body.craft-advanced .craft-basic-only{display:none !important}
         </div>
         <div class="vd-grid">
           <div class="vd-cell">
+            <label>Pitch / Register</label>
+            <select id="vd-pitch" disabled onchange="vdSyncPreview()">
+              <option value="">— auto —</option>
+              <optgroup label="── Register ──">
+                <option value="deep_baritone">deep baritone</option>
+                <option value="baritone">baritone</option>
+                <option value="tenor">tenor</option>
+                <option value="high_tenor">high tenor</option>
+                <option value="countertenor">countertenor (male falsetto)</option>
+                <option value="alto">alto</option>
+                <option value="mezzo">mezzo-soprano</option>
+                <option value="soprano">soprano</option>
+              </optgroup>
+              <optgroup label="── Octave / Formant ──">
+                <option value="octave_up">pitched up an octave</option>
+                <option value="octave_down">pitched down an octave</option>
+                <option value="fifth_up">pitched up a fifth</option>
+                <option value="formant_up">formant up (brighter/younger)</option>
+                <option value="formant_down">formant down (bigger/darker)</option>
+              </optgroup>
+              <optgroup label="── Timbre bend ──">
+                <option value="feminized">feminized timbre</option>
+                <option value="masculinized">masculinized timbre</option>
+                <option value="androgynous">androgynous</option>
+              </optgroup>
+              <optgroup label="── Tuning ──">
+                <option value="hard_autotune">hard auto-tune (robotic)</option>
+                <option value="melodic_autotune">melodic auto-tune (glides)</option>
+                <option value="subtle_tune">subtle pitch correction</option>
+                <option value="natural_pitch">natural / untuned</option>
+              </optgroup>
+              <optgroup label="── Layering ──">
+                <option value="octave_stack">octave-stacked lead</option>
+                <option value="detuned_double">detuned double-tracked</option>
+              </optgroup>
+            </select>
+          </div>
+          <div class="vd-cell">
             <label>Texture</label>
             <select id="vd-texture" disabled onchange="vdSyncPreview()">
               <option value="">— auto —</option>
@@ -13744,7 +13782,7 @@ function laRunSuggest(scope) {
 // Presets one-shot the most useful stacks (Quirky, Whiny-Rap Fix, Intimate…).
 // Auto mode disables the selects so the brain picks from genre+mood+lyrics.
 // ──────────────────────────────────────────────────────────────────────────
-const VD_FAMILIES = ['texture','character','performance','accent','postural','processing'];
+const VD_FAMILIES = ['pitch','texture','character','performance','accent','postural','processing'];
 const VD_LABELS = {
   // Mirror of _vocal-descriptors.js display labels — used only for the live
   // preview chip so users see what gets sent to Suno before they hit Generate.
@@ -13753,7 +13791,8 @@ const VD_LABELS = {
   performance:{whispered:'Whispered',spoken:'Spoken',sprechgesang:'Half-Spoken (Sprechgesang)',shouted:'Shouted',belted:'Belted',crooned:'Crooned',hummed:'Hummed',chanted:'Chanted',mumbled:'Mumbled',sing_song:'Sing-Song',conversational:'Conversational',declamatory:'Declamatory',recitative:'Recitative',preached:'Preached',half_laughed:'Half-Laughed',half_cried:'Half-Cried',on_exhale:'Sung On The Exhale',on_inhale:'Sung On The Inhale',spoken_rap:'Spoken Rap',percussive:'Percussive Delivery',spit_tight:'Spit-Tight',double_time:'Double-Time'},
   accent:{rp_british:'RP British',cockney:'Cockney',scouse:'Scouse',irish_lilt:'Irish Lilt',appalachian:'Appalachian',memphis:'Memphis Drawl',nashville:'Nashville Twang',bayou:'Louisiana Bayou',bronx_bodega:'Bronx Bodega',atl:'ATL',west_coast:'West Coast',texan:'Texan',australian:'Australian',french:'French-Tinged',spanish:'Spanish-Tinged',patois:'Jamaican Patois'},
   postural:{leaning_in:'Sung Leaning In',from_chest:'Sung From The Chest',from_head:'Sung From The Head',back_of_throat:'Sung From The Back Of The Throat',sharing_secret:'Sung Like Sharing A Secret',reciting_confession:'Sung Like Reciting A Confession',through_smile:'Sung Through A Smile',gritted_teeth:'Sung Through Gritted Teeth',on_verge_laughter:'Sung On The Verge Of Laughter',on_verge_tears:'Sung On The Verge Of Tears',in_on_joke:'Sung In On The Joke'},
-  processing:{megaphone:'Megaphone',telephone:'Telephone-EQ',vintage_ribbon:'Vintage Ribbon Mic',lofi_cassette:'Lo-Fi Cassette',radio_broadcast:'Radio-Broadcast',talkbox:'Talkbox',vocoder:'Vocoder',doubled_octave:'Doubled An Octave Down',whisper_doubled:'Whisper-Doubled',pitched_up:'Pitched-Up Imp',pitched_down:'Pitched-Down Demon',close_mic:'Close-Mic Intimate'}
+  processing:{megaphone:'Megaphone',telephone:'Telephone-EQ',vintage_ribbon:'Vintage Ribbon Mic',lofi_cassette:'Lo-Fi Cassette',radio_broadcast:'Radio-Broadcast',talkbox:'Talkbox',vocoder:'Vocoder',doubled_octave:'Doubled An Octave Down',whisper_doubled:'Whisper-Doubled',pitched_up:'Pitched-Up Imp',pitched_down:'Pitched-Down Demon',close_mic:'Close-Mic Intimate'},
+  pitch:{deep_baritone:'Deep Baritone Register',baritone:'Baritone Register',tenor:'Tenor Register',high_tenor:'High-Tenor Register',countertenor:'Countertenor / Male-Falsetto Register',alto:'Alto Register',mezzo:'Mezzo-Soprano Register',soprano:'Soprano Register',octave_up:'Pitched Up An Octave',octave_down:'Pitched Down An Octave',fifth_up:'Pitched Up A Fifth',formant_up:'Formant-Shifted Up',formant_down:'Formant-Shifted Down',feminized:'Feminized Timbre',masculinized:'Masculinized Timbre',androgynous:'Androgynous Timbre',hard_autotune:'Hard Auto-Tune',melodic_autotune:'Melodic Auto-Tune',subtle_tune:'Subtle Pitch Correction',natural_pitch:'Natural Untuned Pitch',octave_stack:'Octave-Stacked Lead',detuned_double:'Detuned Double-Tracked'}
 };
 const VD_PRESETS = {
   quirky:     { texture:'airy',         character:'quirky',        performance:'sprechgesang', postural:'through_smile' },
@@ -13828,7 +13867,7 @@ function vdSyncPreview() {
     prefixEl.textContent = '[Auto — picked from genre + mood at generate time]';
   } else {
     const stack = vdGetStack() || {};
-    const order = ['texture','character','performance','accent','postural','processing'];
+    const order = ['pitch','texture','character','performance','accent','postural','processing'];
     const labels = order.map(f => stack[f] && VD_LABELS[f]?.[stack[f]]).filter(Boolean);
     prefixEl.style.opacity = '1';
     prefixEl.textContent = labels.length
