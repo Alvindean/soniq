@@ -734,7 +734,7 @@ module.exports = async function handler(req, res) {
       console.error('Blend prompt build failed:', err.message);
       return res.status(500).json({ error: 'Blend prompt error: ' + err.message });
     }
-  } else if (body.action === 'generate' || body.action === 'lucky') {
+  } else if (body.action === 'generate' || body.action === 'lucky' || body.action === 'prism') {
     try {
       const brain = require('./_brain');
       let built;
@@ -862,7 +862,7 @@ module.exports = async function handler(req, res) {
         } else {
           built = brain.buildSongPrompt(p);
         }
-      } else {
+      } else if (body.action === 'lucky') {
         const lp = body.params || {};
         // Gate platinum for lucky too
         const PLATINUM_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
@@ -931,6 +931,46 @@ module.exports = async function handler(req, res) {
           lp.avoidPhrases = await getLyricFingerprint(user.id, 30);
         }
         built = brain.buildLuckyPrompt(lp);
+      } else {
+        // PRISM — concept-first roll (inverse of Lucky). Rolls SUBJECT × METAPHOR
+        // × PERSPECTIVE × GENRE into a Concept Brief, then maps it onto buildSongPrompt.
+        // MVP: GENRE + hybrid SUBJECT + light FLIP (metaphor dial = step 3).
+        // docs/PRISM-ENGINE-SPEC.md
+        const pp = body.params || {};
+        // PRISM is a TOP-TIER feature — gate everyone below the highest level.
+        // Allowed: Studio (studio/studio_annual) + all Founding tiers, plus admin.
+        // Everyone else (free / starter / pro) gets a 403 upsell, not a song.
+        const PRISM_TOP_PLANS = new Set(['studio','studio_annual','founding','founding_t1','founding_t1_annual','founding_t2','founding_t2_annual']);
+        if (!req._adminBypass && !PRISM_TOP_PLANS.has(plan)) {
+          return res.status(403).json({
+            error: 'Prism is a Studio-tier feature. Upgrade to unlock concept rolls.',
+            code: 'plan_required'
+          });
+        }
+        if (pp.platinum && !req._adminBypass && !PRISM_TOP_PLANS.has(plan)) pp.platinum = false;
+        const VALID_PRISM_TIERS = new Set(['radio','street','conscious','archival']);
+        if (pp.lyricTier && !VALID_PRISM_TIERS.has(pp.lyricTier)) pp.lyricTier = 'street';
+        // Build the Concept Brief. Live subject pool (soniq:topics:top) wires in
+        // at step 4 via pp.subjectPool; until then the brain's SUBJECT_SEED carries it.
+        const VALID_PHRASE_STRATEGIES = new Set(['LITERAL','SUBVERT','PERSONAL','ANSWER','ORIGIN']);
+        const phraseStrategy = VALID_PHRASE_STRATEGIES.has(pp.phraseStrategy) ? pp.phraseStrategy : undefined;
+        const phraseMode = pp.phraseMode === true ? true : (pp.phraseMode === 'auto' ? 'auto' : undefined);
+        // Top-tier only → full genre access (no allowedGenres constraint needed).
+        const brief = brain.buildPrismConcept({
+          g1: pp.g1, g2: pp.g2, subject: pp.subject,
+          subjectPool: Array.isArray(pp.subjectPool) ? pp.subjectPool : undefined,
+          metaphor: typeof pp.metaphor === 'string' ? pp.metaphor : undefined,
+          phrase: typeof pp.phrase === 'string' ? pp.phrase : undefined,
+          phraseStrategy, phraseMode,
+          spice: pp.spice === true, candidates: pp.candidates
+        });
+        built = brain.buildPrismSongPrompt(brief, {
+          mood: pp.mood, vocal: pp.vocal, lyricTier: pp.lyricTier || 'street',
+          length: pp.length, plan, isAdmin: !!req._adminBypass
+        });
+        // Fire-and-forget monthly Prism usage counter (separate key — never touches
+        // the topics ZSET; see the fan-out caveat at analytics.js:364).
+        redisIncrExpire('soniq:analytics:prism:' + getThisMonth(), 32 * 24 * 3600);
       }
       messages = [{role: 'user', content: built.prompt}];
       system = built.system;

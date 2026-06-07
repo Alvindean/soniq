@@ -727,6 +727,10 @@ module.exports = async function handler(req, res) {
         structure: 'standard',
         era: 'current',
         length: 'short',
+        // Emit only the 3 brief sections Flow surfaces (Arrangement / Vocal /
+        // Sonic References), skipping the heavy production-brief tail so the
+        // response completes those sections inside Flow's tight token+time budget.
+        leanBrief: true,
         quality: flowAllowPlatinum ? 'viral' : 'high',
         bracketMode: 'suno',
         platform: 'suno',
@@ -781,7 +785,7 @@ module.exports = async function handler(req, res) {
       lyrics = await flowCallAI(
         [{ role: 'user', content: built.prompt }],
         built.system,
-        1800,                    // 3-min song fits in 1500-1800 tokens; no production brief tail
+        2200,                    // 3-min song (~1500 tok) + lean brief tail (Arrangement/Vocal/Sonic Refs, ~350 tok); headroom so the 3 surfaced sections finish, not truncate
         55000,                   // sit just under Vercel's 60s ceiling: a song generation runs ~35-40s, and after a fast primary-provider failure the fallback needs the near-full budget — a tighter cap aborts slow-but-valid completions and 500s
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });

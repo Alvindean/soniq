@@ -768,6 +768,48 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .slot-x{font-size:18px;font-weight:700;color:var(--tx4);flex-shrink:0;line-height:1}
 .slot-fusion-label{font-size:10px;color:var(--tx4);text-align:center;width:100%;position:absolute;bottom:-18px;white-space:nowrap}
 
+/* ── PRISM — concept roller (reuses .lucky-* for orb/cta/slots/reveal/counter) ── */
+#pg-prism.on{display:flex;flex-direction:column;align-items:center;text-align:center}
+#pg-prism.on .lucky-wrap{margin:0 auto;width:100%;max-width:960px}
+#pg-prism.on .lucky-reveal{max-width:940px}
+.prism-controls{width:100%;max-width:800px;display:flex;flex-direction:column;gap:12px;margin-bottom:28px;text-align:left}
+.prism-row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.prism-field{display:flex;flex-direction:column;gap:5px}
+.prism-field-grow{flex:1 1 180px;min-width:140px}
+.prism-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx3);padding-left:2px}
+.prism-opt{font-weight:400;text-transform:none;letter-spacing:0;color:var(--tx4)}
+.prism-input,.prism-select{width:100%;box-sizing:border-box;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-family:var(--font);font-size:14px;padding:10px 12px;outline:none;transition:border-color .15s,background .15s}
+.prism-input:focus,.prism-select:focus{border-color:var(--amberline);background:var(--s4)}
+.prism-input::placeholder{color:var(--tx4)}
+.prism-select{appearance:none;-webkit-appearance:none;cursor:pointer;background-image:linear-gradient(45deg,transparent 50%,var(--tx3) 50%),linear-gradient(135deg,var(--tx3) 50%,transparent 50%);background-position:calc(100% - 16px) center,calc(100% - 11px) center;background-size:5px 5px,5px 5px;background-repeat:no-repeat;padding-right:32px}
+.prism-select option{background:var(--s2);color:var(--tx1)}
+.prism-toggle{display:inline-flex;align-items:center;gap:9px;cursor:pointer;user-select:none;padding-bottom:9px}
+.prism-toggle input{position:absolute;opacity:0;width:0;height:0}
+.prism-toggle-track{position:relative;width:40px;height:22px;border-radius:99px;background:var(--s4);border:1px solid var(--b2);transition:all .18s;flex-shrink:0}
+.prism-toggle-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--tx3);transition:all .18s}
+.prism-toggle input:checked + .prism-toggle-track{background:var(--amberbg);border-color:var(--amber)}
+.prism-toggle input:checked + .prism-toggle-track .prism-toggle-thumb{transform:translateX(18px);background:var(--amber)}
+.prism-toggle input:focus-visible + .prism-toggle-track{box-shadow:0 0 0 2px var(--amberline)}
+.prism-toggle-label{font-size:12px;font-weight:600;color:var(--tx2)}
+/* Concept Brief reveal */
+.prism-brief{display:flex;flex-direction:column;gap:10px}
+.prism-brief-head{display:flex;justify-content:flex-end}
+.prism-badge{font-size:10px;font-weight:700;color:var(--amber);background:var(--amberbg);border:1px solid var(--amberline);border-radius:99px;padding:3px 10px;font-variant-numeric:tabular-nums}
+.prism-concept-line{font-size:16px;font-weight:700;color:var(--tx1);line-height:1.4;letter-spacing:-.2px}
+.prism-coherence{font-size:11px;color:var(--tx3)}
+.prism-coherence b{color:var(--amber);font-variant-numeric:tabular-nums}
+.prism-dials{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px}
+.prism-chip{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:9px 12px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.prism-chip-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx4)}
+.prism-chip-value{font-size:13px;font-weight:700;color:var(--tx1);line-height:1.25;overflow:hidden;text-overflow:ellipsis}
+.prism-chip-sub{font-size:10px;color:var(--tx3);line-height:1.3}
+.prism-chip.is-phrase,.prism-chip-phrase{border-color:var(--amberline);background:var(--amberbg)}
+.prism-chip.is-phrase .prism-chip-label,.prism-chip-phrase .prism-chip-label{color:var(--amber)}
+.prism-phrase-strat{font-weight:400;color:var(--tx3);font-size:11px}
+.prism-empty{font-size:13px;color:var(--tx3);text-align:center;padding:12px}
+.prism-song{margin-top:14px}
+@media(max-width:560px){.prism-row{flex-direction:column;align-items:stretch}.prism-toggle{padding-bottom:0;padding-top:4px}}
+
 /* ── LIBRARY ── */
 .libgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;overflow:hidden}
 .libcard{background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:16px 18px;cursor:pointer;transition:all 0.15s;position:relative}
@@ -3161,6 +3203,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
   <button class="sb-btn on" onclick="goPg('write',this)" title="Write"><span class="ni">✍️</span></button>
   <button class="sb-btn" onclick="goPg('flow',this)" title="Flow — concept becomes a song"><span class="ni">✨</span></button>
   <button class="sb-btn" onclick="goPg('lucky',this)" title="Feel Lucky"><span class="ni">🎲</span></button>
+  <button class="sb-btn" onclick="goPg('prism',this)" title="Prism — roll a concept: subject × metaphor × perspective × genre"><span class="ni">🔮</span></button>
   <button class="sb-btn" onclick="goPg('library',this)" title="Library"><span class="ni">📚</span><span id="nav-lib-count" class="sn-badge" style="display:none"></span></button>
   <button class="sb-btn" onclick="goPg('builder',this)" title="Builder"><span class="ni">🎛️</span></button>
   <button class="sb-btn" onclick="goPg('more',this)" title="More"><span class="ni">⚡</span></button>
@@ -3186,6 +3229,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
   <button class="mb-btn on" onclick="goPg('write',this)"><span class="ni">✍️</span>Write</button>
   <button class="mb-btn" onclick="goPg('flow',this)"><span class="ni">✨</span>Flow</button>
   <button class="mb-btn" onclick="goPg('lucky',this)"><span class="ni">🎲</span>Lucky</button>
+  <button class="mb-btn" onclick="goPg('prism',this)"><span class="ni">🔮</span>Prism</button>
   <button class="mb-btn" onclick="goPg('library',this)"><span class="ni">📚</span>Library</button>
   <button class="mb-btn" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
   <button class="mb-btn" onclick="goPg('playlist',this)"><span class="ni">🎧</span>Playlist</button>
@@ -4831,6 +4875,83 @@ body.craft-advanced .craft-basic-only{display:none !important}
      FEEL LUCKY PAGE
 ══════════════════════════════════ -->
 <!-- ══════════════════════════════════
+     PRISM PAGE — concept-first song roller (subject × metaphor × perspective × genre)
+══════════════════════════════════ -->
+<div id="pg-prism" class="pg">
+  <div class="lucky-wrap">
+    <div class="lucky-eyebrow">Roll a concept · not just a genre</div>
+    <div class="lucky-headline">
+      <div class="hl-1">🔮</div>
+      <div class="hl-2">Prism</div>
+    </div>
+    <div class="lucky-sub">Refracts one idea through four dials — <strong>subject × metaphor × perspective × genre</strong> — into a Concept Brief, then writes the song. Optionally flip a saying into the seed.</div>
+
+    <div class="prism-controls">
+      <div class="prism-field">
+        <label class="prism-label" for="prism-phrase">Phrase flip <span class="prism-opt">optional</span></label>
+        <input type="text" id="prism-phrase" class="prism-input" maxlength="120" autocomplete="off"
+          placeholder='a saying to flip — "God willing and the creek don&rsquo;t rise"' />
+      </div>
+      <div class="prism-row">
+        <div class="prism-field prism-field-grow">
+          <label class="prism-label" for="prism-strategy">Flip strategy</label>
+          <select id="prism-strategy" class="prism-select">
+            <option value="">Auto</option>
+            <option value="LITERAL">Take it literal</option>
+            <option value="SUBVERT">Subvert it</option>
+            <option value="PERSONAL">Make it personal</option>
+            <option value="ANSWER">Answer it back</option>
+            <option value="ORIGIN">Tell its origin</option>
+          </select>
+        </div>
+        <label class="prism-toggle" for="prism-spice" title="Allow unexpected genre fusions and bolder refractions">
+          <input type="checkbox" id="prism-spice" />
+          <span class="prism-toggle-track"><span class="prism-toggle-thumb"></span></span>
+          <span class="prism-toggle-label">🌶 Spice <span class="prism-opt">unexpected fusions</span></span>
+        </label>
+      </div>
+      <div class="prism-row">
+        <div class="prism-field prism-field-grow">
+          <label class="prism-label" for="prism-g1">Lock genre <span class="prism-opt">optional</span></label>
+          <input type="text" id="prism-g1" class="prism-input" maxlength="40" autocomplete="off" placeholder="e.g. soul" />
+        </div>
+        <div class="prism-field prism-field-grow">
+          <label class="prism-label" for="prism-g2">Fuse with <span class="prism-opt">optional</span></label>
+          <input type="text" id="prism-g2" class="prism-input" maxlength="40" autocomplete="off" placeholder="e.g. drill" />
+        </div>
+      </div>
+    </div>
+
+    <div class="lucky-orb" id="prism-orb" onclick="feelPrism()">🔮</div>
+
+    <div id="prism-slots" class="lucky-slots">
+      <div class="slot-col" id="slot-col-p1">
+        <div class="slot-reel" id="slot-reel-p1"><div class="slot-item">—</div></div>
+      </div>
+      <div class="slot-x">×</div>
+      <div class="slot-col" id="slot-col-p2">
+        <div class="slot-reel" id="slot-reel-p2"><div class="slot-item">—</div></div>
+      </div>
+    </div>
+
+    <button class="lucky-cta" id="prism-cta" onclick="feelPrism()">
+      <span>🔮</span>
+      <span id="prism-cta-text">Refract</span>
+    </button>
+    <div class="lucky-hint" id="prism-hint">Each refraction rolls a fresh subject, metaphor, perspective-flip and genre — then writes the song around them</div>
+
+    <div class="lucky-counter" id="prism-counter" style="display:none">
+      <span class="lc-icon">🎵</span>
+      <span class="lc-num" id="prism-lc-num">—</span>
+      <span class="lc-label">songs created worldwide</span>
+    </div>
+  </div>
+
+  <!-- Concept Brief reveal — 4-dial chip grid + streamed song. Filled by renderPrismReveal(). -->
+  <div id="prism-reveal" class="lucky-reveal" style="display:none"></div>
+</div>
+
+<!-- ══════════════════════════════════
      FLOW PAGE — concept-driven Lucky
 ══════════════════════════════════ -->
 <div id="pg-flow" class="pg">
@@ -4931,17 +5052,25 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="btn btn-cyan btn-sm" onclick="flowContinueToProduction()" title="Continue to the Editor — get production brief, plugins, key, mastering target, visual prompt">🎛️ Continue to Production →</button>
       </div>
     </div>
-    <div class="flow-tabs" id="fres-tabs" style="display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--b1);margin-top:4px">
+    <!-- Result tabs ordered review → paste → produce. The last three surface
+         arrangement / vocal / references that flowParseBrain already extracts;
+         each auto-hides when the brain didn't return that section. -->
+    <div class="flow-tabs" id="fres-tabs" style="display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--b1);margin-top:4px;flex-wrap:wrap">
       <button class="flow-tab on" data-tab="lyrics" onclick="flowSwitchTab('lyrics')">Lyrics</button>
       <button class="flow-tab"    data-tab="prompt" onclick="flowSwitchTab('prompt')">Song Prompt</button>
+      <button class="flow-tab" id="fres-tab-arrangement" data-tab="arrangement" onclick="flowSwitchTab('arrangement')" style="display:none">Arrangement</button>
+      <button class="flow-tab" id="fres-tab-vocal"       data-tab="vocal"       onclick="flowSwitchTab('vocal')"       style="display:none">Vocal</button>
+      <button class="flow-tab" id="fres-tab-references"  data-tab="references"  onclick="flowSwitchTab('references')"  style="display:none">References</button>
     </div>
     <div class="result-body" id="fres-body"></div>
   </div>
 
   <style>
     #pg-flow.on{display:flex;flex-direction:column;align-items:center;text-align:center}
-    #pg-flow.on .lucky-wrap{margin:0 auto;width:100%;max-width:760px;display:flex;flex-direction:column;align-items:center;text-align:center}
-    .flow-concept-wrap{margin:18px auto 12px;width:100%;max-width:720px;display:flex;flex-direction:column;gap:8px;padding:0 16px;box-sizing:border-box;text-align:left}
+    #pg-flow.on .lucky-wrap{margin:0 auto;width:100%;max-width:960px;display:flex;flex-direction:column;align-items:center;text-align:center}
+    #pg-flow.on .lucky-reveal{max-width:940px}
+    #pg-flow.on #flow-out{width:100%;max-width:940px;margin-left:auto;margin-right:auto}
+    .flow-concept-wrap{margin:18px auto 12px;width:100%;max-width:860px;display:flex;flex-direction:column;gap:8px;padding:0 16px;box-sizing:border-box;text-align:left}
     .flow-concept{width:100%;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx1);font-size:14px;padding:12px 14px;outline:none;resize:vertical;min-height:90px;line-height:1.55;font-family:var(--font);transition:border-color .15s;box-sizing:border-box}
     .flow-concept:focus{border-color:var(--amberline);background:var(--s3)}
     .flow-concept::placeholder{color:var(--tx4)}
@@ -5594,10 +5723,21 @@ body.craft-advanced .craft-basic-only{display:none !important}
           sunoEl.innerHTML = chipsHtml;
         }
         if (bodyEl) {
+          var mkSec = function(id, content){
+            return '<div class="flow-section" id="fres-sec-' + id + '"><pre id="fres-' + id + '-text">' + (content ? flowEsc(content) : '') + '</pre></div>';
+          };
           bodyEl.innerHTML =
             '<div class="flow-section on" id="fres-sec-lyrics"><pre id="fres-lyrics-text">' + flowEsc(parsed.lyrics) + '</pre></div>' +
-            '<div class="flow-section" id="fres-sec-prompt"><pre id="fres-prompt-text">' + (sunoPrompt ? flowEsc(sunoPrompt) : '') + '</pre></div>';
+            '<div class="flow-section" id="fres-sec-prompt"><pre id="fres-prompt-text">' + (sunoPrompt ? flowEsc(sunoPrompt) : '') + '</pre></div>' +
+            mkSec('arrangement', parsed.arrangement) +
+            mkSec('vocal', parsed.vocal) +
+            mkSec('references', parsed.references);
         }
+        // Surface optional tabs only when the brain returned that section.
+        var flowOptTab = function(id, has){ var b = document.getElementById('fres-tab-' + id); if (b) b.style.display = has ? '' : 'none'; };
+        flowOptTab('arrangement', !!parsed.arrangement);
+        flowOptTab('vocal', !!parsed.vocal);
+        flowOptTab('references', !!parsed.references);
         // Reset to the Lyrics tab on each new spin
         document.querySelectorAll('.flow-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab') === 'lyrics'); });
         // Stash on window for save handler (lyrics field is now ONLY lyrics)
@@ -10889,6 +11029,7 @@ const S={selectedGenre:'pop',
   luckyLockedGenres:[],
   genController: null,   // AbortController for main generate
   luckyController: null, // AbortController for lucky generate
+  prismController: null, // AbortController for PRISM generate
   // New quality features
   emotionalArc: 'none',
   syllableCap: 0,
@@ -11009,12 +11150,17 @@ async function callServerStream(action, params, onChunk, signal) {
       err.code = 'limit_reached';
       throw err;
     }
-    throw new Error(e.error || 'API error ' + res.status);
+    const err = new Error(e.error || e.message || 'API error ' + res.status);
+    if (e.code) err.code = e.code;
+    throw err;
   }
   // Read Lucky meta from header if present
   const metaHeader = res.headers.get('X-Soniq-Meta');
   let luckyMeta = null;
-  if (metaHeader) try { luckyMeta = JSON.parse(atob(metaHeader)); } catch(e) {}
+  // UTF-8-safe decode: bare atob() yields a Latin-1 string, so multibyte chars
+  // (em-dashes, curly quotes) in the meta corrupt to mojibake. Mirror the share-link
+  // decoder's idiom. Fixes the concept brief AND Lucky's meta (shared path).
+  if (metaHeader) try { luckyMeta = JSON.parse(decodeURIComponent(escape(atob(metaHeader)))); } catch(e) {}
   // Read SSE stream
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
@@ -11386,9 +11532,9 @@ function compressSunoPrompt(raw){
 }
 
 function cpBriefPrompt(prefix){
-  const el=document.getElementById(prefix==='res'?'res-title':'lres-title');
+  const el=document.getElementById(prefix==='res'?'res-title':prefix==='prism'?'prism-title':'lres-title');
   const briefEl=document.querySelector(`#${prefix}-brief-content .brief-prompt-box`);
-  const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
+  const song=prefix==='res'?S.currentSong:prefix==='prism'?S.prismCurrentSong:S.luckyCurrentSong;
   const raw=briefEl?.textContent||song?.style||'';
   if(!raw){toast('Generate a song first');return;}
   const trimmed = compressSunoPrompt(raw);
@@ -11399,13 +11545,13 @@ function cpBriefPrompt(prefix){
   safeCopy(trimmed, msg);
 }
 function cpVisualPrompt(prefix){
-  const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
+  const song=prefix==='res'?S.currentSong:prefix==='prism'?S.prismCurrentSong:S.luckyCurrentSong;
   const text=song?.visualPrompt||S._remakeVisual||'';
   if(!text){toast('No image prompt — generate a song first');return;}
   safeCopy(text,'Image prompt copied — paste into Midjourney, FLUX, or DALL-E');
 }
 function cpVideoPrompt(prefix){
-  const song=prefix==='res'?S.currentSong:S.luckyCurrentSong;
+  const song=prefix==='res'?S.currentSong:prefix==='prism'?S.prismCurrentSong:S.luckyCurrentSong;
   const text=song?.videoPrompt||S._remakeVideo||'';
   if(!text){toast('No video prompt — generate a song first');return;}
   safeCopy(text,'Video prompt copied — paste into Runway, Sora, or Kling');
@@ -12535,6 +12681,412 @@ VIDEO PROMPT:
   }); // end spinLuckyWheel
 }
 
+// ═══════════════════════════════════════════════════════
+// PRISM — concept-first song roller (sibling to Lucky)
+// Mirrors feelLucky(): same transport, abort, error, counter.
+// ═══════════════════════════════════════════════════════
+function spinPrismWheel(g1Label, g2Label, onComplete){
+  const slots=document.getElementById('prism-slots');
+  if(!slots){onComplete();return;}
+  slots.style.display='flex';
+  let done1=false,done2=false;
+  function check(){if(done1&&done2)onComplete();}
+  spinSlot('slot-reel-p1','slot-col-p1',g1Label,0,()=>{done1=true;check();});
+  spinSlot('slot-reel-p2','slot-col-p2',g2Label,180,()=>{done2=true;check();});
+}
+
+function feelPrism(){
+  if (!S.user && !window.__soniqAdmin) {
+    openAuth('Create your free account — 5 free songs every month');
+    S._pendingGenerate = 'prism';
+    return;
+  }
+  const ctaBtn = document.getElementById('prism-cta');
+  if (ctaBtn?.disabled) return;
+  btnLoad('prism-cta', 'Refracting…');
+  if (S.prismController) { S.prismController.abort(); S.prismController = null; }
+  S.prismController = new AbortController();
+  const prismSignal = S.prismController.signal;
+
+  // ── Gather inputs ──────────────────────────────────────
+  const phraseRaw = (document.getElementById('prism-phrase')?.value || '').trim();
+  const phrase = phraseRaw || undefined;
+  const stratVal = document.getElementById('prism-strategy')?.value || '';
+  const phraseStrategy = (stratVal && stratVal !== 'Auto') ? stratVal : undefined;
+  const spice = document.getElementById('prism-spice')?.checked === true;
+  // phraseMode: typed phrase or chosen strategy → run the phrase engine; else if
+  // spice is on, let the backend surprise us with an auto phrase.
+  let phraseMode;
+  if (phrase || phraseStrategy) phraseMode = true;
+  else if (spice) phraseMode = 'auto';
+  // Genre-lock inputs are free text — normalize/whitelist against the known
+  // genre keys (ALL_GENRE_LABELS + common aliases) so a typo like "soul" or
+  // "drill" maps to a real key instead of silently ignoring the lock. Unknown
+  // input is passed through verbatim with a non-blocking toast warning.
+  const PRISM_GENRE_ALIASES = {
+    soul:'rnb','r&b':'rnb', rb:'rnb', 'neo-soul':'neosoul', rap:'hiphop',
+    'hip-hop':'hiphop', 'hip hop':'hiphop', trap:'hiphop', drill:'hiphop', boombap:'hiphop',
+    electronic:'edm', house:'edm', techno:'edm', dnb:'edm', dubstep:'edm', synthpop:'pop',
+    indie:'altrock', alternative:'altrock', 'singer-songwriter':'ss', singersongwriter:'ss',
+    americana:'folk', bluegrass:'folk', hardrock:'rock', punkrock:'punk', emo:'punk',
+    heavymetal:'metal', afrobeat:'afrobeats', salsa:'latin', bachata:'latin'
+  };
+  const normalizePrismGenre = (input) => {
+    if (!input) return null;
+    const raw = String(input).trim();
+    if (!raw) return null;
+    const labels = (typeof ALL_GENRE_LABELS !== 'undefined') ? ALL_GENRE_LABELS
+                 : (typeof GENRE_LABELS !== 'undefined' ? GENRE_LABELS : {});
+    const k = raw.toLowerCase().replace(/\s+/g, ' ').trim();
+    const compact = k.replace(/[^a-z0-9]/g, '');
+    if (labels[k]) return { key: k, label: labels[k], matched: true };
+    if (labels[compact]) return { key: compact, label: labels[compact], matched: true };
+    if (PRISM_GENRE_ALIASES[k]) { const key = PRISM_GENRE_ALIASES[k]; return { key, label: labels[key] || key, matched: true }; }
+    if (PRISM_GENRE_ALIASES[compact]) { const key = PRISM_GENRE_ALIASES[compact]; return { key, label: labels[key] || key, matched: true }; }
+    for (const [key, label] of Object.entries(labels)) {
+      const ll = String(label).toLowerCase();
+      if (ll === k || ll.split(/[\s\/]+/).includes(k)) return { key, label, matched: true };
+    }
+    return { key: raw, label: raw, matched: false };
+  };
+  const g1Norm = normalizePrismGenre((document.getElementById('prism-g1')?.value || '').trim());
+  const g2Norm = normalizePrismGenre((document.getElementById('prism-g2')?.value || '').trim());
+  const g1In = g1Norm ? g1Norm.key : undefined;
+  const g2In = g2Norm ? g2Norm.key : undefined;
+  const _unmatched = [g1Norm, g2Norm].filter(n => n && !n.matched).map(n => n.key);
+  if (_unmatched.length) {
+    try { toast('🔮 Locking unknown genre' + (_unmatched.length > 1 ? 's' : '') + ': ' + _unmatched.join(', ') + ' — try a known genre if the lock is ignored'); } catch (_) {}
+  }
+
+  const params = { g1: g1In, g2: g2In, phrase, phraseStrategy, phraseMode, spice };
+  Object.keys(params).forEach(k => { if (params[k] === undefined) delete params[k]; });
+
+  const orb=document.getElementById('prism-orb');
+  if(orb){orb.classList.add('spinning');setTimeout(()=>orb.classList.remove('spinning'),1200);}
+
+  const reveal=document.getElementById('prism-reveal');
+  if(reveal){
+    reveal.style.display='block';
+    reveal.innerHTML='<div class="crafting"><div class="craft-waveform"><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div><div class="craft-bar"></div></div><div class="craft-label">Refracting your concept…</div></div>';
+  }
+
+  const g1Label = g1In ? (ALL_GENRE_LABELS?.[g1In] || GENRE_LABELS?.[g1In] || g1In) : '✦';
+  const g2Label = g2In ? (ALL_GENRE_LABELS?.[g2In] || GENRE_LABELS?.[g2In] || g2In) : '✦';
+  spinPrismWheel(g1Label, g2Label, () => {
+    let firstChunk = true;
+    const prismStreamCb = (chunk, full) => {
+      const r = document.getElementById('prism-reveal');
+      if (!r) return;
+      if (firstChunk) { firstChunk = false; r.innerHTML = '<pre class="stream-raw" id="prism-stream-display"></pre>'; }
+      const el = document.getElementById('prism-stream-display');
+      if (el) { el.textContent = full; el.scrollTop = el.scrollHeight; }
+    };
+
+    // Same transport as Lucky — callServerStream with action:'prism'. The concept
+    // engine only exists on the deployed server, so local dev surfaces a clear note.
+    const isVercelPrism = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
+    const prismPromise = isVercelPrism
+      ? callServerStream('prism', params, prismStreamCb, prismSignal)
+      : Promise.reject(Object.assign(new Error('PRISM requires the deployed server (run on mysoniq.com).'), { code: 'local_unsupported' }));
+
+    prismPromise.then((r) => {
+      const meta = r.meta || {};
+      renderPrismReveal(meta, r.text || '');
+      btnDone('prism-cta');
+      const hint = document.getElementById('prism-hint');
+      if (hint) hint.textContent = 'Tweak the phrase or strategy and refract again.';
+      try { trackEvent('prism_used', { strategy: phraseStrategy || 'auto', spice: spice, hasPhrase: !!phrase }); } catch(_) {}
+      try { checkAchievements('feel_lucky'); } catch(_) {}
+      setTimeout(loadGlobalCounter, 1500);
+    }).catch((e) => {
+      const r = document.getElementById('prism-reveal');
+      if (e.name === 'AbortError' || e.message === 'enter-key') { btnDone('prism-cta'); return; }
+      if (e.code === 'auth_required') { btnDone('prism-cta'); return; }
+      if (e.code === 'limit_reached') {
+        if (r) r.innerHTML = apiErrHtml(e.message, 'limit_reached');
+        btnDone('prism-cta');
+        try { showFoundingUpsell(); } catch(_) {}
+        return;
+      }
+      // Top-tier gate (Studio/Founding) — show the upsell rather than a raw error.
+      // e.code is now propagated by callServerStream from the server's 403 body
+      // ({code:'plan_required'}); the message-string match is kept only as a
+      // defensive fallback for older server responses.
+      if (e.code === 'plan_required' || (e.message && e.message.indexOf('Studio-tier') !== -1)) {
+        if (r) r.innerHTML = apiErrHtml(e.message || 'Prism is a Studio-tier feature.', 'plan_required');
+        btnDone('prism-cta');
+        try { showFoundingUpsell(); } catch(_) {}
+        return;
+      }
+      if (r) r.innerHTML = apiErrHtml(e.message);
+      btnDone('prism-cta');
+      const hint = document.getElementById('prism-hint');
+      if (hint) hint.textContent = 'Check API key in Vercel → Settings → Environment Variables.';
+    });
+    S.prismController = null;
+  }); // end spinPrismWheel
+}
+
+// Paint the PRISM concept brief (4 dials) + the streamed song into #prism-reveal.
+function renderPrismReveal(meta, songText){
+  const reveal = document.getElementById('prism-reveal');
+  if (!reveal) return;
+  reveal.style.display = 'block';
+  const p = meta && meta.prism ? meta.prism : null;
+  const esc = (typeof escHtml === 'function') ? escHtml : (s => { const d=document.createElement('div'); d.textContent=String(s==null?'':s); return d.innerHTML; });
+
+  const genreNameEarly = p
+    ? (p.displayGenreLabel ||
+       (p.genre && (p.genre.fusionName || p.genre.label)) ||
+       [(p.genre||{}).primary, (p.genre||{}).secondary].filter(Boolean).join(' × ') || '')
+    : '';
+
+  // ── Parse the streamed song into sections exactly like parseLuckyResult, so
+  // the reveal shows a clean title + collapsible LYRICS card (Batch B fix) plus
+  // a STYLE / Song-Prompt box, instead of dumping raw scaffolding into one <pre>.
+  const _ps = (typeof parseSection === 'function')
+    ? (m, n) => { try { return parseSection(songText, m, n) || ''; } catch (_) { return ''; } }
+    : () => '';
+
+  let lyricsHtml = '';      // collapsible lyrics card markup
+  let clean = '';           // cleaned lyrics-only text (for innerHTML paint)
+  let _cleanLyrics = '';    // same, used for the char counter + autoCollapse
+  let _songPrompt = '';     // SONG PROMPT section (the Suno style/genre text)
+  let _briefRaw = '';       // PRODUCTION BRIEF section (FX/plugin/mix/master)
+  if (songText) {
+    // Lyrics ONLY (not the whole scaffolding dump). Fall back to cleaned full
+    // text only if the model omitted the LYRICS label.
+    const _lyricsParsed = _ps('LYRICS', 'SONG PROMPT');
+    const _lyricsBase = _lyricsParsed || songText;
+    clean = (typeof stripLyricsDashes === 'function') ? stripLyricsDashes(_lyricsBase) : _lyricsBase;
+    _cleanLyrics = clean;
+    _songPrompt = _ps('SONG PROMPT', 'PRODUCTION BRIEF')
+      || _ps('CORE PROMPT', 'ARRANGEMENT BLUEPRINT')
+      || '';
+    _briefRaw = _ps('PRODUCTION BRIEF', 'STRUCTURE MAP') || '';
+
+    const _title = _ps('TITLE', 'LYRICS')
+      || (p && p.phrase && p.phrase.phrase)
+      || (p && p.conceptLine)
+      || (genreNameEarly ? genreNameEarly + ' (Prism)' : 'Prism Song');
+
+    // Collapsible lyrics card mirrors Lucky's lres markup (lyrics-box collapsed +
+    // lyrics-toggle visible + lyrics-charcount). Title heading carries #prism-title
+    // so cpBriefPrompt('prism') can resolve it.
+    lyricsHtml =
+      '<div class="prism-song-card">' +
+        '<div class="result-song-title" id="prism-title">' + esc(_title) + '</div>' +
+        '<div class="opane-hint">→ Paste into your AI music platform — Lyrics field</div>' +
+        '<div id="prism-lyrics-text" class="lyrics-box collapsed"></div>' +
+        '<button class="lyrics-toggle visible" id="prism-lyrics-toggle" onclick="toggleLyrics(\'prism\')">▼ Reveal lyrics</button>' +
+        '<div class="lyrics-charcount" id="prism-lyrics-charcount"></div>' +
+        // STYLE chips (Weirdness / Style Influence / Vocal / Tier) + copyable 🚫 Exclude chip.
+        '<div class="suno-chips" id="prism-suno-chips"></div>' +
+        // STYLE / Song-Prompt box + FX/plugin/mix/master sections (renderBrief target).
+        '<div id="prism-brief-content" class="brief-output"></div>' +
+      '</div>';
+  }
+
+  // ── Build the persisted song object (mirrors parseLuckyResult @ S.luckyCurrentSong) ──
+  // so COPY / SAVE / OPEN-IN-EDITOR have a real object to read instead of a stale one.
+  if (songText) {
+    const _title = _ps('TITLE', 'LYRICS')
+      || (p && p.phrase && p.phrase.phrase)
+      || (p && p.conceptLine)
+      || (genreNameEarly ? genreNameEarly + ' (Prism)' : 'Prism Song');
+    const _lyrics = clean || songText;
+    const _ss = (meta && meta.sunoSettings) || null;
+    const _pd = (meta && meta.prodData) || {};
+    const _ts = Date.now();
+    S.prismCurrentSong = {
+      title: _title,
+      verdict: (p && p.conceptLine) || '',
+      lyrics: _lyrics,
+      // STYLE / Suno prompt — so Copy Prompt + Save + Open-in-Editor carry it.
+      style: _songPrompt,
+      brief: _briefRaw || songText || '',
+      // Suno chip data (Weirdness / Style Influence / Exclude) — straight off meta.
+      sunoSettings: _ss,
+      excludeStyles: (_ss && Array.isArray(_ss.excludeStyles)) ? _ss.excludeStyles : [],
+      lyricTier: (meta && meta.lyricTier) || '',
+      // Production-brief fields (FX/plugin/mix/master) for renderBrief + saved shape.
+      fxChain: _pd.fxChain || '',
+      pluginToolkit: _pd.pluginToolkit || '',
+      mixBlueprint: _pd.mixBlueprint || '',
+      masteringTarget: _pd.masteringTarget || '',
+      genre: genreNameEarly || (meta && meta.fusionName) || '',
+      topic: (meta && meta.topic) || (p && p.conceptLine) || (p && p.subject && p.subject.surface) || '',
+      mood: (meta && meta.mood) || 'Emotional',
+      vocal: (meta && meta.vocal) || 'any',
+      source: 'prism',
+      prism: p,
+      ts: _ts,
+      id: _ts
+    };
+  }
+
+  // Canonical post-generation toolbar — same .result-acts / .btn classes the
+  // Write + Lucky result bars use. COPY reads the #prism-lyrics-text DOM node,
+  // SAVE/OPEN read S.prismCurrentSong, Refract re-runs feelPrism().
+  const actsHtml = songText
+    ? '<div class="result-acts">' +
+        '<button class="btn btn-cyan btn-sm" id="prism-save-btn" onclick="savePrismToLib()">💾 Save</button>' +
+        '<button class="btn btn-sm" onclick="cpField(\'prism-lyrics-text\')" title="Copy song lyrics for pasting into Suno/Udio">📋 Copy Lyrics</button>' +
+        '<button class="btn btn-sm" onclick="cpBriefPrompt(\'prism\')" title="Copy the style/genre prompt for AI music platforms">🎛 Copy Prompt</button>' +
+        '<button class="btn btn-sm" onclick="cpPrismExcludes()" title="Copy the negative/exclude styles for Suno&#39;s Exclude Styles box">🚫 Copy Excludes</button>' +
+        '<button class="btn btn-sm" onclick="openPrismEditor()" title="Move this song into the editor">✏️ Open in Editor</button>' +
+        '<button class="btn btn-sm" onclick="regenerateSong(\'prism\')" title="Refract a fresh concept">🔄 Refract again</button>' +
+      '</div>'
+    : '';
+
+  // After the card markup is in the DOM, paint the lyrics box / chips / brief
+  // with the SAME helpers Lucky uses (parseLuckyResult @ 13031-13038 + the
+  // renderSunoChips call from the stream callback). Must run post-insert because
+  // these functions look the elements up by id.
+  const paintPrismCard = () => {
+    if (!songText) return;
+    const lyEl = document.getElementById('prism-lyrics-text');
+    if (lyEl) {
+      lyEl.innerHTML = esc(_cleanLyrics).replace(/\[([^\]]+)\]/g, '<span class="tag">[$1]</span>');
+      if (typeof updateLyricsCount === 'function') updateLyricsCount('prism', _cleanLyrics);
+      if (typeof autoCollapseLyrics === 'function') autoCollapseLyrics('prism');
+    }
+    // Weirdness / Style Influence / Vocal / Tier chips + copyable 🚫 Exclude chip.
+    if (typeof renderSunoChips === 'function') renderSunoChips('prism', S.prismCurrentSong);
+    // STYLE / Song-Prompt box + FX/plugin/mix/master sections.
+    if (typeof renderBrief === 'function') {
+      renderBrief('prism', _songPrompt, _briefRaw, (meta && meta.prodData) || {});
+    }
+  };
+
+  if (!p) {
+    reveal.innerHTML = (lyricsHtml + actsHtml) || '<div class="prism-empty">No concept data returned.</div>';
+    paintPrismCard();
+    return;
+  }
+
+  const subject  = p.subject || {};
+  const metaphor = p.metaphor || {};
+  const flip     = p.flip || {};
+  const genre    = p.genre || {};
+  const phrase   = p.phrase || null;
+  // Single-sourced display label (punch-list #4): prefer the ONE label that
+  // buildPrismConcept computed and buildPrismSongPrompt echoed (p.displayGenreLabel),
+  // so the chip shows exactly the genre string the prompt resolved. Fall back to
+  // the legacy fusionName/label chain only for older payloads.
+  const genreName = p.displayGenreLabel
+    || genre.fusionName || genre.label
+    || [genre.primary, genre.secondary].filter(Boolean).join(' × ') || '—';
+
+  const dial = (label, value, sub) =>
+    '<div class="prism-chip">' +
+      '<div class="prism-chip-label">' + esc(label) + '</div>' +
+      '<div class="prism-chip-value">' + esc(value || '—') + '</div>' +
+      (sub ? '<div class="prism-chip-sub">' + esc(sub) + '</div>' : '') +
+    '</div>';
+
+  // Map the raw perspective-flip axis token (WHO/WHEN/EYES/VOICE — see
+  // PRISM_FLIP_AXES in api/_brain.js) to a human-readable label so the FLIP
+  // chip never shows a bare engine token to the listener.
+  const PRISM_FLIP_LABELS = {
+    WHO:   'Narrator vs. witness',
+    WHEN:  'Now vs. before',
+    EYES:  'Through the object / place',
+    VOICE: 'Narrator vs. subject'
+  };
+  const flipAxisLabel = flip.axis ? (PRISM_FLIP_LABELS[String(flip.axis).toUpperCase()] || flip.axis) : '';
+
+  // Listener-facing chip labels (punch-list #7) — no engine words. The PHRASE
+  // chip keeps its own clear "PHRASE FLIP" label below; coherence/Custom-concept
+  // badge is unchanged.
+  const dials =
+    dial("What it's about", subject.surface) +
+    dial('Central image', metaphor.token, metaphor.sentiment) +
+    dial('Point of view', flipAxisLabel, flip.flippedPOV) +
+    dial('Sound', genreName, (genre.quality && genre.quality.overall) ? ('quality ' + genre.quality.overall) : '');
+
+  const phraseChip = phrase
+    ? '<div class="prism-chip is-phrase">' +
+        '<div class="prism-chip-label">PHRASE FLIP</div>' +
+        '<div class="prism-chip-value">“' + esc(phrase.phrase) + '”' +
+          (phrase.strategyLabel ? ' <span class="prism-phrase-strat">— ' + esc(phrase.strategyLabel) + '</span>' : '') +
+        '</div>' +
+      '</div>'
+    : '';
+
+  const conceptLine = p.conceptLine ? '<div class="prism-concept-line">' + esc(p.conceptLine) + '</div>' : '';
+  // Coherence badge — but a low score on PINNED inputs reflects the user's own
+  // locked choices, not a weak roll, so don't surface a misleading number.
+  let coherence = '';
+  if (p.pinned) {
+    coherence = '<span class="prism-badge" title="You locked these inputs — coherence scoring is bypassed">Custom concept</span>';
+  } else if (p.coherenceScore != null) {
+    const floorNote = (p.coherenceFloorMet === false) ? ' · below floor' : '';
+    coherence = '<span class="prism-badge" title="Concept coherence (0-100)">Coherence ' + esc(p.coherenceScore) + esc(floorNote) + '</span>';
+  }
+
+  reveal.innerHTML =
+    '<div class="prism-brief">' +
+      '<div class="lucky-eyebrow" style="margin-bottom:6px">🔮 Concept Brief — your four dials</div>' +
+      (coherence ? '<div class="prism-brief-head">' + coherence + '</div>' : '') +
+      phraseChip +
+      conceptLine +
+      '<div class="prism-dials">' + dials + '</div>' +
+    '</div>' +
+    lyricsHtml +
+    actsHtml;
+  paintPrismCard();
+  // Concept-first: scroll the brief (chips) into view so it reads as the hero
+  // of the reveal instead of being buried under the streamed song.
+  try {
+    const briefEl = reveal.querySelector('.prism-brief');
+    if (briefEl && typeof briefEl.scrollIntoView === 'function') {
+      briefEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  } catch (_) {}
+}
+
+// ── PRISM post-generation actions (mirror Lucky: saveLuckyToLib / openLuckyEditor) ──
+// Copy excludes with an honest empty-guard + the same top-level fallback the
+// exclude chip uses (sunoSettings.excludeStyles -> song.excludeStyles).
+function cpPrismExcludes(){
+  const s = S.prismCurrentSong || {};
+  const list = (s.sunoSettings && Array.isArray(s.sunoSettings.excludeStyles) && s.sunoSettings.excludeStyles.length)
+    ? s.sunoSettings.excludeStyles
+    : (Array.isArray(s.excludeStyles) ? s.excludeStyles : []);
+  if (!list.length) { toast('No exclude styles for this song'); return; }
+  safeCopy(list.join(', '), 'Exclude styles copied - paste into Suno Exclude Styles box');
+}
+function savePrismToLib(){
+  if(!S.prismCurrentSong){toast('Refract a song first');return;}
+  const existing = S.prismCurrentSong.id
+    ? S.library.findIndex(s => s.id === S.prismCurrentSong.id)
+    : -1;
+  const song = {
+    ...S.prismCurrentSong,
+    id: existing >= 0 ? S.library[existing].id : (S.prismCurrentSong.id || Date.now().toString(36)+Math.random().toString(36).slice(2,6)),
+    ts: Date.now(),
+  };
+  if(existing >= 0){
+    S.library[existing] = song;
+    toast('✓ Song updated in library');
+  } else {
+    S.library.unshift(song);
+    toast('✓ Prism song saved to library');
+    trackEvent('song_saved', { genre: S.prismCurrentSong?.genre, topic: S.prismCurrentSong?.topic });
+  }
+  if(S.library.length > 200) S.library = S.library.slice(0, 200);
+  persistLib();
+  updateSaveBtn('prism-save-btn', true);
+}
+
+function openPrismEditor(){
+  if(!S.prismCurrentSong?.lyrics){toast('Refract a song first');return;}
+  S.currentSong=S.prismCurrentSong;
+  loadLyricsIntoEditor(S.prismCurrentSong.lyrics,S.prismCurrentSong.title);
+  navTo('editor');
+}
+
 function parseLuckyResult(raw,fusionName,meta,prodData){
   const title=parseSection(raw,'TITLE','VERDICT')||fusionName+' Song';
   // Defensive verdict parse: try multiple downstream markers so we never
@@ -12763,18 +13315,20 @@ function stopGeneration(prefix) {
     'res':      S.genController,
     'lres':     S.luckyController,
     'res-alt':  S.altTakeController,
-    'lres-alt': S.altTakeController
+    'lres-alt': S.altTakeController,
+    'prism':    S.prismController
   };
   const ctrl = controllerMap[prefix];
   if (ctrl) {
     try { ctrl.abort(); } catch(_) {}
     if (prefix === 'res')      S.genController = null;
     if (prefix === 'lres')     S.luckyController = null;
+    if (prefix === 'prism')    S.prismController = null;
     if (prefix.endsWith('alt')) S.altTakeController = null;
   }
   finishSongProgress(prefix, true);
   // Reset gen button so user can click again
-  try { btnDone('gen-btn'); btnDone('lucky-btn'); } catch(_) {}
+  try { btnDone('gen-btn'); btnDone('lucky-btn'); btnDone('prism-cta'); } catch(_) {}
   try { toast('✕ Generation cancelled'); } catch(_) {}
 }
 
@@ -12789,6 +13343,8 @@ function regenerateSong(prefix) {
   } else if (prefix === 'lres') {
     if (typeof feelLucky === 'function') feelLucky();
     else if (typeof spinLuckyWheel === 'function') spinLuckyWheel();
+  } else if (prefix === 'prism') {
+    if (typeof feelPrism === 'function') feelPrism();
   }
 }
 
@@ -14326,7 +14882,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
     masteringTarget= extras.masteringTarget|| '';
   }
   // Always pull countermelody from song store
-  const song = prefix === 'res' ? S.currentSong : S.luckyCurrentSong;
+  const song = prefix === 'res' ? S.currentSong : prefix === 'prism' ? S.prismCurrentSong : S.luckyCurrentSong;
   countermelodyRaw = song?.countermelody || '';
   if (!fxChain)         fxChain         = song?.fxChain         || '';
   if (!pluginToolkit)   pluginToolkit   = song?.pluginToolkit   || '';
@@ -18132,6 +18688,7 @@ function _initSupabase() {
           else if (pending === 'builder') generateFromBuilder();
           else if (pending === 'fusion') generateFusion();
           else if (pending === 'lucky') feelLucky();
+          else if (pending === 'prism') feelPrism();
         }, 300);
       }
     }
@@ -25385,12 +25942,13 @@ const _origGoPg = typeof goPg === 'function' ? goPg : null;
 if (_origGoPg) {
   window.goPg = function(page, btn) {
     _origGoPg(page, btn);
-    if (page === 'lucky') loadGlobalCounter();
+    if (page === 'lucky' || page === 'prism') loadGlobalCounter();
   };
 }
-// Also load on initial page if lucky is shown
+// Also load on initial page if lucky/prism is shown
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('pg-lucky')?.classList.contains('on')) loadGlobalCounter();
+  if (document.getElementById('pg-prism')?.classList.contains('on')) loadGlobalCounter();
 });
 
 // ═══════════════════════════════════════════════════════
