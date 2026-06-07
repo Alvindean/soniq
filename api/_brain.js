@@ -953,7 +953,7 @@ const RAP_STYLE_ADLIBS = {
   'Afro-Rap':             ['O YO!','EHEN!','NA WETIN!','MAKE I TELL YOU','(laughter)','ODESHI!','BROKE WASH','(drum break)'],
   'Latin Rap':            ['¡DALE!','¡WEPA!','¡ESO!','BRR','JEJE','QUE LO QUE','¡FUEGO!','¡VAMOS!'],
   'Hyphy Rap':            ['YEEE!','WHOOP WHOOP!','HELLA!','GO DUMB!','GHOST RIDE!','YADADAMEAN?','THIZZIN!','TURF!'],
-  'Phonk':                ['(pitched down)','(demonic)','yea hoe','triple six','(drawl)','aaagh','(slowed)','(screwed)'],
+  'Phonk':                ['(pitched down)','(demonic)','mane','ride out','(drawl)','aaagh','(slowed)','(screwed)'],  // NOTE: no artist refs — "yea hoe"/"triple six" are Three 6 Mafia signatures Suno rejects; use generic Memphis vernacular instead
   'Anthem Rap':           ['(LET\'S GO!)','(UP!)','(AYY!)','(WHAT IT IS!)','(LIGHT IT UP!)','(STAND UP!)','(IT\'S ON!)','(RIDE OUT!)'],
   'Hustle / Grind':       ['still up','on my grind','long road','(grinding)','no sleep','up first','no days off','get it'],
   'Post-Algorithm':       ['(glitch)','(data)','(refresh)','(buffer)','(fragment)','(error)','(corrupt)','(reset)'],
@@ -1186,7 +1186,7 @@ const LYRIC_CRAFT_UNIVERSAL = {
 
   showNotTell: {
     label: 'SHOW NOT TELL',
-    short: `Never STATE the emotion. Show it through action, object, or sensory detail. "Her hand shook as she poured the third glass" beats "She was sad." "I broke the frame because I couldn't look at him" beats "I was angry." "He left the porch light on for six months" beats "He was hopeful." This is the single hardest discipline in lyric writing AND the single biggest gap between amateur and pro. RULES: (1) In storytelling verses, NO abstract emotion words (sad, angry, lonely, scared, happy, hopeful) — replace each with an image. (2) The listener should be able to draw the scene from the words alone. (3) The emotion lives in the implication, not the statement. (4) Hooks can still state emotion directly — the show-not-tell discipline is for verses.`,
+    short: `Never STATE the emotion. Show it through action, object, or sensory detail. "Her hand shook as she poured the third glass" beats "She was sad." "I broke the frame because I couldn't look at him" beats "I was angry." "He left the porch light on for six months" beats "He was hopeful." This is the single hardest discipline in lyric writing AND the single biggest gap between amateur and pro. RULES: (1) In storytelling verses, NO abstract emotion words (sad, angry, lonely, scared, happy, hopeful) — replace each with an image. (2) The listener should be able to draw the scene from the words alone. (3) The emotion lives in the implication, not the statement. (4) Hooks can still state emotion directly — the show-not-tell discipline is for verses. (5) PURPOSEFUL AMBIGUITY — the listener's challenge: the strongest scene-images carry MORE THAN ONE emotional read. Keep the detail exact and concrete, but leave the FEELING it points to open enough that the listener decodes it WITH you — is the porch light hope, or refusal to let go? Are the shaking hands grief, or relief? The image is precise; the emotion is a question you hand the listener, not a label you stamp on them — they want to EXPERIENCE the feeling with you, not be told it. CAUTION — ambiguity is NOT vagueness: the scene must stay vivid and grounded (a real object, a real action, a real moment); ONLY the emotional meaning is left for the listener to complete. A blurry scene is just unclear writing. Use this on ONLY 1-2 key lines per verse — over-ambiguity reads as confusion — and never on the hook (the hook anchors the feeling; the verses invite the listener to find it).`,
     genres: ['country','folk','hiphop','blues','rock','altrock','ss','americana','pop','rnb','gospel','jazz','indie','neosoul','tvmusical']
   },
 
@@ -1730,6 +1730,577 @@ A single callback to the original metaphor in a later chorus or bridge is fine �
 }
 
 // ════════════════════════════════════════════════════════════════════════════
+// PRINCE METHOD — MELODIC UNITY (Wave 5p)
+// "Same melody" earworm lock (Prince / Max Martin / Katy Perry): the verse tune
+// and chorus tune are ALMOST THE SAME, contrast lives in pre-chorus + dynamics.
+// This engine emits LYRICS not notes, so unity is encoded as STRUCTURE:
+// syllable + stress parity, same contour, pre-chorus as the sanctioned break.
+//
+// AUTO-by-genre with a 3-state override (mode = 'auto' | 'on' | 'off'), modelled
+// on the loopAnchor zero-op-when-off contract. LITERAL/TRANSPOSED for chorus-
+// driven genres (MELODIC_UNITY_GENRES); RELAXED variants (CADENCE / RIFF-TOPLINE
+// / MOTIF) for everything else so non-pop idioms get the correct non-pitch rule
+// rather than a no-op. Returns '' (no-op) only when hard-gated.
+// ════════════════════════════════════════════════════════════════════════════
+
+// Genres whose relaxed rule is RIFF/TOPLINE (the instrumental hook is the constant).
+const PRINCE_RIFF_GENRES = new Set(['edm', 'amapiano', 'dancehall', 'afrobeats', 'reggaeton']);
+// Genres whose relaxed rule is MOTIF (state-then-vary; strict parity hurts the idiom).
+const PRINCE_MOTIF_GENRES = new Set(['jazz', 'neosoul', 'blues', 'metal', 'punk', 'folk', 'ss', 'bossa']);
+
+// Parse a "lo–hi" (or "lo-hi") syllable range into [lo, hi] integers; null if unparseable.
+function _princeParseRange(str) {
+  if (!str) return null;
+  const m = String(str).match(/(\d+)\s*[–-]\s*(\d+)/);
+  if (m) return [parseInt(m[1], 10), parseInt(m[2], 10)];
+  const single = String(str).match(/(\d+)/);
+  if (single) { const n = parseInt(single[1], 10); return [n, n]; }
+  return null;
+}
+
+function buildPrinceMethodNote({ genre, mood, structure, structStr, sylBudget,
+  hookStyle, freestyleMode, noBridgeTier, mode = 'auto' } = {}) {
+  // ── Hard gates → no-op ───────────────────────────────────────────────────
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook|Final Chorus)/i.test(sStr)) return '';
+
+  // ── Genre eligibility (auto) ─────────────────────────────────────────────
+  const isRiff  = PRINCE_RIFF_GENRES.has(genre);
+  const isMotif = PRINCE_MOTIF_GENRES.has(genre);
+  const hs = String(hookStyle || '');
+  const hiphopSungHook = genre === 'hiphop' && /Smooth Sung|Half-Sung|Melodic Auto-Tune|Octave Jump|Title Drop/i.test(hs);
+  const inUnitySet = MELODIC_UNITY_GENRES.has(genre);
+  // RELAXED applies to: hiphop (CADENCE), riff/topline genres, motif genres.
+  const isRelaxed = (genre === 'hiphop') || isRiff || isMotif;
+
+  if (mode === 'auto') {
+    // On auto, fire when: a LITERAL/TRANSPOSED genre, OR hiphop with a sung hook,
+    // OR a relaxed-variant genre (so they get the correct non-pitch rule).
+    if (!inUnitySet && !hiphopSungHook && !isRelaxed) return '';
+    // hiphop on auto only earns even the CADENCE note when the hook is sung.
+    if (genre === 'hiphop' && !hiphopSungHook) return '';
+  }
+  // mode === 'on' forces emission past the genre check.
+
+  // ── Compute the syllable target = verse ∩ chorus overlap ─────────────────
+  const sb = sylBudget || {};
+  const vRange = _princeParseRange(sb.verse);
+  const cRange = _princeParseRange(sb.chorus);
+  let target, noOverlapNote = '';
+  if (vRange && cRange) {
+    const lo = Math.max(vRange[0], cRange[0]);
+    const hi = Math.min(vRange[1], cRange[1]);
+    if (lo <= hi) {
+      target = lo === hi ? `${lo}` : `${lo}–${hi}`;
+    } else {
+      // No overlap → snap to the chorus range and compress the verse into it.
+      target = cRange[0] === cRange[1] ? `${cRange[0]}` : `${cRange[0]}–${cRange[1]}`;
+      noOverlapNote = ` (verse and chorus ranges do not overlap — compress verse phrasing into the chorus window so the same tune fits)`;
+    }
+  } else if (cRange) {
+    target = cRange[0] === cRange[1] ? `${cRange[0]}` : `${cRange[0]}–${cRange[1]}`;
+    noOverlapNote = ` (compress verse phrasing into the chorus window so the same tune fits)`;
+  } else {
+    target = '6–10';
+  }
+
+  // ── Structure detection ──────────────────────────────────────────────────
+  const hasPreChorus   = /\[Pre.?Chorus\]/i.test(sStr);
+  const hasBridge      = /\[Bridge/i.test(sStr) && !noBridgeTier;
+  const octaveOrKeyMove = /Octave Jump|Final-Chorus Key Change/i.test(hs);
+
+  // ── RELAXED variant (CADENCE / RIFF-TOPLINE / MOTIF) ─────────────────────
+  if (isRelaxed) {
+    let relaxedRule;
+    if (genre === 'hiphop') {
+      relaxedRule = `CADENCE UNITY (flow/rhythmic-motif, not pitch): parity is HOOK↔HOOK — every return of the hook keeps the SAME melody and the SAME syllable target (${target}${noOverlapNote}), so the hook is the earworm anchor. The rapped verse is the SANCTIONED contrast: let it run its own cadence and density. Do NOT force verse pitch parity onto the rap.`;
+    } else if (isRiff) {
+      relaxedRule = `RIFF / TOPLINE UNITY (instrumental hook is the constant): the [Build]→[Drop], log-drum, or riddim figure is the recurring melodic anchor — it returns unchanged every section. Keep the sung topline hook on the SAME syllable target (${target}${noOverlapNote}) each time it lands. Verses ride the groove with their own phrasing; do NOT force verse=chorus pitch parity onto a beat-driven idiom.`;
+    } else {
+      relaxedRule = `MOTIF UNITY (state-then-vary, relaxed): unify ONLY the head / chorus-slogan — state the central melodic motif clearly, then let the body vary it idiomatically. Keep the chorus-slogan on a steady syllable target (${target}${noOverlapNote}); strict verse=chorus parity would HURT this idiom, so do NOT impose it on the verses.`;
+    }
+    return `\n\n🎼 PRINCE METHOD — MELODIC UNITY (relaxed for this genre):
+Anchor the recurring hook so it lodges as the earworm, but Do NOT force verse=chorus pitch parity — see the per-genre rule below.
+${relaxedRule}`;
+  }
+
+  // ── LITERAL / TRANSPOSED directive (chorus-driven genres) ────────────────
+  const octaveCarveout = octaveOrKeyMove
+    ? `\nOCTAVE / KEY CARVE-OUT: this hook uses an Octave Jump / Final-Chorus Key Change — keep the RHYTHM and CONTOUR identical and TRANSPOSE the phrase up; do NOT rewrite the phrase. The leap IS the lift, not a new tune.`
+    : '';
+
+  let departureClause;
+  if (hasPreChorus) {
+    departureClause = `\nDEPARTURE (pre-chorus): put ALL the contrast in the PRE-CHORUS — change the meter, add ≥ +2 syllables, end on an unresolved cadence, then SNAP back to the twinned verse/chorus tune. The pre-chorus is the only sanctioned parity-break.`;
+  } else if (hasBridge) {
+    departureClause = `\nDEPARTURE (bridge): with no pre-chorus, put the melodic departure in the BRIDGE — a contrasting tune and meter that resolves back into the returning chorus. Verses and choruses stay twinned.`;
+  } else {
+    departureClause = `\nDEPARTURE (2-bar lift): with no pre-chorus and no bridge, use a 2-bar lift or the last verse line as the micro-departure (small meter/stress break) before the chorus returns. Keep it tiny — the twinned tune is the rule.`;
+  }
+
+  return `\n\n🎼 PRINCE METHOD — MELODIC UNITY (earworm lock):
+The VERSE melody and the CHORUS melody must be ALMOST THE SAME TUNE. This is the
+Prince / Max Martin / Katy Perry principle: one melodic idea, repeated until it lodges
+in the listener's head. Do NOT write a brand-new melody for the chorus.
+
+This engine emits LYRICS, not notes — so encode "same melody" as STRUCTURE:
+1. SYLLABLE + STRESS PARITY — write each twinned verse line and chorus line to the SAME
+   syllable target (${target} syllables) with the SAME stressed-beat positions, so the
+   identical tune literally fits both.${noOverlapNote ? noOverlapNote.trim() + '.' : ''} Match the stress grid line-for-line
+   (DA-da-da-DA in the verse = DA-da-da-DA in the chorus). Hook line: ±0 syllables.
+   Body lines: within ±1.
+2. SAME MELODIC SHAPE — same contour and rhythmic cell. The chorus is the verse melody
+   made BIGGER through ENERGY and ARRANGEMENT (fuller production, higher placement,
+   stacked vocals), NOT through a different tune.
+3. KEEP ENERGY CONTRAST, KEEP MELODY CONSTANT — verse intimate, chorus full; that
+   dynamic lift is the contrast budget. The MELODY itself stays twinned.
+4. REPETITION = THE EARWORM — the hook phrase recurs at least 3× (ideally 4–6). On each
+   repeat keep the melody but allow ONE micro-variation (a held note, an ad-lib, a single
+   word change). Because the verse shares the hook's contour, the listener hears the core
+   tune 6–10× across the song.${octaveCarveout}${departureClause}
+THE TEST: hum the verse, then hum the chorus — a stranger should recognise them as the
+SAME melody at two energy levels. If you must change the tune for the chorus to work, the
+hook isn't strong enough — rewrite the hook, don't re-melody it.`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5q — ANTI-DROP (stripped chorus). ARRANGEMENT directive, not melody.
+// Pre-chorus builds max tension, then the chorus downbeat STRIPS instead of
+// walls-of-sound. Negative space IS the payoff. Mirrors buildPrinceMethodNote's
+// param shape + Set + 3-state gate. Rides next to productionNote (arrangement),
+// NOT the lyric/syllable rules. Returns '' when hard-gated / probability-gated.
+// ════════════════════════════════════════════════════════════════════════════
+function buildAntiDropNote({ genre, substyle, mood, structStr, hookStyle,
+  princeActive, freestyleMode, mode = 'auto' } = {}) {
+  // ── Hard gates → no-op ───────────────────────────────────────────────────
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook)/i.test(sStr)) return '';
+  const moodStr = String(mood || '');
+  if (ANTI_DROP_KILL_MOOD_RE.test(moodStr)) return '';
+
+  // ── hiphop melodic-trap carve-out (mirror the Prince hiphopSungHook gate) ──
+  const sub = String(substyle || '');
+  const hs = String(hookStyle || '');
+  const hiphopMelodicTrap = genre === 'hiphop'
+    && /Trap|Melodic Rap|Cloud Rap/i.test(sub)
+    && /Smooth Sung|Half-Sung|Melodic Auto-Tune|Octave Jump|Title Drop/i.test(hs);
+
+  // ── Eligibility (auto = genre/substyle AND mood AND probability) ──────────
+  if (mode === 'auto') {
+    const genreEligible = ANTI_DROP_GENRES.has(genre) || hiphopMelodicTrap;
+    if (!genreEligible) return '';
+    if (!ANTI_DROP_MOOD_RE.test(moodStr)) return '';
+    // Probability gate — keep the strip a special move, not a tic (~50%).
+    if (Math.random() > 0.5) return '';
+  }
+  // mode === 'on' forces past genre/mood/probability (still respects structural gate).
+
+  // ── Genre-tuned strip / keep targets ─────────────────────────────────────
+  let stripTargets, keepTargets;
+  if (genre === 'rnb') {
+    stripTargets = 'the bass, keys-wash, and reverb tails';
+    keepTargets = 'a single kept element (finger-snap or muted key), lead vocal, and air';
+  } else if (genre === 'hiphop') {
+    stripTargets = 'the 808 sub and melodic layers (keep the kick/hat skeleton)';
+    keepTargets = 'kick + hi-hat, lead vocal, and one atmospheric pad-tail';
+  } else {
+    // pop / edm-pop / default
+    stripTargets = 'the bass, sub, and pads';
+    keepTargets = 'kick, lead vocal, and high-air/reverb';
+  }
+
+  const princeClause = princeActive
+    ? " The Prince Method twins verse and chorus melody — Anti-Drop keeps that twinning and simply removes the energy LIFT, replacing 'chorus = melody made bigger' with 'chorus = melody made barer.' Both rules agree: never re-melody the hook."
+    : '';
+  const choiceNote = (mode === 'auto')
+    ? ' (Use this on ONE chorus — typically the 1st or 2nd hook — not every chorus; an over-used strip loses its shock.)'
+    : '';
+
+  return `\n\n🎚️ ANTI-DROP — STRIPPED CHORUS (arrangement, not melody): Build the PRE-CHORUS to maximum tension — stack layers, rise the synths/strings, tighten the rhythm, end on an unresolved lift as if a huge chorus is coming. Then at the CHORUS DOWNBEAT, do the OPPOSITE of a wall-of-sound drop: STRIP the arrangement. Cut the ${stripTargets} and leave only ${keepTargets}. The hook sits in the hole — negative space IS the payoff, the silence around the vocal is the hook's spotlight. This INVERTS the usual 'chorus is bigger/fuller' reflex: here the chorus is EMPTIER than the build that led to it, and the emptiness lands harder than a crescendo would.
+MELODY UNCHANGED: this is an ARRANGEMENT move only. The hook melody, syllable target, and contour stay exactly as written — do NOT rewrite the tune, do NOT drop a word.${princeClause}
+In the lyrics, mark the stripped chorus with an inline TYPE 3 tag such as [Stripped] or [Drums + Vocal Only] on the chorus's first line, and use a [Build] tag at the end of the pre-chorus so the platform hears the rise-then-cut.${choiceNote}
+The ARRANGEMENT BLUEPRINT must spell this out section-by-section: pre-chorus = additive build, chorus = subtractive drop-out (name what leaves and what stays), and how the FINAL chorus may re-introduce the full arrangement for release (or stay stripped for a haunting close). If there is no [Pre-Chorus] in the structure, use the last 2 bars of the verse as the build.`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5r — CHORUS-IN-INTRO (teaser open). Play the hook/chorus melody in the
+// intro as a teaser, then withhold the full chorus. INTRO-placement directive
+// (rides next to introNote). Real slugs {pop,kpop,rnb} + an Alt/EDM/Synth/
+// Bedroom/Hyper-Pop substyle regex; HARD no-op on freestyle / no-[Chorus].
+// COMPOSES with the (archetype-based) drum intro: there is NO drumIntroActive
+// boolean in this engine, so the caller passes a cheap drumLedIntro signal
+// derived from the picked intro archetype name; when drum-led, the teaser is
+// forced INSTRUMENTAL and stated AFTER the drum bars (graceful coexistence,
+// never two intro identities). Defers melodic unity to the Prince Method.
+// ════════════════════════════════════════════════════════════════════════════
+function buildChorusIntroNote({ genre, structStr, substyle, freestyleMode,
+  drumLedIntro = false, antiDropActive = false, princeActive = false, mode = 'auto' } = {}) {
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook|Final Chorus)/i.test(sStr)) return '';
+
+  const subHit = CHORUS_INTRO_SUBSTYLE_RE.test(String(substyle || ''));
+  if (mode === 'auto') {
+    if (!CHORUS_INTRO_GENRES.has(genre) && !subHit) return '';
+  }
+  // mode === 'on' forces past the genre/substyle gate (still respects off/freestyle/no-chorus).
+
+  const introBars = (genre === 'kpop') ? '2–4' : '4–8';
+
+  // Teaser mode — drum-led intro ALWAYS forces the instrumental statement after
+  // the drum bars (the two intros coexist; drums lead, hook follows). R&B and
+  // vocal-forward substyles otherwise get a short vocal title-line teaser.
+  let teaserMode, teaserModeDetail;
+  if (drumLedIntro) {
+    teaserMode = 'an instrumental vamp of the hook stated AFTER the drum-led bars';
+    teaserModeDetail = 'The intro opens on the groove (the drum/percussion intro owns the first bars); once the pocket is undeniable, a lead instrument states the chorus topline as the teaser. Do NOT compete with the drums for bar 1 — let the rhythm land first, then promise the hook.';
+  } else if (genre === 'rnb' || subHit) {
+    teaserMode = 'a short vocal teaser of the title line (then air/silence into the verse)';
+    teaserModeDetail = 'Hum or half-sing the title phrase over a held chord or sparse pad, then pull the voice away before it resolves.';
+  } else {
+    teaserMode = 'an instrumental vamp of the hook';
+    teaserModeDetail = 'Let a lead instrument (synth, piano, or guitar) play the chorus topline so the listener catches the shape without the words.';
+  }
+
+  const antiDropClause = antiDropActive
+    ? ` If the anti-drop is active, the FIRST full chorus is the STRIPPED one — the maximal payoff the intro promised lands at the FINAL chorus.`
+    : '';
+
+  const unityClause = princeActive
+    ? `\n4. UNITY GUARD — the intro hook and every chorus are the SAME tune at different sizes; the Prince Method note is active, so the intro teaser counts as ONE of the hook's recurrences toward the earworm-repetition target — do not write a separate intro melody.`
+    : `\n4. UNITY GUARD — the intro hook and every chorus are the SAME tune at different sizes; do not write a separate intro melody, only a smaller statement of the chorus tune.`;
+
+  return `\n\n🎟️ CHORUS-IN-INTRO — TEASER OPEN (hook-forward intro):
+Open the song by PLAYING THE CHORUS'S BEST PART FIRST so the listener hears the catchiest moment inside the first 7 seconds — then pull it away and make them wait for the full payoff.
+1. STATE THE HOOK UP FRONT — the first ${introBars} bars carry the CHORUS hook melody/contour, delivered as ${teaserMode}. ${teaserModeDetail}
+2. DON'T RESOLVE IT — cut into Verse 1 BEFORE the hook fully lands. The intro is a promise, not the payoff. Do not sing the full chorus lyric here; tease the title phrase or hum/instrument the topline only.
+3. THE FULL CHORUS PAYS OFF LATER — the FIRST real chorus arrives recognizable (same melody the intro promised) but BIGGER through arrangement; reserve the MAXIMAL chorus (stacked vocals / full production / the post-chorus) for chorus 2 or the final chorus. The intro made a small promise; each chorus over-delivers on it.${antiDropClause}${unityClause}
+THE TEST: a first-time listener should recognize the chorus the instant it first lands because they already heard its shape in the intro — yet still feel it 'finally arrived.'`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5r — ONE-NOTE MELODY (static-pitch topline). Near-monotone (1-3 pitches)
+// verse/pre-hook topline driven by RHYTHM, never the chorus (the chorus opens
+// up for contrast). LYRIC/topline directive (rides next to princeMethodNote).
+// Gate: pop/kpop/cpop/rnb/neosoul/ss + hiphop-sung-hook + bedroom/indie-pop
+// substyle + country-talk substyle; HARD-EXCLUDE gospel/soul-runs/musical-
+// theatre/big-range/riff genres. COMPOSES with the Prince Method — it locks
+// verse PITCH to the rhythmic grid Prince already sanctions (the verse-intimate
+// / chorus-full contrast budget), not a second tune.
+// ════════════════════════════════════════════════════════════════════════════
+function buildOneNoteMelodyNote({ genre, structStr, hookStyle, freestyleMode, substyle,
+  princeActive = false, mode = 'auto' } = {}) {
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook|Final Chorus)/i.test(sStr)) return '';
+
+  const hs = String(hookStyle || '');
+  const hiphopSungHook = genre === 'hiphop'
+    && /Smooth Sung|Half-Sung|Melodic Auto-Tune|Octave Jump|Title Drop/i.test(hs);
+  const sub = String(substyle || '');
+  const bedroomIndie = ONE_NOTE_SUBSTYLE_RE.test(sub);
+  const countryTalk = genre === 'country' && ONE_NOTE_COUNTRY_TALK_RE.test(sub);
+
+  if (mode === 'auto') {
+    if (!ONE_NOTE_MELODY_GENRES.has(genre) && !hiphopSungHook && !bedroomIndie && !countryTalk) return '';
+  }
+  // mode === 'on' forces past the genre gate (still respects off/freestyle/no-chorus).
+
+  const modeLabel = (mode === 'on') ? 'forced' : 'auto-fit for this genre';
+  const hasPreChorus = /\[Pre.?Chorus\]/i.test(sStr);
+  const sections = hasPreChorus ? 'verse and pre-hook' : 'verse(s)';
+
+  const princeClause = princeActive
+    ? `\nPRINCE PARITY: the Prince Method is active and already locks the verse↔chorus syllable/stress GRID. This rule stacks coherently on top of it — keep that rhythmic grid, and additionally hold the verse PITCH flat against it. The flat verse → moving chorus is exactly the 'verse intimate / chorus full' contrast the Prince Method sanctions; this is the pitch/energy side of the same budget, NOT a second tune.`
+    : '';
+
+  return `\n\n🎙 ONE-NOTE MELODY — STATIC-PITCH TOPLINE (${modeLabel}):
+Modern conversational pop/R&B lives on a NEAR-MONOTONE verse — the melody barely moves (1-3 pitches), and RHYTHM is the melody (Taylor Swift verses, Olivia Rodrigo pre-hooks, talky-confessional sections). Minimal pitch movement doesn't fight any listener's melodic conditioning, so the line lands as 'sticky' and universal. This engine emits LYRICS not notes — so encode 'one note' as STRUCTURE:
+1. STATIC-PITCH SECTIONS — write the ${sections} (NOT the chorus) so the line is carried by RHYTHM and SYLLABLE PLACEMENT, not by a rising/falling tune. Keep words landing in a tight, repeated rhythmic cell on the SAME implied pitch; movement is held to a 1-3 note step at most, and only at phrase-ends.
+2. RHYTHM IS THE MELODY — vary INTEREST through syllable count, internal rhyme, consonant attack, and pocket placement against the beat — never through pitch leaps. A flat pitch with a propulsive, conversational rhythm is the target; a 'sung-up' verse melody is the failure mode.
+3. RESERVE MOTION FOR THE HOOK — the CHORUS is where the melody opens up: that is where range, leaps, and contour live. The contrast between the flat verse and the moving chorus IS the lift — do not spend melodic motion early or the chorus has nothing left to give. Any vocal runs/melisma are RESERVED for the hook and capped there — keep the verse flat.
+4. CONVERSATIONAL DELIVERY — keep these sections in a spoken-pitch, close-mic, confessional register; the line should read like talk that happens to be in time.${princeClause}
+THE TEST: speak the ${sections} aloud flat-toned — it should already sound right as rhythm alone. If it needs a tune to make sense, it is too melodic for a static-pitch section; flatten it and move the melody into the chorus.`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5s — CAROLE KING INTERVAL-EMOTION MAP (melodic-direction directive).
+// King's craft: map the emotional journey FIRST, then place the melodic INTERVAL
+// that carries each feeling at the matching structural peak; pick 2-3 signature
+// intervals and RECYCLE them as the song's melodic fingerprint. This engine emits
+// LYRICS + a PROMPT (no MIDI) — so this is a TOPLINE-DIRECTION note the model
+// honors when it composes the tune. COMPOSES WITH (does NOT duplicate):
+//   • EMOTIONAL_ARCS / buildEmotionalVelocityNote — they define WHERE the
+//     emotional peaks land; THIS note defines WHICH interval leaps there.
+//   • Prince Method (buildPrinceMethodNote) — the unified verse=chorus tune uses
+//     these intervals AT its peaks; the contour stays twinned, the leap is sited.
+//   • Octave-Jump hookStyle — when active, the octave IS the peak interval (carve-out).
+// Mirrors the proven pattern: gated build*Note → directive string, a genre Set,
+// a 3-state 'auto'|'on'|'off' param (default 'auto' = on-where-it-fits / '' else),
+// spliced near the melodic cluster, exported. HARD no-op on freestyle / no-chorus
+// / rap-with-no-sung-hook. INTERVAL_EMOTION_MAP is music-theory-accurate.
+// ════════════════════════════════════════════════════════════════════════════
+const INTERVAL_EMOTION_MAP = {
+  m2: { interval: 'minor 2nd',   semitones: 1,  feeling: 'tension / dread / anxiety',          useWhere: 'pre-chorus build, suspense moments, the wound before the turn' },
+  M2: { interval: 'major 2nd',   semitones: 2,  feeling: 'gentle stepwise movement',           useWhere: 'conversational verse motion, calm narration' },
+  m3: { interval: 'minor 3rd',   semitones: 3,  feeling: 'melancholy / introspection',         useWhere: 'reflective verses, the inward turn' },
+  M3: { interval: 'major 3rd',   semitones: 4,  feeling: 'brightness / joy / openness',         useWhere: 'uplift moments, bright chorus openings' },
+  P4: { interval: 'perfect 4th', semitones: 5,  feeling: 'stability / call-to-action / anthemic', useWhere: 'anthemic hook launches, declarations of intent' },
+  TT: { interval: 'tritone',     semitones: 6,  feeling: 'unease / suspense / edge',            useWhere: 'pre-chorus edge, darkest-moment bridge, dread payload' },
+  P5: { interval: 'perfect 5th', semitones: 7,  feeling: 'RESOLUTION / power / arrival',        useWhere: 'cadence resolutions, the landed answer, end of phrases' },
+  m6: { interval: 'minor 6th',   semitones: 8,  feeling: 'yearning / bittersweet longing',      useWhere: 'longing peaks, the reach you cannot quite close' },
+  M6: { interval: 'major 6th',   semitones: 9,  feeling: 'HOPE / soaring optimism',             useWhere: "the King 'Natural Woman' lift — the chorus that opens the chest" },
+  m7: { interval: 'minor 7th',   semitones: 10, feeling: 'soulful unresolved warmth',           useWhere: 'soul/R&B color, warm hooks left hanging' },
+  M7: { interval: 'major 7th',   semitones: 11, feeling: 'longing / dreamy ache',               useWhere: 'dreamy aching peaks, suspended emotional reaches' },
+  P8: { interval: 'octave',      semitones: 12, feeling: 'triumph / peak / transcendence',      useWhere: 'the biggest hook lift, the octave-jump payoff, transcendent climax' },
+};
+
+// mood → 1-2 target emotions for THIS song. Each entry surfaces the interval keys
+// from INTERVAL_EMOTION_MAP that carry that feeling. Regex-matched against the
+// free-text mood string; first 1-2 matches win. Falls back to a HOPE+RESOLUTION
+// default (King's home base) when nothing matches.
+const INTERVAL_MOOD_MAP = [
+  { re: /hope|uplift|optimis|soar|inspir|rising/i,                  targets: ['M6', 'P5'] },
+  { re: /triumph|victorious|euphoric|anthemic|empower|unstopp/i,    targets: ['P8', 'P4'] },
+  { re: /joy|happy|bright|celebrat|sunny|playful|glee/i,            targets: ['M3', 'M6'] },
+  { re: /longing|yearn|pine|wistful|nostalg|\bmiss/i,               targets: ['m6', 'M7'] },
+  { re: /heartbreak|grief|sorrow|\bsad|mourn|loss|devastat|\bcry/i, targets: ['m3', 'm6'] },
+  { re: /tense|anxious|dread|fear|panic|nervous|unease|paranoi/i,   targets: ['m2', 'TT'] },
+  { re: /dark|eerie|haunt|sinister|menac|ominous|edge|suspense/i,   targets: ['TT', 'm2'] },
+  { re: /soul|warm|sultry|smooth|sensual|groove|tender/i,           targets: ['m7', 'M3'] },
+  { re: /dream|ethereal|float|hazy|surreal/i,                       targets: ['M7', 'm6'] },
+  { re: /melancho|introspect|reflect|pensive|lonely|isolat|quiet/i, targets: ['m3', 'M2'] },
+  { re: /calm|gentle|peace|serene|soft|content|still/i,             targets: ['M2', 'M3'] },
+  { re: /anger|rage|furious|defiant|fierce|aggress|\bwar\b/i,       targets: ['P4', 'TT'] },
+];
+
+function _intervalMoodTargets(mood) {
+  const m = String(mood || '');
+  const out = [];
+  for (const row of INTERVAL_MOOD_MAP) {
+    if (row.re.test(m)) {
+      for (const k of row.targets) if (!out.includes(k)) out.push(k);
+    }
+    if (out.length >= 2) break;
+  }
+  if (out.length === 0) return ['M6', 'P5']; // King home base: HOPE + RESOLUTION
+  return out.slice(0, 2);
+}
+
+function buildIntervalMapNote({ genre, mood, structure, structStr, arc,
+  princeActive = false, hookStyle, freestyleMode, mode = 'auto' } = {}) {
+  // ── Hard gates → no-op ───────────────────────────────────────────────────
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook|Final Chorus)/i.test(sStr)) return ''; // no sung peak → nothing to leap to
+
+  // ── Genre eligibility (auto) — melodic/sung genres; hiphop only on sung hook ─
+  const hs = String(hookStyle || '');
+  const hiphopSungHook = genre === 'hiphop'
+    && /Smooth Sung|Half-Sung|Melodic Auto-Tune|Octave Jump|Title Drop/i.test(hs);
+  if (mode === 'auto') {
+    if (!INTERVAL_MAP_GENRES.has(genre) && !hiphopSungHook) return '';
+  }
+  // mode === 'on' forces past the genre gate (still respects off/freestyle/no-chorus).
+  // Even forced: a bare rap with no sung hook has no topline to direct.
+  if (genre === 'hiphop' && !hiphopSungHook) return '';
+
+  // ── Surface the 1-2 target emotions+intervals for THIS song's mood ───────
+  const targetKeys = _intervalMoodTargets(mood);
+  const targetLines = targetKeys.map(k => {
+    const e = INTERVAL_EMOTION_MAP[k];
+    return `${e.feeling.toUpperCase().split(' / ')[0]} → leap a ${e.interval} (${e.semitones} semitones) — ${e.useWhere}`;
+  });
+  const moodTxt = String(mood || '').trim() || 'open';
+  const moodLine = `\nFOR THIS SONG (mood "${moodTxt}"), the signature target interval${targetKeys.length > 1 ? 's are' : ' is'}:\n  • ${targetLines.join('\n  • ')}\nPick these (plus a perfect 5th for cadences) as the 2-3 intervals you RECYCLE across the song.`;
+
+  // ── Structure-aware clauses ──────────────────────────────────────────────
+  const hasPreChorus = /\[Pre.?Chorus\]/i.test(sStr);
+  const preChorusClause = hasPreChorus
+    ? `\nBUILD TENSION IN THE PRE-CHORUS: rise through minor-2nd or tritone steps so the chorus interval lands as RELEASE.`
+    : `\nBUILD TENSION JUST BEFORE THE CHORUS: rise through a minor-2nd or tritone step in the last verse line so the chorus interval lands as RELEASE.`;
+
+  // ── Octave-Jump carve-out (octave = the peak interval) ───────────────────
+  const octaveJump = /Octave Jump/i.test(hs);
+  const octaveCarveout = octaveJump
+    ? `\nOCTAVE CARVE-OUT: this hook is an Octave Jump — the OCTAVE (12 semitones, triumph/transcendence) IS the peak interval. Site it on the hook's signature word; do not fight it with a competing smaller leap at that exact moment.`
+    : '';
+
+  // ── Composition note (coexist, do not duplicate) ─────────────────────────
+  const arcActive = !!(arc && arc !== 'none');
+  const compositionClause = (princeActive || arcActive)
+    ? `\nWORKS WITH: ${arcActive ? 'the EMOTIONAL ARC (it already says WHERE each feeling peaks — this rule only decides WHICH interval carries it there)' : ''}${(arcActive && princeActive) ? '; ' : ''}${princeActive ? 'the unified verse=chorus melody (keep that twinned contour — these intervals live AT its peaks, they do not rewrite the tune)' : ''}.`
+    : '';
+
+  return `\n\n🎹 CAROLE KING INTERVAL-EMOTION MAP — melodic direction:
+This engine emits LYRICS + a PROMPT (no notes) — so direct the TOPLINE's melodic LEAPS, not just words. Use Carole King's method: MAP THE EMOTION AT EACH SECTION FIRST, then LEAP THE MATCHING INTERVAL to deliver it. The interval IS the feeling, made audible.
+THE FORMULA (place the interval that carries each emotion at the matching structural peak):
+  HOPE = major 6th · TENSION = minor 2nd · RESOLUTION = perfect 5th · LONGING = minor 6th · TRIUMPH = octave · JOY = major 3rd · MELANCHOLY = minor 3rd · UNEASE = tritone · ANTHEMIC = perfect 4th · DREAMY ACHE = major 7th · SOULFUL WARMTH = minor 7th
+1. PLACE THE MOOD-APPROPRIATE INTERVAL AT THE CHORUS PEAK — the chorus's highest, most-stressed syllable is where the signature leap lands. That leap is the emotional payload of the song.${moodLine}${preChorusClause}
+2. RESOLVE CADENCES ON A PERFECT 5TH — phrase-ending lines and the final hook resolve on a perfect-5th move so the ear feels ARRIVAL.
+3. PICK 2-3 SIGNATURE INTERVALS AND RECYCLE THEM — the same 2-3 leaps recurring across verse, pre-chorus, and chorus are the song's melodic FINGERPRINT. Do not introduce a new leap for every line; reuse the chosen intervals so the topline lodges as one identity.${octaveCarveout}${compositionClause}
+THE TEST: name the feeling of each section, then check the leap that opens its key line matches the formula above. If a sad section soars on a major 6th, or a triumphant chorus sits flat, the interval is fighting the emotion — re-map it.`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5r — POP DROP (instrumental lead-melody post-chorus). After the chorus,
+// a short instrumental section where a single memorable LEAD RIFF replaces the
+// vocal for contrast (Billie Eilish / The Weeknd). STRUCTURE/production
+// directive (rides next to postChorusNote). DISTINCT from the EDM bass-drop and
+// from the anti-drop (which keeps the vocal and strips production — here the
+// VOICE drops out and an instrument takes the lead). Gate: pop/rnb/afrobeats +
+// Alt/Synth/EDM/Dance-Pop substyle regex; HARD no-op on folk/ss/a-cappella/
+// no-[Chorus] and when the post-chorus archetype is already 'Hook Echo'. Its
+// riff may reference the MELODIC_CLICHES bank and defers contour to Prince.
+// ════════════════════════════════════════════════════════════════════════════
+function buildPopDropNote({ genre, structStr, hookStyle, substyle, postChorusName, freestyleMode,
+  princeActive = false, melodicBassActive = false, clicheActive = false, antiDropActive = false, mode = 'auto' } = {}) {
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook|Final Chorus)/i.test(sStr)) return '';          // hard-gate (covers a-cappella / no chorus)
+  if (/Hook Echo/i.test(String(postChorusName || ''))) return '';        // archetype already covers it — no double-emission
+
+  const sub = String(substyle || '');
+  const subHit = POP_DROP_SUBSTYLE_RE.test(sub);
+  if (mode === 'auto') {
+    if (POP_DROP_HURT_GENRES.has(genre)) return '';
+    if (!POP_DROP_GENRES.has(genre) && !subHit) return '';
+    if (genre === 'hiphop' && !/Smooth Sung|Half-Sung|Melodic Auto-Tune/i.test(String(hookStyle || ''))) return ''; // rapped hook → off
+  }
+  // mode === 'on' forces past the genre check (still respects hard gates + Hook Echo).
+
+  // Lead instrument — substyle flavor overrides the base genre lead.
+  let leadInstr = POP_DROP_LEAD[genre] || 'a synth or guitar topline';
+  if (/Synth-?Pop/i.test(sub)) leadInstr = POP_DROP_SUBSTYLE_LEAD.synth;
+  else if (/EDM-?Pop|Dance-?Pop/i.test(sub)) leadInstr = POP_DROP_SUBSTYLE_LEAD.edm;
+  else if (/Alt-?Pop/i.test(sub)) leadInstr = POP_DROP_SUBSTYLE_LEAD.alt;
+
+  const sunoTags = (genre === 'afrobeats')
+    ? 'instrumental break, lead guitar/marimba riff, no vocals, catchy figure'
+    : (genre === 'rnb')
+      ? 'instrumental break, lead guitar/Rhodes/sax phrase, no vocals, catchy lick'
+      : 'instrumental break, lead synth melody, no vocals, catchy riff';
+
+  const princeClause = princeActive
+    ? ` Echo the hook's locked contour (defer to the Prince Method) — do not invent a new pitch shape.`
+    : '';
+  const clicheClause = clicheActive
+    ? ` Draw the riff from a known MELODIC_CLICHES shape if it fits the key — make it inevitable, not random.`
+    : '';
+  const melodicBassClause = melodicBassActive
+    ? ` If the melodic-bass line is the active lead, this is its FEATURE moment — foreground that bass melody here rather than competing with a second lead.`
+    : '';
+  const antiDropClause = antiDropActive
+    ? ` If the chorus was anti-dropped, this riff is its release valve — chain the stripped chorus into this instrumental answer.`
+    : '';
+
+  return `\n\n🎹 POP DROP — INSTRUMENTAL LEAD-MELODY POST-CHORUS (${mode}):
+After the chorus, insert a SHORT instrumental post-chorus (2–4 bars) where a single MEMORABLE LEAD MELODIC RIFF — ${leadInstr} — carries the section in place of the lead vocal. This is the ear's rest and the song's contrast hook: the listener has just heard words, now they hear the song's most quotable INSTRUMENTAL phrase.
+THE RIFF: it must ANSWER or ECHO the vocal hook — a melodic call-and-response, not a brand-new idea. Take the chorus contour and let the instrument 'sing' it back, or land a counter-phrase that resolves the hook's tension. This is NOT a bass drop or an energy explosion — it is a melodic answer-hook.${princeClause}${clicheClause}${melodicBassClause}${antiDropClause}
+NO LEAD VOCAL across this section. Permitted: ad-libs in parentheses (oh / yeah / woah), vocal chops, or a hummed fragment of the hook — texture, never a new line. (Distinct from the anti-drop, which keeps the vocal and strips production — here the VOICE drops out and an instrument takes the lead.)
+SUNO TAGS: label the section [Post-Chorus] (or [Instrumental Hook]) and tag the production: '${sunoTags}'. Keep it short (2–4 bars) so it reads as a hook moment, not a solo.
+THE TEST: if you muted everything but this riff, a listener should still recognize the song. If the riff isn't that strong, it's a transition, not a pop drop — strengthen it or cut it.\n`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5q — TRESILLO (3-3-2 rhythmic cell). PRODUCTION/groove directive emitted
+// from inside buildProductionNote (travels with PRODUCTION DNA to every call
+// site). Optional VOCAL-RIDE appendix gated separately (vocalRide). 'trap' is a
+// hiphop substyle — gated via substyle when genre==='hiphop'. TRESILLO_POP_GENRES
+// fire on auto only with tropicalPop / tropical-dancehall substyle.
+// ════════════════════════════════════════════════════════════════════════════
+function buildTresilloNote({ genre, mood, substyle, bpm, tropicalPop, mode = 'auto', vocalRide = 'auto' } = {}) {
+  if (mode === 'off') return '';
+
+  const sub = String(substyle || '');
+  const hiphopTrap = genre === 'hiphop' && /trap|latino/i.test(sub);
+  const tropFlag = !!tropicalPop || /tropical|dancehall|reggaeton|afro/i.test(sub);
+
+  // Resolve the profile key (genre, or 'trap' for hiphop+trap substyle).
+  let profKey = genre;
+  if (hiphopTrap) profKey = 'trap';
+
+  if (mode === 'auto') {
+    const eligible = TRESILLO_GENRES.has(genre)
+      || hiphopTrap
+      || (TRESILLO_POP_GENRES.has(genre) && tropFlag);
+    if (!eligible) return '';
+  }
+  // mode === 'on' forces emission past the genre check (reggae/neosoul cases).
+
+  const prof = TRESILLO_GROOVE_PROFILES[profKey] || TRESILLO_GROOVE_PROFILES.reggaeton;
+  const genreLabel = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[genre]) || genre;
+  const bpmHint = (bpm ? `Anchor it at ${bpm}.` : `Anchor it at the genre's tempo feel (${prof.bpm}).`);
+
+  // Vocal-ride appendix — gated separately so straight-sung genres stay straight.
+  const vocalAppendix = (vocalRide !== 'off')
+    ? `\n• VOCAL RIDE (optional): phrase the hook so its stressed syllables fall WITH the 3-3-2 accents — front-load the stress on 1 and the 'and' of 2, leave air on the '2' tail. Stagger the lyric against the cell rather than singing on every downbeat; the off-grid placement is what makes it bounce. Do NOT force every word onto the accent — syncopation needs the gaps.`
+    : '';
+
+  return `\n\n🥁 TRESILLO (3-3-2) — RHYTHMIC CELL: Build the groove on the 3-3-2 accent pattern, not on straight 4-on-the-floor or even backbeat. Over 8 eighth-note subdivisions, the accents land 3+3+2 — hits on beat 1, the 'and' of beat 2, and beat 4 (1 . . / 2-and . . / 4 .). This syncopation IS the pulse of ${genreLabel}. Place it concretely:
+• KICK/LOW-END: the ${prof.lowEndAnchor} carries the 3-3-2 — it does NOT play four-on-the-floor.
+• PERCUSSION/SNARE: counter-accent against the cell (${prof.percCounter}) so the syncopation reads as tension, not just a pattern.
+• KEEP IT THE GROOVE CONSTANT: the cell repeats every bar and is the thing the body locks to — do not 'resolve' it to a straight beat except as a deliberate one-bar fill before a drop.
+Reference this 3-3-2 placement in the SONG PROMPT 'Texture' line and in the PRODUCTION BRIEF 'ARRANGEMENT BLUEPRINT'. ${bpmHint}${vocalAppendix}`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// WAVE 5q — MELODIC BASSLINE / OSTINATO ("Billie Jean Method"). PRODUCTION/
+// arrangement directive with a topline rider. COMPLEMENT of the Prince Method:
+// Prince makes the VOCAL the repeating melody; Billie Jean makes the BASS the
+// repeating melody and frees the vocal to roam. Rides next to productionNote.
+// FULL variant for groove genres; RELAXED variant for riddim genres. '' when
+// hard-gated (off / ballad-slow-intimate / non-set on auto).
+// ════════════════════════════════════════════════════════════════════════════
+function buildMelodicBassNote({ genre, mood, structure, structStr, sylBudget,
+  hookStyle, bassOstinato = 'auto' } = {}) {
+  if (bassOstinato === 'off') return '';
+
+  // Ballad / vocal-led hard gate — bass must stay out of the way.
+  const ctx = String(structure || '') + ' ' + String(mood || '');
+  if (MELODIC_BASS_BALLAD_RE.test(ctx)) return '';
+
+  const inFull    = MELODIC_BASS_GENRES.has(genre);
+  const inRelaxed = MELODIC_BASS_RELAXED.has(genre);
+
+  if (bassOstinato === 'auto') {
+    if (!inFull && !inRelaxed) return '';
+    // pop is broad — require a groove/danceable/upbeat signal on auto.
+    if (genre === 'pop' && !MELODIC_BASS_POP_GROOVE_RE.test(String(mood || ''))) return '';
+  }
+  // bassOstinato === 'on' forces past the genre check (still respects ballad gate).
+
+  const genreLabel = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[genre]) || genre;
+
+  // RELAXED variant for riddim genres (felt foundation, not competing topline).
+  if (inRelaxed && bassOstinato !== 'on') {
+    const grooveName = genre === 'reggae' ? 'one-drop'
+      : genre === 'amapiano' ? 'log-drum pulse'
+      : 'dembow';
+    return `\n\n🎸 BASS AS GROOVE ANCHOR (relaxed): the bass carries the ${grooveName} — write a recurring, instantly-recognizable bass figure that defines the pocket and returns every cycle, but keep it locked to the riddim/pulse rather than competing with the vocal as a counter-topline. The bass is the foundation hook; the vocal still leads.`;
+  }
+
+  // FULL variant (in-set groove genres, or forced via 'on').
+  const prof = GENRE_BASS_PROFILES[genre] || {};
+  const bassFigure = prof.figure || 'syncopated, loopable melodic';
+  const lowEndNote = prof.low || 'mono the bass below 120 Hz, sidechain the kick';
+
+  return `\n\n🎸 MELODIC BASSLINE — OSTINATO LOCK (the Billie Jean principle): in ${genreLabel}, the BASS is not a follower — it is a HOOK. Write the arrangement so the bass plays a memorable, REPEATING melodic riff (an ostinato) that is its own earworm, NOT just root notes tracking the chords. The classic archetype is a ${bassFigure} bass figure that loops unchanged under every section, while the chords/pads sit in the GAPS between bass phrases (call-and-response, not block-chord support) and the lead VOCAL floats on top as the CHANGING melody. The brain locks onto a changing melody stacked over a repeating melody — that contrast is the engine of the groove.
+1. THE RIFF IS THE CONSTANT: the bass ostinato returns unchanged (or with one micro-variation per turnaround) section to section — it is the song's spine and second hook. Reference it in the SONG PROMPT 'Instruments' line and put it first in the ARRANGEMENT BLUEPRINT.
+2. CHORDS IN THE GAPS: comp the chords/keys/guitar between bass phrases, not on top of them — leave pocket air so the bass reads as melody, not mud. EQ-carve so bass and kick don't fight (${lowEndNote}).
+3. VOCAL ROAMS FREE: because the bass already carries a repeating melody, the topline does NOT need verse=chorus pitch parity here — let the vocal be the changing line that the ear tracks against the constant bass. (If the Prince Method note is also active, defer to THIS rule for the verse/chorus relationship: bass = repeating anchor, vocal = free.)
+4. POCKET OVER FLASH: the riff must be singable and rhythmic — syncopated but loopable — not a busy slap-bass run. One great 1–2 bar phrase beats sixteen notes of technique.`;
+}
+
+// ════════════════════════════════════════════════════════════════════════════
 // METAPHOR PALETTE — expanding the metaphor surface area per genre (Wave 4l)
 // ────────────────────────────────────────────────────────────────────────────
 // Pairs with buildMetaphorBalanceNote (the limiter). Where balance prevents
@@ -2103,6 +2674,168 @@ function buildMetaphorPaletteNote(genre, fusionGenre) {
     '\n\nFRESH ANGLES (reframe the obvious-default reading of this genre — pick at least one to lean into):\n' +
     palette.fresh_angles.map(function (a) { return '• ' + a; }).join('\n') +
     borrowSection;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MELODIC CLICHE BANK (Wave 5q) — proven topline/melodic moves, each translated
+// into a SINGABLE INSTRUCTION (syllable/stress/contour shape) since SONIQ emits
+// LYRICS, not notes. Sibling of GENRE_METAPHOR_PALETTE: the palette diversifies
+// the WORD surface; this bank gives the MELODY those words sit on a proven
+// shape. Each record: { name, evoke, genres:[], sections:[], shape, lyricCue }.
+// Surfaced 1–2 at a time by buildMelodicClicheNote with a touchstone-not-checklist
+// discipline rule (mirrors buildMetaphorPaletteNote). Gated by MELODIC_CLICHE_GENRES.
+// ═══════════════════════════════════════════════════════════════════════════
+const MELODIC_CLICHE_BANK = {
+  'sol-mi taunt': {
+    name: 'sol-mi taunt', evoke: 'playground jeer / cocky dismissal',
+    genres: ['pop', 'tvmusical', 'children', 'comedy', 'parody', 'country', 'reggaeton'],
+    sections: ['hook', 'outro'],
+    shape: 'two-note drop high→low (sol→mi) on a 2-syllable repeated cell',
+    lyricCue: 'write a 2-syllable taunt that repeats ("na-na", "told-you", "so-what").',
+  },
+  '4-3-2-1 sad descent': {
+    name: '4-3-2-1 sad descent', evoke: 'resignation / settling sorrow',
+    genres: ['country', 'folk', 'ss', 'pop', 'rnb', 'blues'],
+    sections: ['verse', 'pre-chorus'],
+    shape: 'a stepwise 4-syllable line that walks DOWN to the tonic on the last word',
+    lyricCue: 'end the line on the heaviest/lowest word (the conclusion), each prior word a step above.',
+  },
+  'pentatonic hook leap': {
+    name: 'pentatonic hook leap', evoke: 'triumph / open-sky release',
+    genres: ['pop', 'kpop', 'rock', 'altrock', 'gospel', 'afrobeats', 'metal'],
+    sections: ['hook', 'final-chorus'],
+    shape: 'title syllable JUMPS up a 4th/5th then the line spills back down',
+    lyricCue: 'put the title word at the leap — stressed, open vowel, highest point of the line.',
+  },
+  'suspended-then-resolve': {
+    name: 'suspended-then-resolve', evoke: 'yearning that finally lands',
+    genres: ['pop', 'rnb', 'kpop', 'gospel', 'country'],
+    sections: ['hook'],
+    shape: 'hold a tension syllable a beat too long, then step to the resolving word',
+    lyricCue: "split the hook 'almost…/…there' — delay the payoff word to the downbeat.",
+  },
+  'rising pre-chorus sequence': {
+    name: 'rising pre-chorus sequence', evoke: 'building pressure / lift-off',
+    genres: ['pop', 'kpop', 'rock', 'altrock', 'edm', 'gospel', 'tvmusical'],
+    sections: ['pre-chorus'],
+    shape: 'each 2-bar phrase starts a step HIGHER than the last, ending unresolved',
+    lyricCue: 'stack 2–3 short escalating lines, last one cut off / open so the chorus releases it.',
+  },
+  'oh-oh-oh anthem chant': {
+    name: 'oh-oh-oh anthem chant', evoke: 'communal singalong / festival catharsis',
+    genres: ['pop', 'rock', 'altrock', 'punk', 'edm', 'afrobeats', 'kpop', 'gospel'],
+    sections: ['hook', 'outro'],
+    shape: '3 open-vowel syllables on a REPEATED or simply-stepping note, wordless',
+    lyricCue: 'insert a wordless "oh-oh-oh"/"whoa-oh" rung as the chorus tag or post-chorus.',
+  },
+  'blue-note bend': {
+    name: 'blue-note bend', evoke: 'ache / grit / sexual heat',
+    genres: ['blues', 'rnb', 'neosoul', 'soul', 'rock', 'gospel'],
+    sections: ['verse', 'bridge'],
+    shape: 'a single syllable scooped/bent flat then up',
+    lyricCue: 'land the emotion on ONE elongated word the singer can bend ("baaaby", "loooord").',
+  },
+  'call-and-response answer phrase': {
+    name: 'call-and-response answer phrase', evoke: 'conversation / congregation / crew',
+    genres: ['gospel', 'rnb', 'latin', 'reggae', 'reggaeton', 'afrobeats', 'dancehall', 'country', 'hiphop'],
+    sections: ['hook', 'bridge'],
+    shape: 'a lead phrase answered by a SHORT echo phrase a step lower',
+    lyricCue: "write the line as a call + a 2–4 syllable answer (the 'coro'/echo).",
+  },
+  'Picardy lift': {
+    name: 'Picardy lift (final-chorus key/major button)', evoke: 'redemption / hard-won hope',
+    genres: ['gospel', 'country', 'tvmusical', 'pop', 'rnb', 'children'],
+    sections: ['final-chorus', 'outro'],
+    shape: 'the last chorus resolves BRIGHTER (up a step / to major) than every prior chorus',
+    lyricCue: 'reserve the most hopeful line for the final chorus only — earlier choruses stay in the darker register.',
+  },
+  'descending hook resolution': {
+    name: 'descending hook resolution', evoke: 'cool finality / mic-drop calm',
+    genres: ['hiphop', 'rnb', 'reggaeton', 'latin', 'pop'],
+    sections: ['hook'],
+    shape: 'hook melody glides DOWN to settle on the tonic, no upward fight',
+    lyricCue: 'end the hook on a low, certain, closed word.',
+  },
+};
+
+// Per-genre NATIVE moves for the PRINCE_MOTIF_GENRES relax-to-native lane.
+const _MELODIC_CLICHE_NATIVE = {
+  blues: ['blue-note bend'],
+  metal: ['pentatonic hook leap'],
+};
+
+function buildMelodicClicheNote(genre, mood, { structStr, hookStyle, freestyleMode,
+  hasPreChorus, princeOctaveOrKeyMove, mode = 'auto' } = {}) {
+  // ── Hard gates → no-op ───────────────────────────────────────────────────
+  if (mode === 'off') return '';
+  if (freestyleMode) return '';
+  const sStr = String(structStr || '');
+  if (!/\[(?:Chorus|Hook|Final Chorus)/i.test(sStr)) return '';
+
+  const norm = _normalizeGenreKey(genre);
+  const hs = String(hookStyle || '');
+  const hiphopSungHook = norm === 'hiphop' && /Smooth Sung|Half-Sung|Melodic Auto-Tune|Octave Jump|Title Drop/i.test(hs);
+
+  // Build the candidate pool of records whose genre list includes this genre.
+  let candidates = Object.values(MELODIC_CLICHE_BANK).filter(r => r.genres.includes(norm));
+
+  if (mode === 'auto') {
+    // hiphop: only on a sung hook, and only hook/outro-placed moves (chant / answer).
+    if (norm === 'hiphop') {
+      if (!hiphopSungHook) return '';
+      candidates = candidates.filter(r => r.sections.includes('hook') || r.sections.includes('outro'));
+    } else if (PRINCE_MOTIF_GENRES.has(norm)) {
+      // motif genres prize invention — restrict to the genre's NATIVE move(s) only.
+      const native = _MELODIC_CLICHE_NATIVE[norm] || [];
+      candidates = candidates.filter(r => native.includes(r.name) || native.includes(Object.keys(MELODIC_CLICHE_BANK).find(k => MELODIC_CLICHE_BANK[k] === r)));
+      if (!candidates.length) return '';
+    } else if (!MELODIC_CLICHE_GENRES.has(norm)) {
+      return '';
+    }
+  } else if (mode === 'on') {
+    // forced past the genre gate, but still no records → no-op
+    if (norm === 'hiphop') {
+      candidates = candidates.filter(r => r.sections.includes('hook') || r.sections.includes('outro'));
+    }
+  }
+  if (!candidates.length) return '';
+
+  // Drop a suspended/lift record that would collide with a Prince octave/key carve-out.
+  if (princeOctaveOrKeyMove) {
+    candidates = candidates.filter(r => r.name !== 'suspended-then-resolve' && !/Picardy/i.test(r.name));
+    if (!candidates.length) return '';
+  }
+
+  // Optional mood filter is soft — only narrows when it leaves ≥1 record.
+  const moodStr = String(mood || '').toLowerCase();
+  if (moodStr) {
+    const moodFiltered = candidates.filter(r => !r.mood || r.mood.some(m => moodStr.includes(String(m).toLowerCase())));
+    if (moodFiltered.length) candidates = moodFiltered;
+  }
+
+  // Fisher-Yates sample 1–2 records (mirror the metaphor-palette loop).
+  const pool = candidates.slice();
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  const sampled = pool.slice(0, Math.min(2, pool.length));
+  const surfacedPreChorus = sampled.some(r => r.sections.includes('pre-chorus'));
+
+  const lines = sampled.map(function (r) {
+    return '• ' + r.name.toUpperCase() + ' — evokes: "' + r.evoke + '" → PLACE IN: ' +
+      r.sections.join(' / ') + '. SHAPE: ' + r.shape + '. ' + r.lyricCue;
+  }).join('\n');
+
+  const preChorusClause = (hasPreChorus && surfacedPreChorus)
+    ? ' The rising pre-chorus sequence is your sanctioned lift INTO the chorus — let it end unresolved so the hook lands as release.'
+    : '';
+
+  return '\n\n🎶 MELODIC SHAPE TOUCHSTONES (proven topline moves — singable contours, NOT new vocabulary):\n' +
+    'This engine writes LYRICS, not notes — so each move below is encoded as a SINGABLE SHAPE (syllables + which beats rise/fall/hold). Build the melody implied by the lyric so a singer naturally lands these contours. Use ONE as the signature shape; you MAY add a SECOND only if it lives in a DIFFERENT section. Do NOT stack three — a topline with three competing hooks has none.\n\n' +
+    lines +
+    '\n\nDISCIPLINE: These are touchstones, not a checklist. Pick the move whose FEELING matches the song\'s emotion, place it where it belongs, and let the rest of the topline breathe around it. A cliche works because it\'s familiar — earn it once, in the right spot, then move on.' +
+    preChorusClause;
 }
 
 // ============ SPEED GEARS SYSTEM ============
@@ -3075,10 +3808,26 @@ function buildBlendNote(primaryGenre, blend) {
 
   if (blend.genre2) {
     const g2Label = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[blend.genre2]) || blend.genre2;
-    blocks.push(`SECONDARY GENRE: ${g2Label} (${secondaryPct}% influence)
-- Borrow ${g2Label}'s rhythmic feel, instrument palette, and production texture
-- The primary genre (${ratio}%) keeps its structural backbone (verse/chorus shape, hook placement, length)
-- Where the two genres conflict (e.g. tempo), the primary wins; where they can layer (e.g. instrumentation), let ${g2Label} color the mix`);
+    // Pull the curated fusion entry (Rap-Rock, Blues-Rock, Arena Pop, …) so the
+    // blend carries REAL construction guidance, not a generic "color the mix"
+    // nudge. _resolveFusionKey is order/case tolerant.
+    let fd = null;
+    try { const fk = _resolveFusionKey(primaryGenre, blend.genre2); fd = fk ? FUSION_DATA[fk] : null; } catch (_) {}
+    // One structural moment the secondary genre is allowed to OWN, so the fusion
+    // shapes the song's construction — not just its lyric texture.
+    const g2 = String(blend.genre2).toLowerCase();
+    const structClaim =
+      /rock|metal|punk|blues/.test(g2)            ? 'a guitar-solo / instrumental-break section, and a louder, heavier final chorus' :
+      /edm|house|electronic|techno|trance/.test(g2)? 'a build-and-drop that replaces or launches one chorus' :
+      /jazz/.test(g2)                              ? 'an improvised instrumental solo section' :
+      /gospel|soul/.test(g2)                       ? 'a call-and-response vamp-out section' :
+      /latin|reggae|afro|amapiano|dancehall/.test(g2)? 'a percussion-break / instrumental-groove section' :
+      /country|folk/.test(g2)                      ? 'an acoustic, storyteller bridge' :
+                                                     'one signature instrumental or arrangement moment';
+    blocks.push(`SECONDARY GENRE: ${g2Label} (${secondaryPct}% influence)${fd && fd.name ? ' — ' + fd.name : ''}
+- Borrow ${g2Label}'s rhythmic feel, instrument palette, and production texture${fd && fd.tip ? '\n- FUSION PLAYBOOK: ' + fd.tip : ''}${fd && fd.artists ? '\n- Lineage (study the SOUND, never name an artist in the lyrics): ' + fd.artists : ''}
+- The primary (${ratio}%) owns section ORDER, COUNT and the hook; ${g2Label} OWNS one construction moment: ${structClaim}
+- Where the two conflict (e.g. tempo) the primary wins; where they layer (instrumentation, vocal delivery, that one section) let ${g2Label} genuinely take over — the seam must be AUDIBLE, not buried`);
   }
 
   if (blend.style2) {
@@ -3100,7 +3849,7 @@ INTEGRATION: ${bible.integration}`);
     }
   }
 
-  return `\n\n🎨 SECONDARY STYLE BLEND — primary ${ratio}% / secondary ${secondaryPct}%:\n\n${blocks.join('\n\n')}\n\nThe blend ratio is approximate — the primary genre always wins on structure and length; the secondary leaks into vocal delivery, lyric texture, and production color.`;
+  return `\n\n🎨 SECONDARY STYLE BLEND — primary ${ratio}% / secondary ${secondaryPct}%:\n\n${blocks.join('\n\n')}\n\nThe ratio is approximate: the primary genre anchors section order, length and the hook; the secondary genre claims its ONE construction moment plus vocal/texture/production color — so the fusion is heard in the song's build, not just implied in the words.`;
 }
 
 const STRUCTURES={
@@ -4074,25 +4823,25 @@ const OUTRO_ARCHETYPES = [
 // ═══════════════════════════════════════════════════════════════════════════
 const GENRE_INTRO_INTERLUDE_PREFS = {
   pop:       { intro: ['Vamp Intro','Build-Up','A Cappella Drop','Sample Open'],         interlude: ['Production-Only Loop','Beat-Switch'] },
-  hiphop:    { intro: ['Drop-In','Sample Open','Producer-Tag','Counted-In'],             interlude: ['Phone-Call Skit','Beat-Switch','Sample Drop','Drum-Break'] },
+  hiphop:    { intro: ['Drop-In','Drum-Forward Intro','Sample Open','Producer-Tag','Counted-In'],             interlude: ['Phone-Call Skit','Beat-Switch','Sample Drop','Drum-Break'] },
   rnb:       { intro: ['Vamp Intro','A Cappella Drop','Sample Open'],                    interlude: ['Phone-Call Skit','Choir / Group-Vocal Drop','Production-Only Loop'] },
   neosoul:   { intro: ['Vamp Intro','A Cappella Drop','Sample Open','Field-Recording'],  interlude: ['Phone-Call Skit','Spoken Aside','Choir / Group-Vocal Drop'] },
   jazz:      { intro: ['Vamp Intro','A Cappella Drop','False-Start Tease'],              interlude: ['Instrumental Solo','Drum-Break'] },
   blues:     { intro: ['Riff-First','Vamp Intro','A Cappella Drop'],                     interlude: ['Instrumental Solo','Drum-Break'] },
   gospel:    { intro: ['A Cappella Drop','Vamp Intro'],                                  interlude: ['Choir / Group-Vocal Drop','Spoken Aside'] },
   country:   { intro: ['Riff-First','Vamp Intro','Counted-In'],                          interlude: ['Instrumental Solo','Spoken Aside'] },
-  rock:      { intro: ['Riff-First','Drop-In','Counted-In','Build-Up'],                  interlude: ['Instrumental Solo','Production-Only Loop','Drum-Break'] },
+  rock:      { intro: ['Riff-First','Drum-Forward Intro','Drop-In','Counted-In','Build-Up'],                  interlude: ['Instrumental Solo','Production-Only Loop','Drum-Break'] },
   altrock:   { intro: ['Riff-First','Build-Up','Drop-In','Field-Recording'],             interlude: ['Instrumental Solo','Beat-Switch'] },
-  edm:       { intro: ['Build-Up','Drop-In','Producer-Tag'],                             interlude: ['Beat-Switch','Production-Only Loop'] },
+  edm:       { intro: ['Build-Up','Drop-In','Drum-Forward Intro','Producer-Tag'],                             interlude: ['Beat-Switch','Production-Only Loop'] },
   metal:     { intro: ['Riff-First','Drop-In','Build-Up'],                               interlude: ['Instrumental Solo','Drum-Break','Sample Drop'] },
   punk:      { intro: ['Counted-In','Drop-In','Riff-First'],                             interlude: ['Drum-Break','Instrumental Solo'] },
   folk:      { intro: ['A Cappella Drop','Vamp Intro','Field-Recording'],                interlude: ['Instrumental Solo','Spoken Aside'] },
   ss:        { intro: ['A Cappella Drop','Vamp Intro','Field-Recording'],                interlude: ['Instrumental Solo','Spoken Aside'] },
   reggae:    { intro: ['Vamp Intro','Drop-In','Sample Open'],                            interlude: ['Instrumental Solo','Drum-Break','Production-Only Loop'] },
-  reggaeton: { intro: ['Drop-In','Producer-Tag','Sample Open'],                          interlude: ['Beat-Switch','Drum-Break'] },
-  afrobeats: { intro: ['Drop-In','Producer-Tag','Field-Recording'],                      interlude: ['Beat-Switch','Drum-Break','Choir / Group-Vocal Drop'] },
-  latin:     { intro: ['Vamp Intro','Counted-In','Drop-In'],                             interlude: ['Instrumental Solo','Drum-Break'] },
-  kpop:      { intro: ['Build-Up','Drop-In','Producer-Tag'],                             interlude: ['Beat-Switch','Production-Only Loop'] }
+  reggaeton: { intro: ['Drop-In','Drum-Forward Intro','Producer-Tag','Sample Open'],                          interlude: ['Beat-Switch','Drum-Break'] },
+  afrobeats: { intro: ['Drum-Forward Intro','Drop-In','Producer-Tag','Field-Recording'],                      interlude: ['Beat-Switch','Drum-Break','Choir / Group-Vocal Drop'] },
+  latin:     { intro: ['Vamp Intro','Drum-Forward Intro','Counted-In','Drop-In'],                             interlude: ['Instrumental Solo','Drum-Break'] },
+  kpop:      { intro: ['Build-Up','Drum-Forward Intro','Drop-In','Producer-Tag'],                             interlude: ['Beat-Switch','Production-Only Loop'] }
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4111,6 +4860,7 @@ const INTRO_ARCHETYPES = [
   { name: 'Counted-In',          rule: 'Spoken count-in: "1, 2, 3, 4!" or "uh!" or "let\'s go!" before the band hits. Live-energy signature. Examples: Ramones "Blitzkrieg Bop" (Hey ho let\'s go) / Fall Out Boy "Sugar We\'re Goin Down" count-in / Rolling Stones / Beatles "I Saw Her Standing There" / James Brown "Get Up Off That Thing". Old-school but timeless.' },
   { name: 'Producer-Tag',        rule: 'A short verbal hype-tag opens the song before the beat lands (modern hip-hop / pop signature). The tag becomes part of the song\'s identity. Tag-then-beat structure. IMPORTANT: do NOT name any real producer or use any existing producer\'s canonical tag. Use a generic stylistic call-out — a confident hype phrase, a catchphrase tied to the song\'s topic, or a wordless shout (e.g. "(let\'s go!)", "(it\'s on!)", "(yeah!)", "(we up!)", or a 2-4 syllable phrase pulled from the song\'s own hook). The shape is the signature, not anyone\'s name.' },
   { name: 'Field-Recording',     rule: 'Open with ambient sound, found audio, or atmospheric texture — rain, traffic, birds, dialogue, news clip, phone ring, vinyl crackle. Sets a SCENE before the song begins. Examples: The Weeknd "House of Balloons" lighter flick / Frank Ocean "Pyramids" desert ambience / Pink Floyd "Money" cash register / Public Enemy news clips / Lana Del Rey vinyl crackle openings.' },
+  { name: 'Drum-Forward Intro',  rule: 'Open on DRUMS/RHYTHM alone — kick, snare, hats, percussion, or a full groove locks the pocket for 2-8 bars before any melody or vocal enters. The beat IS the hook first; anticipation builds because the listener feels the pocket and waits for the song to "open up." Layer in tension: a single percussion element, then the full kit, then a bass note teasing the drop — vocal/melody arrives only after the groove is undeniable. Examples: funk/James Brown count-into-groove openings / disco four-on-the-floor + hi-hat builds / afrobeats log-drum + shaker intros / hip-hop boom-bap drum loops before the sample lands / rock tom-fill openers ("When the Levee Breaks") / dance-floor percussion ramps. Critical: the groove must be strong enough to hold attention with NO melody — if the beat is generic, use a melodic intro instead.' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -4130,6 +4880,109 @@ const INTERLUDE_ARCHETYPES = [
   { name: 'Drum-Break',          rule: 'Strip everything except drums for 4-8 bars — funk-tradition / hip-hop-sampling tradition / James Brown signature. Lets the rhythm section breathe and the listener feel the pocket. Examples: James Brown "Funky Drummer" / Outkast "Ms. Jackson" break / DJ Premier scratch-and-drum interludes / Tribe Called Quest catalog.' },
   { name: 'Choir / Group-Vocal Drop', rule: 'Lead vocalist drops out; choir, gang-vocals, or group-backing-vocals take over for 8-16 bars. Gospel tradition / Kanye "Through the Wire" / Chance the Rapper "Sunday Candy" / Beyoncé "Hold Up" group section / Stevie "Higher Ground". Often pre-bridge build.' },
 ];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MODULATION ARCHETYPES (Wave 6) — organic key-change opportunities, scored for
+// TENSION (recolor/darken, usually the bridge) vs MOMENTUM (lift into the final
+// chorus). Cross-genre: a genre-weighted pool + a per-genre fire probability
+// keeps the move authentic — gospel / K-pop / theatre lean in hard, drill /
+// punk rarely modulate. Each archetype names WHERE the pivot lands and emits an
+// explicit [Modulation ...] tag the AI platform can act on. `needs` gates the
+// archetype against the song's actual structure (a bridge move is dropped when
+// the song has no bridge). Picked by buildModulationNote(); ONE move per song.
+// ═══════════════════════════════════════════════════════════════════════════
+const MODULATION_ARCHETYPES = [
+  { name:'Relative Shift',        job:'both',     needs:'bridge',      move:'Re-center onto the relative key (vi in a major song, ♭III in a minor song) — same key signature, new tonal home', where:'the bridge, resolving home for the final chorus', rule:'The most organic modulation there is: keep the SAME key signature but re-center onto the relative minor/major. The bridge suddenly feels like a different emotional room with no jarring gear-shift, because not a single accidental changes. Resolve back to the home key as the final chorus lands so the return feels like coming home.', tag:'[Modulation → Relative Key]' },
+  { name:'Pivot-Chord Lift',      job:'momentum', needs:'finalchorus', move:'Common-chord pivot up a whole step into the final chorus', where:'the last bar before the final chorus', rule:'Land a chord shared by both keys (a pivot/common chord) on the last bar before the final chorus, then drop the final chorus a whole step up. Because the pivot belongs to BOTH keys, the lift feels prepared and smooth — momentum, not whiplash. The most musical way to do the "big final chorus".', tag:'[Modulation Up +2 — pivot]' },
+  { name:'Modal Interchange Lift',job:'tension',  needs:'prechorus',   move:'Borrow ♭VI–♭VII from the parallel minor to lift the pre-chorus — no full key change', where:'the pre-chorus (or the 2 bars before the chorus)', rule:'Without leaving the key, borrow ♭VI and ♭VII from the parallel minor for the "aspirational uplift" cadence (♭VI–♭VII–I) into the chorus. It manufactures reach and tension while keeping the chorus as home base — the lift you feel in countless anthemic pre-choruses.', tag:'[Borrowed ♭VI–♭VII lift]' },
+  { name:'Step-Up Truck-Driver',  job:'momentum', needs:'finalchorus', move:'Modulate UP a half- or whole-step for the FINAL chorus only', where:'the final chorus', rule:'The classic ascension: ONLY the last chorus jumps up a semitone or whole tone; earlier choruses stay home so the lift hits specifically at the climax. Keep the melodic contour identical and transpose — the leap IS the lift, not a new tune. Familiar, so use it when the song earns an unabashed final peak.', tag:'[Modulation Up +1]' },
+  { name:'Parallel-Mode Flip',    job:'tension',  needs:'bridge',      move:'Flip to the parallel minor/major on the SAME tonic for the bridge', where:'the bridge', rule:'Keep the same tonic note but flip the mode (C major → C minor, or the reverse) for the bridge. The root stays put, so it feels like the SAME world turning dark — or suddenly bright — at the song\'s turning point. Flip back for the final chorus. A dramatic emotional inversion without leaving home.', tag:'[Modulation → Parallel Mode]' },
+  { name:'Down-Modulation',       job:'tension',  needs:'bridge',      move:'Drop a whole step (or fall to the relative minor) to darken the bridge', where:'the bridge', rule:'Almost nobody modulates DOWN — that is the opportunity. Drop a whole step or fall to the relative minor at the bridge to sink the emotional floor, so the return to the home key for the final chorus feels like climbing back into the light. Use when the lyric has a real descent before its resolution.', tag:'[Modulation Down −2]' },
+  { name:'Secondary-Dominant Drive',job:'tension',needs:'verse',      move:'Tonicize IV or V with its secondary dominant to push momentum mid-section', where:'inside the verse or pre-chorus', rule:'Insert a secondary dominant (V/V or V/IV) to briefly tonicize the next chord — a "double drive" with far more forward pull than a plain cadence. Not a key change; a momentary lean toward a new center that snaps back, keeping the verse from sitting still. The jazz/gospel/soul momentum engine.', tag:'[Secondary Dominant drive]' },
+  { name:'Direct Gear-Shift',     job:'momentum', needs:'finalchorus', move:'Abrupt direct modulation at a beat-switch', where:'a beat-switch before the final section', rule:'A bold, unprepared jump to a new key at a production beat-switch — no pivot chord, the whole track gear-shifts at once. Jarring on purpose; it signals "new movement." Reserve for songs that already use a beat-switch or a dramatic structural reset.', tag:'[Beat Switch → new key]' },
+];
+
+// Per-genre modulation tuning. `fire` = probability the engine proposes a key
+// move at all (auto mode); `pool` = ordered archetype preference, most canonical
+// first. Genres where modulation is largely inauthentic (drill, punk, reggaeton,
+// afrobeats) get a low fire and a short pool; theatre / K-pop / gospel lean in.
+const GENRE_MODULATION_PREFS = {
+  pop:       { fire:0.50, pool:['Step-Up Truck-Driver','Pivot-Chord Lift','Modal Interchange Lift','Relative Shift'] },
+  kpop:      { fire:0.78, pool:['Step-Up Truck-Driver','Pivot-Chord Lift','Direct Gear-Shift','Modal Interchange Lift'] },
+  rnb:       { fire:0.45, pool:['Relative Shift','Pivot-Chord Lift','Secondary-Dominant Drive','Step-Up Truck-Driver'] },
+  neosoul:   { fire:0.50, pool:['Secondary-Dominant Drive','Relative Shift','Modal Interchange Lift','Parallel-Mode Flip'] },
+  gospel:    { fire:0.72, pool:['Step-Up Truck-Driver','Secondary-Dominant Drive','Pivot-Chord Lift','Relative Shift'] },
+  jazz:      { fire:0.55, pool:['Secondary-Dominant Drive','Relative Shift','Pivot-Chord Lift','Parallel-Mode Flip'] },
+  blues:     { fire:0.30, pool:['Secondary-Dominant Drive','Step-Up Truck-Driver','Relative Shift'] },
+  country:   { fire:0.35, pool:['Step-Up Truck-Driver','Relative Shift','Pivot-Chord Lift'] },
+  rock:      { fire:0.40, pool:['Relative Shift','Parallel-Mode Flip','Step-Up Truck-Driver','Direct Gear-Shift'] },
+  altrock:   { fire:0.38, pool:['Parallel-Mode Flip','Relative Shift','Modal Interchange Lift','Down-Modulation'] },
+  metal:     { fire:0.35, pool:['Parallel-Mode Flip','Down-Modulation','Direct Gear-Shift','Relative Shift'] },
+  punk:      { fire:0.10, pool:['Step-Up Truck-Driver','Direct Gear-Shift'] },
+  folk:      { fire:0.25, pool:['Relative Shift','Modal Interchange Lift','Parallel-Mode Flip'] },
+  ss:        { fire:0.25, pool:['Relative Shift','Modal Interchange Lift','Down-Modulation'] },
+  edm:       { fire:0.28, pool:['Direct Gear-Shift','Step-Up Truck-Driver','Pivot-Chord Lift'] },
+  latin:     { fire:0.30, pool:['Step-Up Truck-Driver','Secondary-Dominant Drive','Relative Shift'] },
+  reggaeton: { fire:0.10, pool:['Direct Gear-Shift','Step-Up Truck-Driver'] },
+  reggae:    { fire:0.15, pool:['Relative Shift','Step-Up Truck-Driver'] },
+  afrobeats: { fire:0.15, pool:['Relative Shift','Direct Gear-Shift'] },
+  hiphop:    { fire:0.12, pool:['Direct Gear-Shift','Relative Shift'] },
+  tvmusical: { fire:0.82, pool:['Step-Up Truck-Driver','Parallel-Mode Flip','Pivot-Chord Lift','Direct Gear-Shift'] },
+  children:  { fire:0.30, pool:['Step-Up Truck-Driver','Pivot-Chord Lift'] },
+};
+
+// ── MODULATION ENGINE (Wave 6) — proposes ONE organic key move per song,
+//    matched to genre and tagged tension vs momentum. Returns '' when the song
+//    should stay in one key: genre fire miss, no bridge/chorus to pivot around,
+//    freestyle bars, or a key-moving hookStyle already owns the lift.
+function buildModulationNote({ genre, mood, structStr, key, hookStyle, freestyleMode, mode = 'auto' } = {}) {
+  if (freestyleMode) return '';                                  // bars-only, no choruses to lift
+  const hs = String(hookStyle || '');
+  if (/Final-Chorus Key Change|Octave Jump/i.test(hs)) return ''; // hook already owns the key move — don't double-stack
+
+  const m = String(mode || 'auto');
+  if (m === 'off') return '';
+  const prefs = GENRE_MODULATION_PREFS[genre] || { fire:0.20, pool:['Relative Shift','Step-Up Truck-Driver','Pivot-Chord Lift'] };
+  if (m !== 'on' && Math.random() > prefs.fire) return '';        // auto: respect genre frequency
+
+  const ss = String(structStr || '');
+  const hasBridge = /bridge/i.test(ss);
+  const hasChorus = /chorus|hook|refrain/i.test(ss);
+  if (!hasBridge && !hasChorus) return '';                        // nothing to pivot around
+
+  // Genre-locked candidate set — no cross-genre surprise (a gospel song must
+  // never roll a down-modulation). Drop bridge moves when the song has no
+  // bridge. Then MOOD biases the pick: dark/tense moods lean toward TENSION
+  // archetypes, bright/triumphant moods toward MOMENTUM — so the key move
+  // serves the song's emotional arc, not just its genre.
+  let cand = prefs.pool
+    .map(n => MODULATION_ARCHETYPES.find(a => a.name === n))
+    .filter(Boolean)
+    .filter(a => !(a.needs === 'bridge' && !hasBridge));
+  if (!cand.length) cand = [MODULATION_ARCHETYPES.find(a => a.name === 'Step-Up Truck-Driver')];
+
+  const moodStr = String(mood || '').toLowerCase();
+  const tensionMood  = /dark|sad|melanch|grief|heartbreak|angr|rage|tense|anx|brood|somber|mourn|lonely|desperat|bitter|haunt|cold|ache/.test(moodStr);
+  const momentumMood = /triumph|joy|uplift|hope|euphor|celebrat|anthem|energ|confiden|victor|soar|bright|exult|empower|defiant|fierce/.test(moodStr);
+  const weights = cand.map((a, i) => {
+    let w = Math.max(4 - i, 1);                               // canonical-first bias from the genre pool order
+    if (tensionMood)  { if (a.job === 'tension')  w += 3; else if (a.job === 'momentum') w = Math.max(1, w - 2); }
+    if (momentumMood) { if (a.job === 'momentum') w += 3; else if (a.job === 'tension')  w = Math.max(1, w - 2); }
+    return w;
+  });
+  const _wtot = weights.reduce((x, y) => x + y, 0);
+  let _r = Math.random() * _wtot, _ma = cand[cand.length - 1];
+  for (let i = 0; i < cand.length; i++) { _r -= weights[i]; if (_r <= 0) { _ma = cand[i]; break; } }
+
+  const jobLabel = _ma.job === 'both' ? 'TENSION + MOMENTUM' : _ma.job.toUpperCase();
+  const keyLine = key ? ` Home key for this song: ${key} — work the move relative to it.` : '';
+
+  return `\n\n🎚️ MODULATION OPPORTUNITY — "${_ma.name}" (${jobLabel}) [${GENRE_LABELS[genre] || genre}]:
+${_ma.move}.
+WHERE: ${_ma.where}.
+WHY: ${_ma.rule}${keyLine}
+Mark it in the lyrics with a ${_ma.tag} tag at the EXACT section where the key moves, and describe the modulation (from-key → to-key, where it lands, and whether its job is tension or momentum) in BOTH the ARRANGEMENT BLUEPRINT and the SONG PROMPT. ONE key move per song — the lift only lands if the rest of the song stays put. If a key change would feel forced on THIS lyric, you may keep one key — but if you modulate, use this approach.`;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // VERSE 2 ESCALATION ARCHETYPES — Verse 2 must do more than repeat Verse 1
@@ -4423,6 +5276,138 @@ const GENRE_SYLLABLE_BUDGETS = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PRINCE METHOD — MELODIC UNITY genre gate (Wave 5p)
+// Chorus-driven genres where verse↔chorus melodic unity (LITERAL / TRANSPOSED)
+// is the right earworm rule. Genres NOT in this set get the RELAXED variant
+// (CADENCE / RIFF-TOPLINE / MOTIF) via buildPrinceMethodNote — never a no-op,
+// so non-pop idioms still get the correct non-pitch-parity rule. hiphop is
+// intentionally OUT (handled as CADENCE, and only when a sung hookStyle is set).
+// ═══════════════════════════════════════════════════════════════════════════
+const MELODIC_UNITY_GENRES = new Set([
+  'pop', 'kpop', 'country', 'rnb', 'gospel', 'children', 'tvmusical',
+  'parody', 'comedy', 'bollywood', 'latin', 'reggae', 'reggaeton',
+  'altrock', 'cpop',
+]);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5q — ANTI-DROP (stripped chorus) genre gate
+// ARRANGEMENT directive (rides next to productionNote, NOT the lyric rules).
+// edm is INTENTIONALLY OUT (festival-drop is the norm; on-only). hiphop is OUT
+// (carve-out: Trap/Melodic Rap/Cloud Rap substyle + a sung hook). rock / gospel
+// NEED the wall — hard kill. Double-gated (genre+mood) then probability-gated.
+// ═══════════════════════════════════════════════════════════════════════════
+const ANTI_DROP_GENRES = new Set(['pop', 'rnb']);
+const ANTI_DROP_MOOD_RE = /heartbreak|longing|yearning|haunt|tense|eerie|vulnerab|confessional|restrain|intimate|lonely|empty|fragile/i;
+const ANTI_DROP_KILL_MOOD_RE = /triumphant|anthemic|celebrat|hype|party|victorious|euphoric/i;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5q — MELODIC CLICHE genre gate (chant/anthem-eligible genres).
+// Sibling of the metaphor palette (palette diversifies WORDS; this gives the
+// MELODY a proven shape). LYRIC/topline directive (rides near princeMethodNote).
+// PRINCE_MOTIF_GENRES are relaxed to NATIVE-move-only; hiphop only on sung hook.
+// ═══════════════════════════════════════════════════════════════════════════
+const MELODIC_CLICHE_GENRES = new Set([
+  'pop', 'kpop', 'cpop', 'mandopop', 'country', 'rnb', 'gospel', 'rock',
+  'altrock', 'punk', 'latin', 'reggaeton', 'reggae', 'afrobeats', 'dancehall',
+  'tvmusical', 'children', 'comedy', 'parody', 'bollywood',
+]);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5q — TRESILLO (3-3-2) rhythmic-cell gate.
+// PRODUCTION/groove directive (emitted from inside buildProductionNote so it
+// travels with PRODUCTION DNA to every call site). 'trap' is a hiphop substyle
+// here — gated via substyle when genre==='hiphop'. TRESILLO_POP_GENRES fire on
+// auto ONLY with a tropicalPop flag / tropical-dancehall substyle.
+// ═══════════════════════════════════════════════════════════════════════════
+const TRESILLO_GENRES = new Set(['reggaeton', 'latin', 'afrobeats', 'amapiano', 'dancehall', 'trap']);
+const TRESILLO_POP_GENRES = new Set(['pop', 'kpop', 'cpop', 'mandopop', 'bollywood']);
+const TRESILLO_GROOVE_PROFILES = {
+  reggaeton: { lowEndAnchor: 'kick + 808', percCounter: "the dembow snare on the off-beats (the 'boom-ch-boom-chick')", bpm: '90-95 BPM' },
+  dembow:    { lowEndAnchor: 'kick + 808', percCounter: "the dembow snare on the off-beats (the 'boom-ch-boom-chick')", bpm: '90-95 BPM' },
+  latin:     { lowEndAnchor: 'bassline (clave-derived)', percCounter: 'clave + conga counter-pattern over the top', bpm: '95-105 BPM' },
+  afrobeats: { lowEndAnchor: 'bass + kick with shaker drive', percCounter: 'shaker/conga 16ths over the top', bpm: '~100 BPM' },
+  amapiano:  { lowEndAnchor: 'log-drum bassline', percCounter: 'shaker + rimshot', bpm: '~112 BPM' },
+  dancehall: { lowEndAnchor: 'riddim kick', percCounter: 'rimshot + hat counter on the off-beats', bpm: '~100 BPM half-time feel' },
+  trap:      { lowEndAnchor: '808 glide', percCounter: 'rolling hi-hat triplets against the cell', bpm: '~140 BPM half-time' },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5q — MELODIC BASSLINE / OSTINATO ("Billie Jean Method") gate.
+// PRODUCTION/arrangement directive with a topline rider (rides next to
+// productionNote). COMPLEMENT of the Prince Method: Prince locks the VOCAL as
+// the repeating melody; Billie Jean locks the BASS and frees the vocal to roam.
+// FULL variant for in-set groove genres; RELAXED variant for riddim genres.
+// ═══════════════════════════════════════════════════════════════════════════
+const MELODIC_BASS_GENRES = new Set(['funk', 'disco', 'synthpop', 'rnb', 'soul', 'pop', 'afrobeats', 'house', 'neosoul', 'motown']);
+const MELODIC_BASS_RELAXED = new Set(['reggae', 'reggaeton', 'dancehall', 'amapiano']);
+const MELODIC_BASS_BALLAD_RE = /ballad|slow|intimate|sad|confessional/i;
+const MELODIC_BASS_POP_GROOVE_RE = /groov|danceab|upbeat|party|funky|bounce|disco|dance|club/i;
+const GENRE_BASS_PROFILES = {
+  funk:     { figure: 'syncopated 16th-note slap-and-pop', low: 'mono the bass below 120 Hz, sidechain the kick' },
+  disco:    { figure: 'octave-jumping pulsing eighth-note', low: 'mono the bass below 100 Hz, tight kick-bass pocket' },
+  synthpop: { figure: 'sequenced/arpeggiated octave-jumping synth-bass', low: 'mono the sub below 120 Hz, sidechain to the kick' },
+  rnb:      { figure: 'melodic walking bass that answers the vocal', low: 'mono the bass below 100 Hz, gentle kick duck' },
+  soul:     { figure: 'melodic walking bass that answers the vocal (a second vocal line)', low: 'warm mono bass below 120 Hz' },
+  neosoul:  { figure: 'behind-the-beat melodic walking bass', low: 'round mono bass below 110 Hz, loose pocket' },
+  pop:      { figure: 'pulsing octave-driven melodic bass', low: 'mono the bass below 120 Hz, sidechain the kick' },
+  afrobeats:{ figure: 'recurring bass figure threading the log-drum/guitar interplay', low: 'mono the bass below 100 Hz' },
+  house:    { figure: 'filtered rolling bass ostinato', low: 'mono the bass below 120 Hz, 4/4 sidechain pump' },
+  motown:   { figure: 'melodic walking bass that answers the vocal', low: 'warm mono bass below 120 Hz' },
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5r — CHORUS-IN-INTRO (teaser open) gate. INTRO-placement directive.
+// Real slugs only (synthpop/altpop/edmpop are NOT top-level slugs); the alt/
+// edm/synth/bedroom/hyper flavors are caught by the substyle regex.
+// ═══════════════════════════════════════════════════════════════════════════
+const CHORUS_INTRO_GENRES = new Set(['pop', 'kpop', 'rnb']);
+const CHORUS_INTRO_SUBSTYLE_RE = /Alt-?Pop|Bedroom Pop|EDM-?Pop|Dance-?Pop|Synth-?Pop|Hyper-?Pop/i;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5r — ONE-NOTE MELODY (static-pitch topline) gate. LYRIC/topline
+// directive (verse/pre-hook only, never the chorus). 'country' is gated via the
+// talk substyle regex (not the genre Set) so straight-sung country stays sung.
+// gospel/soul-runs/musical-theatre/big-range/riff genres are excluded by
+// omission from the Set (and never via auto).
+// ═══════════════════════════════════════════════════════════════════════════
+const ONE_NOTE_MELODY_GENRES = new Set(['pop', 'kpop', 'cpop', 'rnb', 'neosoul', 'ss']);
+const ONE_NOTE_SUBSTYLE_RE = /Bedroom Pop|Indie-?Pop/i;
+const ONE_NOTE_COUNTRY_TALK_RE = /Country-?Talk|Spoken|Storyteller|Recitation/i;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5s — CAROLE KING INTERVAL-EMOTION MAP genre gate. Melodic/sung genres
+// where directing the topline's emotional LEAPS is the right rule. hiphop is
+// intentionally OUT of the Set — it earns this note (via buildIntervalMapNote)
+// ONLY when a sung hookStyle is set, mirroring the Prince/one-note hiphopSungHook
+// carve-out. Bare rap / freestyle / no-chorus hard no-op inside the builder.
+// ═══════════════════════════════════════════════════════════════════════════
+const INTERVAL_MAP_GENRES = new Set([
+  'pop', 'rnb', 'neosoul', 'soul', 'country', 'gospel', 'folk', 'ss',
+  'rock', 'altrock', 'kpop', 'cpop', 'indie', 'jazz', 'blues',
+  'americana', 'tvmusical', 'bollywood',
+]);
+
+// ═══════════════════════════════════════════════════════════════════════════
+// WAVE 5r — POP DROP (instrumental lead-melody post-chorus) gate. STRUCTURE/
+// production directive. Real top-level slugs in POP_DROP_GENRES; synth/alt/edm
+// flavors via POP_DROP_SUBSTYLE_RE. HURT genres hard-suppressed on auto.
+// DISTINCT namespace from the anti-drop (no DROP_* collision).
+// ═══════════════════════════════════════════════════════════════════════════
+const POP_DROP_GENRES = new Set(['pop', 'rnb', 'afrobeats']);
+const POP_DROP_SUBSTYLE_RE = /Alt-?Pop|Synth-?Pop|EDM-?Pop|Dance-?Pop/i;
+const POP_DROP_HURT_GENRES = new Set(['folk', 'ss', 'acappella']);
+const POP_DROP_LEAD = {
+  pop:       'a synth or guitar topline',
+  rnb:       'a guitar lick, Rhodes, or sax phrase',
+  afrobeats: 'a guitar/marimba/log-drum figure',
+};
+const POP_DROP_SUBSTYLE_LEAD = {
+  synth: 'a bright poly-synth lead',
+  alt:   'a synth/guitar topline working the negative space',
+  edm:   'the lead synth / pluck riff',
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRODUCTION KNOWLEDGE BASE
 // Per-genre FX profiles, plugin chains, mastering targets, and production
 // archetypes used to generate the PRODUCTION BRIEF output section.
@@ -4656,7 +5641,7 @@ const LYRIC_TIER_SUNO_MODIFIERS = {
 // Compose the production note injected into the LLM prompt. Genre-authentic,
 // mood-overlaid, aggression-overlaid (hip-hop), tier-overlaid. Returns '' if
 // no FX/mastering data exists for the genre (defensive fallback).
-function buildProductionNote(genre, mood, aggression, lyricTier) {
+function buildProductionNote(genre, mood, aggression, lyricTier, opts = {}) {
   const fx = GENRE_FX_PROFILES[genre] || {};
   const mst = MASTERING_TARGETS[genre] || {};
   if (!fx.reverb && !mst.lufs) return '';
@@ -4695,6 +5680,13 @@ function buildProductionNote(genre, mood, aggression, lyricTier) {
   if (aggrOverlay) overlays.push(fmtOverlay(`AGGRESSION OVERLAY (${aggrKey})`, aggrOverlay));
   if (tierOverlay && tierKey !== 'street') overlays.push(fmtOverlay(`TIER OVERLAY (${tierKey})`, tierOverlay));
 
+  // Wave 5q — Tresillo (3-3-2) groove directive, emitted from inside the
+  // production note so it travels with PRODUCTION DNA to every call site.
+  const tresilloNote = buildTresilloNote({
+    genre, mood, substyle: opts.substyle, bpm: opts.bpm, tropicalPop: opts.tropicalPop,
+    mode: (opts.tresillo || 'auto'), vocalRide: (opts.tresilloVocal || 'auto'),
+  });
+
   return `\n\n🎛️ PRODUCTION DNA — fold this concrete vocabulary into the SONG PROMPT "Texture" line and the PRODUCTION BRIEF blocks. Generic descriptors ("warm production") are not enough — Suno needs specific FX choices to produce the right sound:
 • REVERB: ${fx.reverb || 'medium hall'}
 • DELAY: ${fx.delay || '1/4 note'}
@@ -4704,7 +5696,7 @@ function buildProductionNote(genre, mood, aggression, lyricTier) {
 • SIDECHAIN: ${fx.sidechain || 'light kick ducking'}
 • MASTERING: ${mst.lufs || '-14 LUFS'} · ${mst.dynamicRange || 'DR 8–10'} · ${mst.brightness || 'natural'}${mst.notes ? ' · ' + mst.notes : ''}${overlays.length ? '\n\nOVERLAYS (apply on top of baseline above):\n• ' + overlays.join('\n• ') : ''}
 
-The SONG PROMPT must reference at least 2 of these specifics in the "Texture" or "Full prompt" line. The PRODUCTION BRIEF "ARRANGEMENT BLUEPRINT" and "SONIC REFERENCES" must also draw from this vocabulary. No artist names — describe the SOUND.`;
+The SONG PROMPT must reference at least 2 of these specifics in the "Texture" or "Full prompt" line. The PRODUCTION BRIEF "ARRANGEMENT BLUEPRINT" and "SONIC REFERENCES" must also draw from this vocabulary. No artist names — describe the SOUND.${tresilloNote}`;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -5963,7 +6955,11 @@ function buildSongPrompt(params) {
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], avoidHookPatterns = [], avoidPhrases = [], dualPerspective = false, platinum = false,
-    freestyleMode = false, breakRule = false, eraUndertone = '',
+    freestyleMode = false, melodicUnity = 'auto', breakRule = false, eraUndertone = '',
+    antiDrop = 'auto', tresillo = 'auto',   // Wave 5q — Anti-Drop (stripped chorus) + Tresillo (3-3-2)
+    melodicCliche = 'auto', bassOstinato = 'auto', // Wave 5q — Melodic Cliche bank + Melodic Bassline ostinato
+    chorusIntro = 'auto', oneNoteMelody = 'auto', popDrop = 'auto', // Wave 5r — Chorus-in-intro + One-note melody + Pop drop
+    intervalMap = 'auto',          // Wave 5s — Carole King interval-emotion map (melodic direction)
     offTheTopMode = false,        // Wave 4d — Harry Mack improvisation overlay
     producerTemplate = '',         // Wave 4d — producer beat template
     viralMode = false,             // Wave 4e — Viral Producer Mode (genre-gated)
@@ -5971,7 +6967,8 @@ function buildSongPrompt(params) {
     graftGenre = '', graftSection = 'chorus', invertCounter = false,
     coachInstruction = '', originalLyrics = '', aggression = '',
     genreCraft = [],
-    punchlineCraft = []
+    punchlineCraft = [],
+    leanBrief = false              // flow-song: emit only the 3 surfaced brief sections (Arrangement/Vocal/Sonic Refs), skip the heavy tail so the response fits Flow's tight token+time budget
   } = params;
 
   const topic = sanitizeInput(rawTopic);
@@ -6241,6 +7238,14 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   const _kp = _keyPsych[_chosenKey];
   const keyPsychNote = `\n\nSUGGESTED KEY PSYCHOLOGY: ${_chosenKey} — ${_kp.feel} Tension: ${_kp.tension}, Brightness: ${_kp.bright}/10. Use this key's emotional character to shape the production brief.`;
 
+  // ── Modulation engine (Wave 6) — one organic key move per song, genre-tuned,
+  //    tagged tension vs momentum. Auto-fires by genre frequency; defers when a
+  //    key-moving hookStyle already owns the lift. Uses the suggested key above.
+  const modulationNote = buildModulationNote({
+    genre, mood, structStr, key: _chosenKey, hookStyle,
+    freestyleMode, mode: (params.modulation || 'auto'),
+  });
+
   // ── Emotional arc injection ─────────────────────────────────────────────
   const _arcData = EMOTIONAL_ARCS[emotionalArc];
   const emotionalArcNote = _arcData
@@ -6258,8 +7263,97 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
   const syllableNote = `\n\nSYLLABLE BUDGET:\n- Hook (title/refrain line): ${_sylBudget.hook || '4–7'} syllables — keep it singable and memorable\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
 
+  // ── Prince Method (melodic unity) ───────────────────────────────────────
+  // AUTO-by-genre earworm lock — welds to the syllable budget above (defers
+  // the chorus≤10 / verse 8-13 lines to {target} via the directive, additive).
+  const princeMethodNote = buildPrinceMethodNote({
+    genre, mood, structure, structStr, sylBudget: _sylBudget,
+    hookStyle: resolvedHookStyle, freestyleMode, noBridgeTier: _noBridgeTier,
+    mode: (params.melodicUnity || melodicUnity || 'auto'),
+  });
+
+  // ── Melodic Cliche bank (Wave 5q) — proven topline shapes for that tune ──
+  // Independent 3-state lever (NOT chained to melodicUnity), but reads the same
+  // gate signals so the two notes never contradict. LYRIC/topline directive.
+  const melodicClicheNote = buildMelodicClicheNote(genre, mood, {
+    structStr, hookStyle: resolvedHookStyle, freestyleMode,
+    hasPreChorus: /\[Pre.?Chorus\]/i.test(String(structStr || '')),
+    princeOctaveOrKeyMove: /Octave Jump|Final-Chorus Key Change/i.test(String(resolvedHookStyle || '')),
+    mode: (params.melodicCliche || 'auto'),
+  });
+
   // ── Production DNA — genre FX + mood overlay + aggression overlay + tier overlay ─
-  const productionNote = buildProductionNote(genre, mood, aggression, params.lyricTier);
+  // opts threads substyle + Tresillo (3-3-2) params so the groove cell travels
+  // with PRODUCTION DNA (emitted from inside buildProductionNote).
+  const productionNote = buildProductionNote(genre, mood, aggression, params.lyricTier, {
+    substyle, bpm: params.bpm, tropicalPop: params.tropicalPop,
+    tresillo: (params.tresillo || tresillo || 'auto'),
+    tresilloVocal: (params.tresilloVocal || 'auto'),
+  });
+
+  // ── Anti-Drop (Wave 5q) — stripped-chorus ARRANGEMENT directive. Rides next
+  // to productionNote (arrangement DNA), NOT the lyric/syllable rules. ────────
+  const antiDropNote = buildAntiDropNote({
+    genre, substyle, mood, structStr, hookStyle: resolvedHookStyle,
+    princeActive: (MELODIC_UNITY_GENRES.has(genre) /* || relaxed */),
+    freestyleMode, mode: (params.antiDrop || antiDrop || 'auto'),
+  });
+
+  // ── Melodic Bassline / Ostinato (Wave 5q) — "Billie Jean" arrangement
+  // directive with a topline rider. Production cluster, NOT the lyric rules. ──
+  const melodicBassNote = buildMelodicBassNote({
+    genre, mood, structure, structStr, sylBudget: _sylBudget,
+    hookStyle: resolvedHookStyle, bassOstinato: (params.bassOstinato || 'auto'),
+  });
+
+  // ── Wave 5r gate-result signals (derived from the notes computed above, since
+  // those builders return '' when they no-op). There is NO drumIntroActive
+  // boolean in this engine — the intro is archetype-based — so we cheaply detect
+  // a drum-led intro from the picked INTRO archetype name (_ia) and let the
+  // chorus-in-intro teaser COEXIST (drums lead, instrumental hook follows). ──
+  const _drumLedIntro = /Drum-?Forward|Drop-?In|Counted-?In/i.test(String(_ia?.name || ''));
+  const _princeActive    = princeMethodNote !== '';
+  const _antiDropActive  = antiDropNote !== '';
+  const _melodicBassActive = melodicBassNote !== '';
+  const _clicheActive    = melodicClicheNote !== '';
+
+  // ── Chorus-in-Intro (Wave 5r) — hook-forward teaser open. INTRO placement;
+  // rides next to introNote. Composes with the archetype drum intro via
+  // _drumLedIntro (forces instrumental teaser after the drum bars). ──
+  const chorusIntroNote = buildChorusIntroNote({
+    genre, structStr, substyle, freestyleMode,
+    drumLedIntro: _drumLedIntro, antiDropActive: _antiDropActive,
+    princeActive: _princeActive, mode: (params.chorusIntro || chorusIntro || 'auto'),
+  });
+
+  // ── One-Note Melody (Wave 5r) — static-pitch verse/pre-hook topline. LYRIC/
+  // topline directive; rides next to princeMethodNote (stacks coherently). ──
+  const oneNoteMelodyNote = buildOneNoteMelodyNote({
+    genre, structStr, hookStyle: resolvedHookStyle, freestyleMode, substyle,
+    princeActive: _princeActive, mode: (params.oneNoteMelody || oneNoteMelody || 'auto'),
+  });
+
+  // ── Carole King Interval-Emotion Map (Wave 5s) — melodic-DIRECTION directive.
+  // LYRIC/topline cluster; rides next to princeMethodNote/oneNoteMelodyNote.
+  // COMPOSES (does not duplicate): emotionalArcNote/EMOTIONAL_ARCS say WHERE the
+  // peaks are; this says WHICH interval leaps there. Prince Method's twinned tune
+  // uses these intervals AT its peaks. Octave-Jump hookStyle → octave = the peak. ──
+  const intervalMapNote = buildIntervalMapNote({
+    genre, mood, structure, structStr, arc: emotionalArc,
+    princeActive: _princeActive, hookStyle: resolvedHookStyle, freestyleMode,
+    mode: (params.intervalMap || intervalMap || 'auto'),
+  });
+
+  // ── Pop Drop (Wave 5r) — instrumental lead-melody post-chorus. STRUCTURE/
+  // production directive; rides next to postChorusNote. Hard no-op when the
+  // post-chorus archetype is already 'Hook Echo' (no double-emission). ──
+  const popDropNote = buildPopDropNote({
+    genre, structStr, hookStyle: resolvedHookStyle, substyle,
+    postChorusName: _poa?.name, freestyleMode,
+    princeActive: _princeActive, melodicBassActive: _melodicBassActive,
+    clicheActive: _clicheActive, antiDropActive: _antiDropActive,
+    mode: (params.popDrop || popDrop || 'auto'),
+  });
 
   // ── Dual perspective (antagonist POV in Verse 2) ────────────────────────
   const dualPerspNote = dualPerspective
@@ -6345,6 +7439,58 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
   });
   const surpriseNote = buildSurpriseNote(_surpriseResult);
 
+  // flow-song passes leanBrief:true → drop the heavy production-brief tail
+  // (platform tips, structure/dopamine maps, theory, director notes,
+  // countermelody, visual/video prompts). The 3 sections Flow surfaces
+  // (Arrangement Blueprint, Vocal Direction, Sonic References) come BEFORE
+  // this tail, so removing it lets them complete inside Flow's token budget
+  // instead of being truncated. Write/Lucky leave leanBrief false → full tail.
+  const _heavyBriefTail = leanBrief ? '' : `
+
+PLATFORM TIPS:
+[3 specific actionable tips for ${platform === 'udio' ? 'Udio' : platform === 'stable' ? 'Stable Audio' : 'Suno'}]
+
+STRUCTURE MAP:
+[Each section: bar count · energy level 1-10 · emotional job]
+
+DOPAMINE MAP:
+1. [Moment · What happens · Why the brain rewards it]
+2. [Second peak]
+3. [Third peak]
+
+CHORD PROGRESSION:
+BPM: [exact BPM]
+Key: [e.g. A minor — reason in 5 words]
+Time Signature: [e.g. 4/4]
+[Each section: Section name → Roman numerals (letter names) · rhythm feel]
+
+THEORY ANALYSIS:
+SCALE: [specific scale or mode used]
+KEY FEEL: [2 sentences on emotional intention]
+OUTLIER CHORDS: [any non-diatonic chords and function]
+VOICE LEADING: [most interesting voice-leading move]
+TENSION RATING: [X/10 with description]
+PROGRESSION ARCHETYPE: [which archetype and why]
+
+DIRECTOR NOTES:
+1. [Production decision specific to THIS song]
+2. [tip 2]
+3. [tip 3]
+4. [tip 4]
+5. [tip 5]${vocalStackNote}${loopAnchorNote}${vocalDescriptorNote}${surpriseNote}
+
+COUNTERMELODY:
+DEVICE: [specific counter-melodic instrument/voice]
+WHAT IT DOES: [one sentence]
+HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
+SECTION MAP: [which sections and how it evolves]
+
+VISUAL PROMPT:
+[Write a single ready-to-paste image prompt for Midjourney, DALL-E or Firefly. ONE sentence: visual mood, setting, 2-3 key colors, art style. Under 200 chars. No faces, no text in image.]
+
+VIDEO PROMPT:
+[Write a single ready-to-paste video concept for Sora, Runway or Kling. ONE sentence: setting, visual action, camera movement, color grade, mood. Under 200 chars.]${buildSingerNotesInstruction(genre, genre==='hiphop')}`;
+
   // NOTE: describe the ENERGY, never name artists. Artist names here can bleed
   // into the generated SONG PROMPT and trip Suno's no-artist-name policy.
   const _aggrMap = {
@@ -6402,7 +7548,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${productionNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${princeMethodNote}${oneNoteMelodyNote}${intervalMapNote}${melodicClicheNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${modulationNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${chorusIntroNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${popDropNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${melodicBassNote}${productionNote}${antiDropNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -6464,51 +7610,7 @@ VOCAL DIRECTION:
 [Delivery style per section]
 
 SONIC REFERENCES:
-[3 production reference points — no artist names, describe the sonic feel]
-
-PLATFORM TIPS:
-[3 specific actionable tips for ${platform === 'udio' ? 'Udio' : platform === 'stable' ? 'Stable Audio' : 'Suno'}]
-
-STRUCTURE MAP:
-[Each section: bar count · energy level 1-10 · emotional job]
-
-DOPAMINE MAP:
-1. [Moment · What happens · Why the brain rewards it]
-2. [Second peak]
-3. [Third peak]
-
-CHORD PROGRESSION:
-BPM: [exact BPM]
-Key: [e.g. A minor — reason in 5 words]
-Time Signature: [e.g. 4/4]
-[Each section: Section name → Roman numerals (letter names) · rhythm feel]
-
-THEORY ANALYSIS:
-SCALE: [specific scale or mode used]
-KEY FEEL: [2 sentences on emotional intention]
-OUTLIER CHORDS: [any non-diatonic chords and function]
-VOICE LEADING: [most interesting voice-leading move]
-TENSION RATING: [X/10 with description]
-PROGRESSION ARCHETYPE: [which archetype and why]
-
-DIRECTOR NOTES:
-1. [Production decision specific to THIS song]
-2. [tip 2]
-3. [tip 3]
-4. [tip 4]
-5. [tip 5]${vocalStackNote}${loopAnchorNote}${vocalDescriptorNote}${surpriseNote}
-
-COUNTERMELODY:
-DEVICE: [specific counter-melodic instrument/voice]
-WHAT IT DOES: [one sentence]
-HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
-SECTION MAP: [which sections and how it evolves]
-
-VISUAL PROMPT:
-[Write a single ready-to-paste image prompt for Midjourney, DALL-E or Firefly. ONE sentence: visual mood, setting, 2-3 key colors, art style. Under 200 chars. No faces, no text in image.]
-
-VIDEO PROMPT:
-[Write a single ready-to-paste video concept for Sora, Runway or Kling. ONE sentence: setting, visual action, camera movement, color grade, mood. Under 200 chars.]${buildSingerNotesInstruction(genre, genre==='hiphop')}`;
+[3 production reference points — no artist names, describe the sonic feel]${_heavyBriefTail}`;
 
   return { system, prompt };
 }
@@ -9589,6 +10691,597 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// PRISM — concept-first song engine (the deliberate inverse of Lucky)
+// ───────────────────────────────────────────────────────────────────────────
+// Where buildLuckyPrompt() rolls a FINISHED random song prompt, Prism rolls four
+// independent dials — SUBJECT × METAPHOR × PERSPECTIVE-FLIP × GENRE/fusion —
+// scores N candidates for coherence, and emits a structured CONCEPT BRIEF
+// ("what the song should be about"). buildPrismSongPrompt() then maps that brief
+// onto the existing buildSongPrompt() to produce the actual song.
+// Spec: docs/PRISM-ENGINE-SPEC.md
+//
+// MVP scope (steps 1-2 + hybrid subject + light flip):
+//   ✓ Dial 4 GENRE (quality-weighted over the FUSION_DATA whitelist)
+//   ✓ Dial 1 SUBJECT (hybrid: optional live pool + SUBJECT_SEED + LUCKY_TOPICS)
+//   ~ Dial 3 PERSPECTIVE (light flip; full weighted roller = step 5)
+//   ☐ Dial 2 METAPHOR (step 3 — left null; buildSongPrompt already splices the
+//     metaphor balance + palette notes at ~line 6384, so nothing breaks)
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Weighted pick primitive. weightFn(key) -> positive number. Uniform fallback
+// when all weights are non-positive/invalid.
+function pickWeighted(keys, weightFn) {
+  if (!Array.isArray(keys) || keys.length === 0) return undefined;
+  const weights = keys.map(k => { const w = Number(weightFn(k)); return (isFinite(w) && w > 0) ? w : 0; });
+  const total = weights.reduce((a, b) => a + b, 0);
+  if (total <= 0) return pickRandom(keys);
+  let r = Math.random() * total;
+  for (let i = 0; i < keys.length; i++) { r -= weights[i]; if (r <= 0) return keys[i]; }
+  return keys[keys.length - 1];
+}
+
+// Curated evergreen subject seed (~50, Lucky register). Hybrid Dial-1 merges
+// these with the live `soniq:topics:top` pool (wired in step 4 via params.subjectPool).
+const SUBJECT_SEED = [
+  'the version of yourself you abandoned','a city that never loved you back','the last good day before everything changed',
+  'falling for someone at exactly the wrong time','what your hometown took from you','the friend who didn\'t make it out',
+  'pretending you\'re fine at a party','the voicemail you never deleted','growing up faster than you wanted to',
+  'the people we become at 3am','a love that ended before it started','watching your parents get older',
+  'the apartment you can\'t afford to keep','chasing a dream nobody believes in','the night you almost called',
+  'learning to be alone on purpose','the weight of being the strong one','a summer you keep going back to',
+  'the lie you tell to keep the peace','outgrowing the people you love','the first time the city felt like home',
+  'money you made that didn\'t fix anything','the ghost of who you used to date','starting over in a town no one knows you',
+  'the silence after the argument','being someone\'s second choice','the song that plays at every funeral',
+  'forgiving someone who never apologized','the road out of where you\'re from','holding on to a relationship past its end',
+  'the version of the story you never told','coming home different than you left','a faith you lost and almost found again',
+  'the last text before they stopped answering','being proud and broke at the same time','the dream you gave up to survive',
+  'who you are when no one\'s watching','the family you chose over the one you got','dancing through the worst year of your life',
+  'the promise you couldn\'t keep','realizing your hero was just a person','the cost of always leaving first',
+  'a stranger who felt like an old friend','the weight of a name you didn\'t choose','letting go of a future you planned',
+  'the quiet kind of heartbreak','winning and feeling nothing','the long drive home after bad news','becoming the parent you needed'
+];
+
+// Pillar single genres + roll weights (Dial 4 single-genre branch). Keys are
+// canonical GENRE_LABELS / perspectiveRotation.genres keys.
+const SINGLE_GENRE_WEIGHTS = {
+  pop:12, hiphop:12, rnb:9, rock:8, country:8, edm:7, ss:6, folk:5,
+  indie:5, altrock:5, neosoul:4, jazz:3, gospel:3, americana:3
+};
+
+function _prismGenreFromFusion(key) {
+  const [g1, g2] = key.split('+');
+  const fd = FUSION_DATA[key] || {};
+  const p = _normalizeGenreKey(g1), s = _normalizeGenreKey(g2);
+  return {
+    mode: 'fusion', primary: p, secondary: s, fusionKey: key,
+    fusionName: fd.name || (g1 + ' × ' + g2),
+    label: (GENRE_LABELS[p] || g1) + ' × ' + (GENRE_LABELS[s] || g2) + (fd.name ? ' (' + fd.name + ')' : ''),
+    quality: fd.q || { overall: null }, tip: fd.tip || '', blend: { genre2: s, ratio: 40 }
+  };
+}
+function _prismGenreFromSingle(g) {
+  return {
+    mode: 'single', primary: g, secondary: null, fusionKey: null, fusionName: null,
+    label: GENRE_LABELS[g] || g, quality: { overall: null }, tip: '', blend: {}
+  };
+}
+
+// Resolve a FUSION_DATA key from two genre tokens, tolerant of casing/order.
+// FUSION_DATA keys are title-case ("Pop+Country") but clients may send canonical
+// lowercase ("pop"/"country") — normalize both sides before matching.
+function _resolveFusionKey(rawG1, rawG2) {
+  const n1 = _normalizeGenreKey(rawG1), n2 = _normalizeGenreKey(rawG2);
+  for (const key of Object.keys(FUSION_DATA)) {
+    const [a, b] = key.split('+');
+    const na = _normalizeGenreKey(a), nb = _normalizeGenreKey(b);
+    if ((na === n1 && nb === n2) || (na === n2 && nb === n1)) return key;
+  }
+  const fwd = rawG1 + '+' + rawG2, rev = rawG2 + '+' + rawG1;
+  return FUSION_DATA[fwd] ? fwd : (FUSION_DATA[rev] ? rev : null);
+}
+
+// Dial 4 — GENRE / fusion. ~35% single / ~65% fusion. Coherence is FREE: fusion
+// rolls only over Object.keys(FUSION_DATA), a hand-curated whitelist, so garbage
+// pairs can never appear. Honours client g1/g2 (casing/order tolerant) like Lucky.
+function rollGenreDial(opts) {
+  opts = opts || {};
+  const rawG1 = opts.g1 ? sanitizeInput(opts.g1, 50) : null;
+  const rawG2 = opts.g2 ? sanitizeInput(opts.g2, 50) : null;
+  // Paywall gate: when allowedGenres is set (free/unentitled plan), every genre in
+  // the result — single OR both fusion legs — must be in the set. Disallowed client
+  // locks are IGNORED (fall through to a random allowed roll), never honored, so a
+  // free user can't reach a premium genre via explicit g1/g2.
+  const allow = (Array.isArray(opts.allowedGenres) && opts.allowedGenres.length)
+    ? new Set(opts.allowedGenres.map(_normalizeGenreKey)) : null;
+  const fusionOk = key => { const [a, b] = key.split('+'); return !allow || (allow.has(_normalizeGenreKey(a)) && allow.has(_normalizeGenreKey(b))); };
+  if (rawG1 && rawG2) {
+    const key = _resolveFusionKey(rawG1, rawG2);
+    if (key && fusionOk(key)) return _prismGenreFromFusion(key);
+  }
+  if (rawG1 && !rawG2) {
+    const ng = _normalizeGenreKey(rawG1);
+    if (!allow || allow.has(ng)) return _prismGenreFromSingle(ng);
+  }
+  const fusionKeys = Object.keys(FUSION_DATA).filter(fusionOk);
+  if (fusionKeys.length && Math.random() < 0.65) {
+    const key = opts.spice
+      ? pickWeighted(fusionKeys, k => { const c = (FUSION_DATA[k].q && FUSION_DATA[k].q.compat) || 85; return (c >= 72 && c <= 82) ? 30 : 5; })
+      : pickWeighted(fusionKeys, k => (FUSION_DATA[k].q && FUSION_DATA[k].q.overall) || 70);
+    return _prismGenreFromFusion(key);
+  }
+  const singleKeys = Object.keys(SINGLE_GENRE_WEIGHTS).filter(k => !allow || allow.has(_normalizeGenreKey(k)));
+  const g = pickWeighted(singleKeys.length ? singleKeys : Object.keys(SINGLE_GENRE_WEIGHTS), k => SINGLE_GENRE_WEIGHTS[k]);
+  return _prismGenreFromSingle(g);
+}
+
+function _prismSubjId(s) {
+  return 'subj_' + String(s).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 32);
+}
+const _PRISM_AGENT_WORDS = new Set(['you','your','yourself','yours','her','hers','him','his','she','he','they','them','their',
+  'we','us','our','ours','i','me','my','mine','myself','stranger','lover','mother','father','mom','dad','mama','papa',
+  'friend','family','parent','child','son','daughter','brother','sister','wife','husband','girl','boy','man','woman',
+  'kid','baby','someone','somebody','nobody','everybody','everyone','anyone','neighbor','soldier','preacher','teacher',
+  'ex','king','queen','ghost','angel','devil','god','sinner','saint','widow']);
+const _PRISM_ABSTRACT_WORDS = new Set(['feeling','silence','loneliness','grief','hope','fear','time','memory','regret',
+  'longing','freedom','truth','faith','loss','distance','emptiness','nostalgia','change','ambition','money','fame',
+  'success','power','sense','idea','dream','summer','winter','autumn','spring','city','town','road','home','night',
+  'morning','light','dark','rain','ocean','sky']);
+// Agency heuristic (agent vs abstraction). Deterministic token tally: agent
+// signals (pronouns, people/relationship nouns, possessive 's) vs abstraction
+// signals (concept nouns, leading "the <noun> of …", -ness/-tion/-ity endings).
+// Returns the same two labels _scorePrism keys on; drives Dial-3 axis bias.
+function _prismSubjectAgency(s) {
+  const text = String(s || '').toLowerCase();
+  const tokens = text.split(/[^a-z0-9']+/).filter(Boolean);
+  if (!tokens.length) return 'abstraction';
+  let agent = 0, abstract = 0;
+  for (const t of tokens) {
+    if (_PRISM_AGENT_WORDS.has(t)) agent++;
+    if (_PRISM_ABSTRACT_WORDS.has(t)) abstract++;
+  }
+  if (/\b[a-z]+'s\b/.test(text)) agent++;                       // possessive 's → person
+  if (/^the\s+\w+(\s+\w+)?\s+of\b/.test(text)) abstract++;     // "the <noun> of …" framing
+  if (/\b\w+(ness|tion|ity|hood|ship)\b/.test(text)) abstract++; // abstract-noun endings
+  if (agent > abstract) return 'agent';
+  if (abstract > agent) return 'abstraction';
+  return agent > 0 ? 'agent' : 'abstraction';                     // tie-break
+}
+
+// Dial 1 — SUBJECT (hybrid). livePool: array of strings or {surface,score}
+// (the `soniq:topics:top` ZSET, wired in step 4). Live dominates when present;
+// SUBJECT_SEED + LUCKY_TOPICS backfill to keep the pool ≥ 20.
+function rollSubjectDial(opts) {
+  opts = opts || {};
+  if (opts.subject) {
+    const surf = sanitizeInput(opts.subject, 120);
+    return { id: _prismSubjId(surf), surface: surf, score: 100, source: 'user', agency: _prismSubjectAgency(surf) };
+  }
+  const live = Array.isArray(opts.livePool) ? opts.livePool : [];
+  // Filter null/undefined/garbage BEFORE mapping — a sparse live ZSET (missing
+  // members, null scores) must never throw a TypeError on the request path.
+  const liveTokens = live
+    .filter(item => item != null && (typeof item === 'string' || typeof item === 'object'))
+    .map(item => typeof item === 'string'
+      ? { surface: item.trim(), score: 1 }
+      : { surface: String(item.surface || item.name || '').trim(), score: Number(item.score) || 1 })
+    .filter(t => t.surface && t.surface.length >= 6);
+  let pool = liveTokens.slice(0, 30);
+  if (pool.length < 20) {
+    const have = new Set(pool.map(t => t.surface.toLowerCase()));
+    for (const surf of SUBJECT_SEED.concat(LUCKY_TOPICS)) {
+      const key = surf.toLowerCase();
+      if (!have.has(key)) { pool.push({ surface: surf, score: 1 }); have.add(key); }
+    }
+  }
+  const tok = pickWeighted(pool, t => t.score) || pool[0] || { surface: SUBJECT_SEED[0], score: 1 };
+  const surface = sanitizeInput(tok.surface, 120);
+  return { id: _prismSubjId(surface), surface, score: tok.score, source: liveTokens.length ? 'hybrid' : 'seed', agency: _prismSubjectAgency(surface) };
+}
+
+// Dial 3 — PERSPECTIVE-FLIP (v0 light roller; full weighted/legality version = step 5).
+const PRISM_FLIP_AXES = {
+  WHO:   { dual: true, structure: 'storytelling' },
+  WHEN:  { dual: true, structure: 'storytelling' },
+  EYES:  { dual: true, structure: 'standard' },
+  VOICE: { dual: true, structure: 'story_reveal_twist' }
+};
+function _prismFlipResolve(axis, subject) {
+  switch (axis) {
+    case 'WHO':   return 'a second character who watched "' + subject + '" happen from the outside';
+    case 'WHEN':  return 'the version of you from before "' + subject + '" ever happened';
+    case 'EYES':  return 'the place or object at the center of "' + subject + '", watching it unfold';
+    case 'VOICE': return 'the subject of "' + subject + '" answering the narrator back';
+    default:      return 'the opposite vantage on "' + subject + '"';
+  }
+}
+function rollFlipDial(genreKey, subject) {
+  // WEIGHTED + legality-aware. Axes are BIASED (never pre-filtered) so the coherence
+  // SCORE still culls — every axis keeps a nonzero floor. Two signals set the weights:
+  //  (1) SUBJECT AGENCY — WHO/VOICE need a second human agent, so an agent subject
+  //      favors them; an abstraction leans on EYES (object/place POV) + WHEN (same
+  //      self across time), which read coherently without a 2nd person.
+  //  (2) GENRE LEGALITY — when genreKey is NOT a perspectiveRotation genre, dampen the
+  //      dual-perspective-heavy axes (WHO/VOICE) hardest; lean on the lighter EYES/WHEN.
+  const agency = (subject && subject.agency) || 'abstraction';
+  const rot = LYRIC_CRAFT_UNIVERSAL.perspectiveRotation;
+  const legalForRotation = !!(rot && Array.isArray(rot.genres) && rot.genres.includes(genreKey));
+  const AGENCY_WEIGHTS = agency === 'agent'
+    ? { WHO: 9, WHEN: 6, EYES: 4, VOICE: 8 }
+    : { WHO: 2, WHEN: 7, EYES: 9, VOICE: 2 };
+  const LEGAL_MULT = legalForRotation
+    ? { WHO: 1, WHEN: 1, EYES: 1, VOICE: 1 }
+    : { WHO: 0.3, WHEN: 0.8, EYES: 1, VOICE: 0.3 };
+  const axis = pickWeighted(Object.keys(PRISM_FLIP_AXES),
+    a => (AGENCY_WEIGHTS[a] || 1) * (LEGAL_MULT[a] || 1)) || 'WHEN';
+  const ax = PRISM_FLIP_AXES[axis];
+  return {
+    axis,
+    defaultPOV: 'first-person narrator living "' + (subject ? subject.surface : '') + '"',
+    flippedPOV: _prismFlipResolve(axis, subject ? subject.surface : ''),
+    reconciliation: 'the final chorus reconciles both looks into one truth',
+    generatorParams: { dualPerspective: ax.dual, structure: ax.structure }
+  };
+}
+
+// ── Dial 2 — METAPHOR ───────────────────────────────────────────────────────
+// Flatten GENRE_METAPHOR_PALETTE (genre → families[] → images[]) into a rollable
+// bank, cached once. Each token carries its source genre + family + sentiment so
+// the roll can bias toward the active genre and the brief can carry the FEELING.
+let _PRISM_METAPHOR_BANK = null;
+function buildMetaphorBank() {
+  if (_PRISM_METAPHOR_BANK) return _PRISM_METAPHOR_BANK;
+  const flat = [];
+  const byGenre = {};
+  for (const genre of Object.keys(GENRE_METAPHOR_PALETTE)) {
+    const fams = (GENRE_METAPHOR_PALETTE[genre] && GENRE_METAPHOR_PALETTE[genre].families) || [];
+    byGenre[genre] = [];
+    for (const fam of fams) {
+      for (const img of (fam.images || [])) {
+        const tok = { token: img, family: fam.name, sentiment: fam.sentiment, genre };
+        flat.push(tok); byGenre[genre].push(tok);
+      }
+    }
+  }
+  _PRISM_METAPHOR_BANK = { flat, byGenre };
+  return _PRISM_METAPHOR_BANK;
+}
+
+// Roll the metaphor dial. Primary: the active genre's palette (the home
+// vocabulary). ~25% of rolls borrow a cross-genre image for surprise. Falls back
+// to the full bank when the genre has no palette entry. Honours user override.
+function rollMetaphorDial(opts) {
+  opts = opts || {};
+  if (opts.metaphor) {
+    const t = sanitizeInput(opts.metaphor, 100);
+    // A user-typed metaphor is NOT auto-credited as a home-genre image. We try to
+    // place it in the metaphor bank: if its token/family actually belongs to the
+    // active genre's palette it earns home fit; if it lives in another genre it is
+    // a borrow; otherwise it carries no genre claim (genres:[]) and _scorePrism
+    // grades it by fit like a rolled one. This kills the old flat +30 inflation.
+    const gk = _normalizeGenreKey(opts.genreKey || '');
+    const bank = buildMetaphorBank();
+    const needle = t.toLowerCase();
+    let hit = null;
+    for (const tok of bank.flat) {
+      if (String(tok.token).toLowerCase() === needle) { hit = tok; break; }
+    }
+    if (hit) {
+      return { token: t, family: hit.family, sentiment: hit.sentiment, genres: [hit.genre],
+        directive: 'TOUCHPOINT not THROUGHLINE', borrow: (hit.genre !== gk) ? hit.genre : null, source: 'user' };
+    }
+    return { token: t, family: 'user', sentiment: '', genres: [],
+      directive: 'TOUCHPOINT not THROUGHLINE', borrow: null, source: 'user' };
+  }
+  const bank = buildMetaphorBank();
+  const gk = _normalizeGenreKey(opts.genreKey || '');
+  const home = bank.byGenre[gk] && bank.byGenre[gk].length ? bank.byGenre[gk] : null;
+  const borrow = Math.random() < 0.25 || !home;
+  const pool = borrow ? bank.flat : home;
+  const tok = pickRandom(pool) || bank.flat[0];
+  return {
+    token: tok.token, family: tok.family, sentiment: tok.sentiment,
+    genres: [tok.genre],
+    directive: 'TOUCHPOINT not THROUGHLINE',
+    borrow: (borrow && tok.genre !== gk) ? tok.genre : null
+  };
+}
+
+// ── Dial 5 — PHRASE FLIP ────────────────────────────────────────────────────
+// Turn a colloquial saying / idiom / proverb into a song concept by FLIPPING it
+// — taking it literal, contradicting it, personalizing it, answering it back, or
+// telling its origin. Accepts a user-typed phrase ("God willing and the creek
+// don't rise") or rolls one from PHRASE_BANK. Public-domain sayings only.
+const PHRASE_BANK = [
+  { phrase: "God willing and the creek don't rise", meaning: "barring disaster, I'll be there", register: 'southern' },
+  { phrase: 'come hell or high water', meaning: 'no matter what stands in the way', register: 'southern' },
+  { phrase: "the grass is always greener on the other side", meaning: 'what we don\'t have looks better', register: 'folksy' },
+  { phrase: 'every cloud has a silver lining', meaning: 'there is good hidden in the bad', register: 'hopeful' },
+  { phrase: 'when it rains it pours', meaning: 'troubles arrive all at once', register: 'folksy' },
+  { phrase: "don't count your chickens before they hatch", meaning: "don't assume the win too early", register: 'cautionary' },
+  { phrase: 'a bird in the hand is worth two in the bush', meaning: 'what you hold beats what you chase', register: 'cautionary' },
+  { phrase: 'burning the candle at both ends', meaning: 'spending yourself faster than you can refill', register: 'folksy' },
+  { phrase: 'the apple never falls far from the tree', meaning: 'we become our people', register: 'folksy' },
+  { phrase: 'make hay while the sun shines', meaning: 'use the good time before it ends', register: 'folksy' },
+  { phrase: 'still waters run deep', meaning: 'the quiet ones carry the most', register: 'folksy' },
+  { phrase: 'blood is thicker than water', meaning: 'family pulls hardest', register: 'folksy' },
+  { phrase: 'you reap what you sow', meaning: 'the harvest matches the seed', register: 'biblical' },
+  { phrase: 'a house divided cannot stand', meaning: 'split from inside, it falls', register: 'biblical' },
+  { phrase: 'the road to hell is paved with good intentions', meaning: 'meaning well is not enough', register: 'biblical' },
+  { phrase: 'a wolf in sheep\'s clothing', meaning: 'danger dressed as safety', register: 'biblical' },
+  { phrase: 'between a rock and a hard place', meaning: 'no good way out', register: 'folksy' },
+  { phrase: 'out of the frying pan into the fire', meaning: 'escaping one bad thing into a worse one', register: 'folksy' },
+  { phrase: 'the straw that broke the camel\'s back', meaning: 'the last small thing that ends it', register: 'folksy' },
+  { phrase: 'let sleeping dogs lie', meaning: 'leave the buried thing buried', register: 'cautionary' },
+  { phrase: 'barking up the wrong tree', meaning: 'chasing the wrong answer', register: 'folksy' },
+  { phrase: 'fish or cut bait', meaning: 'commit or walk away', register: 'folksy' },
+  { phrase: "you can't have your cake and eat it too", meaning: 'every choice costs the other', register: 'folksy' },
+  { phrase: 'a watched pot never boils', meaning: 'wanting it makes the wait longer', register: 'folksy' },
+  { phrase: 'curiosity killed the cat', meaning: 'wanting to know has a price', register: 'cautionary' },
+  { phrase: 'pull yourself up by your bootstraps', meaning: 'save yourself with nothing but yourself', register: 'americana' },
+  { phrase: 'throw caution to the wind', meaning: 'stop being careful and leap', register: 'folksy' },
+  { phrase: 'like a moth to a flame', meaning: 'drawn to the thing that burns you', register: 'folksy' },
+  { phrase: 'cross that bridge when you come to it', meaning: 'deal with it when it\'s real', register: 'folksy' },
+  { phrase: 'speak of the devil', meaning: 'the one you named just appeared', register: 'folksy' },
+  { phrase: 'a cold day in hell', meaning: 'never, or only when the impossible happens', register: 'folksy' },
+  { phrase: 'the proof is in the pudding', meaning: 'you only know it by how it turns out', register: 'folksy' },
+  { phrase: 'actions speak louder than words', meaning: 'what you do outweighs what you say', register: 'folksy' },
+  { phrase: 'beggars can\'t be choosers', meaning: 'take what you\'re given when you have nothing', register: 'folksy' },
+  { phrase: 'if the shoe fits, wear it', meaning: 'own the truth that describes you', register: 'folksy' },
+  { phrase: 'don\'t bite the hand that feeds you', meaning: 'don\'t wound what keeps you alive', register: 'cautionary' },
+  { phrase: 'the devil is in the details', meaning: 'the small things hide the danger', register: 'folksy' },
+  { phrase: 'don\'t throw the baby out with the bathwater', meaning: 'don\'t lose the good clearing out the bad', register: 'folksy' },
+  { phrase: 'hold your horses', meaning: 'slow down before you ruin it', register: 'southern' },
+  { phrase: 'that dog won\'t hunt', meaning: 'that excuse won\'t work', register: 'southern' }
+];
+// label = the listener-facing strategy name shown on the PHRASE chip.
+// dir   = the MODEL-facing instruction folded into promptDirective (directive voice).
+// desc  = a SHORT human-facing sentence describing the SONG to the user — no
+//         "Write a song where…" instruction voice. Feeds the human conceptLine so
+//         the brief reads as a description, not as an AI directive (punch-list #2).
+const PHRASE_FLIP_STRATEGIES = {
+  LITERAL:  { label: 'Take it literal', desc: 'A song that takes the old saying at its word and makes it really happen.', dir: (p, m) => `Write "${p}" LITERALLY — make it an actual event in the song, not a figure of speech. The image is real, the scene is concrete; the saying becomes the thing that physically happens.` },
+  SUBVERT:  { label: 'Subvert it',      desc: 'A song that proves the old saying wrong.',                                  dir: (p, m) => `CONTRADICT "${p}". Write a song where the saying fails — the opposite is true (${m}, except it isn't). The whole song is the proof that this old wisdom was wrong this time.` },
+  PERSONAL: { label: 'Make it personal',desc: 'A song that shrinks the old saying down to one private, specific moment.',  dir: (p, m) => `Shrink "${p}" down to ONE specific intimate moment. The proverb stops being general wisdom and becomes about a single person, a single night, a single choice.` },
+  ANSWER:   { label: 'Answer it back',  desc: 'A song that talks back to the old saying and argues with it.',             dir: (p, m) => `Write the song as a REPLY to whoever says "${p}". Argue with the saying — the narrator has heard it their whole life and is finally talking back to it.` },
+  ORIGIN:   { label: 'Tell its origin', desc: 'A song about the first time someone said the old saying and why it stuck.', dir: (p, m) => `Tell the story of the FIRST time someone said "${p}" to the narrator and why it stuck. The saying is the last line they remember; the song is everything that led to it.` }
+};
+function rollPhraseDial(opts) {
+  opts = opts || {};
+  let entry;
+  if (opts.phrase) {
+    entry = { phrase: sanitizeInput(opts.phrase, 120), meaning: opts.meaning ? sanitizeInput(opts.meaning, 160) : 'what the saying means to the narrator', register: 'user' };
+  } else {
+    entry = pickRandom(PHRASE_BANK);
+  }
+  const stratKey = opts.strategy && PHRASE_FLIP_STRATEGIES[opts.strategy] ? opts.strategy : pickRandom(Object.keys(PHRASE_FLIP_STRATEGIES));
+  const strat = PHRASE_FLIP_STRATEGIES[stratKey];
+  return {
+    phrase: entry.phrase, meaning: entry.meaning, register: entry.register,
+    strategy: stratKey, strategyLabel: strat.label,
+    // Human-facing one-liner describing the SONG (punch-list #2) — no directive voice.
+    strategyDesc: strat.desc || '',
+    flipDirective: strat.dir(entry.phrase, entry.meaning)
+  };
+}
+
+// Deterministic 0..1 jitter from a string. Lets the score reflect the ACTUAL
+// concept (token/family/axis/subject) instead of bunching every same-tier combo
+// on one integer — so the "Coherence NN" badge spreads and means something. FNV-1a.
+function _prismHash01(str) {
+  let h = 2166136261 >>> 0;
+  str = String(str || '');
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+  return (h >>> 8) / 16777216;
+}
+
+// Coherence score (§3 rubric) — GRADUATED so the gate genuinely discriminates.
+// Each of the five axes pays partial credit across a band (not a near-binary
+// max), and the band position is fixed by a concept-derived hash, so coherent
+// concepts spread across ~60-100 and weak ones fall under the REJECT floor.
+// User-typed metaphors are graded by real genre fit (no flat +30 inflation).
+function _scorePrism(q) {
+  let s = 0;
+  const prim = q.genre.primary;
+  // Genre↔Metaphor fit (0-30). Home image is strongest but still varies by which
+  // family/genre it is; a borrow is mid-band friction; a metaphor that claims no
+  // home and isn't a borrow fights the genre and earns little.
+  const m = q.metaphor;
+  if (m) {
+    const j = _prismHash01((m.token || '') + '|' + (m.family || '') + '|' + prim);
+    if (m.genres && m.genres.includes(prim)) {
+      s += 22 + Math.round(j * 8);          // 22-30 home fit
+    } else if (m.borrow) {
+      s += 8 + Math.round(j * 10);          // 8-18 intentional cross-genre friction
+    } else {
+      s += Math.round(j * 6);               // 0-6 metaphor fights / has no genre claim
+    }
+  }
+  // Subject↔Perspective fit. WHO/VOICE on an agent-less abstraction is the failure
+  // mode → hard penalty so the floor binds. Otherwise graded by how well the axis
+  // suits the subject's agency (agents take any lens cleanly; abstractions read
+  // best through EYES/WHEN), with concept jitter inside the band.
+  const abstraction = q.subject.agency === 'abstraction';
+  const whoVoice = q.flip.axis === 'WHO' || q.flip.axis === 'VOICE';
+  const ja = _prismHash01((q.subject.surface || '') + '|' + q.flip.axis);
+  if (abstraction && whoVoice) {
+    s -= 25;                                // the documented failure pairing
+  } else if (abstraction) {
+    s += 13 + Math.round(ja * 7);           // 13-20 abstraction through EYES/WHEN
+  } else {
+    s += 18 + Math.round(ja * 7);           // 18-25 agent takes any lens
+  }
+  // Genre↔Perspective legality (0-20). perspectiveRotation lives under LYRIC_CRAFT_UNIVERSAL.
+  const legal = (LYRIC_CRAFT_UNIVERSAL.perspectiveRotation && LYRIC_CRAFT_UNIVERSAL.perspectiveRotation.genres) || [];
+  const jl = _prismHash01(prim + '|' + q.flip.axis + '|legal');
+  s += legal.includes(prim) ? (14 + Math.round(jl * 6)) : (2 + Math.round(jl * 8)); // 14-20 vs 2-10
+  // Fusion quality (0-15). Fusions read their real compat; singles are graded by
+  // genre weight so a marquee single beats a fringe one instead of all flat 12.
+  if (q.genre.mode === 'fusion' && q.genre.quality && isFinite(q.genre.quality.overall)) {
+    s += (q.genre.quality.overall / 100) * 15;
+  } else {
+    const w = Number(SINGLE_GENRE_WEIGHTS[prim]) || Number(SINGLE_GENRE_WEIGHTS[_normalizeGenreKey(prim)]) || 0;
+    const ws = Object.values(SINGLE_GENRE_WEIGHTS).filter(x => isFinite(x));
+    const maxW = ws.length ? Math.max(...ws) : 1;
+    s += 6 + (maxW > 0 ? (w / maxW) : 0.5) * 9;   // 6-15 by genre strength
+  }
+  // Metaphor over-extension risk (0-10): a cross-genre borrow is likelier to over-extend.
+  const jo = _prismHash01((m && m.token || '') + '|over');
+  s += (m && m.borrow) ? (3 + Math.round(jo * 4)) : (7 + Math.round(jo * 3)); // 3-7 vs 7-10
+  return Math.max(0, Math.min(100, Math.round(s)));
+}
+
+// Roll all dials N times, score, return the best CONCEPT BRIEF (no prompt/system —
+// that's what makes it the inverse of Lucky).
+// params: { g1?, g2?, subject?, subjectPool?, metaphor?, phrase?, phraseStrategy?,
+//           phraseMode? ('auto'|true), spice?, candidates? }.
+function buildPrismConcept(params) {
+  params = params || {};
+  const N = Math.max(1, Math.min(parseInt(params.candidates, 10) || 5, 12));
+  // Phrase-flip activates when the user types a phrase, forces it on, or opts into
+  // 'auto' (~35% of rolls surface a colloquial-phrase concept).
+  const phraseOn = !!params.phrase || params.phraseMode === true ||
+    (params.phraseMode === 'auto' && Math.random() < 0.35);
+  // Roll ≥N candidates, keep the best, then enforce a quality FLOOR: if the best
+  // hasn't cleared the floor after N rolls, keep rolling (capped) until one does.
+  // Calibrated EMPIRICALLY, not to the spec's nominal 55 — coherent dials (whitelist
+  // fusions, mostly-agent subjects, always-coherent metaphors) floor naturally at
+  // ~58, so 55 never binds. 70 sits inside the live winner band (72-100) so the gate
+  // actually culls weak batches and forces a re-roll toward the stronger end.
+  const REJECT = 70, MAX_ATTEMPTS = N + 15;
+  // "Pinned" = the user hard-locked the inputs that drive coherence (subject AND
+  // metaphor). With those fixed, candidates barely vary and the reject floor can be
+  // unsatisfiable — a low score then reflects the USER'S deliberate choices, not a
+  // weak roll. We flag it (coherenceFloorMet/pinned) so the UI shows "Custom concept"
+  // instead of silently shipping a misleading low "Coherence NN" badge.
+  const pinned = !!(params.subject && params.metaphor);
+  let best = null, attempts = 0;
+  while (attempts < MAX_ATTEMPTS) {
+    attempts++;
+    const genre = rollGenreDial({ g1: params.g1, g2: params.g2, spice: params.spice, allowedGenres: params.allowedGenres });
+    const subject = rollSubjectDial({ subject: params.subject, livePool: params.subjectPool });
+    const flip = rollFlipDial(genre.primary, subject);
+    const metaphor = rollMetaphorDial({ genreKey: genre.primary, metaphor: params.metaphor });
+    const phrase = phraseOn ? rollPhraseDial({ phrase: params.phrase, strategy: params.phraseStrategy }) : null;
+    const score = _scorePrism({ genre, subject, flip, metaphor });
+    if (!best || score > best.score || (score === best.score && subject.score > best.subject.score)) {
+      best = { genre, subject, flip, metaphor, phrase, score };
+    }
+    if (attempts >= N && best.score >= REJECT) break;
+  }
+  const g = best.genre;
+  const genreLabel = g.mode === 'fusion' ? g.fusionName : (GENRE_LABELS[g.primary] || g.primary);
+  // SINGLE display label (punch-list #4). This is the ONE genre string the chip
+  // shows; buildPrismSongPrompt echoes the SAME value back into meta so the chip
+  // and the prompt can never diverge. For a fusion the chip's marketing fusionName
+  // is the listener-facing label; the prompt's own header label (GENRE_LABELS of
+  // the primary leg) is a different string, so we surface BOTH and let the chip
+  // read displayGenreLabel.
+  const displayGenreLabel = genreLabel;
+  const m = best.metaphor;
+  const touch = ' the image of "' + m.token + '" (' + (m.sentiment || 'the feeling underneath') + ')';
+  // ── TWO fields (punch-list #2) ──────────────────────────────────────────────
+  // conceptLine    = HUMAN description (genre + subject + human strategy desc +
+  //                  touchstone image). NO "Write a song where…" instruction voice.
+  // promptDirective = MODEL-facing directive (flipDirective + dial instructions)
+  //                  that buildPrismSongPrompt feeds in as `topic`.
+  let conceptLine, promptDirective;
+  if (best.phrase) {
+    // Phrase-flip drives the concept: the saying is the spine, subject grounds it,
+    // metaphor is a supporting touchpoint.
+    const human = best.phrase.strategyDesc || (best.phrase.strategyLabel + ' the old saying.');
+    conceptLine = displayGenreLabel + '. "' + best.phrase.phrase + '" — ' + human +
+      ' Grounded in ' + best.subject.surface + ', touched once by' + touch + '.';
+    promptDirective = displayGenreLabel + '. "' + best.phrase.phrase + '" — ' + best.phrase.strategyLabel + '. ' +
+      best.phrase.flipDirective + ' Ground it in ' + best.subject.surface +
+      ', touched once by' + touch + '.';
+  } else {
+    // Non-phrase path: conceptLine is already a human description (no instruction
+    // voice). promptDirective mirrors it — the dials carry their own directives
+    // (flip.reconciliation, metaphor.directive) downstream, so the same text
+    // serves both the human read and the model topic here.
+    conceptLine = displayGenreLabel + '. A song about ' + best.subject.surface +
+      ', told from the angle of ' + best.flip.flippedPOV +
+      ', with' + touch + ' as a touchstone. ' + best.flip.reconciliation + '.';
+    promptDirective = conceptLine;
+  }
+  return {
+    version: 'prism-1',
+    subject: best.subject,
+    metaphor: { token: m.token, family: m.family, sentiment: m.sentiment, genres: m.genres, directive: m.directive, borrow: m.borrow },
+    phrase: best.phrase,
+    flip: best.flip,
+    genre: { mode: g.mode, primary: g.primary, secondary: g.secondary, fusionName: g.fusionName, label: g.label, quality: g.quality, blend: g.blend, treatment: g.tip || '' },
+    // Single-sourced display label — chip + prompt both read this (punch-list #4).
+    displayGenreLabel,
+    coherenceScore: best.score,
+    coherenceFloorMet: best.score >= REJECT,
+    pinned,
+    conceptLine,                       // HUMAN description (no "Write a song where…")
+    promptDirective,                   // MODEL-facing directive (fed to buildSongPrompt as topic)
+    meta: { rolledCandidates: N, spice: params.spice ? 'on' : 'low', phraseFlip: !!best.phrase }
+  };
+}
+
+// Map a CONCEPT BRIEF → buildSongPrompt. Folds the four dials into existing
+// params (topic / seedLine / dualPerspective / structure / blend) — no new
+// buildSongPrompt param required. extra: { mood?, vocal?, lyricTier?, length?, plan?, isAdmin? }.
+function buildPrismSongPrompt(brief, extra) {
+  extra = extra || {};
+  const g = (brief && brief.genre) || {};
+  const fp = (brief && brief.flip && brief.flip.generatorParams) || {};
+  // seedLine force-locks verbatim into every chorus (buildSongPrompt: seedLineNote).
+  // Only a flipped PHRASE earns that — a saying is a real, intended hook/title. A
+  // rolled metaphor must stay a TOUCHPOINT (it lives in conceptLine/topic only),
+  // honoring the "touchpoint not throughline" rule the app enforces elsewhere.
+  const seedLine = (brief && brief.phrase && brief.phrase.phrase) || '';
+  // Resolve mood/vocal HERE so they can be surfaced in meta — buildSongPrompt does
+  // not echo them back, so reading built.meta.mood would always be undefined.
+  const mood  = extra.mood  ? sanitizeInput(extra.mood, 100)  : pickRandom(LUCKY_MOODS);
+  const vocal = extra.vocal ? sanitizeInput(extra.vocal, 100) : pickRandom(LUCKY_VOCALS);
+  // topic = the MODEL-facing directive (punch-list #2). The UI keeps showing the
+  // HUMAN conceptLine; the model still receives the full flip/dial instruction.
+  const modelTopic = (brief && brief.promptDirective)
+    || (brief && brief.conceptLine)
+    || (brief && brief.subject && brief.subject.surface) || '';
+  // Single-sourced display label (punch-list #4) — echoed into meta below so the
+  // chip and the prompt agree on ONE genre string.
+  const displayGenreLabel = (brief && brief.displayGenreLabel)
+    || (g.mode === 'fusion' ? g.fusionName : (GENRE_LABELS[g.primary] || g.primary)) || '';
+  const built = buildSongPrompt({
+    genre: g.primary || 'pop',
+    blend: (g.mode === 'fusion' && g.blend) ? g.blend : {},
+    topic: modelTopic,
+    seedLine, mood, vocal,
+    dualPerspective: fp.dualPerspective === true,
+    structure: fp.structure || 'standard',
+    lyricTier: extra.lyricTier || 'street',
+    length: extra.length || 'medium',
+    plan: extra.plan, isAdmin: extra.isAdmin
+  });
+  // Surface the brief + the lucky-style meta keys the client reveal UI expects.
+  built.meta = Object.assign({}, built.meta, {
+    prism: {
+      subject: brief.subject, metaphor: brief.metaphor, phrase: brief.phrase,
+      flip: brief.flip, genre: brief.genre,
+      // HUMAN line for the UI + the MODEL directive that was actually sent (#2).
+      conceptLine: brief.conceptLine, promptDirective: brief.promptDirective,
+      // Single-sourced display label — chip reads this (#4).
+      displayGenreLabel,
+      coherenceScore: brief.coherenceScore, coherenceFloorMet: brief.coherenceFloorMet, pinned: brief.pinned
+    },
+    g1: g.primary, g2: g.secondary,
+    // topic echoes the HUMAN line for legacy reveal fallbacks; the model already
+    // received promptDirective via buildSongPrompt above.
+    topic: brief.conceptLine,
+    mood, vocal,
+    // fusionName carries the SAME single label so any caller reading meta.fusionName
+    // agrees with the chip (#4).
+    fusionName: displayGenreLabel, substyle: (built.meta && built.meta.substyle) || ''
+  });
+  return built;
+}
+
 module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
@@ -9599,6 +11292,26 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   OUTRO_ARCHETYPES, VERSE2_ARCHETYPES, PRE_CHORUS_ARCHETYPES, POST_CHORUS_ARCHETYPES,
   // Wave 4k addition
   buildMetaphorBalanceNote,
+  // Wave 5p — Prince Method (melodic unity)
+  buildPrinceMethodNote, MELODIC_UNITY_GENRES,
+  // Wave 5q — Anti-Drop (stripped chorus)
+  buildAntiDropNote, ANTI_DROP_GENRES,
+  // Wave 5q — Melodic Cliche bank
+  buildMelodicClicheNote, MELODIC_CLICHE_BANK, MELODIC_CLICHE_GENRES,
+  // Wave 5q — Tresillo (3-3-2 rhythmic cell)
+  buildTresilloNote, TRESILLO_GENRES,
+  // Wave 5q — Melodic Bassline / Ostinato (Billie Jean Method)
+  buildMelodicBassNote, MELODIC_BASS_GENRES, GENRE_BASS_PROFILES,
+  // Wave 5r — Chorus-in-Intro (teaser open)
+  buildChorusIntroNote, CHORUS_INTRO_GENRES,
+  // Wave 5r — One-Note Melody (static-pitch topline)
+  buildOneNoteMelodyNote, ONE_NOTE_MELODY_GENRES,
+  // Wave 5r — Pop Drop (instrumental lead-melody post-chorus)
+  buildPopDropNote, POP_DROP_GENRES, POP_DROP_LEAD,
+  // Wave 5s — Carole King Interval-Emotion Map (melodic direction)
+  buildIntervalMapNote, INTERVAL_EMOTION_MAP, INTERVAL_MAP_GENRES,
+  // Wave 6 — cross-genre Modulation Engine (organic key changes: tension vs momentum)
+  buildModulationNote, MODULATION_ARCHETYPES, GENRE_MODULATION_PREFS,
   // Wave 4l additions
   GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote,
   // Wave 5 addition — two-song blend
@@ -9606,7 +11319,11 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   // Lever #7 — vocal character descriptors (re-exported for tests / debug)
   selectVocalDescriptors, buildVocalDescriptorNote,
   // Lever #8 — surprise / creativity engine
-  selectSurpriseMoves, buildSurpriseNote };
+  selectSurpriseMoves, buildSurpriseNote,
+  // PRISM — concept-first engine (inverse of Lucky). docs/PRISM-ENGINE-SPEC.md
+  buildPrismConcept, buildPrismSongPrompt, rollGenreDial, rollSubjectDial, rollFlipDial,
+  rollMetaphorDial, buildMetaphorBank, rollPhraseDial, PHRASE_BANK, PHRASE_FLIP_STRATEGIES,
+  _scorePrism, pickWeighted, SUBJECT_SEED, SINGLE_GENRE_WEIGHTS };
 
 
 
