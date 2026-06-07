@@ -786,7 +786,7 @@ module.exports = async function handler(req, res) {
         [{ role: 'user', content: built.prompt }],
         built.system,
         2200,                    // 3-min song (~1500 tok) + lean brief tail (Arrangement/Vocal/Sonic Refs, ~350 tok); headroom so the 3 surfaced sections finish, not truncate
-        55000,                   // sit just under Vercel's 60s ceiling: a song generation runs ~35-40s, and after a fast primary-provider failure the fallback needs the near-full budget — a tighter cap aborts slow-but-valid completions and 500s
+        52000,                   // sit under Vercel's 60s ceiling with headroom for POST-processing (section parse, Suno-settings, rate-limit increment, serialization) — a song runs ~35-40s, fallback needs near-full budget, but the AI call must leave ~8s so a slow-but-valid completion + a slow Supabase round-trip don't tip the whole function past 60s and 500
       );
       console.log('[flow-song] ai-ok', { ms: Date.now() - t0, lyricChars: lyrics.length });
     } catch (e) {

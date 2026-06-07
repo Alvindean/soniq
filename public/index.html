@@ -5733,11 +5733,14 @@ body.craft-advanced .craft-basic-only{display:none !important}
             mkSec('vocal', parsed.vocal) +
             mkSec('references', parsed.references);
         }
-        // Surface optional tabs only when the brain returned that section.
+        // Surface optional tabs only when the brain returned REAL content for
+        // that section — not an unfilled "[Section by section: ...]" placeholder
+        // echoed straight from the prompt template.
+        var flowReal = function(s){ s = String(s || '').trim(); return s.length > 0 && !(s.charAt(0) === '[' && s.charAt(s.length - 1) === ']'); };
         var flowOptTab = function(id, has){ var b = document.getElementById('fres-tab-' + id); if (b) b.style.display = has ? '' : 'none'; };
-        flowOptTab('arrangement', !!parsed.arrangement);
-        flowOptTab('vocal', !!parsed.vocal);
-        flowOptTab('references', !!parsed.references);
+        flowOptTab('arrangement', flowReal(parsed.arrangement));
+        flowOptTab('vocal', flowReal(parsed.vocal));
+        flowOptTab('references', flowReal(parsed.references));
         // Reset to the Lyrics tab on each new spin
         document.querySelectorAll('.flow-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-tab') === 'lyrics'); });
         // Stash on window for save handler (lyrics field is now ONLY lyrics)

@@ -4934,13 +4934,29 @@ function buildModulationNote({ genre, mood, structStr, key, hookStyle, freestyle
   const hasChorus = /chorus|hook|refrain/i.test(ss);
   if (!hasBridge && !hasChorus) return '';                        // nothing to pivot around
 
-  // Pick from the genre pool; if it needs a bridge the song doesn't have, swap
-  // to a non-bridge archetype still inside this genre's pool.
-  let _ma = pickWeightedArchetype(MODULATION_ARCHETYPES, prefs.pool);
-  if (_ma.needs === 'bridge' && !hasBridge) {
-    const alt = MODULATION_ARCHETYPES.filter(a => a.needs !== 'bridge' && prefs.pool.includes(a.name));
-    _ma = alt.length ? pickRandom(alt) : MODULATION_ARCHETYPES.find(a => a.name === 'Step-Up Truck-Driver');
-  }
+  // Genre-locked candidate set — no cross-genre surprise (a gospel song must
+  // never roll a down-modulation). Drop bridge moves when the song has no
+  // bridge. Then MOOD biases the pick: dark/tense moods lean toward TENSION
+  // archetypes, bright/triumphant moods toward MOMENTUM — so the key move
+  // serves the song's emotional arc, not just its genre.
+  let cand = prefs.pool
+    .map(n => MODULATION_ARCHETYPES.find(a => a.name === n))
+    .filter(Boolean)
+    .filter(a => !(a.needs === 'bridge' && !hasBridge));
+  if (!cand.length) cand = [MODULATION_ARCHETYPES.find(a => a.name === 'Step-Up Truck-Driver')];
+
+  const moodStr = String(mood || '').toLowerCase();
+  const tensionMood  = /dark|sad|melanch|grief|heartbreak|angr|rage|tense|anx|brood|somber|mourn|lonely|desperat|bitter|haunt|cold|ache/.test(moodStr);
+  const momentumMood = /triumph|joy|uplift|hope|euphor|celebrat|anthem|energ|confiden|victor|soar|bright|exult|empower|defiant|fierce/.test(moodStr);
+  const weights = cand.map((a, i) => {
+    let w = Math.max(4 - i, 1);                               // canonical-first bias from the genre pool order
+    if (tensionMood)  { if (a.job === 'tension')  w += 3; else if (a.job === 'momentum') w = Math.max(1, w - 2); }
+    if (momentumMood) { if (a.job === 'momentum') w += 3; else if (a.job === 'tension')  w = Math.max(1, w - 2); }
+    return w;
+  });
+  const _wtot = weights.reduce((x, y) => x + y, 0);
+  let _r = Math.random() * _wtot, _ma = cand[cand.length - 1];
+  for (let i = 0; i < cand.length; i++) { _r -= weights[i]; if (_r <= 0) { _ma = cand[i]; break; } }
 
   const jobLabel = _ma.job === 'both' ? 'TENSION + MOMENTUM' : _ma.job.toUpperCase();
   const keyLine = key ? ` Home key for this song: ${key} — work the move relative to it.` : '';
