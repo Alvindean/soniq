@@ -4284,6 +4284,55 @@ body.craft-advanced .craft-basic-only{display:none !important}
             <span class="bpill" onclick="setHookStyle(this,'Antithesis Hook')" title="Chorus pairs CONTRASTING ideas in adjacent lines. Supremes 'Stop! In the Name of Love', Adele 'Set Fire to the Rain', TLC 'No Scrubs'.">Antithesis</span>
           </div>
 
+          <!-- FEATURED GUEST — a different performer takes ONE section -->
+          <div class="voice-card" id="guest-card" style="margin-top:14px">
+            <div class="voice-card-title" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span>🎤 Featured Guest</span>
+              <div class="bracket-pills" style="margin:0">
+                <span class="bpill on" id="guest-off" onclick="setGuestOn(false)">Off</span>
+                <span class="bpill" id="guest-on" onclick="setGuestOn(true)">On</span>
+              </div>
+            </div>
+            <div style="font-size:10px;color:var(--tx4);text-transform:none;letter-spacing:0;font-weight:400;margin:-4px 0 10px">A different singer/rapper takes ONE section — split hook, a country/jazz guest on a rap, or a rapped chorus on a sung song.</div>
+            <div id="guest-panel" style="display:none">
+              <div class="bracket-label" style="margin-top:4px">Section</div>
+              <div class="bracket-pills" id="guest-section-pills">
+                <span class="bpill on" onclick="setGuestSection(this,'Hook')">Hook</span>
+                <span class="bpill" onclick="setGuestSection(this,'Bridge')">Bridge</span>
+                <span class="bpill" onclick="setGuestSection(this,'Verse 2')">Verse 2</span>
+              </div>
+              <div class="bracket-label" style="margin-top:12px">Delivery</div>
+              <div class="bracket-pills" id="guest-delivery-pills">
+                <span class="bpill on" onclick="setGuestDelivery(this,'Sung')">Sung</span>
+                <span class="bpill" onclick="setGuestDelivery(this,'Rapped')">Rapped</span>
+              </div>
+              <div class="bracket-label" style="margin-top:12px">Guest style <span style="font-weight:400;color:var(--tx4);font-size:10px;text-transform:none;letter-spacing:0">— optional</span></div>
+              <select id="guest-style" onchange="setGuestStyle(this.value)" style="width:100%;margin:4px 0 6px">
+                <option value="">— match the song's natural style —</option>
+                <option>Country</option>
+                <option>Jazz</option>
+                <option>R&amp;B / Soul</option>
+                <option>Neo-Soul</option>
+                <option>Gospel</option>
+                <option>Pop</option>
+                <option>Rap / Hip-Hop</option>
+                <option>Afrobeats</option>
+                <option>Reggae</option>
+                <option>Blues</option>
+                <option>Folk</option>
+                <option>Rock</option>
+              </select>
+              <input type="text" id="guest-style-custom" placeholder="…or type any style (e.g. mariachi, opera)" oninput="setGuestStyleCustom(this.value)" style="width:100%"/>
+              <div class="bracket-label" style="margin-top:12px">Voice</div>
+              <div class="bracket-pills" id="guest-voice-pills">
+                <span class="bpill on" onclick="setGuestVoice(this,'Auto')">Auto</span>
+                <span class="bpill" onclick="setGuestVoice(this,'Male')">Male</span>
+                <span class="bpill" onclick="setGuestVoice(this,'Female')">Female</span>
+              </div>
+              <div id="guest-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-top:12px"></div>
+            </div>
+          </div>
+
           <!-- ARTIST VOICE PROFILE -->
           <div class="voice-card" id="voice-card">
             <div class="voice-card-title">🎤 Artist Voice</div>
@@ -11131,6 +11180,8 @@ const MOOD_COLORS = {
 // ═══════════════════════════════════════════════════════
 const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
+  // Featured Guest — a different performer takes ONE section (off by default → no change to normal songs)
+  featuredGuest:{on:false,section:'Hook',delivery:'Sung',style:'',voice:'Auto'},
   // Wave 4i — Production Mode toggles (server reads these via songParams + Lucky payload)
   viralMode:false, sampleHookMode:false, offTheTopMode:false, producerTemplate:'',
   rapStyle: 'trap',
@@ -14098,6 +14149,14 @@ async function generateSong(){
     eraUndertone: typeof S.eraUndertone === 'string' ? S.eraUndertone : '',
     graftGenre: typeof S.graftGenre === 'string' ? S.graftGenre : '',
     graftSection: ['verse','chorus','bridge'].includes(S.graftSection) ? S.graftSection : 'chorus',
+    // Featured Guest — a different performer takes ONE section. Omitted entirely when off (backwards-compatible).
+    featuredGuest: (S.featuredGuest && S.featuredGuest.on) ? {
+      on: true,
+      section: S.featuredGuest.section || 'Hook',
+      delivery: S.featuredGuest.delivery || 'Sung',
+      style: S.featuredGuest.style || '',
+      voice: S.featuredGuest.voice || 'Auto'
+    } : undefined,
     invertCounter: S.invertCounter === true,
     platinum: _platinumOn && isPlatinumEligible(),
     // Loop Anchor — short phrase (2-8 syl) the song rotates around. Loops in
@@ -18656,6 +18715,13 @@ async function applyCoachAndRegenerate() {
       mode: 'auto',
       substyle: S.substyle || song.substyle || (_genreWasLabel ? _rawGenre : ''),
       hookStyle: S.hookStyle || 'auto',
+      featuredGuest: (S.featuredGuest && S.featuredGuest.on) ? {
+        on: true,
+        section: S.featuredGuest.section || 'Hook',
+        delivery: S.featuredGuest.delivery || 'Sung',
+        style: S.featuredGuest.style || '',
+        voice: S.featuredGuest.voice || 'Auto'
+      } : undefined,
       bracketMode: S.bracketMode || 'suno',
       voice: {
         name: localStorage.getItem('soniq_voice_name') || '',
@@ -25304,6 +25370,46 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       d.textContent = '';
     }
+  }
+
+  // ── Featured Guest — a different performer takes ONE section ──────────────
+  function _guestPillSelect(el){
+    if(!el || !el.parentElement) return;
+    Array.prototype.forEach.call(el.parentElement.querySelectorAll('.bpill'), function(p){ p.classList.remove('on'); });
+    el.classList.add('on');
+  }
+  window.setGuestOn = function(on){
+    S.featuredGuest = S.featuredGuest || {on:false,section:'Hook',delivery:'Sung',style:'',voice:'Auto'};
+    S.featuredGuest.on = !!on;
+    var offb=document.getElementById('guest-off'), onb=document.getElementById('guest-on'), panel=document.getElementById('guest-panel');
+    if(offb) offb.classList.toggle('on', !on);
+    if(onb) onb.classList.toggle('on', !!on);
+    if(panel) panel.style.display = on ? 'block' : 'none';
+    _refreshGuestDesc();
+  };
+  window.setGuestSection  = function(el,val){ S.featuredGuest.section = val;  _guestPillSelect(el); _refreshGuestDesc(); };
+  window.setGuestDelivery = function(el,val){ S.featuredGuest.delivery = val; _guestPillSelect(el); _refreshGuestDesc(); };
+  window.setGuestVoice    = function(el,val){ S.featuredGuest.voice = val;    _guestPillSelect(el); _refreshGuestDesc(); };
+  window.setGuestStyle = function(val){
+    S.featuredGuest.style = val || '';
+    var c=document.getElementById('guest-style-custom'); if(c) c.value='';   // dropdown wins → clear custom
+    _refreshGuestDesc();
+  };
+  window.setGuestStyleCustom = function(val){
+    var t=(val||'').trim();
+    S.featuredGuest.style = t;
+    if(t){ var s=document.getElementById('guest-style'); if(s) s.value=''; } // custom wins → clear dropdown
+    _refreshGuestDesc();
+  };
+  function _refreshGuestDesc(){
+    var d=document.getElementById('guest-desc'); if(!d) return;
+    var g=S.featuredGuest||{};
+    if(!g.on){ d.textContent=''; return; }
+    var sec=(g.section||'Hook');
+    var del=(g.delivery||'Sung').toLowerCase();
+    var sty=g.style? (g.style+' ') : '';
+    var voi=(g.voice && g.voice!=='Auto')? (g.voice.toLowerCase()+' ') : '';
+    d.textContent='→ A '+sty+voi+del+' guest takes the '+sec+'; the rest of the song stays as the lead.';
   }
 
   window.qfToggleInvertCounter = function(){
