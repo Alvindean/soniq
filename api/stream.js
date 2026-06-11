@@ -292,6 +292,21 @@ function isLoopAnchorEntitled(plan, isAdmin) {
   return !!isAdmin || LOOP_ANCHOR_PLANS.has(plan);
 }
 
+// Featured Guest — a different vocalist takes one section (hook/bridge/verse)
+// in a contrasting delivery (sung↔rapped) + optional style/voice. Whitelist the
+// discrete fields; style is free-text (the brain resolves it to a genre or uses
+// it verbatim) so cap + ASCII-clean it. Off / malformed → undefined (no-op).
+function sanitizeFeaturedGuest(v) {
+  if (!v || typeof v !== 'object' || Array.isArray(v) || v.on !== true) return undefined;
+  const section  = ['Hook', 'Bridge', 'Verse 2'].includes(v.section) ? v.section : 'Hook';
+  const delivery = ['Sung', 'Rapped'].includes(v.delivery) ? v.delivery : 'Sung';
+  const voice    = ['Auto', 'Male', 'Female'].includes(v.voice) ? v.voice : 'Auto';
+  const style    = (typeof v.style === 'string')
+    ? v.style.replace(/[^\x20-\x7E]/g, '').trim().slice(0, 60)
+    : '';
+  return { on: true, section, delivery, style, voice };
+}
+
 // free = 3 lifetime songs (trial); paid = monthly
 const PLAN_LIMITS = {
   free:                3,    // lifetime trial
@@ -836,6 +851,7 @@ module.exports = async function handler(req, res) {
           p.loopAnchor = undefined;
         }
         p.surprise = sanitizeSurprise(p.surprise);
+        p.featuredGuest = sanitizeFeaturedGuest(p.featuredGuest);
         // Emotional velocity whitelist — invalid → 'auto' (server resolves to genre default)
         const VALID_VELOCITY = new Set(['auto','slow_burn','standard_arc','cycling','whiplash','plateau_drift']);
         if (p.emotionalVelocity && !VALID_VELOCITY.has(p.emotionalVelocity)) p.emotionalVelocity = 'auto';
@@ -884,6 +900,7 @@ module.exports = async function handler(req, res) {
         }
         // Lever #8 — surprise engine for Lucky.
         lp.surprise = sanitizeSurprise(lp.surprise);
+        lp.featuredGuest = sanitizeFeaturedGuest(lp.featuredGuest);
         // Punchline-craft tool whitelist for Lucky — same set as the song path.
         // When unset, buildLuckyPrompt auto-picks 1-2 tools for thinking-artist genres.
         const VALID_LUCKY_PUNCHLINE = new Set([

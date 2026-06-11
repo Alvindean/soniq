@@ -6964,7 +6964,7 @@ function buildSongPrompt(params) {
     producerTemplate = '',         // Wave 4d — producer beat template
     viralMode = false,             // Wave 4e — Viral Producer Mode (genre-gated)
     sampleHookMode = false,        // Wave 4f — auto-extract sample phrase hook
-    graftGenre = '', graftSection = 'chorus', invertCounter = false,
+    graftGenre = '', graftSection = 'chorus', invertCounter = false, featuredGuest = null,
     coachInstruction = '', originalLyrics = '', aggression = '',
     genreCraft = [],
     punchlineCraft = [],
@@ -7548,7 +7548,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${princeMethodNote}${oneNoteMelodyNote}${intervalMapNote}${melodicClicheNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${invertCounterNote}${keyPsychNote}${modulationNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${chorusIntroNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${popDropNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${melodicBassNote}${productionNote}${antiDropNote}${vocalDescriptorNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${princeMethodNote}${oneNoteMelodyNote}${intervalMapNote}${melodicClicheNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${buildFeaturedGuestNote(featuredGuest)}${invertCounterNote}${keyPsychNote}${modulationNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${chorusIntroNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${popDropNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${melodicBassNote}${productionNote}${antiDropNote}${vocalDescriptorNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -9341,6 +9341,44 @@ function buildProducerTemplateNote(producerKey) {
 The beat MUST feel like this exact sonic-DNA — every drum, instrumentation, and energy field above is a hard constraint. Use the opener archetype if appropriate to the song's intro. Do NOT name any specific producer or artist in the lyrics, ad-libs, or SONG PROMPT — describe the SOUND, never the person.`;
 }
 
+// ── Featured Guest ─────────────────────────────────────────────────────────
+// A DIFFERENT vocalist takes ONE section in a contrasting delivery (sung↔rapped)
+// and optionally a different genre/style. The Eminem×Dido / Jay-Z×Alicia Keys /
+// Nate Dogg-hook architecture, generalised to any section + any style. Distinct
+// from graft (which only tints a section's genre DNA in the SAME lead voice).
+function buildFeaturedGuestNote(featuredGuest) {
+  if (!featuredGuest || !featuredGuest.on) return '';
+  const secRaw = String(featuredGuest.section || 'Hook');
+  const sec = /bridge/i.test(secRaw) ? 'bridge' : /verse/i.test(secRaw) ? 'verse' : 'chorus';
+  const secLabel = sec === 'chorus' ? 'hook/chorus' : sec;
+  const secTag = sec === 'chorus' ? 'Chorus' : sec === 'bridge' ? 'Bridge' : 'Verse';
+  const delivery = /rap/i.test(featuredGuest.delivery) ? 'rapped' : 'sung';
+  const oppDelivery = delivery === 'sung' ? 'rapped/spoken' : 'sung';
+  const vRaw = String(featuredGuest.voice || '').toLowerCase();
+  const voice = vRaw === 'male' ? 'male' : vRaw === 'female' ? 'female' : '';
+  const styleRaw = String(featuredGuest.style || '').trim().slice(0, 60);
+  let styleKey = '';
+  if (styleRaw) {
+    const lc = styleRaw.toLowerCase();
+    for (const k of Object.keys(GENRE_BIBLE)) {
+      if (k.toLowerCase() === lc || String(GENRE_LABELS[k] || '').toLowerCase() === lc) { styleKey = k; break; }
+    }
+  }
+  const styleLabel = styleKey ? (GENRE_LABELS[styleKey] || styleKey) : styleRaw;
+  const dnaLine = (styleKey && GENRE_BIBLE[styleKey] && GENRE_BIBLE[styleKey].dna)
+    ? `\nThat section carries ${styleLabel} DNA: ${GENRE_BIBLE[styleKey].dna}`
+    : (styleLabel ? `\nPerform that section in a ${styleLabel} style.` : '');
+  const voiceLine = voice
+    ? ` The guest is a ${voice} vocalist (clearly a different person from the lead).`
+    : ' The guest is clearly a different voice from the lead.';
+  const tag = `[${secTag} | Featured Vocalist${styleLabel ? ' | ' + styleLabel : ''} | ${delivery === 'rapped' ? 'Rapped' : 'Sung'}${voice ? ' | ' + (voice === 'female' ? 'Female' : 'Male') : ''}]`;
+  const sunoHint = `${styleLabel ? styleLabel.toLowerCase() + ' ' : ''}${delivery} ${voice ? voice + ' ' : ''}guest vocalist on the ${secLabel}`;
+  return `\n\n🎤 FEATURED GUEST — ${secLabel.toUpperCase()} handed to a different performer:
+A SEPARATE featured vocalist performs the ${secLabel}, contrasting the lead. Their delivery is ${delivery.toUpperCase()} while the lead's ${oppDelivery} sections stay as they are.${dnaLine}${voiceLine}
+Tag that section in the lyric output EXACTLY as: ${tag}
+This is the Eminem×Dido / Jay-Z×Alicia Keys / Nate Dogg-hook move — the listener must feel a different person took over for the ${secLabel}. Write it as the guest's OWN moment (their cadence, register, phrasing), not the lead imitating a style. Reflect the guest in the Suno style prompt too, e.g. "${sunoHint}".`;
+}
+
 function buildRapLabPrompt(params) {
   const {
     genre = 'hiphop',
@@ -9361,7 +9399,8 @@ function buildRapLabPrompt(params) {
     barSwitch = 0,
     breakRule = false,
     length = 'medium',
-    punchlineCraft = []
+    punchlineCraft = [],
+    featuredGuest = null
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -9511,7 +9550,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
