@@ -127,7 +127,7 @@ async function callOpenRouter(apiKey, messages, system, max_tokens) {
   return d.choices?.[0]?.message?.content || '';
 }
 
-module.exports = async function handler(req, res) {
+const _generateHandler = async function handler(req, res) {
   const origin = req.headers.origin || '';
   const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
   // Scope preview CORS to this project's preview subdomains only (was
@@ -1125,4 +1125,33 @@ module.exports = async function handler(req, res) {
     errMsg = 'Song generation failed. ' + (errors.length ? errors.join(' | ') : 'Check Vercel function logs.');
   }
   return res.status(502).json({error: errMsg});
+};
+
+// Top-level safety net. Without this, ANY uncaught throw in the handler
+// (post-AI section parsing, a slow Supabase round-trip, serialization, a
+// function timeout) escapes to Vercel, which then returns its own
+// object-shaped platform error — { error: { code: 'FUNCTION_INVOCATION_FAILED',
+// message } }. The client used to print that object as the useless
+// "[HTTP 500] [object Object]". This converts any such crash into a clean
+// JSON body with a STRING `error`, so the client always has a real message.
+// CORS headers are set at the very top of the handler before anything can
+// throw, so the error response still carries them.
+module.exports = async function handler(req, res) {
+  try {
+    return await _generateHandler(req, res);
+  } catch (e) {
+    console.error('[generate] uncaught handler error:', (e && e.stack) || e);
+    if (res.headersSent) return;
+    if (!res.getHeader || !res.getHeader('Access-Control-Allow-Origin')) {
+      const origin = (req.headers && req.headers.origin) || '';
+      const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+      res.setHeader('Access-Control-Allow-Origin', allowed.includes(origin) ? origin : 'https://www.mysoniq.com');
+      res.setHeader('Vary', 'Origin');
+    }
+    return res.status(500).json({
+      error: (e && e.message) ? String(e.message) : 'Server error',
+      message: 'Something went wrong generating your song — you were not charged. Please try again.',
+      notCharged: true,
+    });
+  }
 };
