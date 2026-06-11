@@ -5408,6 +5408,25 @@ body.craft-advanced .craft-basic-only{display:none !important}
     // Captures the raw response text when JSON parse fails so the catch
     // handler can surface the actual error (Vercel HTML 504, etc.) instead
     // of a cryptic generic message.
+    // Coerce ANY server/platform error response into a readable string.
+    // Vercel platform crashes/timeouts return { error: { code, message } } — an
+    // OBJECT — so naive `'' + data.error` renders the useless "[object Object]".
+    // Walk objects for a real message, fall back to raw HTML, and map the
+    // common platform crash codes to friendly, plain-voice copy.
+    window.soniqErrMsg = function(data, rawText, fallback){
+      var pick = function(v){
+        if (v == null) return '';
+        if (typeof v === 'string') return v;
+        if (typeof v === 'object') return pick(v.message) || pick(v.error) || pick(v.code) || '';
+        return String(v);
+      };
+      var msg = data ? (pick(data.message) || pick(data.error)) : '';
+      if (!msg && rawText) msg = String(rawText).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
+      if (/FUNCTION_INVOCATION_TIMEOUT|GATEWAY_TIMEOUT|DEPLOYMENT_PAUSED/i.test(msg)) return 'It took too long and timed out — you were not charged. Try again.';
+      if (/FUNCTION_INVOCATION_FAILED|INTERNAL_FUNCTION/i.test(msg)) return 'The engine hit an error — you were not charged. Try again.';
+      return msg || fallback || 'Request failed';
+    };
+
     async function flowAuthedPost(url, body, signal){
       var doFetch = function(){
         return fetch(url, { method: 'POST', headers: flowAuthHeaders(), body: JSON.stringify(body), signal: signal });
@@ -5784,16 +5803,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
         }
         if (!res.ok || !res.data) {
           // Surface the actual server response so the user (and dev) can see
-          // exactly what failed — Vercel 504 HTML, raw error string, etc.
-          var dbg = '[HTTP ' + res.status + '] ';
-          if (res.data && (res.data.message || res.data.error)) {
-            dbg += (res.data.message || res.data.error);
-          } else if (res.rawText) {
-            // Strip HTML tags + take first 200 chars
-            dbg += res.rawText.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 200);
-          } else {
-            dbg += 'Song generation failed';
-          }
+          // exactly what failed — Vercel 504 HTML, raw error string, an
+          // object-shaped platform crash ({error:{code,message}}), etc.
+          var dbg = '[HTTP ' + res.status + '] ' + window.soniqErrMsg(res.data, res.rawText, 'Song generation failed');
           console.error('[flow-song] server error:', { status: res.status, data: res.data, rawText: res.rawText && res.rawText.slice(0, 500) });
           throw new Error(dbg);
         }
@@ -23017,7 +23029,7 @@ async function sparkGenerate() {
     const r = await fetch('/api/track', { method: 'POST', headers, body: JSON.stringify(payload) });
     const data = await r.json();
     if (!r.ok) {
-      const msg = data?.message || data?.error || 'Spark failed';
+      const msg = window.soniqErrMsg(data, null, 'Spark failed');
       if (r.status === 401) { toast('Sign in to spark song ideas'); openAuth?.(); }
       else if (r.status === 429) toast('⚠️ ' + msg, 5000);
       else toast('⚠️ ' + msg, 5000);
@@ -23067,7 +23079,7 @@ async function sparkRegenerateOne(i) {
     });
     const result = await r.json();
     if (!r.ok || !result.seeds || !result.seeds[0]) {
-      toast('⚠️ ' + (result?.message || result?.error || 'Regen failed'));
+      toast('⚠️ ' + window.soniqErrMsg(result, null, 'Regen failed'));
       return;
     }
     data.seeds[i] = result.seeds[0];
