@@ -4495,7 +4495,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="btn-import" onclick="showImportModal()">↑ Import Lyrics</button>
         <div class="gen-progress" id="gen-progress">
           <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div><div class="gp-pip" id="gp-pip-2"></div><div class="gp-pip" id="gp-pip-3"></div><div class="gp-pip" id="gp-pip-4"></div><div class="gp-pip" id="gp-pip-5"></div></div>
-          <span id="gp-label">5 free songs this month</span>
+          <span id="gp-label">3 free songs to try</span>
           <span id="ss-timer" class="ss-timer" hidden>⏱ <span id="ss-timer-val">0s</span></span>
         </div>
       </div>
@@ -6910,7 +6910,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <div class="upgrade-top">
       <div class="upgrade-eyebrow">Unlock SONIQ</div>
       <div class="upgrade-headline">You've found your flow.</div>
-      <div class="upgrade-sub" id="upgrade-sub-text">Unlock unlimited songs, all genres, and pro features.</div>
+      <div class="upgrade-sub" id="upgrade-sub-text">Unlock more songs, all genres, and pro features.</div>
     </div>
 
     <!-- Founding tier banner — shown when spots available -->
@@ -6933,11 +6933,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
 
     <!-- 3-tier plan cards -->
     <div class="upgrade-plans">
-      <div class="uplan" id="uplan-creator" onclick="startCheckoutPlan(S._annualBilling?'creator_annual':'creator')">
-        <div class="uplan-name">Creator</div>
-        <div class="uplan-price" id="uplan-creator-price">$7<span>/mo</span></div>
+      <div class="uplan" id="uplan-creator" onclick="startCheckoutPlan(S._annualBilling?'founding_t2_annual':'founding_t2')">
+        <div class="uplan-name">Entry</div>
+        <div class="uplan-price" id="uplan-creator-price">$9.99<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>30 songs / month</li>
+          <li>10 songs / month</li>
           <li>All 30 genres</li>
           <li>Visual + Video prompts</li>
           <li>Full production brief</li>
@@ -6951,7 +6951,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <div class="uplan-name">Pro</div>
         <div class="uplan-price" id="uplan-pro-price">$19<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>Unlimited songs</li>
+          <li>20 songs / month</li>
           <li>Album Planner</li>
           <li>Rap Lab + Fusion</li>
           <li>Batch generation</li>
@@ -6963,9 +6963,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
       <div class="uplan" id="uplan-studio" onclick="startCheckoutPlan(S._annualBilling?'studio_annual':'studio')">
         <div class="uplan-name">Studio</div>
-        <div class="uplan-price" id="uplan-studio-price">$39<span>/mo</span></div>
+        <div class="uplan-price" id="uplan-studio-price">$49<span>/mo</span></div>
         <ul class="uplan-features">
-          <li>Unlimited songs</li>
+          <li>50 songs / month</li>
           <li>Platinum mode</li>
           <li>Commercial licensing</li>
           <li>White-label export</li>
@@ -11329,13 +11329,13 @@ async function callServerStream(action, params, onChunk, signal) {
   if (!res.ok) {
     const e = await res.json().catch(() => ({}));
     if (res.status === 401) {
-      openAuth('Create your free account — 5 free songs every month');
+      openAuth('Create your free account — 3 free songs to try');
       const err = new Error(e.message || 'Sign in to generate songs');
       err.code = 'auth_required';
       throw err;
     }
     if (res.status === 429) {
-      const err = new Error(e.message || 'Daily limit reached — upgrade for unlimited songs');
+      const err = new Error(e.message || 'Limit reached — upgrade to keep creating');
       err.code = 'limit_reached';
       throw err;
     }
@@ -11395,14 +11395,14 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
     });
     const ct = res.headers.get('content-type') || '';
     if (res.status === 401) {
-      openAuth('Create your free account — 5 free songs every month');
+      openAuth('Create your free account — 3 free songs to try');
       const err = new Error('Sign in to generate songs');
       err.code = 'auth_required';
       throw err;
     }
     if (res.status === 429) {
       const e = await res.json().catch(()=>({}));
-      const err = new Error(e.message || 'Daily limit reached — upgrade for unlimited songs');
+      const err = new Error(e.message || 'Limit reached — upgrade to keep creating');
       err.code = 'limit_reached';
       throw err;
     }
@@ -12486,9 +12486,9 @@ function apiErrHtml(msg, errCode) {
   const isOverload = m.includes('overloaded') || m.includes('529');
   let hint = '';
   if (isAuthRequired) {
-    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account — 5 free songs every month\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
+    hint = '<br><br><button class="btn btn-amber" onclick="openAuth(\'Create your free account — 3 free songs to try\')" style="margin-top:6px;font-size:13px">Create Free Account</button>';
   } else if (isLimitReached) {
-    hint = '<br><br>You\'ve used your free songs this month. Upgrade from $7/mo for more — or go Pro for unlimited.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock More Songs →</button>';
+    hint = '<br><br>You\'ve used your free songs. Upgrade from $9.99/mo for more songs.<br><button class="btn btn-amber" onclick="openUpgradeModal()" style="margin-top:8px;font-size:13px">Unlock More Songs →</button>';
   } else if (isCredits) {
     hint = '<br><br><strong>Fix:</strong> Add credits at <a href="https://openrouter.ai/settings/credits" target="_blank" style="color:var(--amber)">openrouter.ai → credits</a>';
   } else if (isKey) {
@@ -12663,7 +12663,7 @@ function spinLuckyWheel(g1Label, g2Label, onComplete){
 
 function feelLucky(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account — 5 free songs every month');
+    openAuth('Create your free account — 3 free songs to try');
     S._pendingGenerate = 'lucky';
     return;
   }
@@ -12905,7 +12905,7 @@ function spinPrismWheel(g1Label, g2Label, onComplete){
 
 function feelPrism(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account — 5 free songs every month');
+    openAuth('Create your free account — 3 free songs to try');
     S._pendingGenerate = 'prism';
     return;
   }
@@ -14053,7 +14053,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function generateSong(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account — 5 free songs every month');
+    openAuth('Create your free account — 3 free songs to try');
     S._pendingGenerate = 'song';
     return;
   }
@@ -14800,7 +14800,7 @@ function parseSongResult(raw,genre,topic,prodData,albumWriteBackIndex){
 var OB_KEY           = 'soniq:onboarding:v1:complete';
 var OB_DAILY_KEY     = 'soniq:daily:songs';
 var OB_DAILY_DATE_KEY= 'soniq:daily:date';
-var OB_FREE_LIMIT    = 5;
+var OB_FREE_LIMIT    = 3;
 var _nudgeTimer      = null;
 
 function getDailySongCount() {
@@ -14859,7 +14859,7 @@ function showGenNudge(songNum) {
   if (window.__soniqAdmin || isFounder || isPaid) return;
   var remaining = Math.max(0, OB_FREE_LIMIT - songNum);
   if (remaining > 0) {
-    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' left</strong> this month — upgrade from $7/mo for more.';
+    txt.innerHTML = 'Song <strong>' + songNum + '</strong> generated. <strong>' + remaining + ' free left</strong> — upgrade to keep creating.';
   } else {
     txt.innerHTML = 'You\'ve used all <strong>' + OB_FREE_LIMIT + ' free songs</strong>. Upgrade to keep creating.';
   }
@@ -15313,9 +15313,9 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
         <div class="theory-header">🎼 Theory Analysis</div>
         <div class="theory-lock-gate">
           <div class="tlg-icon">🔒</div>
-          <div class="tlg-title">Full theory analysis unlocks with Creator</div>
+          <div class="tlg-title">Full theory analysis unlocks with Entry</div>
           <div class="tlg-sub">Scale · Key feel · Outlier chords · Voice leading · Tension rating · Archetype</div>
-          <button class="tlg-btn" onclick="openUpgradeModal()">Unlock from $7/mo →</button>
+          <button class="tlg-btn" onclick="openUpgradeModal()">Unlock from $9.99/mo →</button>
         </div>
       </div>`;
     } else {
@@ -15938,7 +15938,7 @@ function initBuilder(){
 
 async function generateFromBuilder(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account — 5 free songs every month');
+    openAuth('Create your free account — 3 free songs to try');
     S._pendingGenerate = 'builder';
     return;
   }
@@ -16182,7 +16182,7 @@ function showFusion(g1,g2){
 
 async function generateFusion(){
   if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account — 5 free songs every month');
+    openAuth('Create your free account — 3 free songs to try');
     S._pendingGenerate = 'fusion';
     return;
   }
@@ -18219,7 +18219,7 @@ function initGenreGrid(){
     const overflow = i >= VISIBLE ? ' gp-overflow' : '';
     return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
-         title="${locked?'Unlock all 30 genres with Creator — from $7/mo':''}"
+         title="${locked?'Unlock all 30 genres with Entry — from $9.99/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
@@ -18245,7 +18245,7 @@ function toggleGenreExpand(){
 }
 
 function lockedGenreClick(gid) {
-  toast('🔒 ' + (GENRES_DEF.find(g=>g.id===gid)?.label||'This genre') + ' unlocks with Creator — from $7/mo');
+  toast('🔒 ' + (GENRES_DEF.find(g=>g.id===gid)?.label||'This genre') + ' unlocks with Entry — from $9.99/mo');
   openUpgradeModal();
 }
 
@@ -19062,7 +19062,7 @@ async function openUpgradeModal() {
   document.body.style.overflow = 'hidden';
   // Update sub-text based on context
   const sub = document.getElementById('upgrade-sub-text');
-  if (sub) sub.textContent = S.user ? 'Unlock unlimited songs, all genres, and pro features.' : 'Sign in first, then pick your plan.';
+  if (sub) sub.textContent = S.user ? 'Unlock more songs, all genres, and pro features.' : 'Sign in first, then pick your plan.';
   // Show founding banner if spots available
   try {
     const res = await fetch('/api/founding');
@@ -19127,17 +19127,17 @@ function toggleBillingCycle() {
     badge.style.display = '';
     lm.style.color = 'var(--tx4)';
     la.style.color = 'var(--amber)';
-    document.getElementById('uplan-creator-price').innerHTML = '$5<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$60/yr — save 29%</div>';
+    document.getElementById('uplan-creator-price').innerHTML = '$7<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$84/yr — save 30%</div>';
     document.getElementById('uplan-pro-price').innerHTML = '$15<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$180/yr — save 21%</div>';
-    document.getElementById('uplan-studio-price').innerHTML = '$29<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$348/yr — save 26%</div>';
+    document.getElementById('uplan-studio-price').innerHTML = '$39<span>/mo</span><div style="font-size:10px;color:var(--green,#34d399);font-weight:700">$468/yr — save 20%</div>';
   } else {
     dot.style.left = '3px';
     badge.style.display = 'none';
     lm.style.color = 'var(--tx2)';
     la.style.color = 'var(--tx4)';
-    document.getElementById('uplan-creator-price').innerHTML = '$7<span>/mo</span>';
+    document.getElementById('uplan-creator-price').innerHTML = '$9.99<span>/mo</span>';
     document.getElementById('uplan-pro-price').innerHTML = '$19<span>/mo</span>';
-    document.getElementById('uplan-studio-price').innerHTML = '$39<span>/mo</span>';
+    document.getElementById('uplan-studio-price').innerHTML = '$49<span>/mo</span>';
   }
 }
 
@@ -20116,7 +20116,7 @@ function renderCreativePrompts(prefix, visualPrompt, videoPrompt) {
 function tryOpenVisual(prefix) {
   if (!window.__soniqAdmin && !PAID_PLANS.has(S.plan)) {
     if (!S.user) { openAuth('Sign in and upgrade to unlock Visual Prompts, Music Video concepts & Social Media captions'); return; }
-    toast('🎬 Visual Prompts unlock with Creator — artist visuals, music video concepts & social captions');
+    toast('🎬 Visual Prompts unlock with Entry — artist visuals, music video concepts & social captions');
     openUpgradeModal();
     return;
   }
@@ -25712,10 +25712,10 @@ function loadProfilePage() {
     starter:'Creator',starter_annual:'Creator'
   };
   const CLIENT_PLAN_LIMITS = {
-    free:5,creator:30,creator_annual:30,
-    founding_t1:30,founding_t1_annual:30,founding_t2:30,founding_t2_annual:30,
-    pro:Infinity,pro_annual:Infinity,studio:Infinity,studio_annual:Infinity,
-    founding:Infinity,starter:30,starter_annual:30
+    free:3,creator:30,creator_annual:30,
+    founding_t1:20,founding_t1_annual:20,founding_t2:10,founding_t2_annual:10,
+    pro:20,pro_annual:20,studio:50,studio_annual:50,
+    founding:50,starter:10,starter_annual:10
   };
   const plan = S.plan || 'free';
   const planLabel = PLAN_DISPLAY[plan] || plan.charAt(0).toUpperCase()+plan.slice(1);
@@ -25751,7 +25751,7 @@ function loadProfilePage() {
     const remaining = Math.max(0, planLimit - usageCount);
     const resetDate = new Date(new Date().getFullYear(), new Date().getMonth()+1, 1).toLocaleDateString(undefined,{month:'short',day:'numeric'});
     document.getElementById('profile-usage-sub').textContent = plan === 'free'
-      ? `${remaining} free song${remaining !== 1 ? 's' : ''} left this month · resets ${resetDate}`
+      ? `${remaining} free song${remaining !== 1 ? 's' : ''} left · lifetime trial`
       : `${remaining} remaining · resets ${resetDate}`;
     if ((plan === 'free' || plan === 'creator' || plan === 'creator_annual') && usageCount >= planLimit) {
       document.getElementById('profile-upgrade-cta').style.display = '';
