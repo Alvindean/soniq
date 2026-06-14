@@ -1260,6 +1260,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
 @keyframes pls-spin{to{transform:rotate(360deg)}}
 .pls-empty{text-align:center;padding:30px 16px;color:var(--tx4);font-size:12.5px;line-height:1.6}
 .pls-empty-ico{font-size:24px;margin-bottom:8px;opacity:.7}
+.alb-money-headline{font-size:14px;font-weight:800;color:var(--tx1);line-height:1.5;padding:12px 14px;margin-bottom:12px;background:linear-gradient(135deg,var(--amberbg),transparent);border:1px solid var(--amberline);border-left:3px solid var(--amber);border-radius:var(--r2)}
+.alb-money-row{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);margin-bottom:8px}
+.alb-money-ico{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;background:var(--s4);border:1px solid var(--b2);color:var(--tx2)}
+.alb-money-label{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
 .album-ie-box{padding:14px 16px;border-top:1px solid var(--b1);background:var(--amberbg)}
 .album-ie-label{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
 .album-ie-textarea{width:100%;background:var(--s3);border:1px solid var(--amberline);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:48px;line-height:1.6;font-family:var(--font)}
@@ -7691,6 +7695,9 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <div class="album-tabs">
       <div class="album-tab on" onclick="goAlbTab('concept',this)">📖 Concept</div>
       <div class="album-tab" onclick="goAlbTab('tracks',this)">🎵 Track Map</div>
+      <div class="album-tab" onclick="goAlbTab('money',this)">💰 Money Angle</div>
+      <div class="album-tab" onclick="goAlbTab('viability',this)">📊 Viability</div>
+      <div class="album-tab" onclick="goAlbTab('release',this)">🗓 Release Plan</div>
       <div class="album-tab" onclick="goAlbTab('sonic',this)">🔊 Sonic Palette</div>
       <div class="album-tab" onclick="goAlbTab('visual',this)">🎨 Visual &amp; Brand</div>
       <div class="album-tab" onclick="goAlbTab('gap',this);loadGapMap()">🗺 Gap Map</div>
@@ -7712,6 +7719,27 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
       <div class="gap-map-grid" id="alb-track-types"></div>
       <div id="alb-tracks-written" style="margin-top:14px"></div>
+    </div>
+    <div id="alb-pane-money" class="album-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="album-section-title" style="margin-bottom:0">💰 Money Angle — the revenue you're not seeing</div>
+        <button class="btn btn-sm btn-gold" id="alb-money-btn" onclick="generateAlbumMoney()">✦ Find the Angle</button>
+      </div>
+      <div id="alb-money-body"><div class="pls-empty"><div class="pls-empty-ico">💰</div>The angle most artists miss — sync &amp; licensing lanes, the sleeper deep-cut that actually earns, a deluxe/superfan upsell, and the catalog play.<br>Tap <b>Find the Angle</b>.</div></div>
+    </div>
+    <div id="alb-pane-viability" class="album-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="album-section-title" style="margin-bottom:0">📊 Viability — CADENCE streaming score</div>
+        <button class="btn btn-sm btn-gold" id="alb-viab-btn" onclick="generateAlbumViability()">✦ Score It</button>
+      </div>
+      <div id="alb-viab-body"><div class="pls-empty"><div class="pls-empty-ico">📊</div>Score this album 0–100 on streaming viability across 6 factors, with an honest 12-month revenue projection.<br>Tap <b>Score It</b>.</div></div>
+    </div>
+    <div id="alb-pane-release" class="album-pane">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div class="album-section-title" style="margin-bottom:0">🗓 Release Plan</div>
+        <button class="btn btn-sm btn-gold" id="alb-rel-btn" onclick="generateAlbumReleasePlan()">✦ Build Plan</button>
+      </div>
+      <div id="alb-rel-body"><div class="pls-empty"><div class="pls-empty-ico">🗓</div>Turn the album into a rollout — which tracks to release as singles, in what order, the cadence, and the hook for each.<br>Tap <b>Build Plan</b>.</div></div>
     </div>
     <div id="alb-pane-sonic" class="album-pane">
       <div class="album-section-title">Sonic Palette</div>
@@ -7912,6 +7940,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
       <div id="pls-arc" class="album-prose" style="margin-bottom:14px"></div>
       <div class="album-section-title" id="pls-motifs-title">Sonic Identity Anchors</div>
       <ul id="pls-motifs" class="album-list"></ul>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 8px;flex-wrap:wrap;gap:8px;border-top:1px solid var(--b1);padding-top:14px">
+        <div class="album-section-title" style="margin-bottom:0">💰 Money Angle</div>
+        <button class="btn btn-sm btn-gold" id="pls-money-btn" onclick="generatePlaylistMoney()">✦ Find the Angle</button>
+      </div>
+      <div id="pls-money-body"><div class="pls-empty" style="padding:18px 12px"><div class="pls-empty-ico">💰</div>How this playlist actually earns — sync potential, the highest-RPM country play, catalog ownership, and multi-placement repackaging.<br>Tap <b>Find the Angle</b>.</div></div>
     </div>
 
     <div id="pls-pane-tracks" class="album-pane">
@@ -21469,6 +21502,169 @@ function goAlbTab(id, el) {
   if (el) el.classList.add('on');
 }
 
+// ── Album on-demand analysis: Money Angle · Viability (CADENCE) · Release Plan ──
+// Each runs a focused call against the generated album so the main album
+// generation stays lean (critical for the 25-track Mega Album) and every
+// analysis gets its own full token budget.
+function resetAlbumAnalysisPanes() {
+  const m = document.getElementById('alb-money-body');
+  if (m) m.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">💰</div>The angle most artists miss — sync &amp; licensing lanes, the sleeper deep-cut that actually earns, a deluxe/superfan upsell, and the catalog play.<br>Tap <b>Find the Angle</b>.</div>`;
+  const v = document.getElementById('alb-viab-body');
+  if (v) v.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">📊</div>Score this album 0–100 on streaming viability across 6 factors, with an honest 12-month revenue projection.<br>Tap <b>Score It</b>.</div>`;
+  const r = document.getElementById('alb-rel-body');
+  if (r) r.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">🗓</div>Turn the album into a rollout — which tracks to release as singles, in what order, the cadence, and the hook for each.<br>Tap <b>Build Plan</b>.</div>`;
+  if (S.albumData) { S.albumData.money = null; S.albumData.viability = null; S.albumData.releasePlan = null; }
+}
+
+function _albumContextBlock() {
+  const a = S.albumData || {};
+  const tracks = (a.trackList || []).map((t,i)=>`${i+1}. ${t.ttype}${t.title?` "${t.title}"`:''} — ${t.desc||''}`).join('\n');
+  return `ALBUM: "${a.name||'Untitled'}" — genre ${a.genre||'pop'}, ${(ALBUM_TYPE_TRACKS[a.type]?.label)||a.type||'album'} (${(a.trackList||[]).length} tracks)
+TARGET LANES: ${a.lanes || 'mainstream streaming'}
+SUMMARY: ${a.summary || '(none)'}
+ARC: ${a.arc || '(none)'}
+TRACK MAP:
+${tracks || '(no tracks)'}`;
+}
+
+function _albSecParser(raw) {
+  return (key) => {
+    const re = new RegExp(key + ':\\s*([\\s\\S]*?)(?=\\n[A-Z0-9][A-Z0-9 &\\/\\-]+:|$)');
+    const m = raw.match(re);
+    return m ? m[1].trim() : '';
+  };
+}
+
+async function generateAlbumMoney() {
+  if (!S.albumData) { toast('Generate an album concept first'); return; }
+  const host = document.getElementById('alb-money-body');
+  host.innerHTML = `<div class="pls-loader"><span class="pls-loader-ring"></span>Finding the revenue angle you're not seeing…</div>`;
+  btnLoad('alb-money-btn','Analyzing…');
+  try {
+    const raw = await callClaude(
+`${_albumContextBlock()}
+
+You are a sharp, honest music-business strategist. Surface the MONEY ANGLE most artists miss with an album like this — the revenue this catalog can earn beyond plain streaming payouts. Be concrete, name specific tracks, use real dollar logic.
+
+Respond EXACTLY in this format:
+HEADLINE: [one punchy sentence — the single biggest revenue angle they're not seeing]
+SYNC / LICENSING: [which specific tracks fit TV / film / ads / games / trailers, the lane, and why]
+SLEEPER EARNER: [name the one deep-cut or non-single most likely to be the real long-tail earner, and why]
+DELUXE / UPSELL: [a deluxe-edition, vinyl, bundle, or superfan upsell play specific to THIS album]
+CATALOG / OWNERSHIP: [a publishing / splits / admin / future catalog-sale move to protect and grow the asset]
+90-DAY MONEY MOVES:
+- [concrete move 1]
+- [concrete move 2]
+- [concrete move 3]`,
+      'You are a concrete, honest music-business strategist. Specifics over platitudes. No hype.', 1500);
+    const sec = _albSecParser(raw);
+    const headline = raw.match(/HEADLINE:\s*(.+)/)?.[1]?.trim() || '';
+    const card = (icon,label,body)=> body ? `<div class="alb-money-row"><div class="alb-money-ico">${icon}</div><div><div class="alb-money-label">${label}</div><div class="album-prose" style="margin:0">${escHtml(body)}</div></div></div>` : '';
+    const moves = sec('90-DAY MONEY MOVES');
+    const movesHtml = moves.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+    host.innerHTML = `
+      ${headline?`<div class="alb-money-headline">💡 ${escHtml(headline)}</div>`:''}
+      ${card('🎬','Sync / Licensing',sec('SYNC \\/ LICENSING'))}
+      ${card('💎','Sleeper Earner',sec('SLEEPER EARNER'))}
+      ${card('📀','Deluxe / Upsell',sec('DELUXE \\/ UPSELL'))}
+      ${card('🏦','Catalog / Ownership',sec('CATALOG \\/ OWNERSHIP'))}
+      ${movesHtml?`<div class="album-section-title" style="margin-top:14px">90-Day Money Moves</div><ul class="album-list">${movesHtml}</ul>`:''}`;
+    S.albumData.money = raw;
+    toast('💰 Money angle surfaced!');
+  } catch(e) {
+    host.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>${escHtml(e.message||'Failed')} — tap Find the Angle to retry.</div>`;
+  }
+  btnDone('alb-money-btn');
+}
+
+async function generateAlbumViability() {
+  if (!S.albumData) { toast('Generate an album concept first'); return; }
+  const host = document.getElementById('alb-viab-body');
+  host.innerHTML = `<div class="pls-loader"><span class="pls-loader-ring"></span>Scoring streaming viability &amp; projecting revenue…</div>`;
+  btnLoad('alb-viab-btn','Scoring…');
+  try {
+    const raw = await callClaude(
+`${buildCadenceContextBlock()}
+
+${_albumContextBlock()}
+
+Score THIS ALBUM as a streaming asset using the CADENCE formula above. Respond EXACTLY:
+CADENCE SCORE: [total]/100
+CADENCE VERDICT: [one honest sentence]
+CADENCE FACTORS:
+- Sonic distinctiveness: [n]/25 — [reason]
+- Audience size: [n]/20 — [reason]
+- Country-mix economics: [n]/15 — [reason]
+- Producer competition: [n]/15 — [reason]
+- Content fit: [n]/15 — [reason]
+- Disclosure compliance: [n]/10 — [reason]
+REVENUE PROJECTION:
+[2-3 sentences, concrete numbers — assume ${(S.albumData.trackList||[]).length} tracks, realistic threshold-clearing, US-mix rate, apply the 0.96 2026 dilution]`,
+      'You are the CADENCE engine — a senior streaming-arbitrage analyst. Be numerical and honest.', 1400);
+    const sec = _albSecParser(raw);
+    const score = parseInt(raw.match(/CADENCE SCORE:\s*(\d+)/i)?.[1] || '0', 10);
+    const verdict = raw.match(/CADENCE VERDICT:\s*(.+)/i)?.[1]?.trim() || '';
+    const gate = score>=75?{cls:'pls-gate-go',txt:'✅ High-conviction'}:score>=60?{cls:'pls-gate-go',txt:'✅ Viable'}:score>=45?{cls:'pls-gate-mid',txt:'⚠️ Borderline'}:{cls:'pls-gate-no',txt:'⛔ Weak'};
+    const col = score>=60?'var(--green,#3ee896)':score>=45?'var(--amber)':'var(--red,#ff6b6b)';
+    const factorsHtml = sec('CADENCE FACTORS').split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+    host.innerHTML = `
+      <div class="pls-gauge-wrap">
+        <div class="pls-gauge" id="alb-gauge-ring" style="--col:${col}">
+          <div class="pls-gauge-val"><div class="pls-gauge-num" style="color:${col}">${score||'—'}</div><div class="pls-gauge-den">/ 100</div></div>
+        </div>
+        <div class="pls-gauge-meta"><span class="pls-gate ${gate.cls}">${gate.txt}</span><div class="pls-verdict">${escHtml(verdict)}</div></div>
+      </div>
+      <div class="album-section-title" style="margin-top:6px">6-Factor Breakdown</div>
+      <ul class="album-list">${factorsHtml}</ul>
+      <div class="album-section-title" style="margin-top:14px">12-Month Revenue Projection</div>
+      <div class="album-prose">${escHtml(sec('REVENUE PROJECTION'))}</div>`;
+    requestAnimationFrame(()=>{const r=document.getElementById('alb-gauge-ring');if(r)r.style.setProperty('--plspct',String(Math.max(0,Math.min(100,score))));});
+    S.albumData.viability = raw;
+    toast('📊 Viability scored!');
+  } catch(e) {
+    host.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>${escHtml(e.message||'Failed')} — tap Score It to retry.</div>`;
+  }
+  btnDone('alb-viab-btn');
+}
+
+async function generateAlbumReleasePlan() {
+  if (!S.albumData) { toast('Generate an album concept first'); return; }
+  const host = document.getElementById('alb-rel-body');
+  host.innerHTML = `<div class="pls-loader"><span class="pls-loader-ring"></span>Sequencing the rollout…</div>`;
+  btnLoad('alb-rel-btn','Planning…');
+  try {
+    const raw = await callClaude(
+`${_albumContextBlock()}
+
+You are a record-label release strategist. Build a concrete rollout plan for THIS album. Respond EXACTLY:
+LEAD SINGLE: [track name/role] — [why it leads + the hook to push]
+SINGLE 2: [track] — [why + when]
+SINGLE 3: [track] — [why + when]
+RELEASE CADENCE:
+[2-3 sentences — weeks between singles, pre-save window, album drop timing, day-of-week logic]
+ROLLOUT MOVES:
+- [move 1 — content/marketing tied to a specific track]
+- [move 2]
+- [move 3]
+- [move 4]`,
+      'You are a sharp record-label release strategist. Concrete picks, real timing.', 1200);
+    const sec = _albSecParser(raw);
+    const single = (n,txt)=> txt?`<div class="alb-money-row"><div class="alb-money-ico">${n}</div><div><div class="alb-money-label">${n===1?'Lead Single':'Single '+n}</div><div class="album-prose" style="margin:0">${escHtml(txt)}</div></div></div>`:'';
+    const movesHtml = sec('ROLLOUT MOVES').split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+    host.innerHTML = `
+      ${single(1, raw.match(/LEAD SINGLE:\s*(.+)/)?.[1]?.trim()||'')}
+      ${single(2, raw.match(/SINGLE 2:\s*(.+)/)?.[1]?.trim()||'')}
+      ${single(3, raw.match(/SINGLE 3:\s*(.+)/)?.[1]?.trim()||'')}
+      ${(()=>{const c=sec('RELEASE CADENCE');return c?`<div class="album-section-title" style="margin-top:14px">Release Cadence</div><div class="album-prose">${escHtml(c)}</div>`:'';})()}
+      ${movesHtml?`<div class="album-section-title" style="margin-top:14px">Rollout Moves</div><ul class="album-list">${movesHtml}</ul>`:''}`;
+    S.albumData.releasePlan = raw;
+    toast('🗓 Release plan built!');
+  } catch(e) {
+    host.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>${escHtml(e.message||'Failed')} — tap Build Plan to retry.</div>`;
+  }
+  btnDone('alb-rel-btn');
+}
+
 function setLane(el, lane) {
   el.classList.toggle('on');
   if (el.classList.contains('on')) {
@@ -21553,14 +21749,24 @@ async function writeAllTracks() {
   if (writeBtn) writeBtn.onclick = () => { S.cancelAllTracks = true; writeBtn.textContent = 'Cancelling…'; };
   toast(`Writing ${alb.trackList.length} tracks — est. ${alb.trackList.length * 4}s`);
   const out = document.getElementById('alb-tracks-written');
-  out.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Writing all tracks…</span></div>';
+  out.innerHTML = `<div style="padding:10px 0">
+    <div class="ld-msg" style="font-size:13px;color:var(--tx2);margin-bottom:8px;display:flex;align-items:center;gap:8px"><span class="pls-loader-ring"></span>Writing all tracks…</div>
+    <div style="height:8px;background:var(--s4);border:1px solid var(--b1);border-radius:99px;overflow:hidden"><div class="alb-prog-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--violet),var(--amber));transition:width .35s ease"></div></div>
+    <div class="alb-prog-count" style="font-size:11px;color:var(--tx4);margin-top:5px;font-variant-numeric:tabular-nums">0 / ${alb.trackList.length}</div>
+  </div>`;
+  const _setProg = (done) => {
+    const fill = out.querySelector('.alb-prog-fill'); if (fill) fill.style.width = Math.round((done/alb.trackList.length)*100)+'%';
+    const cnt = out.querySelector('.alb-prog-count'); if (cnt) cnt.textContent = `${done} / ${alb.trackList.length}`;
+  };
   const results = [];
   const written = [];  // cross-track memory — titles + opening lines already used
   try {
     for (let i = 0; i < alb.trackList.length; i++) {
       if (S.cancelAllTracks) break;
       const tr = alb.trackList[i];
-      out.querySelector('.ld-msg').textContent = `Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
+      const _msg = out.querySelector('.ld-msg');
+      if (_msg) _msg.innerHTML = `<span class="pls-loader-ring"></span>Writing track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
+      _setProg(i);
       try {
         // Per-track spec — regenerate if this album predates the spec system.
         const spec = (tr.bpm && tr.structure) ? tr : buildTrackSpec(tr.ttype, i, alb.trackList.length, 'album');
@@ -21602,7 +21808,17 @@ async function writeAllTracks() {
             siblings: sib
           }
         };
-        const raw = (await callServerStream('generate', songParams, null, null)).text;
+        // Retry once on a transient failure — over 25 tracks a single network
+        // blip shouldn't kill an otherwise-good track.
+        let raw, _attempt = 0;
+        while (true) {
+          try { raw = (await callServerStream('generate', songParams, null, null)).text; break; }
+          catch (err) {
+            _attempt++;
+            if (_attempt >= 2) throw err;
+            if (_msg) _msg.innerHTML = `<span class="pls-loader-ring"></span>Retrying track ${i+1}/${alb.trackList.length}: ${tr.ttype}…`;
+          }
+        }
         const title  = parseSection(raw,'TITLE','LYRICS');
         const lyrics = parseSection(raw,'LYRICS','SONG PROMPT');
         const style  = parseSection(raw,'SONG PROMPT', null);
@@ -21617,9 +21833,16 @@ async function writeAllTracks() {
   } finally {
     if (writeBtn) { writeBtn.disabled = false; writeBtn.textContent = '✍️ Write All Tracks'; writeBtn.onclick = () => writeAllTracks(); }
   }
+  // Stash the finished pack so Export can rebuild a clean text file.
+  S._lastAlbumPack = { album: alb.name || 'Album', genre: alb.genre || 'pop', tracks: results };
+  const _errCount = results.filter(r => r.title === 'Error').length;
   out.innerHTML = `
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px">
-      <button class="btn btn-sm btn-gold" onclick="saveAllAlbTracks(this)">💾 Save All to Library</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      <div style="font-size:11px;color:var(--tx4)">${results.length} tracks${_errCount?` · <span style="color:var(--red,#ff6b6b)">${_errCount} failed — re-run Write All to retry</span>`:''}</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-sm" onclick="downloadAlbumPack()">⬇️ Export Pack</button>
+        <button class="btn btn-sm btn-gold" onclick="saveAllAlbTracks(this)">💾 Save All to Library</button>
+      </div>
     </div>` + results.map(r => `
     <div class="alb-track-card" data-idx="${r.i}" data-genre="${escHtml(alb.genre||'pop')}" data-ttype="${escHtml(r.ttype||'')}" data-style="${escHtml(r.style||'')}" data-lyrics="${escHtml(r.lyrics||'')}" data-title="${escHtml(r.title||'')}" style="background:var(--s3);border:1px solid var(--b1);border-radius:var(--r2);padding:14px 16px;margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px">
@@ -21637,6 +21860,28 @@ async function writeAllTracks() {
       <div class="styleout" style="font-size:11px">${escHtml(r.style||'')}</div>
     </div>`).join('');
   toast(`✓ ${results.length} tracks written`);
+}
+
+// Export the whole written album as a single copy/paste-ready .md file —
+// titles + lyrics + Suno prompts for every track. Makes a 25-track mega
+// album actually deliverable in one click.
+function downloadAlbumPack() {
+  const pack = S._lastAlbumPack;
+  if (!pack || !pack.tracks?.length) { toast('Write the tracks first'); return; }
+  const lines = [`# ${pack.album}`, ``, `**Genre:** ${pack.genre}  ·  **Tracks:** ${pack.tracks.length}`, ``, `---`, ``];
+  pack.tracks.forEach(r => {
+    lines.push(`## ${r.i+1}. ${r.ttype} — "${r.title || 'Untitled'}"`, ``);
+    lines.push(`### Lyrics`, ``, (r.lyrics || '(none)'), ``);
+    lines.push(`### Suno / Style Prompt`, ``, (r.style || '(none)'), ``, `---`, ``);
+  });
+  const blob = new Blob([lines.join('\n')], { type: 'text/markdown;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = ((pack.album || 'album').replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'album') + '-pack.md';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  toast('⬇️ Album pack exported');
 }
 
 // FIX 3 — persist a bulk-generated album track to the client-side library.
@@ -21843,6 +22088,8 @@ async function generateAlbumTheme() {
   if (out) { out.style.display = 'block'; out.classList.add('visible'); }
   document.getElementById('alb-name').textContent = 'Generating album concept…';
   document.getElementById('alb-tags').innerHTML = '';
+  // Reset on-demand analysis panes so a new album starts from a clean slate.
+  resetAlbumAnalysisPanes();
 
   const albumDef = ALBUM_TYPE_TRACKS[type] || ALBUM_TYPE_TRACKS.full;
   const trackTypesTemplate = albumDef.types.map(t => `${t} | [description] | [emotional role]`).join('\n');
@@ -22308,6 +22555,8 @@ ${extraSections}`;
   });
   const _cadHeadReset = document.getElementById('pls-cadence-headline');
   if (_cadHeadReset) { _cadHeadReset.style.display = 'block'; _cadHeadReset.innerHTML = '<div class="pls-loader"><span class="pls-loader-ring"></span>Scoring the niche &amp; projecting revenue…</div>'; }
+  const _plsMoneyReset = document.getElementById('pls-money-body');
+  if (_plsMoneyReset) _plsMoneyReset.innerHTML = `<div class="pls-empty" style="padding:18px 12px"><div class="pls-empty-ico">💰</div>How this playlist actually earns — sync potential, the highest-RPM country play, catalog ownership, and multi-placement repackaging.<br>Tap <b>Find the Angle</b>.</div>`;
   document.getElementById('pls-name').textContent = isNiche ? 'Generating CADENCE plan…' : 'Generating playlist concept…';
 
   // Staged loading feedback — a full niche plan can take 30-45s. Rotate status
@@ -22459,6 +22708,51 @@ ${extraSections}`;
     el.style.opacity = '';
   });
   btnDone('pls-btn');
+}
+
+async function generatePlaylistMoney() {
+  const pls = S.playlistData;
+  if (!pls) { toast('Generate a playlist concept first'); return; }
+  const host = document.getElementById('pls-money-body');
+  host.innerHTML = `<div class="pls-loader"><span class="pls-loader-ring"></span>Finding how this playlist actually earns…</div>`;
+  btnLoad('pls-money-btn','Analyzing…');
+  try {
+    const ctx = `PLAYLIST: "${pls.name}" — genre ${pls.genre||'pop'}, ${pls.mode||'niche'} mode
+SUMMARY: ${pls.summary||''}
+TRACK SLOTS:
+${pls.trackTypes||''}`;
+    const raw = await callClaude(
+`${ctx}
+
+You are a streaming-business strategist. Surface the MONEY ANGLE most curators miss with a playlist play like this — how the tracks in it actually earn beyond raw streams. Be concrete.
+
+Respond EXACTLY:
+HEADLINE: [one punchy sentence — the biggest revenue angle they're not seeing]
+SYNC / LICENSING: [which track types fit sync / licensing and why]
+HIGH-RPM TARGETING: [the country / listener-mix move that lifts per-stream payout]
+CATALOG / OWNERSHIP: [owning the masters/publishing of these tracks and why it compounds]
+MULTI-PLACEMENT: [how to repackage these tracks across multiple playlists / moods for more streams]
+90-DAY MONEY MOVES:
+- [move 1]
+- [move 2]
+- [move 3]`,
+      'You are a concrete, honest streaming-business strategist. Specifics over platitudes. No hype.', 1300);
+    const sec = _albSecParser(raw);
+    const headline = raw.match(/HEADLINE:\s*(.+)/)?.[1]?.trim() || '';
+    const card = (icon,label,body)=> body ? `<div class="alb-money-row"><div class="alb-money-ico">${icon}</div><div><div class="alb-money-label">${label}</div><div class="album-prose" style="margin:0">${escHtml(body)}</div></div></div>` : '';
+    const movesHtml = sec('90-DAY MONEY MOVES').split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
+    host.innerHTML = `
+      ${headline?`<div class="alb-money-headline">💡 ${escHtml(headline)}</div>`:''}
+      ${card('🎬','Sync / Licensing',sec('SYNC \\/ LICENSING'))}
+      ${card('🌍','High-RPM Targeting',sec('HIGH-RPM TARGETING'))}
+      ${card('🏦','Catalog / Ownership',sec('CATALOG \\/ OWNERSHIP'))}
+      ${card('🔁','Multi-Placement',sec('MULTI-PLACEMENT'))}
+      ${movesHtml?`<div class="album-section-title" style="margin-top:14px">90-Day Money Moves</div><ul class="album-list">${movesHtml}</ul>`:''}`;
+    toast('💰 Money angle surfaced!');
+  } catch(e) {
+    host.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>${escHtml(e.message||'Failed')} — tap Find the Angle to retry.</div>`;
+  }
+  btnDone('pls-money-btn');
 }
 
 function writePlaylistTrack(index) {
