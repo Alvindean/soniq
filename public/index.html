@@ -3650,6 +3650,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
               <option value="percussive">percussive delivery</option>
               <option value="spit_tight">spit-tight</option>
               <option value="double_time">double-time</option>
+              <option value="yelled">yelled</option>
+              <option value="screamed">screamed</option>
+              <option value="growled">growled</option>
+              <option value="strained">strained (vocally pushed)</option>
+              <option value="crack_in_voice">voice cracking with emotion</option>
             </select>
           </div>
         </div>
@@ -3709,6 +3714,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
               <option value="pitched_up">pitched-up imp</option>
               <option value="pitched_down">pitched-down demon</option>
               <option value="close_mic">close-mic intimate</option>
+              <option value="harmonized">harmonized (stacked harmonies)</option>
+              <option value="choir">choir-backed</option>
+              <option value="double_tracked">double-tracked</option>
+              <option value="stutter">stutter-edited (chopped)</option>
+              <option value="tremolo">tremolo (wavering)</option>
             </select>
           </div>
           <div class="vd-cell">
@@ -13864,10 +13874,10 @@ const VD_LABELS = {
   // preview chip so users see what gets sent to Suno before they hit Generate.
   texture:{raspy:'Raspy',gravelly:'Gravelly',smoky:'Smoky',husky:'Husky',breathy:'Breathy',airy:'Airy',nasal:'Nasal',throaty:'Throaty',chesty:'Chesty',sandpaper:'Sandpaper',velvety:'Velvety',honeyed:'Honeyed',silken:'Silken',brittle:'Brittle',reedy:'Reedy',rich_baritone:'Rich Baritone',paper_thin:'Paper-Thin',whiskey_soaked:'Whiskey-Soaked',cigarette_burned:'Cigarette-Burned',feathered:'Feathered',glassy:'Glassy'},
   character:{quirky:'Quirky',theatrical:'Theatrical',whimsical:'Whimsical',mischievous:'Mischievous',deadpan:'Deadpan',wry:'Wry',sardonic:'Sardonic',cartoonish:'Cartoonish',vaudevillian:'Vaudevillian',manic_pixie:'Manic-Pixie',oddball:'Oddball',innocent:'Innocent',childlike:'Childlike',world_weary:'World-Weary',sinister:'Sinister',seductive:'Seductive',menacing:'Menacing',vulnerable:'Vulnerable',confessional:'Confessional',drunken:'Drunken',possessed:'Possessed',feral:'Feral',regal:'Regal',cabaret:'Cabaret',preacher:'Preacher',narrator:'Narrator',matter_of_fact:'Matter-Of-Fact',confident:'Confident',sneering:'Sneering'},
-  performance:{whispered:'Whispered',spoken:'Spoken',sprechgesang:'Half-Spoken (Sprechgesang)',shouted:'Shouted',belted:'Belted',crooned:'Crooned',hummed:'Hummed',chanted:'Chanted',mumbled:'Mumbled',sing_song:'Sing-Song',conversational:'Conversational',declamatory:'Declamatory',recitative:'Recitative',preached:'Preached',half_laughed:'Half-Laughed',half_cried:'Half-Cried',on_exhale:'Sung On The Exhale',on_inhale:'Sung On The Inhale',spoken_rap:'Spoken Rap',percussive:'Percussive Delivery',spit_tight:'Spit-Tight',double_time:'Double-Time'},
+  performance:{whispered:'Whispered',spoken:'Spoken',sprechgesang:'Half-Spoken (Sprechgesang)',shouted:'Shouted',belted:'Belted',crooned:'Crooned',hummed:'Hummed',chanted:'Chanted',mumbled:'Mumbled',sing_song:'Sing-Song',conversational:'Conversational',declamatory:'Declamatory',recitative:'Recitative',preached:'Preached',half_laughed:'Half-Laughed',half_cried:'Half-Cried',on_exhale:'Sung On The Exhale',on_inhale:'Sung On The Inhale',spoken_rap:'Spoken Rap',percussive:'Percussive Delivery',spit_tight:'Spit-Tight',double_time:'Double-Time',yelled:'Yelled',screamed:'Screamed',growled:'Growled',strained:'Strained, Vocally Pushed',crack_in_voice:'Voice Cracking With Emotion'},
   accent:{rp_british:'RP British',cockney:'Cockney',scouse:'Scouse',irish_lilt:'Irish Lilt',appalachian:'Appalachian',memphis:'Memphis Drawl',nashville:'Nashville Twang',bayou:'Louisiana Bayou',bronx_bodega:'Bronx Bodega',atl:'ATL',west_coast:'West Coast',texan:'Texan',australian:'Australian',french:'French-Tinged',spanish:'Spanish-Tinged',patois:'Jamaican Patois'},
   postural:{leaning_in:'Sung Leaning In',from_chest:'Sung From The Chest',from_head:'Sung From The Head',back_of_throat:'Sung From The Back Of The Throat',sharing_secret:'Sung Like Sharing A Secret',reciting_confession:'Sung Like Reciting A Confession',through_smile:'Sung Through A Smile',gritted_teeth:'Sung Through Gritted Teeth',on_verge_laughter:'Sung On The Verge Of Laughter',on_verge_tears:'Sung On The Verge Of Tears',in_on_joke:'Sung In On The Joke'},
-  processing:{megaphone:'Megaphone',telephone:'Telephone-EQ',vintage_ribbon:'Vintage Ribbon Mic',lofi_cassette:'Lo-Fi Cassette',radio_broadcast:'Radio-Broadcast',talkbox:'Talkbox',vocoder:'Vocoder',doubled_octave:'Doubled An Octave Down',whisper_doubled:'Whisper-Doubled',pitched_up:'Pitched-Up Imp',pitched_down:'Pitched-Down Demon',close_mic:'Close-Mic Intimate'},
+  processing:{megaphone:'Megaphone',telephone:'Telephone-EQ',vintage_ribbon:'Vintage Ribbon Mic',lofi_cassette:'Lo-Fi Cassette',radio_broadcast:'Radio-Broadcast',talkbox:'Talkbox',vocoder:'Vocoder',doubled_octave:'Doubled An Octave Down',whisper_doubled:'Whisper-Doubled',pitched_up:'Pitched-Up Imp',pitched_down:'Pitched-Down Demon',close_mic:'Close-Mic Intimate',harmonized:'Harmonized, Stacked Harmonies',choir:'Choir-Backed, Choral Stack',double_tracked:'Double-Tracked',stutter:'Stutter-Edited, Chopped Repeat',tremolo:'Tremolo, Wavering Vocal'},
   pitch:{deep_baritone:'Deep Baritone Register',baritone:'Baritone Register',tenor:'Tenor Register',high_tenor:'High-Tenor Register',countertenor:'Countertenor / Male-Falsetto Register',alto:'Alto Register',mezzo:'Mezzo-Soprano Register',soprano:'Soprano Register',octave_up:'Pitched Up An Octave',octave_down:'Pitched Down An Octave',fifth_up:'Pitched Up A Fifth',formant_up:'Formant-Shifted Up',formant_down:'Formant-Shifted Down',feminized:'Feminized Timbre',masculinized:'Masculinized Timbre',androgynous:'Androgynous Timbre',hard_autotune:'Hard Auto-Tune',melodic_autotune:'Melodic Auto-Tune',subtle_tune:'Subtle Pitch Correction',natural_pitch:'Natural Untuned Pitch',octave_stack:'Octave-Stacked Lead',detuned_double:'Detuned Double-Tracked'},
   spatial:{far_away:'Far-Away, Distant In The Mix',in_your_ear:'In-Your-Ear, ASMR-Close',center_stage:'Center-Stage, Front And Dominant',background:'Background, Behind The Mix',in_the_distance:'Faint, In The Distance',dry:'Dry, No Space, Clean And Direct',wide:'Wide, Expansive Full-Stereo'}
 };

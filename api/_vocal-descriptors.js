@@ -54,6 +54,9 @@ const PERFORMANCE = {
   on_exhale:'sung on the exhale', on_inhale:'sung on the inhale',
   spoken_rap:'spoken rap', percussive:'percussive delivery',
   spit_tight:'spit-tight', double_time:'double-time',
+  // Intensity gradient above shouted, plus emotional-break delivery atoms.
+  yelled:'yelled', screamed:'screamed', growled:'growled',
+  strained:'strained, vocally pushed', crack_in_voice:'voice cracking with emotion',
 };
 
 // ── D. Accent / Region (optional) ────────────────────────────────────────────
@@ -114,6 +117,11 @@ const PROCESSING = {
   doubled_octave:'doubled an octave down', whisper_doubled:'whisper-doubled',
   pitched_up:'pitched-up imp', pitched_down:'pitched-down demon',
   reversed:'reversed-phrasing', close_mic:'close-mic intimate',
+  // Vocal-arrangement / effect atoms (harmony stacks, choral backing, doubling,
+  // rhythmic chop, wavering modulation).
+  harmonized:'harmonized, stacked harmonies', choir:'choir-backed, choral stack',
+  double_tracked:'double-tracked', stutter:'stutter-edited, chopped repeat',
+  tremolo:'tremolo, wavering vocal',
 };
 
 // ── J. Placement / Space (where the voice sits in the field) ─────────────────
@@ -172,6 +180,9 @@ const CONFLICTS = [
   ['sandpaper','silken'], ['whiskey_soaked','silken'],
   ['deadpan','ecstatic'], ['deadpan','triumphant'], ['deadpan','manic_pixie'],
   ['whispered','belted'], ['whispered','shouted'],
+  ['whispered','yelled'], ['whispered','screamed'], ['mumbled','screamed'], ['mumbled','yelled'],
+  ['screamed','crooned'], ['screamed','silken'], ['screamed','close_mic'], ['yelled','close_mic'],
+  ['growled','silken'], ['growled','honeyed'], ['growled','velvety'],
   ['childlike','world_weary'], ['childlike','whiskey_soaked'], ['childlike','sinister'],
   ['megaphone','close_mic'], ['megaphone','whispered'],
   ['preacher','mumbled'], ['cartoonish','menacing'],
@@ -510,16 +521,27 @@ function buildVocalDescriptorNote(stackResult) {
     .join(', ');
 
   // Genre-appropriate MOMENT-tag palette for the inline dynamics pass. Spoken-rap
-  // stacks must never be handed melodic/sung moment tags (falsetto/belted) — that
-  // is the one way an inline tag can fight the global stack. Detect rap from the
-  // resolved profile key and the performance keys in the stack.
+  // stacks must never be handed melodic/sung moment tags (falsetto/belted), and
+  // the high-intensity atoms ([Scream]/[Growl]) only belong to aggressive genres —
+  // a folk ballad must never be told it MAY scream. Detect both axes from the
+  // resolved profile key and the performance/character keys in the stack.
   const profileKey = String(stackResult.profileKey || '');
   const stackKeys = (stackResult.stack || []).map(e => e.key);
   const isRap = /^hiphop/.test(profileKey) ||
     stackKeys.some(k => /spoken_rap|sprechgesang|percussive|spit_tight|double_time/.test(k));
-  const momentPalette = isRap
-    ? '[Whisper] · [Spoken] · [Half-Time] · [Double-Time] · [Shouted] · [Gritted Teeth] · [Ad-Lib] · [Build] · [Fade Out]'
-    : '[Whisper] · [Breathy] · [Soft] · [Spoken] · [Falsetto] · [Belted] · [Powerful] · [Voice Crack] · [Build] · [Whispered Outro] · [Fade Out]';
+  const isAggressive = /^(metal|punk|rock|altrock)$/.test(profileKey) ||
+    stackKeys.some(k => /screamed|shouted|growled|feral|menacing|gritted_teeth|possessed/.test(k));
+  // [Voice Crack] and [Strained] are emotionally universal — a pop or folk climax
+  // earns them — so they sit in every non-rap palette. [Scream]/[Growl]/[Yell]
+  // gate behind the aggression axis.
+  let momentPalette;
+  if (isRap) {
+    momentPalette = '[Whisper] · [Spoken] · [Half-Time] · [Double-Time] · [Shouted] · [Yell] · [Gritted Teeth] · [Strained] · [Ad-Lib] · [Build] · [Fade Out]'
+      + (isAggressive ? ' · [Growl] · [Scream]' : '');
+  } else {
+    momentPalette = '[Whisper] · [Breathy] · [Soft] · [Spoken] · [Falsetto] · [Belted] · [Powerful] · [Voice Crack] · [Strained] · [Build] · [Whispered Outro] · [Fade Out]'
+      + (isAggressive ? ' · [Yell] · [Scream] · [Growl]' : '');
+  }
 
   return `
 
@@ -545,6 +567,8 @@ Moment-tag rules:
     [Voice Crack] but I'm falling apart
 - Cap it: at most ONE moment tag per section and ~4 across the whole song. Most lines get NO tag — restraint is the point. Over-tagging makes Suno sing the brackets aloud or flatten every dynamic.
 - Moment tags are DELTAS: never restate the global stack inline, and never pick a tag that contradicts the genre (the palette above is already filtered for that).
+- The LYRIC must EARN the tag — write the moment, don't just label a flat line. [Whisper]/[Breathy] go on a line that is genuinely small and bare; [Belted]/[Powerful]/[Scream] go on the line carrying the song's biggest emotional or thematic payload; [Voice Crack]/[Strained] go where the words break under their own weight. If no line earns a given tag, leave it off — a tag on an undeserving line reads as fake.
+- Build the dynamic arc into the WRITING: pull the words back (shorter, plainer, more intimate) right before the line you want to land hardest, so the loud/cracked moment has contrast to hit against. Quiet → loud is the engine; a song that is loud everywhere has no climax.
 - Section tags ([Verse], [Chorus], [Bridge], [Outro]) and ad-libs in (parentheses) are separate layers — moment tags stack ON TOP of them, they do not replace them.
 - NEVER an inline [no …] / "avoid:" negative (Suno reads it as ADD).`;
 }
