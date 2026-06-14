@@ -3711,6 +3711,19 @@ body.craft-advanced .craft-basic-only{display:none !important}
               <option value="close_mic">close-mic intimate</option>
             </select>
           </div>
+          <div class="vd-cell">
+            <label>Placement (opt.)</label>
+            <select id="vd-spatial" disabled onchange="vdSyncPreview()">
+              <option value="">— none —</option>
+              <option value="in_your_ear">in-your-ear (ASMR-close)</option>
+              <option value="center_stage">center-stage (front)</option>
+              <option value="wide">wide (full stereo)</option>
+              <option value="dry">dry (no space)</option>
+              <option value="background">background (behind mix)</option>
+              <option value="far_away">far-away (distant)</option>
+              <option value="in_the_distance">faint, in the distance</option>
+            </select>
+          </div>
         </div>
         <div class="vd-exclude-row" style="margin-top:10px">
           <label for="vd-exclude" style="display:block;font-size:11px;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">
@@ -13845,7 +13858,7 @@ function laRunSuggest(scope) {
 // Presets one-shot the most useful stacks (Quirky, Whiny-Rap Fix, Intimate…).
 // Auto mode disables the selects so the brain picks from genre+mood+lyrics.
 // ──────────────────────────────────────────────────────────────────────────
-const VD_FAMILIES = ['pitch','texture','character','performance','accent','postural','processing'];
+const VD_FAMILIES = ['pitch','texture','character','performance','accent','postural','processing','spatial'];
 const VD_LABELS = {
   // Mirror of _vocal-descriptors.js display labels — used only for the live
   // preview chip so users see what gets sent to Suno before they hit Generate.
@@ -13855,7 +13868,8 @@ const VD_LABELS = {
   accent:{rp_british:'RP British',cockney:'Cockney',scouse:'Scouse',irish_lilt:'Irish Lilt',appalachian:'Appalachian',memphis:'Memphis Drawl',nashville:'Nashville Twang',bayou:'Louisiana Bayou',bronx_bodega:'Bronx Bodega',atl:'ATL',west_coast:'West Coast',texan:'Texan',australian:'Australian',french:'French-Tinged',spanish:'Spanish-Tinged',patois:'Jamaican Patois'},
   postural:{leaning_in:'Sung Leaning In',from_chest:'Sung From The Chest',from_head:'Sung From The Head',back_of_throat:'Sung From The Back Of The Throat',sharing_secret:'Sung Like Sharing A Secret',reciting_confession:'Sung Like Reciting A Confession',through_smile:'Sung Through A Smile',gritted_teeth:'Sung Through Gritted Teeth',on_verge_laughter:'Sung On The Verge Of Laughter',on_verge_tears:'Sung On The Verge Of Tears',in_on_joke:'Sung In On The Joke'},
   processing:{megaphone:'Megaphone',telephone:'Telephone-EQ',vintage_ribbon:'Vintage Ribbon Mic',lofi_cassette:'Lo-Fi Cassette',radio_broadcast:'Radio-Broadcast',talkbox:'Talkbox',vocoder:'Vocoder',doubled_octave:'Doubled An Octave Down',whisper_doubled:'Whisper-Doubled',pitched_up:'Pitched-Up Imp',pitched_down:'Pitched-Down Demon',close_mic:'Close-Mic Intimate'},
-  pitch:{deep_baritone:'Deep Baritone Register',baritone:'Baritone Register',tenor:'Tenor Register',high_tenor:'High-Tenor Register',countertenor:'Countertenor / Male-Falsetto Register',alto:'Alto Register',mezzo:'Mezzo-Soprano Register',soprano:'Soprano Register',octave_up:'Pitched Up An Octave',octave_down:'Pitched Down An Octave',fifth_up:'Pitched Up A Fifth',formant_up:'Formant-Shifted Up',formant_down:'Formant-Shifted Down',feminized:'Feminized Timbre',masculinized:'Masculinized Timbre',androgynous:'Androgynous Timbre',hard_autotune:'Hard Auto-Tune',melodic_autotune:'Melodic Auto-Tune',subtle_tune:'Subtle Pitch Correction',natural_pitch:'Natural Untuned Pitch',octave_stack:'Octave-Stacked Lead',detuned_double:'Detuned Double-Tracked'}
+  pitch:{deep_baritone:'Deep Baritone Register',baritone:'Baritone Register',tenor:'Tenor Register',high_tenor:'High-Tenor Register',countertenor:'Countertenor / Male-Falsetto Register',alto:'Alto Register',mezzo:'Mezzo-Soprano Register',soprano:'Soprano Register',octave_up:'Pitched Up An Octave',octave_down:'Pitched Down An Octave',fifth_up:'Pitched Up A Fifth',formant_up:'Formant-Shifted Up',formant_down:'Formant-Shifted Down',feminized:'Feminized Timbre',masculinized:'Masculinized Timbre',androgynous:'Androgynous Timbre',hard_autotune:'Hard Auto-Tune',melodic_autotune:'Melodic Auto-Tune',subtle_tune:'Subtle Pitch Correction',natural_pitch:'Natural Untuned Pitch',octave_stack:'Octave-Stacked Lead',detuned_double:'Detuned Double-Tracked'},
+  spatial:{far_away:'Far-Away, Distant In The Mix',in_your_ear:'In-Your-Ear, ASMR-Close',center_stage:'Center-Stage, Front And Dominant',background:'Background, Behind The Mix',in_the_distance:'Faint, In The Distance',dry:'Dry, No Space, Clean And Direct',wide:'Wide, Expansive Full-Stereo'}
 };
 const VD_PRESETS = {
   quirky:     { texture:'airy',         character:'quirky',        performance:'sprechgesang', postural:'through_smile' },
@@ -13930,7 +13944,7 @@ function vdSyncPreview() {
     prefixEl.textContent = '[Auto — picked from genre + mood at generate time]';
   } else {
     const stack = vdGetStack() || {};
-    const order = ['pitch','texture','character','performance','accent','postural','processing'];
+    const order = ['pitch','texture','character','performance','accent','postural','processing','spatial'];
     const labels = order.map(f => stack[f] && VD_LABELS[f]?.[stack[f]]).filter(Boolean);
     prefixEl.style.opacity = '1';
     prefixEl.textContent = labels.length

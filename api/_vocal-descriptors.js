@@ -116,6 +116,21 @@ const PROCESSING = {
   reversed:'reversed-phrasing', close_mic:'close-mic intimate',
 };
 
+// ── J. Placement / Space (where the voice sits in the field) ─────────────────
+// Spatial placement is distinct from PROCESSING (which stamps a sonic character
+// like telephone/lo-fi). SPATIAL controls DISTANCE and STEREO WIDTH. close_mic
+// already lives in PROCESSING as the intimacy stamp; the rest of the depth/width
+// axis lives here.
+const SPATIAL = {
+  far_away:'far-away, distant in the mix',
+  in_your_ear:'in-your-ear, ASMR-close',
+  center_stage:'center-stage, front and dominant',
+  background:'background, behind the mix',
+  in_the_distance:'faint, in the distance',
+  dry:'dry, no space, clean and direct',
+  wide:'wide, expansive full-stereo',
+};
+
 // ── I. Pitch / Register / Tuning (THE "unique artist" lever) ─────────────────
 // Controls the actual PITCH of the voice — natural range, octave/formant shifts
 // to morph perceived size/age/gender, and the auto-tune style. This is the
@@ -160,6 +175,11 @@ const CONFLICTS = [
   ['childlike','world_weary'], ['childlike','whiskey_soaked'], ['childlike','sinister'],
   ['megaphone','close_mic'], ['megaphone','whispered'],
   ['preacher','mumbled'], ['cartoonish','menacing'],
+  // Spatial — depth and width are mutually exclusive at the extremes.
+  ['far_away','in_your_ear'], ['far_away','center_stage'], ['far_away','close_mic'],
+  ['in_the_distance','in_your_ear'], ['in_the_distance','center_stage'],
+  ['background','center_stage'], ['in_your_ear','far_away'],
+  ['dry','wide'], ['dry','far_away'],
 ];
 function _conflicts(a, b) {
   return CONFLICTS.some(([x, y]) => (a === x && b === y) || (a === y && b === x));
@@ -255,10 +275,10 @@ const MOOD_OVERLAYS = {
   sad:         { add_character: 'heartbroken', add_postural: 'on_verge_tears' },
   drunk:       { add_character: 'drunken',    add_performance: 'mumbled' },
   manic:       { add_character: 'possessed',  add_performance: 'shouted' },
-  dreamy:      { add_texture: 'feathered',    add_performance: 'on_exhale' },
-  ethereal:    { add_texture: 'glassy',       add_performance: 'on_exhale' },
-  cinematic:   { add_character: 'narrator',   add_performance: 'declamatory' },
-  epic:        { add_character: 'triumphant', add_performance: 'belted' },
+  dreamy:      { add_texture: 'feathered',    add_performance: 'on_exhale', add_spatial: 'wide' },
+  ethereal:    { add_texture: 'glassy',       add_performance: 'on_exhale', add_spatial: 'wide' },
+  cinematic:   { add_character: 'narrator',   add_performance: 'declamatory', add_spatial: 'wide' },
+  epic:        { add_character: 'triumphant', add_performance: 'belted', add_spatial: 'center_stage' },
 };
 
 // ── Genre pitch pools ────────────────────────────────────────────────────────
@@ -332,6 +352,8 @@ const LYRIC_SIGNALS = [
   { match: /cradle|lullaby|sleep|moonlight|bedtime/i, add_character: 'innocent', add_performance: 'sing_song' },
   { match: /night drive|highway|midnight|cigarette/i, add_texture: 'smoky' },
   { match: /telephone|payphone|dial tone/i, add_processing: 'telephone' },
+  { match: /far away|distance|across the room|drifting|fading away|miles between/i, add_spatial: 'far_away' },
+  { match: /right here|next to me|in my ear|so close|skin on skin/i, add_spatial: 'in_your_ear' },
 ];
 
 // ── Resolve a label → display string (handles raw user input too) ────────────
@@ -383,6 +405,7 @@ function selectVocalDescriptors({
     era:         null,
     postural:    null,
     processing:  null,
+    spatial:     null,
   };
 
   // Apply mood overlays (additive — first mood wins per slot, but won't displace
@@ -396,6 +419,7 @@ function selectVocalDescriptors({
     if (o.add_performance && !picked._mood_performance) { picked.performance = o.add_performance; picked._mood_performance = true; }
     if (o.add_postural    && !picked.postural)          { picked.postural    = o.add_postural; }
     if (o.add_processing  && !picked.processing)        { picked.processing  = o.add_processing; }
+    if (o.add_spatial     && !picked.spatial)           { picked.spatial     = o.add_spatial; }
   }
   delete picked._mood_character; delete picked._mood_texture; delete picked._mood_performance;
 
@@ -408,12 +432,13 @@ function selectVocalDescriptors({
     if (sig.add_performance && !picked._lyric_performance) { picked.performance = sig.add_performance; picked._lyric_performance = true; }
     if (sig.add_postural    && !picked.postural)           { picked.postural    = sig.add_postural; }
     if (sig.add_processing  && !picked.processing)         { picked.processing  = sig.add_processing; }
+    if (sig.add_spatial     && !picked.spatial)            { picked.spatial     = sig.add_spatial; }
   }
   delete picked._lyric_character; delete picked._lyric_texture; delete picked._lyric_performance;
 
   // User overrides win — but only when not in pure auto mode.
   if (!autoMode && overrides && typeof overrides === 'object') {
-    for (const k of ['texture','character','performance','accent','era','postural','processing']) {
+    for (const k of ['texture','character','performance','accent','era','postural','processing','spatial']) {
       if (overrides[k]) picked[k] = String(overrides[k]).trim().slice(0, 40);
     }
   }
@@ -427,9 +452,9 @@ function selectVocalDescriptors({
 
   // Build ordered stack — pitch leads (it defines WHO is singing), then texture,
   // character, performance; optionals only when present + non-conflicting.
-  const order = ['pitch','texture','character','performance','accent','era','postural','processing'];
+  const order = ['pitch','texture','character','performance','accent','era','postural','processing','spatial'];
   const families = { pitch:PITCH, texture:TEXTURE, character:CHARACTER, performance:PERFORMANCE,
-                     accent:ACCENT, era:ERA, postural:POSTURAL, processing:PROCESSING };
+                     accent:ACCENT, era:ERA, postural:POSTURAL, processing:PROCESSING, spatial:SPATIAL };
 
   const stack = [];
   const usedKeys = new Set();
@@ -483,6 +508,19 @@ function buildVocalDescriptorNote(stackResult) {
     .map(n => String(n).replace(/^no\s+/i, '').trim())
     .filter(Boolean)
     .join(', ');
+
+  // Genre-appropriate MOMENT-tag palette for the inline dynamics pass. Spoken-rap
+  // stacks must never be handed melodic/sung moment tags (falsetto/belted) — that
+  // is the one way an inline tag can fight the global stack. Detect rap from the
+  // resolved profile key and the performance keys in the stack.
+  const profileKey = String(stackResult.profileKey || '');
+  const stackKeys = (stackResult.stack || []).map(e => e.key);
+  const isRap = /^hiphop/.test(profileKey) ||
+    stackKeys.some(k => /spoken_rap|sprechgesang|percussive|spit_tight|double_time/.test(k));
+  const momentPalette = isRap
+    ? '[Whisper] · [Spoken] · [Half-Time] · [Double-Time] · [Shouted] · [Gritted Teeth] · [Ad-Lib] · [Build] · [Fade Out]'
+    : '[Whisper] · [Breathy] · [Soft] · [Spoken] · [Falsetto] · [Belted] · [Powerful] · [Voice Crack] · [Build] · [Whispered Outro] · [Fade Out]';
+
   return `
 
 🎙️ VOCAL DESCRIPTOR LOCK (Lever #7 — controls WHO is singing, not just what):
@@ -495,13 +533,26 @@ Rules:
 - Do NOT insert artist names. The bracket above is already Suno-policy-safe.
 - The descriptor stack ALWAYS appears BEFORE genre/instrument tokens in the Full prompt.
 - NEVER place a [no …] or "avoid:" negative inside the Full prompt or style string — Suno treats those as things to ADD. Negatives belong only in Suno's Exclude Styles field.
-- If the lyric content forces a contradiction (e.g. a whispered intimate verse inside an otherwise belted song), add an inline [Whispered] / [Spoken] DELIVERY tag on that section — do NOT change the global descriptor stack.`;
+
+🎚️ MOMENT DIRECTION PASS (dynamics — where the performance DEPARTS from the global stack):
+The stack above is the DEFAULT voice. Emotion comes from a FEW deliberate departures. Inside the LYRIC BODY, place inline DELIVERY tags on individual lines at 2–4 emotional inflection points ONLY:
+  • the most vulnerable / quietest line   • the climax or hardest-hitting line   • a release or resolution line   • (optional) one big transition
+Approved moment tags for THIS song — stay inside this palette (it already matches the genre + global stack):
+  ${momentPalette}
+Moment-tag rules:
+- One tag, in square brackets, at the START of its own line, immediately before the lyric it governs. e.g.
+    [Whisper] I'm fine
+    [Voice Crack] but I'm falling apart
+- Cap it: at most ONE moment tag per section and ~4 across the whole song. Most lines get NO tag — restraint is the point. Over-tagging makes Suno sing the brackets aloud or flatten every dynamic.
+- Moment tags are DELTAS: never restate the global stack inline, and never pick a tag that contradicts the genre (the palette above is already filtered for that).
+- Section tags ([Verse], [Chorus], [Bridge], [Outro]) and ad-libs in (parentheses) are separate layers — moment tags stack ON TOP of them, they do not replace them.
+- NEVER an inline [no …] / "avoid:" negative (Suno reads it as ADD).`;
 }
 
 module.exports = {
   selectVocalDescriptors,
   buildVocalDescriptorNote,
   // Exported families let the UI render the picker without duplicating the taxonomy.
-  TEXTURE, CHARACTER, PERFORMANCE, ACCENT, ERA, EMOTION, POSTURAL, PROCESSING, PITCH,
+  TEXTURE, CHARACTER, PERFORMANCE, ACCENT, ERA, EMOTION, POSTURAL, PROCESSING, PITCH, SPATIAL,
   GENRE_PROFILES, GENRE_PITCH, MOOD_OVERLAYS,
 };

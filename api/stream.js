@@ -235,7 +235,10 @@ function sanitizeSurprise(s) {
 // Lever #7 — sanitise the vocal-descriptor stack from the request body.
 // The brain's _vocal-descriptors module is the canonical gate; this is
 // defense-in-depth so we never forward arbitrary strings or weird shapes.
-const _VOCAL_DESC_FAMILIES = ['texture','character','performance','accent','era','postural','processing'];
+// NOTE: includes 'pitch' and 'spatial' — both are exposed in the UI picker and
+// consumed by selectVocalDescriptors(). They were previously absent here, so the
+// pitch/spatial overrides were silently stripped before reaching the brain.
+const _VOCAL_DESC_FAMILIES = ['pitch','texture','character','performance','accent','era','postural','processing','spatial'];
 const _VOCAL_DESC_SAFE = /^[A-Za-z0-9 _\-()'/]{1,40}$/;
 function sanitizeVocalDescriptors(v) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return undefined;
