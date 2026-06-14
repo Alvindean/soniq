@@ -1233,6 +1233,33 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .gap-status-present{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
 .gap-write-btn{background:var(--amberbg);border:1px solid var(--amberline);border-radius:var(--r1);padding:4px 10px;font-size:10px;font-weight:700;color:var(--amber);cursor:pointer;transition:all .15s;white-space:nowrap}
 .gap-write-btn:hover{background:var(--amber);color:#050505}
+
+/* ── PLAYLIST ENGINE — enriched track cards, CADENCE gauge, staged loader ── */
+@property --plspct{syntax:'<number>';initial-value:0;inherits:false}
+.pls-track-card{align-items:center;gap:11px}
+.pls-track-card .gap-role-icon{margin-top:0}
+.pls-track-card:hover{border-color:var(--violetline,rgba(155,135,245,.45));background:var(--s4)}
+.pls-track-num{flex-shrink:0;width:22px;height:22px;border-radius:6px;background:var(--s4);border:1px solid var(--b2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--tx3);font-variant-numeric:tabular-nums}
+.pls-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.pls-chip{font-size:9.5px;font-weight:700;letter-spacing:.02em;padding:2px 7px;border-radius:99px;background:var(--s4);border:1px solid var(--b2);color:var(--tx3);white-space:nowrap}
+.pls-chip-bpm{color:var(--violet);border-color:var(--violetline,rgba(155,135,245,.35))}
+.pls-gauge-wrap{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:6px}
+.pls-gauge{--plspct:0;--col:var(--amber);position:relative;width:110px;height:110px;border-radius:50%;flex-shrink:0;background:conic-gradient(var(--col) calc(var(--plspct)*1%),var(--s4) 0);display:flex;align-items:center;justify-content:center;transition:--plspct .9s ease}
+.pls-gauge::after{content:'';position:absolute;inset:9px;border-radius:50%;background:var(--s2);border:1px solid var(--b1)}
+.pls-gauge-val{position:relative;z-index:1;text-align:center;line-height:1}
+.pls-gauge-num{font-size:31px;font-weight:900;letter-spacing:-1px;color:var(--col)}
+.pls-gauge-den{font-size:10px;font-weight:700;color:var(--tx4);margin-top:2px}
+.pls-gauge-meta{flex:1;min-width:170px}
+.pls-gate{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:4px 11px;border-radius:99px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.04em}
+.pls-gate-go{background:var(--greenbg);color:var(--green);border:1px solid var(--greenline)}
+.pls-gate-mid{background:var(--amberbg);color:var(--amber);border:1px solid var(--amberline)}
+.pls-gate-no{background:var(--redbg);color:var(--red);border:1px solid var(--redline)}
+.pls-verdict{font-size:12.5px;color:var(--tx2);line-height:1.55}
+.pls-loader{display:flex;align-items:center;gap:11px;padding:16px 2px;color:var(--tx2);font-size:13px;font-weight:600}
+.pls-loader-ring{width:18px;height:18px;border-radius:50%;border:2.5px solid var(--b2);border-top-color:var(--violet);animation:pls-spin .7s linear infinite;flex-shrink:0}
+@keyframes pls-spin{to{transform:rotate(360deg)}}
+.pls-empty{text-align:center;padding:30px 16px;color:var(--tx4);font-size:12.5px;line-height:1.6}
+.pls-empty-ico{font-size:24px;margin-bottom:8px;opacity:.7}
 .album-ie-box{padding:14px 16px;border-top:1px solid var(--b1);background:var(--amberbg)}
 .album-ie-label{font-size:9px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
 .album-ie-textarea{width:100%;background:var(--s3);border:1px solid var(--amberline);border-radius:var(--r2);color:var(--tx1);font-size:13px;padding:10px 12px;outline:none;resize:vertical;min-height:48px;line-height:1.6;font-family:var(--font)}
@@ -11281,19 +11308,25 @@ if (localStorage.getItem('soniq_admin_token')) {
 // ═══════════════════════════════════════════════════════
 
 // ── STREAMING ────────────────────────────────────────
-async function callClaudeStream(prompt, systemPrompt, onChunk, signal) {
+async function callClaudeStream(prompt, systemPrompt, onChunk, signal, maxTokens = 2048) {
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
 
   if (isVercel) {
-    // Try streaming first; fall back to /api/generate if stream fails
+    // Try streaming first; fall back to /api/generate if stream fails.
+    // Auth + admin headers must be sent or /api/stream answers 401 and we
+    // silently drop to the buffered /api/generate path (which DOES send them).
+    const streamHeaders = {'Content-Type': 'application/json'};
+    if (S.session?.access_token) streamHeaders['Authorization'] = 'Bearer ' + S.session.access_token;
+    const _adminTokS = localStorage.getItem('soniq_admin_token');
+    if (window.__soniqAdmin && _adminTokS) streamHeaders['X-Admin-Token'] = _adminTokS;
     try {
       const res = await fetch('/api/stream', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: streamHeaders,
         body: JSON.stringify({
           messages: [{role: 'user', content: prompt}],
           system: systemPrompt || undefined,
-          max_tokens: 2048
+          max_tokens: maxTokens
         }),
         signal
       });
@@ -11326,7 +11359,7 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal) {
     } catch (streamErr) {
       // Streaming failed — silently fall back to regular endpoint
       console.warn('Stream failed, falling back to /api/generate:', streamErr.message);
-      const text = await callClaude(prompt, systemPrompt);
+      const text = await callClaude(prompt, systemPrompt, maxTokens);
       onChunk(text, text);
       return text;
     }
@@ -21833,7 +21866,7 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
 
   try {
     let raw = '';
-    await callClaudeStream(prompt, 'You are a creative director for a major record label. Be specific and commercially minded.', (chunk, full) => { raw = full; });
+    await callClaudeStream(prompt, 'You are a creative director for a major record label. Be specific and commercially minded.', (chunk, full) => { raw = full; }, null, 4096);
 
     const sec = (key, next) => { const re = new RegExp(key+':\\s*([\\s\\S]*?)(?=\\n[A-Z][A-Z &\\/]+:|$)'); const m = raw.match(re); return m ? m[1].trim() : ''; };
     const name = raw.match(/ALBUM NAME:\s*(.+)/)?.[1]?.trim() || 'Untitled Album';
@@ -22252,19 +22285,37 @@ ${extraSections}`;
     const el = document.getElementById(id);
     if (el) el.innerHTML = '';
   });
-  const _scoreReset = document.getElementById('pls-cadence-score');
-  if (_scoreReset) { _scoreReset.textContent = '—'; _scoreReset.style.color = ''; }
-  const _verdictReset = document.getElementById('pls-cadence-verdict');
-  if (_verdictReset) _verdictReset.textContent = '';
+  const _cadHeadReset = document.getElementById('pls-cadence-headline');
+  if (_cadHeadReset) { _cadHeadReset.style.display = 'block'; _cadHeadReset.innerHTML = '<div class="pls-loader"><span class="pls-loader-ring"></span>Scoring the niche &amp; projecting revenue…</div>'; }
   document.getElementById('pls-name').textContent = isNiche ? 'Generating CADENCE plan…' : 'Generating playlist concept…';
+
+  // Staged loading feedback — a full niche plan can take 30-45s. Rotate status
+  // messages so the wait reads as deliberate progress, not a frozen button.
+  const _plsStages = isNiche
+    ? ['🎯 Scoring sonic distinctiveness…','📈 Sizing audience & country-mix economics…','🗺 Mapping the retention arc…','💰 Projecting 12-month revenue…','🗓 Drafting the 90-day plan…']
+    : ['🎧 Locking the mood…','🗺 Mapping the energy curve…','🎚 Sequencing the tracks…','🎨 Mixing the sonic palette…'];
+  let _plsStageI = 0;
+  const _plsTrackPane = document.getElementById('pls-track-types');
+  const _renderStage = () => { if (_plsTrackPane) _plsTrackPane.innerHTML = `<div class="pls-loader"><span class="pls-loader-ring"></span>${_plsStages[_plsStageI % _plsStages.length]}</div>`; };
+  _renderStage();
+  clearInterval(S._plsLoaderTimer);
+  S._plsLoaderTimer = setInterval(() => { _plsStageI++; _renderStage(); }, 2600);
 
   try {
     let raw = '';
+    // Size the token budget to the plan. A 20-30 track CADENCE plan with the
+    // 6-factor score + revenue projection + 90-day plan runs well past 2048
+    // tokens and used to silently truncate — that's why the Track Map was
+    // short and the CADENCE Score / 90-Day Plan tabs came back empty.
+    const _plsMaxTok = isNiche
+      ? (playlistDef.count >= 25 ? 8192 : 6144)
+      : (playlistDef.count >= 25 ? 6144 : 4096);
     await callClaudeStream(prompt,
       isNiche
         ? 'You are the CADENCE engine — a senior streaming-arbitrage analyst. Be specific, numerical, and honest. If the math does not work, say so.'
         : 'You are a senior playlist curator and songwriter. Be specific and use-case-driven.',
-      (chunk, full) => { raw = full; });
+      (chunk, full) => { raw = full; }, null, _plsMaxTok);
+    clearInterval(S._plsLoaderTimer);
 
     const sec = (key) => {
       // Match content up to the next ALL-CAPS section header (which can start
@@ -22298,7 +22349,22 @@ ${extraSections}`;
     });
     document.getElementById('pls-track-types').innerHTML = trackList.map((tr,i)=>{
       const meta = PLAYLIST_ROLE_META[tr.ttype.toUpperCase()] || PLAYLIST_DEFAULT_META;
-      return `<div class="gap-role"><div class="gap-role-icon">${meta.icon}</div><div class="gap-role-body"><div class="gap-role-name">${escHtml(tr.ttype)}</div><div class="gap-role-desc">${escHtml(tr.desc)} — ${escHtml(tr.role)}</div></div><button class="gap-write-btn" onclick="writePlaylistTrack(${i})">✦ Write This Track</button></div>`;
+      const chips = [
+        tr.bpm ? `<span class="pls-chip pls-chip-bpm">${tr.bpm} BPM</span>` : '',
+        tr.key ? `<span class="pls-chip">${escHtml(tr.key)}</span>` : '',
+        tr.energy ? `<span class="pls-chip">⚡ ${tr.energy}/10</span>` : '',
+        tr.lengthLabel ? `<span class="pls-chip">${escHtml(tr.lengthLabel)}</span>` : ''
+      ].filter(Boolean).join('');
+      return `<div class="gap-role pls-track-card">
+        <div class="pls-track-num">${i+1}</div>
+        <div class="gap-role-icon">${meta.icon}</div>
+        <div class="gap-role-body">
+          <div class="gap-role-name">${escHtml(tr.ttype)}</div>
+          <div class="gap-role-desc">${escHtml(tr.desc)}${tr.role ? ' — ' + escHtml(tr.role) : ''}</div>
+          ${chips ? `<div class="pls-chips">${chips}</div>` : ''}
+        </div>
+        <button class="gap-write-btn" onclick="writePlaylistTrack(${i})">✦ Write</button>
+      </div>`;
     }).join('');
 
     const PALETTE_COLORS = ['#3A86FF','#FF006E','#FFBE0B','#8338EC','#06D6A0','#FB5607'];
@@ -22319,11 +22385,27 @@ ${extraSections}`;
       const thresholdRaw = sec('THRESHOLD MOVES');
       const risk = sec('RISK NOTES');
 
-      document.getElementById('pls-cadence-score').textContent = score || '—';
-      document.getElementById('pls-cadence-verdict').textContent = verdict;
-      // Color-code score
-      const scoreEl = document.getElementById('pls-cadence-score');
-      scoreEl.style.color = score >= 75 ? 'var(--green,#3ee896)' : score >= 60 ? 'var(--amber)' : 'var(--red,#ff6b6b)';
+      // Ring gauge + viability gate (formula: 60+ viable, 75+ high-conviction)
+      const _gate = score >= 75 ? {cls:'pls-gate-go',  txt:'✅ High-conviction'}
+                  : score >= 60 ? {cls:'pls-gate-go',  txt:'✅ Viable'}
+                  : score >= 45 ? {cls:'pls-gate-mid', txt:'⚠️ Borderline'}
+                  :               {cls:'pls-gate-no',  txt:'⛔ Abort'};
+      const _col = score >= 60 ? 'var(--green,#3ee896)' : score >= 45 ? 'var(--amber)' : 'var(--red,#ff6b6b)';
+      const _headEl = document.getElementById('pls-cadence-headline');
+      if (_headEl) {
+        _headEl.style.display = 'block';
+        _headEl.innerHTML = `
+          <div class="pls-gauge-wrap">
+            <div class="pls-gauge" id="pls-gauge-ring" style="--col:${_col}">
+              <div class="pls-gauge-val"><div class="pls-gauge-num" style="color:${_col}">${score || '—'}</div><div class="pls-gauge-den">/ 100</div></div>
+            </div>
+            <div class="pls-gauge-meta">
+              <span class="pls-gate ${_gate.cls}">${_gate.txt}</span>
+              <div class="pls-verdict">${escHtml(verdict)}</div>
+            </div>
+          </div>`;
+        requestAnimationFrame(() => { const _r = document.getElementById('pls-gauge-ring'); if (_r) _r.style.setProperty('--plspct', String(Math.max(0, Math.min(100, score)))); });
+      }
       document.getElementById('pls-cadence-factors').innerHTML = factorsRaw.split('\n').filter(l=>l.trim().startsWith('-')).map(l=>`<li>${escHtml(l.replace(/^-\s*/,''))}</li>`).join('');
       document.getElementById('pls-cadence-revenue').textContent = revenue;
       document.getElementById('pls-plan-90').textContent = plan90;
@@ -22345,8 +22427,11 @@ ${extraSections}`;
   } catch (e) {
     document.getElementById('pls-name').textContent = 'Error';
     document.getElementById('pls-summary').innerHTML = apiErrHtml(e.message);
+    const _errPane = document.getElementById('pls-track-types');
+    if (_errPane) _errPane.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>Generation failed — ${escHtml(e.message || 'try again')}.<br>Tap Generate to retry.</div>`;
     // Stale state was already cleared up-front; nothing else to undo.
   }
+  clearInterval(S._plsLoaderTimer);
   S._playlistGenerating = false;
   document.querySelectorAll('#playlist-mode-pills [data-pls-mode]').forEach(el => {
     el.style.pointerEvents = '';

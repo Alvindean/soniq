@@ -1024,7 +1024,7 @@ const _generateHandler = async function handler(req, res) {
   if (userKey) {
     // User-supplied key: use their key directly
     const { messages, system } = body;
-    const max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
+    const max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 8192);
     if (!messages?.length) return res.status(400).json({error:'messages required'});
     try {
       const text = await callAnthropic(userKey, messages, system, max_tokens);
@@ -1045,7 +1045,7 @@ const _generateHandler = async function handler(req, res) {
   }
 
   let { messages, system } = body || {};
-  const max_tokens = Math.min(Math.max(parseInt(body?.max_tokens) || 2048, 256), 4096);
+  const max_tokens = Math.min(Math.max(parseInt(body?.max_tokens) || 2048, 256), 8192);
 
   if (body?.variant) {
     const { buildVariantPrompt } = require('./_brain');

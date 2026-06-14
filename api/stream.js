@@ -1039,7 +1039,7 @@ module.exports = async function handler(req, res) {
     // Cap max_tokens — never let a client request blow through credit limits
     messages = body.messages;
     system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
-    max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 4096);
+    max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 8192);
   }
 
   // Treat 'server-side' sentinel (set by client on Vercel) as no user key
