@@ -7659,6 +7659,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
       <div>
         <label class="album-label">Album Type</label>
         <select id="alb-type" class="album-select">
+          <option value="mega">🔥 Mega Album (25 tracks — double LP)</option>
           <option value="full">Full LP (12 tracks)</option>
           <option value="ep">EP (6 tracks)</option>
           <option value="mini">Mini Album (8 tracks)</option>
@@ -21716,6 +21717,23 @@ function copyAlbTrackField(btn, field) {
 }
 
 const ALBUM_TYPE_TRACKS = {
+  mega: {
+    label: 'Mega Album', count: 25,
+    // Double-LP arc across two discs. Roles repeat where a real deluxe album
+    // would (multiple singles / ballads / deep cuts / features); buildTrackSpec
+    // jitters BPM + strides keys per track index, so duplicate roles still come
+    // out as distinct songs rather than the same track 25 times.
+    types: [
+      // ── Disc 1 ──
+      'INTRO','OPENER','LEAD SINGLE','FEEL-GOOD ANTHEM','MID-TEMPO BANGER',
+      'BALLAD','STATEMENT TRACK','DEEP CUT','INTERLUDE','ENERGY TRACK',
+      'COLLABORATION','FAN FAVORITE','CLUB / DANCE',
+      // ── Disc 2 ──
+      'CHAPTER OPENER','LEAD SINGLE','RISING ACTION','BALLAD','MID-TEMPO BANGER',
+      'DEEP CUT','TURNING POINT','ENERGY TRACK','COLLABORATION','CLIMAX TRACK',
+      'REPRISE','CLOSER'
+    ]
+  },
   full: {
     label: 'Full LP', count: 12,
     types: ['OPENER','LEAD SINGLE','FEEL-GOOD ANTHEM','BALLAD','MID-TEMPO BANGER','STATEMENT TRACK','INTERLUDE','DEEP CUT','ENERGY TRACK','CLUB / DANCE','COLLABORATION','CLOSER']
@@ -21866,7 +21884,10 @@ POSSIBLE TITLES: [title 1] | [title 2] | [title 3]`;
 
   try {
     let raw = '';
-    await callClaudeStream(prompt, 'You are a creative director for a major record label. Be specific and commercially minded.', (chunk, full) => { raw = full; }, null, 4096);
+    // Scale the budget to album size — a 25-track mega album's track map +
+    // all concept sections runs past 4096 and would truncate otherwise.
+    const _albMaxTok = albumDef.count >= 20 ? 8192 : albumDef.count >= 11 ? 5120 : 4096;
+    await callClaudeStream(prompt, 'You are a creative director for a major record label. Be specific and commercially minded.', (chunk, full) => { raw = full; }, null, _albMaxTok);
 
     const sec = (key, next) => { const re = new RegExp(key+':\\s*([\\s\\S]*?)(?=\\n[A-Z][A-Z &\\/]+:|$)'); const m = raw.match(re); return m ? m[1].trim() : ''; };
     const name = raw.match(/ALBUM NAME:\s*(.+)/)?.[1]?.trim() || 'Untitled Album';
