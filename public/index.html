@@ -21713,7 +21713,10 @@ ROLLOUT MOVES:
 }
 
 // ── Sound-Like: reverse-engineer an artist into a ready-to-run SONIQ recipe ──
-const SL_GENRES = ['pop','hiphop','rnb','rock','country','edm','jazz','folk','metal','neosoul','gospel','blues','ambient','lofi','latin','reggaeton','reggae','afrobeats','kpop','altrock','punk','ss'];
+// Must mirror the real Write-page genre keys (GENRES_DEF / #g-genre2). 'ambient'
+// and 'lofi' are NOT real genres here — including them let the model pick a key
+// that onGenreChange() couldn't apply. Broadened to the full musical set.
+const SL_GENRES = ['pop','hiphop','rnb','rock','country','edm','latin','reggaeton','folk','metal','jazz','ss','altrock','reggae','afrobeats','blues','kpop','punk','neosoul','gospel','brazilian','amapiano','dancehall','bollywood','arabesque','mandopop'];
 const SL_AGG = ['mellow','mid','heat','rage'];
 const SL_LEN = ['short','medium','long','extended'];
 const SL_GENRE_LABEL = {hiphop:'Hip-Hop',rnb:'R&B',edm:'EDM',ss:'Singer-Songwriter',kpop:'K-Pop',altrock:'Alt-Rock',neosoul:'Neo-Soul',lofi:'Lofi'};
@@ -21803,8 +21806,15 @@ function loadRecipeIntoWrite(topicIdx) {
     document.querySelectorAll('#length-pills .lpill').forEach(p=>p.classList.toggle('on', p.dataset.val===r.len));
   }
   // Lyric Influences field literally takes artist names — nudge lyrics too.
+  // saveVoiceProfile() is Studio-gated (it fires the upgrade modal for everyone
+  // else), so only persist it for entitled users; the visible field is set
+  // either way.
   const vi = document.getElementById('voice-influences');
-  if (vi) { vi.value = r.name; if (typeof saveVoiceProfile === 'function') saveVoiceProfile(); }
+  if (vi) {
+    vi.value = r.name;
+    const _isStudio = window.__soniqAdmin || (typeof STUDIO_PLANS !== 'undefined' && STUDIO_PLANS.has(S.plan));
+    if (_isStudio && typeof saveVoiceProfile === 'function') saveVoiceProfile();
+  }
   // Topic — chosen suggestion, else the first.
   const topic = (typeof topicIdx === 'number' && r.topics[topicIdx]) ? r.topics[topicIdx] : (r.topics[0] || '');
   const topicEl = document.getElementById('g-topic');
@@ -21978,6 +21988,7 @@ async function writeAllTracks() {
       } catch(e) {
         results.push({i, ttype:tr.ttype, title:'Error', lyrics:`Error: ${e.message}`, style:''});
       }
+      _setProg(i+1);
     }
   } finally {
     if (writeBtn) { writeBtn.disabled = false; writeBtn.textContent = '✍️ Write All Tracks'; writeBtn.onclick = () => writeAllTracks(); }
@@ -22897,6 +22908,7 @@ MULTI-PLACEMENT: [how to repackage these tracks across multiple playlists / mood
       ${card('🏦','Catalog / Ownership',sec('CATALOG \\/ OWNERSHIP'))}
       ${card('🔁','Multi-Placement',sec('MULTI-PLACEMENT'))}
       ${movesHtml?`<div class="album-section-title" style="margin-top:14px">90-Day Money Moves</div><ul class="album-list">${movesHtml}</ul>`:''}`;
+    if (S.playlistData) S.playlistData.money = raw;
     toast('💰 Money angle surfaced!');
   } catch(e) {
     host.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>${escHtml(e.message||'Failed')} — tap Find the Angle to retry.</div>`;
