@@ -450,9 +450,9 @@
     var orig = btn ? btn.innerHTML : '';
     if (btn) { btn.innerHTML = '⏳ Building…'; }
 
-    global.fetch('/api/frequency', {
+    global.fetch('/api/track', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Soniq-Mod': 'freq' },
       body: JSON.stringify({ chantStyleId: selChantId, frequencyId: selFreqId })
     }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
@@ -661,7 +661,7 @@
     loading = true;
     loadFailed = false;
     renderLoading();
-    global.fetch('/api/frequency', { method: 'GET', headers: { 'Accept': 'application/json' } })
+    global.fetch('/api/track', { method: 'GET', headers: { 'Accept': 'application/json', 'X-Soniq-Mod': 'freq' } })
       .then(function (r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();

@@ -1,11 +1,16 @@
 /**
- * SONIQ — Frequency Mode endpoint
+ * SONIQ — Frequency Mode endpoint (delegated module, NOT its own function)
  *
- *   GET  /api/frequency
+ * Hosted via api/track.js to stay under Vercel's 12-function Hobby limit:
+ * track.js delegates here when the request carries header `X-Soniq-Mod: freq`.
+ * The browser calls /api/track (GET for catalog, POST to compose) with that
+ * header. Underscore-prefixed so Vercel does NOT deploy it as a standalone fn.
+ *
+ *   GET  (X-Soniq-Mod: freq)
  *     → { chants: [client-safe chant projections], frequencies: FREQUENCIES }
  *       The per-chant `sunoPrompt` (server-only IP) is OMITTED from the GET list.
  *
- *   POST /api/frequency   body: { chantStyleId, frequencyId, intent? }
+ *   POST (X-Soniq-Mod: freq)   body: { chantStyleId, frequencyId, intent? }
  *     → { title, chantLyrics, sunoPrompt, frequency:{id,label,carrierHz,beatHz,mode,target} }
  *       sunoPrompt = chant.sunoPrompt + ambient/healing tail derived from the frequency.
  *       chantLyrics defaults to the chant's loopable seed — DEFAULT PATH MAKES NO LLM CALL.

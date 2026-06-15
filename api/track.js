@@ -53,6 +53,12 @@ async function redisCmd(...args) {
 }
 
 module.exports = async function handler(req, res) {
+  // Frequency Mode is hosted here (delegated to ./_frequency) to stay under the
+  // 12-function Vercel Hobby plan limit. Guarded by a header marker that normal
+  // /api/track calls never send, so this returns before any tracking/auth logic.
+  if (req.headers && req.headers['x-soniq-mod'] === 'freq') {
+    return require('./_frequency')(req, res);
+  }
   const origin = req.headers.origin || '';
   const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
   const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
