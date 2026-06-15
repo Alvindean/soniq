@@ -39,6 +39,16 @@
   var nodes = null;          // active graph teardown handle
   var curVolume = 0.6;       // last requested user volume (0..1)
 
+  // ---- Noise bed state (independent of the tone) -------------------------
+  var BED_RAMP = 0.08;       // seconds — fade in / fade out time constant
+  var BED_HEADROOM = 0.7;    // keep the bed comfortably below clipping
+  var BED_LOOP_SECS = 5;     // length of the looping noise buffer (seconds)
+  var bedSource = null;      // active looping BufferSourceNode (null = no bed)
+  var bedGain = null;        // bed's OWN GainNode -> destination (independent)
+  var bedType = 'off';       // 'off' | 'white' | 'pink' | 'brown'
+  var bedVolume = 0.5;       // last requested bed volume (0..1)
+  var bedBuffers = {};       // cache of generated noise buffers by color
+
   // ------------------------------------------------------------------------
   function getAudioContextCtor() {
     return global.AudioContext || global.webkitAudioContext || null;
@@ -318,6 +328,248 @@
   }
 
   // ------------------------------------------------------------------------
+  // NOISE BED — an INDEPENDENT looping noise layer (white/pink/brown) on its
+  // OWN GainNode -> destination. It is fully decoupled from the tone: it plays
+  // with OR without start(), and stop() never touches it. renderWav stays
+  // TONE-ONLY (the bed is a live listening aid, not part of the exported WAV).
+  //
+  // We generate the noise ONCE into a ~5s AudioBuffer with source.loop=true:
+  // cheap, and seamless because we apply a short internal crossfade so the tail
+  // matches the head (no click at the loop point). Each color is normalized so
+  // perceived loudness is roughly even when switching between them.
+  // ------------------------------------------------------------------------
+
+  // Apply a short head/tail crossfade in-place so a looped buffer is seamless.
+  // We blend the final `xf` samples with the first `xf` samples (linear), which
+  // makes the wrap-around continuous in both value and slope-ish, killing clicks.
+  function crossfadeLoop(data, sampleRate) {
+    var n = data.length;
+    var xf = Math.min(Math.floor(sampleRate * 0.05), Math.floor(n / 4)); // ~50ms
+    if (xf < 8) return;
+    for (var i = 0; i < xf; i++) {
+      var t = i / xf;                 // 0..1 across the fade
+      var head = data[i];
+      var tail = data[n - xf + i];
+      // Crossfade the tail region into a blend of tail->head so end meets start.
+      data[n - xf + i] = tail * (1 - t) + head * t;
+    }
+  }
+
+  // Normalize so the peak sits at `peak` (keeps colors at even perceived level).
+  function normalizePeak(data, peak) {
+    var max = 0;
+    for (var i = 0; i < data.length; i++) {
+      var a = data[i] < 0 ? -data[i] : data[i];
+      if (a > max) max = a;
+    }
+    if (max < 1e-6) return;
+    var g = peak / max;
+    for (var j = 0; j < data.length; j++) data[j] *= g;
+  }
+
+  function fillWhite(data) {
+    for (var i = 0; i < data.length; i++) {
+      data[i] = Math.random() * 2 - 1; // [-1, 1)
+    }
+  }
+
+  // Paul Kellet's refined pink-noise filter (an economical Voss-McCartney
+  // approximation). Softer, "rain-like" spectrum.
+  function fillPink(data) {
+    var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (var i = 0; i < data.length; i++) {
+      var w = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + w * 0.0555179;
+      b1 = 0.99332 * b1 + w * 0.0750759;
+      b2 = 0.96900 * b2 + w * 0.1538520;
+      b3 = 0.86650 * b3 + w * 0.3104856;
+      b4 = 0.55000 * b4 + w * 0.5329522;
+      b5 = -0.7616 * b5 - w * 0.0168980;
+      var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
+      b6 = w * 0.115926;
+      data[i] = pink * 0.11; // rough scale into range; normalized after
+    }
+  }
+
+  // Brown / red noise = integrated white (running sum), leak-clamped to keep it
+  // bounded, then normalized. Deep "waterfall / ocean" rumble.
+  function fillBrown(data) {
+    var last = 0;
+    for (var i = 0; i < data.length; i++) {
+      var w = Math.random() * 2 - 1;
+      last = (last + 0.02 * w) / 1.02; // leaky integrator stays bounded
+      if (last > 1) last = 1; else if (last < -1) last = -1;
+      data[i] = last;
+    }
+  }
+
+  // Build (and cache) a seamless looping noise buffer for the given color in
+  // the supplied audio context. Mono buffer; the source fans out to stereo.
+  function getNoiseBuffer(audioCtx, type) {
+    if (bedBuffers[type]) return bedBuffers[type];
+    var sampleRate = audioCtx.sampleRate || 44100;
+    var frames = Math.max(1, Math.floor(sampleRate * BED_LOOP_SECS));
+    var buf = audioCtx.createBuffer(1, frames, sampleRate);
+    var data = buf.getChannelData(0);
+
+    if (type === 'pink') fillPink(data);
+    else if (type === 'brown') fillBrown(data);
+    else fillWhite(data);
+
+    // Even perceived loudness across colors, then seamless wrap.
+    normalizePeak(data, 0.9);
+    crossfadeLoop(data, sampleRate);
+
+    bedBuffers[type] = buf;
+    return buf;
+  }
+
+  function isBedColor(t) {
+    return t === 'white' || t === 'pink' || t === 'brown';
+  }
+
+  // Build the bed graph for `type` and fade it in to `bedVolume`.
+  function buildBed(type) {
+    ensureContext();
+    unlockIfNeeded(); // resume + iOS unlock — caller must be in a user gesture
+
+    var buf = getNoiseBuffer(ctx, type);
+
+    var src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+
+    var g = ctx.createGain();
+    g.gain.value = 0.0001; // ramp up to avoid a click
+
+    src.connect(g);
+    g.connect(ctx.destination);
+
+    try {
+      if (typeof src.start === 'function') src.start(0);
+      else if (typeof src.noteOn === 'function') src.noteOn(0);
+    } catch (e) { /* ignore */ }
+
+    bedSource = src;
+    bedGain = g;
+    bedType = type;
+
+    var now = ctx.currentTime;
+    var target = clampVol(bedVolume) * BED_HEADROOM;
+    try {
+      g.gain.cancelScheduledValues(now);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.setTargetAtTime(target, now, BED_RAMP);
+    } catch (e) {
+      try { g.gain.value = target; } catch (e2) {}
+    }
+  }
+
+  // setBed({ type, volume }) — type 'off' stops the bed; a color starts or
+  // updates it live. Independent of the tone. Call from a user gesture.
+  function setBed(spec) {
+    spec = spec || {};
+    var type = spec.type;
+    if (typeof spec.volume === 'number') bedVolume = clampVol(spec.volume);
+
+    if (type === 'off' || (typeof type === 'string' && !isBedColor(type) && type !== undefined)) {
+      // explicit 'off' (or any non-color string) -> stop
+      stopBed();
+      return;
+    }
+    if (type === undefined) {
+      // No type change requested: treat as a live volume update only.
+      if (bedSource) setBedVolume(bedVolume);
+      return;
+    }
+
+    if (bedSource && bedGain) {
+      // Bed already running: swap the buffer for the new color in place (reuse
+      // the same gain -> destination plumbing) and ramp volume — click-free.
+      if (type !== bedType) {
+        var buf = getNoiseBuffer(ctx, type);
+        var newSrc = ctx.createBufferSource();
+        newSrc.buffer = buf;
+        newSrc.loop = true;
+        newSrc.connect(bedGain);
+        try {
+          if (typeof newSrc.start === 'function') newSrc.start(0);
+          else if (typeof newSrc.noteOn === 'function') newSrc.noteOn(0);
+        } catch (e) {}
+        // Tear down the old source (gain stays live, so no audible gap/click).
+        var old = bedSource;
+        try { old.stop(0); } catch (e) {}
+        try { old.disconnect(); } catch (e) {}
+        bedSource = newSrc;
+        bedType = type;
+      }
+      setBedVolume(bedVolume);
+      return;
+    }
+
+    // Not running: build it.
+    buildBed(type);
+  }
+
+  // stopBed() — fade out, then fully tear down the bed nodes (no leaks).
+  function stopBed() {
+    bedType = 'off';
+    if (!bedSource && !bedGain) return;
+
+    var src = bedSource;
+    var g = bedGain;
+    bedSource = null;
+    bedGain = null;
+
+    var localCtx = ctx;
+    var now = (localCtx && typeof localCtx.currentTime === 'number') ? localCtx.currentTime : 0;
+
+    if (g) {
+      try {
+        g.gain.cancelScheduledValues(now);
+        var cur = g.gain.value;
+        g.gain.setValueAtTime(cur, now);
+        g.gain.setTargetAtTime(0.0001, now, BED_RAMP);
+      } catch (e) {
+        try { g.gain.value = 0; } catch (e2) {}
+      }
+    }
+
+    var stopAt = now + BED_RAMP * 4 + 0.02;
+    try {
+      if (src) {
+        if (typeof src.stop === 'function') src.stop(stopAt);
+        else if (typeof src.noteOff === 'function') src.noteOff(stopAt);
+      }
+    } catch (e) { /* already stopped */ }
+
+    var delayMs = Math.ceil((stopAt - now) * 1000) + 60;
+    global.setTimeout(function () {
+      try { if (src) src.disconnect(); } catch (e) {}
+      try { if (g) g.disconnect(); } catch (e) {}
+    }, delayMs);
+  }
+
+  // setBedVolume(v) — live 0..1.
+  function setBedVolume(v) {
+    bedVolume = clampVol(v);
+    if (!bedGain || !ctx) return;
+    var target = bedVolume * BED_HEADROOM;
+    var now = ctx.currentTime;
+    try {
+      bedGain.gain.cancelScheduledValues(now);
+      bedGain.gain.setTargetAtTime(target, now, BED_RAMP);
+    } catch (e) {
+      try { bedGain.gain.value = target; } catch (e2) {}
+    }
+  }
+
+  // isBedPlaying() — true only while a bed source is active.
+  function isBedPlaying() {
+    return !!bedSource;
+  }
+
+  // ------------------------------------------------------------------------
   // renderWav — render the same graph offline and encode a 16-bit PCM WAV.
   // ------------------------------------------------------------------------
   function getOfflineCtor() {
@@ -470,10 +722,15 @@
   // ---- Export -------------------------------------------------------------
   var FreqEngine = {
     start: start,
-    stop: stop,
+    stop: stop,                 // stops ONLY the tone — the bed is unaffected
     setVolume: setVolume,
     isPlaying: isPlaying,
-    renderWav: renderWav,
+    renderWav: renderWav,       // TONE-ONLY — the bed is a live aid, never exported
+    // ---- Noise bed (independent of the tone) ----
+    setBed: setBed,             // setBed({type:"off"|"white"|"pink"|"brown", volume:0..1})
+    stopBed: stopBed,           // fade out + tear down the bed
+    setBedVolume: setBedVolume, // live 0..1
+    isBedPlaying: isBedPlaying, // boolean
     // exposed for diagnostics / UI (not part of the required contract)
     _normalizeSpec: normalizeSpec
   };
