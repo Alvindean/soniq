@@ -3245,6 +3245,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
   <button class="sb-btn" onclick="goPg('community',this)" id="nav-community-btn" title="Community"><span class="ni">🌐</span></button>
   <button class="sb-btn" onclick="goPg('blog',this)" id="nav-blog-btn" title="Blog"><span class="ni">📝</span></button>
   <button class="sb-btn" onclick="goPg('editor',this)" title="Editor"><span class="ni">✏️</span></button>
+  <button class="sb-btn" onclick="goPg('frequency',this)" title="Frequency Mode"><span class="ni">🧘</span></button>
   <button class="sb-btn" onclick="goPg('admin',this)" id="nav-admin-btn" style="display:none" title="Admin"><span class="ni">📊</span></button>
   <div class="sn-spacer"></div>
   <div class="sn-bottom">
@@ -3267,7 +3268,13 @@ body.craft-advanced .craft-basic-only{display:none !important}
   <button class="mb-btn" onclick="goPg('playlist',this)"><span class="ni">🎧</span>Playlist</button>
   <button class="mb-btn" onclick="goPg('soundlike',this)"><span class="ni">🎯</span>Sound-Like</button>
   <button class="mb-btn" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
+  <button class="mb-btn" onclick="goPg('frequency',this)"><span class="ni">🧘</span>Frequency</button>
 </nav>
+
+<!-- ══════════════════════════════════
+     FREQUENCY MODE PAGE  (built by frequency-mode.js)
+══════════════════════════════════ -->
+<div class="pg" id="pg-frequency"></div>
 
 <!-- ══════════════════════════════════
      SOUND-LIKE PAGE  (artist → recipe)
@@ -11731,6 +11738,7 @@ function goPg(id,el){
       if(src?.lyrics) loadLyricsIntoEditor(src.lyrics, src.title);
     }
   }
+  if(id==='frequency')initFrequency();
   // Layout handled by CSS margin-left:64px — no JS enforcement needed
 }
 function goStab(ns,id,el){
@@ -28421,4 +28429,9 @@ function updateBlogAdminUI() {
 .dbg-pane{display:none}.dbg-pane.on{display:block}
 .dbg-label{font-weight:700;color:var(--amber);margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em}
 .dbg-rows{background:var(--s3);border:1px solid var(--b2);border-radius:4px;padding:8px;margin-bottom:8px}
-.dbg-row{display:flex;justify-content:space-between;pad
+.dbg-row{display:flex;justify-content:space-between;padding:2px 0}
+</style>
+
+<!-- Frequency Mode: engine first, then UI panel -->
+<script src="/frequency-engine.js"></script>
+<script src="/frequency-mode.js"></script>
