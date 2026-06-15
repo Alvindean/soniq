@@ -3240,6 +3240,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
   <button class="sb-btn" onclick="goPg('more',this)" title="More"><span class="ni">⚡</span></button>
   <button class="sb-btn" onclick="goPg('album',this)" title="Album"><span class="ni">🎼</span></button>
   <button class="sb-btn" onclick="goPg('playlist',this)" title="Playlist"><span class="ni">🎧</span></button>
+  <button class="sb-btn" onclick="goPg('soundlike',this)" title="Sound-Like — turn any artist into a recipe"><span class="ni">🎯</span></button>
   <button class="sb-btn" onclick="goPg('campaign',this)" title="Campaign"><span class="ni">🚀</span></button>
   <button class="sb-btn" onclick="goPg('community',this)" id="nav-community-btn" title="Community"><span class="ni">🌐</span></button>
   <button class="sb-btn" onclick="goPg('blog',this)" id="nav-blog-btn" title="Blog"><span class="ni">📝</span></button>
@@ -3264,8 +3265,54 @@ body.craft-advanced .craft-basic-only{display:none !important}
   <button class="mb-btn" onclick="goPg('library',this)"><span class="ni">📚</span>Library</button>
   <button class="mb-btn" onclick="goPg('album',this)"><span class="ni">🎼</span>Album</button>
   <button class="mb-btn" onclick="goPg('playlist',this)"><span class="ni">🎧</span>Playlist</button>
+  <button class="mb-btn" onclick="goPg('soundlike',this)"><span class="ni">🎯</span>Sound-Like</button>
   <button class="mb-btn" onclick="goPg('more',this)"><span class="ni">⚡</span>More</button>
 </nav>
+
+<!-- ══════════════════════════════════
+     SOUND-LIKE PAGE  (artist → recipe)
+══════════════════════════════════ -->
+<div id="pg-soundlike" class="pg">
+  <div class="album-hero">
+    <div class="album-hero-label">🎯 Sound-Like</div>
+    <div class="album-hero-title">Turn any artist into a SONIQ recipe</div>
+    <div class="album-hero-sub">Type an artist and SONIQ reverse-engineers their sonic + lyrical fingerprint, suggests topics, and sets the exact genre / fusion / aggression / vocal recipe — then loads it straight into Write. Captures style &amp; vibe, not a real person's actual voice.</div>
+  </div>
+
+  <div class="album-form">
+    <label class="album-label">Artist to channel</label>
+    <input id="sl-artist" class="topic-input" placeholder="e.g. Boo-Yaa T.R.I.B.E., Sade, Tyler, the Creator, Fela Kuti…" style="width:100%;box-sizing:border-box" onkeydown="if(event.key==='Enter')generateArtistRecipe()"/>
+    <button class="album-gen-btn" id="sl-btn" onclick="generateArtistRecipe()" style="margin-top:14px"><span>🎯</span> Build Recipe</button>
+  </div>
+
+  <div class="album-out" id="sl-out" style="display:none">
+    <div class="album-out-hdr">
+      <div class="album-name" id="sl-name">—</div>
+      <div class="album-concept-tags" id="sl-tags"></div>
+    </div>
+    <div style="padding:16px 20px">
+      <div class="album-section-title">🔊 Sonic Fingerprint</div>
+      <div id="sl-sonic" class="album-prose" style="margin-bottom:14px"></div>
+      <div class="album-section-title">✍️ Lyrical Fingerprint</div>
+      <div id="sl-lyrical" class="album-prose" style="margin-bottom:14px"></div>
+
+      <div class="album-section-title">🎛 SONIQ Recipe</div>
+      <div id="sl-recipe-chips" class="pls-chips" style="margin-bottom:10px"></div>
+      <div class="alb-money-row" style="margin-bottom:14px">
+        <div class="alb-money-ico">🎚</div>
+        <div style="flex:1">
+          <div class="alb-money-label">Style Prompt <button class="btn btn-sm" style="font-size:9px;padding:2px 7px;margin-left:6px" onclick="safeCopy(document.getElementById('sl-style').textContent,'Style prompt copied')">Copy</button></div>
+          <div id="sl-style" class="album-prose" style="margin:0"></div>
+        </div>
+      </div>
+
+      <div class="album-section-title">💡 Suggested Topics — tap one to write it</div>
+      <div id="sl-topics" class="gap-map-grid" style="margin-bottom:16px"></div>
+
+      <button class="album-gen-btn" onclick="loadRecipeIntoWrite()" style="width:100%;justify-content:center"><span>🎛</span> Load Recipe into Write</button>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════
      WRITE PAGE
@@ -21663,6 +21710,108 @@ ROLLOUT MOVES:
     host.innerHTML = `<div class="pls-empty"><div class="pls-empty-ico">⚠️</div>${escHtml(e.message||'Failed')} — tap Build Plan to retry.</div>`;
   }
   btnDone('alb-rel-btn');
+}
+
+// ── Sound-Like: reverse-engineer an artist into a ready-to-run SONIQ recipe ──
+const SL_GENRES = ['pop','hiphop','rnb','rock','country','edm','jazz','folk','metal','neosoul','gospel','blues','ambient','lofi','latin','reggaeton','reggae','afrobeats','kpop','altrock','punk','ss'];
+const SL_AGG = ['mellow','mid','heat','rage'];
+const SL_LEN = ['short','medium','long','extended'];
+const SL_GENRE_LABEL = {hiphop:'Hip-Hop',rnb:'R&B',edm:'EDM',ss:'Singer-Songwriter',kpop:'K-Pop',altrock:'Alt-Rock',neosoul:'Neo-Soul',lofi:'Lofi'};
+const slGenreLabel = k => SL_GENRE_LABEL[k] || (k ? k.charAt(0).toUpperCase()+k.slice(1) : '');
+
+async function generateArtistRecipe() {
+  const artist = document.getElementById('sl-artist')?.value?.trim();
+  if (!artist) { toast('Type an artist first'); return; }
+  const out = document.getElementById('sl-out');
+  out.style.display = 'block';
+  document.getElementById('sl-name').textContent = `Analyzing ${artist}…`;
+  ['sl-tags','sl-lyrical','sl-recipe-chips','sl-style','sl-topics'].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML='';});
+  document.getElementById('sl-sonic').innerHTML = `<div class="pls-loader"><span class="pls-loader-ring"></span>Reverse-engineering the sound…</div>`;
+  btnLoad('sl-btn','Analyzing…');
+  try {
+    const raw = await callClaude(
+`Analyze the recording artist "${artist}" and translate them into a song-generation recipe. If you don't actually know them, infer from the name and note that briefly in the SONIC line.
+
+Pick GENRE and FUSION from these EXACT keys only: ${SL_GENRES.join(', ')}.
+AGGRESSION must be one of: ${SL_AGG.join(', ')}. LENGTH must be one of: ${SL_LEN.join(', ')}.
+
+Respond EXACTLY in this format, one per line:
+ARTIST: [proper name]
+TAGS: [3-4 short style tags, comma-separated]
+SONIC: [3-4 sentences — production, instrumentation, tempo/energy, the signature sound]
+LYRICAL: [3-4 sentences — themes, point of view, register, signature lyric moves]
+GENRE: [one valid genre key]
+FUSION: [one valid genre key, or the word none]
+AGGRESSION: [one valid aggression]
+LENGTH: [one valid length]
+VOCAL: [a short vocal-character phrase, e.g. "deep gravelly baritone with gang-shout backs"]
+STYLE: [one Suno-style production line under 200 chars]
+TOPIC 1: [a song topic squarely in their lane]
+TOPIC 2: [a different one]
+TOPIC 3: [a different one]
+TOPIC 4: [a different one]`,
+      'You are a sharp music A&R analyst and producer. Be accurate, specific, and honest about uncertainty.', 1200);
+    const m = (k)=> raw.match(new RegExp(k+':\\s*(.+)'))?.[1]?.trim() || '';
+    const sec = _albSecParser(raw);
+    const name = m('ARTIST') || artist;
+    let genre  = m('GENRE').toLowerCase();   if(!SL_GENRES.includes(genre)) genre = 'pop';
+    let fusion = m('FUSION').toLowerCase();   if(fusion==='none' || !SL_GENRES.includes(fusion)) fusion = '';
+    let agg    = m('AGGRESSION').toLowerCase(); if(!SL_AGG.includes(agg)) agg = 'mid';
+    let len    = m('LENGTH').toLowerCase();   if(!SL_LEN.includes(len)) len = 'medium';
+    const vocal = m('VOCAL'), style = m('STYLE');
+    const topics = [m('TOPIC 1'),m('TOPIC 2'),m('TOPIC 3'),m('TOPIC 4')].filter(Boolean);
+    S.soundLikeRecipe = { name, genre, fusion, agg, len, vocal, style, topics };
+
+    document.getElementById('sl-name').textContent = name;
+    document.getElementById('sl-tags').innerHTML = m('TAGS').split(',').filter(t=>t.trim()).map(t=>`<span class="album-concept-tag">${escHtml(t.trim())}</span>`).join('');
+    document.getElementById('sl-sonic').textContent = sec('SONIC');
+    document.getElementById('sl-lyrical').textContent = sec('LYRICAL');
+    const chips = [
+      `🎵 ${slGenreLabel(genre)}`,
+      fusion ? `✚ ${slGenreLabel(fusion)}` : '',
+      `💢 ${agg}`, `⏱ ${len}`,
+      vocal ? `🎙 ${vocal}` : ''
+    ].filter(Boolean).map(c=>`<span class="pls-chip pls-chip-bpm">${escHtml(c)}</span>`).join('');
+    document.getElementById('sl-recipe-chips').innerHTML = chips;
+    document.getElementById('sl-style').textContent = style;
+    document.getElementById('sl-topics').innerHTML = topics.map((t,i)=>`<div class="gap-role" style="cursor:pointer" onclick="loadRecipeIntoWrite(${i})"><div class="gap-role-icon">💡</div><div class="gap-role-body"><div class="gap-role-desc">${escHtml(t)}</div></div><button class="gap-write-btn">✦ Write This</button></div>`).join('');
+    toast(`🎯 Recipe built for ${name}`);
+    out.scrollIntoView({behavior:'smooth', block:'nearest'});
+  } catch(e) {
+    document.getElementById('sl-name').textContent = 'Error';
+    document.getElementById('sl-sonic').innerHTML = apiErrHtml(e.message);
+  }
+  btnDone('sl-btn');
+}
+
+function loadRecipeIntoWrite(topicIdx) {
+  const r = S.soundLikeRecipe;
+  if (!r) { toast('Build a recipe first'); return; }
+  // Primary genre — canonical setter handles grid + color + craft toolkits.
+  if (typeof onGenreChange === 'function') onGenreChange(r.genre);
+  // Fusion / secondary genre — set the select and fire its change handlers.
+  const g2 = document.getElementById('g-genre2');
+  if (g2) { g2.value = r.fusion || ''; g2.dispatchEvent(new Event('change')); }
+  // Aggression — click the matching pill so its state + description update.
+  if (r.agg) {
+    const pill = document.querySelector(`#aggression-pills .qpill[onclick*="'${r.agg}'"]`);
+    if (pill && typeof setAggression === 'function') setAggression(pill, r.agg);
+  }
+  // Length
+  if (r.len) {
+    S.selectedLength = r.len;
+    document.querySelectorAll('#length-pills .lpill').forEach(p=>p.classList.toggle('on', p.dataset.val===r.len));
+  }
+  // Lyric Influences field literally takes artist names — nudge lyrics too.
+  const vi = document.getElementById('voice-influences');
+  if (vi) { vi.value = r.name; if (typeof saveVoiceProfile === 'function') saveVoiceProfile(); }
+  // Topic — chosen suggestion, else the first.
+  const topic = (typeof topicIdx === 'number' && r.topics[topicIdx]) ? r.topics[topicIdx] : (r.topics[0] || '');
+  const topicEl = document.getElementById('g-topic');
+  if (topicEl && topic) topicEl.value = topic;
+  goPg('write');
+  toast(`🎛 ${r.name} recipe loaded — style prompt: "${(r.style||'').slice(0,40)}…" · tweak & Generate`);
+  setTimeout(()=>document.getElementById('gen-btn')?.scrollIntoView({behavior:'smooth', block:'center'}), 300);
 }
 
 function setLane(el, lane) {
