@@ -35,6 +35,8 @@
     { "src": "/favicon.svg", "dest": "/favicon.svg" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
     { "src": "/og-image.png", "dest": "/og-image.png" },
+    { "src": "/frequency-engine.js", "dest": "/frequency-engine.js" },
+    { "src": "/frequency-mode.js", "dest": "/frequency-mode.js" },
     { "src": "/api/(.*)", "dest": "/api/$1" },
     { "src": "/admin", "dest": "/admin.html" },
     { "src": "/legal/(.*)", "dest": "/legal/$1" },
