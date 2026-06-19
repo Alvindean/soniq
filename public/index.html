@@ -1437,6 +1437,27 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .qcb-btn:hover{border-color:var(--amberline);background:var(--s4);transform:translateY(-1px)}
 .qcb-btn.qcb-primary{border-color:var(--amberline);background:var(--amberbg);color:var(--amber)}
 .qcb-btn.qcb-primary:hover{background:var(--amber);color:#050505}
+/* Produce bar — render the actual mp3 */
+.produce-bar{display:none;flex-direction:column;gap:12px;padding:16px 18px;margin-bottom:14px;background:linear-gradient(135deg,var(--cyanbg),var(--s1));border:1px solid var(--cyanline);border-radius:var(--r3)}
+.produce-bar.visible{display:flex}
+.produce-head{display:flex;flex-direction:column;gap:3px}
+.produce-title{font-size:14px;font-weight:800;color:var(--tx1);display:flex;align-items:center;gap:8px}
+.produce-badge{font-size:10px;font-weight:800;letter-spacing:.04em;padding:2px 7px;border-radius:999px;background:var(--cyan);color:#04181b}
+.produce-sub{font-size:12px;color:var(--tx2)}
+.produce-acts{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.produce-inst{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--tx2);cursor:pointer;user-select:none}
+.btn-produce{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:var(--r4);border:none;background:var(--cyan);color:#04181b;font-family:var(--font);font-size:13px;font-weight:800;cursor:pointer;transition:all .15s}
+.btn-produce:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.btn-produce:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+.produce-status{font-size:12.5px;color:var(--tx1);padding:10px 14px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r4);line-height:1.5}
+.produce-status .ps-spin{display:inline-block;width:12px;height:12px;margin-right:7px;border:2px solid var(--b3);border-top-color:var(--cyan);border-radius:50%;vertical-align:-1px;animation:psspin .8s linear infinite}
+@keyframes psspin{to{transform:rotate(360deg)}}
+.produce-players{display:flex;flex-direction:column;gap:12px}
+.produce-track{padding:12px 14px;background:var(--s2);border:1px solid var(--b2);border-radius:var(--r4)}
+.produce-track-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.produce-track-name{font-size:12px;font-weight:700;color:var(--tx1)}
+.produce-track audio{width:100%;height:36px}
+.produce-track .btn-dl{margin-top:8px;font-size:12px;padding:7px 14px}
 .qcb-divider{width:1px;background:var(--b2);margin:0 4px}
 .feat-disco{display:none;gap:6px;padding:10px 14px;margin:-4px 0 14px;border-radius:var(--r3);flex-wrap:wrap;align-items:center}
 .feat-disco.visible{display:flex}
@@ -4807,6 +4828,20 @@ body.craft-advanced .craft-basic-only{display:none !important}
         <button class="btn-save-lib" onclick="saveLib()">Save to Library</button>
         <span class="save-bar-saved" id="res-save-bar-saved">✓ Saved!</span>
       </div>
+    </div>
+
+    <!-- PRODUCE BAR — render the actual mp3 (Suno-wrapper). Hidden until audio render is live. -->
+    <div class="produce-bar" id="res-produce-bar">
+      <div class="produce-head">
+        <span class="produce-title">🎵 Produce the song <span class="produce-badge">mp3</span></span>
+        <span class="produce-sub">Turn these lyrics + song prompt into a finished track you can play and download.</span>
+      </div>
+      <div class="produce-acts">
+        <label class="produce-inst"><input type="checkbox" id="res-produce-instrumental"> Instrumental (no vocals)</label>
+        <button class="btn-produce" id="res-produce-btn" onclick="produceSong('res')">🎙 Produce Song</button>
+      </div>
+      <div class="produce-status" id="res-produce-status" style="display:none"></div>
+      <div class="produce-players" id="res-produce-players"></div>
     </div>
 
     <!-- QUICK COPY BAR — prominent copy actions -->
@@ -14919,6 +14954,7 @@ function parseSongResult(raw,genre,topic,prodData,albumWriteBackIndex){
   // Show quick copy bar + feature discovery
   const qcb=document.getElementById('res-quick-copy');if(qcb)qcb.classList.add('visible');
   const fd=document.getElementById('res-feat-disco');if(fd)fd.classList.add('visible');
+  resetProduceBar('res');
   toast('✓ Song generated: "'+title+'"');
   trackEvent('song_generated', { genre, topic, rap_style: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined });
   checkAchievements('song_generated', { genre });
@@ -15488,6 +15524,158 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
   showEmptyTabState(prefix + '-chords-text', 'Chord analysis not available for this genre');
 }
 
+// ─────────────────────────────────────────────────────────────────────────
+// PRODUCE — render the actual mp3 via the audio-render endpoint (hosted on
+// /api/track behind header X-Soniq-Mod:render). Fail-closed server-side: if
+// audio render isn't live the server returns 503 and we show "coming soon".
+// The browser does the polling (renders take 1–3 min) — no long function.
+// ─────────────────────────────────────────────────────────────────────────
+var _produceState = {};
+function resetProduceBar(prefix){
+  prefix = prefix || 'res';
+  var bar = document.getElementById(prefix+'-produce-bar');
+  if(bar) bar.classList.add('visible');
+  var st = document.getElementById(prefix+'-produce-status');
+  if(st){ st.style.display='none'; st.innerHTML=''; }
+  var pl = document.getElementById(prefix+'-produce-players');
+  if(pl) pl.innerHTML='';
+  var btn = document.getElementById(prefix+'-produce-btn');
+  if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce Song'; }
+  if(_produceState[prefix] && _produceState[prefix].timer){ clearTimeout(_produceState[prefix].timer); }
+  _produceState[prefix] = { running:false, timer:null, polls:0 };
+}
+function _produceStatus(prefix, html, spinning){
+  var st = document.getElementById(prefix+'-produce-status');
+  if(!st) return;
+  st.style.display='block';
+  st.innerHTML = (spinning ? '<span class="ps-spin"></span>' : '') + html;
+}
+function _produceHeaders(){
+  // mirror flowAuthHeaders + the render delegation marker
+  var h = (typeof flowAuthHeaders==='function') ? flowAuthHeaders() : { 'Content-Type':'application/json' };
+  h['X-Soniq-Mod'] = 'render';
+  return h;
+}
+async function produceSong(prefix){
+  prefix = prefix || 'res';
+  var song = S.currentSong;
+  if(!song || !song.lyrics){ toast('Generate a song first'); return; }
+  var instrumental = !!(document.getElementById(prefix+'-produce-instrumental') || {}).checked;
+  if(!song.style){ toast('This song has no song prompt to render'); return; }
+
+  if(typeof flowEnsureSession==='function'){ await flowEnsureSession(); }
+  var btn = document.getElementById(prefix+'-produce-btn');
+  if(btn){ btn.disabled=true; btn.innerHTML='⏳ Starting…'; }
+  document.getElementById(prefix+'-produce-players').innerHTML='';
+  _produceStatus(prefix, 'Sending your song to the studio…', true);
+  _produceState[prefix] = { running:true, timer:null, polls:0 };
+
+  var taskId;
+  try {
+    var r = await fetch('/api/track', {
+      method:'POST', headers:_produceHeaders(),
+      body: JSON.stringify({ action:'submit', lyrics: song.lyrics, style: song.style, title: song.title || 'SONIQ Song', instrumental: instrumental })
+    });
+    var data = await r.json().catch(function(){ return {}; });
+    if(r.status===503){ // not live yet / not configured — honest teaser
+      _produceStatus(prefix, '🔜 '+(data.message||'Audio rendering is coming soon.')+'<br><span style="color:var(--tx2)">Your lyrics and song prompt are ready — paste them into Suno to render now.</span>', false);
+      if(btn){ btn.disabled=true; btn.innerHTML='🔜 Coming soon'; }
+      return;
+    }
+    if(r.status===402 || r.status===429){ // plan / quota
+      _produceStatus(prefix, '🔒 '+(data.message||'Upgrade to render audio.'), false);
+      if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce Song'; }
+      return;
+    }
+    if(!r.ok || !data.taskId){
+      _produceStatus(prefix, '⚠️ '+(data.message || data.error || 'Could not start the render.')+' Try again in a moment.', false);
+      if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce Song'; }
+      return;
+    }
+    taskId = data.taskId;
+    if(typeof trackEvent==='function') trackEvent('song_render_started', { genre: song.genre });
+    if(typeof data.remaining==='number'){ /* could surface remaining renders */ }
+  } catch(e){
+    _produceStatus(prefix, '⚠️ Network error starting the render. Try again.', false);
+    if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce Song'; }
+    return;
+  }
+
+  // ── poll ──
+  if(btn) btn.innerHTML='🎛 Rendering…';
+  _produceStatus(prefix, 'Rendering your song… this usually takes 1–3 minutes. You can keep working — leave this tab open.', true);
+  var MAX_POLLS = 50; // ~8 min at 10s
+  function poll(){
+    var stt = _produceState[prefix];
+    if(!stt || !stt.running) return;
+    stt.polls++;
+    fetch('/api/track', { method:'POST', headers:_produceHeaders(), body: JSON.stringify({ action:'status', taskId: taskId }) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }); })
+      .then(function(d){
+        if(!_produceState[prefix] || !_produceState[prefix].running) return;
+        if(d.failed){
+          _produceStatus(prefix, '⚠️ The render failed'+(d.errorMessage?(': '+d.errorMessage):'')+'. No render was counted against your quota for a failed track. Try again.', false);
+          if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce Song'; }
+          _produceState[prefix].running=false; return;
+        }
+        if(d.done && d.songs && d.songs.length){
+          renderProducedTracks(prefix, d.songs);
+          _produceState[prefix].running=false;
+          return;
+        }
+        if(stt.polls >= MAX_POLLS){
+          _produceStatus(prefix, '⏳ Still rendering — taking longer than usual. <a href="#" onclick="produceResume(\''+prefix+'\',\''+taskId+'\');return false;" style="color:var(--cyan)">Check again</a>.', false);
+          if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce Song'; }
+          _produceState[prefix].running=false; return;
+        }
+        // friendly state labels
+        var label = ({PENDING:'Queued…', TEXT_SUCCESS:'Lyrics locked, composing…', FIRST_SUCCESS:'First track ready, finishing the second…'})[d.state] || 'Rendering…';
+        _produceStatus(prefix, label+' ('+stt.polls+')', true);
+        _produceState[prefix].timer = setTimeout(poll, 10000);
+      })
+      .catch(function(){
+        if(!_produceState[prefix] || !_produceState[prefix].running) return;
+        _produceState[prefix].timer = setTimeout(poll, 10000); // transient — keep trying
+      });
+  }
+  _produceState[prefix].timer = setTimeout(poll, 8000);
+}
+function produceResume(prefix, taskId){
+  _produceState[prefix] = { running:true, timer:null, polls:0 };
+  _produceStatus(prefix, 'Checking…', true);
+  fetch('/api/track', { method:'POST', headers:_produceHeaders(), body: JSON.stringify({ action:'status', taskId: taskId }) })
+    .then(function(r){ return r.json().catch(function(){return{};}); })
+    .then(function(d){
+      if(d.done && d.songs && d.songs.length){ renderProducedTracks(prefix, d.songs); _produceState[prefix].running=false; }
+      else if(d.failed){ _produceStatus(prefix, '⚠️ The render failed. Try again.', false); _produceState[prefix].running=false; }
+      else { _produceStatus(prefix, 'Still rendering — give it another minute, then check again.', false); _produceState[prefix].running=false; }
+    });
+}
+function renderProducedTracks(prefix, songs){
+  var btn = document.getElementById(prefix+'-produce-btn');
+  if(btn){ btn.disabled=false; btn.innerHTML='🎙 Produce again'; }
+  _produceStatus(prefix, '✅ Done! SONIQ rendered '+songs.length+' take'+(songs.length>1?'s':'')+' — play and download below.', false);
+  var pl = document.getElementById(prefix+'-produce-players');
+  if(!pl) return;
+  var safe = ((S.currentSong && S.currentSong.title) || 'soniq-song').replace(/[^a-z0-9]+/gi,'-').replace(/^-+|-+$/g,'').toLowerCase() || 'soniq-song';
+  pl.innerHTML = songs.map(function(s, i){
+    var name = (s.title || ((S.currentSong&&S.currentSong.title)||'SONIQ Song')) + ' — Take ' + (i+1);
+    var dl = s.audioUrl;
+    return '<div class="produce-track">'
+      + '<div class="produce-track-top"><span class="produce-track-name">🎵 '+escHtml(name)+'</span></div>'
+      + '<audio controls preload="none" src="'+escHtml(s.audioUrl)+'"></audio>'
+      + '<a class="btn-dl" href="'+escHtml(dl)+'" download="'+escHtml(safe+'-take-'+(i+1))+'.mp3" target="_blank" rel="noopener">⬇ Download mp3</a>'
+      + '</div>';
+  }).join('');
+  // Persist the audio onto the current song so Save to Library keeps it.
+  if(S.currentSong){
+    S.currentSong.audioUrl = songs[0].audioUrl;
+    S.currentSong.audioUrls = songs.map(function(s){ return s.audioUrl; });
+  }
+  if(typeof trackEvent==='function') trackEvent('song_render_done', { takes: songs.length });
+  toast('🎵 Your song is ready');
+}
+
 function saveLib(){
   if(!S.currentSong?.lyrics){toast('Generate a song first');return;}
 
@@ -15711,6 +15899,13 @@ function loadSongIntoOutput(song){
   // Reset to lyrics tab
   const firstTab = document.querySelector('.otabs .otab');
   if(firstTab) goOtab('res','lyrics', firstTab);
+  // Produce bar — reset, and re-show any audio rendered earlier for this song
+  resetProduceBar('res');
+  if(song.audioUrls && song.audioUrls.length){
+    renderProducedTracks('res', song.audioUrls.map(function(u){ return { audioUrl: u }; }));
+  } else if(song.audioUrl){
+    renderProducedTracks('res', [{ audioUrl: song.audioUrl }]);
+  }
 }
 
 function loadFromLib(id){

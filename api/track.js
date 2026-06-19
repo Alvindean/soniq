@@ -59,6 +59,21 @@ module.exports = async function handler(req, res) {
   if (req.headers && req.headers['x-soniq-mod'] === 'freq') {
     return require('./_frequency')(req, res);
   }
+  // Audio render ("make the actual song") is hosted here for the same reason —
+  // it would be the 13th Vercel function. Delegated to ./_render before any
+  // tracking/auth logic; the module does its own auth + quota. Fail-closed
+  // (SONIQ_AUDIO_LIVE + provider key) so a normal deploy charges nothing.
+  if (req.headers && req.headers['x-soniq-mod'] === 'render') {
+    const origin = req.headers.origin || '';
+    const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
+    const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
+    const cors = allowed.includes(origin) || isPreview ? origin : 'https://www.mysoniq.com';
+    res.setHeader('Access-Control-Allow-Origin', cors);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Admin-Token, X-Soniq-Mod');
+    return require('./_render')(req, res);
+  }
   const origin = req.headers.origin || '';
   const allowed = ['https://www.mysoniq.com', 'https://mysoniq.com', 'https://soniq.vercel.app', 'http://localhost:3000', 'http://localhost:5000'];
   const isPreview = origin.startsWith('https://') && origin.endsWith('.vercel.app');
