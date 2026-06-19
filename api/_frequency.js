@@ -25,6 +25,54 @@
 const { FREQUENCIES } = require('./_frequency_catalog');
 const { CHANTS }      = require('./_frequency_chants');
 
+// ── spend caps for the optional LLM chant-craft path ─────────────────────────
+// The endpoint is public/unauthenticated, so without a cap, enabling
+// FREQ_LLM_ENABLED would expose uncapped model spend. We bound the blast radius
+// with a global daily ceiling + a per-IP hourly ceiling (Redis/Upstash). Over
+// either cap, we silently fall back to the free seed chant — the user still gets
+// a result, just not an AI-crafted one. Tunable via env.
+const UPSTASH_URL   = process.env.UPSTASH_REDIS_REST_URL;
+const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const LLM_DAILY_CAP     = parseInt(process.env.FREQ_LLM_DAILY_CAP || '300', 10);
+const LLM_IP_HOURLY_CAP = parseInt(process.env.FREQ_LLM_IP_HOURLY_CAP || '6', 10);
+
+async function redisGet(key) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return null;
+  try {
+    const r = await fetch(`${UPSTASH_URL}/get/${encodeURIComponent(key)}`, { headers: { Authorization: `Bearer ${UPSTASH_TOKEN}` } });
+    const d = await r.json();
+    return d.result;
+  } catch (e) { console.error('Freq redisGet error:', e.message); return null; }
+}
+async function redisIncrExpire(key, ttl) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return;
+  try {
+    await fetch(`${UPSTASH_URL}/pipeline`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${UPSTASH_TOKEN}` },
+      body: JSON.stringify([['INCR', key], ['EXPIRE', key, ttl]]),
+    });
+  } catch (e) { console.error('Freq redisIncrExpire error:', e.message); }
+}
+function clientIp(req) {
+  const xff = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+  return xff || req.headers['x-real-ip'] || 'unknown';
+}
+// Returns { allowed, dayKey, ipKey }. If Redis is unconfigured we DENY the LLM
+// path (fail-closed on cost) rather than allow uncapped spend.
+async function checkLLMCap(req) {
+  if (!UPSTASH_URL || !UPSTASH_TOKEN) return { allowed: false };
+  const now    = new Date();
+  const dayKey = `soniq:freq:llm:daily:${now.toISOString().slice(0, 10)}`;
+  const ipKey  = `soniq:freq:llm:ip:${clientIp(req)}:${now.toISOString().slice(0, 13)}`; // YYYY-MM-DDTHH
+  const [dayN, ipN] = await Promise.all([
+    redisGet(dayKey).then(v => parseInt(v || '0', 10)),
+    redisGet(ipKey).then(v => parseInt(v || '0', 10)),
+  ]);
+  if (dayN >= LLM_DAILY_CAP || ipN >= LLM_IP_HOURLY_CAP) return { allowed: false, dayKey, ipKey };
+  return { allowed: true, dayKey, ipKey };
+}
+
 // ── client-safe projections ──────────────────────────────────────────────────
 // Strip the server-only `sunoPrompt` and `chantSeed` from the chant list before
 // it ever reaches the browser. The browser only needs enough to render the pad.
@@ -158,10 +206,20 @@ async function callOpenRouterChant(apiKey, prompt) {
 async function craftCustomChant(chant, freq, intent) {
   const prompt = buildCraftPrompt(chant, freq, intent);
   const ak = anthropicKey();
-  if (ak) return callAnthropicChant(ak, prompt);
   const ok = openrouterKey();
+  // Anthropic primary; if its key is bad/unset (e.g. an OAuth token that the
+  // direct API rejects) and OpenRouter is available, fall back to it rather
+  // than giving up on the seed. Mirrors generate.js's provider resilience.
+  if (ak) {
+    try {
+      const out = await callAnthropicChant(ak, prompt);
+      if (out) return out;
+    } catch (e) {
+      if (!ok) throw e;   // no fallback available — surface the failure
+    }
+  }
   if (ok) return callOpenRouterChant(ok, prompt);
-  // No key — caller should never reach here, but be safe.
+  // No key — caller should never reach here (hasLLMKey gates it), but be safe.
   throw new Error('NO_LLM_KEY');
 }
 
@@ -210,25 +268,43 @@ module.exports = async function handler(req, res) {
 
     // Default path — ZERO paid calls.
     let chantLyrics = defaultChantLyrics(chant);
+    let crafted = false;       // true once an AI chant successfully replaces the seed
+    let craftSkipped = false;  // true when intent was given but the LLM path was capped/off
 
     // Paid-call guard: the optional LLM craft path is DISABLED unless explicitly
     // enabled via env (FREQ_LLM_ENABLED=1). With it off, no request — authenticated
     // or not — can trigger model spend. Standing rule: never burn credits.
     // Never blocks the response: any failure (or missing key) falls back to the seed.
     if (intentRaw && process.env.FREQ_LLM_ENABLED === '1' && hasLLMKey()) {
-      try {
-        const crafted = await craftCustomChant(chant, freq, intentRaw);
-        if (crafted && crafted.length > 0) {
-          chantLyrics = ['[Chant - loop]', crafted, '[Repeat softly, fading]'].join('\n');
+      const cap = await checkLLMCap(req);
+      if (!cap.allowed) {
+        // Over the daily/hourly ceiling (or Redis unconfigured) — protect spend,
+        // keep the seed chant. Signal the client so it can explain gracefully.
+        craftSkipped = true;
+      } else {
+        // Reserve the slot BEFORE the call so concurrent bursts can't overshoot
+        // the cap (the cost is incurred on the attempt regardless of outcome).
+        await redisIncrExpire(cap.dayKey, 36 * 3600); // ~1.5 days, self-cleans
+        await redisIncrExpire(cap.ipKey, 2 * 3600);   // 2h window
+        try {
+          const out = await craftCustomChant(chant, freq, intentRaw);
+          if (out && out.length > 0) {
+            chantLyrics = ['[Chant - loop]', out, '[Repeat softly, fading]'].join('\n');
+            crafted = true;
+          } else {
+            craftSkipped = true; // empty result — fell back to seed
+          }
+        } catch (_err) {
+          craftSkipped = true; // model/network error — fell back to seed
         }
-      } catch (_err) {
-        // fall back to the seed-based default — already set above
       }
     }
 
     return res.status(200).json({
       title: buildTitle(chant, freq),
       chantLyrics,
+      crafted,
+      craftSkipped,
       sunoPrompt: buildSunoPrompt(chant, freq),
       frequency: frequencyEcho(freq)
     });

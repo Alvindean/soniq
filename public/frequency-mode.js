@@ -266,6 +266,11 @@
       '.fq-note-epilepsy{background:rgba(255,107,107,0.07);border:1px solid rgba(255,107,107,0.24);color:#ffb0b0}',
       '.fq-note-warn{background:rgba(245,192,0,0.07);border:1px solid rgba(245,192,0,0.28);color:#f5d873}',
       '.fq-chant-cta{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.07);display:flex;flex-wrap:wrap;gap:12px;align-items:center}',
+      '.fq-intent-wrap{flex:1 1 100%;display:flex;flex-direction:column;gap:6px}',
+      '.fq-intent-label{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--tx3,#6a6a90)}',
+      '.fq-intent-input{width:100%;font-size:13px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);background:rgba(0,0,0,0.25);color:var(--tx,#f0f0f8);font-family:inherit;box-sizing:border-box}',
+      '.fq-intent-input:focus{outline:none;border-color:rgba(0,220,192,0.5)}',
+      '.fq-intent-input::placeholder{color:var(--tx3,#6a6a90)}',
       '.fq-chant-hint{font-size:12px;color:var(--tx3,#6a6a90);flex:1;min-width:200px}',
       '.fq-out{margin-top:16px;border:1px solid var(--amberline,rgba(245,192,0,0.28));background:rgba(245,192,0,0.04);border-radius:14px;padding:18px;display:none}',
       '.fq-out.fq-show{display:block}',
@@ -819,15 +824,20 @@
     var orig = btn ? btn.innerHTML : '';
     if (btn) { btn.innerHTML = '⏳ Building…'; }
 
+    var intentEl = $('fq-intent');
+    var intentVal = intentEl && intentEl.value ? String(intentEl.value).trim().slice(0, 160) : '';
+
     global.fetch('/api/track', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-Soniq-Mod': 'freq' },
-      body: JSON.stringify({ chantStyleId: selChantId, frequencyId: selFreqId })
+      body: JSON.stringify({ chantStyleId: selChantId, frequencyId: selFreqId, intent: intentVal })
     }).then(function (r) {
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     }).then(function (res) {
       renderChantOut(res);
+      if (intentVal && res && res.crafted) notify('✨ Custom chant crafted for your intention');
+      else if (intentVal && res && res.craftSkipped) notify('Chant ready (custom crafting busy — using the classic mantra)');
       // Auto-start the tone on success (we're still in the click gesture chain
       // via the resolved promise — browsers allow resume() here after a prior
       // gesture; if blocked, the user can hit Play).
@@ -1084,10 +1094,21 @@
 
     // Chant CTA
     var cta = el('div', { class: 'fq-chant-cta' });
+    // Optional intention — when filled, the server crafts a custom chant with AI
+    // (gated by FREQ_LLM_ENABLED + capped). Empty = the free seed-based default.
+    var intentWrap = el('div', { class: 'fq-intent-wrap' });
+    intentWrap.appendChild(el('label', { class: 'fq-intent-label', for: 'fq-intent' },
+      'Set an intention (optional) — turns the mantra into a custom AI-crafted chant'));
+    var intent = el('input', {
+      id: 'fq-intent', type: 'text', class: 'fq-intent-input', maxlength: '160',
+      placeholder: 'e.g. release anxiety before sleep · gratitude · deep focus'
+    });
+    intentWrap.appendChild(intent);
+    cta.appendChild(intentWrap);
     var gen = el('button', { class: 'fq-btn fq-btn-primary', id: 'fq-generate', type: 'button', disabled: 'disabled' }, '🕉️ Generate Chant Layer');
     cta.appendChild(gen);
     cta.appendChild(el('div', { class: 'fq-chant-hint' },
-      'Select a frequency + a chant style, then generate a Suno-ready prompt and mantra.'));
+      'Select a frequency + a chant style, then generate a Suno-ready prompt and mantra. Add an intention above for a one-of-a-kind chant.'));
     t.appendChild(cta);
 
     return t;
