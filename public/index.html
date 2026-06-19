@@ -15531,8 +15531,14 @@ function renderChords(prefix, chordsRaw, theoryRaw) {
 // The browser does the polling (renders take 1–3 min) — no long function.
 // ─────────────────────────────────────────────────────────────────────────
 var _produceState = {};
+// Master UI switch for the audio-render ("Produce Song") feature. OFF = SONIQ
+// ships as a pure prompt engine and the Produce panel never appears. To turn
+// the feature ON later: set this to true AND set the Vercel env vars
+// SONIQ_AUDIO_LIVE=1 + SUNO_API_KEY (or another provider key), then redeploy.
+var SONIQ_AUDIO_UI = false;
 function resetProduceBar(prefix){
   prefix = prefix || 'res';
+  if(!SONIQ_AUDIO_UI) return;            // feature hidden — keep the app a clean prompt engine
   var bar = document.getElementById(prefix+'-produce-bar');
   if(bar) bar.classList.add('visible');
   var st = document.getElementById(prefix+'-produce-status');

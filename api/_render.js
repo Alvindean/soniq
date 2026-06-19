@@ -212,7 +212,9 @@ module.exports = async function renderHandler(req, res) {
     const style  = typeof body.style  === 'string' ? body.style.replace(/[^\x20-\x7E]/g, ' ').trim().slice(0, 1000) : '';
     const title  = typeof body.title  === 'string' ? body.title.slice(0, 80) : 'SONIQ Song';
     const instrumental = !!body.instrumental;
-    const model  = ['V4_5', 'V4', 'V5', 'V3_5'].includes(body.model) ? body.model : undefined;
+    // Accept any sane Suno model id (e.g. V4_5, V4_5ALL, V5, V3_5); else let the
+    // provider apply its default. Pattern-guarded so we never forward junk.
+    const model  = (typeof body.model === 'string' && /^V[0-9][0-9A-Z_]{0,9}$/.test(body.model)) ? body.model : undefined;
 
     if (!instrumental && lyrics.trim().length < 20) {
       return res.status(400).json({ error: 'lyrics_required', message: 'Generate a song first, then produce it.' });
