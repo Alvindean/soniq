@@ -15,20 +15,15 @@
     "api/admin-session.js":  { "maxDuration": 10 },
     "api/aff.js":            { "maxDuration": 10 }
   },
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
-        { "key": "X-XSS-Protection", "value": "1; mode=block" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://adservice.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io https://gotrwbhkavkqmxtnxkkj.supabase.co https://*.supabase.co https://api.resend.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.google.com; img-src 'self' data: blob: https://pagead2.googlesyndication.com; media-src 'self' blob: data: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(), microphone=(self), geolocation=()" }
-      ]
-    }
-  ],
   "routes": [
+    { "src": "/(.*)", "continue": true, "headers": {
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-XSS-Protection": "1; mode=block",
+      "Content-Security-Policy": "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://pagead2.googlesyndication.com https://adservice.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.anthropic.com https://openrouter.ai https://cute-minnow-72066.upstash.io https://gotrwbhkavkqmxtnxkkj.supabase.co https://*.supabase.co https://api.resend.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.google.com; img-src 'self' data: blob: https://pagead2.googlesyndication.com; media-src 'self' blob: data: https:; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'",
+      "Referrer-Policy": "strict-origin-when-cross-origin",
+      "Permissions-Policy": "camera=(), microphone=(self), geolocation=()"
+    } },
     { "src": "/robots.txt", "dest": "/robots.txt" },
     { "src": "/sitemap.xml", "dest": "/sitemap.xml" },
     { "src": "/llms.txt", "dest": "/llms.txt" },
