@@ -25,3 +25,12 @@ nuwav/
 sparqiq/
 endpoint-monitor-report-*.md
 soniq-endpoint-monitor-*.md
+
+# Archived generated reports & local junk (moved out of repo root 2026-06-19)
+_archive/
+# Generated status/pulse reports — keep them from cluttering the root again
+*endpoint-status*.md
+*endpoint-status*.html
+*endpoint_status*.md
+*weekly-pulse*.md
+*Weekly-Pulse*.md
