@@ -5965,11 +5965,29 @@ const _FUSION_KEY_MAP = {
   'Arabesque': 'arabesque', 'Mandopop': 'mandopop',
   'Neo-Soul': 'neosoul', 'Pop': 'pop', 'Punk': 'punk', 'R&B': 'rnb',
   'Reggae': 'reggae', 'Reggaeton': 'reggaeton', 'Rock': 'rock',
-  'Singer-Songwriter': 'ss', 'Soul': 'neosoul', 'Funk': 'rnb'
+  'Singer-Songwriter': 'ss', 'Soul': 'neosoul', 'Funk': 'rnb',
+  // Lowercase aliases for GENRE_BIBLE-only keys that lack their own ADLIB_BIBLE
+  // entry — normalize onto the equivalent tradition so they never fall through
+  // to "no ad-libs". Single source of truth (no duplicated data).
+  'bossa': 'brazilian', 'cpop': 'mandopop'
 };
 function _normalizeGenreKey(genre) {
   return _FUSION_KEY_MAP[genre] || genre;
 }
+
+// Electronic substyle ad-lib banks — parallel to RAP_STYLE_ADLIBS but for the
+// genres that all map onto the single generic `edm` ADLIB_BIBLE entry. Merged
+// into buildAdlibNote's pool via the substyle label so House / Lo-Fi /
+// Synthwave / Dream-Pop / Hyperpop stop sharing one generic EDM ad-lib set.
+const EDM_STYLE_ADLIBS = {
+  'House':         ['oh', 'yeah', 'come on', 'work', 'move', '(filtered)', 'all night', 'feel it'],
+  'Deep House':    ['(soulful)', 'ooh', 'yeah', 'deep', '(whispered)', 'all night', 'mmm', 'feel'],
+  'Lo-Fi Hip-Hop': ['(vinyl crackle)', '(soft sigh)', 'mmm', '(muted)', 'hmm', '(tape hiss)', '(distant)'],
+  'Synthwave':     ['(gated)', 'oh-oh', '(neon)', 'ahh', '(vocoded)', 'drive', '(reverb)', 'tonight'],
+  'Dream-Pop':     ['(hazy)', 'ooh', 'ahh', '(reverb wash)', 'mmm', '(floating)', 'oh-oh'],
+  'Hyperpop':      ['(pitched up)', 'ahh!', '(glitch)', 'yeah!', '(bitcrush)', 'woah!', 'go!'],
+  'Trance':        ['(uplifting)', 'oh-oh-oh', 'yeah!', '(euphoric)', 'higher', '(build)', 'hands up'],
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MOOD_ADLIB_OVERLAYS — vibe-gated ad-lib policy.
@@ -6073,6 +6091,16 @@ const MOOD_ADLIB_OVERLAYS = {
     placementOverride: 'between phrases, outro fade',
     toneNote: 'Confessional. Ad-libs are the cracks in the voice — never bravado.',
   },
+  solemn: {
+    ban: ['skrrt','skrrrt','skrt','let\'s go','woo','bands','yessir','demon time','grrah',
+          'splash','brr','opps','gang','no cap','slide','yee','whoop whoop','hella','go dumb',
+          'woohoo','yay','hallelujah','amen','glory','one love','¡fuego!','¡vamos!','¡dale!',
+          'dale','wepa','la-la-la','na-na-na','baby','mmm','ooh','ah','ahh','sigh','hmm','huh','yeah!'],
+    add: [],
+    densityOverride: 'none — zero ad-libs; this song carries no background interjections at all',
+    placementOverride: 'do not place any ad-libs; leave the vocal completely bare',
+    toneNote: 'Reverent and grave. The absence of ad-libs IS the texture — silence holds the weight.',
+  },
   playful: {
     ban: ['hallelujah','amen','glory','yes lord','grrah','demon time','opps','brr','skrrt',
           'screamed','feedback noise'],
@@ -6111,8 +6139,9 @@ const MOOD_ADLIB_OVERLAYS = {
 // apply — multiple buckets can stack (e.g. "dark hype" → ['dark','hype'];
 // later buckets override earlier on conflicts).
 const _MOOD_BUCKET_KEYWORDS = {
-  sad:         ['sad','heartbreak','heartbroken','grief','grieving','mourning','lonely','crying','tears','blue','sorrow','depress','depression','despair','hopeless'],
-  melancholy:  ['melancholy','melancholic','wistful','pensive','bittersweet','rueful','solemn','yearning'],
+  sad:         ['sad','heartbreak','heartbroken','grief','grieving','mourning','lonely','crying','tears','blue','sorrow','depress','depression','despair','hopeless','mournful'],
+  solemn:      ['solemn','reverent','funeral','funereal','eulogy','requiem','memorial','dirge','elegy','sombre','somber'],
+  melancholy:  ['melancholy','melancholic','wistful','pensive','bittersweet','rueful','yearning'],
   romantic:    ['romantic','love','loving','tender','affectionate','devoted','adoring','smitten','infatuated'],
   sensual:     ['sensual','sultry','seductive','sexy','smoky','smooth','bedroom','intimate'],
   angry:       ['angry','anger','furious','rage','enraged','hostile','vindictive','wrathful','livid','pissed'],
@@ -6171,9 +6200,18 @@ function _composeMoodOverlay(buckets) {
   };
 }
 
-function buildAdlibNote(genre, mood, substyle) {
+function buildAdlibNote(genre, mood, substyle, opts) {
   const a = ADLIB_BIBLE[_normalizeGenreKey(genre)];
   if (!a) return '';
+
+  // Explicit off-switch, honored end-to-end. Callers pass { suppress:true }
+  // (e.g. a vocal-descriptor profile carrying a 'no ad-libs' negative); a mood
+  // that resolves to the 'solemn' near-zero tier also forces silence. Emit an
+  // affirmative ban so the model doesn't improvise ad-libs into the gap.
+  const suppress = !!(opts && opts.suppress) || _classifyMoodBuckets(mood).includes('solemn');
+  if (suppress) {
+    return `\n\nAD-LIBS: NONE. This song uses ZERO ad-libs — do not place any (parenthetical) interjections, background shouts, vocables, or crowd chants anywhere. The bare vocal is intentional.`;
+  }
 
   // Pool = genre base sounds + (optional) substyle-specific ad-libs from
   // RAP_STYLE_ADLIBS. The substyle bank covers Trap (skrrt etc.), Drill,
@@ -6181,8 +6219,10 @@ function buildAdlibNote(genre, mood, substyle) {
   // It applies wherever the substyle label is recognized — works for all
   // genres that map into RAP_STYLE_ADLIBS via hiphop substyles.
   let pool = Array.from(a.sounds);
-  const substyleBank = (substyle && typeof substyle === 'string' && typeof RAP_STYLE_ADLIBS === 'object')
-    ? RAP_STYLE_ADLIBS[substyle] : null;
+  const substyleBank = (substyle && typeof substyle === 'string')
+    ? ((typeof RAP_STYLE_ADLIBS === 'object' && RAP_STYLE_ADLIBS[substyle])
+        || EDM_STYLE_ADLIBS[substyle] || null)
+    : null;
   if (Array.isArray(substyleBank)) {
     for (const s of substyleBank) {
       if (!pool.some(p => p.toLowerCase() === String(s).toLowerCase())) pool.push(s);
@@ -6210,9 +6250,24 @@ function buildAdlibNote(genre, mood, substyle) {
     }
   }
 
-  const density   = (overlay && overlay.density)   || a.density;
+  let density     = (overlay && overlay.density)   || a.density;
   const placement = (overlay && overlay.placement) || a.placement;
-  const sounds = pool.slice(0, 6).map(s => `(${s})`).join(' ');
+  // Translate a bare abstract density word ('high'/'medium'/…) into an
+  // enforceable cadence. Overlay densities already carry their own "— every N
+  // bars" tail and won't exact-match a key, so only bare genre words expand.
+  const DENSITY_CADENCE = {
+    'maximum':    'an ad-lib on essentially every bar — wall-to-wall background energy',
+    'high':       'an ad-lib roughly every 2nd bar, plus every bar-end and section transition',
+    'medium':     'an ad-lib roughly every 4th bar — mostly bar-ends, post-chorus, and lifts',
+    'low-medium': 'one ad-lib every 4–8 bars — phrase-ends and section seams only',
+    'low':        'one ad-lib every 8 bars or so — sparse, between phrases as breath',
+    'minimal':    'only 1–2 ad-libs in the WHOLE song — end-of-phrase exhales, nothing else',
+  };
+  const _densKey = String(density).trim().toLowerCase();
+  if (DENSITY_CADENCE[_densKey]) density = `${density} (${DENSITY_CADENCE[_densKey]})`;
+  // Strip any parens already on a sound token before re-wrapping, so tokens that
+  // ship pre-wrapped (comedy/parody/tvmusical/electronic FX) don't double-up.
+  const sounds = pool.slice(0, 6).map(s => `(${String(s).replace(/^\(+|\)+$/g, '').trim()})`).join(' ');
   const banLine = (overlay && banned.length)
     ? `\nMOOD GATE — DO NOT USE (vibe-incompatible for this song): ${banned.map(s => `(${s})`).join(' ')}`
     : '';
@@ -6225,9 +6280,11 @@ function buildAdlibNote(genre, mood, substyle) {
 
   return `\n\nAD-LIBS (Suno parentheses syntax — use throughout):
 Sounds: ${sounds} — ${placement}
+(Map any "drop"/"breakdown"/"pre-drop"/"post-drop" placement to the nearest real section tag this song uses — [Chorus] entry, [Bridge], or [Outro].)
 Density: ${density}
 Example: ${a.example}
 Outro: ${a.outro}${bucketLine}${toneLine}${banLine}
+Variety: Rotate through the sound pool — never repeat the same ad-lib more than twice in a row, and use at least 3 distinct ad-libs across any 8-bar span. Save the highest-energy tag for section peaks, not every bar.
 Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line = spotlight moment.`;
 }
 
