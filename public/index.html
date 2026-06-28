@@ -3272,6 +3272,26 @@ body.craft-advanced .craft-basic-only{display:none !important}
   };
 })();
 </script>
+<script>
+// ── Growth Loop v1 — first-party analytics ping ──────────────────────────────
+// Fire-and-forget event counter. Routes through the same /api/* → Worker fetch
+// shim above, hits /api/pv (no auth, CORS-open, always-200), and increments a
+// daily Redis hash field. NEVER throws — every call is wrapped + .catch'd so a
+// missing endpoint or offline network can never break app flow.
+// Allowed events: pageview, gen_started, gen_done, signup, anon_gen.
+window.pingPv = function(event){
+  try {
+    fetch('/api/pv', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event: String(event || 'pageview') }),
+      keepalive: true
+    }).catch(function(){});
+  } catch(e){}
+};
+// pageview once on app load.
+try { window.pingPv('pageview'); } catch(e){}
+</script>
 <script src="./lib/lyrics-analysis-engine.js"></script>
 <script src="./lib/liu-components.js"></script>
 <script src="./lib/smart-lyrics-upgrade-integration.js"></script>
@@ -3375,7 +3395,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <button id="nav-auth-btn" onclick="openAuth()" class="sb-btn" title="Sign In"><span class="ni"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg></span></button>
     <button id="nav-signout-btn" onclick="authSignOut()" class="sb-btn" style="display:none" title="Sign Out"><span class="ni" style="color:var(--tx4)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span></button>
   </div>
-  <div class="sn-version" id="sn-version" title="SONIQ v1.1.2 · build 2026-06-28 · emoji→SVG icons">v1.1.2</div>
+  <div class="sn-version" id="sn-version" title="build 2026-06-28 · growth loop: anon first song + analytics">v1.2.0</div>
 </nav>
 
 <!-- MOBILE BOTTOM NAV -->
@@ -14339,11 +14359,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function generateSong(){
-  if (!S.user && !window.__soniqAdmin) {
-    openAuth('Create your free account — 3 free songs to try');
-    S._pendingGenerate = 'song';
-    return;
-  }
+  // Growth Loop v1: anonymous visitors may generate ONE song with no account.
+  // The pre-block is removed — the Worker enforces a 1-song-per-IP anon limit
+  // and returns `auth_required` once it's used, which surfaces the signup modal
+  // via the catch() handler below. Track whether THIS run is anonymous so we
+  // can fire the right analytics + show a non-blocking signup nudge on success.
+  const _isAnonRun = (!S.user && !window.__soniqAdmin);
   const genBtn = document.getElementById('gen-btn');
   if (genBtn?.disabled) return; // prevent double-fire
   btnLoad('gen-btn', 'Writing song…');
@@ -14376,6 +14397,9 @@ async function generateSong(){
     setTimeout(()=>{inp.style.borderColor='';inp.style.animation='';},700);
     return;
   }
+
+  // Analytics: a real generation attempt is now underway (post empty-topic guard).
+  try { window.pingPv && window.pingPv('gen_started'); } catch(e){}
 
   // Build params for server-side prompt construction
   const songParams = {
@@ -14721,6 +14745,12 @@ VIDEO PROMPT:
       }
     }
     renderSunoChips('res', S.currentSong);
+    // Analytics: a song landed. Fire gen_done always; anon_gen when no session.
+    try { window.pingPv && window.pingPv('gen_done'); } catch(e){}
+    if (_isAnonRun) {
+      try { window.pingPv && window.pingPv('anon_gen'); } catch(e){}
+      try { showAnonNudge(); } catch(e){}
+    }
   }catch(e){
     finishSongProgress('res', true);
     if(e.name==='AbortError'||e.message==='enter-key'){btnDone('gen-btn');return;}
@@ -14737,6 +14767,38 @@ VIDEO PROMPT:
     toast('⚠️ '+e.message, 4000);
   }
   btnDone('gen-btn');
+}
+
+// Growth Loop v1: friendly, NON-blocking nudge shown to anonymous users after
+// their one free song lands. Does not gate the result — it sits above the
+// output and offers a one-click path to create a free account (save + 3 more).
+function showAnonNudge(){
+  if (S.user) return; // signed in mid-flight — nothing to nudge
+  var host = document.getElementById('gen-out');
+  if (!host) return;
+  var existing = document.getElementById('anon-nudge');
+  if (existing) { existing.style.display='flex'; return; }
+  var bar = document.createElement('div');
+  bar.id = 'anon-nudge';
+  bar.style.cssText = 'display:flex;align-items:center;gap:12px;flex-wrap:wrap;'
+    + 'margin:0 0 14px;padding:12px 16px;border-radius:14px;'
+    + 'background:linear-gradient(135deg,rgba(124,58,237,.16),rgba(236,72,153,.14));'
+    + 'border:1px solid rgba(124,58,237,.35);font-size:14px;line-height:1.4;';
+  bar.innerHTML = '<span style="flex:1;min-width:200px;color:var(--tx1,#fff);font-weight:600">'
+    + '❤ Love it? Create a free account to save this song + get 3 more free.</span>'
+    + '<button id="anon-nudge-btn" style="cursor:pointer;border:0;border-radius:10px;'
+    + 'padding:9px 18px;font-weight:700;font-size:14px;color:#fff;'
+    + 'background:linear-gradient(135deg,#7c3aed,#ec4899)">Create free account</button>'
+    + '<button id="anon-nudge-x" aria-label="Dismiss" style="cursor:pointer;background:none;'
+    + 'border:0;color:var(--tx3,#9aa);font-size:18px;line-height:1;padding:4px 6px">×</button>';
+  // Insert at the top of the output panel so it reads before the result.
+  host.insertBefore(bar, host.firstChild);
+  var go = document.getElementById('anon-nudge-btn');
+  if (go) go.onclick = function(){
+    try { openAuth('Create your free account — save this song + 3 more free'); } catch(e){}
+  };
+  var x = document.getElementById('anon-nudge-x');
+  if (x) x.onclick = function(){ bar.style.display='none'; };
 }
 
 function parseSection(raw, key, nextKey){
@@ -19893,6 +19955,9 @@ async function authSignUp() {
   });
 
   if (error) { showAuthError(error.message); btn.disabled = false; btn.textContent = 'Create Account'; return; }
+
+  // Analytics: account creation succeeded (Growth Loop conversion event).
+  try { window.pingPv && window.pingPv('signup'); } catch(e){}
 
   // Belt-and-suspenders: also update the profile row directly with consent data
   // (the Supabase trigger captures it, but this handles race conditions)
