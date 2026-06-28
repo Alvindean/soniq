@@ -6863,7 +6863,8 @@ try { window.pingPv('pageview'); } catch(e){}
       <textarea id="paste-area" style="min-height:130px" placeholder="[Verse 1]&#10;Your lyrics here&#10;Another line&#10;&#10;[Chorus]&#10;Hook line here"></textarea>
     </div>
     <div class="btn-row">
-      <button class="btn btn-gold" onclick="loadPasted()">Load into Editor</button>
+      <button class="btn btn-gold" onclick="loadPastedAppend()" title="Add these lyrics to the end of what's already in the editor">➕ Add to Editor</button>
+      <button class="btn" onclick="loadPasted()" title="Replace everything in the editor with these lyrics">↻ Replace All</button>
       <button class="btn" onclick="document.getElementById('paste-modal').style.display='none'">Cancel</button>
     </div>
   </div>
@@ -16334,6 +16335,40 @@ function loadPasted(){
   loadLyricsIntoEditor(raw,'Pasted Song');
   ta.value='';
   toast('✓ Lyrics loaded into editor');
+}
+function appendLyricsToEditor(lyrics){
+  // Add pasted lyrics to the END of what's already in the editor instead of
+  // replacing it — so you can build a song up in passes (verse, then chorus,
+  // then a second verse) without losing what's there.
+  lyrics=(lyrics||'').replace(/\r\n?/g,'\n');
+  // Nothing in the editor yet — just do a normal load.
+  if(!S.editorLines||!S.editorLines.length){
+    loadLyricsIntoEditor(lyrics,(S.editorSong&&S.editorSong.title)||'Pasted Song');
+    return;
+  }
+  // Snapshot the current text to History before we change it, so the pre-append
+  // state is always recoverable.
+  syncEditorSong();
+  if(S.editorSong&&S.editorSong.lyrics){
+    vhAddVersion(S.editorSong.title,S.editorSong.lyrics,S.editorSong.genre,'Pre-append snapshot');
+  }
+  const newLines=lyrics.split('\n').map(l=>({text:l,isTag:/^\[/.test(l.trim()),isEmpty:!l.trim()}));
+  // Separate the appended block with a blank line if the editor doesn't already
+  // end on one, so the two pieces don't run together visually.
+  const last=S.editorLines[S.editorLines.length-1];
+  if(last&&!last.isEmpty)S.editorLines.push({text:'',isTag:false,isEmpty:true});
+  S.editorLines.push(...newLines);
+  syncEditorSong();
+  renderEditor();
+}
+function loadPastedAppend(){
+  const ta=document.getElementById('paste-area');
+  const raw=ta?.value||'';
+  if(!raw.trim()){toast('Paste some lyrics first');return;}
+  appendLyricsToEditor(raw);
+  ta.value='';
+  const m=document.getElementById('paste-modal');if(m)m.style.display='none';
+  toast('✓ Lyrics added to editor');
 }
 function syncEditorSong(){
   // Keep S.editorSong.lyrics in lockstep with the live editor lines so the
