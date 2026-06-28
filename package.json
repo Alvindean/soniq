@@ -1,6 +1,6 @@
 {
   "name": "soniq",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "SONIQ — AI Song Creation Studio",
   "private": true,
   "engines": {
