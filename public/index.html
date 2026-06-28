@@ -309,6 +309,7 @@ a{color:var(--amber);text-decoration:none}
 .sb-btn.on{background:var(--s4);color:var(--tx1)}
 .sb-btn.on::before{content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);width:3px;height:24px;background:var(--amber);border-radius:0 3px 3px 0}
 .sb-btn .ni{font-size:20px;line-height:1}
+.sn-version{font-size:12px;color:var(--tx4);text-align:center;padding:6px 0 4px;letter-spacing:.02em;flex-shrink:0;user-select:none}
 .sn-spacer{flex:1}
 .sn-bottom{display:flex;flex-direction:column;align-items:center;gap:2px}
 .sn-badge{position:absolute;top:4px;right:4px;min-width:14px;height:14px;border-radius:99px;background:var(--amber);color:#08080a;font-size:12px;font-weight:700;text-align:center;line-height:14px;padding:0 3px}
@@ -3369,6 +3370,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
     <button id="nav-auth-btn" onclick="openAuth()" class="sb-btn" title="Sign In"><span class="ni"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg></span></button>
     <button id="nav-signout-btn" onclick="authSignOut()" class="sb-btn" style="display:none" title="Sign Out"><span class="ni" style="color:var(--tx4)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg></span></button>
   </div>
+  <div class="sn-version" id="sn-version" title="SONIQ v1.1.0 · build 2026-06-27">v1.1.0</div>
 </nav>
 
 <!-- MOBILE BOTTOM NAV -->
