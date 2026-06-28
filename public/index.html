@@ -3172,7 +3172,100 @@ body.craft-advanced .craft-basic-only{display:none !important}
 
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js" defer></script>
+<!-- ── SONIQ auth: Cloudflare D1 Worker (replaces Supabase) ──────────────────
+     Self-contained drop-in for the `supabase` client surface the app uses
+     (auth.signInWithPassword/signUp/signOut/getSession/refreshSession/
+      onAuthStateChange/resetPasswordForEmail/updateUser + a no-op .from()).
+     Also installs a fetch interceptor that routes every same-origin /api/*
+     call to the Worker, so generation + auth both leave Supabase behind.
+     Backend: https://soniq-api.thealvindean.workers.dev -->
+<script>
+(function(){
+  var BASE = 'https://soniq-api.thealvindean.workers.dev';
+  window.SONIQ_API_BASE = BASE;
+  var _f = window.fetch.bind(window);
+  // Route same-origin /api/* → Worker (Bearer-token auth, no cookies/CORS creds).
+  window.fetch = function(input, init){
+    try {
+      var url = typeof input === 'string' ? input : (input && input.url);
+      if (url && url.indexOf('/api/') === 0) {
+        if (typeof input === 'string') return _f(BASE + url, init);
+        return _f(new Request(BASE + url, input), init);
+      }
+    } catch(e){}
+    return _f(input, init);
+  };
+  var SKEY = 'soniq_session_v1';
+  function load(){ try { return JSON.parse(localStorage.getItem(SKEY)||'null'); } catch(e){ return null; } }
+  function save(s){ try { s ? localStorage.setItem(SKEY, JSON.stringify(s)) : localStorage.removeItem(SKEY); } catch(e){} }
+  function sess(d){ return { access_token: d.access_token, token_type:'bearer', user: d.user }; }
+  window.__SoniqAuthClient = function(){
+    var listeners = [];
+    function emit(ev, s){ listeners.forEach(function(cb){ try{ cb(ev, s); }catch(e){} }); }
+    async function post(path, body){
+      var r = await _f(BASE + path, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body||{}) });
+      var d = await r.json().catch(function(){ return {}; });
+      return { ok: r.ok, status: r.status, data: d };
+    }
+    var auth = {
+      onAuthStateChange: function(cb){
+        listeners.push(cb);
+        var s = load();
+        setTimeout(function(){ emit('INITIAL_SESSION', s); }, 0);
+        return { data: { subscription: { unsubscribe: function(){ var i=listeners.indexOf(cb); if(i>=0) listeners.splice(i,1); } } } };
+      },
+      getSession: async function(){ return { data: { session: load() }, error: null }; },
+      refreshSession: async function(){
+        var s = load();
+        if (!s || !s.access_token) return { data:{ session:null }, error:null };
+        var r = await _f(BASE + '/api/auth/session', { headers: { Authorization: 'Bearer ' + s.access_token } });
+        if (!r.ok) { save(null); emit('SIGNED_OUT', null); return { data:{ session:null }, error:null }; }
+        var d = await r.json().catch(function(){ return {}; });
+        if (d && d.user) { s.user = d.user; save(s); }
+        return { data: { session: s }, error: null };
+      },
+      signInWithPassword: async function(c){
+        var res = await post('/api/auth/signin', { email: c.email, password: c.password });
+        if (!res.ok) return { data:{ session:null, user:null }, error: { message: (res.data && res.data.error) || 'Sign in failed', code: res.data && res.data.error_code } };
+        var s = sess(res.data); save(s); emit('SIGNED_IN', s);
+        return { data: { session: s, user: res.data.user }, error: null };
+      },
+      signUp: async function(a){
+        var meta = (a.options && a.options.data) || {};
+        var res = await post('/api/auth/signup', { email: a.email, password: a.password, full_name: meta.full_name, terms_accepted: meta.terms_accepted, terms_version: meta.terms_version });
+        if (!res.ok) return { data:{ user:null, session:null }, error: { message: (res.data && res.data.error) || 'Sign up failed' } };
+        var s = sess(res.data); save(s); emit('SIGNED_IN', s);
+        return { data: { user: res.data.user, session: s }, error: null };
+      },
+      signOut: async function(){ save(null); emit('SIGNED_OUT', null); _f(BASE+'/api/auth/signout',{method:'POST'}).catch(function(){}); return { error: null }; },
+      resetPasswordForEmail: async function(email){ await post('/api/auth/reset-request', { email: email }); return { data:{}, error: null }; },
+      updateUser: async function(attrs){
+        var u = new URLSearchParams(location.search), token = u.get('token'), email = u.get('email');
+        if (!token || !email) return { data:{}, error: { message: 'Reset link is invalid or expired — request a new one' } };
+        var res = await post('/api/auth/reset-confirm', { email: email, token: token, password: attrs.password });
+        if (!res.ok) return { data:{}, error: { message: (res.data && res.data.error) || 'Reset failed' } };
+        var s = sess(res.data); save(s); emit('SIGNED_IN', s);
+        return { data:{ user: res.data.user }, error: null };
+      },
+      getUser: async function(){ var s = load(); return { data:{ user: (s && s.user) || null }, error: null }; }
+    };
+    // Cloud-data (profiles/songs/community) is phase-2; degrade gracefully so
+    // the localStorage-first library/UI never crashes on a Supabase .from() call.
+    function from(){
+      var chain = {
+        select:function(){return chain;}, insert:function(){return chain;}, update:function(){return chain;},
+        upsert:function(){return chain;}, delete:function(){return chain;}, eq:function(){return chain;},
+        order:function(){return chain;}, limit:function(){return chain;},
+        single:function(){return Promise.resolve({data:null,error:null});},
+        maybeSingle:function(){return Promise.resolve({data:null,error:null});},
+        then:function(res){ return Promise.resolve({data:[],error:null}).then(res); }
+      };
+      return chain;
+    }
+    return { auth: auth, from: from };
+  };
+})();
+</script>
 <script src="./lib/lyrics-analysis-engine.js"></script>
 <script src="./lib/liu-components.js"></script>
 <script src="./lib/smart-lyrics-upgrade-integration.js"></script>
@@ -6905,7 +6998,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
       <div style="margin-bottom:16px">
         <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
-        <input id="auth-password" type="password" autocomplete="current-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="••••••••">
+        <div style="position:relative">
+          <input id="auth-password" type="password" autocomplete="current-password" style="width:100%;padding:9px 40px 9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="••••••••" onkeydown="if(event.key==='Enter')authSignIn()">
+          <button type="button" onclick="soniqTogglePw('auth-password', this)" aria-label="Show password" title="Show password" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;padding:4px;line-height:1;color:var(--tx3)">👁</button>
+        </div>
       </div>
       <button class="btn btn-amber" onclick="authSignIn()" id="auth-signin-btn" style="width:100%;padding:10px;font-size:14px;margin-bottom:10px">Sign In</button>
       <button onclick="authForgotPassword()" style="width:100%;background:none;border:none;color:var(--tx3);font-size:12px;cursor:pointer;padding:4px">Forgot password?</button>
@@ -6922,7 +7018,10 @@ body.craft-advanced .craft-basic-only{display:none !important}
       </div>
       <div style="margin-bottom:16px">
         <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Password</div>
-        <input id="auth-signup-password" type="password" autocomplete="new-password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+        <div style="position:relative">
+          <input id="auth-signup-password" type="password" autocomplete="new-password" style="width:100%;padding:9px 40px 9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+          <button type="button" onclick="soniqTogglePw('auth-signup-password', this)" aria-label="Show password" title="Show password" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;padding:4px;line-height:1;color:var(--tx3)">👁</button>
+        </div>
       </div>
       <!-- Age verification -->
       <label style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--tx2);margin-bottom:10px;cursor:pointer;line-height:1.5">
@@ -10991,7 +11090,7 @@ const SUBSTYLE_NOTES={
 };
 
 const SUBSTYLES={
-  country:['Outlaw Country','Bakersfield','Nashville Pop','Americana','Bluegrass','Bro-Country','Alt-Country','Texas / Red Dirt','Classic Honky-Tonk','Country Gospel','Country Rap','Country Blues'],
+  country:['Outlaw Country','Bakersfield','Nashville Pop','Americana','Bluegrass','Bro-Country','Alt-Country','Texas / Red Dirt','Classic Honky-Tonk','Country Gospel','Country Rap','Country Blues','Synthwave Country','Lo-Fi Country','Cowpunk','Trap-Soul Country'],
   kpop:['Girl Group','Boy Group','K-Pop Ballad','Dance Pop','Dark Concept','Bubblegum','Hip-Hop K-Pop','R&B K-Pop'],
   hiphop:['Trap','Boom Bap','Lyrical/Conscious','Drill','Melodic Rap','Punchline Heavy','Storytelling','Old School','G-Funk','Bay Area','Down South','Crunk','Chopped & Screwed','East Coast','Midwest','Cloud Rap','Phonk','Jazz Rap','Jazz Improv Rap','Toronto Sound','Pop-Rap Crossover','Pop-Rap Rock'],
   metal:['Classic Metal','Nu-Metal','Metalcore','Thrash','Death Metal','Black Metal','Doom Metal','Power Metal','Symphonic Metal','Progressive Metal','Djent','Melodic Death Metal','Screamo','Avant-Garde Metal'],
@@ -11002,7 +11101,7 @@ const SUBSTYLES={
   blues:['Chicago Blues','Delta Blues','Texas Blues','Jump Blues','Soul Blues'],
   reggae:['Roots Reggae','Dancehall','Ska','Rocksteady','Dub','Lovers Rock'],
   jazz:['Bebop','Cool Jazz','Hard Bop','Modal Jazz','Free Jazz','Jazz Fusion','Smooth Jazz','Vocal Jazz','Big Band / Swing','Gypsy Jazz','Soul Jazz / Acid Jazz','Nu-Jazz'],
-  rnb:['Motown Soul','Stax / Memphis Soul','Philadelphia Soul','Quiet Storm','New Jack Swing','Contemporary R&B','Alt R&B / PBR&B','Classic Funk','P-Funk','Minneapolis Funk','Funk Rock','Boogie / Post-Disco','Modern Funk','Afro-Funk'],
+  rnb:['Motown Soul','Stax / Memphis Soul','Philadelphia Soul','Quiet Storm','New Jack Swing','Contemporary R&B','Alt R&B / PBR&B','Trap-Soul','Classic Funk','P-Funk','Minneapolis Funk','Funk Rock','Boogie / Post-Disco','Modern Funk','Afro-Funk'],
   pop:['Synth-Pop','Teen-Pop','Dance-Pop','Indie-Pop','Bedroom Pop','Hyper-Pop','Pop Ballad','Pop-Rap Crossover','Pop Rock','Disco-Pop Revival'],
   edm:['House','Deep House','Tech House','Techno','Trance','Drum & Bass','Dubstep','Future Bass','EDM Festival / Big Room','Garage / 2-Step','Hardstyle','Ambient / IDM'],
   folk:['Traditional Folk','Folk Revival','Contemporary Folk','Indie Folk','Folk Rock','Anti-Folk','Celtic / Irish Folk','Bluegrass Folk','Murder Ballad / Dark Folk','Folk Punk'],
@@ -19273,10 +19372,10 @@ function expandStep(n){
 
 // ─── SUPABASE AUTH ─────────────────────────────────────────────
 function _initSupabase() {
-  const url = 'https://gotrwbhkavkqmxtnxkkj.supabase.co';
-  const key = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdvdHJ3YmhrYXZrcW14dG54a2tqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM5NjM1MDYsImV4cCI6MjA4OTUzOTUwNn0.qbvU0gfRKjMqnn49Jy8db6DQ66m8pp7Xs25IQuTgXhI';
-  if (!window.supabase) return;
-  S.supabase = window.supabase.createClient(url, key);
+  // Auth now runs on the Cloudflare D1 Worker via the drop-in shim defined in
+  // <head> (window.__SoniqAuthClient). No external supabase-js / network dep.
+  if (!window.__SoniqAuthClient) return;
+  S.supabase = window.__SoniqAuthClient();
   // Admin email allow-list — UX HINT ONLY. The server (/api/analytics, /api/admin)
   // is the authoritative gate; this list just decides whether to show the admin
   // button. MUST stay in sync with ADMIN_EMAILS in api/analytics.js.
@@ -19366,12 +19465,11 @@ function _initSupabase() {
 }
 // Supabase CDN loads with defer — call init when ready (aggressive retry)
 function _tryInitSupabase(attempt) {
-  if (window.supabase) { _initSupabase(); return; }
-  if (attempt >= 10) { console.error('[SONIQ] Supabase failed to load after 10 retries'); return; }
-  console.warn('[SONIQ] Supabase not ready — retry ' + (attempt+1) + '/10');
+  if (window.__SoniqAuthClient) { _initSupabase(); return; }
+  if (attempt >= 10) { console.error('[SONIQ] Auth client failed to load after 10 retries'); return; }
   setTimeout(function(){ _tryInitSupabase(attempt + 1); }, 300 * (attempt + 1));
 }
-if (window.supabase) _initSupabase();
+if (window.__SoniqAuthClient) _initSupabase();
 else if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', function(){ _tryInitSupabase(0); });
 } else { _tryInitSupabase(0); }
@@ -19693,7 +19791,10 @@ function openPasswordResetModal() {
       <div class="ctitle">Set New Password</div>
       <div style="margin-bottom:12px">
         <div style="font-size:11px;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">New Password</div>
-        <input id="pwd-reset-new" type="password" style="width:100%;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+        <div style="position:relative">
+          <input id="pwd-reset-new" type="password" style="width:100%;padding:9px 40px 9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box" placeholder="Min. 8 characters">
+          <button type="button" onclick="soniqTogglePw('pwd-reset-new', this)" aria-label="Show password" title="Show password" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:15px;padding:4px;line-height:1;color:var(--tx3)">👁</button>
+        </div>
       </div>
       <div id="pwd-reset-error" style="display:none;color:#f87171;font-size:12px;margin-bottom:10px"></div>
       <button class="btn btn-amber" onclick="submitPasswordReset()" style="width:100%;padding:10px;font-size:14px">Update Password</button>
@@ -19733,6 +19834,13 @@ function showAuthError(msg) {
   const el = document.getElementById('auth-error');
   el.textContent = msg;
   el.style.display = '';
+}
+
+// Show/hide password toggle for the auth + reset fields.
+function soniqTogglePw(id, btn){
+  var el = document.getElementById(id); if(!el) return;
+  if (el.type === 'password'){ el.type = 'text';  btn.textContent='🙈'; btn.title='Hide password'; btn.setAttribute('aria-label','Hide password'); }
+  else                       { el.type = 'password'; btn.textContent='👁'; btn.title='Show password'; btn.setAttribute('aria-label','Show password'); }
 }
 
 async function authSignIn() {
