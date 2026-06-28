@@ -6833,8 +6833,10 @@ try { window.pingPv('pageview'); } catch(e){}
         <button class="btn btn-sm btn-teal" onclick="copyEdited()">📋 Copy</button>
         <button class="btn btn-sm btn-gold" onclick="saveEdited()" title="Save this edited version to your library">💾 Save</button>
         <button class="btn btn-sm btn-amber" onclick="showPasteModal()" title="Paste lyrics from clipboard">📥 Paste</button>
+        <button class="btn btn-sm" onclick="refreshEditor()" id="ed-refresh-btn" title="Reload the editor from your latest song (discards unsaved edits — auto-saved to History first)">🔄 Refresh</button>
         <button class="btn btn-sm" onclick="openVH()" id="ed-vh-btn" title="Version history">🕐 History</button>
         <button class="btn btn-sm" onclick="openCoach('editor')" id="ed-coach-btn" title="AI Feedback Coach">🎓 Coach</button>
+        <button class="btn btn-sm btn-red" onclick="clearEditor()" id="ed-clear-btn" title="Clear all lines from the editor (auto-saved to History first)">🗑 Clear All</button>
       </div>
     </div>
     <div class="edbody" id="ed-body">
@@ -16148,7 +16150,14 @@ function navTo(pageId){
 
 function renderEditor(){
   const body=document.getElementById('ed-body');
-  if(!S.editorLines.length)return;
+  if(!S.editorLines||!S.editorLines.length){
+    // Empty editor (e.g. after Clear All) — show the empty state and hide the
+    // production-prompt panel so the page isn't left with a stale style block.
+    if(body)body.innerHTML='<div style="text-align:center;padding:60px 24px;color:var(--tx4)"><div style="font-size:36px;margin-bottom:10px">✏️</div><div style="font-size:15px;font-weight:600;color:var(--tx3);margin-bottom:6px">No lyrics loaded</div><div style="font-size:12px;margin-bottom:16px">Generate a song first, then open the Editor — or paste lyrics to start fresh</div><button class="btn btn-amber" onclick="navTo(\'write\')" style="font-size:13px">✍️ Go Write a Song</button></div>';
+    const _w=document.getElementById('ed-style-wrap');if(_w)_w.style.display='none';
+    updEdStats();
+    return;
+  }
   let html='';
   let chorus=false;
   let sectionOpen=false;
@@ -16369,6 +16378,30 @@ async function refreshEditorStyle(){
     toast('⚠️ Refresh failed: '+e.message,3000);
   }
   if(btn){btn.disabled=false;btn.textContent='🔄 Refresh';}
+}
+function refreshEditor(){
+  // Reload the editor from the latest song (the one just generated on the Write
+  // page, or the most recent library entry). Pulls fresh lyrics in when the
+  // editor is showing a stale song. loadLyricsIntoEditor() snapshots the current
+  // edited text to version history first, so nothing is lost.
+  const src = (S.currentSong&&S.currentSong.lyrics) ? S.currentSong : (S.library&&S.library[0]);
+  if(!src||!src.lyrics){toast('No song to load — generate or paste lyrics first');return;}
+  loadLyricsIntoEditor(src.lyrics, src.title);
+  toast('🔄 Editor refreshed from latest song');
+}
+function clearEditor(){
+  if(!S.editorLines||!S.editorLines.length){toast('Editor is already empty');return;}
+  if(!confirm('Clear all lines from the editor? Your current text is auto-saved to History first.'))return;
+  // Snapshot the current edit before wiping so it can be recovered from History.
+  syncEditorSong();
+  if(S.editorSong&&S.editorSong.lyrics){
+    vhAddVersion(S.editorSong.title, S.editorSong.lyrics, S.editorSong.genre, 'Pre-clear snapshot');
+  }
+  S.editorLines=[];
+  if(S.editorSong)S.editorSong.lyrics='';
+  renderEditor();
+  updEdStats();
+  toast('🗑 Editor cleared');
 }
 function deleteLine(i){
   if(!S.editorLines||!S.editorLines[i])return;
