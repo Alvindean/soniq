@@ -1452,6 +1452,53 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
     genres: ['hiphop','pop','comedy','parody','country','blues','rnb','altrock']
   },
 
+  // ── CINEMATIC & INTER-LAYER CRAFT ────────────────────────────────────────────
+  // Universal "think in levels" toolkit. Distilled from the Biggie / Jay-Z
+  // craft breakdown — the moves that make writing FELT instead of stated.
+  // All genres: these serve story, music-interaction, and listener-feeling
+  // across every style, not just rap.
+  reactionShot: {
+    label: 'REACTION SHOT / OBLIQUE AFTERMATH',
+    short: `Never state the emotional peak — cut AWAY from it and show a peripheral detail, figure, or reaction, and let the listener reconstruct the event. Biggie conveys a shooting's severity through "the paramedics breathing soft on him" — you infer everything from how gently strangers handle the body; he never films the bullet. Breakup: not "I'm devastated" but "your coffee cup's still by the sink." Joy: not "I was happy" but "my mother finally unclenched her hands." RULE: name the peak moment to yourself, then write the thing ADJACENT to it, never the moment. The listener assembling it is the payoff.`,
+    genres: 'all'
+  },
+
+  understatedWeight: {
+    label: 'UNDERSTATEMENT / RESTRAINT',
+    short: `The smaller and more specific the detail, the bigger the feeling — escalating to the obvious ("I'll kill you," "I love you so much") deflates it; a minor precise detail delivered flat detonates. Biggie's "shoot your daughter in the calf muscle" — a minor, non-lethal body part, offhand — reads scarier than any threat because it signals control. Love: "you left a toothbrush" outweighs "I miss you." RULE: pick the smallest true detail and deliver it casually. Restraint is the amplifier; never say the big word.`,
+    genres: 'all'
+  },
+
+  misdirectionPlant: {
+    label: 'MISDIRECTION / STAGING',
+    short: `The narrator ACTS to shape how others — or the listener — will read the scene; the cover story reveals the real intent underneath. Biggie's "sprinkle coke on the floor, make it drug-related" stages the crime scene two moves ahead, and the staging tells you he's calculated, not wild. Universal: the character performing "I'm fine," the too-bright smile, the alibi, the cleaned-up room. RULE: show the constructed surface and let the seam reveal the truth beneath. What someone stages tells you what they fear being seen.`,
+    genres: 'all'
+  },
+
+  adlibCounterVoice: {
+    label: 'AD-LIB AS COUNTER-VOICE',
+    short: `Ad-libs are a SECOND character in the room, not decoration — they undercut, answer, heckle, confirm, or contradict the main line, so tension lives between the two voices. Biggie's "(What?!)" answers the bar. Gospel call-response, country asides, and pop backing hooks all do this. RULE: every ad-lib COMMENTS on the line it sits under — never just echoes the last word. Ask: what does this second voice KNOW that the lead voice is hiding?`,
+    genres: 'all'
+  },
+
+  negativeSpace: {
+    label: 'NEGATIVE SPACE',
+    short: `Leave the music OPEN so a line can land — silence and drop-outs are punctuation. The most important line often hits hardest with the beat stripped beneath it (the anti-drop cousin). RULE: mark 1-2 moments per song where the arrangement should THIN or DROP so the lyric carries alone, and note it in the structure/production tags. What you don't play frames what you do.`,
+    genres: 'all'
+  },
+
+  lyricMusicFriction: {
+    label: 'LYRIC–MUSIC FRICTION',
+    short: `Deliberate contrast between what is SAID and what is PLAYED — dark words over a pretty loop, tenderness over menace, a bright major-key melody carrying a devastating lyric. The gap does the work (the "Pumped Up Kicks" / "Hey Ya" / "Semi-Charmed Life" effect). RULE: when the lyric is heavy, consider music lighter than expected, and vice versa. Matching mood-to-mood is the amateur default; friction is what the listener remembers.`,
+    genres: 'all'
+  },
+
+  mosaicCompoundRhyme: {
+    label: 'MOSAIC / COMPOUND RHYME',
+    short: `Rhyme a multi-word PHRASE against another phrase across word boundaries — the rhyme is assembled from parts, not carried by one word. "calf MUSCLE" ≈ "fuck a TUSSLE"; "REST for" ≈ "BREAST-plate"; "BIGGER than" ≈ "FIGURE, man." The ear stitches it together a beat late, so it feels sly and offhand instead of hammered. Biggie signature; works in any wordy genre. RULE: at least one side spans 2+ words; both phrases must do real syntactic work (never filler); deliver conversationally so the seam hides. Distinct from multi-syllabic (one long word-cluster).`,
+    genres: 'all'
+  },
+
   battleRapCraft: {
     label: 'BATTLE RAP CRAFT',
     short: `Every bar must damage a target. Six laws: (1) PERSONAL — specific and true, not generic insults; (2) REBUTTAL — flip the opponent's own words against them; (3) SCHEME CHAIN — commit to a multi for 4-8 bars, never break it mid-round; (4) THE ANGLE — one conceptual lane per round, stay in it; (5) CROWD MOMENT — one "oh shit" bar engineered per round; (6) CONSISTENCY — every bar supports the angle, no off-topic bars.`,
@@ -1474,6 +1521,22 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
 // "funny story my grandma told me" and that phrase must NOT trigger comedy
 // craft injection. Mood is a short emotional label and a reliable signal.
 // `topic` is accepted in the signature for future extensibility.
+// THE DIRECTOR'S PASS — always-on reasoning scaffold prepended to every craft
+// note, so it underpins every generation path (song, Rap Lab, Lucky, Edit).
+// The premise: the greats don't decorate with technique, they THINK in levels
+// and write the deepest one. This forces that thinking before a line exists,
+// in service of story, music-interaction, and listener-feeling — every genre.
+const DIRECTORS_PASS = `
+
+THE DIRECTOR'S PASS — think in levels BEFORE you write (every song, every genre):
+Great writing is thought, not decoration. Plan silently before the first line:
+1. ARC — what does the listener FEEL from section to section? Name each shift (hope→doubt→release, etc.). One moving feeling per section.
+2. THE MOVE — per section, the ONE craft move that earns that feeling (a reaction shot, a restraint, a friction, a rhyme lock). Never more than a section can hold.
+3. LEVELS — for the key moment, separate what is SAID vs. SHOWN vs. what the listener RECONSTRUCTS. Write the DEEPEST level. If you would state the feeling outright, cut it and write the thing adjacent to it instead.
+4. FOUR LAYERS IN TENSION — lyric, melody/beat, ad-libs, and space are four instruments. Decide where they PULL AGAINST each other, not merely align: where an ad-lib undercuts a line, where the music contradicts the words, where the arrangement drops so a line lands alone.
+5. THE TEST — for every standout line: "quoted alone, does it still hit, and does it make them FEEL rather than merely understand?" If it only informs, rewrite until it lands.
+Do this reasoning silently. Output only the finished song — the thinking must be VISIBLE IN THE RESULT, never printed as text.`;
+
 function buildLyricCraftNote(genre, mood, topic) {
   // Normalize mood: lowercase, turn hyphens/underscores into spaces, collapse
   // internal whitespace, pad with single spaces for word-boundary matching
@@ -1496,8 +1559,9 @@ function buildLyricCraftNote(genre, mood, topic) {
   const craftBlock = applicable.length
     ? `\n\nLYRIC CRAFT TOOLKIT — use these where they serve the song, never forced:\n${applicable.map(t => `• ${t.label}: ${t.short}`).join('\n')}`
     : '';
-  // Anti-cliche rules always apply, regardless of genre or mood.
-  return craftBlock + buildAntiClicheNote();
+  // The Director's Pass + anti-cliche rules always apply, regardless of genre
+  // or mood — this is the universal underpinning of the craft logic.
+  return DIRECTORS_PASS + craftBlock + buildAntiClicheNote();
 }
 
 // ============ ANTI-CLICHE RHYME SYSTEM ============
@@ -9029,7 +9093,7 @@ const RHYME_NOTES = {
   'internal':       'Internal rhyme scheme — rhymes occur within bars not just at the end. Creates density and momentum.',
   'multi-syllabic': 'Multi-syllabic rhymes — multiple syllables rhyme simultaneously (e.g., "motivate" / "innovate"). Technical showcase.',
   'chain':          'Chain rhyming — each bar\'s last word or sound becomes the first sound of the next internal rhyme. Continuous forward pull.',
-  'mosaic':         'Mosaic rhyme — complex interlocking rhyme scheme where multiple words throughout the verse form a web. Every word load-bearing.',
+  'mosaic':         'Mosaic / compound rhyme — a multi-word PHRASE rhymed against another phrase across word boundaries ("calf muscle" ≈ "fuck a tussle"). The rhyme is assembled from parts; the ear stitches it a beat late, so it lands sly and offhand. Deliver conversationally so the seam hides.',
   'slant':          'Slant rhyme — near-rhymes and approximate rhymes preferred over exact. More natural speech feel, less sing-song.',
   'deferred':       'Deferred rhyme — the rhyme scheme lands 2-4 bars later than the ear expects it. Creates tension-and-release across a whole verse rather than bar-to-bar.',
   'vowel-chain':    'Vowel chain — pick ONE specific vowel phoneme (long A, short I, schwa) and thread it through 8-16 bars. Hit the vowel at every 2-4 syllables in each bar. Eminem "Till I Collapse" runs the "at" sound this way. Bright vowels for triumph, dark vowels for menace.',
