@@ -1487,6 +1487,12 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
     genres: 'all'
   },
 
+  vocalChopAnchor: {
+    label: 'WORD AS INSTRUMENT / VOCAL-CHOP ANCHOR',
+    short: `PRODUCER + WRITER move in one: take ONE word or short phrase and make it the beat's melodic-rhythmic SPINE — a chopped, re-pitched, looped vocal fragment that repeats as the ENGINE of the track, and build the lyric, flow, and ad-libs to ORBIT it. Cam'ron "Oh Boy" (Just Blaze chops "ohh boy" into the hook), Kanye/Dipset chipmunk-soul, RZA vocal chops, house and gospel one-word vamps. The anchor word does three jobs at once: PERCUSSION (it lands on a fixed beat every bar/phrase), MELODY (its pitch is itself a hook), and THEME (its meaning is the song's center). Example construct — the word "breathe" dropped every four counts: "one into the two, two into the three, three into the four... (breathe)" — and the verse rhymes AROUND that fixed anchor, always returning to it. RULES: (1) pick a word that carries the whole theme in one or two syllables — it repeats dozens of times, so it must be load-bearing, never filler; (2) FIX its rhythmic slot (e.g. the last beat of every two bars) and bend the flow to land rhymes into and around it; (3) let the chop or an ad-lib deliver it so the lead voice can rhyme PAST it; (4) REFLECT IT IN THE PRODUCTION TAGS — the SONG PROMPT / Suno tags MUST name it: "chopped, re-pitched, stutter-edited vocal sample of the word '[X]' looped as the hook," plus a counter-melody answering it. Simple songs ride one anchor start to finish; complex ones swap the anchor at the bridge. Pairs with negativeSpace (the chop fills the gap the beat leaves) and adlibRhymeButton (the anchor can BE the button).`,
+    genres: 'all'
+  },
+
   negativeSpace: {
     label: 'NEGATIVE SPACE',
     short: `Leave the music OPEN so a line can land — silence and drop-outs are punctuation. The most important line often hits hardest with the beat stripped beneath it (the anti-drop cousin). RULE: mark 1-2 moments per song where the arrangement should THIN or DROP so the lyric carries alone, and note it in the structure/production tags. What you don't play frames what you do.`,
