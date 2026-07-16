@@ -1489,7 +1489,7 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
 
   lyricMusicFriction: {
     label: 'LYRIC–MUSIC FRICTION',
-    short: `Deliberate contrast between what is SAID and what is PLAYED — dark words over a pretty loop, tenderness over menace, a bright major-key melody carrying a devastating lyric. The gap does the work (the "Pumped Up Kicks" / "Hey Ya" / "Semi-Charmed Life" effect). RULE: when the lyric is heavy, consider music lighter than expected, and vice versa. Matching mood-to-mood is the amateur default; friction is what the listener remembers.`,
+    short: `Deliberate contrast between what is SAID and what is PLAYED — dark words over a pretty loop, tenderness over menace, a bright major-key melody carrying a devastating lyric ("Pumped Up Kicks" / "Hey Ya" / "Semi-Charmed Life"). Use it as a deliberate SPIKE on 1-2 moments, NOT a blanket rule — most of the song can let music and lyric agree; friction is a tool you reach for, not a mandate that overrides the song's mood. When you do deploy it, commit fully — the gap between bright music and heavy words is what the listener remembers.`,
     genres: 'all'
   },
 
@@ -1530,12 +1530,12 @@ const DIRECTORS_PASS = `
 
 THE DIRECTOR'S PASS — think in levels BEFORE you write (every song, every genre):
 Great writing is thought, not decoration. Plan silently before the first line:
-1. ARC — what does the listener FEEL from section to section? Name each shift (hope→doubt→release, etc.). One moving feeling per section.
-2. THE MOVE — per section, the ONE craft move that earns that feeling (a reaction shot, a restraint, a friction, a rhyme lock). Never more than a section can hold.
-3. LEVELS — for the key moment, separate what is SAID vs. SHOWN vs. what the listener RECONSTRUCTS. Write the DEEPEST level. If you would state the feeling outright, cut it and write the thing adjacent to it instead.
-4. FOUR LAYERS IN TENSION — lyric, melody/beat, ad-libs, and space are four instruments. Decide where they PULL AGAINST each other, not merely align: where an ad-lib undercuts a line, where the music contradicts the words, where the arrangement drops so a line lands alone.
-5. THE TEST — for every standout line: "quoted alone, does it still hit, and does it make them FEEL rather than merely understand?" If it only informs, rewrite until it lands.
-Do this reasoning silently. Output only the finished song — the thinking must be VISIBLE IN THE RESULT, never printed as text.`;
+1. ARC & DISTRIBUTION — map what the listener FEELS section to section, one moving feeling each. CRUCIAL — DO NOT WARM UP: verse 1 gets your BEST, sharpest, most surprising material, never safe throat-clearing. Writers who coast early and only get brave in the back half lose the listener before the payoff. Land a standout line in the FIRST verse, hold the intensity through the MIDDLE (the usual sag point), and still escalate at the end. Peak early, mid, AND late — never a slow climb out of boring.
+2. THE MOVE & SELECTION — per section, choose the ONE craft move that earns that feeling. From the toolkit, SELECT the 3-5 devices that fit THIS song's arc and commit to them fully — a focused set honored completely beats the whole list applied halfway. Never cram every technique into one song.
+3. LEVELS — for each key moment, separate what is SAID vs. SHOWN vs. what the listener RECONSTRUCTS. Write the DEEPEST level. If you would state the feeling outright, cut it and write the thing adjacent to it instead.
+4. FOUR LAYERS IN TENSION — lyric, melody/beat, ad-libs, and space are four instruments. Decide where they PULL AGAINST each other, not merely align: an ad-lib that undercuts a line, music that contradicts the words, an arrangement that drops so a line lands alone.
+5. THE TEST — every standout line: "quoted alone, does it still hit, and does it make them FEEL rather than merely understand?" If it only informs, rewrite until it lands. Apply this test to VERSE 1 exactly as hard as the final verse.
+Do this reasoning silently. Output ONLY the finished song — never print the plan, the level labels, section reasoning, or any of this scaffold as lyric text. The thinking must be VISIBLE IN THE RESULT, invisible on the page.`;
 
 function buildLyricCraftNote(genre, mood, topic) {
   // Normalize mood: lowercase, turn hyphens/underscores into spaces, collapse
