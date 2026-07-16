@@ -1499,6 +1499,12 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
     genres: 'all'
   },
 
+  vernacularRhyme: {
+    label: 'VERNACULAR / DIALECT CHOP',
+    short: `Write to how the VOICE actually SAYS a word, not how the dictionary spells it — clip, slide, or bend the pronunciation so it does DOUBLE work: (1) unlock a rhyme the spelling would never allow, and (2) tell the listener WHO is speaking, from WHERE, in what state. The spelling is not the sound. "asking→axin'" opens "relaxin'/faxin'" and places the speaker; a g-drop ("running→runnin'") swaps the whole rhyme family (now rhymes "somethin'/comin'", not "cunning"); "here→hurr" (St. Louis), "more→mo' / for→fo' / sure→sho'" (South), "about→'bout", "them→'em/dem", "isn't it→innit" (UK), "you all→y'all / fixing to→finna" (country/South). Emotional state bends too — a grieving or drunk voice slurs and swallows consonants ("I'm→'m", "don't→'on't"). The bend is double-payload like a reaction shot: it earns the rhyme AND characterizes in one move — never say "he's a rural old-timer," write his "reckon" and "cain't." RULES: (1) the vernacular must be AUTHENTIC and CONSISTENT to the song's voice / region / genre — wrong or tourist dialect is worse than none, and caricature is a hard no; (2) don't drown the page in apostrophes — eye-dialect overload reads as mockery and kills singability; bend only where it earns a rhyme or reveals character, leave the rest clean; (3) the meaning must survive the bend. Distinct from phoneticMorph (which manufactures a homophone/pun); this is the SPEAKING VOICE as rhyme-engine and characterization at once. Country, blues, soul, reggae/dancehall, hip-hop, and folk all live on this.`,
+    genres: 'all'
+  },
+
   battleRapCraft: {
     label: 'BATTLE RAP CRAFT',
     short: `Every bar must damage a target. Six laws: (1) PERSONAL — specific and true, not generic insults; (2) REBUTTAL — flip the opponent's own words against them; (3) SCHEME CHAIN — commit to a multi for 4-8 bars, never break it mid-round; (4) THE ANGLE — one conceptual lane per round, stay in it; (5) CROWD MOMENT — one "oh shit" bar engineered per round; (6) CONSISTENCY — every bar supports the angle, no off-topic bars.`,
