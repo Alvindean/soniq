@@ -1481,6 +1481,12 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
     genres: 'all'
   },
 
+  adlibRhymeButton: {
+    label: 'AD-LIB AS RHYME / PUNCHLINE BUTTON',
+    short: `Make the ad-lib LOAD-BEARING — the main bar sets up and leaves a gap, and the ad-lib SNAPS it shut: it lands the rhyme word, completes the punchline, or hits like a drummer's rimshot after a joke. The lead voice throws, the ad-lib catches. Three shapes: (1) RHYME COMPLETION — the bar's rhyme is delivered BY the ad-lib in the pocket, so the line feels unfinished without it ("Said she'd be right back, gave me her word — / (that was March)"); (2) PUNCHLINE BUTTON — the setup runs on the bar, the ad-lib is the payoff word/sound that makes it land ("Told her I'm a catch — / (gone fishin')"); (3) RIMSHOT — a percussive ad-lib (brr / skrrt / what / ha / uh) that buttons the bar like ba-dum-tss, the hype or comedic punctuation. Migos, DMX, Waka, Carti, 50 Cent, and comedy-rap all live here; country and pop use the button/rimshot too. RULES: (1) the setup must LEAVE ROOM — write the bar so the ad-lib is the RESOLUTION, not a redundant echo of the last word; (2) the ad-lib carries the stress/rhyme, so place it on the beat the rhyme wants; (3) vary it — not every bar gets a button or it becomes a tic; save it for the lines that most want the snap. Pairs with adlibCounterVoice — that one COMMENTS on the bar, this one COMPLETES it.`,
+    genres: 'all'
+  },
+
   negativeSpace: {
     label: 'NEGATIVE SPACE',
     short: `Leave the music OPEN so a line can land — silence and drop-outs are punctuation. The most important line often hits hardest with the beat stripped beneath it (the anti-drop cousin). RULE: mark 1-2 moments per song where the arrangement should THIN or DROP so the lyric carries alone, and note it in the structure/production tags. What you don't play frames what you do.`,
