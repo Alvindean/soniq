@@ -5159,8 +5159,8 @@ const FLOW_POCKET_LENSES = [
 ];
 
 // Genre relevance — raw genre keys as used elsewhere in this file.
-const POCKET_GENRES     = new Set(['hiphop','rnb','pop','country','ss','folk','jazz','funk','soul','reggae','blues','gospel','latin','afrobeats','rock','altrock']);
-const ENJAMB_GENRES     = new Set(['hiphop','ss','folk','country','pop','rnb','rock','altrock','gospel','blues','jazz','tvmusical','indie']);
+const POCKET_GENRES     = new Set(['hiphop','rnb','pop','country','ss','folk','jazz','reggae','blues','gospel','latin','afrobeats','rock','altrock']);
+const ENJAMB_GENRES     = new Set(['hiphop','ss','folk','country','pop','rnb','rock','altrock','gospel','blues','jazz','tvmusical']);
 const DOUBLETIME_GENRES = new Set(['hiphop','tvmusical','folk','country','pop']);
 
 // Returns a concatenated directive string (may be '') for the given genre key.
@@ -5168,16 +5168,18 @@ const DOUBLETIME_GENRES = new Set(['hiphop','tvmusical','folk','country','pop'])
 // devices vary take-to-take instead of firing as a rigid checklist every time.
 function buildFlowCraftNotes(genreKey) {
   const g = String(genreKey || '').toLowerCase();
-  let out = '';
+  const out = [];
   if (POCKET_GENRES.has(g)) {
     const p = pickRandom(FLOW_POCKET_LENSES);
-    out += `\n\nFLOW POCKET — "${p.name}" (WHERE the voice sits against the beat — placement, not speed or rhyme density):\n${p.rule}\nThis is RHYTHMIC PLACEMENT: a simple line hits hard when the pocket is right. Hold this feel as the section default; you may break it once for a specific moment, then return to it.`;
+    out.push({ id: 'flow-pocket', priority: 90, group: 'pocket', spine: null,
+      text: `\n\nFLOW POCKET — "${p.name}" (WHERE the voice sits against the beat — placement, not speed or rhyme density):\n${p.rule}\nThis is RHYTHMIC PLACEMENT: a simple line hits hard when the pocket is right. Hold this feel as the section default; you may break it once for a specific moment, then return to it.` });
   }
   if (ENJAMB_GENRES.has(g) && Math.random() < 0.55) {
     const unit = (g === 'hiphop') ? 'bar line' : 'line / phrase break';
     const models = (g === 'hiphop') ? 'wrap the sentence over the bar (Eminem, Black Thought, Kendrick)'
       : 'let a lyric run through the natural phrase break instead of pausing on every line (Joni Mitchell, Dylan, narrative country/folk)';
-    out += `\n\nPHRASING — ENJAMBMENT (run SOME lines past the ${unit}):\nDo NOT end-stop every line. Let a few sentences spill across the ${unit} so the grammar and the rhyme grid deliberately fall out of sync — the thought finishes mid-next-line while the rhyme still lands where it should. This creates momentum and a conversational, un-sing-song feel: ${models}. Balance it — a lyric that is ALL enjambment loses its landing points; alternate end-stopped lines with run-on ones so the run-ons have contrast to work against.`;
+    out.push({ id: 'enjambment', priority: 70, group: null, spine: null,
+      text: `\n\nPHRASING — ENJAMBMENT (run SOME lines past the ${unit}):\nDo NOT end-stop every line. Let a few sentences spill across the ${unit} so the grammar and the rhyme grid deliberately fall out of sync — the thought finishes mid-next-line while the rhyme still lands where it should. This creates momentum and a conversational, un-sing-song feel: ${models}. Balance it — a lyric that is ALL enjambment loses its landing points; alternate end-stopped lines with run-on ones so the run-ons have contrast to work against.` });
   }
   if (DOUBLETIME_GENRES.has(g) && Math.random() < 0.28) {
     const models = (g === 'hiphop') ? 'Logic, Eminem "Rap God", Twista, Tech N9ne'
@@ -5185,7 +5187,8 @@ function buildFlowCraftNotes(genreKey) {
       : (g === 'folk') ? 'Dylan "Subterranean Homesick Blues"'
       : (g === 'country') ? 'Garth Brooks "Ain\'t Going Down (\'Til the Sun Comes Up)"'
       : 'Billy Joel "We Didn\'t Start the Fire", R.E.M. "It\'s the End of the World"';
-    out += `\n\nSUSTAINED DOUBLE-TIME (one section, HELD — not a one-bar burst):\nTake ONE section (a verse or the bridge) and double the syllable rate, held for the whole section, with enunciation kept crystal-clear the entire time. The flex is sustained speed WITH clarity, never a chaotic blur (${models}). Every word must stay intelligible — if a listener couldn't catch it, slow down. Return to the normal pocket after the section so the double-time reads as a deliberate gear, not the default.`;
+    out.push({ id: 'sustained-double-time', priority: 60, group: null, spine: null,
+      text: `\n\nSUSTAINED DOUBLE-TIME (one section, HELD — not a one-bar burst):\nTake ONE section (a verse or the bridge) and double the syllable rate, held for the whole section, with enunciation kept crystal-clear the entire time. The flex is sustained speed WITH clarity, never a chaotic blur (${models}). Every word must stay intelligible — if a listener couldn't catch it, slow down. Return to the normal pocket after the section so the double-time reads as a deliberate gear, not the default.` });
   }
   return out;
 }
@@ -5202,37 +5205,42 @@ function buildFlowCraftNotes(genreKey) {
 //   5. Associative Detail Cascade — Ghostface: hyper-specific concrete-noun rush
 // ═══════════════════════════════════════════════════════════════════════════
 
-const CADENCE_FLUID_GENRES   = new Set(['hiphop','rnb','ss','pop','soul','gospel','jazz','afrobeats','reggae']);
+const CADENCE_FLUID_GENRES   = new Set(['hiphop','rnb','ss','pop','gospel','jazz','afrobeats','reggae']);
 const CHARACTER_MASK_GENRES  = new Set(['hiphop','tvmusical','ss','pop','rock','altrock','folk','country','metal']);
-const LEXICAL_GENRES         = new Set(['hiphop','ss','folk','altrock','pop','indie']);
+const LEXICAL_GENRES         = new Set(['hiphop','ss','folk','altrock','pop']);
 const HARMONIZED_FLOW_GENRES = new Set(['hiphop','rnb','gospel']);
-const DETAIL_CASCADE_GENRES  = new Set(['hiphop','country','folk','ss','rnb','rock','altrock','blues','soul']);
+const DETAIL_CASCADE_GENRES  = new Set(['hiphop','country','folk','ss','rnb','rock','altrock','blues']);
 
 function buildSignatureCraftNotes(genreKey, lyricTier) {
   const g = String(genreKey || '').toLowerCase();
   const tier = String(lyricTier || '').toLowerCase();
-  let out = '';
+  const out = [];
   // 1. CADENCE FLUIDITY (André 3000) — ~30%
   if (CADENCE_FLUID_GENRES.has(g) && Math.random() < 0.30) {
-    out += `\n\nCADENCE FLUIDITY — refuse a locked cadence (André 3000 / Lauryn Hill / Cee-Lo):\nDo NOT lock every line to the same syllable count and delivery. Let the cadence BREATHE — a long crammed line, then a short bare one; a rapped phrase that melts into a half-sung one, then a near-spoken aside. Within a single verse you may shift between rapped, sung, and spoken delivery where the emotion pulls, marking each shift with the inline tag ([Spoken], [Sung], [Half-Sung]) so the platform hears it. RULE: controlled variation, not chaos — the through-line is the FEELING; only the shapes change under it.`;
+    out.push({ id: 'cadence-fluidity', priority: 50, group: 'persona', spine: null,
+      text: `\n\nCADENCE FLUIDITY — refuse a locked cadence (André 3000 / Lauryn Hill / Cee-Lo):\nDo NOT lock every line to the same syllable count and delivery. Let the cadence BREATHE — a long crammed line, then a short bare one; a rapped phrase that melts into a half-sung one, then a near-spoken aside. Within a single verse you may shift between rapped, sung, and spoken delivery where the emotion pulls, marking each shift with the inline tag ([Spoken], [Sung], [Half-Sung]) so the platform hears it. RULE: controlled variation, not chaos — the through-line is the FEELING; only the shapes change under it.` });
   }
   // 2. CHARACTER-MASK NARRATOR (MF DOOM) — ~22%
   if (CHARACTER_MASK_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nCHARACTER-MASK NARRATOR (MF DOOM / Ghostface's "Tony Starks" / Bowie's Ziggy / Nicki's alter-egos):\nWrite the WHOLE song in the voice of a constructed character, not a straight autobiographical "I." Give the mask a clear identity — a villain, a trickster, an unreliable narrator, a persona with its own logic — and stay inside it start to finish: its diction, its blind spots, its agenda. The listener should sense a character, not the songwriter. Let the mask say a truth the plain "I" couldn't. Do NOT break character to explain — trust the listener to read between the lines.`;
+    out.push({ id: 'character-mask', priority: 50, group: 'persona', spine: null,
+      text: `\n\nCHARACTER-MASK NARRATOR (MF DOOM / Ghostface's "Tony Starks" / Bowie's Ziggy / Nicki's alter-egos):\nWrite the WHOLE song in the voice of a constructed character, not a straight autobiographical "I." Give the mask a clear identity — a villain, a trickster, an unreliable narrator, a persona with its own logic — and stay inside it start to finish: its diction, its blind spots, its agenda. The listener should sense a character, not the songwriter. Let the mask say a truth the plain "I" couldn't. Do NOT break character to explain — trust the listener to read between the lines.` });
   }
   // 3. LEXICAL-DENSITY / RARE-WORD IMAGISM (Aesop Rock) — opt-in via deep tiers, else rare
   const _lexOn = LEXICAL_GENRES.has(g) &&
     ((tier === 'archival' || tier === 'conscious') ? Math.random() < 0.45 : Math.random() < 0.10);
   if (_lexOn) {
-    out += `\n\nLEXICAL-DENSITY / RARE-WORD IMAGISM (Aesop Rock / Joanna Newsom / early Joni Mitchell):\nReach past the common word for the exact, unexpected one — favor precise, rarely-used vocabulary and abstract image-collage over plain literal narrative. Build meaning through layered, associative imagery rather than a clean storyline; the song becomes a dense verbal painting decoded over repeat plays. RULES: (1) every rare word must be the RIGHT word — precision, never thesaurus-flexing; (2) keep it singable — sound and rhythm still rule; (3) at least one concrete anchor per section so the abstraction has ground to stand on. Use this register deliberately — the "difficult, rewarding" lane, not the radio lane.`;
+    out.push({ id: 'lexical-density', priority: 50, group: 'register', spine: null,
+      text: `\n\nLEXICAL-DENSITY / RARE-WORD IMAGISM (Aesop Rock / Joanna Newsom / early Joni Mitchell):\nReach past the common word for the exact, unexpected one — favor precise, rarely-used vocabulary and abstract image-collage over plain literal narrative. Build meaning through layered, associative imagery rather than a clean storyline; the song becomes a dense verbal painting decoded over repeat plays. RULES: (1) every rare word must be the RIGHT word — precision, never thesaurus-flexing; (2) keep it singable — sound and rhythm still rule; (3) at least one concrete anchor per section so the abstraction has ground to stand on. Use this register deliberately — the "difficult, rewarding" lane, not the radio lane.` });
   }
   // 4. HARMONIZED FLOW (Bone Thugs) — ~25%
   if (HARMONIZED_FLOW_GENRES.has(g) && Math.random() < 0.25) {
-    out += `\n\nHARMONIZED FLOW (Bone Thugs-N-Harmony / Anderson .Paak / gospel-rap):\nDeliver the rapid/rhythmic flow ITSELF as sung, stacked harmony — not a rapped verse with a separate sung hook, but the flow lines harmonized in thirds/fifths as they rap-sing. Mark harmonized passages with [Harmony] / [Layered Vocal] tags and put "harmonized rap flow, stacked vocal thirds" in the production. Best on triplet-chained or melodic sections; keep the words intelligible under the harmony. Reserve it for a section or two (a hook or a signature verse), not the whole song.`;
+    out.push({ id: 'harmonized-flow', priority: 45, group: null, spine: null,
+      text: `\n\nHARMONIZED FLOW (Bone Thugs-N-Harmony / Anderson .Paak / gospel-rap):\nDeliver the rapid/rhythmic flow ITSELF as sung, stacked harmony — not a rapped verse with a separate sung hook, but the flow lines harmonized in thirds/fifths as they rap-sing. Mark harmonized passages with [Harmony] / [Layered Vocal] tags and put "harmonized rap flow, stacked vocal thirds" in the production. Best on triplet-chained or melodic sections; keep the words intelligible under the harmony. Reserve it for a section or two (a hook or a signature verse), not the whole song.` });
   }
   // 5. ASSOCIATIVE DETAIL CASCADE (Ghostface) — ~35%, exclusive with the abstract register
   if (!_lexOn && DETAIL_CASCADE_GENRES.has(g) && Math.random() < 0.35) {
-    out += `\n\nASSOCIATIVE DETAIL CASCADE (Ghostface Killah / Springsteen / Jason Isbell object-lists):\nIn at least one section, drop a rush of oddly SPECIFIC concrete details — brand names, exact objects, colors, foods, small physical facts — in an associative stream that hits like sensory overload and lands emotionally WITHOUT a tidy plot. The specificity IS the feeling: "the Wallabees, the bathrobe, the cold takeout on the counter" beats "I was going through it." RULES: (1) real, textured nouns only, no generic filler; (2) let the details IMPLY the story instead of explaining it; (3) 3-6 hyper-specific hits, then breathe. Precision over abstraction — the opposite lane from the rare-word register.`;
+    out.push({ id: 'detail-cascade', priority: 45, group: null, spine: null,
+      text: `\n\nASSOCIATIVE DETAIL CASCADE (Ghostface Killah / Springsteen / Jason Isbell object-lists):\nIn at least one section, drop a rush of oddly SPECIFIC concrete details — brand names, exact objects, colors, foods, small physical facts — in an associative stream that hits like sensory overload and lands emotionally WITHOUT a tidy plot. The specificity IS the feeling: "the Wallabees, the bathrobe, the cold takeout on the counter" beats "I was going through it." RULES: (1) real, textured nouns only, no generic filler; (2) let the details IMPLY the story instead of explaining it; (3) 3-6 hyper-specific hits, then breathe. Precision over abstraction — the opposite lane from the rare-word register.` });
   }
   return out;
 }
@@ -5248,35 +5256,40 @@ function buildSignatureCraftNotes(genreKey, lyricTier) {
 //   5. Coded Parallel Lexicon    — Clipse: a sustained double-language across a verse
 // ═══════════════════════════════════════════════════════════════════════════
 
-const AUTOTUNE_MELANCHOLY_GENRES = new Set(['hiphop','rnb','pop','altpop','indie']);
-const VOCALISE_HOOK_GENRES       = new Set(['hiphop','pop','rnb','altrock','indie','edm','rock']);
+const AUTOTUNE_MELANCHOLY_GENRES = new Set(['hiphop','rnb','pop','altrock']);
+const VOCALISE_HOOK_GENRES       = new Set(['hiphop','pop','rnb','altrock','edm','rock']);
 const MULTIVOICE_GENRES          = new Set(['hiphop','pop','tvmusical']);
 const CODED_LEXICON_GENRES       = new Set(['hiphop','country','folk','gospel','blues']);
 
 function buildEraCraftNotes(genreKey) {
   const g = String(genreKey || '').toLowerCase();
-  let out = '';
+  const out = [];
   // 1. AUTO-TUNE MELANCHOLY (Kanye 808s) — ~20%
   if (AUTOTUNE_MELANCHOLY_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nAUTO-TUNE MELANCHOLY (Kanye "808s & Heartbreak" lineage → Drake / The Weeknd / Juice WRLD):\nThe vocal is SUNG through Auto-Tune for raw VULNERABILITY, not flex — numb, heartbroken, robotic-sad. Melody carries the ache; the pitch-correction makes it sound emotionally frozen. Keep the lyric bare and confessional with lots of space. Mark sung passages [Auto-Tune] / [Melodic] inline.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "auto-tuned melodic vocal, melancholic, sparse booming 808 drums, cavernous reverb, emotional minimalism".`;
+    out.push({ id: 'era-autotune', priority: 80, group: null, spine: 'trap-808',
+      text: `\n\nAUTO-TUNE MELANCHOLY (Kanye "808s & Heartbreak" lineage → Drake / The Weeknd / Juice WRLD):\nThe vocal is SUNG through Auto-Tune for raw VULNERABILITY, not flex — numb, heartbroken, robotic-sad. Melody carries the ache; the pitch-correction makes it sound emotionally frozen. Keep the lyric bare and confessional with lots of space. Mark sung passages [Auto-Tune] / [Melodic] inline.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "auto-tuned melodic vocal, melancholic, sparse booming 808 drums, cavernous reverb, emotional minimalism".` });
   }
   // 2. VOCALISE / HUM HOOK (Kid Cudi) — ~18%
   if (VOCALISE_HOOK_GENRES.has(g) && Math.random() < 0.18) {
-    out += `\n\nVOCALISE / HUM HOOK (Kid Cudi "Man on the Moon" → the wordless-melody hook):\nMake the hook (or one whole section) a WORDLESS melodic hum or moan — "hmm-hmm-hmmm", "na-na-naaa", a sustained "ooohh" — pure cathartic melody, no lyrics. It should be the most hummable moment in the song. Pair it with interior, lonely, searching verse lyrics. Mark it [Hum] / [Vocalise] / [Wordless Melody].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "wordless hummed melodic hook, vocalise, reverb-soaked atmosphere".`;
+    out.push({ id: 'era-vocalise', priority: 40, group: null, spine: null,
+      text: `\n\nVOCALISE / HUM HOOK (Kid Cudi "Man on the Moon" → the wordless-melody hook):\nMake the hook (or one whole section) a WORDLESS melodic hum or moan — "hmm-hmm-hmmm", "na-na-naaa", a sustained "ooohh" — pure cathartic melody, no lyrics. It should be the most hummable moment in the song. Pair it with interior, lonely, searching verse lyrics. Mark it [Hum] / [Vocalise] / [Wordless Melody].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "wordless hummed melodic hook, vocalise, reverb-soaked atmosphere".` });
   }
   // 3. MULTI-VOICE / ACCENT SWITCHING (Nicki) — ~18%
   if (MULTIVOICE_GENRES.has(g) && Math.random() < 0.18) {
-    out += `\n\nMULTI-VOICE / ACCENT SWITCHING (Nicki Minaj "Roman" / "Monster" → theatrical vocal shifts):\nSwitch VOICE mid-verse — a low growl for menace, a high cartoonish squeak for mockery, a put-on accent (British, Valley-girl, cartoon-villain) for a character beat, then snap back. Each switch voices a different attitude within the same verse. Mark every shift with an inline delivery tag, e.g. [Growl], [High Cartoon Voice], [British Accent], [Whispered], so the platform performs the change. Distinct from the character-MASK device (one persona held all song) — this is RAPID switching between several. Keep it purposeful: 2-3 switches that land, not a costume change every line.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST reference — "multiple vocal characters, sudden register and accent switches, theatrical delivery".`;
+    out.push({ id: 'era-multivoice', priority: 50, group: 'persona', spine: null,
+      text: `\n\nMULTI-VOICE / ACCENT SWITCHING (Nicki Minaj "Roman" / "Monster" → theatrical vocal shifts):\nSwitch VOICE mid-verse — a low growl for menace, a high cartoonish squeak for mockery, a put-on accent (British, Valley-girl, cartoon-villain) for a character beat, then snap back. Each switch voices a different attitude within the same verse. Mark every shift with an inline delivery tag, e.g. [Growl], [High Cartoon Voice], [British Accent], [Whispered], so the platform performs the change. Distinct from the character-MASK device (one persona held all song) — this is RAPID switching between several. Keep it purposeful: 2-3 switches that land, not a costume change every line.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST reference — "multiple vocal characters, sudden register and accent switches, theatrical delivery".` });
   }
   // 4. ASSOCIATIVE PUNCHLINE DRIFT (Lil Wayne) — hiphop only, ~24%
   if (g === 'hiphop' && Math.random() < 0.24) {
-    out += `\n\nASSOCIATIVE PUNCHLINE DRIFT (Lil Wayne mixtape run — "Da Drought 3" / "Carter III"):\nRun a chain of punchlines where each line is its OWN standalone flex or joke and the glue between lines is VIBE, not subject — the topic drifts freely (weapon → weather → wordplay → wealth), held together only by attitude and the rhyme. Every line must be quotable alone. Let one word trigger the next line's image by sound or double-meaning, then jump. Do NOT force a narrative — the drift IS the style.\nPRODUCTION: optionally add "raspy, textured lead vocal" to the SONG PROMPT if a rougher vocal grain fits the mood.`;
+    out.push({ id: 'era-punchline-drift', priority: 40, group: null, spine: null,
+      text: `\n\nASSOCIATIVE PUNCHLINE DRIFT (Lil Wayne mixtape run — "Da Drought 3" / "Carter III"):\nRun a chain of punchlines where each line is its OWN standalone flex or joke and the glue between lines is VIBE, not subject — the topic drifts freely (weapon → weather → wordplay → wealth), held together only by attitude and the rhyme. Every line must be quotable alone. Let one word trigger the next line's image by sound or double-meaning, then jump. Do NOT force a narrative — the drift IS the style.\nPRODUCTION: optionally add "raspy, textured lead vocal" to the SONG PROMPT if a rougher vocal grain fits the mood.` });
   }
   // 5. CODED PARALLEL LEXICON (Clipse / Pusha T) — ~20%
   if (CODED_LEXICON_GENRES.has(g) && Math.random() < 0.20) {
     const models = (g === 'hiphop') ? 'Clipse "Hell Hath No Fury" / Pusha T coded coke-rap'
       : 'the coded protest / gospel / murder-ballad tradition — sing one thing, mean another';
-    out += `\n\nCODED PARALLEL LEXICON (${models}):\nBuild the verse on a SUSTAINED double meaning — a surface vocabulary (luxury, cooking, weather, farming, church) where nearly every image also decodes to a hidden second subject. Not one double-entendre bar — a whole PARALLEL LANGUAGE held across the section, so an attentive listener realizes the entire verse has been saying two things at once. RULES: (1) the surface reading must fully cohere on its own; (2) the coded reading must be consistent, not random; (3) never explain the code — the discovery is the reward. Pick ONE surface domain and stay disciplined inside it.`;
+    out.push({ id: 'era-coded-lexicon', priority: 40, group: null, spine: null,
+      text: `\n\nCODED PARALLEL LEXICON (${models}):\nBuild the verse on a SUSTAINED double meaning — a surface vocabulary (luxury, cooking, weather, farming, church) where nearly every image also decodes to a hidden second subject. Not one double-entendre bar — a whole PARALLEL LANGUAGE held across the section, so an attentive listener realizes the entire verse has been saying two things at once. RULES: (1) the surface reading must fully cohere on its own; (2) the coded reading must be consistent, not random; (3) never explain the code — the discovery is the reward. Pick ONE surface domain and stay disciplined inside it.` });
   }
   return out;
 }
@@ -5295,47 +5308,57 @@ const SCHEME_GENRES      = new Set(['pop','rock']);
 const REBUTTAL_GENRES    = new Set(['pop','rock','altrock','rnb','country']);
 const TITLE_TURN_GENRES  = new Set(['country','pop','folk','ss','rock']);
 const TWIST_END_GENRES   = new Set(['country','folk','ss','pop','rnb']);
-const PLAINSPOKEN_GENRES = new Set(['country','folk','ss','rock','gospel','blues','americana']);
-const MELISMA_GENRES     = new Set(['rnb','gospel','pop','soul']);
-const HARMONY_WALL_GENRES= new Set(['rnb','gospel','soul','pop','rock']);
-const SPOKEN_INTIMACY_GENRES = new Set(['rnb','soul','pop','hiphop','gospel']);
-const QUIET_STORM_GENRES = new Set(['rnb','soul','jazz','altrnb']);
+const PLAINSPOKEN_GENRES = new Set(['country','folk','ss','rock','gospel','blues']);
+const MELISMA_GENRES     = new Set(['rnb','gospel','pop']);
+const HARMONY_WALL_GENRES= new Set(['rnb','gospel','pop','rock']);
+const SPOKEN_INTIMACY_GENRES = new Set(['rnb','pop','hiphop','gospel']);
+const QUIET_STORM_GENRES = new Set(['rnb','jazz']);
 
 function buildStyleCraftNotes(genreKey) {
   const g = String(genreKey || '').toLowerCase();
-  let out = '';
+  const out = [];
   // ── BATTLE RAP (3) ──
   if (ANGLE_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nTHE ANGLE — direct-address takedown (battle-rap core → diss tracks, kiss-off breakups, protest, roast):\nAim the WHOLE verse at a specific "you" and dismantle them with concrete, personal specifics — never vague insults. Name real details (habits, contradictions, failures) so it feels aimed, not generic. Second person throughout. A small precise detail cuts deeper than a big vague one. Cross-genre: point it at an ex (kiss-off song), a public figure (protest), a rival, or a past version of yourself. RULE: specific-and-personal beats loud-and-general.`;
+    out.push({ id: 'style-angle', priority: 40, group: null, spine: null,
+      text: `\n\nTHE ANGLE — direct-address takedown (battle-rap core → diss tracks, kiss-off breakups, protest, roast):\nAim the WHOLE verse at a specific "you" and dismantle them with concrete, personal specifics — never vague insults. Name real details (habits, contradictions, failures) so it feels aimed, not generic. Second person throughout. A small precise detail cuts deeper than a big vague one. Cross-genre: point it at an ex (kiss-off song), a public figure (protest), a rival, or a past version of yourself. RULE: specific-and-personal beats loud-and-general.` });
   }
   if (SCHEME_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nTHE SCHEME — a wordplay run built to a haymaker (Loaded Lux / Rum Nitty / battle-rap lineage):\nLock ONE domain (guns, chess, medicine, cards, weather) for 4-8 bars and make EVERY line a double-meaning inside it that ALSO lands a shot — the vocabulary is weaponized, each bar tightening, until a final HAYMAKER bar pays the whole scheme off. Distinct from theme-cluster (imagery only): here each image carries a covert attack. RULE: the payoff bar must recontextualize the run — if the listener doesn't go "ohhh" on the last bar, the scheme didn't land.`;
+    out.push({ id: 'style-scheme', priority: 40, group: null, spine: null,
+      text: `\n\nTHE SCHEME — a wordplay run built to a haymaker (Loaded Lux / Rum Nitty / battle-rap lineage):\nLock ONE domain (guns, chess, medicine, cards, weather) for 4-8 bars and make EVERY line a double-meaning inside it that ALSO lands a shot — the vocabulary is weaponized, each bar tightening, until a final HAYMAKER bar pays the whole scheme off. Distinct from theme-cluster (imagery only): here each image carries a covert attack. RULE: the payoff bar must recontextualize the run — if the listener doesn't go "ohhh" on the last bar, the scheme didn't land.` });
   }
   if (REBUTTAL_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nTHE REBUTTAL / FLIP — preempt and reverse (battle defense → argument songs, confidence anthems):\nVoice the shot coming AT you — the obvious criticism, the likely comeback, your own apparent weakness — then flip it into a strength or turn it back in the same breath. Anticipation is the flex: proving you already know what they'd say and it still doesn't touch you. Cross-genre: own the insecurity then flip it (anthem), concede a point then reverse it (argument song). RULE: state their strongest shot fairly, or the flip feels cheap.`;
+    out.push({ id: 'style-rebuttal', priority: 40, group: null, spine: null,
+      text: `\n\nTHE REBUTTAL / FLIP — preempt and reverse (battle defense → argument songs, confidence anthems):\nVoice the shot coming AT you — the obvious criticism, the likely comeback, your own apparent weakness — then flip it into a strength or turn it back in the same breath. Anticipation is the flex: proving you already know what they'd say and it still doesn't touch you. Cross-genre: own the insecurity then flip it (anthem), concede a point then reverse it (argument song). RULE: state their strongest shot fairly, or the flip feels cheap.` });
   }
   // ── COUNTRY (3) ──
   if (TITLE_TURN_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nTITLE-TURN HOOK — the idiom-flip that IS the song (country signature → pop, folk, novelty):\nBuild the hook on a turned phrase, pun, or idiom that reframes the whole song in one line — the title doing double duty (literal + emotional). The verses set up the ordinary meaning; the hook reveals the second. RULE: the turn must feel DISCOVERED, not forced — a real idiom bent naturally, never a groan-pun.`;
+    out.push({ id: 'style-title-turn', priority: 40, group: null, spine: null,
+      text: `\n\nTITLE-TURN HOOK — the idiom-flip that IS the song (country signature → pop, folk, novelty):\nBuild the hook on a turned phrase, pun, or idiom that reframes the whole song in one line — the title doing double duty (literal + emotional). The verses set up the ordinary meaning; the hook reveals the second. RULE: the turn must feel DISCOVERED, not forced — a real idiom bent naturally, never a groan-pun.` });
   }
   if (TWIST_END_GENRES.has(g) && Math.random() < 0.18) {
-    out += `\n\nTWIST-ENDING STORY — the final-verse reveal (country story-song → folk, singer-songwriter, narrative pop):\nStructure the song so the LAST verse recontextualizes everything before it — a death, a secret, a time-jump, a reveal that reframes the earlier verses in a heavier light. Plant the clues early and innocent; pay them off at the end. The chorus can mean one thing in verse 1 and something devastating by the last chorus. RULE: the twist must be EARNED by details already present — a cheat reveal (info withheld unfairly) breaks the contract.`;
+    out.push({ id: 'style-twist-end', priority: 40, group: null, spine: null,
+      text: `\n\nTWIST-ENDING STORY — the final-verse reveal (country story-song → folk, singer-songwriter, narrative pop):\nStructure the song so the LAST verse recontextualizes everything before it — a death, a secret, a time-jump, a reveal that reframes the earlier verses in a heavier light. Plant the clues early and innocent; pay them off at the end. The chorus can mean one thing in verse 1 and something devastating by the last chorus. RULE: the twist must be EARNED by details already present — a cheat reveal (info withheld unfairly) breaks the contract.` });
   }
   if (PLAINSPOKEN_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nPLAINSPOKEN ADDRESS — the front-porch register (country / Americana → folk, roots, singer-songwriter):\nWrite in plain, direct, unpretentious diction — talking TO the listener like a neighbor on the porch, not performing at them. No ornate vocabulary, no forced cleverness; the power is honest, concrete, conversational language and one true detail. The OPPOSITE of the rare-word register — accessibility as craft. RULE: every line should sound like something a real person would actually say out loud.`;
+    out.push({ id: 'style-plainspoken', priority: 50, group: 'register', spine: null,
+      text: `\n\nPLAINSPOKEN ADDRESS — the front-porch register (country / Americana → folk, roots, singer-songwriter):\nWrite in plain, direct, unpretentious diction — talking TO the listener like a neighbor on the porch, not performing at them. No ornate vocabulary, no forced cleverness; the power is honest, concrete, conversational language and one true detail. The OPPOSITE of the rare-word register — accessibility as craft. RULE: every line should sound like something a real person would actually say out loud.` });
   }
   // ── R&B (4) ──
   if (MELISMA_GENRES.has(g) && Math.random() < 0.25) {
-    out += `\n\nMELISMATIC RUN — the R&B vocal run/riff (Whitney / Mariah / Brandy / Beyoncé → gospel, pop):\nOn key emotional words, bend a single syllable across multiple notes (the melisma), and build to a riff-and-run climax in the final chorus or outro where the vocalist improvises melodic runs over the hook. Reserve the biggest runs for the peak so they read as release, not decoration. Mark them [Melisma] / [Vocal Run] / [Riff].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "melismatic vocal runs, riff-and-run ad-libs, powerhouse vocal climax".`;
+    out.push({ id: 'style-melisma', priority: 40, group: null, spine: null,
+      text: `\n\nMELISMATIC RUN — the R&B vocal run/riff (Whitney / Mariah / Brandy / Beyoncé → gospel, pop):\nOn key emotional words, bend a single syllable across multiple notes (the melisma), and build to a riff-and-run climax in the final chorus or outro where the vocalist improvises melodic runs over the hook. Reserve the biggest runs for the peak so they read as release, not decoration. Mark them [Melisma] / [Vocal Run] / [Riff].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "melismatic vocal runs, riff-and-run ad-libs, powerhouse vocal climax".` });
   }
   if (HARMONY_WALL_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nSTACKED HARMONY WALL — layered background vocals (Boyz II Men / Brandy "vocal bible" / Jodeci → gospel, soul, pop):\nArrange lush stacked background harmonies (thirds and fifths, plus the occasional close cluster) that answer the lead and swell on the hook — a wall of the singer's own layered voice. The backgrounds are an instrument: they respond, build, drop out for a solo line, then flood back. Mark [Harmony] / [Background Vocals] / [Vocal Stack].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "lush stacked background harmonies, layered vocal wall, call-and-response backing vocals".`;
+    out.push({ id: 'style-harmony-wall', priority: 40, group: null, spine: null,
+      text: `\n\nSTACKED HARMONY WALL — layered background vocals (Boyz II Men / Brandy "vocal bible" / Jodeci → gospel, soul, pop):\nArrange lush stacked background harmonies (thirds and fifths, plus the occasional close cluster) that answer the lead and swell on the hook — a wall of the singer's own layered voice. The backgrounds are an instrument: they respond, build, drop out for a solo line, then flood back. Mark [Harmony] / [Background Vocals] / [Vocal Stack].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "lush stacked background harmonies, layered vocal wall, call-and-response backing vocals".` });
   }
   if (SPOKEN_INTIMACY_GENRES.has(g) && Math.random() < 0.16) {
-    out += `\n\nSPOKEN INTIMACY INTERLUDE — "the talk" (Barry White / late-night R&B → soul, pop, hip-hop skits):\nDrop a short spoken-word passage — intimate, conversational, close-mic — where the singer stops singing and just TALKS to the person: a confession, a seduction, a plea, a promise. It breaks the fourth wall of melody and lands as raw honesty. Keep it real and specific, never cheesy. Mark it [Spoken]. Cross-genre: a confessional aside in pop, a preacher-aside in gospel, a skit in hip-hop.`;
+    out.push({ id: 'style-spoken-intimacy', priority: 40, group: null, spine: null,
+      text: `\n\nSPOKEN INTIMACY INTERLUDE — "the talk" (Barry White / late-night R&B → soul, pop, hip-hop skits):\nDrop a short spoken-word passage — intimate, conversational, close-mic — where the singer stops singing and just TALKS to the person: a confession, a seduction, a plea, a promise. It breaks the fourth wall of melody and lands as raw honesty. Keep it real and specific, never cheesy. Mark it [Spoken]. Cross-genre: a confessional aside in pop, a preacher-aside in gospel, a skit in hip-hop.` });
   }
   if (QUIET_STORM_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nQUIET-STORM REGISTER — slow-jam intimacy (Sade / Maxwell / D'Angelo → soul, alt-R&B, jazz):\nWrite in a hushed, sensual, restrained register — close-mic, lots of space, the lyric breathing between phrases, nothing oversung. Sensuality through UNDERSTATEMENT: warmth, patience, one held image instead of ten. The vocal sits low and intimate, more felt than performed.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "quiet storm, intimate close-mic vocal, sparse warm arrangement, slow-jam, understated".`;
+    out.push({ id: 'style-quiet-storm', priority: 50, group: 'register', spine: null,
+      text: `\n\nQUIET-STORM REGISTER — slow-jam intimacy (Sade / Maxwell / D'Angelo → soul, alt-R&B, jazz):\nWrite in a hushed, sensual, restrained register — close-mic, lots of space, the lyric breathing between phrases, nothing oversung. Sensuality through UNDERSTATEMENT: warmth, patience, one held image instead of ten. The vocal sits low and intimate, more felt than performed.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "quiet storm, intimate close-mic vocal, sparse warm arrangement, slow-jam, understated".` });
   }
   return out;
 }
@@ -5359,36 +5382,45 @@ const MOSH_CALL_GENRES     = new Set(['metal','rock','punk','altrock','hiphop'])
 
 function buildRetroCraftNotes(genreKey) {
   const g = String(genreKey || '').toLowerCase();
-  let out = '';
+  const out = [];
   // ── LATE-90s RAP (3) ──
   if (INTERP_HOOK_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nINTERPOLATION HOOK — the chorus rides a familiar melody (late-90s Bad Boy / Puff Daddy → pop & R&B sampling tradition):\nAnchor the hook to a melody that feels instantly familiar and nostalgic — a singsong the listener half-knows — so the chorus lands on first listen while the verses stay new. Since a real song can't be named or cleared, DESCRIBE the melodic feel ("a soaring 80s-soul chorus melody", "a nursery-rhyme-simple singsong lift") and put that description in the SONG PROMPT. RULE: the familiar-feeling melody must recontextualize the new lyric, not just bait nostalgia.`;
+    out.push({ id: 'retro-interp-hook', priority: 40, group: null, spine: null,
+      text: `\n\nINTERPOLATION HOOK — the chorus rides a familiar melody (late-90s Bad Boy / Puff Daddy → pop & R&B sampling tradition):\nAnchor the hook to a melody that feels instantly familiar and nostalgic — a singsong the listener half-knows — so the chorus lands on first listen while the verses stay new. Since a real song can't be named or cleared, DESCRIBE the melodic feel ("a soaring 80s-soul chorus melody", "a nursery-rhyme-simple singsong lift") and put that description in the SONG PROMPT. RULE: the familiar-feeling melody must recontextualize the new lyric, not just bait nostalgia.` });
   }
   if (MAFIOSO_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nMAFIOSO LUXURY NARRATIVE (Raekwon "Cuban Linx" / Jay-Z "Reasonable Doubt" / Nas):\nNarrate from inside a world of aspirational crime-luxury — tailored suits, imported cars, ocean views, brand-name opulence — with a cold undertone of danger and consequence beneath the glamour. Godfather / Scarface framing: power, loyalty, paranoia, the price of the life. Specific brands and textures sell it; the menace is implied, never cartoonish. RULE: the luxury and the dread must coexist inside the same image.`;
+    out.push({ id: 'retro-mafioso', priority: 40, group: null, spine: null,
+      text: `\n\nMAFIOSO LUXURY NARRATIVE (Raekwon "Cuban Linx" / Jay-Z "Reasonable Doubt" / Nas):\nNarrate from inside a world of aspirational crime-luxury — tailored suits, imported cars, ocean views, brand-name opulence — with a cold undertone of danger and consequence beneath the glamour. Godfather / Scarface framing: power, loyalty, paranoia, the price of the life. Specific brands and textures sell it; the menace is implied, never cartoonish. RULE: the luxury and the dread must coexist inside the same image.` });
   }
   if (GROWL_PRAYER_GENRES.has(g) && Math.random() < 0.18) {
-    out += `\n\nGRUFF GROWL + PRAYER DUALITY (DMX):\nPair raw, guttural aggression — a growled, barked, from-the-chest delivery — with genuine spiritual struggle: the same voice that threatens also confesses, doubts, and prays. The song swings between street menace and a raw, direct talk with God. Mark the growl [Gruff] / [Growl] and the prayer [Spoken] / [Whispered]. RULE: the prayer must be as real as the rage — the duality IS the soul of it.`;
+    out.push({ id: 'retro-growl-prayer', priority: 40, group: null, spine: null,
+      text: `\n\nGRUFF GROWL + PRAYER DUALITY (DMX):\nPair raw, guttural aggression — a growled, barked, from-the-chest delivery — with genuine spiritual struggle: the same voice that threatens also confesses, doubts, and prays. The song swings between street menace and a raw, direct talk with God. Mark the growl [Gruff] / [Growl] and the prayer [Spoken] / [Whispered]. RULE: the prayer must be as real as the rage — the duality IS the soul of it.` });
   }
   // ── LATE-90s R&B (3) ──
   if (HIPHOP_SOUL_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nHIP-HOP SOUL (Mary J. Blige / Faith Evans → the rap-soul fusion):\nSing real soul vulnerability OVER hard hip-hop drums and a looped sample — the toughness of the street meets the tenderness of the church. The voice carries pain and survival at once; the beat knocks like a rap record. Lyric is plainspoken and lived-in, not polished-pretty.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "soulful vocal over hard boom-bap hip-hop drums, looped soul sample, 90s hip-hop soul".`;
+    out.push({ id: 'retro-hiphop-soul', priority: 80, group: null, spine: 'boom-bap',
+      text: `\n\nHIP-HOP SOUL (Mary J. Blige / Faith Evans → the rap-soul fusion):\nSing real soul vulnerability OVER hard hip-hop drums and a looped sample — the toughness of the street meets the tenderness of the church. The voice carries pain and survival at once; the beat knocks like a rap record. Lyric is plainspoken and lived-in, not polished-pretty.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "soulful vocal over hard boom-bap hip-hop drums, looped soul sample, 90s hip-hop soul".` });
   }
   if (TIMBALAND_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nTIMBALAND STUTTER-BOUNCE (Timbaland / Missy / Aaliyah → futuristic R&B-pop):\nBuild on a syncopated, hiccupping rhythm with lots of SPACE — the beat stutters and skips, leaving gaps the vocal dances around. Use vocal percussion and mouth-sounds (beatbox clicks, "hee", breaths, tics) as instruments woven into the groove. Off-kilter, minimal, futuristic.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "syncopated stutter-bounce beat, vocal percussion, spacious minimal futuristic R&B, hiccup rhythm".`;
+    out.push({ id: 'retro-timbaland', priority: 80, group: null, spine: 'stutter-electronic',
+      text: `\n\nTIMBALAND STUTTER-BOUNCE (Timbaland / Missy / Aaliyah → futuristic R&B-pop):\nBuild on a syncopated, hiccupping rhythm with lots of SPACE — the beat stutters and skips, leaving gaps the vocal dances around. Use vocal percussion and mouth-sounds (beatbox clicks, "hee", breaths, tics) as instruments woven into the groove. Off-kilter, minimal, futuristic.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "syncopated stutter-bounce beat, vocal percussion, spacious minimal futuristic R&B, hiccup rhythm".` });
   }
   if (NEOSOUL_GROOVE_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nNEO-SOUL ORGANIC GROOVE (D'Angelo "Voodoo" / Erykah Badu / Lauryn Hill):\nSit the whole track in a live, warm, slightly-drunk BEHIND-THE-BEAT pocket — Rhodes piano, jazzy 7th and 9th chords, real drums with human swing and imperfection, fat unhurried bass. The vocal is conversational and lived-in, floating just behind the groove. The looseness IS the feel — nothing quantized or shiny.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "neo-soul, live behind-the-beat drunk swing, Rhodes, jazzy 7th and 9th chords, warm organic, unquantized".`;
+    out.push({ id: 'retro-neosoul-groove', priority: 80, group: 'pocket', spine: 'acoustic-organic',
+      text: `\n\nNEO-SOUL ORGANIC GROOVE (D'Angelo "Voodoo" / Erykah Badu / Lauryn Hill):\nSit the whole track in a live, warm, slightly-drunk BEHIND-THE-BEAT pocket — Rhodes piano, jazzy 7th and 9th chords, real drums with human swing and imperfection, fat unhurried bass. The vocal is conversational and lived-in, floating just behind the groove. The looseness IS the feel — nothing quantized or shiny.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "neo-soul, live behind-the-beat drunk swing, Rhodes, jazzy 7th and 9th chords, warm organic, unquantized".` });
   }
   // ── 2000s NU-METAL (3) ──
   if (NUMB_RAGE_GENRES.has(g) && Math.random() < 0.22) {
-    out += `\n\nNUMB-TO-RAGE DYNAMIC (nu-metal / Linkin Park → emo, post-grunge, dark-pop like Billie Eilish):\nBuild the song on a dissociation-to-detonation arc — the verse is quiet, numb, dissociated, almost flat/whispered; the chorus EXPLODES into cathartic release (belted, screamed, or a wall of sound). The contrast IS the emotion: the number the verse, the harder the chorus hits. Mark the shift with dynamic tags. RULE: the verse must feel genuinely SUPPRESSED so the chorus reads as a dam breaking.`;
+    out.push({ id: 'retro-numb-rage', priority: 40, group: null, spine: null,
+      text: `\n\nNUMB-TO-RAGE DYNAMIC (nu-metal / Linkin Park → emo, post-grunge, dark-pop like Billie Eilish):\nBuild the song on a dissociation-to-detonation arc — the verse is quiet, numb, dissociated, almost flat/whispered; the chorus EXPLODES into cathartic release (belted, screamed, or a wall of sound). The contrast IS the emotion: the number the verse, the harder the chorus hits. Mark the shift with dynamic tags. RULE: the verse must feel genuinely SUPPRESSED so the chorus reads as a dam breaking.` });
   }
   if (RAGE_SCAT_GENRES.has(g) && Math.random() < 0.18) {
-    out += `\n\nRAGE-SCAT / VOCAL-AS-WEAPON (Korn's Jonathan Davis → metalcore, industrial):\nIn the most intense section, abandon clean words for raw vocalized anguish — guttural scatting, wordless syllables, a within-a-single-line slide from whisper to scream. The voice becomes a SYMBOL of the feeling rather than a carrier of literal meaning. Mark it [Scat] / [Whisper-to-Scream] / [Guttural]. RULE: use it as the PEAK release, not throughout — one section where language fails and only sound remains.`;
+    out.push({ id: 'retro-rage-scat', priority: 40, group: null, spine: null,
+      text: `\n\nRAGE-SCAT / VOCAL-AS-WEAPON (Korn's Jonathan Davis → metalcore, industrial):\nIn the most intense section, abandon clean words for raw vocalized anguish — guttural scatting, wordless syllables, a within-a-single-line slide from whisper to scream. The voice becomes a SYMBOL of the feeling rather than a carrier of literal meaning. Mark it [Scat] / [Whisper-to-Scream] / [Guttural]. RULE: use it as the PEAK release, not throughout — one section where language fails and only sound remains.` });
   }
   if (MOSH_CALL_GENRES.has(g) && Math.random() < 0.20) {
-    out += `\n\nBREAKDOWN MOSH-CALL (nu-metal / metalcore / hardcore → rap-metal):\nEngineer one half-time BREAKDOWN section — the tempo drops to a heavy, chugging, palm-muted stomp — with a shouted call-to-action over it ("get up!", "let's go!", "one more time!", a group shout) built to detonate a live pit. Simple, rhythmic, physical; lyrics minimal and percussive. Mark it [Breakdown] / [Half-Time Chug] / [Group Shout].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "half-time breakdown, palm-muted chug, group shout, mosh-pit energy".`;
+    out.push({ id: 'retro-mosh-call', priority: 40, group: null, spine: null,
+      text: `\n\nBREAKDOWN MOSH-CALL (nu-metal / metalcore / hardcore → rap-metal):\nEngineer one half-time BREAKDOWN section — the tempo drops to a heavy, chugging, palm-muted stomp — with a shouted call-to-action over it ("get up!", "let's go!", "one more time!", a group shout) built to detonate a live pit. Simple, rhythmic, physical; lyrics minimal and percussive. Mark it [Breakdown] / [Half-Time Chug] / [Group Shout].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "half-time breakdown, palm-muted chug, group shout, mosh-pit energy".` });
   }
   return out;
 }
@@ -5405,6 +5437,10 @@ function buildRetroCraftNotes(genreKey) {
 
 const RHYTHM_DONORS = new Set(['hiphop']);
 const MELODIC_HOSTS = new Set(['ss','folk','pop','rnb','neosoul','country','jazz','gospel','blues']);
+// REVERSE direction: a melodic PRIMARY genre sung OVER trap/hip-hop production
+// (Post Malone / Lil Nas X / Juice WRLD / Shaboozey). Subset of the hosts that
+// naturally carry a big sung topline over an 808 beat.
+const MELODIC_DONORS = new Set(['folk','country','pop','ss','rnb','neosoul']);
 const TRANSPLANT_HOST_FEEL = {
   folk:'confessional folk-pop', ss:'intimate singer-songwriter', pop:'anthemic folk-pop',
   rnb:'soulful R&B', neosoul:'warm neo-soul', country:'plainspoken country narrative',
@@ -5430,28 +5466,118 @@ function _transplantLabel(host) {
   if (host === 'blues')                                    return 'Blues-Hop';
   return 'Phrasing-Transplant Hybrid';
 }
-function buildPhrasingTransplantNote(donorGenre, hostGenre) {
-  const donor = String(donorGenre || '').toLowerCase();
-  const host  = String(hostGenre  || '').toLowerCase();
-  if (!RHYTHM_DONORS.has(donor) || !MELODIC_HOSTS.has(host)) return '';
+// Label for the REVERSE direction (melodic topline over trap production).
+function _reverseTransplantLabel(host) {
+  if (host === 'country')                    return 'Country-Trap / Melodic-Trap';
+  if (host === 'folk')                       return 'Folk-Trap / Melodic-Trap';
+  if (host === 'rnb')                        return 'Melodic-Trap R&B';
+  if (host === 'neosoul')                    return 'Neo-Soul Trap / Melodic-Trap';
+  if (host === 'pop')                        return 'Melodic-Trap Pop';
+  if (host === 'ss')                         return 'Melodic-Trap';
+  return 'Melodic-Trap';
+}
+// Returns a TAGGED DIRECTIVE ARRAY (0 or 1 item). `direction` is 'forward'
+// (hip-hop phrasing over a melodic host — folk-hop family) or 'reverse'
+// (a melodic topline sung OVER trap/hip-hop production — Post Malone family).
+function buildPhrasingTransplantNote(a, b, direction) {
+  const dir = (direction === 'reverse') ? 'reverse' : 'forward';
+  if (dir === 'reverse') {
+    // a = melodic PRIMARY (donor), b = hip-hop (production host)
+    const host = String(a || '').toLowerCase();
+    if (!MELODIC_DONORS.has(host)) return [];
+    const label = _reverseTransplantLabel(host);
+    const short = label.split(' / ')[0];
+    const feel  = TRANSPLANT_HOST_FEEL[host] || 'melodic';
+    return [{
+      id: 'transplant', priority: 100, group: null, spine: 'trap-808',
+      text: `\n\n🎛️ PHRASING-TRANSPLANT RECIPE — "${label}" (${feel} melody sung OVER trap/hip-hop production — Post Malone / Lil Nas X / Juice WRLD / Shaboozey):
+This blend has ONE job — marry ${feel} SONGWRITING to TRAP / hip-hop PRODUCTION. Execute all four:
+1. TOPLINE = SUNG MELODY: deliver the song as a real SUNG melodic topline — the emotional melody, phrasing, and hooks of ${feel}, NOT rapped. The voice carries the feeling; let it soar.
+2. HOST'S HEART: keep the emotional register, songwriting, and imagery of ${feel} — confessional, specific, first-person truth (real names, places, details), melodic and heartfelt, never a hollow flex.
+3. DENSITY CONTRAST (still the engine): verses stay more melodic and conversational; the CHORUS opens the vowels wide and hands over a big, simple, singable SUNG hook. Melodic verses → huge sung hook IS the style.
+4. PRODUCTION MARRIAGE: the beat IS trap — booming 808s and rolling hi-hats — with the ${feel} melodic topline sung over the top. This is melody riding a hard trap floor, not acoustic instruments as the beat.
+PRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "${short}, booming 808 trap drums, hi-hat rolls, ${feel} melodic topline sung over trap, melodic verses, big sung hook".`,
+    }];
+  }
+  // FORWARD (existing behavior): a = hip-hop donor, b = melodic host
+  const donor = String(a || '').toLowerCase();
+  const host  = String(b || '').toLowerCase();
+  if (!RHYTHM_DONORS.has(donor) || !MELODIC_HOSTS.has(host)) return [];
   const label = _transplantLabel(host);
   const short = label.split(' / ')[0];
   const feel  = TRANSPLANT_HOST_FEEL[host]  || 'melodic';
   const instr = TRANSPLANT_HOST_INSTR[host] || 'organic acoustic instrumentation played rhythmically';
-  return `\n\n🎛️ PHRASING-TRANSPLANT RECIPE — "${label}" (hip-hop-phrased ${feel}):
+  return [{
+    id: 'transplant', priority: 100, group: null, spine: 'acoustic-organic',
+    text: `\n\n🎛️ PHRASING-TRANSPLANT RECIPE — "${label}" (hip-hop-phrased ${feel}):
 This blend has ONE job — marry hip-hop PHRASING to ${feel} SONGWRITING. Execute all four:
 1. VERSES = TALK-SING: deliver verses as rhythmic, conversational speech, not sung melody — tight rhythm, loose pitch. Pack them with words, internal rhyme, and assonance, riding the groove the way a rapper rides a beat. Sit BEHIND the beat; let lines run on / enjamb so it pours out like real talk.
 2. HOST'S HEART: keep the emotional register, melodic sense, and imagery of ${feel} — confessional, specific, first-person truth (real names, places, details), plainspoken, never "rappy" flexing.
 3. DENSITY CONTRAST (the engine of the whole style): verses are MAXIMAL — wordy, dense, rhythmic; the CHORUS drops the word-count hard, opens the vowels wide, and hands over a big, simple, singable melodic hook. Busy verse → open hook IS the style. Save the long vowels and the real melody for the chorus.
 4. PRODUCTION MARRIAGE: NO hip-hop drums — play the acoustic instruments RHYTHMICALLY as the beat (${instr}).
-PRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "${short}, ${instr}, rhythmic talk-sung verses, big open melodic sung chorus, organic and warm, no trap drums".`;
+PRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "${short}, ${instr}, rhythmic talk-sung verses, big open melodic sung chorus, organic and warm, no trap drums".`,
+  }];
 }
-// Order-tolerant detector: returns the recipe if {a,b} is a donor×host pair.
-function buildTransplantForPair(a, b) {
-  const A = String(a || '').toLowerCase(), B = String(b || '').toLowerCase();
-  if (RHYTHM_DONORS.has(A) && MELODIC_HOSTS.has(B)) return buildPhrasingTransplantNote(A, B);
-  if (RHYTHM_DONORS.has(B) && MELODIC_HOSTS.has(A)) return buildPhrasingTransplantNote(B, A);
-  return '';
+// Direction-aware detector (first arg = PRIMARY genre). Returns a tagged array.
+// FORWARD when hip-hop is primary over a melodic host; REVERSE when a melodic
+// donor is primary and hip-hop is secondary; forward fallback preserves the old
+// order-tolerant behavior for melodic hosts outside the reverse-donor set.
+function buildTransplantForPair(primary, secondary) {
+  const P = String(primary || '').toLowerCase();
+  const S = String(secondary || '').toLowerCase();
+  // FORWARD — hip-hop phrasing over a melodic host (folk-hop family)
+  if (RHYTHM_DONORS.has(P) && MELODIC_HOSTS.has(S)) return buildPhrasingTransplantNote(P, S, 'forward');
+  // REVERSE — a melodic donor sung over trap/hip-hop production (Post Malone family)
+  if (MELODIC_DONORS.has(P) && RHYTHM_DONORS.has(S)) return buildPhrasingTransplantNote(P, S, 'reverse');
+  // Order-tolerant fallback: any melodic host (incl. jazz/gospel/blues) + hip-hop → forward
+  if (MELODIC_HOSTS.has(P) && RHYTHM_DONORS.has(S)) return buildPhrasingTransplantNote(S, P, 'forward');
+  return [];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CRAFT ASSEMBLER — merges the tagged directive arrays from every craft helper
+// through four guardrails so the injected block never over-fills or self-
+// contradicts: (1) dedupe by id (fixes fusion double-injection), (2) production-
+// SPINE owner (one drum/beat assertion wins; conflicting spines dropped),
+// (3) MUTEX groups (one member per group: pocket / register / persona),
+// (4) budget cap by priority. Returns the concatenated .text string.
+// ═══════════════════════════════════════════════════════════════════════════
+function assembleCraft(arrays, opts) {
+  const budget = (opts && typeof opts.budget === 'number') ? opts.budget : 4;
+  // 0. flatten (accept array-of-arrays; tolerate stray falsy / non-array entries)
+  const flat = [];
+  for (const arr of (arrays || [])) {
+    if (!Array.isArray(arr)) continue;
+    for (const d of arr) { if (d && typeof d.text === 'string' && d.text) flat.push(d); }
+  }
+  // 1. dedupe by id — keep the highest-priority instance (first-seen wins on ties)
+  const byId = new Map();
+  for (const d of flat) {
+    const ex = byId.get(d.id);
+    if (!ex || (d.priority || 0) > (ex.priority || 0)) byId.set(d.id, d);
+  }
+  let items = Array.from(byId.values());
+  // 2. spine owner — the highest-priority spine-asserting device claims the spine;
+  //    every OTHER device with a non-null, different spine is dropped.
+  const spineItems = items.filter(d => d.spine);
+  if (spineItems.length) {
+    let owner = spineItems[0];
+    for (const d of spineItems) if ((d.priority || 0) > (owner.priority || 0)) owner = d;
+    const claimed = owner.spine;
+    items = items.filter(d => !d.spine || d.spine === claimed);
+  }
+  // 3. mutex groups — for each non-null group, keep only the highest-priority member
+  const groupWinner = new Map();
+  for (const d of items) {
+    if (!d.group) continue;
+    const ex = groupWinner.get(d.group);
+    if (!ex || (d.priority || 0) > (ex.priority || 0)) groupWinner.set(d.group, d);
+  }
+  items = items.filter(d => !d.group || groupWinner.get(d.group) === d);
+  // 4. sort by priority desc (stable), then cap to budget
+  items.sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  items = items.slice(0, budget);
+  return items.map(d => d.text).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7693,22 +7819,20 @@ This sets the song's first 7 seconds — the make-or-break TikTok / Spotify / ra
 ${_entryLens.rule}
 BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the overused domestic-establishing-shot clichés the model reaches for by reflex): sitting in the kitchen, standing or leaning by the sink, at the kitchen table, waking up in bed, lying on the couch, staring out a window, looking in the mirror, "it's 3am and I can't sleep," coffee going cold. If your first instinct is a room inside a house, MOVE the camera — change the room, take it outdoors, put the narrator in motion, or enter through a non-visual sense. The opening must still obey the FIRST LINE RULE (a concrete image or action, never abstract) — it just must NOT be the domestic default.`;
 
-  // Wave 4l — flow-craft layer (pocket / enjambment / sustained double-time),
-  // genre-gated inside the helper so pop/country/SS/etc. only get what fits.
-  const flowCraftNote = buildFlowCraftNotes(genre);
-  // Wave 4m — signature-craft layer (cadence fluidity / character-mask /
-  // lexical density / harmonized flow / detail cascade), genre + tier gated.
-  const signatureCraftNote = buildSignatureCraftNotes(genre, params.lyricTier);
-  // Wave 4n — era-craft layer (2005–2010). Sonic devices carry PRODUCTION LOCKs
-  // so the signature reaches the SONG PROMPT string (and thus fusion/blends).
-  const eraCraftNote = buildEraCraftNotes(genre);
-  // Wave 4o — style-craft layer (battle rap / country / R&B), genre-gated.
-  const styleCraftNote = buildStyleCraftNotes(genre);
-  // Wave 4p — retro-craft layer (late-90s rap / late-90s R&B / 2000s nu-metal).
-  const retroCraftNote = buildRetroCraftNotes(genre);
-  // Wave 4q — phrasing-transplant recipe (folk-hop & kin). Fires deterministically
-  // when the primary genre + blend genre form a rhythm-donor × melodic-host pair.
-  const transplantNote = buildTransplantForPair(genre, blend && blend.genre2);
+  // Wave 4l-4q — craft-directive layers. Each helper now returns a TAGGED
+  // DIRECTIVE ARRAY; assembleCraft merges them through the guardrails
+  // (dedupe / production-spine owner / mutex groups / budget) and returns the
+  // concatenated block. Budget 4 for a solo song. The transplant (folk-hop or
+  // reverse melodic-trap) fires deterministically when primary + blend genre
+  // form a donor×host pair; direction depends on which genre is primary.
+  const craftBlock = assembleCraft([
+    buildFlowCraftNotes(genre),
+    buildSignatureCraftNotes(genre, params.lyricTier),
+    buildEraCraftNotes(genre),
+    buildStyleCraftNotes(genre),
+    buildRetroCraftNotes(genre),
+    buildTransplantForPair(genre, blend && blend.genre2),
+  ], { budget: 4 });
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -8077,7 +8201,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}${styleCraftNote}${retroCraftNote}${transplantNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${craftBlock}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8467,13 +8591,15 @@ function buildLuckyPrompt(params) {
   // the second genre (g2) contributes its SONIC era-signatures + production locks
   // so a blend (e.g. rap × pop) renders both sides correctly in the SONG PROMPT.
   const _g2diff = g2 && String(g2).toLowerCase() !== String(g1).toLowerCase();
-  const blendCraftNote = buildFlowCraftNotes(g1)
-    + buildSignatureCraftNotes(g1, params && params.lyricTier)
-    + buildEraCraftNotes(g1)
-    + buildStyleCraftNotes(g1)
-    + buildRetroCraftNotes(g1)
-    + buildTransplantForPair(g1, g2)
-    + (_g2diff ? buildEraCraftNotes(g2) + buildStyleCraftNotes(g2) + buildRetroCraftNotes(g2) : '');
+  const blendCraftNote = assembleCraft([
+    buildFlowCraftNotes(g1),
+    buildSignatureCraftNotes(g1, params && params.lyricTier),
+    buildEraCraftNotes(g1),
+    buildStyleCraftNotes(g1),
+    buildRetroCraftNotes(g1),
+    buildTransplantForPair(g1, g2),
+    ...(_g2diff ? [buildEraCraftNotes(g2), buildStyleCraftNotes(g2), buildRetroCraftNotes(g2)] : []),
+  ], { budget: 6 });
   const vocalStackNote = buildVocalStackNote(g1);
   // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
   // overrides flow through params.vocalDescriptors when supplied)
@@ -10110,7 +10236,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${buildEraCraftNotes('hiphop')}${buildStyleCraftNotes('hiphop')}${buildRetroCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${assembleCraft([buildFlowCraftNotes('hiphop'), buildSignatureCraftNotes('hiphop', ''), buildEraCraftNotes('hiphop'), buildStyleCraftNotes('hiphop'), buildRetroCraftNotes('hiphop')], { budget: 4 })}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
