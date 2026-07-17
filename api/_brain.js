@@ -5238,6 +5238,50 @@ function buildSignatureCraftNotes(genreKey, lyricTier) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ERA-CRAFT LAYER (2005–2010 signatures). SONIC devices carry a PRODUCTION LOCK
+// so the signature lands in the SONG PROMPT "Full prompt" (Suno style) string —
+// not just the lyric — so it also renders correctly inside a fusion/blend.
+//   1. Auto-Tune Melancholy      — Kanye "808s": sung-through-autotune vulnerability
+//   2. Vocalise / Hum Hook       — Kid Cudi: a wordless melodic hum as the hook
+//   3. Multi-Voice / Accent Switch — Nicki: rapid voice/accent switches mid-verse
+//   4. Associative Punchline Drift — Lil Wayne: non-sequitur flex chain, vibe-glued
+//   5. Coded Parallel Lexicon    — Clipse: a sustained double-language across a verse
+// ═══════════════════════════════════════════════════════════════════════════
+
+const AUTOTUNE_MELANCHOLY_GENRES = new Set(['hiphop','rnb','pop','altpop','indie']);
+const VOCALISE_HOOK_GENRES       = new Set(['hiphop','pop','rnb','altrock','indie','edm','rock']);
+const MULTIVOICE_GENRES          = new Set(['hiphop','pop','tvmusical']);
+const CODED_LEXICON_GENRES       = new Set(['hiphop','country','folk','gospel','blues']);
+
+function buildEraCraftNotes(genreKey) {
+  const g = String(genreKey || '').toLowerCase();
+  let out = '';
+  // 1. AUTO-TUNE MELANCHOLY (Kanye 808s) — ~20%
+  if (AUTOTUNE_MELANCHOLY_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nAUTO-TUNE MELANCHOLY (Kanye "808s & Heartbreak" lineage → Drake / The Weeknd / Juice WRLD):\nThe vocal is SUNG through Auto-Tune for raw VULNERABILITY, not flex — numb, heartbroken, robotic-sad. Melody carries the ache; the pitch-correction makes it sound emotionally frozen. Keep the lyric bare and confessional with lots of space. Mark sung passages [Auto-Tune] / [Melodic] inline.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "auto-tuned melodic vocal, melancholic, sparse booming 808 drums, cavernous reverb, emotional minimalism".`;
+  }
+  // 2. VOCALISE / HUM HOOK (Kid Cudi) — ~18%
+  if (VOCALISE_HOOK_GENRES.has(g) && Math.random() < 0.18) {
+    out += `\n\nVOCALISE / HUM HOOK (Kid Cudi "Man on the Moon" → the wordless-melody hook):\nMake the hook (or one whole section) a WORDLESS melodic hum or moan — "hmm-hmm-hmmm", "na-na-naaa", a sustained "ooohh" — pure cathartic melody, no lyrics. It should be the most hummable moment in the song. Pair it with interior, lonely, searching verse lyrics. Mark it [Hum] / [Vocalise] / [Wordless Melody].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "wordless hummed melodic hook, vocalise, reverb-soaked atmosphere".`;
+  }
+  // 3. MULTI-VOICE / ACCENT SWITCHING (Nicki) — ~18%
+  if (MULTIVOICE_GENRES.has(g) && Math.random() < 0.18) {
+    out += `\n\nMULTI-VOICE / ACCENT SWITCHING (Nicki Minaj "Roman" / "Monster" → theatrical vocal shifts):\nSwitch VOICE mid-verse — a low growl for menace, a high cartoonish squeak for mockery, a put-on accent (British, Valley-girl, cartoon-villain) for a character beat, then snap back. Each switch voices a different attitude within the same verse. Mark every shift with an inline delivery tag, e.g. [Growl], [High Cartoon Voice], [British Accent], [Whispered], so the platform performs the change. Distinct from the character-MASK device (one persona held all song) — this is RAPID switching between several. Keep it purposeful: 2-3 switches that land, not a costume change every line.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST reference — "multiple vocal characters, sudden register and accent switches, theatrical delivery".`;
+  }
+  // 4. ASSOCIATIVE PUNCHLINE DRIFT (Lil Wayne) — hiphop only, ~24%
+  if (g === 'hiphop' && Math.random() < 0.24) {
+    out += `\n\nASSOCIATIVE PUNCHLINE DRIFT (Lil Wayne mixtape run — "Da Drought 3" / "Carter III"):\nRun a chain of punchlines where each line is its OWN standalone flex or joke and the glue between lines is VIBE, not subject — the topic drifts freely (weapon → weather → wordplay → wealth), held together only by attitude and the rhyme. Every line must be quotable alone. Let one word trigger the next line's image by sound or double-meaning, then jump. Do NOT force a narrative — the drift IS the style.\nPRODUCTION: optionally add "raspy, textured lead vocal" to the SONG PROMPT if a rougher vocal grain fits the mood.`;
+  }
+  // 5. CODED PARALLEL LEXICON (Clipse / Pusha T) — ~20%
+  if (CODED_LEXICON_GENRES.has(g) && Math.random() < 0.20) {
+    const models = (g === 'hiphop') ? 'Clipse "Hell Hath No Fury" / Pusha T coded coke-rap'
+      : 'the coded protest / gospel / murder-ballad tradition — sing one thing, mean another';
+    out += `\n\nCODED PARALLEL LEXICON (${models}):\nBuild the verse on a SUSTAINED double meaning — a surface vocabulary (luxury, cooking, weather, farming, church) where nearly every image also decodes to a hidden second subject. Not one double-entendre bar — a whole PARALLEL LANGUAGE held across the section, so an attentive listener realizes the entire verse has been saying two things at once. RULES: (1) the surface reading must fully cohere on its own; (2) the coded reading must be consistent, not random; (3) never explain the code — the discovery is the reward. Pick ONE surface domain and stay disciplined inside it.`;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7482,6 +7526,9 @@ BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the 
   // Wave 4m — signature-craft layer (cadence fluidity / character-mask /
   // lexical density / harmonized flow / detail cascade), genre + tier gated.
   const signatureCraftNote = buildSignatureCraftNotes(genre, params.lyricTier);
+  // Wave 4n — era-craft layer (2005–2010). Sonic devices carry PRODUCTION LOCKs
+  // so the signature reaches the SONG PROMPT string (and thus fusion/blends).
+  const eraCraftNote = buildEraCraftNotes(genre);
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -7850,7 +7897,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8236,6 +8283,14 @@ function buildLuckyPrompt(params) {
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const lengthBudgetNote = buildLengthBudgetNote(length);
   const adlibNote = buildAdlibNote(g1, mood, params.substyle);
+  // Fusion craft: primary genre (g1) gets the full flow+signature+era treatment;
+  // the second genre (g2) contributes its SONIC era-signatures + production locks
+  // so a blend (e.g. rap × pop) renders both sides correctly in the SONG PROMPT.
+  const _g2diff = g2 && String(g2).toLowerCase() !== String(g1).toLowerCase();
+  const blendCraftNote = buildFlowCraftNotes(g1)
+    + buildSignatureCraftNotes(g1, params && params.lyricTier)
+    + buildEraCraftNotes(g1)
+    + (_g2diff ? buildEraCraftNotes(g2) : '');
   const vocalStackNote = buildVocalStackNote(g1);
   // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
   // overrides flow through params.vocalDescriptors when supplied)
@@ -8412,7 +8467,7 @@ SONGWRITING RULES:
 - Bridge must be a new perspective · Last chorus bigger than first
 - Every section MUST start with its bracket tag on its own line.
 - GENRE PURITY: every Chorus MUST contain ≥1 inline TYPE 3 production tag (e.g. [Drop], [808 Bass], [Build], [Swell]) placed INSIDE the lyric body, not as a section header. No production tag in a chorus = rewrite it.
-- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}${luckyProductionNote}
+- NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${lengthBudgetNote}${platinum ? buildTopTierNote(g1, g2) : ''}${adlibNote}${blendCraftNote}${luckyProductionNote}
 
 Respond with EXACTLY this format:
 
@@ -9872,7 +9927,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${buildEraCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
