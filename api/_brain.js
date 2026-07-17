@@ -5341,6 +5341,59 @@ function buildStyleCraftNotes(genreKey) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// RETRO-CRAFT LAYER — late-90s rap (3) + late-90s R&B (3) + 2000s nu-metal (3).
+// Sonic devices carry PRODUCTION LOCKs. Neo-soul groove is gated to ADJACENT
+// genres (not the neosoul genre, which already owns that DNA); mafioso is a
+// LYRIC/narrative device (complements the existing mafioso PRODUCTION template).
+// ═══════════════════════════════════════════════════════════════════════════
+
+const INTERP_HOOK_GENRES   = new Set(['hiphop','pop','rnb']);
+const MAFIOSO_GENRES       = new Set(['hiphop']);
+const GROWL_PRAYER_GENRES  = new Set(['hiphop','gospel']);
+const HIPHOP_SOUL_GENRES   = new Set(['rnb','neosoul','hiphop','pop']);
+const TIMBALAND_GENRES     = new Set(['rnb','pop','hiphop']);
+const NEOSOUL_GROOVE_GENRES= new Set(['rnb','jazz','gospel']);
+const NUMB_RAGE_GENRES     = new Set(['metal','rock','altrock','punk','pop']);
+const RAGE_SCAT_GENRES     = new Set(['metal','rock','altrock','punk']);
+const MOSH_CALL_GENRES     = new Set(['metal','rock','punk','altrock','hiphop']);
+
+function buildRetroCraftNotes(genreKey) {
+  const g = String(genreKey || '').toLowerCase();
+  let out = '';
+  // ── LATE-90s RAP (3) ──
+  if (INTERP_HOOK_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nINTERPOLATION HOOK — the chorus rides a familiar melody (late-90s Bad Boy / Puff Daddy → pop & R&B sampling tradition):\nAnchor the hook to a melody that feels instantly familiar and nostalgic — a singsong the listener half-knows — so the chorus lands on first listen while the verses stay new. Since a real song can't be named or cleared, DESCRIBE the melodic feel ("a soaring 80s-soul chorus melody", "a nursery-rhyme-simple singsong lift") and put that description in the SONG PROMPT. RULE: the familiar-feeling melody must recontextualize the new lyric, not just bait nostalgia.`;
+  }
+  if (MAFIOSO_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nMAFIOSO LUXURY NARRATIVE (Raekwon "Cuban Linx" / Jay-Z "Reasonable Doubt" / Nas):\nNarrate from inside a world of aspirational crime-luxury — tailored suits, imported cars, ocean views, brand-name opulence — with a cold undertone of danger and consequence beneath the glamour. Godfather / Scarface framing: power, loyalty, paranoia, the price of the life. Specific brands and textures sell it; the menace is implied, never cartoonish. RULE: the luxury and the dread must coexist inside the same image.`;
+  }
+  if (GROWL_PRAYER_GENRES.has(g) && Math.random() < 0.18) {
+    out += `\n\nGRUFF GROWL + PRAYER DUALITY (DMX):\nPair raw, guttural aggression — a growled, barked, from-the-chest delivery — with genuine spiritual struggle: the same voice that threatens also confesses, doubts, and prays. The song swings between street menace and a raw, direct talk with God. Mark the growl [Gruff] / [Growl] and the prayer [Spoken] / [Whispered]. RULE: the prayer must be as real as the rage — the duality IS the soul of it.`;
+  }
+  // ── LATE-90s R&B (3) ──
+  if (HIPHOP_SOUL_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nHIP-HOP SOUL (Mary J. Blige / Faith Evans → the rap-soul fusion):\nSing real soul vulnerability OVER hard hip-hop drums and a looped sample — the toughness of the street meets the tenderness of the church. The voice carries pain and survival at once; the beat knocks like a rap record. Lyric is plainspoken and lived-in, not polished-pretty.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "soulful vocal over hard boom-bap hip-hop drums, looped soul sample, 90s hip-hop soul".`;
+  }
+  if (TIMBALAND_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nTIMBALAND STUTTER-BOUNCE (Timbaland / Missy / Aaliyah → futuristic R&B-pop):\nBuild on a syncopated, hiccupping rhythm with lots of SPACE — the beat stutters and skips, leaving gaps the vocal dances around. Use vocal percussion and mouth-sounds (beatbox clicks, "hee", breaths, tics) as instruments woven into the groove. Off-kilter, minimal, futuristic.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "syncopated stutter-bounce beat, vocal percussion, spacious minimal futuristic R&B, hiccup rhythm".`;
+  }
+  if (NEOSOUL_GROOVE_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nNEO-SOUL ORGANIC GROOVE (D'Angelo "Voodoo" / Erykah Badu / Lauryn Hill):\nSit the whole track in a live, warm, slightly-drunk BEHIND-THE-BEAT pocket — Rhodes piano, jazzy 7th and 9th chords, real drums with human swing and imperfection, fat unhurried bass. The vocal is conversational and lived-in, floating just behind the groove. The looseness IS the feel — nothing quantized or shiny.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "neo-soul, live behind-the-beat drunk swing, Rhodes, jazzy 7th and 9th chords, warm organic, unquantized".`;
+  }
+  // ── 2000s NU-METAL (3) ──
+  if (NUMB_RAGE_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nNUMB-TO-RAGE DYNAMIC (nu-metal / Linkin Park → emo, post-grunge, dark-pop like Billie Eilish):\nBuild the song on a dissociation-to-detonation arc — the verse is quiet, numb, dissociated, almost flat/whispered; the chorus EXPLODES into cathartic release (belted, screamed, or a wall of sound). The contrast IS the emotion: the number the verse, the harder the chorus hits. Mark the shift with dynamic tags. RULE: the verse must feel genuinely SUPPRESSED so the chorus reads as a dam breaking.`;
+  }
+  if (RAGE_SCAT_GENRES.has(g) && Math.random() < 0.18) {
+    out += `\n\nRAGE-SCAT / VOCAL-AS-WEAPON (Korn's Jonathan Davis → metalcore, industrial):\nIn the most intense section, abandon clean words for raw vocalized anguish — guttural scatting, wordless syllables, a within-a-single-line slide from whisper to scream. The voice becomes a SYMBOL of the feeling rather than a carrier of literal meaning. Mark it [Scat] / [Whisper-to-Scream] / [Guttural]. RULE: use it as the PEAK release, not throughout — one section where language fails and only sound remains.`;
+  }
+  if (MOSH_CALL_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nBREAKDOWN MOSH-CALL (nu-metal / metalcore / hardcore → rap-metal):\nEngineer one half-time BREAKDOWN section — the tempo drops to a heavy, chugging, palm-muted stomp — with a shouted call-to-action over it ("get up!", "let's go!", "one more time!", a group shout) built to detonate a live pit. Simple, rhythmic, physical; lyrics minimal and percussive. Mark it [Breakdown] / [Half-Time Chug] / [Group Shout].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "half-time breakdown, palm-muted chug, group shout, mosh-pit energy".`;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7590,6 +7643,8 @@ BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the 
   const eraCraftNote = buildEraCraftNotes(genre);
   // Wave 4o — style-craft layer (battle rap / country / R&B), genre-gated.
   const styleCraftNote = buildStyleCraftNotes(genre);
+  // Wave 4p — retro-craft layer (late-90s rap / late-90s R&B / 2000s nu-metal).
+  const retroCraftNote = buildRetroCraftNotes(genre);
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -7958,7 +8013,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}${styleCraftNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}${styleCraftNote}${retroCraftNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8352,7 +8407,8 @@ function buildLuckyPrompt(params) {
     + buildSignatureCraftNotes(g1, params && params.lyricTier)
     + buildEraCraftNotes(g1)
     + buildStyleCraftNotes(g1)
-    + (_g2diff ? buildEraCraftNotes(g2) + buildStyleCraftNotes(g2) : '');
+    + buildRetroCraftNotes(g1)
+    + (_g2diff ? buildEraCraftNotes(g2) + buildStyleCraftNotes(g2) + buildRetroCraftNotes(g2) : '');
   const vocalStackNote = buildVocalStackNote(g1);
   // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
   // overrides flow through params.vocalDescriptors when supplied)
@@ -9989,7 +10045,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${buildEraCraftNotes('hiphop')}${buildStyleCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${buildEraCraftNotes('hiphop')}${buildStyleCraftNotes('hiphop')}${buildRetroCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
