@@ -5394,6 +5394,67 @@ function buildRetroCraftNotes(genreKey) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// PHRASING-TRANSPLANT ENGINE — the generalized "folk-hop" recipe. Marries a
+// rhythm-DONOR genre's phrasing (hip-hop) to a melodic-HOST genre's songwriting
+// + production, via density contrast (wordy rhythmic verse → open melodic hook)
+// and a production marriage (host's acoustic instruments played AS the beat).
+// Auto-fires (deterministically) whenever a donor×host pair is blended — in the
+// main path (genre + blend.genre2) and the Lucky/fusion path (g1 + g2). One
+// engine covers every named preset (Folk-Hop, Soul-Hop, Jazz-Hop, Porch-Rap…).
+// ═══════════════════════════════════════════════════════════════════════════
+
+const RHYTHM_DONORS = new Set(['hiphop']);
+const MELODIC_HOSTS = new Set(['ss','folk','pop','rnb','neosoul','country','jazz','gospel','blues']);
+const TRANSPLANT_HOST_FEEL = {
+  folk:'confessional folk-pop', ss:'intimate singer-songwriter', pop:'anthemic folk-pop',
+  rnb:'soulful R&B', neosoul:'warm neo-soul', country:'plainspoken country narrative',
+  jazz:'smoky jazz', gospel:'uplifting gospel', blues:'raw blues',
+};
+const TRANSPLANT_HOST_INSTR = {
+  folk:'fingerpicked and percussively-strummed acoustic guitar, foot-stomps and claps, optional banjo or upright bass',
+  ss:'percussive acoustic guitar, hand percussion, intimate close-mic warmth',
+  pop:'acoustic guitar plus light organic percussion, hand-claps, gang-vocal lift on the chorus',
+  rnb:'Rhodes / electric piano, warm rounded bass, live-feel drums played deep in the pocket',
+  neosoul:'Rhodes, jazzy 7th and 9th chords, drunk-swing live drums, fat unhurried bass',
+  country:'acoustic guitar, foot-stomp and clap, optional banjo or dobro, warm upright bass',
+  jazz:'upright bass, brushed drums, comping piano, muted trumpet or sax fills',
+  gospel:'organ and piano, hand-claps and stomps, choir swell on the lift',
+  blues:'resonator or acoustic guitar, foot-stomp, harmonica fills',
+};
+function _transplantLabel(host) {
+  if (host === 'folk' || host === 'ss' || host === 'pop') return 'Folk-Hop';
+  if (host === 'rnb' || host === 'neosoul')               return 'Soul-Hop / Neo-Soul Rap';
+  if (host === 'jazz')                                     return 'Jazz-Hop';
+  if (host === 'country')                                  return 'Porch-Rap / Country-Hop';
+  if (host === 'gospel')                                   return 'Gospel-Hop';
+  if (host === 'blues')                                    return 'Blues-Hop';
+  return 'Phrasing-Transplant Hybrid';
+}
+function buildPhrasingTransplantNote(donorGenre, hostGenre) {
+  const donor = String(donorGenre || '').toLowerCase();
+  const host  = String(hostGenre  || '').toLowerCase();
+  if (!RHYTHM_DONORS.has(donor) || !MELODIC_HOSTS.has(host)) return '';
+  const label = _transplantLabel(host);
+  const short = label.split(' / ')[0];
+  const feel  = TRANSPLANT_HOST_FEEL[host]  || 'melodic';
+  const instr = TRANSPLANT_HOST_INSTR[host] || 'organic acoustic instrumentation played rhythmically';
+  return `\n\n🎛️ PHRASING-TRANSPLANT RECIPE — "${label}" (hip-hop-phrased ${feel}):
+This blend has ONE job — marry hip-hop PHRASING to ${feel} SONGWRITING. Execute all four:
+1. VERSES = TALK-SING: deliver verses as rhythmic, conversational speech, not sung melody — tight rhythm, loose pitch. Pack them with words, internal rhyme, and assonance, riding the groove the way a rapper rides a beat. Sit BEHIND the beat; let lines run on / enjamb so it pours out like real talk.
+2. HOST'S HEART: keep the emotional register, melodic sense, and imagery of ${feel} — confessional, specific, first-person truth (real names, places, details), plainspoken, never "rappy" flexing.
+3. DENSITY CONTRAST (the engine of the whole style): verses are MAXIMAL — wordy, dense, rhythmic; the CHORUS drops the word-count hard, opens the vowels wide, and hands over a big, simple, singable melodic hook. Busy verse → open hook IS the style. Save the long vowels and the real melody for the chorus.
+4. PRODUCTION MARRIAGE: NO hip-hop drums — play the acoustic instruments RHYTHMICALLY as the beat (${instr}).
+PRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "${short}, ${instr}, rhythmic talk-sung verses, big open melodic sung chorus, organic and warm, no trap drums".`;
+}
+// Order-tolerant detector: returns the recipe if {a,b} is a donor×host pair.
+function buildTransplantForPair(a, b) {
+  const A = String(a || '').toLowerCase(), B = String(b || '').toLowerCase();
+  if (RHYTHM_DONORS.has(A) && MELODIC_HOSTS.has(B)) return buildPhrasingTransplantNote(A, B);
+  if (RHYTHM_DONORS.has(B) && MELODIC_HOSTS.has(A)) return buildPhrasingTransplantNote(B, A);
+  return '';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7645,6 +7706,9 @@ BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the 
   const styleCraftNote = buildStyleCraftNotes(genre);
   // Wave 4p — retro-craft layer (late-90s rap / late-90s R&B / 2000s nu-metal).
   const retroCraftNote = buildRetroCraftNotes(genre);
+  // Wave 4q — phrasing-transplant recipe (folk-hop & kin). Fires deterministically
+  // when the primary genre + blend genre form a rhythm-donor × melodic-host pair.
+  const transplantNote = buildTransplantForPair(genre, blend && blend.genre2);
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -8013,7 +8077,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}${styleCraftNote}${retroCraftNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}${styleCraftNote}${retroCraftNote}${transplantNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8408,6 +8472,7 @@ function buildLuckyPrompt(params) {
     + buildEraCraftNotes(g1)
     + buildStyleCraftNotes(g1)
     + buildRetroCraftNotes(g1)
+    + buildTransplantForPair(g1, g2)
     + (_g2diff ? buildEraCraftNotes(g2) + buildStyleCraftNotes(g2) + buildRetroCraftNotes(g2) : '');
   const vocalStackNote = buildVocalStackNote(g1);
   // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
