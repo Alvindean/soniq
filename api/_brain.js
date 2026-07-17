@@ -5191,6 +5191,53 @@ function buildFlowCraftNotes(genreKey) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// SIGNATURE-CRAFT LAYER — five MC signatures we were missing, generalized to
+// every genre they fit. All probabilistic so they vary take-to-take, never a
+// checklist. Lexical-density (abstract) and detail-cascade (concrete) are
+// OPPOSITE registers and are made mutually exclusive.
+//   1. Cadence Fluidity        — André 3000 / Lauryn Hill: refuse a locked cadence
+//   2. Character-Mask Narrator — MF DOOM: run the whole song through a persona
+//   3. Lexical-Density Imagism — Aesop Rock: rare-word abstract painting (opt-in)
+//   4. Harmonized Flow         — Bone Thugs: the flow itself sung in harmony
+//   5. Associative Detail Cascade — Ghostface: hyper-specific concrete-noun rush
+// ═══════════════════════════════════════════════════════════════════════════
+
+const CADENCE_FLUID_GENRES   = new Set(['hiphop','rnb','ss','pop','soul','gospel','jazz','afrobeats','reggae']);
+const CHARACTER_MASK_GENRES  = new Set(['hiphop','tvmusical','ss','pop','rock','altrock','folk','country','metal']);
+const LEXICAL_GENRES         = new Set(['hiphop','ss','folk','altrock','pop','indie']);
+const HARMONIZED_FLOW_GENRES = new Set(['hiphop','rnb','gospel']);
+const DETAIL_CASCADE_GENRES  = new Set(['hiphop','country','folk','ss','rnb','rock','altrock','blues','soul']);
+
+function buildSignatureCraftNotes(genreKey, lyricTier) {
+  const g = String(genreKey || '').toLowerCase();
+  const tier = String(lyricTier || '').toLowerCase();
+  let out = '';
+  // 1. CADENCE FLUIDITY (André 3000) — ~30%
+  if (CADENCE_FLUID_GENRES.has(g) && Math.random() < 0.30) {
+    out += `\n\nCADENCE FLUIDITY — refuse a locked cadence (André 3000 / Lauryn Hill / Cee-Lo):\nDo NOT lock every line to the same syllable count and delivery. Let the cadence BREATHE — a long crammed line, then a short bare one; a rapped phrase that melts into a half-sung one, then a near-spoken aside. Within a single verse you may shift between rapped, sung, and spoken delivery where the emotion pulls, marking each shift with the inline tag ([Spoken], [Sung], [Half-Sung]) so the platform hears it. RULE: controlled variation, not chaos — the through-line is the FEELING; only the shapes change under it.`;
+  }
+  // 2. CHARACTER-MASK NARRATOR (MF DOOM) — ~22%
+  if (CHARACTER_MASK_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nCHARACTER-MASK NARRATOR (MF DOOM / Ghostface's "Tony Starks" / Bowie's Ziggy / Nicki's alter-egos):\nWrite the WHOLE song in the voice of a constructed character, not a straight autobiographical "I." Give the mask a clear identity — a villain, a trickster, an unreliable narrator, a persona with its own logic — and stay inside it start to finish: its diction, its blind spots, its agenda. The listener should sense a character, not the songwriter. Let the mask say a truth the plain "I" couldn't. Do NOT break character to explain — trust the listener to read between the lines.`;
+  }
+  // 3. LEXICAL-DENSITY / RARE-WORD IMAGISM (Aesop Rock) — opt-in via deep tiers, else rare
+  const _lexOn = LEXICAL_GENRES.has(g) &&
+    ((tier === 'archival' || tier === 'conscious') ? Math.random() < 0.45 : Math.random() < 0.10);
+  if (_lexOn) {
+    out += `\n\nLEXICAL-DENSITY / RARE-WORD IMAGISM (Aesop Rock / Joanna Newsom / early Joni Mitchell):\nReach past the common word for the exact, unexpected one — favor precise, rarely-used vocabulary and abstract image-collage over plain literal narrative. Build meaning through layered, associative imagery rather than a clean storyline; the song becomes a dense verbal painting decoded over repeat plays. RULES: (1) every rare word must be the RIGHT word — precision, never thesaurus-flexing; (2) keep it singable — sound and rhythm still rule; (3) at least one concrete anchor per section so the abstraction has ground to stand on. Use this register deliberately — the "difficult, rewarding" lane, not the radio lane.`;
+  }
+  // 4. HARMONIZED FLOW (Bone Thugs) — ~25%
+  if (HARMONIZED_FLOW_GENRES.has(g) && Math.random() < 0.25) {
+    out += `\n\nHARMONIZED FLOW (Bone Thugs-N-Harmony / Anderson .Paak / gospel-rap):\nDeliver the rapid/rhythmic flow ITSELF as sung, stacked harmony — not a rapped verse with a separate sung hook, but the flow lines harmonized in thirds/fifths as they rap-sing. Mark harmonized passages with [Harmony] / [Layered Vocal] tags and put "harmonized rap flow, stacked vocal thirds" in the production. Best on triplet-chained or melodic sections; keep the words intelligible under the harmony. Reserve it for a section or two (a hook or a signature verse), not the whole song.`;
+  }
+  // 5. ASSOCIATIVE DETAIL CASCADE (Ghostface) — ~35%, exclusive with the abstract register
+  if (!_lexOn && DETAIL_CASCADE_GENRES.has(g) && Math.random() < 0.35) {
+    out += `\n\nASSOCIATIVE DETAIL CASCADE (Ghostface Killah / Springsteen / Jason Isbell object-lists):\nIn at least one section, drop a rush of oddly SPECIFIC concrete details — brand names, exact objects, colors, foods, small physical facts — in an associative stream that hits like sensory overload and lands emotionally WITHOUT a tidy plot. The specificity IS the feeling: "the Wallabees, the bathrobe, the cold takeout on the counter" beats "I was going through it." RULES: (1) real, textured nouns only, no generic filler; (2) let the details IMPLY the story instead of explaining it; (3) 3-6 hyper-specific hits, then breathe. Precision over abstraction — the opposite lane from the rare-word register.`;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7432,6 +7479,9 @@ BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the 
   // Wave 4l — flow-craft layer (pocket / enjambment / sustained double-time),
   // genre-gated inside the helper so pop/country/SS/etc. only get what fits.
   const flowCraftNote = buildFlowCraftNotes(genre);
+  // Wave 4m — signature-craft layer (cadence fluidity / character-mask /
+  // lexical density / harmonized flow / detail cascade), genre + tier gated.
+  const signatureCraftNote = buildSignatureCraftNotes(genre, params.lyricTier);
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -7800,7 +7850,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -9822,7 +9872,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
