@@ -5282,6 +5282,65 @@ function buildEraCraftNotes(genreKey) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
+// STYLE-CRAFT LAYER — Battle Rap (3) + Country (3) + R&B (4), each generalized
+// to the genres it fits. Sonic R&B devices carry PRODUCTION LOCKs so the vocal
+// signature reaches the SONG PROMPT string (and renders inside a fusion/blend).
+// ═══════════════════════════════════════════════════════════════════════════
+
+// NOTE: hiphop is intentionally EXCLUDED from the three battle devices — the
+// existing `battleRapCraft` lyric-craft device already owns rap battle (its six
+// laws cover angle/rebuttal/scheme). These extend battle TECHNIQUE cross-genre.
+const ANGLE_GENRES       = new Set(['pop','rock','altrock','rnb','country']);
+const SCHEME_GENRES      = new Set(['pop','rock']);
+const REBUTTAL_GENRES    = new Set(['pop','rock','altrock','rnb','country']);
+const TITLE_TURN_GENRES  = new Set(['country','pop','folk','ss','rock']);
+const TWIST_END_GENRES   = new Set(['country','folk','ss','pop','rnb']);
+const PLAINSPOKEN_GENRES = new Set(['country','folk','ss','rock','gospel','blues','americana']);
+const MELISMA_GENRES     = new Set(['rnb','gospel','pop','soul']);
+const HARMONY_WALL_GENRES= new Set(['rnb','gospel','soul','pop','rock']);
+const SPOKEN_INTIMACY_GENRES = new Set(['rnb','soul','pop','hiphop','gospel']);
+const QUIET_STORM_GENRES = new Set(['rnb','soul','jazz','altrnb']);
+
+function buildStyleCraftNotes(genreKey) {
+  const g = String(genreKey || '').toLowerCase();
+  let out = '';
+  // ── BATTLE RAP (3) ──
+  if (ANGLE_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nTHE ANGLE — direct-address takedown (battle-rap core → diss tracks, kiss-off breakups, protest, roast):\nAim the WHOLE verse at a specific "you" and dismantle them with concrete, personal specifics — never vague insults. Name real details (habits, contradictions, failures) so it feels aimed, not generic. Second person throughout. A small precise detail cuts deeper than a big vague one. Cross-genre: point it at an ex (kiss-off song), a public figure (protest), a rival, or a past version of yourself. RULE: specific-and-personal beats loud-and-general.`;
+  }
+  if (SCHEME_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nTHE SCHEME — a wordplay run built to a haymaker (Loaded Lux / Rum Nitty / battle-rap lineage):\nLock ONE domain (guns, chess, medicine, cards, weather) for 4-8 bars and make EVERY line a double-meaning inside it that ALSO lands a shot — the vocabulary is weaponized, each bar tightening, until a final HAYMAKER bar pays the whole scheme off. Distinct from theme-cluster (imagery only): here each image carries a covert attack. RULE: the payoff bar must recontextualize the run — if the listener doesn't go "ohhh" on the last bar, the scheme didn't land.`;
+  }
+  if (REBUTTAL_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nTHE REBUTTAL / FLIP — preempt and reverse (battle defense → argument songs, confidence anthems):\nVoice the shot coming AT you — the obvious criticism, the likely comeback, your own apparent weakness — then flip it into a strength or turn it back in the same breath. Anticipation is the flex: proving you already know what they'd say and it still doesn't touch you. Cross-genre: own the insecurity then flip it (anthem), concede a point then reverse it (argument song). RULE: state their strongest shot fairly, or the flip feels cheap.`;
+  }
+  // ── COUNTRY (3) ──
+  if (TITLE_TURN_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nTITLE-TURN HOOK — the idiom-flip that IS the song (country signature → pop, folk, novelty):\nBuild the hook on a turned phrase, pun, or idiom that reframes the whole song in one line — the title doing double duty (literal + emotional). The verses set up the ordinary meaning; the hook reveals the second. RULE: the turn must feel DISCOVERED, not forced — a real idiom bent naturally, never a groan-pun.`;
+  }
+  if (TWIST_END_GENRES.has(g) && Math.random() < 0.18) {
+    out += `\n\nTWIST-ENDING STORY — the final-verse reveal (country story-song → folk, singer-songwriter, narrative pop):\nStructure the song so the LAST verse recontextualizes everything before it — a death, a secret, a time-jump, a reveal that reframes the earlier verses in a heavier light. Plant the clues early and innocent; pay them off at the end. The chorus can mean one thing in verse 1 and something devastating by the last chorus. RULE: the twist must be EARNED by details already present — a cheat reveal (info withheld unfairly) breaks the contract.`;
+  }
+  if (PLAINSPOKEN_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nPLAINSPOKEN ADDRESS — the front-porch register (country / Americana → folk, roots, singer-songwriter):\nWrite in plain, direct, unpretentious diction — talking TO the listener like a neighbor on the porch, not performing at them. No ornate vocabulary, no forced cleverness; the power is honest, concrete, conversational language and one true detail. The OPPOSITE of the rare-word register — accessibility as craft. RULE: every line should sound like something a real person would actually say out loud.`;
+  }
+  // ── R&B (4) ──
+  if (MELISMA_GENRES.has(g) && Math.random() < 0.25) {
+    out += `\n\nMELISMATIC RUN — the R&B vocal run/riff (Whitney / Mariah / Brandy / Beyoncé → gospel, pop):\nOn key emotional words, bend a single syllable across multiple notes (the melisma), and build to a riff-and-run climax in the final chorus or outro where the vocalist improvises melodic runs over the hook. Reserve the biggest runs for the peak so they read as release, not decoration. Mark them [Melisma] / [Vocal Run] / [Riff].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "melismatic vocal runs, riff-and-run ad-libs, powerhouse vocal climax".`;
+  }
+  if (HARMONY_WALL_GENRES.has(g) && Math.random() < 0.22) {
+    out += `\n\nSTACKED HARMONY WALL — layered background vocals (Boyz II Men / Brandy "vocal bible" / Jodeci → gospel, soul, pop):\nArrange lush stacked background harmonies (thirds and fifths, plus the occasional close cluster) that answer the lead and swell on the hook — a wall of the singer's own layered voice. The backgrounds are an instrument: they respond, build, drop out for a solo line, then flood back. Mark [Harmony] / [Background Vocals] / [Vocal Stack].\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "lush stacked background harmonies, layered vocal wall, call-and-response backing vocals".`;
+  }
+  if (SPOKEN_INTIMACY_GENRES.has(g) && Math.random() < 0.16) {
+    out += `\n\nSPOKEN INTIMACY INTERLUDE — "the talk" (Barry White / late-night R&B → soul, pop, hip-hop skits):\nDrop a short spoken-word passage — intimate, conversational, close-mic — where the singer stops singing and just TALKS to the person: a confession, a seduction, a plea, a promise. It breaks the fourth wall of melody and lands as raw honesty. Keep it real and specific, never cheesy. Mark it [Spoken]. Cross-genre: a confessional aside in pop, a preacher-aside in gospel, a skit in hip-hop.`;
+  }
+  if (QUIET_STORM_GENRES.has(g) && Math.random() < 0.20) {
+    out += `\n\nQUIET-STORM REGISTER — slow-jam intimacy (Sade / Maxwell / D'Angelo → soul, alt-R&B, jazz):\nWrite in a hushed, sensual, restrained register — close-mic, lots of space, the lyric breathing between phrases, nothing oversung. Sensuality through UNDERSTATEMENT: warmth, patience, one held image instead of ten. The vocal sits low and intimate, more felt than performed.\nPRODUCTION LOCK: the SONG PROMPT Full prompt MUST include — "quiet storm, intimate close-mic vocal, sparse warm arrangement, slow-jam, understated".`;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7529,6 +7588,8 @@ BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the 
   // Wave 4n — era-craft layer (2005–2010). Sonic devices carry PRODUCTION LOCKs
   // so the signature reaches the SONG PROMPT string (and thus fusion/blends).
   const eraCraftNote = buildEraCraftNotes(genre);
+  // Wave 4o — style-craft layer (battle rap / country / R&B), genre-gated.
+  const styleCraftNote = buildStyleCraftNotes(genre);
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -7897,7 +7958,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}${signatureCraftNote}${eraCraftNote}${styleCraftNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8290,7 +8351,8 @@ function buildLuckyPrompt(params) {
   const blendCraftNote = buildFlowCraftNotes(g1)
     + buildSignatureCraftNotes(g1, params && params.lyricTier)
     + buildEraCraftNotes(g1)
-    + (_g2diff ? buildEraCraftNotes(g2) : '');
+    + buildStyleCraftNotes(g1)
+    + (_g2diff ? buildEraCraftNotes(g2) + buildStyleCraftNotes(g2) : '');
   const vocalStackNote = buildVocalStackNote(g1);
   // Lever #7 — vocal character descriptors for Lucky (genre + mood derived; user
   // overrides flow through params.vocalDescriptors when supplied)
@@ -9927,7 +9989,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${buildEraCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${buildSignatureCraftNotes('hiphop', '')}${buildEraCraftNotes('hiphop')}${buildStyleCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
