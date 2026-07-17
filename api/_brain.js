@@ -5110,6 +5110,34 @@ const VERSE2_ARCHETYPES = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
+// ENTRY-POINT LENSES — WHERE the song drops the listener in on line 1.
+// Fixes the LLM domestic-default bias: left alone, the model opens ~1 song in 3
+// in a kitchen / by a sink / staring out a window — a "specific sensory image"
+// that technically passes the FIRST LINE RULE but is the single most overused
+// establishing shot in songwriting. One lens is picked per song (pickRandom) and
+// forces a fresh vantage: motion, a non-visual sense, an unusual place/hour, a
+// stranger's eye, mid-dialogue. The lens never overrides the FIRST LINE RULE —
+// the opening must STILL be a concrete image/action, just not the default one.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ENTRY_POINT_LENSES = [
+  { name: 'In Motion', rule: 'Open with the narrator already moving — walking, driving, running, riding, mid-stride. No one is seated, no one is at home. Motion in line 1; we learn WHY they are moving later.' },
+  { name: 'Sound-First', rule: 'Enter through a sound the narrator hears before anything is seen — a specific noise (a phone buzzing on tile, tires on gravel, a screen door, a voice through a wall). The image arrives second, after the ear.' },
+  { name: 'Body-First', rule: 'Enter through a physical sensation inside the narrator\'s body — a heartbeat, a dry mouth, cold hands, a held breath, a jaw clenched. The world outside comes into focus only after the body does.' },
+  { name: 'Object Out of Place', rule: 'Open on a single specific object exactly where it should not be — a shoe in the driveway, a ring on the dashboard, a suitcase in the hall. The wrongness of its placement carries the whole story\'s tension.' },
+  { name: 'Mid-Dialogue', rule: 'Drop in mid-sentence — the narrator answering a question we never heard, finishing an argument, or catching a name mid-air. It should feel like the tape started thirty seconds too late.' },
+  { name: 'Wrong Hour', rule: 'Open at a precise, unusual hour in a place that is empty at that hour — a parking garage at 4am, an office at midnight, a diner at closing, a highway with no other cars. The emptiness is the mood.' },
+  { name: 'Unusual Vantage', rule: 'Enter from an unexpected physical vantage — a rooftop, an overpass, the back seat, a window seat above the clouds, underwater, from across a crowded room. Height, distance, or angle does the emotional work.' },
+  { name: 'Weather as Character', rule: 'Open outdoors with the environment actively doing something — rain finding a collar, wind taking a door, heat bending the road, first snow killing the sound. The narrator is inside the weather, not watching it from a window.' },
+  { name: 'Stranger\'s Eye', rule: 'Open on someone ELSE — a person the narrator is watching — before we learn a single thing about the narrator. We meet the "I" only through what they notice about the other.' },
+  { name: 'Threshold / In Transit', rule: 'Set line 1 in a liminal public space — an airport gate, a bus stop, a hospital hallway, an elevator, a gas station at the edge of town. Never a kitchen, bedroom, or living room. People pass through here; no one stays.' },
+  { name: 'Sense-Memory Trigger', rule: 'Enter through an involuntary smell or taste that yanks the narrator somewhere — cigarette smoke, rain on hot asphalt, a stranger wearing someone\'s perfume, cheap wine. The trigger fires before the memory names itself.' },
+  { name: 'Aftermath', rule: 'Open on the residue of an event that already happened — broken glass still settling, a door still shaking in its frame, taillights already gone, a phone still warm. We arrive AFTER the moment and reconstruct it backward.' },
+  { name: 'Small Hands Action', rule: 'Open on a tight close-up of one small physical action mid-task — lacing a boot, counting bills, dialing then hanging up, folding a note, turning a key that won\'t catch. The tiny gesture holds the whole weight.' },
+  { name: 'Direct Address', rule: 'Open by speaking straight to a "you," mid-conversation, with zero setup — as if the listener walked in on the narrator already talking to someone. No scene at all: just the voice, already aimed.' },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7293,6 +7321,9 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   // (separate const so we don't have to edit 30+ GENRE_SECTION_DNA entries).
   const _giip = GENRE_INTRO_INTERLUDE_PREFS[genre] || {};
   const _ia  = pickWeightedArchetype(INTRO_ARCHETYPES,      _giip.intro);
+  // Point-of-entry lens — rotates WHERE line 1 drops the listener in, to break
+  // the domestic-default opening (kitchen / sink / window). Fires every song.
+  const _entryLens = pickRandom(ENTRY_POINT_LENSES);
   const _ltier = params.lyricTier;
   const _shouldInterlude = (_ltier === 'archival' || _ltier === 'conscious' || Math.random() < 0.35);
   const _intla = _shouldInterlude ? pickWeightedArchetype(INTERLUDE_ARCHETYPES, _giip.interlude) : null;
@@ -7337,6 +7368,12 @@ Rule: ${_poa.rule}`;
   const introNote = `\n\nINTRO APPROACH — "${_ia.name}":
 ${_ia.rule}
 This sets the song's first 7 seconds — the make-or-break TikTok / Spotify / radio attention window.`;
+
+  // Wave 4k — lyrical POINT OF ENTRY. Sits alongside the always-on FIRST LINE
+  // RULE and pushes the opening off the domestic-establishing-shot default.
+  const openingImageNote = `\n\nOPENING IMAGE / POINT OF ENTRY — "${_entryLens.name}":
+${_entryLens.rule}
+BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the overused domestic-establishing-shot clichés the model reaches for by reflex): sitting in the kitchen, standing or leaning by the sink, at the kitchen table, waking up in bed, lying on the couch, staring out a window, looking in the mirror, "it's 3am and I can't sleep," coffee going cold. If your first instinct is a room inside a house, MOVE the camera — change the room, take it outdoors, put the narrator in motion, or enter through a non-visual sense. The opening must still obey the FIRST LINE RULE (a concrete image or action, never abstract) — it just must NOT be the domestic default.`;
 
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
@@ -7705,10 +7742,10 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}
 
 SONGWRITING RULES:
-- FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
+- FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
 - Hook must arrive within 30 seconds
 - Chorus lines: maximum 10 syllables each for singability
 - Verse lines: 8-13 syllables, consistent within each verse
