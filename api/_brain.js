@@ -5138,6 +5138,59 @@ const ENTRY_POINT_LENSES = [
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
+// FLOW-CRAFT LAYER — three cross-genre devices the engine was missing:
+//   (1) FLOW POCKET  — WHERE the voice sits against the beat (placement, not
+//       speed/density). The single biggest driver of "feel." Applies to any
+//       vocal genre — a country vocal behind the beat is Willie; ahead is punk.
+//   (2) ENJAMBMENT   — running sentences past the bar/phrase line so grammar
+//       and the rhyme grid fall out of sync. Rap (Eminem/Black Thought) AND
+//       sung genres (Joni Mitchell run-on lines, folk/country narrative).
+//   (3) SUSTAINED DOUBLE-TIME — hold a double-time section WITH clarity as the
+//       flex (Logic), plus its cross-genre cousins (Dylan speed-folk, Garth
+//       "Ain't Going Down", G&S/Hamilton patter, Billy Joel inventory-cascade).
+// One helper serves buildSongPrompt (all genres) and buildRapLabPrompt (rap).
+// ═══════════════════════════════════════════════════════════════════════════
+
+const FLOW_POCKET_LENSES = [
+  { name: 'On the Beat', rule: 'Lock stressed syllables squarely onto the kick and snare — every accent lands ON the grid. Punchy, certain, declarative. The pocket is tight (Migos-hard rap; four-on-the-floor pop; marching country).' },
+  { name: 'Behind the Beat', rule: 'Lay the vocal slightly BEHIND the beat — drag the phrasing a hair late so it feels relaxed, cool, conversational, in-control. The delay IS the swagger (Snoop; cool-jazz croon; Willie Nelson; laid-back soul).' },
+  { name: 'Pushed / Ahead', rule: 'Phrase slightly AHEAD of the beat — lean in so the delivery feels urgent, breathless, driving. The forward pull manufactures momentum and tension (punk; hype rap; anxious indie).' },
+  { name: 'Off-Grid / Syncopated', rule: 'Place accents BETWEEN the beats — start phrases on off-beats and stagger stresses across the bar so the flow rides against the grid instead of on it. Conversational, unpredictable, technically alive (Eminem; Black Thought; André 3000; D\'Angelo behind-and-around).' },
+];
+
+// Genre relevance — raw genre keys as used elsewhere in this file.
+const POCKET_GENRES     = new Set(['hiphop','rnb','pop','country','ss','folk','jazz','funk','soul','reggae','blues','gospel','latin','afrobeats','rock','altrock']);
+const ENJAMB_GENRES     = new Set(['hiphop','ss','folk','country','pop','rnb','rock','altrock','gospel','blues','jazz','tvmusical','indie']);
+const DOUBLETIME_GENRES = new Set(['hiphop','tvmusical','folk','country','pop']);
+
+// Returns a concatenated directive string (may be '') for the given genre key.
+// Pocket fires every eligible song; enjambment ~55%; double-time ~28% — so the
+// devices vary take-to-take instead of firing as a rigid checklist every time.
+function buildFlowCraftNotes(genreKey) {
+  const g = String(genreKey || '').toLowerCase();
+  let out = '';
+  if (POCKET_GENRES.has(g)) {
+    const p = pickRandom(FLOW_POCKET_LENSES);
+    out += `\n\nFLOW POCKET — "${p.name}" (WHERE the voice sits against the beat — placement, not speed or rhyme density):\n${p.rule}\nThis is RHYTHMIC PLACEMENT: a simple line hits hard when the pocket is right. Hold this feel as the section default; you may break it once for a specific moment, then return to it.`;
+  }
+  if (ENJAMB_GENRES.has(g) && Math.random() < 0.55) {
+    const unit = (g === 'hiphop') ? 'bar line' : 'line / phrase break';
+    const models = (g === 'hiphop') ? 'wrap the sentence over the bar (Eminem, Black Thought, Kendrick)'
+      : 'let a lyric run through the natural phrase break instead of pausing on every line (Joni Mitchell, Dylan, narrative country/folk)';
+    out += `\n\nPHRASING — ENJAMBMENT (run SOME lines past the ${unit}):\nDo NOT end-stop every line. Let a few sentences spill across the ${unit} so the grammar and the rhyme grid deliberately fall out of sync — the thought finishes mid-next-line while the rhyme still lands where it should. This creates momentum and a conversational, un-sing-song feel: ${models}. Balance it — a lyric that is ALL enjambment loses its landing points; alternate end-stopped lines with run-on ones so the run-ons have contrast to work against.`;
+  }
+  if (DOUBLETIME_GENRES.has(g) && Math.random() < 0.28) {
+    const models = (g === 'hiphop') ? 'Logic, Eminem "Rap God", Twista, Tech N9ne'
+      : (g === 'tvmusical') ? 'Gilbert & Sullivan patter, Hamilton "Guns and Ships"'
+      : (g === 'folk') ? 'Dylan "Subterranean Homesick Blues"'
+      : (g === 'country') ? 'Garth Brooks "Ain\'t Going Down (\'Til the Sun Comes Up)"'
+      : 'Billy Joel "We Didn\'t Start the Fire", R.E.M. "It\'s the End of the World"';
+    out += `\n\nSUSTAINED DOUBLE-TIME (one section, HELD — not a one-bar burst):\nTake ONE section (a verse or the bridge) and double the syllable rate, held for the whole section, with enunciation kept crystal-clear the entire time. The flex is sustained speed WITH clarity, never a chaotic blur (${models}). Every word must stay intelligible — if a listener couldn't catch it, slow down. Return to the normal pocket after the section so the double-time reads as a deliberate gear, not the default.`;
+  }
+  return out;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
 // PRE-CHORUS ARCHETYPES — The tension builder before the chorus drop
 // Each archetype defines HOW to build anticipation differently
 // ═══════════════════════════════════════════════════════════════════════════
@@ -7376,6 +7429,10 @@ This sets the song's first 7 seconds — the make-or-break TikTok / Spotify / ra
 ${_entryLens.rule}
 BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the overused domestic-establishing-shot clichés the model reaches for by reflex): sitting in the kitchen, standing or leaning by the sink, at the kitchen table, waking up in bed, lying on the couch, staring out a window, looking in the mirror, "it's 3am and I can't sleep," coffee going cold. If your first instinct is a room inside a house, MOVE the camera — change the room, take it outdoors, put the narrator in motion, or enter through a non-visual sense. The opening must still obey the FIRST LINE RULE (a concrete image or action, never abstract) — it just must NOT be the domestic default.`;
 
+  // Wave 4l — flow-craft layer (pocket / enjambment / sustained double-time),
+  // genre-gated inside the helper so pop/country/SS/etc. only get what fits.
+  const flowCraftNote = buildFlowCraftNotes(genre);
+
   const interludeNote = _intla ? `\n\nINTERLUDE — "${_intla.name}" (optional 8-16 bar mid-song detour, between verse 2 and bridge OR between bridge and final chorus):
 ${_intla.rule}
 The interlude RESETS attention before the final chorus delivery. If unnatural for this song, omit it — don't force one in.` : '';
@@ -7743,7 +7800,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${flowCraftNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -9765,7 +9822,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${buildFlowCraftNotes('hiphop')}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
