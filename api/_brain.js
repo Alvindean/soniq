@@ -5921,7 +5921,10 @@ const TRESILLO_GROOVE_PROFILES = {
 // the repeating melody; Billie Jean locks the BASS and frees the vocal to roam.
 // FULL variant for in-set groove genres; RELAXED variant for riddim genres.
 // ═══════════════════════════════════════════════════════════════════════════
-const MELODIC_BASS_GENRES = new Set(['funk', 'disco', 'synthpop', 'rnb', 'soul', 'pop', 'afrobeats', 'house', 'neosoul', 'motown']);
+// Real top-level genre keys only. Funk / soul / disco / synthpop / motown reach
+// this feature via their PARENT keys (rnb / pop / neosoul) — they are substyles,
+// never top-level `genre`, so the literal entries were dead (never matched).
+const MELODIC_BASS_GENRES = new Set(['rnb', 'pop', 'afrobeats', 'neosoul']);
 const MELODIC_BASS_RELAXED = new Set(['reggae', 'reggaeton', 'dancehall', 'amapiano']);
 const MELODIC_BASS_BALLAD_RE = /ballad|slow|intimate|sad|confessional/i;
 const MELODIC_BASS_POP_GROOVE_RE = /groov|danceab|upbeat|party|funky|bounce|disco|dance|club/i;
