@@ -6425,6 +6425,7 @@ Density: ${density}
 Example: ${a.example}
 Outro: ${a.outro}${bucketLine}${toneLine}${banLine}
 Variety: Rotate through the sound pool — never repeat the same ad-lib more than twice in a row, and use at least 3 distinct ad-libs across any 8-bar span. Save the highest-energy tag for section peaks, not every bar.
+Homage, not costume: these vernacular ad-libs are a NOD to the lineage, not a costume worn on every line. Never turn an artist's signature into a recurring tag — a Memphis / Phonk cut does not need "triple six" chants to sound Memphis, and no style needs "you dig" (or any single filler) on repeat. Use the flavor sparingly and let plenty of lines breathe with no ad-lib at all.
 Rule: Parentheses = background layer. Same line = rhythmic pocket. Separate line = spotlight moment.`;
 }
 
@@ -9677,7 +9678,15 @@ function buildRapLabPrompt(params) {
   const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
   const rapSubSunoLock = rapSubSunoTag ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.` : '';
   const rapAdlibs = RAP_STYLE_ADLIBS[style.label] || null;
-  const rapAdlibLock = rapAdlibs ? `\n\n🎤 AUTHENTIC AD-LIBS — ${style.label} (regional/era vernacular; use THESE, not generic "(yeah)" or "(hey)"):\n  ${rapAdlibs.join('  ·  ')}\n\nAd-lib placement rules:\n- Weave 2-4 of these per verse in parentheses on the same line as rap bars.\n- Hook gets 1-2 prominent/chanted ad-libs from the list above.\n- Do NOT invent new ad-libs OR use generic hip-hop ad-libs ("yeah", "uh", "hey") — those sound AI-written.\n- The above ad-libs are specific to ${style.label}'s regional vernacular, era, and artist lineage. Stay inside this vocabulary.` : '';
+  // Ad-lib density rotates per generation so alternate takes diverge and no
+  // song comes out wall-to-wall vernacular. Homage, not costume — see below.
+  const _adr = Math.random();
+  const _adlibMode = _adr < 0.30
+    ? { label: 'BARE', rule: 'Use NONE, or at most ONE ad-lib in the entire song. Let the bars stand naked. Silence is a confident choice — a strong verse needs no decoration.' }
+    : _adr < 0.75
+    ? { label: 'LIGHT', rule: 'Use ad-libs SPARINGLY — 0 to 2 across a whole verse, and only where one genuinely lands in the pocket. Most lines carry none. Never every line, never every section.' }
+    : { label: 'SEASONED', rule: 'Use ad-libs as light texture — up to 2 or 3 per verse where they punctuate naturally, with bare lines between them. Seasoning, not a coating.' };
+  const rapAdlibLock = rapAdlibs ? `\n\n🎤 AD-LIB PALETTE — ${style.label} (regional/era vernacular you MAY draw from — a menu, never a checklist):\n  ${rapAdlibs.join('  ·  ')}\n\nAD-LIB PHILOSOPHY — homage, not costume:\n- DENSITY THIS TAKE (${_adlibMode.label}): ${_adlibMode.rule}\n- The vernacular is a NOD to the lineage, not a reconstruction of it. One well-placed regional word beats five stacked signatures.\n- NEVER turn an artist's signature into a recurring tag. A Memphis / Phonk track does NOT need "triple six" or "three six" chants to sound Memphis, and NO style needs "you dig" (or any single filler) on repeat. If a phrase has landed once, do not lean on it again.\n- Taste outranks the menu: a fitting ad-lib that is NOT on the list is welcome when it is authentic to the voice. Just don't fall back on generic AI filler ("yeah", "uh", "hey") as a crutch.\n- Make THIS take distinct — do not drop the same ad-libs in the same spots a default version would, so alternate takes actually differ.` : '';
   // Break One Rule for Rap Lab (uses hip-hop outliers)
   let breakRuleLock = '';
   if (breakRule && GENRE_BIBLE && GENRE_BIBLE.hiphop && GENRE_BIBLE.hiphop.outliers && GENRE_BIBLE.hiphop.outliers.length) {
