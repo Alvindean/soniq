@@ -4432,7 +4432,7 @@ ${(()=>{const g=GENRE_BIBLE[genre];if(g&&g.vocables){return `\n\nVOCABLE SIGNATU
 Your output is used directly by music creators to generate tracks on AI music platforms. Always respond with the exact format requested. No extra commentary before or after. Write with the full weight of this genre's history, the precision of its current moment, and the curiosity of its trajectory.`;
 }
 
-const LUCKY_TOPICS=['growing up too fast','a city that never loved you back','last message before midnight','the version of yourself you abandoned','driving nowhere at 3am','falling in love with the wrong timeline','what silence sounds like after a storm','rebuilding from zero','the first morning after everything changed','chasing something you lost before you knew its name','finding home in a stranger','the day the music saved you'];
+const LUCKY_TOPICS=['growing up too fast','a city that never loved you back','last message before midnight','the version of yourself you abandoned','missing someone in a room full of people','falling in love with the wrong timeline','what silence sounds like after a storm','rebuilding from zero','the first morning after everything changed','chasing something you lost before you knew its name','finding home in a stranger','the day the music saved you'];
 
 const LUCKY_MOODS=['Euphoric','Melancholic','Hopeful','Defiant','Nostalgic','Dark','Rebellious','Romantic','Peaceful','Angry','Longing','Transcendent','Devastated','Tender','Triumphant','Bittersweet'];
 
@@ -5126,7 +5126,7 @@ const ENTRY_POINT_LENSES = [
   { name: 'Body-First', rule: 'Enter through a physical sensation inside the narrator\'s body — a heartbeat, a dry mouth, cold hands, a held breath, a jaw clenched. The world outside comes into focus only after the body does.' },
   { name: 'Object Out of Place', rule: 'Open on a single specific object exactly where it should not be — a shoe in the driveway, a ring on the dashboard, a suitcase in the hall. The wrongness of its placement carries the whole story\'s tension.' },
   { name: 'Mid-Dialogue', rule: 'Drop in mid-sentence — the narrator answering a question we never heard, finishing an argument, or catching a name mid-air. It should feel like the tape started thirty seconds too late.' },
-  { name: 'Wrong Hour', rule: 'Open at a precise, unusual hour in a place that is empty at that hour — a parking garage at 4am, an office at midnight, a diner at closing, a highway with no other cars. The emptiness is the mood.' },
+  { name: 'Wrong Hour', rule: 'Open at a precise, unusual hour in a place that is empty at that hour — and the hour is NOT automatically late. Daylight emptiness is stranger and far less used: an office at 2pm on a public holiday, a school lot in mid-July, a bar at 11 in the morning, a beach town in February, a stadium concourse the morning after, a church on a Tuesday. Late-night versions (a garage at 4am, a diner at closing) are permitted but are the OBVIOUS choice — reach for a daytime wrong hour first. The emptiness is the mood.' },
   { name: 'Unusual Vantage', rule: 'Enter from an unexpected physical vantage — a rooftop, an overpass, the back seat, a window seat above the clouds, underwater, from across a crowded room. Height, distance, or angle does the emotional work.' },
   { name: 'Weather as Character', rule: 'Open outdoors with the environment actively doing something — rain finding a collar, wind taking a door, heat bending the road, first snow killing the sound. The narrator is inside the weather, not watching it from a window.' },
   { name: 'Stranger\'s Eye', rule: 'Open on someone ELSE — a person the narrator is watching — before we learn a single thing about the narrator. We meet the "I" only through what they notice about the other.' },
@@ -5136,6 +5136,58 @@ const ENTRY_POINT_LENSES = [
   { name: 'Small Hands Action', rule: 'Open on a tight close-up of one small physical action mid-task — lacing a boot, counting bills, dialing then hanging up, folding a note, turning a key that won\'t catch. The tiny gesture holds the whole weight.' },
   { name: 'Direct Address', rule: 'Open by speaking straight to a "you," mid-conversation, with zero setup — as if the listener walked in on the narrator already talking to someone. No scene at all: just the voice, already aimed.' },
 ];
+
+// ═══════════════════════════════════════
+// SETTING LENS — WHEN & WHERE the song is staged (Wave 4r)
+// Distinct from ENTRY_POINT_LENSES: that pool decides the camera angle of
+// LINE 1 only; this one fixes the hour, place and season the WHOLE song lives
+// in. Without it the model defaults to small-hours staging (3am, midnight,
+// empty street, dark bedroom) on every emotionally heavy topic, because that
+// is the statistical reflex — not a craft decision. Night entries stay in the
+// pool deliberately but are held to a small minority so they read as a choice.
+// Craft principle encoded below: a lonely feeling in a lonely place is
+// REDUNDANT. Staging longing in daylight, in public, or inside an ordinary
+// obligation creates friction, and friction is what makes the line land.
+// ═══════════════════════════════════════
+
+const SETTING_LENSES = [
+  { name: 'Broad Daylight', rule: 'Stage the song under high sun, early-to-mid afternoon, with nothing to hide behind. Flat bright light, heat off pavement, everything visible. The feeling has nowhere to go and no darkness to excuse it.' },
+  { name: 'The Commute', rule: 'Set it in the ordinary transit of a working life — the drive home at 5:40, a bus with other passengers, a train platform, the walk from the lot. Routine motion the narrator has made a thousand times, carrying something new.' },
+  { name: 'Crowded Room', rule: 'Stage it surrounded by people — a party at peak, a full bar, a family gathering, a packed gym. The narrator is the only one holding the feeling and everyone else is fine. Absence is loudest where the scene is otherwise full.' },
+  { name: 'Errand Hour', rule: 'Put the whole song inside a mundane daylight task — a grocery aisle, a pharmacy line, a car wash, returning something, pumping gas. The banality is the point: grief and longing do not wait for a cinematic moment.' },
+  { name: 'Golden Hour', rule: 'Late afternoon into early evening, the hour before dark. Long shadows, warm low light, everything ending softly. Melancholy is fully available here WITHOUT the crutch of night.' },
+  { name: 'The Ceremony', rule: 'Stage it at a marked occasion where feeling is socially scheduled — a wedding, a funeral, a graduation, a christening, a reunion. The narrator must perform the expected emotion while privately holding a different one.' },
+  { name: 'Holding Pattern', rule: 'Set it in institutional waiting — a clinic waiting room, the school pickup line, a DMV, an airport gate, a hospital corridor at shift change. Fluorescent light, other people also waiting, time that will not move.' },
+  { name: 'On The Clock', rule: 'The narrator is mid-shift and cannot stop — a register, a job site, a delivery route, a double, a desk at 2pm. They have to keep working THROUGH the feeling. The labour continues underneath every verse.' },
+  { name: 'High Summer', rule: 'Let the season do the work — heat, long light, open windows, sweat, an air conditioner losing. Summer memory is sharper than winter memory, and the warmth actively contradicts the ache.' },
+  { name: 'Deep Winter', rule: 'Cold and early dark — but the EARLY part is the point: it is dark at 4:30pm, not at 3am. Coats worn indoors, a car that will not warm, breath visible, the sun gone before the day was over.' },
+  { name: 'Sunday Texture', rule: 'Name the specific day and let it carry the mood — Sunday afternoon flatness, Monday morning dread, Friday at 4, the dead week between the holidays. A weekday has a texture the listener already knows.' },
+  { name: 'Shared Table', rule: 'Stage it over food with other people present — a kitchen table with family, a diner booth, a work lunch, a holiday meal. Conversation happening across the narrator while they are somewhere else entirely.' },
+  { name: 'Somewhere Loud', rule: 'Set it where the volume is already high — a concert, a game, a bar with the TV on, a shop floor, a highway with the windows down. The narrator cannot hear themselves think, and that is either relief or torture.' },
+  { name: 'Off-Season', rule: 'A place experienced outside its intended time — a beach town in February, a school in July, a ski lodge in summer, a fairground the week after. Built for crowds, currently empty, and the emptiness has a DATE rather than an hour.' },
+  { name: 'Small Hours', rule: 'Genuine late-night staging — but it must be EARNED, never defaulted to. If you choose this, the song has to justify why it could ONLY happen at this hour, and you must avoid the stock furniture: do not state "3am" outright, no staring at a ceiling, no unsent text, no empty street under a streetlight. Give the hour a specific task.' },
+  { name: 'Edge of Light', rule: 'Dawn or dusk — the boundary minutes. Pre-shift dark giving way, or the last light going. Something is changing state in the sky and the narrator is awake for it, usually for a practical reason rather than a poetic one.' }
+];
+
+// Staging directive. Fires on every generation path (song / Lucky / Rap Lab,
+// and Prism via its delegation to buildSongPrompt) so no path can quietly fall
+// back to the small-hours default.
+function buildSettingNote(lens) {
+  const _s = lens || pickRandom(SETTING_LENSES);
+  return `\n\nSTAGING — TIME & PLACE — "${_s.name}":
+${_s.rule}
+SETTING DISCIPLINE: Fix the song's hour, place and season BEFORE writing line 1, and hold them consistent across every section unless a Time Jump is explicitly called for elsewhere in this brief. The setting must do EMOTIONAL WORK rather than echo the mood — a lonely feeling staged in a lonely place is redundant and reads as a first draft. Longing placed in daylight, in public, or in the middle of an ordinary obligation is harder to write and lands harder. If the song is about missing someone, stage it somewhere they are conspicuously ABSENT from a scene that is otherwise full. Do NOT default to small-hours staging — 3am, midnight, "can't sleep", empty streets, dark bedrooms and unanswered texts are the reflex choice, not a decision.`;
+}
+
+// Point-of-entry directive — extracted from buildSongPrompt (Wave 4k) so every
+// path can share it. Was song-path-only, which left Lucky and Rap Lab with no
+// anti-cliché opening guard at all.
+function buildOpeningImageNote(lens) {
+  const _l = lens || pickRandom(ENTRY_POINT_LENSES);
+  return `\n\nOPENING IMAGE / POINT OF ENTRY — "${_l.name}":
+${_l.rule}
+BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the overused domestic-establishing-shot clichés the model reaches for by reflex): sitting in the kitchen, standing or leaning by the sink, at the kitchen table, waking up in bed, lying on the couch, staring out a window, looking in the mirror, "it's 3am and I can't sleep," coffee going cold. If your first instinct is a room inside a house, MOVE the camera — change the room, take it outdoors, put the narrator in motion, or enter through a non-visual sense. The opening must still obey the FIRST LINE RULE (a concrete image or action, never abstract) — it just must NOT be the domestic default.`;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // FLOW-CRAFT LAYER — three cross-genre devices the engine was missing:
@@ -7818,9 +7870,10 @@ This sets the song's first 7 seconds — the make-or-break TikTok / Spotify / ra
 
   // Wave 4k — lyrical POINT OF ENTRY. Sits alongside the always-on FIRST LINE
   // RULE and pushes the opening off the domestic-establishing-shot default.
-  const openingImageNote = `\n\nOPENING IMAGE / POINT OF ENTRY — "${_entryLens.name}":
-${_entryLens.rule}
-BANNED DEFAULT OPENINGS — do NOT enter the song at any of these (they are the overused domestic-establishing-shot clichés the model reaches for by reflex): sitting in the kitchen, standing or leaning by the sink, at the kitchen table, waking up in bed, lying on the couch, staring out a window, looking in the mirror, "it's 3am and I can't sleep," coffee going cold. If your first instinct is a room inside a house, MOVE the camera — change the room, take it outdoors, put the narrator in motion, or enter through a non-visual sense. The opening must still obey the FIRST LINE RULE (a concrete image or action, never abstract) — it just must NOT be the domestic default.`;
+  const openingImageNote = buildOpeningImageNote(_entryLens);
+  // Wave 4r — staging dial. Fixes hour/place/season for the whole song so the
+  // model cannot fall back to small-hours default staging on heavy topics.
+  const settingNote = buildSettingNote();
 
   // Wave 4l-4q — craft-directive layers. Each helper now returns a TAGGED
   // DIRECTIVE ARRAY; assembleCraft merges them through the guardrails
@@ -8204,7 +8257,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${craftBlock}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${settingNote}${craftBlock}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8763,6 +8816,12 @@ function buildLuckyPrompt(params) {
   const _luckyProdGenre = GENRE_FX_PROFILES[_g1Norm] ? _g1Norm : (GENRE_FX_PROFILES[_g2Norm] ? _g2Norm : _g1Norm);
   const luckyProductionNote = buildProductionNote(_luckyProdGenre, mood, params && params.aggression, params && params.lyricTier);
 
+  // Wave 4r — Lucky previously received neither the point-of-entry lens nor the
+  // banned-openings list (both were song-path-only), leaving the small-hours
+  // cliché entirely unguarded on this path. Staging dial added alongside.
+  const luckyOpeningNote = buildOpeningImageNote();
+  const luckySettingNote = buildSettingNote();
+
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
 ${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(g1, g2)}
 
@@ -8770,7 +8829,7 @@ Fusion style: ${fd?.name || g1 + ' × ' + g2}. Blend both genres authentically.
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${luckySampleHookLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${luckySampleHookLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}${luckyOpeningNote}${luckySettingNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -10210,6 +10269,10 @@ function buildRapLabPrompt(params) {
 
 RAP LAB ACTIVE: You are operating in precision rap construction mode. Every dimension below is a hard constraint — not a suggestion. Your craft must honor the specific combination of dimensions requested.`;
 
+  // Wave 4r — same gap as Lucky: no entry lens, no banned-openings list.
+  const rapOpeningNote = buildOpeningImageNote();
+  const rapSettingNote = buildSettingNote();
+
   const prompt = `Write a complete, production-ready Rap / Hip-Hop song in the ${style.label} style at the highest possible level of craft.
 
 Style: ${style.label} (${style.era})
@@ -10244,7 +10307,7 @@ ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${assembleCraf
 BRACKET REQUIREMENTS:
 ${freestyleMode
   ? 'Use ONLY: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (optional), [Outro] (optional). Inline ad-libs in (parentheses) on the same line as bars are allowed. NO hook/chorus/bridge/pre-chorus brackets of any kind.'
-  : bracketInstructionServer('hiphop', 'suno', style.label)}
+  : bracketInstructionServer('hiphop', 'suno', style.label)}${rapOpeningNote}${rapSettingNote}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
@@ -11456,7 +11519,7 @@ const SUBJECT_SEED = [
   'the version of yourself you abandoned','a city that never loved you back','the last good day before everything changed',
   'falling for someone at exactly the wrong time','what your hometown took from you','the friend who didn\'t make it out',
   'pretending you\'re fine at a party','the voicemail you never deleted','growing up faster than you wanted to',
-  'the people we become at 3am','a love that ended before it started','watching your parents get older',
+  'the people we become in front of everyone','a love that ended before it started','watching your parents get older',
   'the apartment you can\'t afford to keep','chasing a dream nobody believes in','the night you almost called',
   'learning to be alone on purpose','the weight of being the strong one','a summer you keep going back to',
   'the lie you tell to keep the peace','outgrowing the people you love','the first time the city felt like home',
