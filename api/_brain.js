@@ -11302,9 +11302,13 @@ function buildSingerNotesInstruction(genre, isRap) {
 
 
 // ============ SUNO GENERATION SETTINGS SYSTEM ============
-// Per-song recommended values for Suno's three generation knobs:
+// Per-song recommended values for Suno's Advanced Mode controls. Updated for
+// the v6 model generation (2026-09-09), which added a third slider and a
+// spend toggle on top of the two knobs this system already drove:
 //   • Weirdness  (0-100%) — experimental / safe balance
 //   • Style Influence (0-100%) — genre lock / drift balance
+//   • Variety (v6, NEW) — pinned to 0 by us, see SUNO_VARIETY_LOCK below
+//   • Max Mode (v6, NEW) — extra spend for longer / higher-fidelity takes
 //   • Exclude Styles — negative prompt, what to keep out
 // Studio-plan only. Free users see a masked placeholder with upgrade CTA.
 // Phase 2 (learning loop) blends community + user-specific signals in via
@@ -11395,7 +11399,84 @@ const STRUCTURE_SUNO_MODIFIERS = {
 // Core formula. Blends base + mood + structure + optional learning overlay.
 // `userLearning` shape: { sampleSize, avgWeirdness, avgStyleInfluence, excludeHits }
 // When sampleSize >= 3, learning overlays with weight = min(0.5, sampleSize/20).
-function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes }) {
+// ── v6 VARIETY LOCK ────────────────────────────────────────────────────
+// Suno v6 added a "Variety" slider that is ON by default. Per Suno's own v6
+// FAQ it "is designed to introduce variety in your outputs by adjusting and
+// updating your style prompts", and dropping it to 0 is what "retains full
+// control of your style tags".
+//
+// That is a direct threat to what this engine produces. Every GENRE_BIBLE
+// entry carries a hand-written `Suno style: "..."` string, substyles add a
+// Suno lock on top, and buildSunoSettings emits a curated Exclude list. Left
+// at its default, v6 paraphrases all of it before generating.
+//
+// We pin it to 0 everywhere and do NOT expose it per genre, because SONIQ
+// already owns a precise exploration lever: `weirdness`. Weirdness widens the
+// output without corrupting the style prompt; Variety widens it BY corrupting
+// the style prompt. Use the knob that keeps the brief intact.
+const SUNO_VARIETY_LOCK = 0;
+const SUNO_VARIETY_REASON = 'v6 rewrites your style prompt when Variety is above 0 — keep it at 0 so the engineered style string, substyle lock and exclude list survive intact. Use Weirdness to explore instead.';
+
+// ── v6 MAX MODE ────────────────────────────────────────────────────────
+// Suno recommends Max Mode for songs over two minutes, for covers needing
+// fidelity, for style transfers, and for vocal consistency across a track.
+// It costs extra credits, so this is surfaced as a recommendation with a
+// reason rather than an instruction.
+const MAX_MODE_LENGTHS = new Set(['medium', 'long', 'extended']);
+
+// ── v6 MODEL ROUTING ───────────────────────────────────────────────────
+// v6 is "reliable, precise, consistently polished"; v6-wild is "less
+// predictable and more varied, producing unexpected, textured and ambitious
+// results"; v6-mini is the faster model available on every plan. That split
+// is the same precision-vs-exploration axis this engine already scores with
+// weirdness and lyricTier, so we route on the values we have already resolved
+// rather than adding another dial.
+function _routeV6Model(weirdness, lyricTier) {
+  const tier = String(lyricTier || '').toLowerCase();
+  const wild = weirdness >= 55 || tier === 'archival' || (tier === 'conscious' && weirdness >= 45);
+  if (wild) {
+    return { recommended: 'v6-wild', alt: 'v6',
+      reason: 'This song is scored toward the experimental end (weirdness ' + weirdness + '%' + (tier ? ', ' + tier + ' tier' : '') + '), which is what v6-wild is built for. Use v6 instead if you want a safer, more polished take.' };
+  }
+  return { recommended: 'v6', alt: 'v6-wild',
+    reason: 'This song wants precision over surprise (weirdness ' + weirdness + '%' + (tier ? ', ' + tier + ' tier' : '') + '), which is v6\'s strength. Reach for v6-wild only if the takes come back too safe.' };
+}
+
+// ── v6 SECTION EDITING ─────────────────────────────────────────────────
+// v6 accepts natural-language edits against one section of an existing song
+// ("change the chorus so it's sung by a gospel choir") without regenerating
+// the track. buildEditPrompt still rewrites LYRICS — that is a different job.
+// This emits the paste-ready production instruction to sit alongside it.
+function buildV6EditDirective(opts) {
+  opts = opts || {};
+  const section = sanitizeInput(opts.section || '', 40).trim();
+  const instruction = sanitizeInput(opts.instruction || '', 300).trim().replace(/[.\s]+$/, '');
+  if (!section || !instruction) return null;
+  const lead = /^(make|change|turn|add|remove|strip|swap|give|drop|bring|cut|slow|speed|re)/i.test(instruction)
+    ? instruction.charAt(0).toLowerCase() + instruction.slice(1)
+    : 'make it ' + instruction;
+  return {
+    directive: 'In the ' + section + ', ' + lead + '. Leave every other section exactly as it is.',
+    note: 'Paste this into v6\'s section edit rather than regenerating — it preserves the rest of the take.'
+  };
+}
+
+// Per-variant v6 transform. The existing VARIANT_PROMPTS rewrite LYRICS for a
+// variant; these are the matching production instructions for v6, so a variant
+// can be applied to an existing track instead of generated from scratch.
+const V6_VARIANT_DIRECTIVES = {
+  dj_remix:       'Rework this as a club/DJ edit — extend the intro to 16 bars of beat, add a filtered build into a drop on the hook, keep the lead vocal, and end on a mixable outro.',
+  acoustic:       'Strip this back to acoustic — solo acoustic guitar and voice, no drums and no electronic production, keeping the melody and lyrics intact.',
+  radio_edit:     'Cut this to a radio edit around 3:00 — hook inside the first 15 seconds, trim the second verse, keep the final chorus, and clean any explicit language.',
+  lofi:           'Rework this as lo-fi — relaxed halftime feel, vinyl crackle and tape saturation, softened drums, and a more distant filtered vocal.',
+  slowed_reverb:  'Slow this down roughly 20% and drench it in reverb — cathedral-sized space, magnified emotion, vocal still intelligible.',
+  live_version:   'Make this a live version — room ambience and audience presence, slightly looser timing, live drum kit, and an ad-libbed vocal moment before the last chorus.',
+  trap_remix:     'Remix this as trap — 808 sub bass, rolling hi-hats with triplet fills, halftime feel, keeping the original vocal melody on top.',
+  gospel_version: 'Rework this as gospel — Hammond organ, full choir on the chorus, hand claps, and a key change into the final chorus with runs on the lead vocal.',
+  cinematic:      'Rework this as cinematic trailer music — orchestral strings and low brass, big percussion hits, a build from sparse to full, with the vocal as the emotional center.'
+};
+
+function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes, length }) {
   const base = SUNO_GEN_SETTINGS_BASE[genre] || SUNO_GEN_SETTINGS_BASE.pop;
   let weirdness = base.weirdness;
   let styleInfluence = base.styleInfluence;
@@ -11474,9 +11555,24 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   weirdness = Math.max(0, Math.min(100, Math.round(weirdness)));
   styleInfluence = Math.max(0, Math.min(100, Math.round(styleInfluence)));
 
+  // v6 Max Mode — recommended past the ~2 minute mark (Suno's own guidance),
+  // where consistency across a longer take is worth the extra credits.
+  const _len = String(length || 'medium').toLowerCase();
+  const _maxMode = MAX_MODE_LENGTHS.has(_len);
+
   return {
     weirdness,
     styleInfluence,
+    // v6: pinned to 0 so Suno cannot rewrite the style prompt we just built.
+    variety: SUNO_VARIETY_LOCK,
+    varietyReason: SUNO_VARIETY_REASON,
+    maxMode: {
+      recommended: _maxMode,
+      reason: _maxMode
+        ? 'Suno recommends Max Mode past ~2 minutes — it holds vocal consistency across the take. Costs extra credits.'
+        : 'Not needed at this length — standard mode is fine for short songs.'
+    },
+    model: _routeV6Model(weirdness, lyricTier),
     excludeStyles: Array.from(excludes).slice(0, 10),
     learningApplied,
     sampleSize: userLearning?.sampleSize || 0
@@ -12074,7 +12170,7 @@ function buildPrismSongPrompt(brief, extra) {
   return built;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,

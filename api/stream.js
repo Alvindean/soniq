@@ -1015,7 +1015,9 @@ module.exports = async function handler(req, res) {
         aggression: sunoParams.aggression,
         lyricTier: sunoParams.lyricTier,
         userLearning: sunoParams.sunoLearning,
-        userExcludes: (sunoParams.vocalDescriptors && sunoParams.vocalDescriptors.negativeAdd) || sunoParams.exclude
+        userExcludes: (sunoParams.vocalDescriptors && sunoParams.vocalDescriptors.negativeAdd) || sunoParams.exclude,
+        // v6 Max Mode recommendation keys off the target length.
+        length: sunoParams.length
       });
       const lyricTier = sunoParams.lyricTier || 'street';
       const metaObj = { ...(built.meta || {}), prodData, sunoSettings, lyricTier };
