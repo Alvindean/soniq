@@ -20,7 +20,9 @@
  * status() (a fast GET) every ~10s. No Queue / Worker needed for the MVP —
  * the provider hosts the mp3 and we hand back its audioUrl.
  *
- * Provider contract (verified, docs.sunoapi.org 2026-06; mirrors render-spike.mjs):
+ * Provider contract (verified, docs.sunoapi.org 2026-06; model enum re-checked
+ * 2026-09-10 after the Suno v6 launch — V6/V6_WILD/V6_MINI current, V5_5 and
+ * below deprecated upstream; mirrors render-spike.mjs):
  *   submit: POST {base}/api/v1/generate
  *           { customMode, instrumental, callBackUrl, model, prompt(=lyrics),
  *             style(=sunoPrompt), title } -> { code:200, data:{ taskId } }
@@ -102,7 +104,7 @@ const SUNO = {
       customMode:   true,
       instrumental: !!instrumental,
       callBackUrl:  process.env.SUNO_CALLBACK_URL || 'https://www.mysoniq.com/api/track', // we poll; field is required
-      model:        model || process.env.SUNO_MODEL || 'V4_5',
+      model:        model || process.env.SUNO_MODEL || 'V6',
       prompt:       instrumental ? '' : (lyrics || ''),
       style:        style || '',
       title:        (title || 'SONIQ Song').slice(0, 80),
@@ -212,9 +214,14 @@ module.exports = async function renderHandler(req, res) {
     const style  = typeof body.style  === 'string' ? body.style.replace(/[^\x20-\x7E]/g, ' ').trim().slice(0, 1000) : '';
     const title  = typeof body.title  === 'string' ? body.title.slice(0, 80) : 'SONIQ Song';
     const instrumental = !!body.instrumental;
-    // Accept any sane Suno model id (e.g. V4_5, V4_5ALL, V5, V3_5); else let the
-    // provider apply its default. Pattern-guarded so we never forward junk.
-    const model  = (typeof body.model === 'string' && /^V[0-9][0-9A-Z_]{0,9}$/.test(body.model)) ? body.model : undefined;
+    // Accept any sane Suno model id and normalize it first: the brain emits its
+    // recommendation lowercase and hyphenated ('v6-wild', from buildSunoSettings),
+    // while the provider enum is uppercase and underscored ('V6_WILD'). Current
+    // series is V6 / V6_WILD / V6_MINI; V5_5 and below still resolve but are
+    // deprecated upstream. Pattern-guarded so we never forward junk — anything
+    // unrecognised falls through to the provider default.
+    const _rawModel = typeof body.model === 'string' ? body.model.trim().toUpperCase().replace(/-/g, '_') : '';
+    const model  = /^V[0-9][0-9A-Z_]{0,9}$/.test(_rawModel) ? _rawModel : undefined;
 
     if (!instrumental && lyrics.trim().length < 20) {
       return res.status(400).json({ error: 'lyrics_required', message: 'Generate a song first, then produce it.' });
