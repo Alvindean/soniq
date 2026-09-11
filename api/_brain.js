@@ -8098,7 +8098,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
 
   // ── Platform-specific instructions ─────────────────────────────────────
   const platformNotes = {
-    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 440 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
+    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 800 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
     udio:   'PLATFORM: Udio — Section tags work differently: Udio responds well to emotional descriptors in brackets, e.g. [Verse - melancholic], [Chorus - anthemic]. Keep SONG PROMPT under 300 characters. Udio prefers genre descriptors over instrument lists.',
     stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
   };

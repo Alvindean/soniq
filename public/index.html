@@ -4437,7 +4437,7 @@ try { window.pingPv('pageview'); } catch(e){}
             <span class="bpill" onclick="setPlatform(this,'udio')">Udio</span>
             <span class="bpill" onclick="setPlatform(this,'stable')">Stable Audio</span>
           </div>
-          <div id="platform-desc" style="font-size:12px;color:var(--tx3);font-style:italic;margin-bottom:14px;min-height:16px">Output optimized for Suno — bracket tags, under-200-char prompts</div>
+          <div id="platform-desc" style="font-size:12px;color:var(--tx3);font-style:italic;margin-bottom:14px;min-height:16px">Output optimized for Suno — bracket tags, style prompt under 1,000 chars</div>
 
           <!-- EMOTIONAL ARC -->
           <label class="bracket-label" style="margin-top:2px">🌊 Emotional Arc <span style="font-weight:400;color:var(--tx3);font-size:12px;text-transform:none;letter-spacing:0">— shapes the emotional journey of the whole song</span></label>
@@ -15575,7 +15575,7 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
         ${cpBtn('brief-core-prompt', 'Copy Prompt')}
       </div>
       <div class="brief-prompt-box" id="brief-core-prompt">${escHtml(corePrompt)}</div>
-      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/200 characters (Suno style field)</div>
+      <div class="brief-prompt-charcount" id="brief-charcount">${corePrompt.length}/1000 characters (Suno style field)</div>
     </div>
 
     <div class="brief-grid">
@@ -15636,7 +15636,9 @@ function renderBrief(prefix, songPrompt, briefRaw, extras) {
   const cc = el.querySelector('#brief-charcount');
   if (cc) {
     const len = corePrompt.length;
-    cc.style.color = len > 200 ? 'var(--red)' : len > 160 ? 'var(--amber)' : 'var(--green)';
+    // 1000 = Suno's actual style-box cap (v5 through v6); 800 = our target,
+    // so amber means "approaching the cap", not "you have done something wrong".
+    cc.style.color = len > 1000 ? 'var(--red)' : len > 800 ? 'var(--amber)' : 'var(--green)';
   }
 }
 
@@ -16425,7 +16427,7 @@ async function refreshEditorStyle(){
   if(txt)txt.textContent=cur?'Updating production prompt to fit your edits…':'Deriving production prompt from the lyrics…';
   const sys='You are a music production assistant. You refine Suno/Udio style prompts to match a song. You NEVER write, quote, or modify song lyrics.';
   const prompt=(cur
-    ? `A songwriter edited the lyrics of a ${song.genre||'pop'} song. Update the existing PRODUCTION PROMPT so it still fits — but change ONLY the parts that genuinely need to change.\n\nRULES:\n- Keep genre, instrumentation and BPM exactly as-is unless the edited lyrics clearly demand otherwise.\n- Only adjust mood / energy / vocal-delivery / dynamics descriptors that the lyric edits actually affect.\n- If nothing needs changing, return the prompt unchanged.\n- Do NOT rewrite, quote or output the lyrics.\n- Keep it under 440 characters, comma-separated, Suno-optimised.\n\nEXISTING PRODUCTION PROMPT:\n${cur}\n\nCURRENT (EDITED) LYRICS:\n${lyrics}`
+    ? `A songwriter edited the lyrics of a ${song.genre||'pop'} song. Update the existing PRODUCTION PROMPT so it still fits — but change ONLY the parts that genuinely need to change.\n\nRULES:\n- Keep genre, instrumentation and BPM exactly as-is unless the edited lyrics clearly demand otherwise.\n- Only adjust mood / energy / vocal-delivery / dynamics descriptors that the lyric edits actually affect.\n- If nothing needs changing, return the prompt unchanged.\n- Do NOT rewrite, quote or output the lyrics.\n- Keep it under 800 characters, comma-separated, Suno-optimised.\n\nEXISTING PRODUCTION PROMPT:\n${cur}\n\nCURRENT (EDITED) LYRICS:\n${lyrics}`
     : `Derive a Suno/Udio PRODUCTION PROMPT for this ${song.genre||'pop'} song from its lyrics.\n\nRULES:\n- Comma-separated descriptors: genre, 4-5 instruments, BPM, tempo feel, vocal style, mood.\n- Under 440 characters, Suno-optimised.\n- Do NOT rewrite, quote or output the lyrics.\n\nLYRICS:\n${lyrics}`)
     +`\n\nReturn ONLY the production prompt — one block of comma-separated descriptors, nothing else.`;
   try{
@@ -16564,7 +16566,7 @@ async function generateFromBuilder(){
     const system='You are a world-class songwriter. Write exactly the format requested. No extra commentary.';
     const vocableChecked = document.getElementById('pb-vocable')?.checked;
     const vocableInstruction = vocableChecked ? '\n\nVOCABLE INSTRUCTION: Include a singalong vocable section in the outro (na-na-na, ooh, hey, or genre-appropriate open vowel sounds). Tag it [Outro - singalong] for Suno compatibility.' : '';
-    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}${vocableInstruction}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 440 chars — use the production prompt above as base, include genre, instruments (4-5), BPM, tempo feel, vocal style, counter-melody device. Optimise for Suno/Udio.]`;
+    const fullPrompt=`Write a complete, production-ready song using this style prompt as the production blueprint.\n\nStyle/Production Prompt: ${prompt}\nTopic / Concept: ${topic}${vocableInstruction}\n\nSSONGWRITING RULES:\n- Hook within the first 30 seconds\n- Chorus lines max 10 syllables for singability\n- Every line must be specific — no vague emotions, no clichés\n- Dynamic contrast: verse energy lower than chorus\n- Use section tags on their own line: [Verse 1], [Pre-Chorus], [Chorus], [Verse 2], [Bridge], [Outro]\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics]\n\nSUNO STYLE PROMPT:\n[under 800 chars — use the production prompt above as base, include genre, instruments (4-5), BPM, tempo feel, vocal style, counter-melody device. Optimise for Suno/Udio.]`;
     const raw = await callClaude(fullPrompt, system, 2000);
     const title = parseSection(raw,'TITLE','LYRICS');
     const lyrics = parseSection(raw,'LYRICS','SUNO STYLE PROMPT');
@@ -16799,7 +16801,7 @@ async function generateFusion(){
   }
   const {g1,g2,fd}=S.currentFusion||{};
   if(!g1)return;
-  const prompt=`Write a complete ${g1} × ${g2} genre fusion song.\n\n${fd?`Fusion style: ${fd.name}\nFormula: ${fd.formula}`:`Experimental fusion of ${g1} and ${g2}. Define what makes it work and write accordingly.`}\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics with all section tags]\n\nSONG PROMPT:\n[under 440 chars, core genre, instruments (4-5), BPM, tempo, vocal descriptor, counter-melody device, no artist names]\n\nFUSION EXPLANATION:\n[2-3 sentences on how the two genres combine and what makes it work]`;
+  const prompt=`Write a complete ${g1} × ${g2} genre fusion song.\n\n${fd?`Fusion style: ${fd.name}\nFormula: ${fd.formula}`:`Experimental fusion of ${g1} and ${g2}. Define what makes it work and write accordingly.`}\n\nRespond with EXACTLY this format:\n\nTITLE: [song title]\n\nLYRICS:\n[full lyrics with all section tags]\n\nSONG PROMPT:\n[under 800 chars, core genre, instruments (4-5), BPM, tempo, vocal descriptor, counter-melody device, no artist names]\n\nFUSION EXPLANATION:\n[2-3 sentences on how the two genres combine and what makes it work]`;
 
   btnLoad('fd-gen-btn','Writing…');
   document.getElementById('fd-out').innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:12px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Generating fusion song…</span></div>';
@@ -17649,7 +17651,7 @@ DNA KEPT: [2-3 bullet points — which structural/psychological elements from th
 
 TWIST APPLIED: [2-3 bullet points — how the user's idea changed the song's direction]
 
-SONG PROMPT: [under 440 chars, no artist names, include: genre, era-specific production texture, instruments (4-5) authentic to genre and era, BPM, vocal style, counter-melody device — Suno-ready]
+SONG PROMPT: [under 800 chars, no artist names, include: genre, era-specific production texture, instruments (4-5) authentic to genre and era, BPM, vocal style, counter-melody device — Suno-ready]
 
 LYRICS:
 [Full lyrics with structure brackets like [Verse 1], [Chorus], [Bridge], etc. Match the bar counts and section flow of the original DNA]
@@ -18551,7 +18553,7 @@ async function buildBlueprint(){
   const genre=document.getElementById('f-genre').options[document.getElementById('f-genre').selectedIndex].text;
   const topic=document.getElementById('f-topic').value||'finding peace after struggle';
   const emotion=document.getElementById('f-emotion').value;
-  const prompt=`Build a complete song blueprint.\nGenre: ${genre}\nTopic: ${topic}\nTarget emotion: ${emotion}\n\nDeliver with these exact headers:\n\nSONG TITLE: [title]\n\nSTRUCTURE MAP:\n[sections with bar counts]\n\nSECTION BLUEPRINT:\n[each section: emotional job, energy 1-10, 2 example opening lines]\n\nHOOK FORMULA:\n[chorus phrase + psychological reason it works]\n\nSONG PROMPT:\n[under 440 chars, no artist names, include instruments (4-5), BPM, vocal style, counter-melody device]\n\nDOPAMINE MAP:\n[3 peak moments and what creates each]\n\nSUCCESS PREDICTION:\nViral Potential: X/10\nEmotional Depth: X/10\nCommercial Appeal: X/10`;
+  const prompt=`Build a complete song blueprint.\nGenre: ${genre}\nTopic: ${topic}\nTarget emotion: ${emotion}\n\nDeliver with these exact headers:\n\nSONG TITLE: [title]\n\nSTRUCTURE MAP:\n[sections with bar counts]\n\nSECTION BLUEPRINT:\n[each section: emotional job, energy 1-10, 2 example opening lines]\n\nHOOK FORMULA:\n[chorus phrase + psychological reason it works]\n\nSONG PROMPT:\n[under 800 chars, no artist names, include instruments (4-5), BPM, vocal style, counter-melody device]\n\nDOPAMINE MAP:\n[3 peak moments and what creates each]\n\nSUCCESS PREDICTION:\nViral Potential: X/10\nEmotional Depth: X/10\nCommercial Appeal: X/10`;
   btnLoad('f-btn','Building…');
   document.getElementById('f-out').innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:8px;padding:8px 0"><span class="ld"><span class="ldd"></span><span class="ldd"></span><span class="ldd"></span></span><span class="ld-msg">Building blueprint…</span></div></div>';
   try{
@@ -22233,7 +22235,7 @@ FUSION: [one valid genre key, or the word none]
 AGGRESSION: [one valid aggression]
 LENGTH: [one valid length]
 VOCAL: [a short vocal-character phrase, e.g. "deep gravelly baritone with gang-shout backs"]
-STYLE: [one Suno-style production line under 200 chars]
+STYLE: [one Suno-style production line under 800 chars]
 TOPIC 1: [a song topic squarely in their lane]
 TOPIC 2: [a different one]
 TOPIC 3: [a different one]
@@ -23782,7 +23784,7 @@ function setSyllable(el, density) {
 }
 
 const PLATFORM_DESCS = {
-  suno:   'Output optimized for Suno — bracket tags, under-200-char prompts',
+  suno:   'Output optimized for Suno — bracket tags, style prompt under 1,000 chars',
   udio:   'Output optimized for Udio — emotional descriptors in brackets, richer genre descriptions',
   stable: 'Output optimized for Stable Audio — dense style description, no bracket tags needed',
 };
