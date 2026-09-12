@@ -5169,6 +5169,82 @@ const SETTING_LENSES = [
   { name: 'Edge of Light', rule: 'Dawn or dusk — the boundary minutes. Pre-shift dark giving way, or the last light going. Something is changing state in the sky and the narrator is awake for it, usually for a practical reason rather than a poetic one.' }
 ];
 
+// ── ENTRY x SETTING MUTEX ──────────────────────────────────────────────
+// ENTRY_POINT_LENSES sets the camera for line 1; SETTING_LENSES fixes the
+// hour/place/season for the whole song. Rolled independently they contradict
+// each other about 1 song in 21 — "Threshold / In Transit" forbids kitchens
+// while "Shared Table" IS a kitchen table; "Wrong Hour" wants the place empty
+// while "Crowded Room" is full. The model then gets two opposing orders in one
+// brief, which is exactly how a song ends up not making sense.
+//
+// Fix: roll the SETTING first (it governs the whole song), then draw the entry
+// lens from the subset that can coexist with it. Only 4 lenses carry any
+// conflicts, so the eligible pool is never smaller than 10 of 14.
+const ENTRY_SETTING_CONFLICTS = {
+  'In Motion':             ['Shared Table'],
+  'Wrong Hour':            ['Crowded Room', 'Somewhere Loud', 'Shared Table', 'The Ceremony', 'On The Clock', 'Holding Pattern', 'The Commute'],
+  'Weather as Character':  ['Holding Pattern', 'Shared Table', 'On The Clock'],
+  'Threshold / In Transit':['Shared Table']
+};
+
+// How many settings accept a given entry lens. Used to keep the entry-lens
+// marginal frequency near-uniform under the mutex: a lens blocked by many
+// settings would otherwise fire far less often overall (Wrong Hour conflicts
+// with 7 of 16, so a flat roll drops it to ~4.0% against ~7.6% for the
+// unconstrained lenses). The SETTING pool is deliberately NOT corrected — it
+// is rolled uniformly first, because spreading staging across the clock is the
+// whole point of that dial and it must not inherit any bias from this one.
+function _entrySettingEligibility(lensName) {
+  const blocked = ENTRY_SETTING_CONFLICTS[lensName];
+  return SETTING_LENSES.length - ((blocked && blocked.length) || 0);
+}
+
+// Single source for the staging pair. Every path calls this instead of rolling
+// the two lenses separately, so the mutex cannot be bypassed by adding a path.
+function buildStagingPair(opts) {
+  opts = opts || {};
+  const setting = opts.setting || pickRandom(SETTING_LENSES);
+  const blocked = new Set();
+  for (const entryName of Object.keys(ENTRY_SETTING_CONFLICTS)) {
+    if (ENTRY_SETTING_CONFLICTS[entryName].indexOf(setting.name) !== -1) blocked.add(entryName);
+  }
+  const pool = ENTRY_POINT_LENSES.filter(function (l) { return !blocked.has(l.name); });
+  const eligible = pool.length ? pool : ENTRY_POINT_LENSES;
+  const lens = opts.lens || pickWeighted(eligible, function (l) {
+    return SETTING_LENSES.length / _entrySettingEligibility(l.name);
+  });
+  return {
+    setting: setting,
+    lens: lens,
+    settingNote: buildSettingNote(setting),
+    openingNote: buildOpeningImageNote(lens)
+  };
+}
+
+// ── CONTINUITY CONTRACT ────────────────────────────────────────────────
+// The engine hands the model a lot of simultaneous instruction — staging, entry
+// lens, verse-2 archetype, craft devices, production notes. Each is locally
+// correct and nothing was checking that the finished song holds together. This
+// is the global consistency pass.
+//
+// Deliberately does NOT forbid contradiction outright: several validated devices
+// are built on it (VERSE2_ARCHETYPES "Time Jump" and "The Other Side", the
+// unreliable-narrator and covert-narrative tools). What it forbids is the
+// ACCIDENTAL kind — the contradiction no device asked for, which reads as a
+// mistake rather than a move.
+function buildContinuityNote() {
+  return `\n\nCONTINUITY CONTRACT — the song must survive a second listen:
+- ONE narrator throughout. Person (I / you / he / she / they) and tense stay fixed unless a device named elsewhere in this brief explicitly changes them.
+- The hour, place and season fixed by STAGING hold in EVERY section. Do not drift from an afternoon into a night, or from summer into snow, between verses.
+- Physical logic holds: the narrator cannot be in two places at once. If they are driving, they are not also seated at a table. If they leave, they are gone until the song says otherwise.
+- Props persist. An object introduced in one section stays where the song put it — a ring left on the dashboard is still on the dashboard in the last chorus unless a line moves it.
+- Facts do not contradict. If someone left in verse 1 they cannot still be present in verse 2; if the narrator never called, they cannot later refer to the call.
+- Named details stay stable: a name, city, month, age, count or duration keeps the same value every time it appears. "Two years" does not become "five years".
+- The chorus stays true across all repeats. If its meaning is meant to shift, the shift must come from what the VERSES revealed around it, never from editing the facts inside the chorus.
+- A contradiction is permitted ONLY when a device named in this brief calls for it (a verse-2 time jump, an opposing-perspective verse, a deliberately unreliable narrator). When that happens it must be legible as intentional — the listener should think "that is the point", never "that is a mistake".
+- Before you finish: re-read the lyric start to end. If any detail contradicts an earlier one and no device explains it, fix the later line, not the earlier one.`;
+}
+
 // Staging directive. Fires on every generation path (song / Lucky / Rap Lab,
 // and Prism via its delegation to buildSongPrompt) so no path can quietly fall
 // back to the small-hours default.
@@ -7822,7 +7898,7 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   const _ia  = pickWeightedArchetype(INTRO_ARCHETYPES,      _giip.intro);
   // Point-of-entry lens — rotates WHERE line 1 drops the listener in, to break
   // the domestic-default opening (kitchen / sink / window). Fires every song.
-  const _entryLens = pickRandom(ENTRY_POINT_LENSES);
+  // Staging pair — setting rolled first, entry lens drawn from what can coexist
   const _ltier = params.lyricTier;
   const _shouldInterlude = (_ltier === 'archival' || _ltier === 'conscious' || Math.random() < 0.35);
   const _intla = _shouldInterlude ? pickWeightedArchetype(INTERLUDE_ARCHETYPES, _giip.interlude) : null;
@@ -7870,10 +7946,12 @@ This sets the song's first 7 seconds — the make-or-break TikTok / Spotify / ra
 
   // Wave 4k — lyrical POINT OF ENTRY. Sits alongside the always-on FIRST LINE
   // RULE and pushes the opening off the domestic-establishing-shot default.
-  const openingImageNote = buildOpeningImageNote(_entryLens);
+  const _staging = buildStagingPair();
+  const openingImageNote = _staging.openingNote;
   // Wave 4r — staging dial. Fixes hour/place/season for the whole song so the
   // model cannot fall back to small-hours default staging on heavy topics.
-  const settingNote = buildSettingNote();
+  const settingNote = _staging.settingNote;
+  const continuityNote = buildContinuityNote();
 
   // Wave 4l-4q — craft-directive layers. Each helper now returns a TAGGED
   // DIRECTIVE ARRAY; assembleCraft merges them through the guardrails
@@ -8257,7 +8335,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${settingNote}${craftBlock}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}${openingImageNote}${settingNote}${continuityNote}${craftBlock}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1. And avoid the domestic-default opening — do NOT start the song in a kitchen, by a sink, at a kitchen table, waking up in bed, on a couch, staring out a window, or looking in a mirror. If the story truly lives in a house, enter through a different room, a small action, a sound, or a body sensation — not the reflex establishing shot. Follow the OPENING IMAGE / POINT OF ENTRY lens above.
@@ -8819,8 +8897,10 @@ function buildLuckyPrompt(params) {
   // Wave 4r — Lucky previously received neither the point-of-entry lens nor the
   // banned-openings list (both were song-path-only), leaving the small-hours
   // cliché entirely unguarded on this path. Staging dial added alongside.
-  const luckyOpeningNote = buildOpeningImageNote();
-  const luckySettingNote = buildSettingNote();
+  const _luckyStaging = buildStagingPair();
+  const luckyOpeningNote = _luckyStaging.openingNote;
+  const luckySettingNote = _luckyStaging.settingNote;
+  const luckyContinuityNote = buildContinuityNote();
 
   const prompt = `Write a complete ${g1} × ${g2} fusion song at the highest possible level of craft.
 ${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(g1, g2)}
@@ -8829,7 +8909,7 @@ Fusion style: ${fd?.name || g1 + ' × ' + g2}. Blend both genres authentically.
 Topic: ${topic}
 Mood: ${mood}
 Vocal style: ${vocal}
-Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${luckySampleHookLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}${luckyOpeningNote}${luckySettingNote}
+Structure: ${structStr}${STRUCTURE_OPENING_HINTS[structure] ? '\n\n⚠ ' + STRUCTURE_OPENING_HINTS[structure] : ''}${outlierNote ? `\n\nRULE-BREAKING INSPIRATION:\n${outlierNote}\nUse these as permission: if the emotional truth demands it, break a rule.` : ''}${luckySubstyleNote}${luckySubstyleSunoLock}${crossoverNote}${luckyProducerNote}${luckyViralLock}${luckySampleHookLock}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${punchlineCraftNote ? '\n\n' + punchlineCraftNote : ''}${luckyOpeningNote}${luckySettingNote}${luckyContinuityNote}
 
 SONGWRITING RULES:
 - Hook within 30 seconds · Chorus max 10 syllables · Verse 8-13 syllables
@@ -10270,8 +10350,10 @@ function buildRapLabPrompt(params) {
 RAP LAB ACTIVE: You are operating in precision rap construction mode. Every dimension below is a hard constraint — not a suggestion. Your craft must honor the specific combination of dimensions requested.`;
 
   // Wave 4r — same gap as Lucky: no entry lens, no banned-openings list.
-  const rapOpeningNote = buildOpeningImageNote();
-  const rapSettingNote = buildSettingNote();
+  const _rapStaging = buildStagingPair();
+  const rapOpeningNote = _rapStaging.openingNote;
+  const rapSettingNote = _rapStaging.settingNote;
+  const rapContinuityNote = buildContinuityNote();
 
   const prompt = `Write a complete, production-ready Rap / Hip-Hop song in the ${style.label} style at the highest possible level of craft.
 
@@ -10307,7 +10389,7 @@ ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${assembleCraf
 BRACKET REQUIREMENTS:
 ${freestyleMode
   ? 'Use ONLY: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (optional), [Outro] (optional). Inline ad-libs in (parentheses) on the same line as bars are allowed. NO hook/chorus/bridge/pre-chorus brackets of any kind.'
-  : bracketInstructionServer('hiphop', 'suno', style.label)}${rapOpeningNote}${rapSettingNote}
+  : bracketInstructionServer('hiphop', 'suno', style.label)}${rapOpeningNote}${rapSettingNote}${rapContinuityNote}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
@@ -12170,7 +12252,7 @@ function buildPrismSongPrompt(brief, extra) {
   return built;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
