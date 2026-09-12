@@ -5245,6 +5245,89 @@ function buildContinuityNote() {
 - Before you finish: re-read the lyric start to end. If any detail contradicts an earlier one and no device explains it, fix the later line, not the earlier one.`;
 }
 
+// ── POST-GENERATION CONTINUITY CHECK ───────────────────────────────────
+// buildContinuityNote() tells the model to keep the song coherent. This reads
+// what actually came back and flags the contradictions a machine can see.
+//
+// Every finding is ADVISORY, never a gate, and that is a deliberate limit: a
+// song may legitimately span a night into a morning, or jump seasons on a
+// verse-2 Time Jump. Nothing here can distinguish "the writer meant it" from
+// "the model slipped" without understanding intent, so this surfaces evidence
+// for a human and refuses to auto-reject. Only high-contrast pairs are tested
+// — the checks that are cheap to run and hard to trip by accident.
+const CONTINUITY_PATTERNS = [
+  {
+    type: 'time_of_day',
+    label: 'Song states both small-hours and full-daylight times',
+    a: { name: 'small hours', re: /\b(?:[1-4]\s?a\.?m\.?|midnight|after midnight|dead of night)\b/gi },
+    b: { name: 'daylight',    re: /\b(?:noon|midday|high noon|broad daylight|afternoon sun|[1-4]\s?p\.?m\.?)\b/gi }
+  },
+  {
+    type: 'season',
+    label: 'Song states conflicting seasons',
+    a: { name: 'summer', re: /\b(?:summer|july|august|heat ?wave|sunburn)\b/gi },
+    b: { name: 'winter', re: /\b(?:winter|january|february|snow(?:ing|fall)?|blizzard|frostbite)\b/gi }
+  }
+];
+
+// Durations stated with the same unit but different values ("two years" in V1,
+// "five years" in V3). Word-numbers included because lyrics rarely use digits.
+const _NUMWORDS = { one:1, two:2, three:3, four:4, five:5, six:6, seven:7, eight:8, nine:9, ten:10, eleven:11, twelve:12, twenty:20, thirty:30 };
+const _DURATION_RE = /\b(\d{1,3}|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|twenty|thirty)\s+(year|month|week|day|hour|minute)s?\b/gi;
+
+// Strip bracket tags before checking — [Verse 1], [808 Bass], [Whispered] are
+// instructions to Suno, not lines the narrator sings, and must not count as
+// evidence of anything.
+function _continuityBody(lyrics) {
+  return String(lyrics || '').replace(/\[[^\]]*\]/g, ' ');
+}
+
+function checkContinuity(lyrics) {
+  const body = _continuityBody(lyrics);
+  const findings = [];
+  if (!body.trim()) return { ok: true, findings: [], checked: false };
+
+  for (const pat of CONTINUITY_PATTERNS) {
+    const hitsA = body.match(pat.a.re) || [];
+    const hitsB = body.match(pat.b.re) || [];
+    if (hitsA.length && hitsB.length) {
+      findings.push({
+        type: pat.type,
+        severity: 'advisory',
+        detail: pat.label,
+        evidence: [
+          pat.a.name + ': ' + Array.from(new Set(hitsA.map(h => h.trim().toLowerCase()))).slice(0, 4).join(', '),
+          pat.b.name + ': ' + Array.from(new Set(hitsB.map(h => h.trim().toLowerCase()))).slice(0, 4).join(', ')
+        ]
+      });
+    }
+  }
+
+  // Duration contradictions, grouped by unit.
+  const byUnit = {};
+  let m;
+  _DURATION_RE.lastIndex = 0;
+  while ((m = _DURATION_RE.exec(body)) !== null) {
+    const rawNum = m[1].toLowerCase();
+    const n = _NUMWORDS[rawNum] !== undefined ? _NUMWORDS[rawNum] : parseInt(rawNum, 10);
+    if (!isFinite(n)) continue;
+    const unit = m[2].toLowerCase();
+    (byUnit[unit] = byUnit[unit] || new Map()).set(n, m[0].trim().toLowerCase());
+  }
+  for (const unit of Object.keys(byUnit)) {
+    if (byUnit[unit].size > 1) {
+      findings.push({
+        type: 'duration',
+        severity: 'advisory',
+        detail: 'Song states more than one value for the same unit of time (' + unit + ')',
+        evidence: Array.from(byUnit[unit].values()).slice(0, 4)
+      });
+    }
+  }
+
+  return { ok: findings.length === 0, findings: findings, checked: true };
+}
+
 // Staging directive. Fires on every generation path (song / Lucky / Rap Lab,
 // and Prism via its delegation to buildSongPrompt) so no path can quietly fall
 // back to the small-hours default.
@@ -12252,7 +12335,7 @@ function buildPrismSongPrompt(brief, extra) {
   return built;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,

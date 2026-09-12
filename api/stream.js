@@ -440,7 +440,15 @@ function streamBuffered(text, score, res) {
   for (let i = 0; i < text.length; i += chunkSize) {
     res.write(`data: ${JSON.stringify({text: text.slice(i, i + chunkSize)})}\n\n`);
   }
-  res.write(`data: ${JSON.stringify({done: true, score})}\n\n`);
+  // Post-generation continuity check — deterministic and local, so it costs no
+  // API call and no credits and runs on every buffered song regardless of plan.
+  // Advisory only: it reports evidence and never gates or rewrites, because it
+  // cannot tell a deliberate verse-2 Time Jump from a genuine slip. Wrapped so a
+  // checker bug can never break a generation that already succeeded.
+  let continuity = null;
+  try { continuity = require('./_brain.js').checkContinuity(text); }
+  catch (_) { /* non-fatal — ship the song without the advisory */ }
+  res.write(`data: ${JSON.stringify({done: true, score, continuity})}\n\n`);
   res.end();
 }
 
