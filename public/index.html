@@ -8598,7 +8598,7 @@ try { window.pingPv('pageview'); } catch(e){}
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:10px">
       <div>
         <div style="font-size:20px;font-weight:800;color:var(--tx1)">📊 Master Analytics</div>
-        <div style="font-size:12px;color:var(--tx3);margin-top:2px">Admin-only · All user data · Real-time</div>
+        <div style="font-size:12px;color:var(--tx3);margin-top:2px">Admin-only · D1 users · Redis counters · Stripe revenue · <span id="adm-generated-at">—</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-sm btn-teal" onclick="loadAdminDashboard()">🔄 Refresh</button>
@@ -8633,6 +8633,85 @@ try { window.pingPv('pageview'); } catch(e){}
         <div id="adm-total-reactions" style="font-size:26px;font-weight:900;color:#f47292">—</div>
         <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Reactions</div>
       </div>
+      <div class="card" style="padding:14px;text-align:center">
+        <div id="adm-new-7d" style="font-size:26px;font-weight:900;color:#2dd4bf">—</div>
+        <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Signups 7d</div>
+      </div>
+    </div>
+
+    <!-- ── SALES & REVENUE ──
+         D1 is the source for plan/subscription state (written by the Stripe
+         webhook). Stripe itself is queried only when STRIPE_SECRET_KEY exists on
+         the Worker; otherwise the banner says so rather than showing $0 as fact. -->
+    <div class="card" style="margin-bottom:16px" id="adm-sales-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1)">💰 Sales &amp; Revenue</div>
+        <div id="adm-stripe-status" style="font-size:12px;font-weight:600;color:var(--tx3)">—</div>
+      </div>
+      <div id="adm-stripe-banner" style="display:none;font-size:12px;line-height:1.5;padding:8px 10px;border-radius:6px;background:rgba(244,114,146,.08);border:1px solid rgba(244,114,146,.35);color:var(--tx2);margin-bottom:10px"></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:12px">
+        <div style="padding:10px;background:var(--bg2);border-radius:6px;text-align:center">
+          <div id="adm-mrr" style="font-size:22px;font-weight:900;color:#34d399">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">MRR</div>
+        </div>
+        <div style="padding:10px;background:var(--bg2);border-radius:6px;text-align:center">
+          <div id="adm-paying" style="font-size:22px;font-weight:900;color:var(--amber)">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Paying</div>
+        </div>
+        <div style="padding:10px;background:var(--bg2);border-radius:6px;text-align:center">
+          <div id="adm-rev-30d" style="font-size:22px;font-weight:900;color:#60a5fa">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Revenue 30d</div>
+        </div>
+        <div style="padding:10px;background:var(--bg2);border-radius:6px;text-align:center">
+          <div id="adm-rev-all" style="font-size:22px;font-weight:900;color:#a78bfa">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">All-time</div>
+        </div>
+        <div style="padding:10px;background:var(--bg2);border-radius:6px;text-align:center">
+          <div id="adm-comped" style="font-size:22px;font-weight:900;color:#fbbf24">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Comped</div>
+        </div>
+        <div style="padding:10px;background:var(--bg2);border-radius:6px;text-align:center">
+          <div id="adm-founding" style="font-size:22px;font-weight:900;color:#f97316">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em">Founding seats</div>
+        </div>
+      </div>
+      <div class="adm-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px">Plan revenue (list price)</div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:12px">
+              <thead><tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
+                <th style="padding:4px 6px;text-align:left">Plan</th><th style="padding:4px 6px;text-align:center">Users</th><th style="padding:4px 6px;text-align:center">Stripe-active</th><th style="padding:4px 6px;text-align:center">Comped</th><th style="padding:4px 6px;text-align:right">MRR</th><th style="padding:4px 6px;text-align:right">At list</th>
+              </tr></thead>
+              <tbody id="adm-sales-plans"></tbody>
+            </table>
+          </div>
+          <div id="adm-sales-note" style="font-size:12px;color:var(--tx4);margin-top:6px;line-height:1.5"></div>
+        </div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px">Recent payments (Stripe)</div>
+          <div id="adm-payments"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── TRAFFIC & FUNNEL ── first-party /api/pv beacons + song_saved, last 30 UTC days -->
+    <div class="card" style="margin-bottom:16px" id="adm-traffic-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--tx1)">👁 Traffic &amp; Funnel</div>
+        <div style="font-size:12px;color:var(--tx4)">first-party pings · UTC days</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:12px">
+          <thead><tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
+            <th style="padding:4px 6px;text-align:left">Metric</th><th style="padding:4px 6px;text-align:right">Today</th><th style="padding:4px 6px;text-align:right">7d</th><th style="padding:4px 6px;text-align:right">30d</th>
+          </tr></thead>
+          <tbody id="adm-traffic-body"></tbody>
+        </table>
+      </div>
+      <div id="adm-funnel" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--tx3)"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--tx2);margin:12px 0 6px">Pageviews (last 30 days)</div>
+      <div id="adm-pv-daily" style="display:flex;align-items:flex-end;gap:2px;height:44px"></div>
     </div>
 
     <!-- Pipeline reconciliation — surfaces drift between Redis counters, the songs DB,
@@ -8707,10 +8786,10 @@ try { window.pingPv('pageview'); } catch(e){}
               <th style="padding:6px 8px;text-align:left">Email</th>
               <th style="padding:6px 8px;text-align:left">Name</th>
               <th style="padding:6px 8px;text-align:center">Plan</th>
-              <th style="padding:6px 8px;text-align:center">Songs</th>
-              <th style="padding:6px 8px;text-align:center">XP</th>
-              <th style="padding:6px 8px;text-align:center">Streak</th>
-              <th style="padding:6px 8px;text-align:left">Last Active</th>
+              <th style="padding:6px 8px;text-align:center">Billing</th>
+              <th style="padding:6px 8px;text-align:center">Sub Status</th>
+              <th style="padding:6px 8px;text-align:center">Confirmed</th>
+              <th style="padding:6px 8px;text-align:left">Last Sign-in</th>
               <th style="padding:6px 8px;text-align:left">Joined</th>
             </tr>
           </thead>
@@ -27031,15 +27110,18 @@ let _adminLoadInflight = false;
 // failure doesn't leave the admin staring at yesterday's successful data.
 function _resetAdminDashboard(loadingState) {
   const placeholder = loadingState ? '…' : '—';
-  const statIds = ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs','adm-total-posts','adm-total-reactions','adm-total-comments','adm-songs-db','adm-songs-redis','adm-genre-zset-total'];
+  const statIds = ['adm-total-users','adm-total-songs','adm-total-published','adm-today-songs','adm-total-posts','adm-total-reactions','adm-total-comments','adm-songs-db','adm-songs-redis','adm-genre-zset-total',
+                   'adm-new-7d','adm-mrr','adm-paying','adm-rev-30d','adm-rev-all','adm-comped','adm-founding','adm-generated-at'];
   statIds.forEach(id => { const el = document.getElementById(id); if (el) el.textContent = placeholder; });
   const emptyHtml = loadingState ? '' : '<div style="color:var(--tx4);font-size:12px">No data</div>';
-  ['adm-plans','adm-genres','adm-topics','adm-comm-breakdown','adm-recent','adm-users-body'].forEach(id => {
+  ['adm-plans','adm-genres','adm-topics','adm-comm-breakdown','adm-recent','adm-users-body','adm-sales-plans','adm-payments','adm-traffic-body','adm-funnel','adm-pv-daily','adm-sales-note'].forEach(id => {
     const el = document.getElementById(id); if (el) el.innerHTML = emptyHtml;
   });
   const dailyEl = document.getElementById('adm-daily');         if (dailyEl) dailyEl.innerHTML = '';
   const labelEl = document.getElementById('adm-daily-labels');  if (labelEl) labelEl.innerHTML = '';
   const reconCard = document.getElementById('adm-recon-card');  if (reconCard) reconCard.style.display = 'none';
+  const sb = document.getElementById('adm-stripe-banner');      if (sb) sb.style.display = 'none';
+  const ss = document.getElementById('adm-stripe-status');      if (ss) ss.textContent = placeholder;
   const noUsers = document.getElementById('adm-no-users');      if (noUsers) noUsers.style.display = loadingState ? 'none' : '';
 }
 
@@ -27093,6 +27175,12 @@ function renderAdminDashboard(data) {
   document.getElementById('adm-total-posts').textContent = data.summary?.total_posts ?? '—';
   document.getElementById('adm-total-reactions').textContent = data.summary?.total_reactions ?? '—';
   document.getElementById('adm-total-comments').textContent = data.summary?.total_comments ?? '—';
+  document.getElementById('adm-new-7d').textContent = data.summary?.new_7d ?? '—';
+  const genAt = document.getElementById('adm-generated-at');
+  if (genAt) genAt.textContent = data.generated_at ? ('as of ' + new Date(data.generated_at).toLocaleTimeString()) : 'live';
+
+  renderAdminSales(data.sales, data.summary);
+  renderAdminTraffic(data.traffic);
 
   // Pipeline reconciliation — surfaces drift between Redis counters and the
   // authoritative DB count. Only shows when at least one of the diagnostic
@@ -27115,7 +27203,20 @@ function renderAdminDashboard(data) {
     const allPresent = songsDb !== null && songsDb !== undefined
                     && songsRedis !== null && songsRedis !== undefined
                     && genreTotal !== null && genreTotal !== undefined;
-    if (!allPresent) {
+    const redisOnly = (songsDb === null || songsDb === undefined)
+                    && songsRedis !== null && songsRedis !== undefined
+                    && genreTotal !== null && genreTotal !== undefined;
+    if (redisOnly) {
+      // Songs table retired with Supabase — only the Redis counter and the
+      // genre ZSET remain, so drift is measured between those two.
+      document.getElementById('adm-songs-db').textContent = 'n/a';
+      const redisN = Number(songsRedis), genreN = Number(genreTotal);
+      const drift = Math.abs(redisN - genreN);
+      const tol = Math.max(2, Math.round(redisN * 0.02));
+      if (redisN === 0 && genreN === 0) { status.textContent = '⚪ No songs yet'; status.style.color = 'var(--tx3)'; note.textContent = ''; }
+      else if (drift <= tol) { status.textContent = '✓ In sync'; status.style.color = '#34d399'; note.textContent = 'Songs DB retired (client-side storage); Redis counter vs genre ZSET agree.'; }
+      else { status.textContent = '⚠️ Drift detected'; status.style.color = '#f47292'; note.textContent = `Redis counter (${redisN}) vs genre ZSET total (${genreN}) off by ${drift} — check fan-out in track.js (fusion g1+g2 / alt-take reruns).`; }
+    } else if (!allPresent) {
       status.textContent = '⚠️ Partial data';
       status.style.color = 'var(--tx3)';
       note.textContent = 'One or more counts didn\'t come back from the API; drift check skipped.';
@@ -27250,6 +27351,125 @@ function renderAdminDashboard(data) {
   }).join('') || '<div style="color:var(--tx4);font-size:12px">No recent activity</div>';
 }
 
+function _usd(cents) {
+  if (cents === null || cents === undefined) return '—';
+  return '$' + (Number(cents) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function renderAdminSales(sales, summary) {
+  const st = sales?.stripe || {};
+  const statusEl = document.getElementById('adm-stripe-status');
+  const banner   = document.getElementById('adm-stripe-banner');
+  if (!sales) {
+    if (statusEl) { statusEl.textContent = '— no sales block from API'; statusEl.style.color = 'var(--tx4)'; }
+    return;
+  }
+  // Stripe connection state drives which numbers are "real money" vs D1-derived.
+  if (!st.configured) {
+    statusEl.textContent = '⚪ Stripe not connected';
+    statusEl.style.color = 'var(--tx3)';
+    banner.style.display = '';
+    banner.innerHTML = '<b>No Stripe key on the API Worker.</b> Checkout, the webhook and revenue reporting are inactive — MRR below is derived from D1 plan flags at list price, and Revenue 30d / All-time can\'t be read. Add <code>STRIPE_SECRET_KEY</code> + <code>STRIPE_WEBHOOK_SECRET</code> + the price IDs to <code>soniq-api</code> to turn this on.';
+  } else if (!st.ok) {
+    statusEl.textContent = '⚠️ Stripe error';
+    statusEl.style.color = '#f47292';
+    banner.style.display = '';
+    banner.textContent = 'Stripe query failed: ' + (st.error || 'unknown') + ' — D1-derived numbers still shown.';
+  } else {
+    statusEl.textContent = (st.mode === 'live' ? '🟢 Stripe live' : st.mode === 'test' ? '🟡 Stripe TEST mode' : '🟢 Stripe connected');
+    statusEl.style.color = st.mode === 'test' ? '#fbbf24' : '#34d399';
+    banner.style.display = 'none';
+  }
+
+  // Headline: prefer Stripe's own MRR/active-sub count when it answered; else D1.
+  const mrrCents = st.ok ? st.mrr_cents : sales.mrr_active_cents;
+  const paying   = st.ok ? st.active_subscriptions : sales.paying_customers;
+  document.getElementById('adm-mrr').textContent     = _usd(mrrCents);
+  document.getElementById('adm-paying').textContent  = paying ?? '—';
+  document.getElementById('adm-rev-30d').textContent = st.ok ? _usd(st.revenue_30d_cents) : '—';
+  document.getElementById('adm-rev-all').textContent = st.ok ? _usd(st.revenue_all_time_cents) : '—';
+  document.getElementById('adm-comped').textContent  = sales.comped_users ?? '—';
+  const f = sales.founding || {};
+  document.getElementById('adm-founding').textContent =
+    `${(f.tier1?.count||0)+(f.tier2?.count||0)} / ${(f.tier1?.limit||0)+(f.tier2?.limit||0)}`;
+
+  // Plan table
+  const rows = (sales.by_plan || []).filter(p => p.plan !== 'free' || p.users > 0);
+  document.getElementById('adm-sales-plans').innerHTML = rows.map(p => `<tr style="border-bottom:1px solid var(--bg2)">
+      <td style="padding:4px 6px;color:var(--tx2)">${escHtml(p.label||p.plan)}</td>
+      <td style="padding:4px 6px;text-align:center;color:var(--tx2);font-weight:700">${p.users}</td>
+      <td style="padding:4px 6px;text-align:center;color:#34d399">${p.active_subs}</td>
+      <td style="padding:4px 6px;text-align:center;color:#fbbf24">${p.comped}</td>
+      <td style="padding:4px 6px;text-align:right;color:var(--tx1);font-weight:700">${_usd(p.mrr_cents)}</td>
+      <td style="padding:4px 6px;text-align:right;color:var(--tx4)">${_usd(p.mrr_at_list_cents)}</td>
+    </tr>`).join('') || '<tr><td colspan="6" style="padding:6px;color:var(--tx4)">No users yet</td></tr>';
+  const noteBits = [];
+  noteBits.push(`Stripe-backed active subs: <b>${sales.active_subs ?? 0}</b> · past-due ${sales.past_due_subs ?? 0} · canceled ${sales.canceled_subs ?? 0} · Stripe customers on file ${sales.stripe_customers ?? 0}.`);
+  if ((sales.comped_users || 0) > 0) noteBits.push(`<b>${sales.comped_users}</b> non-free account${sales.comped_users===1?'':'s'} have no Stripe customer — manually granted (team/comps), not revenue.`);
+  noteBits.push(`If every paid-plan account paid list price: ${_usd(sales.mrr_at_list_cents)}/mo. Founding: T1 ${f.tier1?.count||0}/${f.tier1?.limit||0} ${f.tier1?.open?'(open)':'(closed)'} · T2 ${f.tier2?.count||0}/${f.tier2?.limit||0} ${f.tier2?.open?'(open)':'(closed)'}.`);
+  if (st.ok) {
+    const sbs = Object.entries(st.subs_by_status || {}).map(([k, v]) => `${k} ${v}`).join(', ') || 'none';
+    noteBits.push(`Stripe subscriptions: ${sbs}. SONIQ charges: ${st.charges_total} paid, ${st.failed_all_time} failed (${st.failed_30d} failed in 30d${st.failed_30d ? ' — <b style="color:#f47292">dunning/churn signal</b>' : ''}).`);
+    if (st.first_sale_ts) noteBits.push(`First sale ${new Date(st.first_sale_ts).toLocaleDateString()} · last ${new Date(st.last_sale_ts).toLocaleDateString()}.`);
+    if (st.other_products_charges) noteBits.push(`Excluded ${_usd(st.other_products_cents)} (${st.other_products_charges} charges) from other products on this shared Stripe account.`);
+    if (st.balance_available_cents !== null) noteBits.push(`Stripe balance: ${_usd(st.balance_available_cents)} available · ${_usd(st.balance_pending_cents)} pending.`);
+  }
+  document.getElementById('adm-sales-note').innerHTML = noteBits.join(' ');
+
+  // Recent payments
+  const payEl = document.getElementById('adm-payments');
+  const pays = st.recent_payments || [];
+  if (!st.configured) payEl.innerHTML = '<div style="color:var(--tx4);font-size:12px">Connect Stripe to see payments.</div>';
+  else if (!st.ok)   payEl.innerHTML = '<div style="color:var(--tx4);font-size:12px">Unavailable (Stripe error).</div>';
+  else payEl.innerHTML = pays.map(c => {
+    const when = c.ts ? new Date(c.ts).toLocaleDateString() : '';
+    const col = c.status === 'succeeded' ? '#34d399' : c.status === 'failed' ? '#f47292' : 'var(--tx3)';
+    return `<div style="display:flex;gap:8px;padding:4px 0;border-bottom:1px solid var(--bg2);font-size:12px;align-items:center">
+      <span style="color:var(--tx4);white-space:nowrap">${when}</span>
+      <span style="color:${col};font-weight:700;white-space:nowrap">${_usd(c.amount_cents)}${c.refunded_cents?` <span style="color:var(--tx4);font-weight:400">(−${_usd(c.refunded_cents)} ref.)</span>`:''}</span>
+      <span style="color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${escHtml((c.description||'')+(c.failure?' — '+c.failure:''))}">${escHtml(c.email||c.description||c.id||'')}${c.status!=='succeeded'?` <span style="color:#f47292">${escHtml(c.status)}</span>`:''}</span>
+    </div>`;
+  }).join('') || '<div style="color:var(--tx4);font-size:12px">No charges yet — $0 collected through Stripe.</div>';
+}
+
+function renderAdminTraffic(tr) {
+  const body = document.getElementById('adm-traffic-body');
+  const funnel = document.getElementById('adm-funnel');
+  const pvEl = document.getElementById('adm-pv-daily');
+  if (!tr) { body.innerHTML = '<tr><td colspan="4" style="padding:6px;color:var(--tx4)">No traffic block from API</td></tr>'; return; }
+  const METRICS = [
+    ['pageview',    '👁 Pageviews'],
+    ['signup',      '🆕 Signups (beacon)'],
+    ['gen_started', '▶ Generations started'],
+    ['gen_done',    '✅ Generations finished'],
+    ['anon_gen',    '👤 Anonymous first-song gens'],
+    ['song_saved',  '💾 Songs saved'],
+  ];
+  const t = tr.today || {}, w7 = tr.last_7d || {}, w30 = tr.last_30d || {};
+  body.innerHTML = METRICS.map(([k, label]) => `<tr style="border-bottom:1px solid var(--bg2)">
+      <td style="padding:4px 6px;color:var(--tx2)">${label}</td>
+      <td style="padding:4px 6px;text-align:right;color:var(--tx1);font-weight:700">${t[k] ?? 0}</td>
+      <td style="padding:4px 6px;text-align:right;color:var(--tx2)">${w7[k] ?? 0}</td>
+      <td style="padding:4px 6px;text-align:right;color:var(--tx2)">${w30[k] ?? 0}</td>
+    </tr>`).join('');
+  const c = tr.conversion_30d || {};
+  const fmtPct = v => (v === null || v === undefined) ? '—' : v + '%';
+  const d1Signups = (tr.signups_daily_d1 || []).reduce((a, r) => a + (r.n || 0), 0);
+  funnel.innerHTML = [
+    `<span>30d view→gen: <b style="color:var(--tx1)">${fmtPct(c.pageview_to_gen_pct)}</b></span>`,
+    `<span>30d view→signup: <b style="color:var(--tx1)">${fmtPct(c.pageview_to_signup_pct)}</b></span>`,
+    `<span>30d gen start→done: <b style="color:var(--tx1)">${fmtPct(c.gen_start_to_done_pct)}</b></span>`,
+    `<span>30d signups (D1, authoritative): <b style="color:var(--tx1)">${d1Signups}</b></span>`,
+  ].join('');
+  const days = tr.daily || [];
+  const maxPv = Math.max(...days.map(d => d.pageview || 0), 1);
+  pvEl.innerHTML = days.map(d => {
+    const v = d.pageview || 0;
+    const h = Math.max(2, Math.round(v / maxPv * 42));
+    return `<div title="${d.date}: ${v} pageviews" style="flex:1;height:${h}px;background:${v?'#60a5fa':'var(--bg3)'};border-radius:2px 2px 0 0;min-width:4px"></div>`;
+  }).join('');
+}
+
 function renderAdminUsers(users) {
   const tbody = document.getElementById('adm-users-body');
   const noEl  = document.getElementById('adm-no-users');
@@ -27260,15 +27480,17 @@ function renderAdminUsers(users) {
     const plan = u.plan || 'free';
     const pc = planColors[plan] || planColors[plan.replace(/_annual/,'')] || '#94a3b8';
     const joined = u.created_at ? new Date(u.created_at).toLocaleDateString() : '—';
-    const lastActive = u.last_active ? new Date(u.last_active).toLocaleDateString() : '—';
+    const lastActive = (u.last_sign_in_at || u.last_active) ? new Date(u.last_sign_in_at || u.last_active).toLocaleDateString() : '—';
+    const billing = u.billing_source || (plan !== 'free' ? (u.stripe_customer_id ? 'stripe' : 'comped') : '');
+    const subColor = u.subscription_status === 'active' ? '#34d399' : u.subscription_status === 'past_due' ? '#f47292' : u.subscription_status === 'canceled' ? 'var(--tx4)' : 'var(--tx4)';
     return `<tr style="border-bottom:1px solid var(--bg2)">
       <td data-label="Email" style="padding:6px 8px;color:var(--tx2)">${escHtml(u.email||'—')}</td>
-      <td data-label="Name" style="padding:6px 8px;color:var(--tx3)">${escHtml(u.display_name||u.artist_name||'—')}</td>
+      <td data-label="Name" style="padding:6px 8px;color:var(--tx3)">${escHtml(u.full_name||u.display_name||'—')}${u.is_admin?' <span title="admin" style="color:var(--amber)">★</span>':''}</td>
       <td data-label="Plan" style="padding:6px 8px;text-align:center"><span style="background:${pc}20;color:${pc};border:1px solid ${pc}60;border-radius:99px;padding:1px 7px;font-size:12px;font-weight:700;white-space:nowrap">${plan}</span></td>
-      <td data-label="Songs" style="padding:6px 8px;text-align:center;color:var(--tx2);font-weight:700">${u.song_count||0}</td>
-      <td data-label="XP" style="padding:6px 8px;text-align:center;color:var(--tx3)">${u.xp||0}</td>
-      <td data-label="Streak" style="padding:6px 8px;text-align:center;color:var(--tx3)">${u.streak||0}${(u.streak||0)>2?'🔥':''}</td>
-      <td data-label="Last Active" style="padding:6px 8px;color:var(--tx4)">${lastActive}</td>
+      <td data-label="Billing" style="padding:6px 8px;text-align:center;color:${billing==='stripe'?'#34d399':billing==='comped'?'#fbbf24':'var(--tx4)'};font-weight:${billing?'700':'400'}">${billing||'—'}</td>
+      <td data-label="Sub Status" style="padding:6px 8px;text-align:center;color:${subColor}">${escHtml(u.subscription_status||'—')}</td>
+      <td data-label="Confirmed" style="padding:6px 8px;text-align:center;color:${u.email_confirmed?'#34d399':'var(--tx4)'}">${u.email_confirmed?'✓':'—'}</td>
+      <td data-label="Last Sign-in" style="padding:6px 8px;color:var(--tx4)">${lastActive}</td>
       <td data-label="Joined" style="padding:6px 8px;color:var(--tx4)">${joined}</td>
     </tr>`;
   }).join('');
@@ -27278,8 +27500,9 @@ function filterAdminUsers() {
   const q = (document.getElementById('adm-user-search')?.value || '').toLowerCase();
   const filtered = q ? _adminUsersAll.filter(u =>
     (u.email||'').toLowerCase().includes(q) ||
-    (u.display_name||'').toLowerCase().includes(q) ||
-    (u.artist_name||'').toLowerCase().includes(q) ||
+    (u.full_name||u.display_name||'').toLowerCase().includes(q) ||
+    (u.subscription_status||'').toLowerCase().includes(q) ||
+    (u.billing_source||'').toLowerCase().includes(q) ||
     (u.plan||'').toLowerCase().includes(q)
   ) : _adminUsersAll;
   renderAdminUsers(filtered);
