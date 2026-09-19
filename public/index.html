@@ -19943,15 +19943,33 @@ async function loadFoundingStatus() {
     // must NOT overwrite studio back to 'free'. Previously a bug where admin
     // users got briefly granted studio then silently demoted to free a second
     // later because their profiles row had no plan set.
-    if (S.supabase && !window.__soniqAdmin) {
+    if (!window.__soniqAdmin) {
+      // Plan is authoritative in D1. The Supabase `profiles` shim always returned
+      // null here, which pinned every paying user to 'free' in the UI even when
+      // the Worker was enforcing their paid limits. Ask the Worker for the fresh
+      // row; after a Stripe redirect the webhook can lag a few seconds, so retry.
+      const justPaid = new URLSearchParams(location.search).get('checkout') === 'success';
+      const fetchPlan = async () => {
+        const tok = S.session?.access_token || (await S.supabase?.auth?.getSession())?.data?.session?.access_token;
+        if (!tok) return null;
+        const r = await fetch('/api/auth/session', { headers: { Authorization: 'Bearer ' + tok } });
+        const d = r.ok ? await r.json() : null;
+        return d?.user?.plan || null;
+      };
       try {
-        const { data: profile } = await S.supabase
-          .from('profiles')
-          .select('plan')
-          .eq('id', S.user.id)
-          .single();
-        S.plan = profile?.plan || 'free';
-      } catch (e) { S.plan = 'free'; }
+        let plan = await fetchPlan();
+        for (let i = 0; justPaid && (!plan || plan === 'free') && i < 4; i++) {
+          await new Promise(r => setTimeout(r, 3000));
+          plan = await fetchPlan();
+        }
+        S.plan = plan || S.user?.plan || 'free';
+        try { const k = 'soniq_session_v1'; const st = JSON.parse(localStorage.getItem(k) || 'null'); if (st && st.user) { st.user.plan = S.plan; localStorage.setItem(k, JSON.stringify(st)); } } catch (_) {}
+        if (justPaid) {
+          window.history.replaceState({}, '', location.pathname);
+          toast(S.plan !== 'free' ? `🎉 You're on ${S.plan.replace(/_/g, ' ')} — your songs are unlocked.` : '✅ Payment received — your plan will unlock within a minute. Refresh if it does not.', 6000);
+        }
+        if (typeof updateAuthUI === 'function') updateAuthUI();
+      } catch (e) { S.plan = S.user?.plan || 'free'; }
     } else if (window.__soniqAdmin) {
       S.plan = 'studio'; // re-assert admin studio access after any async drift
     }
