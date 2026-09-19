@@ -28255,14 +28255,20 @@ async function loadCMSPosts() {
   const list = document.getElementById('cms-posts-list');
   if(!list) return;
   list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--tx4);font-size:13px">Loading posts…</div>';
-  if(!S.supabase) {
-    list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red);font-size:13px">Supabase not connected. Reload the page.</div>';
-    return;
-  }
   try {
-    const {data, error} = await S.supabase.from('blog_posts').select('*').order('created_at',{ascending:false});
-    if(error) throw error;
-    cmsPosts = data || [];
+    // Posts live in D1 behind the Worker; the 17 repo posts come back as
+    // read-only "static" rows with their on-page SEO audit.
+    const r = await fetch('/api/content?action=list', { headers: _seoHeaders() });
+    if (r.status === 401) { list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--red);font-size:13px">Session expired — sign in again.</div>'; return; }
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    const views = (_adminData && _adminData.traffic && _adminData.traffic.top_pages) || {};
+    const vm = new Map((views.all_time || []).map(x => [x.name, x.count]));
+    const d1 = (d.posts || []).map(p => ({ ...p, source: 'cms', content: p.body_html, views: vm.get('/blog/' + p.slug) || 0 }));
+    cmsStatic = (d.static?.pages || []).filter(x => !x.error).map(x => ({ id: 'static:' + x.slug, source: 'static', title: x.title, slug: x.slug, status: 'published',
+      category: x.category, published_at: x.published_at, views: vm.get(x.path) || 0, words: x.words, issues: x.issues || [], path: x.path }));
+    cmsPosts = [...d1, ...cmsStatic];
+    cmsAuditAt = d.static?.fetched_at || null;
   } catch(e) {
     console.error('CMS load error:', e);
     list.innerHTML = `<div style="padding:40px;text-align:center;color:var(--red);font-size:13px">Error loading posts: ${e.message||e}</div>`;
@@ -28274,6 +28280,7 @@ async function loadCMSPosts() {
   el('cms-published') && (el('cms-published').textContent = cmsPosts.filter(p=>p.status==='published').length);
   el('cms-drafts') && (el('cms-drafts').textContent = cmsPosts.filter(p=>p.status==='draft').length);
   el('cms-views') && (el('cms-views').textContent = cmsPosts.reduce((s,p)=>s+(p.views||0),0));
+  el('cms-drafts') && (el('cms-drafts').textContent = cmsPosts.filter(p=>p.status==='draft'||p.status==='ready').length);
   renderCMSList();
 }
 
@@ -28302,14 +28309,16 @@ function renderCMSList() {
     return `
       <div class="cms-post-row" style="display:grid;grid-template-columns:1fr 80px 90px 100px 60px 60px;gap:12px;padding:12px 16px;border-bottom:1px solid var(--b2);align-items:center">
         <div>
-          <div style="font-weight:600;color:var(--tx1);font-size:13px">${post.title||'Untitled'}</div>
-          <div style="font-size:12px;color:var(--tx4);margin-top:2px">/blog/${post.slug||''}</div>
+          <div style="font-weight:600;color:var(--tx1);font-size:13px">${escHtml(post.title||'Untitled')}</div>
+          <div style="font-size:12px;color:var(--tx4);margin-top:2px">/blog/${escHtml(post.slug||'')}${post.source==='static' ? ' · <span style="color:var(--tx4)">static</span>' : ''}${(post.issues||[]).length ? ' · <span style="color:#fbbf24" title="on-page SEO audit">⚠ ' + escHtml(post.issues.join(', ')) + '</span>' : ''}</div>
         </div>
         <div style="text-align:center"><span class="cms-status-badge ${sc}">${post.status||'draft'}</span></div>
         <div style="text-align:center;font-size:12px;color:var(--tx3)">${cats}</div>
         <div style="text-align:center;font-size:12px;color:var(--tx3)">${dateStr}</div>
         <div style="text-align:center;font-size:12px;color:var(--tx2);font-weight:600">${post.views||0}</div>
-        <div style="text-align:center"><button onclick="openCMSEditor('${post.id}')" style="padding:4px 10px;font-size:12px;background:var(--amb2);border:1px solid var(--amberline);border-radius:4px;cursor:pointer;color:var(--amber);font-weight:600">Edit</button></div>
+        <div style="text-align:center">${post.source === 'static'
+          ? `<a href="${escHtml(post.path)}" target="_blank" rel="noopener" style="padding:4px 10px;font-size:12px;border:1px solid var(--b2);border-radius:4px;color:var(--tx2);text-decoration:none;font-weight:600" title="Static file in the repo — edit via Claude">Open</a>`
+          : `<button onclick="openCMSEditor('${post.id}')" style="padding:4px 10px;font-size:12px;background:var(--amb2);border:1px solid var(--amberline);border-radius:4px;cursor:pointer;color:var(--amber);font-weight:600">Edit</button>`}</div>
       </div>
     `;
   }).join('');
@@ -28447,15 +28456,13 @@ async function saveCMSPost(status) {
   };
 
   try {
-    let res;
-    if(cmsEditingId) {
-      res = await S.supabase.from('blog_posts').update(row).eq('id', cmsEditingId);
-    } else {
-      res = await S.supabase.from('blog_posts').insert(row);
-    }
-    if(res.error) throw res.error;
-    alert(cmsEditingId ? 'Post updated!' : 'Post created!');
+    const r = await fetch('/api/content?action=save', { method: 'POST', headers: _seoHeaders(), body: JSON.stringify({
+      id: cmsEditingId || undefined, title, slug, meta_title, meta_description, excerpt, category, tags, featured_image,
+      body_html: content, status: row.status, published_at: row.published_at }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error === 'slug_taken' ? 'That slug is already used by another post' : (d.error || ('HTTP ' + r.status)));
     _blogPostsCache = null; // bust blog page cache
+    toast(row.status === 'published' ? `✅ Live at /blog/${d.post.slug}` : (cmsEditingId ? 'Draft saved' : 'Draft created'), 4000);
     closeCMSEditor();
   } catch(e) {
     console.error('Save error:', e);
@@ -28742,11 +28749,18 @@ async function cmsAIGenerate(mode) {
       setProgress(50, 'Writing article sections…');
       await new Promise(r => setTimeout(r, 600));
 
-      const {title, html} = _generateArticleContent(keyword, style);
+      setProgress(30, 'Writing with the model (30–60s)…');
+      const r = await fetch('/api/content?action=ai_draft', { method: 'POST', headers: _seoHeaders(), body: JSON.stringify({ keyword, style }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.draft) throw new Error(d.error || ('HTTP ' + r.status));
+      const title = d.draft.title, html = d.draft.body_html;
+      window._cmsLastDraft = d.draft;
       setProgress(75, 'Generating SEO metadata…');
       await new Promise(r => setTimeout(r, 400));
 
-      const seo = _generateSEOMeta(keyword, title, html);
+      const gen = _generateSEOMeta(keyword, title, html);
+      const m = window._cmsLastDraft || {};
+      const seo = { slug: m.slug || gen.slug, excerpt: m.excerpt || gen.excerpt, metaTitle: m.meta_title || gen.metaTitle, metaDesc: m.meta_description || gen.metaDesc, tags: (m.tags && m.tags.length) ? m.tags : gen.tags };
 
       // Fill all fields
       document.getElementById('cms-field-title').value = title;
@@ -29034,6 +29048,7 @@ function escapeHtml(s) {
 // BLOG PAGE — loads from Supabase blog_posts table
 // ═══════════════════════════════════════════════════════
 let _blogPostsCache = null;
+let cmsStatic = [], cmsAuditAt = null;
 
 async function loadBlogPosts() {
   const grid = document.getElementById('blog-posts-grid');
@@ -29043,17 +29058,11 @@ async function loadBlogPosts() {
   // Fetch from Supabase if not cached
   if (!_blogPostsCache) {
     try {
-      if (!S.supabase) {
-        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx4)">Blog loading…</div>';
-        return;
-      }
-      const { data, error } = await S.supabase
-        .from('blog_posts')
-        .select('id,title,slug,excerpt,status,category,tags,author_name,published_at,created_at,views')
-        .in('status', ['published','draft'])
-        .order('created_at', { ascending: false });
-      if (error) throw error;
-      _blogPostsCache = data || [];
+      const r = await fetch('/api/content?action=public');
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+      _blogPostsCache = (d.posts || []).map(p => ({ id: p.source + ':' + p.slug, title: p.title, slug: p.slug, url: p.url, excerpt: p.excerpt, status: 'published',
+        category: p.category, tags: p.tags || [], author_name: 'SONIQ', published_at: p.published_at, created_at: p.published_at, views: 0, words: p.words }));
     } catch (e) {
       grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--tx4)"><div style="font-size:32px;margin-bottom:12px">⚠️</div><div style="font-size:14px">Could not load articles</div><div style="font-size:12px;margin-top:4px;color:var(--tx4)">'+e.message+'</div></div>';
       return;
@@ -29131,57 +29140,11 @@ function filterBlogPosts() {
   loadBlogPosts();
 }
 
-async function openBlogPost(slug) {
-  const detail = document.getElementById('blog-post-detail');
-  const grid = document.getElementById('blog-posts-grid');
-  const featured = document.getElementById('blog-featured');
-  const searchBar = document.getElementById('blog-search')?.parentElement;
-  const filterBar = document.querySelector('#pg-blog > div > div:first-child');
-
-  if (!detail || !S.supabase) return;
-
-  // Fetch full post content
-  try {
-    const { data, error } = await S.supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .single();
-    if (error) throw error;
-
-    document.getElementById('blog-post-title').textContent = data.title;
-    document.getElementById('blog-post-content').innerHTML = data.content || '';
-    document.getElementById('blog-post-author').textContent = data.author_name || 'SONIQ';
-    document.getElementById('blog-post-date').textContent = formatBlogDate(data.published_at || data.created_at);
-    document.getElementById('blog-post-category-badge').textContent = data.category || 'article';
-    const viewsEl = document.getElementById('blog-post-views');
-    if (viewsEl) viewsEl.textContent = data.views ? '👁 ' + data.views + ' views' : '';
-
-    // Tags
-    const tagsEl = document.getElementById('blog-post-tags');
-    if (tagsEl) tagsEl.innerHTML = (data.tags || []).map(t => '<span class="blog-tag">' + escHtml(t) + '</span>').join('');
-
-    // Admin actions in detail view
-    const adminActions = document.getElementById('blog-post-admin-actions');
-    if (adminActions && S.isAdmin) {
-      const isDraft = data.status === 'draft';
-      adminActions.style.display = 'flex';
-      adminActions.innerHTML =
-        '<button onclick="blogEditPost(\'' + data.id + '\')" style="padding:6px 14px;border:1px solid var(--b2);border-radius:var(--r2);background:var(--s3);color:var(--tx2);font-size:12px;font-weight:600;cursor:pointer">✏️ Edit</button>' +
-        '<button onclick="blogTogglePublish(\'' + data.id + '\',\'' + data.status + '\')" style="padding:6px 14px;border:1px solid ' + (isDraft ? 'rgba(74,222,128,.3)' : 'var(--b2)') + ';border-radius:var(--r2);background:' + (isDraft ? 'rgba(74,222,128,.08)' : 'var(--s3)') + ';color:' + (isDraft ? '#4ade80' : 'var(--tx2)') + ';font-size:12px;font-weight:600;cursor:pointer">' + (isDraft ? '🟢 Publish' : '📝 Unpublish') + '</button>';
-    }
-
-    // Show detail, hide grid
-    grid.style.display = 'none';
-    if (featured) featured.style.display = 'none';
-    if (searchBar) searchBar.style.display = 'none';
-    detail.style.display = 'block';
-
-    // Increment view count (fire and forget)
-    S.supabase.from('blog_posts').update({ views: (data.views || 0) + 1 }).eq('id', data.id).then(() => {});
-  } catch(e) {
-    toast('Could not load article: ' + e.message);
-  }
+async function openBlogPost(id) {
+  // Posts are real pages now (static file or Worker-rendered) — open them.
+  const p = (_blogPostsCache || []).find(x => x.id === id);
+  if (p && p.url) { window.location.href = p.url; return; }
+  window.location.href = '/blog';
 }
 
 function closeBlogPost() {
@@ -29226,18 +29189,9 @@ function blogEditPost(postId) {
 
 // ── Blog Admin: Publish/unpublish a post directly ──
 async function blogTogglePublish(postId, currentStatus) {
-  if (!S.supabase) return;
-  const newStatus = currentStatus === 'published' ? 'draft' : 'published';
-  const publishedAt = newStatus === 'published' ? new Date().toISOString() : null;
-  try {
-    const { error } = await S.supabase.from('blog_posts')
-      .update({ status: newStatus, published_at: publishedAt })
-      .eq('id', postId);
-    if (error) throw error;
-    toast(newStatus === 'published' ? '🟢 Post published!' : '📝 Moved to drafts');
-    _blogPostsCache = null; // bust cache
-    loadBlogPosts();
-  } catch(e) { toast('Error: ' + e.message); }
+  // Publishing lives in Admin → Content (D1 via the Worker); the public grid is read-only.
+  toast('Manage posts in Admin → ✍ Content', 3000);
+  if (typeof switchAdmTab === 'function') { try { location.hash = '#admin'; switchAdmTab('content', document.querySelector('[data-adm-tab="content"]')); } catch (_) {} }
 }
 
 // ── Show admin controls on blog page when admin is logged in ──

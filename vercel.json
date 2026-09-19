@@ -25,7 +25,8 @@
       "Permissions-Policy": "camera=(), microphone=(self), geolocation=()"
     } },
     { "src": "/robots.txt", "dest": "/robots.txt" },
-    { "src": "/sitemap.xml", "dest": "/sitemap.xml" },
+    { "src": "/sitemap.xml", "dest": "https://soniq-api.thealvindean.workers.dev/sitemap.xml" },
+    { "src": "/sitemap-static.xml", "dest": "/sitemap-static.xml" },
     { "src": "/llms.txt", "dest": "/llms.txt" },
     { "src": "/favicon.svg", "dest": "/favicon.svg" },
     { "src": "/favicon.ico", "dest": "/favicon.ico" },
@@ -37,7 +38,7 @@
     { "src": "/legal/(.*)", "dest": "/legal/$1" },
     { "src": "/blog", "dest": "/blog/index.html" },
     { "src": "/blog/(.*)\\.html", "dest": "/blog/$1.html" },
-    { "src": "/blog/(.*)", "dest": "/blog/$1.html" },
+    { "src": "/blog/([a-z0-9-]+)/?", "dest": "https://soniq-api.thealvindean.workers.dev/blog/$1" },
     { "src": "/app", "dest": "/index.html" },
     { "src": "/", "dest": "/landing.html" },
     { "src": "/(.*)", "dest": "/index.html" }
