@@ -3293,9 +3293,93 @@ window.pingPv = function(event){
 // pageview once on app load.
 try { window.pingPv('pageview'); } catch(e){}
 </script>
-<script src="./lib/lyrics-analysis-engine.js"></script>
-<script src="./lib/liu-components.js"></script>
-<script src="./lib/smart-lyrics-upgrade-integration.js"></script>
+<style id="adm-v2">
+/* ═══════════════════════════════════════════════════════════════
+   ADMIN v2 — "mission console". Scoped to #pg-admin. Overrides the
+   inline-styled markup via attribute selectors so all four tabs get
+   the system without rewriting them. Shell built by initAdminShell().
+   ═══════════════════════════════════════════════════════════════ */
+#pg-admin { --adm-rail: 232px; --adm-surface: linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,.012)); --adm-border: rgba(255,255,255,.09); --adm-border-2: rgba(255,255,255,.14); --adm-accent: var(--amber); }
+#pg-admin > div { max-width: 1360px !important; padding: 8px 24px 48px !important; }
+.adm-shell { display: grid; grid-template-columns: var(--adm-rail) minmax(0, 1fr); gap: 28px; align-items: start; }
+
+/* rail */
+.adm-rail { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 14px; }
+.adm-rail-brand { display: flex; align-items: center; gap: 10px; padding: 6px 4px 2px; }
+.adm-rail-mark { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, var(--amber), #ff9f1c); color: #111; font-weight: 900; font-size: 13px; display: grid; place-items: center; letter-spacing: -.02em; box-shadow: 0 8px 24px -10px rgba(245,192,0,.7); }
+.adm-rail-brand b { display: block; font-size: 13px; color: var(--tx1); letter-spacing: -.01em; }
+.adm-rail-brand span { display: block; font-size: 11px; color: var(--tx4); font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; }
+#pg-admin .adm-tabs { flex-direction: column; gap: 3px; border: 0 !important; margin: 0 !important; padding: 6px; background: var(--adm-surface); border: 1px solid var(--adm-border) !important; border-radius: 14px; }
+#pg-admin .adm-tab { justify-content: flex-start; gap: 10px; padding: 10px 12px !important; border: 0 !important; border-radius: 10px; min-height: 40px; font-size: 13px; color: var(--tx3); width: 100%; text-align: left; }
+#pg-admin .adm-tab:hover { background: rgba(255,255,255,.05); color: var(--tx1); }
+#pg-admin .adm-tab.on { background: rgba(245,192,0,.12); color: var(--amber); box-shadow: inset 0 0 0 1px rgba(245,192,0,.28); }
+#pg-admin .adm-tab .adm-badge { margin-left: auto; font-family: var(--mono); font-size: 11px; color: var(--tx4); background: rgba(255,255,255,.06); padding: 1px 7px; border-radius: 999px; }
+#pg-admin .adm-tab.on .adm-badge { color: var(--amber); background: rgba(245,192,0,.14); }
+.adm-status { background: var(--adm-surface); border: 1px solid var(--adm-border); border-radius: 14px; padding: 12px 12px 8px; }
+.adm-status .adm-kicker { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--tx4); margin-bottom: 8px; }
+.adm-status-row { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; padding: 6px 2px; font-size: 12px; color: var(--tx2); border-top: 1px solid rgba(255,255,255,.05); white-space: nowrap; }
+.adm-status-row:first-of-type { border-top: 0; }
+.adm-status-row i { width: 8px; height: 8px; border-radius: 50%; background: var(--tx4); box-shadow: 0 0 0 3px rgba(255,255,255,.04); }
+.adm-status-row i.ok { background: var(--green); box-shadow: 0 0 10px rgba(62,232,150,.55); }
+.adm-status-row i.warn { background: var(--amber); box-shadow: 0 0 10px rgba(245,192,0,.5); }
+.adm-status-row i.bad { background: var(--red); box-shadow: 0 0 10px rgba(255,107,107,.5); }
+.adm-status-row small { font-family: var(--mono); font-size: 11px; color: var(--tx4); }
+.adm-links { display: flex; flex-direction: column; gap: 2px; padding: 4px; }
+.adm-links a { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 9px; font-size: 12px; color: var(--tx3); text-decoration: none; }
+.adm-links a:hover { background: rgba(255,255,255,.05); color: var(--tx1); }
+.adm-links a::after { content: '↗'; color: var(--tx4); font-size: 11px; }
+
+/* body: section headers */
+.adm-body { min-width: 0; }
+#pg-admin .adm-tab-panel > div:first-child[style*="justify-content:space-between"] { margin-bottom: 18px !important; padding-bottom: 16px; border-bottom: 1px solid var(--adm-border); }
+#pg-admin .adm-tab-panel > div:first-child div[style*="font-size:20px"] { font-size: 26px !important; letter-spacing: -.03em; line-height: 1.1; }
+#pg-admin .adm-tab-panel > div:first-child div[style*="font-size:12px"] { margin-top: 6px !important; color: var(--tx4) !important; }
+
+/* cards */
+#pg-admin .card { background: var(--adm-surface) !important; border: 1px solid var(--adm-border) !important; border-radius: 14px !important; box-shadow: 0 1px 0 rgba(255,255,255,.03) inset; }
+#pg-admin .card > div:first-child[style*="font-weight:700"][style*="font-size:12px"],
+#pg-admin .card > div:first-child > div[style*="font-weight:700"][style*="font-size:12px"] { font-size: 13px !important; color: var(--tx1) !important; letter-spacing: -.01em; }
+
+/* KPI tiles (the centered stat cards) */
+#pg-admin .adm-tab-panel > div[style*="minmax(130px,1fr)"] { grid-template-columns: repeat(auto-fit, minmax(112px, 1fr)) !important; }
+#pg-admin .card[style*="text-align:center"] { padding: 18px 12px 16px !important; position: relative; overflow: hidden; transition: transform .15s, border-color .15s; }
+#pg-admin .card[style*="text-align:center"]:hover { transform: translateY(-1px); border-color: var(--adm-border-2) !important; }
+#pg-admin .card[style*="text-align:center"] > div:first-child { font-size: 30px !important; font-weight: 900 !important; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; margin-bottom: 8px; }
+#pg-admin .card[style*="text-align:center"] > div:last-child { font-size: 11px !important; letter-spacing: .1em !important; color: var(--tx4) !important; font-weight: 700; }
+#pg-admin .card[style*="text-align:center"]::before { content: ''; position: absolute; inset: 0 auto auto 0; width: 100%; height: 2px; background: currentColor; opacity: 0; }
+/* inner stat tiles inside Sales card (bg2 boxes) */
+#pg-admin div[style*="background:var(--bg2)"][style*="text-align:center"] { background: rgba(255,255,255,.03) !important; border: 1px solid var(--adm-border); border-radius: 12px !important; padding: 14px 10px !important; }
+#pg-admin div[style*="background:var(--bg2)"][style*="text-align:center"] > div:first-child { font-size: 24px !important; font-weight: 900 !important; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin-bottom: 6px; }
+#pg-admin div[style*="background:var(--bg2)"][style*="text-align:center"] > div:last-child { font-size: 11px !important; letter-spacing: .1em !important; color: var(--tx4) !important; font-weight: 700; }
+
+/* tables */
+#pg-admin table { font-variant-numeric: tabular-nums; }
+#pg-admin thead tr { color: var(--tx4) !important; font-size: 11px !important; letter-spacing: .08em !important; }
+#pg-admin thead th { padding: 8px 10px !important; font-weight: 700; border-bottom: 1px solid var(--adm-border) !important; }
+#pg-admin tbody td { padding: 9px 10px !important; font-size: 13px !important; }
+#pg-admin tbody tr { border-bottom: 1px solid rgba(255,255,255,.05) !important; transition: background .1s; }
+#pg-admin tbody tr:hover { background: rgba(255,255,255,.03); }
+#pg-admin .cms-post-row { padding: 12px 16px !important; }
+#pg-admin .cms-post-row:hover { background: rgba(255,255,255,.03); }
+
+/* inputs + buttons inside admin */
+#pg-admin input[type="text"], #pg-admin input:not([type]), #pg-admin select, #pg-admin input[placeholder] { background: rgba(0,0,0,.25) !important; border: 1px solid var(--adm-border-2) !important; border-radius: 9px !important; color: var(--tx1) !important; }
+#pg-admin input:focus, #pg-admin select:focus { outline: 2px solid rgba(245,192,0,.45); outline-offset: 1px; }
+#pg-admin .btn { border-radius: 10px; }
+#pg-admin .btn.btn-sm { padding: 7px 12px; font-size: 12px; }
+
+/* banners / notes */
+#pg-admin #adm-stripe-banner { border-radius: 12px !important; }
+#pg-admin #adm-recon-card { border-style: dashed !important; }
+
+@media (max-width: 960px) {
+  .adm-shell { grid-template-columns: 1fr; gap: 16px; }
+  .adm-rail { position: static; }
+  #pg-admin .adm-tabs { flex-direction: row; flex-wrap: wrap; }
+  #pg-admin .adm-tab { width: auto; }
+  .adm-status, .adm-links, .adm-rail-brand { display: none; }
+}
+</style>
 </head>
 <body>
 <!-- v2.1 topbar progress -->
@@ -27223,6 +27307,8 @@ function _resetAdminDashboard(loadingState) {
 
 async function loadAdminDashboard(forceRefresh) {
   if (!S.isAdmin && !window.__soniqAdmin) { toast('Admin access required'); return; }
+  initAdminShell();
+  if (forceRefresh) _admShellPing();
   if (_adminLoadInflight) return; // debounce concurrent refreshes
   _adminLoadInflight = true;
 
@@ -27280,12 +27366,13 @@ function renderAdminDashboard(data) {
   document.getElementById('adm-total-comments').textContent = data.summary?.total_comments ?? '—';
   document.getElementById('adm-new-7d').textContent = data.summary?.new_7d ?? '—';
   const tl = document.getElementById('adm-total-users-label');
-  if (tl) tl.textContent = 'Total Users' + (data.summary?.admin_users ? ` · ${data.summary.admin_users} team` : '');
+  if (tl) tl.textContent = 'Users' + (data.summary?.admin_users ? ` · ${data.summary.admin_users} team` : '');
   const genAt = document.getElementById('adm-generated-at');
   if (genAt) genAt.textContent = data.generated_at ? ('as of ' + new Date(data.generated_at).toLocaleTimeString()) : 'live';
 
   renderAdminSales(data.sales, data.summary);
   renderAdminTraffic(data.traffic);
+  _admShellFromData(data);
 
   // Pipeline reconciliation — surfaces drift between Redis counters and the
   // authoritative DB count. Only shows when at least one of the diagnostic
@@ -27915,6 +28002,79 @@ function refreshCommunityFeed() {
 document.addEventListener('DOMContentLoaded', () => { refreshInspirationBoard(); refreshCommunityFeed(); });
 
 // ── ADMIN TAB SYSTEM ──
+// ── Admin v2 shell: section rail + live status. Built once, on first open. ──
+// #pg-admin lived outside the app's .wrap, so .wrap's bottom padding rendered
+// as a 120px void above the dashboard — it's moved inside here.
+let _admShellBuilt = false, _admStatusTimer = null;
+function initAdminShell() {
+  if (_admShellBuilt) return;
+  const pg = document.getElementById('pg-admin'); if (!pg) return;
+  const wrap = document.querySelector('body > .wrap');
+  if (wrap && pg.parentElement !== wrap) wrap.appendChild(pg);
+  const inner = pg.firstElementChild; const tabs = inner.querySelector('.adm-tabs'); if (!tabs) return;
+  const shell = document.createElement('div'); shell.className = 'adm-shell';
+  const rail = document.createElement('aside'); rail.className = 'adm-rail';
+  const body = document.createElement('div'); body.className = 'adm-body';
+  rail.innerHTML = '<div class="adm-rail-brand"><div class="adm-rail-mark">IQ</div><div><b>SONIQ admin</b><span>mission console</span></div></div>';
+  rail.appendChild(tabs);
+  rail.insertAdjacentHTML('beforeend',
+    '<div class="adm-status"><div class="adm-kicker">Live status</div>' +
+      '<div class="adm-status-row" data-k="worker"><i></i><span>API Worker</span><small>…</small></div>' +
+      '<div class="adm-status-row" data-k="stripe"><i></i><span>Stripe</span><small>…</small></div>' +
+      '<div class="adm-status-row" data-k="autopilot"><i></i><span>Autopilot</span><small>…</small></div>' +
+      '<div class="adm-status-row" data-k="email"><i></i><span>Email rail</span><small>alvin@mysoniq.com</small></div>' +
+      '<div class="adm-status-row" data-k="updated"><i class="ok"></i><span>Data refreshed</span><small>—</small></div>' +
+    '</div>' +
+    '<div class="adm-links">' +
+      '<a href="/blog" target="_blank" rel="noopener">View blog</a>' +
+      '<a href="/" target="_blank" rel="noopener">View landing</a>' +
+      '<a href="https://dashboard.stripe.com/" target="_blank" rel="noopener">Stripe dashboard</a>' +
+      '<a href="https://resend.com/emails" target="_blank" rel="noopener">Resend logs</a>' +
+      '<a href="https://dash.cloudflare.com/" target="_blank" rel="noopener">Cloudflare</a>' +
+    '</div>');
+  // move every tab panel into the body column
+  Array.prototype.slice.call(inner.querySelectorAll('.adm-tab-panel')).forEach(p => body.appendChild(p));
+  shell.appendChild(rail); shell.appendChild(body); inner.appendChild(shell);
+  // badges on nav (filled by data)
+  tabs.querySelectorAll('.adm-tab').forEach(t => { const b = document.createElement('span'); b.className = 'adm-badge'; b.style.display = 'none'; t.appendChild(b); });
+  _admShellBuilt = true;
+  _admShellPing();
+}
+function _admSet(k, cls, text) {
+  const row = document.querySelector('.adm-status-row[data-k="' + k + '"]'); if (!row) return;
+  const dot = row.querySelector('i'), sm = row.querySelector('small');
+  if (cls) dot.className = cls; if (text != null) sm.textContent = text;
+}
+function _admBadge(tab, text) {
+  const b = document.querySelector('.adm-tab[data-adm-tab="' + tab + '"] .adm-badge'); if (!b) return;
+  b.textContent = text; b.style.display = text ? '' : 'none';
+}
+// Worker health + autopilot state (cheap, admin-gated), refreshed with the dashboard.
+async function _admShellPing() {
+  try { const r = await fetch('/healthz'); _admSet('worker', r.ok ? 'ok' : 'bad', r.ok ? 'healthy' : 'HTTP ' + r.status); }
+  catch (_) { _admSet('worker', 'bad', 'unreachable'); }
+  try {
+    const r = await fetch('/api/content?action=plan_list', { headers: _seoHeaders() });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok) {
+      const q = (d.plan || []).filter(x => x.status === 'planned').length, f = (d.plan || []).filter(x => x.status === 'failed').length;
+      _admSet('autopilot', d.autopublish ? (f ? 'warn' : 'ok') : 'warn', (d.autopublish ? 'M/W/F · ' : 'paused · ') + q + ' queued' + (f ? ' · ' + f + ' failed' : ''));
+      _admBadge('content', q ? q + ' queued' : '');
+    } else _admSet('autopilot', 'bad', r.status === 401 ? 'sign in' : 'HTTP ' + r.status);
+  } catch (_) { _admSet('autopilot', 'bad', 'unreachable'); }
+}
+// Called from renderAdminDashboard with the analytics payload.
+function _admShellFromData(data) {
+  const st = data?.sales?.stripe || {};
+  if (!st.configured) _admSet('stripe', 'bad', st.key_state === 'set but EMPTY' ? 'key EMPTY' : 'not connected');
+  else if (!st.ok) _admSet('stripe', 'warn', 'error');
+  else _admSet('stripe', st.mode === 'live' ? 'ok' : 'warn', (st.mode || 'live') + ' · ' + (st.active_subscriptions + (st.trialing_subscriptions || 0)) + ' subs');
+  _admSet('email', 'ok', null);
+  _admSet('updated', 'ok', data?.generated_at ? new Date(data.generated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'now');
+  _admBadge('analytics', data?.summary?.total_users != null ? data.summary.total_users + ' users' : '');
+  const kw = data?.seo?.snapshot?.keywords; if (kw) _admBadge('seotraffic', kw.length + ' kw');
+}
+
 function switchAdmTab(tabName, el) {
   // Hide all panels
   document.querySelectorAll('.adm-tab-panel').forEach(p => p.classList.remove('on'));
