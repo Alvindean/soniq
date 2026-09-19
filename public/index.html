@@ -3285,7 +3285,7 @@ window.pingPv = function(event){
     fetch('/api/pv', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ event: String(event || 'pageview') }),
+      body: JSON.stringify({ event: String(event || 'pageview'), path: location.pathname }),
       keepalive: true
     }).catch(function(){});
   } catch(e){}
@@ -8984,130 +8984,137 @@ try { window.pingPv('pageview'); } catch(e){}
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px">
         <div>
-          <div style="font-size:20px;font-weight:800;color:var(--tx1)">🔍 SEO & Traffic</div>
-          <div style="font-size:12px;color:var(--tx3);margin-top:2px">Track rankings, traffic, and optimization opportunities</div>
+          <div style="font-size:20px;font-weight:800;color:var(--tx1)">🔍 SEO &amp; Traffic</div>
+          <div id="seo-subtitle" style="font-size:12px;color:var(--tx3);margin-top:2px">Sitemap · first-party pageviews · Ubersuggest rankings snapshot</div>
         </div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-sm btn-teal" onclick="loadSEODashboard()">🔄 Refresh</button>
-          <button class="btn btn-sm btn-amber" onclick="runSEOAudit()">🤖 Run AI Audit</button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-teal" onclick="loadSEODashboard(true)">🔄 Refresh</button>
+          <button class="btn btn-sm btn-amber" id="seo-audit-btn" onclick="runSEOAudit()">🤖 Run AI Audit</button>
         </div>
       </div>
 
-      <!-- SEO Stats -->
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px">
-        <div class="card" style="padding:12px;text-align:center">
+      <!-- Stat tiles — every number has a named source; unknowns stay "—" -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:10px">
+        <div class="card" style="padding:12px;text-align:center" title="URLs listed in /sitemap.xml">
           <div id="seo-pages-indexed" style="font-size:22px;font-weight:900;color:#34d399">—</div>
-          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Pages Indexed</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Pages in sitemap</div>
         </div>
-        <div class="card" style="padding:12px;text-align:center">
-          <div id="seo-keywords-tracked" style="font-size:22px;font-weight:900;color:var(--amber)">—</div>
-          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Keywords Tracked</div>
+        <div class="card" style="padding:12px;text-align:center" title="Organic keywords mysoniq.com ranks for (Ubersuggest, US, top 100)">
+          <div id="seo-keywords-tracked" style="font-size:22px;font-weight:900;color:#60a5fa">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Ranking keywords</div>
         </div>
-        <div class="card" style="padding:12px;text-align:center">
-          <div id="seo-avg-position" style="font-size:22px;font-weight:900;color:#60a5fa">—</div>
-          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Avg Position</div>
+        <div class="card" style="padding:12px;text-align:center" title="Mean Google position across ranking keywords (Ubersuggest)">
+          <div id="seo-avg-position" style="font-size:22px;font-weight:900;color:#fbbf24">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Avg position</div>
         </div>
-        <div class="card" style="padding:12px;text-align:center">
+        <div class="card" style="padding:12px;text-align:center" title="First-party pageview beacons, last 30 UTC days, all pages carrying the beacon">
           <div id="seo-total-views" style="font-size:22px;font-weight:900;color:#a78bfa">—</div>
-          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Total Views</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Pageviews 30d</div>
         </div>
-        <div class="card" style="padding:12px;text-align:center">
-          <div id="seo-ai-citations" style="font-size:22px;font-weight:900;color:#f47292">—</div>
-          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">AI Citations</div>
+        <div class="card" style="padding:12px;text-align:center" title="Estimated monthly organic visits (Ubersuggest)">
+          <div id="seo-est-traffic" style="font-size:22px;font-weight:900;color:#f97316">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">Est. organic / mo</div>
         </div>
-      </div>
-
-      <!-- Deep links — external dashboards that already have the live data.
-           Vercel Analytics has no free public API so we link out rather than
-           re-query; Search Console + Bing Webmaster show indexing + search query
-           data; sitemap.xml is a sanity-check that the site is crawlable. -->
-      <div class="card" style="padding:10px 12px;margin-bottom:16px;display:flex;flex-wrap:wrap;gap:8px;align-items:center">
-        <div style="font-size:12px;color:var(--tx3);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-right:6px">Live Dashboards</div>
-        <a href="https://vercel.com/dashboard" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:12px">📊 Vercel Analytics</a>
-        <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amysoniq.com" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:12px">🔍 Google Search Console</a>
-        <a href="https://www.bing.com/webmasters" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:12px">🔍 Bing Webmaster</a>
-        <a href="/sitemap.xml" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:12px">🗺 sitemap.xml</a>
-        <a href="/robots.txt" target="_blank" rel="noopener" class="btn btn-sm" style="font-size:12px">🤖 robots.txt</a>
-      </div>
-
-      <!-- Keyword Rankings Table -->
-      <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
-        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:13px;font-weight:700;color:var(--tx1)">🎯 Keyword Rankings</div>
-          <button class="btn btn-sm" onclick="checkAllRankings()" style="font-size:12px">Check Now</button>
-        </div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
-            <thead>
-              <tr style="color:var(--tx3);text-transform:uppercase;font-size:12px;letter-spacing:.06em;border-bottom:1px solid var(--b1)">
-                <th style="padding:8px 12px;text-align:left">Keyword</th>
-                <th style="padding:8px;text-align:center">Position</th>
-                <th style="padding:8px;text-align:center">Change</th>
-                <th style="padding:8px;text-align:left">Target Page</th>
-                <th style="padding:8px;text-align:center">Status</th>
-              </tr>
-            </thead>
-            <tbody id="seo-keywords-body">
-              <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--tx4)">Click "Check Now" to scan rankings</td></tr>
-            </tbody>
-          </table>
+        <div class="card" style="padding:12px;text-align:center" title="Domain authority · backlinks · referring domains (Ubersuggest)">
+          <div id="seo-authority" style="font-size:22px;font-weight:900;color:#2dd4bf">—</div>
+          <div style="font-size:12px;color:var(--tx3);text-transform:uppercase">DA · links · domains</div>
         </div>
       </div>
+      <div id="seo-source-line" style="font-size:12px;color:var(--tx4);margin-bottom:16px;line-height:1.5">—</div>
 
-      <!-- Page Performance Database -->
-      <div class="card" style="margin-bottom:16px;padding:0;overflow:hidden">
-        <div style="padding:12px 14px;border-bottom:1px solid var(--b1);display:flex;align-items:center;justify-content:space-between">
-          <div style="font-size:13px;font-weight:700;color:var(--tx1)">📄 All Pages — Performance Database</div>
-          <div style="display:flex;gap:6px">
-            <input id="seo-page-search" placeholder="Search pages…" style="padding:5px 9px;border-radius:6px;border:1px solid var(--b2);background:var(--s2);color:var(--tx1);font-size:12px;width:150px">
-            <button class="btn btn-sm" onclick="exportSEOCSV()" style="font-size:12px">⬇ CSV</button>
-          </div>
-        </div>
-        <div style="overflow-x:auto">
-          <table style="width:100%;border-collapse:collapse;font-size:12px">
-            <thead>
-              <tr style="color:var(--tx3);text-transform:uppercase;font-size:12px;letter-spacing:.06em;border-bottom:1px solid var(--b1)">
-                <th style="padding:8px 12px;text-align:left">Page</th>
-                <th style="padding:8px;text-align:center">Type</th>
-                <th style="padding:8px;text-align:center">Status</th>
-                <th style="padding:8px;text-align:center">Views</th>
-                <th style="padding:8px;text-align:center">Top Keyword</th>
-                <th style="padding:8px;text-align:center">Rank</th>
-                <th style="padding:8px;text-align:center">SEO Score</th>
-                <th style="padding:8px;text-align:center">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="seo-pages-body">
-              <tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">Click Refresh to load page data</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- AI SEO Audit Panel -->
+      <!-- Trend: monthly ranking keywords + est. traffic from the snapshot -->
       <div class="card" style="margin-bottom:16px">
-        <div style="font-size:13px;font-weight:700;color:var(--tx1);margin-bottom:12px">🤖 AI SEO Engine</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runContentGapAnalysis()">
-            <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:4px">Content Gap Finder</div>
-            <div style="font-size:12px;color:var(--tx3)">Find "People Also Ask" questions you haven't covered yet</div>
-          </div>
-          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runCompetitorWatch()">
-            <div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:4px">Competitor Watch</div>
-            <div style="font-size:12px;color:var(--tx3)">Check what Suno, Udio, and others are publishing</div>
-          </div>
-          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runSchemaGenerator()">
-            <div style="font-size:12px;font-weight:700;color:#34d399;margin-bottom:4px">Schema Generator</div>
-            <div style="font-size:12px;color:var(--tx3)">Generate JSON-LD structured data for any page</div>
-          </div>
-          <div class="card" style="padding:14px;background:var(--s2);cursor:pointer" onclick="runAICitationCheck()">
-            <div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:4px">AI Citation Check</div>
-            <div style="font-size:12px;color:var(--tx3)">See if ChatGPT/Perplexity mention SONIQ</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1)">📈 Organic trend (keywords · est. visits / month)</div>
+          <div id="seo-trend-note" style="font-size:12px;color:var(--tx4)"></div>
+        </div>
+        <div id="seo-trend" style="display:flex;align-items:flex-end;gap:6px;height:64px"></div>
+        <div id="seo-trend-labels" style="display:flex;gap:6px;margin-top:4px;font-size:11px;color:var(--tx4)"></div>
+      </div>
+
+      <!-- Keyword rankings -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1)">🎯 Keyword rankings</div>
+          <div id="seo-keywords-note" style="font-size:12px;color:var(--tx4)"></div>
+        </div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12px" aria-label="Keyword rankings">
+            <thead>
+              <tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
+                <th style="padding:6px 8px;text-align:left">Keyword</th>
+                <th style="padding:6px 8px;text-align:center">Position</th>
+                <th style="padding:6px 8px;text-align:center">Change</th>
+                <th style="padding:6px 8px;text-align:right">Volume</th>
+                <th style="padding:6px 8px;text-align:right">Difficulty</th>
+                <th style="padding:6px 8px;text-align:left">Ranking page</th>
+                <th style="padding:6px 8px;text-align:center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="seo-keywords-body"><tr><td colspan="7" style="padding:14px;color:var(--tx4)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Pages -->
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1)">📄 All pages — sitemap × first-party views × organic</div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input id="seo-page-search" placeholder="Search pages…" aria-label="Search pages" oninput="filterSEOPages()" style="padding:5px 9px;border-radius:6px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:12px;width:180px">
+            <button class="btn btn-sm" onclick="exportSEOCSV()">⬇ CSV</button>
           </div>
         </div>
-        <div id="seo-ai-output" style="margin-top:16px;display:none">
-          <div style="font-size:12px;font-weight:600;color:var(--tx2);margin-bottom:8px">AI Output:</div>
-          <div id="seo-ai-result" style="background:var(--s2);border:1px solid var(--b2);border-radius:var(--r3);padding:14px;font-size:12px;color:var(--tx2);line-height:1.7;white-space:pre-wrap"></div>
+        <div style="overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:12px" aria-label="Pages performance">
+            <thead>
+              <tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
+                <th style="padding:6px 8px;text-align:left">Page</th>
+                <th style="padding:6px 8px;text-align:center">Type</th>
+                <th style="padding:6px 8px;text-align:right">Views (mo)</th>
+                <th style="padding:6px 8px;text-align:right">Views (all)</th>
+                <th style="padding:6px 8px;text-align:right">Est. organic/mo</th>
+                <th style="padding:6px 8px;text-align:left">Top keyword</th>
+                <th style="padding:6px 8px;text-align:center">Rank</th>
+                <th style="padding:6px 8px;text-align:center">Schema</th>
+              </tr>
+            </thead>
+            <tbody id="seo-pages-body"><tr><td colspan="8" style="padding:14px;color:var(--tx4)">Loading…</td></tr></tbody>
+          </table>
+        </div>
+        <div id="seo-pages-note" style="font-size:12px;color:var(--tx4);margin-top:8px;line-height:1.5"></div>
+      </div>
+
+      <!-- AI SEO tools — each click is one paid OpenRouter call (admin only) -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <div style="font-size:12px;font-weight:700;color:var(--tx1)">🤖 AI SEO engine</div>
+          <div style="font-size:12px;color:var(--tx4)">Uses the snapshot + sitemap as context · one model call per click · verify before acting</div>
+        </div>
+        <div class="adm-2col" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button type="button" class="card" style="text-align:left;cursor:pointer;padding:12px" onclick="runContentGapAnalysis()">
+            <div style="font-size:12px;font-weight:700;color:var(--tx1)">Content gap finder</div>
+            <div style="font-size:12px;color:var(--tx3);margin-top:2px">12 uncovered questions/topics we can realistically rank for, with slugs</div>
+          </button>
+          <button type="button" class="card" style="text-align:left;cursor:pointer;padding:12px" onclick="runCompetitorWatch()">
+            <div style="font-size:12px;font-weight:700;color:var(--tx1)">Competitor watch <span style="color:var(--tx4);font-weight:400">(live web)</span></div>
+            <div style="font-size:12px;color:var(--tx3);margin-top:2px">What Suno, Udio, Boomy shipped in the last 30 days + 3 angles to own</div>
+          </button>
+          <button type="button" class="card" style="text-align:left;cursor:pointer;padding:12px" onclick="runSchemaGenerator()">
+            <div style="font-size:12px;font-weight:700;color:var(--tx1)">Schema generator</div>
+            <div style="font-size:12px;color:var(--tx3);margin-top:2px">JSON-LD for a page — pick one in the table (Schema column) or type a path</div>
+          </button>
+          <button type="button" class="card" style="text-align:left;cursor:pointer;padding:12px" onclick="runAICitationCheck()">
+            <div style="font-size:12px;font-weight:700;color:var(--tx1)">AI citation check <span style="color:var(--tx4);font-weight:400">(live web)</span></div>
+            <div style="font-size:12px;color:var(--tx3);margin-top:2px">Where SONIQ is (and isn't) mentioned for AI-songwriting queries</div>
+          </button>
+        </div>
+        <div id="seo-ai-output" style="margin-top:14px;display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div id="seo-ai-title" style="font-size:12px;font-weight:700;color:var(--tx2)">AI output</div>
+            <div id="seo-ai-meta" style="font-size:12px;color:var(--tx4)"></div>
+          </div>
+          <div id="seo-ai-result" style="background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:14px;font-size:12px;color:var(--tx2);line-height:1.7;white-space:pre-wrap;max-height:520px;overflow:auto"></div>
         </div>
       </div>
 
@@ -28814,106 +28821,189 @@ async function cmsAIGenerate(mode) {
 // Sources: Supabase blog_posts (.views), /sitemap.xml (parsed for URL count),
 // Vercel Analytics deep-link (Vercel doesn't have a free public API, so we link
 // to the dashboard rather than re-querying), Google Search Console deep-link.
-async function loadSEODashboard() {
-  await Promise.all([
-    renderSEOPagesReal(),
-    renderSEOSitemapStatus(),
-    renderSEOKeywordsPlaceholder(),
-  ]);
+// ═══════════════════════════════════════════════════════
+// SEO & TRAFFIC TAB — real sources only:
+//   /sitemap.xml (pages) · /api/analytics traffic.top_pages (first-party
+//   pageviews by path) · /api/analytics seo.snapshot (Ubersuggest, pushed by
+//   admin) · POST /api/analytics?seo_ai=<kind> (OpenRouter, one call per click)
+// ═══════════════════════════════════════════════════════
+let _seo = { data: null, sitemap: [], loadedAt: 0 };
+
+function _seoHeaders() {
+  const h = { 'Content-Type': 'application/json' };
+  const adminKey = localStorage.getItem('soniq_admin_token') || '';
+  const token = S.session?.access_token || '';
+  if (adminKey) h['x-admin-key'] = adminKey;
+  if (token)    h['Authorization'] = 'Bearer ' + token;
+  return h;
+}
+function _seoPageType(p) {
+  if (p === '/' ) return 'landing';
+  if (p === '/app' || p.startsWith('/app/')) return 'app';
+  if (p.startsWith('/blog')) return 'blog';
+  if (p.startsWith('/legal') || p === '/privacy' || p === '/terms') return 'legal';
+  return 'page';
+}
+function _seoStatus(pos) {
+  if (pos == null) return ['—', 'var(--tx4)'];
+  if (pos <= 3)  return ['Top 3', '#34d399'];
+  if (pos <= 10) return ['Page 1', '#2dd4bf'];
+  if (pos <= 30) return ['Page 2–3', '#fbbf24'];
+  return ['Beyond p3', 'var(--tx4)'];
 }
 
-// Top stat tiles: Pages Indexed comes from sitemap URL count (best proxy without
-// a Search Console API hookup). Keywords Tracked = blog_posts count (each post
-// targets a keyword cluster). Avg Position / Total Views / AI Citations need
-// external integrations — show "—" + a tooltip pointer rather than fake data.
-async function renderSEOSitemapStatus() {
+async function loadSEODashboard(force) {
+  if (!S.isAdmin && !window.__soniqAdmin) { toast('Admin access required'); return; }
+  const fresh = _seo.data && !force && (Date.now() - _seo.loadedAt < 60000);
   try {
-    const r = await fetch('/sitemap.xml', { cache: 'no-store' });
-    if (!r.ok) throw new Error('sitemap fetch failed');
-    const xml = await r.text();
-    const urlMatches = xml.match(/<loc>/g) || [];
-    document.getElementById('seo-pages-indexed').textContent = urlMatches.length;
-  } catch (_) {
-    document.getElementById('seo-pages-indexed').textContent = '—';
-  }
-  // Keywords Tracked = published blog post count
-  try {
-    if (S.supabase) {
-      const { count } = await S.supabase.from('blog_posts').select('id', { count: 'exact', head: true }).eq('status', 'published');
-      document.getElementById('seo-keywords-tracked').textContent = count ?? '—';
+    if (!fresh) {
+      const [ar, sr] = await Promise.all([
+        fetch('/api/analytics' + (force ? '?refresh=1' : ''), { headers: _seoHeaders() }),
+        fetch('/sitemap.xml', { cache: 'no-store' }).catch(() => null),
+      ]);
+      if (!ar.ok) { const b = await ar.json().catch(() => ({})); throw new Error(b.error || ('HTTP ' + ar.status)); }
+      _seo.data = await ar.json();
+      _seo.sitemap = [];
+      if (sr && sr.ok) {
+        const xml = await sr.text();
+        _seo.sitemap = [...xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map(m => { try { return new URL(m[1]).pathname.replace(/\/+$/, '') || '/'; } catch { return null; } }).filter(Boolean);
+      }
+      _seo.loadedAt = Date.now();
     }
-  } catch (_) {}
-  // Total Views — sum of blog_posts.views (rough lower bound; ignores landing/app)
-  try {
-    if (S.supabase) {
-      const { data } = await S.supabase.from('blog_posts').select('views').eq('status', 'published');
-      const sum = (data || []).reduce((acc, r) => acc + (r.views || 0), 0);
-      document.getElementById('seo-total-views').textContent = sum.toLocaleString();
-    }
-  } catch (_) {}
-  // Avg Position + AI Citations require Search Console API + custom tracking.
-  // Hard-coded "—" with explanatory tooltip instead of fake numbers.
-  const avgPos = document.getElementById('seo-avg-position');
-  const aiCit = document.getElementById('seo-ai-citations');
-  if (avgPos) { avgPos.textContent = '—'; avgPos.title = 'Connect Google Search Console API to populate'; }
-  if (aiCit)  { aiCit.textContent  = '—'; aiCit.title  = 'Tracking via OpenRouter/Perplexity/Claude citation logs — coming soon'; }
-}
-
-async function renderSEOPagesReal() {
-  const body = document.getElementById('seo-pages-body');
-  if (!body) return;
-  body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">Loading…</td></tr>';
-
-  if (!S.supabase) {
-    body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">Supabase not connected — sign in as admin</td></tr>';
-    return;
-  }
-
-  try {
-    const { data, error } = await S.supabase
-      .from('blog_posts')
-      .select('id,title,slug,status,views,published_at,created_at,category')
-      .order('views', { ascending: false, nullsFirst: false });
-    if (error) throw error;
-    const rows = data || [];
-    if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--tx4)">No blog posts in Supabase yet</td></tr>';
-      return;
-    }
-    body.innerHTML = rows.map(p => {
-      // Slug is technically admin-controlled, but defense-in-depth: escape into
-      // both the href attribute and any text usage in case a slug ever contains
-      // a quote or angle bracket.
-      const safeSlug = encodeURIComponent(String(p.slug || ''));
-      const url = '/blog/' + safeSlug;
-      const hrefAttr = escapeHtml(url);
-      const views = (p.views || 0).toLocaleString();
-      const status = p.status === 'published' ? '<span style="color:#34d399">●</span> Live' : '<span style="color:var(--tx4)">○</span> ' + escapeHtml(p.status || 'draft');
-      return `<tr style="border-bottom:1px solid var(--b2);font-size:12px">
-        <td style="padding:8px 12px"><a href="${hrefAttr}" target="_blank" rel="noopener" style="color:var(--tx1);text-decoration:none">${escapeHtml(p.title || p.slug)}</a></td>
-        <td style="padding:8px;text-align:center;color:var(--tx3)">${escapeHtml(p.category || 'blog')}</td>
-        <td style="padding:8px;text-align:center">${status}</td>
-        <td style="padding:8px;text-align:center;color:var(--tx2);font-weight:600">${views}</td>
-        <td style="padding:8px;text-align:center;color:var(--tx4)" title="Connect Search Console for keyword data">—</td>
-        <td style="padding:8px;text-align:center;color:var(--tx4)">—</td>
-        <td style="padding:8px;text-align:center;color:var(--tx4)">—</td>
-        <td style="padding:8px;text-align:center"><a href="${hrefAttr}" target="_blank" rel="noopener" style="font-size:12px;color:var(--amber)">View →</a></td>
-      </tr>`;
-    }).join('');
+    renderSEOTiles(); renderSEOTrend(); renderSEOKeywords(); renderSEOPages();
   } catch (e) {
-    body.innerHTML = '<tr><td colspan="8" style="padding:20px;text-align:center;color:#f47292">Load failed: ' + escapeHtml(e.message || String(e)) + '</td></tr>';
+    toast('⚠️ SEO data load failed: ' + e.message, 4000);
+    console.error('SEO tab error:', e);
   }
 }
 
-function renderSEOKeywordsPlaceholder() {
-  const body = document.getElementById('seo-keywords-body');
+function renderSEOTiles() {
+  const d = _seo.data || {}; const snap = d.seo?.snapshot; const ov = snap?.overview || {};
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = (v === null || v === undefined || v === '') ? '—' : v; };
+  set('seo-pages-indexed', _seo.sitemap.length || null);
+  set('seo-keywords-tracked', snap ? (snap.keywords || []).length : null);
+  set('seo-avg-position', snap?.avg_position ?? null);
+  set('seo-total-views', d.traffic?.last_30d?.pageview ?? null);
+  set('seo-est-traffic', ov.traffic ?? null);
+  set('seo-authority', snap ? `${ov.domain_authority ?? '—'} · ${ov.backlinks ?? '—'} · ${ov.ref_domains ?? '—'}` : null);
+  const src = document.getElementById('seo-source-line');
+  if (src) {
+    const bits = [`Sitemap: ${_seo.sitemap.length} URLs.`];
+    bits.push(`Pageviews: first-party beacon, ${d.traffic?.last_30d?.pageview ?? 0} in 30d (only pages carrying the beacon report — app, landing, blog, legal).`);
+    bits.push(snap ? `Rankings: ${escHtml(snap.source || 'snapshot')} · US · fetched ${new Date(snap.fetched_at).toLocaleString()}${snap.prev_fetched_at ? ` · changes vs ${new Date(snap.prev_fetched_at).toLocaleDateString()}` : ' · no earlier snapshot yet (changes appear after the next refresh)'}. Top 10: ${snap.top10 ?? 0} · pages 1–3: ${snap.page1_3 ?? 0}. Refresh = ask Claude "refresh the SONIQ SEO snapshot".`
+                   : '<b>No rankings snapshot stored yet</b> — ask Claude "refresh the SONIQ SEO snapshot".');
+    src.innerHTML = bits.join(' ');
+  }
+}
+
+function renderSEOTrend() {
+  const el = document.getElementById('seo-trend'), lab = document.getElementById('seo-trend-labels'), note = document.getElementById('seo-trend-note');
+  const trend = _seo.data?.seo?.snapshot?.trend || [];
+  if (!el) return;
+  if (!trend.length) { el.innerHTML = '<div style="color:var(--tx4);font-size:12px">No trend data in snapshot</div>'; if (lab) lab.innerHTML = ''; return; }
+  const maxK = Math.max(...trend.map(t => t.keywords || 0), 1), maxT = Math.max(...trend.map(t => t.traffic || 0), 1);
+  el.innerHTML = trend.map(t => {
+    const hk = Math.max(2, Math.round((t.keywords || 0) / maxK * 60)), ht = Math.max(2, Math.round((t.traffic || 0) / maxT * 60));
+    return `<div title="${t.month}: ${t.keywords || 0} keywords · ${t.traffic || 0} est. visits" style="flex:1;display:flex;gap:2px;align-items:flex-end;height:60px">
+      <div style="flex:1;height:${hk}px;background:#60a5fa;border-radius:2px 2px 0 0"></div>
+      <div style="flex:1;height:${ht}px;background:#f97316;border-radius:2px 2px 0 0"></div></div>`;
+  }).join('');
+  if (lab) lab.innerHTML = trend.map(t => `<div style="flex:1;text-align:center">${escHtml(String(t.month).slice(2))}</div>`).join('');
+  if (note) note.innerHTML = '<span style="color:#60a5fa">■</span> keywords &nbsp;<span style="color:#f97316">■</span> est. visits';
+}
+
+function renderSEOKeywords() {
+  const body = document.getElementById('seo-keywords-body'), note = document.getElementById('seo-keywords-note');
   if (!body) return;
-  body.innerHTML = `<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--tx4);font-size:12px;line-height:1.6">
-    Keyword ranking data requires a Google Search Console API connection.<br>
-    <a href="https://search.google.com/search-console?resource_id=sc-domain%3Amysoniq.com" target="_blank" rel="noopener" style="color:var(--amber);text-decoration:none">Open Search Console →</a>
-    &nbsp;·&nbsp;
-    <a href="https://vercel.com/dashboard" target="_blank" rel="noopener" style="color:var(--amber);text-decoration:none">Open Vercel Analytics →</a>
-  </td></tr>`;
+  const snap = _seo.data?.seo?.snapshot;
+  if (!snap) { body.innerHTML = '<tr><td colspan="7" style="padding:14px;color:var(--tx4)">No rankings snapshot stored yet.</td></tr>'; if (note) note.textContent = ''; return; }
+  const rows = [...(snap.keywords || [])].sort((a, b) => (a.position ?? 999) - (b.position ?? 999));
+  body.innerHTML = rows.map(k => {
+    const [label, col] = _seoStatus(k.position);
+    const ch = k.change == null ? '<span style="color:var(--tx4)">new</span>' : k.change === 0 ? '<span style="color:var(--tx4)">0</span>' : k.change > 0 ? `<span style="color:#34d399">▲ ${k.change}</span>` : `<span style="color:#f47292">▼ ${-k.change}</span>`;
+    return `<tr style="border-bottom:1px solid var(--bg2)">
+      <td style="padding:6px 8px;color:var(--tx1);font-weight:600">${escHtml(k.keyword || '')}</td>
+      <td style="padding:6px 8px;text-align:center;color:var(--tx2);font-weight:700">${k.position ?? '—'}</td>
+      <td style="padding:6px 8px;text-align:center">${ch}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--tx3)">${k.volume ?? '—'}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--tx4)">${k.difficulty ?? '—'}</td>
+      <td style="padding:6px 8px;color:var(--tx3)"><a href="${escHtml(k.path || '/')}" target="_blank" rel="noopener" style="color:var(--tx3)">${escHtml(k.path || '/')}</a></td>
+      <td style="padding:6px 8px;text-align:center"><span style="color:${col};font-weight:700">${label}</span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" style="padding:14px;color:var(--tx4)">Snapshot has no ranking keywords.</td></tr>';
+  if (note) note.textContent = `${rows.length} keywords · ${snap.source || ''} · ${new Date(snap.fetched_at).toLocaleDateString()}`;
+}
+
+function _seoPagesRows() {
+  const d = _seo.data || {}; const tp = d.traffic?.top_pages || {}; const snap = d.seo?.snapshot;
+  const monthMap = new Map((tp.this_month || []).map(x => [x.name, x.count]));
+  const allMap = new Map((tp.all_time || []).map(x => [x.name, x.count]));
+  const orgMap = new Map((snap?.top_pages || []).map(x => [x.path, x]));
+  const kwByPath = new Map();
+  for (const k of (snap?.keywords || [])) { const p = k.path || '/'; const cur = kwByPath.get(p); if (!cur || (k.position ?? 999) < (cur.position ?? 999)) kwByPath.set(p, k); }
+  const paths = new Set([..._seo.sitemap, ...monthMap.keys(), ...allMap.keys(), ...orgMap.keys()]);
+  return [...paths].map(p => ({
+    path: p, type: _seoPageType(p), in_sitemap: _seo.sitemap.includes(p),
+    views_month: monthMap.get(p) || 0, views_all: allMap.get(p) || 0,
+    est_organic: orgMap.get(p)?.traffic ?? null,
+    top_keyword: kwByPath.get(p)?.keyword || '', rank: kwByPath.get(p)?.position ?? null,
+  })).sort((a, b) => (b.views_month - a.views_month) || (b.views_all - a.views_all) || a.path.localeCompare(b.path));
+}
+
+function renderSEOPages() {
+  const body = document.getElementById('seo-pages-body'), note = document.getElementById('seo-pages-note');
+  if (!body) return;
+  const q = (document.getElementById('seo-page-search')?.value || '').toLowerCase();
+  const rows = _seoPagesRows().filter(r => !q || r.path.includes(q) || r.type.includes(q) || (r.top_keyword || '').toLowerCase().includes(q));
+  const typeCol = { landing: '#f97316', app: '#a78bfa', blog: '#60a5fa', legal: 'var(--tx4)', page: 'var(--tx3)' };
+  body.innerHTML = rows.map(r => `<tr style="border-bottom:1px solid var(--bg2)">
+      <td style="padding:6px 8px"><a href="${escHtml(r.path)}" target="_blank" rel="noopener" style="color:var(--tx1);text-decoration:none">${escHtml(r.path)}</a>${r.in_sitemap ? '' : ' <span title="Not in sitemap.xml" style="color:#fbbf24">⚠</span>'}</td>
+      <td style="padding:6px 8px;text-align:center;color:${typeCol[r.type] || 'var(--tx3)'};font-weight:600">${r.type}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--tx1);font-weight:700">${r.views_month}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--tx3)">${r.views_all}</td>
+      <td style="padding:6px 8px;text-align:right;color:var(--tx3)">${r.est_organic ?? '—'}</td>
+      <td style="padding:6px 8px;color:var(--tx2)">${escHtml(r.top_keyword || '—')}</td>
+      <td style="padding:6px 8px;text-align:center;color:var(--tx2)">${r.rank ?? '—'}</td>
+      <td style="padding:6px 8px;text-align:center"><button class="btn btn-sm" style="padding:2px 8px;font-size:11px" onclick="runSchemaGenerator('${escHtml(r.path)}')">JSON-LD</button></td>
+    </tr>`).join('') || '<tr><td colspan="8" style="padding:14px;color:var(--tx4)">No pages match.</td></tr>';
+  if (note) {
+    const tp = _seo.data?.traffic?.top_pages || {};
+    note.textContent = `${rows.length} pages · views are first-party beacons (${tp.month || 'this month'} / all-time since the beacon shipped) — a 0 means no beacon hits, not necessarily no visitors · est. organic and keywords from the Ubersuggest snapshot.`;
+  }
+}
+function filterSEOPages() { renderSEOPages(); }
+
+function exportSEOCSV() {
+  const rows = _seoPagesRows();
+  const esc = v => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const head = ['path', 'type', 'in_sitemap', 'views_month', 'views_all', 'est_organic_mo', 'top_keyword', 'rank'];
+  const csv = '﻿' + [head.join(','), ...rows.map(r => head.map(h => esc(r[h])).join(','))].join('\r\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = `soniq-seo-pages-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// One paid OpenRouter call per click, admin-gated server-side.
+async function _seoAI(kind, title, extra) {
+  const out = document.getElementById('seo-ai-output'), res = document.getElementById('seo-ai-result'), t = document.getElementById('seo-ai-title'), meta = document.getElementById('seo-ai-meta');
+  if (!out || !res) return;
+  out.style.display = ''; t.textContent = title; meta.textContent = 'running…'; res.textContent = 'Thinking… (10–40s)';
+  try {
+    const r = await fetch('/api/analytics?seo_ai=' + encodeURIComponent(kind), { method: 'POST', headers: _seoHeaders(), body: JSON.stringify(extra || {}) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.ok) { res.textContent = '⚠️ ' + (d.error || ('HTTP ' + r.status)); meta.textContent = ''; return; }
+    res.textContent = d.text || '(empty response)';
+    const u = d.usage || {};
+    meta.textContent = `${d.model} · ${Math.round((d.ms || 0) / 1000)}s${u.total_tokens ? ` · ${u.total_tokens} tokens` : ''} · AI output, verify before acting`;
+  } catch (e) { res.textContent = '⚠️ ' + (e.message || 'request failed'); meta.textContent = ''; }
+}
+function runSEOAudit()            { _seoAI('audit', '🤖 AI SEO audit'); }
+function runContentGapAnalysis()  { _seoAI('content_gap', 'Content gap finder'); }
+function runCompetitorWatch()     { _seoAI('competitor_watch', 'Competitor watch (live web)'); }
+function runAICitationCheck()     { _seoAI('citation_check', 'AI citation check (live web)'); }
+function runSchemaGenerator(path) {
+  const page = path || prompt('Page path to generate JSON-LD for (e.g. /blog/ai-songwriting-guide):', '/');
+  if (!page) return;
+  _seoAI('schema', 'Schema generator — ' + page, { page });
 }
 
 // Tiny HTML-escape helper used in the SEO table renders (fallback if a
