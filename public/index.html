@@ -3228,7 +3228,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
         var r = await _f(BASE + '/api/auth/session', { headers: { Authorization: 'Bearer ' + s.access_token } });
         if (!r.ok) { save(null); emit('SIGNED_OUT', null); return { data:{ session:null }, error:null }; }
         var d = await r.json().catch(function(){ return {}; });
-        if (d && d.user) { s.user = d.user; save(s); }
+        if (d && d.user) { s.user = d.user; if (d.access_token) s.access_token = d.access_token; save(s); }
         return { data: { session: s }, error: null };
       },
       signInWithPassword: async function(c){
@@ -19678,8 +19678,20 @@ function _initSupabase() {
       openPasswordResetModal();
     }
   });
-  S.supabase.auth.getSession().then(({ data: { session } }) => {
+  S.supabase.auth.getSession().then(async ({ data: { session } }) => {
     if (!session && window.__soniqAdmin) return; // don't overwrite admin session
+    // Validate the stored session against the Worker (and slide its expiry).
+    // A dead token used to keep the UI "signed in" while every call returned 401.
+    if (session && session.access_token && S.supabase.auth.refreshSession) {
+      try {
+        const r = await S.supabase.auth.refreshSession();
+        if (!r?.data?.session) {
+          session = null;
+          if (!localStorage.getItem('soniq_admin_token')) window.__soniqAdmin = false;
+          toast('Your session expired — please sign in again.', 5000);
+        } else { session = r.data.session; }
+      } catch (_) {}
+    }
     S.session = session;
     S.user = session?.user || null;
     // Email whitelist — grant full studio access automatically (case-insensitive)
@@ -27204,6 +27216,12 @@ async function loadAdminDashboard(forceRefresh) {
     if (token)    headers['Authorization'] = 'Bearer ' + token;
 
     const res = await fetch('/api/analytics' + (forceRefresh ? '?refresh=1' : ''), { headers });
+    if (res.status === 401) {
+      _resetAdminDashboard(false);
+      toast('Session expired — sign in again to load analytics.', 5000);
+      if (typeof openAuth === 'function') { try { openAuth('Session expired — sign in again'); } catch (_) {} }
+      return;
+    }
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
       const msg = errBody.detail || errBody.error || ('HTTP ' + res.status);
