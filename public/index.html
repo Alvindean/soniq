@@ -8359,8 +8359,9 @@ try { window.pingPv('pageview'); } catch(e){}
               <div id="profile-member-since" style="font-size:12px;color:var(--tx4)"></div>
             </div>
           </div>
-          <div style="display:flex;gap:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-sm" onclick="openProfileEdit()" style="flex:1">✏️ Edit Profile</button>
+            <button class="btn btn-sm" id="manage-billing-btn" onclick="openBillingPortal()" style="flex:1;display:none">💳 Manage Billing</button>
             <button class="btn btn-sm btn-red" onclick="authSignOut()" style="flex:1">Sign Out</button>
           </div>
         </div>
@@ -19879,26 +19880,60 @@ async function startCheckout(variant) {
       }
       return;
     }
-    const resp = await fetch('/api/stripe', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-      body: JSON.stringify({ plan }),
-    });
-    const data = await resp.json();
-    if (data.url) {
+    let resp;
+    try {
+      resp = await fetch('/api/stripe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ plan }),
+      });
+    } catch (netErr) {
+      // API unreachable: a Payment Link is an acceptable fallback ONLY for the
+      // exact plan (never substitute Pro for Studio) — the webhook attributes
+      // link purchases by checkout email + price.
+      const link = STRIPE_PAYMENT_LINKS[plan];
+      if (link) { window.open(link, '_blank', 'noopener'); }
+      else toast('⚠️ Checkout is unreachable right now — please try again in a minute.', 5000);
+      return;
+    }
+    const data = await resp.json().catch(() => ({}));
+    if (resp.ok && data.url) {
       window.location.href = data.url;
       return;
     }
-    throw new Error(data.error || 'no url');
-  } catch (e) {
-    // Only use payment links as fallback for non-auth errors (API down, etc.)
-    if (e.message !== 'no session') {
-      const link = STRIPE_PAYMENT_LINKS[plan] || STRIPE_PAYMENT_LINKS['pro'];
-      window.open(link, '_blank', 'noopener');
+    if (resp.status === 401) {
+      // Token expired (7-day TTL): re-authenticate, don't sell blind via a link.
+      const authModal = document.getElementById('auth-modal');
+      if (authModal) { authModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+      toast('Please sign in again to continue to checkout.', 4000);
+      return;
     }
+    toast('⚠️ ' + (data.error || ('Checkout failed (HTTP ' + resp.status + ')')), 5000);
+  } catch (e) {
+    toast('⚠️ Checkout failed: ' + (e.message || 'unknown error'), 5000);
   } finally {
     if (btn) { btn.textContent = 'Lock In ' + (priceEl ? priceEl.outerHTML : '') + ' Forever →'; btn.disabled = false; }
   }
+}
+
+// Stripe-hosted billing portal: update card, invoices, cancel. Shown only for
+// signed-in paid users; the Worker 404s when there's no Stripe customer on file.
+async function openBillingPortal() {
+  const btn = document.getElementById('manage-billing-btn');
+  const tok = S.session?.access_token;
+  if (!tok) { toast('Sign in first.'); return; }
+  if (btn) { btn.disabled = true; btn.textContent = 'Opening…'; }
+  try {
+    const r = await fetch('/api/stripe?portal=1', { method: 'POST', headers: { 'Authorization': 'Bearer ' + tok } });
+    const d = await r.json().catch(() => ({}));
+    if (r.ok && d.url) { window.location.href = d.url; return; }
+    toast(d.error === 'no_billing_on_file' ? 'No Stripe billing on this account yet.' : ('⚠️ ' + (d.error || 'Could not open billing portal')), 4000);
+  } catch (e) { toast('⚠️ Billing portal unreachable — try again shortly.', 4000); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = '💳 Manage Billing'; } }
+}
+function _syncBillingButton() {
+  const btn = document.getElementById('manage-billing-btn');
+  if (btn) btn.style.display = (S.user && S.plan && S.plan !== 'free' && !window.__soniqAdmin) ? '' : 'none';
 }
 
 async function loadFoundingStatus() {
@@ -19969,6 +20004,8 @@ async function loadFoundingStatus() {
           toast(S.plan !== 'free' ? `🎉 You're on ${S.plan.replace(/_/g, ' ')} — your songs are unlocked.` : '✅ Payment received — your plan will unlock within a minute. Refresh if it does not.', 6000);
         }
         if (typeof updateAuthUI === 'function') updateAuthUI();
+        if (typeof initGenreGrid === 'function') initGenreGrid(); // unlock paid genres immediately
+        _syncBillingButton();
       } catch (e) { S.plan = S.user?.plan || 'free'; }
     } else if (window.__soniqAdmin) {
       S.plan = 'studio'; // re-assert admin studio access after any async drift
