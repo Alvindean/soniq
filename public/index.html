@@ -1475,6 +1475,7 @@ body.craft-advanced .craft-basic-only{display:none !important}
   .adm-user-table td{padding:2px 4px;border:none;font-size:12px}
   .adm-user-table td:first-child{grid-column:1/-1;font-weight:700;color:var(--tx1)}
   .adm-user-table td[data-label="Name"]{display:none}
+  .adm-user-table td[data-label]:not(:first-child)::before{content:attr(data-label);display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--tx4);margin-bottom:1px}
 }
 @media(max-width:480px){
   .prof-quick-grid{grid-template-columns:repeat(2,1fr)!important}
@@ -8601,7 +8602,7 @@ try { window.pingPv('pageview'); } catch(e){}
         <div style="font-size:12px;color:var(--tx3);margin-top:2px">Admin-only · D1 users · Redis counters · Stripe revenue · <span id="adm-generated-at">—</span></div>
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-sm btn-teal" onclick="loadAdminDashboard()">🔄 Refresh</button>
+        <button class="btn btn-sm btn-teal" onclick="loadAdminDashboard(true)">🔄 Refresh</button>
         <button class="btn btn-sm btn-amber" onclick="exportAdminCSV()">⬇ Export CSV</button>
         <button class="btn btn-sm" onclick="exportAdminJSON()">⬇ Export JSON</button>
       </div>
@@ -8611,7 +8612,7 @@ try { window.pingPv('pageview'); } catch(e){}
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px">
       <div class="card" style="padding:14px;text-align:center">
         <div id="adm-total-users" style="font-size:26px;font-weight:900;color:var(--amber)">—</div>
-        <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Total Users</div>
+        <div id="adm-total-users-label" style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Total Users</div>
       </div>
       <div class="card" style="padding:14px;text-align:center">
         <div id="adm-total-songs" style="font-size:26px;font-weight:900;color:#60a5fa">—</div>
@@ -8635,7 +8636,7 @@ try { window.pingPv('pageview'); } catch(e){}
       </div>
       <div class="card" style="padding:14px;text-align:center">
         <div id="adm-new-7d" style="font-size:26px;font-weight:900;color:#2dd4bf">—</div>
-        <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Signups 7d</div>
+        <div style="font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-top:2px">Signups 7d (D1)</div>
       </div>
     </div>
 
@@ -8679,7 +8680,7 @@ try { window.pingPv('pageview'); } catch(e){}
         <div>
           <div style="font-size:12px;font-weight:700;color:var(--tx2);margin-bottom:6px">Plan revenue (list price)</div>
           <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:collapse;font-size:12px">
+            <table style="width:100%;border-collapse:collapse;font-size:12px" aria-label="Plan revenue by tier">
               <thead><tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
                 <th style="padding:4px 6px;text-align:left">Plan</th><th style="padding:4px 6px;text-align:center">Users</th><th style="padding:4px 6px;text-align:center">Stripe-active</th><th style="padding:4px 6px;text-align:center">Comped</th><th style="padding:4px 6px;text-align:right">MRR</th><th style="padding:4px 6px;text-align:right">At list</th>
               </tr></thead>
@@ -8702,7 +8703,7 @@ try { window.pingPv('pageview'); } catch(e){}
         <div style="font-size:12px;color:var(--tx4)">first-party pings · UTC days</div>
       </div>
       <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse;font-size:12px">
+        <table style="width:100%;border-collapse:collapse;font-size:12px" aria-label="Traffic and funnel metrics">
           <thead><tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
             <th style="padding:4px 6px;text-align:left">Metric</th><th style="padding:4px 6px;text-align:right">Today</th><th style="padding:4px 6px;text-align:right">7d</th><th style="padding:4px 6px;text-align:right">30d</th>
           </tr></thead>
@@ -8711,7 +8712,7 @@ try { window.pingPv('pageview'); } catch(e){}
       </div>
       <div id="adm-funnel" style="display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--tx3)"></div>
       <div style="font-size:12px;font-weight:700;color:var(--tx2);margin:12px 0 6px">Pageviews (last 30 days)</div>
-      <div id="adm-pv-daily" style="display:flex;align-items:flex-end;gap:2px;height:44px"></div>
+      <div id="adm-pv-daily" role="img" aria-label="Daily pageviews, last 30 days" style="display:flex;align-items:flex-end;gap:2px;height:44px"></div>
     </div>
 
     <!-- Pipeline reconciliation — surfaces drift between Redis counters, the songs DB,
@@ -27125,7 +27126,7 @@ function _resetAdminDashboard(loadingState) {
   const noUsers = document.getElementById('adm-no-users');      if (noUsers) noUsers.style.display = loadingState ? 'none' : '';
 }
 
-async function loadAdminDashboard() {
+async function loadAdminDashboard(forceRefresh) {
   if (!S.isAdmin && !window.__soniqAdmin) { toast('Admin access required'); return; }
   if (_adminLoadInflight) return; // debounce concurrent refreshes
   _adminLoadInflight = true;
@@ -27140,7 +27141,7 @@ async function loadAdminDashboard() {
     if (adminKey) headers['x-admin-key'] = adminKey;
     if (token)    headers['Authorization'] = 'Bearer ' + token;
 
-    const res = await fetch('/api/analytics', { headers });
+    const res = await fetch('/api/analytics' + (forceRefresh ? '?refresh=1' : ''), { headers });
     if (!res.ok) {
       const errBody = await res.json().catch(() => ({}));
       const msg = errBody.detail || errBody.error || ('HTTP ' + res.status);
@@ -27166,7 +27167,8 @@ function renderAdminDashboard(data) {
   // Summary
   const today = new Date().toISOString().slice(0,10);
   const todayEvents = (data.daily_events || []).find(d => d.date === today);
-  const todayCount = todayEvents?.song_saved || todayEvents?.total || 0;
+  // song_saved only — `total` sums pageviews/gen events too since /api/pv shares this hash.
+  const todayCount = todayEvents?.song_saved || 0;
 
   document.getElementById('adm-total-users').textContent = (data.summary?.total_users ?? (data.users?.length ?? '—'));
   document.getElementById('adm-total-songs').textContent = data.summary?.total_songs ?? data.total_songs ?? '—';
@@ -27176,6 +27178,8 @@ function renderAdminDashboard(data) {
   document.getElementById('adm-total-reactions').textContent = data.summary?.total_reactions ?? '—';
   document.getElementById('adm-total-comments').textContent = data.summary?.total_comments ?? '—';
   document.getElementById('adm-new-7d').textContent = data.summary?.new_7d ?? '—';
+  const tl = document.getElementById('adm-total-users-label');
+  if (tl) tl.textContent = 'Total Users' + (data.summary?.admin_users ? ` · ${data.summary.admin_users} team` : '');
   const genAt = document.getElementById('adm-generated-at');
   if (genAt) genAt.textContent = data.generated_at ? ('as of ' + new Date(data.generated_at).toLocaleTimeString()) : 'live';
 
@@ -27215,7 +27219,7 @@ function renderAdminDashboard(data) {
       const tol = Math.max(2, Math.round(redisN * 0.02));
       if (redisN === 0 && genreN === 0) { status.textContent = '⚪ No songs yet'; status.style.color = 'var(--tx3)'; note.textContent = ''; }
       else if (drift <= tol) { status.textContent = '✓ In sync'; status.style.color = '#34d399'; note.textContent = 'Songs DB retired (client-side storage); Redis counter vs genre ZSET agree.'; }
-      else { status.textContent = '⚠️ Drift detected'; status.style.color = '#f47292'; note.textContent = `Redis counter (${redisN}) vs genre ZSET total (${genreN}) off by ${drift} — check fan-out in track.js (fusion g1+g2 / alt-take reruns).`; }
+      else { status.textContent = '⚠️ Drift detected'; status.style.color = '#f47292'; note.textContent = `Redis counter (${redisN}) vs genre ZSET total (${genreN}) off by ${drift}. Both are written in one pipeline by track.js, so a gap means soniq:total_songs was reset/clobbered or an INCR silently errored (pipeline errors are now logged) — the ZSET is the better history.`; }
     } else if (!allPresent) {
       status.textContent = '⚠️ Partial data';
       status.style.color = 'var(--tx3)';
@@ -27246,7 +27250,7 @@ function renderAdminDashboard(data) {
         status.style.color = '#f47292';
         const parts = [];
         if (Math.abs(dbN - redisN) > tolerance) parts.push(`DB vs Redis off by ${Math.abs(dbN - redisN)} — Redis counter may be reset/stale, or fan-out missed some increments.`);
-        if (Math.abs(dbN - genreN) > tolerance) parts.push(`Genre ZSET total (${genreN}) ≠ DB count (${dbN}) — investigate fan-out (Lucky fusion writing g1+g2, alt-take reruns, or Redis seed/reset history).`);
+        if (Math.abs(dbN - genreN) > tolerance) parts.push(`Genre ZSET total (${genreN}) ≠ DB count (${dbN}) — a Redis reset/seed or a silently failed INCR in track.js (now logged).`);
         note.textContent = parts.join(' ');
       }
     }
@@ -27285,7 +27289,7 @@ function renderAdminDashboard(data) {
     const color = planColors[plan] || planColors[plan.replace(/_annual/,'')] || '#94a3b8';
     return `<div style="margin-bottom:7px">
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px">
-        <span style="color:var(--tx2);font-weight:600">${plan}</span>
+        <span style="color:var(--tx2);font-weight:600">${escHtml(plan)}</span>
         <span style="color:var(--tx4)">${cnt} user${cnt!==1?'s':''} (${pct}%)</span>
       </div>
       <div style="height:5px;background:var(--bg3);border-radius:99px;overflow:hidden">
@@ -27304,7 +27308,7 @@ function renderAdminDashboard(data) {
     const color = GCOLS[g.name] || '#94a3b8';
     return `<div style="margin-bottom:6px">
       <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px">
-        <span style="color:var(--tx2);font-weight:600">${g.name}</span>
+        <span style="color:var(--tx2);font-weight:600">${escHtml(g.name)}</span>
         <span style="color:var(--tx4)">${g.count}</span>
       </div>
       <div style="height:4px;background:var(--bg3);border-radius:99px;overflow:hidden">
@@ -27317,9 +27321,9 @@ function renderAdminDashboard(data) {
   const dailyEl = document.getElementById('adm-daily');
   const labelEl = document.getElementById('adm-daily-labels');
   const days = data.daily_events || [];
-  const maxDay = Math.max(...days.map(d => d.song_saved || d.total || 0), 1);
+  const maxDay = Math.max(...days.map(d => d.song_saved || 0), 1);
   dailyEl.innerHTML = days.map(d => {
-    const cnt = d.song_saved || d.total || 0;
+    const cnt = d.song_saved || 0;
     const h = Math.max(4, Math.round(cnt/maxDay*56));
     return `<div title="${d.date}: ${cnt} songs" style="flex:1;height:${h}px;background:linear-gradient(180deg,var(--amber),var(--violet));border-radius:3px 3px 0 0;min-width:12px;cursor:default"></div>`;
   }).join('');
@@ -27337,6 +27341,8 @@ function renderAdminDashboard(data) {
 
   // Users table
   renderAdminUsers(_adminUsersAll);
+  const uh = document.getElementById('adm-users-heading');
+  if (uh) uh.textContent = data.summary?.users_truncated ? `👥 Users — showing ${_adminUsersAll.length} of ${data.summary.total_users} (newest; use CSV for the rest)` : '👥 All Users';
 
   // Recent activity
   const recentEl = document.getElementById('adm-recent');
@@ -27352,7 +27358,7 @@ function renderAdminDashboard(data) {
 }
 
 function _usd(cents) {
-  if (cents === null || cents === undefined) return '—';
+  if (cents === null || cents === undefined || !Number.isFinite(Number(cents))) return '—';
   return '$' + (Number(cents) / 100).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
@@ -27362,14 +27368,18 @@ function renderAdminSales(sales, summary) {
   const banner   = document.getElementById('adm-stripe-banner');
   if (!sales) {
     if (statusEl) { statusEl.textContent = '— no sales block from API'; statusEl.style.color = 'var(--tx4)'; }
+    ['adm-mrr','adm-paying','adm-rev-30d','adm-rev-all','adm-comped','adm-founding'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = '—'; });
+    const nd = '<div style="color:var(--tx4);font-size:12px">No data</div>';
+    ['adm-sales-plans','adm-payments','adm-sales-note'].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = nd; });
+    if (banner) banner.style.display = 'none';
     return;
   }
   // Stripe connection state drives which numbers are "real money" vs D1-derived.
   if (!st.configured) {
-    statusEl.textContent = '⚪ Stripe not connected';
-    statusEl.style.color = 'var(--tx3)';
+    statusEl.textContent = st.key_state === 'set but EMPTY' ? '⚠️ Stripe key EMPTY' : st.key_state === 'malformed' ? '⚠️ Stripe key malformed' : '⚪ Stripe not connected';
+    statusEl.style.color = st.key_state ? '#fbbf24' : 'var(--tx3)';
     banner.style.display = '';
-    banner.innerHTML = '<b>No Stripe key on the API Worker.</b> Checkout, the webhook and revenue reporting are inactive — MRR below is derived from D1 plan flags at list price, and Revenue 30d / All-time can\'t be read. Add <code>STRIPE_SECRET_KEY</code> + <code>STRIPE_WEBHOOK_SECRET</code> + the price IDs to <code>soniq-api</code> to turn this on.';
+    banner.innerHTML = '<b>' + escHtml(st.reason || 'No Stripe key on the API Worker.') + '</b> MRR / Revenue can\'t be read; D1 shows ' + (sales.active_subs ?? 0) + ' Stripe-active subs (comps excluded — see At list). Fix: <code>cd ~\\soniq-workers</code> then <code>npx wrangler secret put STRIPE_SECRET_KEY</code> (paste the sk_live key when prompted). Webhook + price IDs are separate secrets.';
   } else if (!st.ok) {
     statusEl.textContent = '⚠️ Stripe error';
     statusEl.style.color = '#f47292';
@@ -27382,7 +27392,8 @@ function renderAdminSales(sales, summary) {
   }
 
   // Headline: prefer Stripe's own MRR/active-sub count when it answered; else D1.
-  const mrrCents = st.ok ? st.mrr_cents : sales.mrr_active_cents;
+  // Stripe answered → its MRR. Stripe errored → D1's Stripe-active subs. Not connected → unknown.
+  const mrrCents = st.ok ? st.mrr_cents : (st.configured ? sales.mrr_active_cents : null);
   const paying   = st.ok ? st.active_subscriptions : sales.paying_customers;
   document.getElementById('adm-mrr').textContent     = _usd(mrrCents);
   document.getElementById('adm-paying').textContent  = paying ?? '—';
@@ -27411,6 +27422,9 @@ function renderAdminSales(sales, summary) {
     const sbs = Object.entries(st.subs_by_status || {}).map(([k, v]) => `${k} ${v}`).join(', ') || 'none';
     noteBits.push(`Stripe subscriptions: ${sbs}. SONIQ charges: ${st.charges_total} paid, ${st.failed_all_time} failed (${st.failed_30d} failed in 30d${st.failed_30d ? ' — <b style="color:#f47292">dunning/churn signal</b>' : ''}).`);
     if (st.first_sale_ts) noteBits.push(`First sale ${new Date(st.first_sale_ts).toLocaleDateString()} · last ${new Date(st.last_sale_ts).toLocaleDateString()}.`);
+    if (st.trialing_subscriptions) noteBits.push(`${st.trialing_subscriptions} trialing (${_usd(st.mrr_trialing_cents)}/mo not yet billed, excluded from MRR).`);
+    if (sales.stripe_d1_active_subs_diff) noteBits.push(`<b style="color:#f47292">Stripe shows ${sales.stripe_d1_active_subs_diff > 0 ? sales.stripe_d1_active_subs_diff + ' more' : (-sales.stripe_d1_active_subs_diff) + ' fewer'} active subs than D1</b> — webhook lag/miss: a real payer may be sitting on the free plan.`);
+    noteBits.push(`Attribution: ${escHtml(st.discriminator || '')}${st.cached ? ' · cached ≤60s (Refresh bypasses)' : ''}.`);
     if (st.other_products_charges) noteBits.push(`Excluded ${_usd(st.other_products_cents)} (${st.other_products_charges} charges) from other products on this shared Stripe account.`);
     if (st.balance_available_cents !== null) noteBits.push(`Stripe balance: ${_usd(st.balance_available_cents)} available · ${_usd(st.balance_pending_cents)} pending.`);
   }
@@ -27436,7 +27450,11 @@ function renderAdminTraffic(tr) {
   const body = document.getElementById('adm-traffic-body');
   const funnel = document.getElementById('adm-funnel');
   const pvEl = document.getElementById('adm-pv-daily');
-  if (!tr) { body.innerHTML = '<tr><td colspan="4" style="padding:6px;color:var(--tx4)">No traffic block from API</td></tr>'; return; }
+  if (!tr) {
+    body.innerHTML = '<tr><td colspan="4" style="padding:6px;color:var(--tx4)">No traffic block from API</td></tr>';
+    funnel.innerHTML = '<span>—</span>'; pvEl.innerHTML = '';
+    return;
+  }
   const METRICS = [
     ['pageview',    '👁 Pageviews'],
     ['signup',      '🆕 Signups (beacon)'],
@@ -27453,12 +27471,12 @@ function renderAdminTraffic(tr) {
       <td style="padding:4px 6px;text-align:right;color:var(--tx2)">${w30[k] ?? 0}</td>
     </tr>`).join('');
   const c = tr.conversion_30d || {};
-  const fmtPct = v => (v === null || v === undefined) ? '—' : v + '%';
+  const fmtPct = (v, den) => (v === null || v === undefined) ? '—' : v + '%' + ((den || 0) < 10 ? ` <span style="color:var(--tx4)">(n=${den || 0})</span>` : '');
   const d1Signups = (tr.signups_daily_d1 || []).reduce((a, r) => a + (r.n || 0), 0);
   funnel.innerHTML = [
-    `<span>30d view→gen: <b style="color:var(--tx1)">${fmtPct(c.pageview_to_gen_pct)}</b></span>`,
-    `<span>30d view→signup: <b style="color:var(--tx1)">${fmtPct(c.pageview_to_signup_pct)}</b></span>`,
-    `<span>30d gen start→done: <b style="color:var(--tx1)">${fmtPct(c.gen_start_to_done_pct)}</b></span>`,
+    `<span>30d gen events per view: <b style="color:var(--tx1)">${fmtPct(c.pageview_to_gen_pct, w30.pageview)}</b></span>`,
+    `<span>30d view→signup: <b style="color:var(--tx1)">${fmtPct(c.pageview_to_signup_pct, w30.pageview)}</b></span>`,
+    `<span>30d gen start→done: <b style="color:var(--tx1)">${fmtPct(c.gen_start_to_done_pct, w30.gen_started)}</b></span>`,
     `<span>30d signups (D1, authoritative): <b style="color:var(--tx1)">${d1Signups}</b></span>`,
   ].join('');
   const days = tr.daily || [];
@@ -27486,8 +27504,8 @@ function renderAdminUsers(users) {
     return `<tr style="border-bottom:1px solid var(--bg2)">
       <td data-label="Email" style="padding:6px 8px;color:var(--tx2)">${escHtml(u.email||'—')}</td>
       <td data-label="Name" style="padding:6px 8px;color:var(--tx3)">${escHtml(u.full_name||u.display_name||'—')}${u.is_admin?' <span title="admin" style="color:var(--amber)">★</span>':''}</td>
-      <td data-label="Plan" style="padding:6px 8px;text-align:center"><span style="background:${pc}20;color:${pc};border:1px solid ${pc}60;border-radius:99px;padding:1px 7px;font-size:12px;font-weight:700;white-space:nowrap">${plan}</span></td>
-      <td data-label="Billing" style="padding:6px 8px;text-align:center;color:${billing==='stripe'?'#34d399':billing==='comped'?'#fbbf24':'var(--tx4)'};font-weight:${billing?'700':'400'}">${billing||'—'}</td>
+      <td data-label="Plan" style="padding:6px 8px;text-align:center"><span style="background:${pc}20;color:${pc};border:1px solid ${pc}60;border-radius:99px;padding:1px 7px;font-size:12px;font-weight:700;white-space:nowrap">${escHtml(plan)}</span></td>
+      <td data-label="Billing" style="padding:6px 8px;text-align:center;color:${billing==='stripe'?'#34d399':billing==='comped'?'#fbbf24':'var(--tx4)'};font-weight:${billing?'700':'400'}">${escHtml(billing||'—')}</td>
       <td data-label="Sub Status" style="padding:6px 8px;text-align:center;color:${subColor}">${escHtml(u.subscription_status||'—')}</td>
       <td data-label="Confirmed" style="padding:6px 8px;text-align:center;color:${u.email_confirmed?'#34d399':'var(--tx4)'}">${u.email_confirmed?'✓':'—'}</td>
       <td data-label="Last Sign-in" style="padding:6px 8px;color:var(--tx4)">${lastActive}</td>
@@ -27542,6 +27560,7 @@ async function exportAdminCSV() {
 }
 
 function exportAdminJSON() {
+  if (!S.isAdmin && !window.__soniqAdmin) return;
   if (!_adminData) { toast('Load dashboard first'); return; }
   if (typeof confirm === 'function' && !confirm(_ADMIN_EXPORT_WARN)) return;
   const blob = new Blob([JSON.stringify(_adminData, null, 2)], { type: 'application/json' });

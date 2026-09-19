@@ -1,3 +1,8 @@
+/* ⚠️ PRE-D1 ROLLBACK COPY — NOT what mysoniq.com runs. The live API is the
+   soniq-api Worker (~/soniq-workers/src/handlers/analytics.js, D1 + Redis +
+   Stripe). The browser fetch shim in public/index.html routes /api/* there.
+   This file still expects Supabase and returns the OLD response shape; do not
+   sync it into the Worker. Kept only as the documented Vercel rollback path. */
 /**
  * SONIQ — Extended admin analytics API
  *
