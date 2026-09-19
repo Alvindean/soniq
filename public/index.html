@@ -8851,6 +8851,27 @@ try { window.pingPv('pageview'); } catch(e){}
           </div>
         </div>
 
+        <!-- Publishing plan (keyword map + autopilot) -->
+        <div class="card" style="margin-bottom:16px" id="cms-plan-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:8px">
+            <div style="font-size:12px;font-weight:700;color:var(--tx1)">🗓 Publishing plan — autopilot</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="cms-plan-status" style="font-size:12px;color:var(--tx4)">—</span>
+              <button class="btn btn-sm" onclick="loadCMSPlan(true)">🔄</button>
+              <button class="btn btn-sm btn-amber" id="cms-plan-run" onclick="cmsRunNext()">▶ Publish next now</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto">
+            <table style="width:100%;border-collapse:collapse;font-size:12px" aria-label="Publishing plan">
+              <thead><tr style="color:var(--tx3);text-transform:uppercase;font-size:11px;letter-spacing:.06em;border-bottom:1px solid var(--brd)">
+                <th style="padding:4px 6px;text-align:left">#</th><th style="padding:4px 6px;text-align:left">Keyword</th><th style="padding:4px 6px;text-align:left">Cluster</th><th style="padding:4px 6px;text-align:left">Angle</th><th style="padding:4px 6px;text-align:center">Status</th><th style="padding:4px 6px;text-align:left">Post</th><th style="padding:4px 6px;text-align:center"></th>
+              </tr></thead>
+              <tbody id="cms-plan-body"><tr><td colspan="7" style="padding:10px;color:var(--tx4)">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div id="cms-plan-note" style="font-size:12px;color:var(--tx4);margin-top:8px;line-height:1.5"></div>
+        </div>
+
         <!-- Post list header -->
         <div class="card" style="padding:0;overflow:hidden">
           <div class="cms-post-row" style="background:var(--s2);font-weight:700;font-size:12px;color:var(--tx3);text-transform:uppercase;letter-spacing:.05em;cursor:default">
@@ -28251,9 +28272,50 @@ function resetGrowthStatuses() {
 let cmsPosts = [];
 let cmsEditingId = null;
 
+let _cmsPlan = null, _cmsPlanShowAll = false;
+async function loadCMSPlan(force) {
+  const body = document.getElementById('cms-plan-body'), st = document.getElementById('cms-plan-status'), note = document.getElementById('cms-plan-note');
+  if (!body) return;
+  try {
+    const r = await fetch('/api/content?action=plan_list', { headers: _seoHeaders() });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status));
+    _cmsPlan = d;
+    const rows = d.plan || [];
+    const planned = rows.filter(x => x.status === 'planned'), pub = rows.filter(x => x.status === 'published'), failed = rows.filter(x => x.status === 'failed');
+    st.textContent = `${d.autopublish ? '🟢 on' : '⏸ paused'} · ${d.schedule} · ${planned.length} queued · ${pub.length} published${failed.length ? ' · ' + failed.length + ' failed' : ''}`;
+    const show = _cmsPlanShowAll ? rows : [...failed, ...planned.slice(0, 6), ...pub.slice(-3).reverse()];
+    const col = { planned: 'var(--tx3)', published: '#34d399', failed: '#f47292', skipped: 'var(--tx4)' };
+    body.innerHTML = show.map(x => `<tr style="border-bottom:1px solid var(--bg2)">
+        <td style="padding:4px 6px;color:var(--tx4)">${x.priority}</td>
+        <td style="padding:4px 6px;color:var(--tx1);font-weight:600">${escHtml(x.keyword)}</td>
+        <td style="padding:4px 6px;color:var(--tx3)">${escHtml(x.cluster || '')}</td>
+        <td style="padding:4px 6px;color:var(--tx4);max-width:360px">${escHtml(x.title_hint || '')}${x.note ? ' <span style="color:#f47292">' + escHtml(x.note) + '</span>' : ''}</td>
+        <td style="padding:4px 6px;text-align:center;color:${col[x.status] || 'var(--tx3)'};font-weight:700">${escHtml(x.status)}</td>
+        <td style="padding:4px 6px">${x.post_slug ? `<a href="/blog/${escHtml(x.post_slug)}" target="_blank" rel="noopener" style="color:var(--amber)">/blog/${escHtml(x.post_slug)}</a>` : '—'}</td>
+        <td style="padding:4px 6px;text-align:center">${x.status === 'planned' ? `<button class="btn btn-sm" style="padding:2px 8px;font-size:11px" onclick="cmsPlanSkip('${x.id}')">skip</button>` : x.status === 'failed' ? `<button class="btn btn-sm" style="padding:2px 8px;font-size:11px" onclick="cmsPlanRetry('${x.id}')">retry</button>` : ''}</td>
+      </tr>`).join('') || '<tr><td colspan="7" style="padding:10px;color:var(--tx4)">No keywords in the map.</td></tr>';
+    note.innerHTML = `Runs Mon/Wed/Fri 15:00 UTC (8am Pacific): takes the next queued keyword, writes with the model, checks length/meta, adds a Related section for guaranteed internal links, publishes to /blog/&lt;slug&gt;, and emails ${escHtml(d.notify_to || '')} the link. Pause: set <code>CONTENT_AUTOPUBLISH="0"</code> in wrangler.toml. <a href="#" onclick="_cmsPlanShowAll=!_cmsPlanShowAll;loadCMSPlan();return false" style="color:var(--amber)">${_cmsPlanShowAll ? 'Show summary' : 'Show all ' + rows.length}</a>`;
+  } catch (e) { body.innerHTML = `<tr><td colspan="7" style="padding:10px;color:#f47292">${escHtml(e.message)}</td></tr>`; }
+}
+async function cmsPlanSkip(id)  { await fetch('/api/content?action=plan_update', { method: 'POST', headers: _seoHeaders(), body: JSON.stringify({ id, status: 'skipped' }) }); loadCMSPlan(); }
+async function cmsPlanRetry(id) { await fetch('/api/content?action=plan_update', { method: 'POST', headers: _seoHeaders(), body: JSON.stringify({ id, status: 'planned', note: '' }) }); loadCMSPlan(); }
+async function cmsRunNext() {
+  const btn = document.getElementById('cms-plan-run');
+  if (!confirm('Write and publish the next queued post now? (one model call, ~60s, goes live immediately)')) return;
+  if (btn) { btn.disabled = true; btn.textContent = 'Writing… (up to 90s)'; }
+  try {
+    const r = await fetch('/api/content?action=run_now', { method: 'POST', headers: _seoHeaders(), body: '{}' });
+    const d = await r.json().catch(() => ({}));
+    if (d.ok) toast(`✅ Live: ${d.url} (${d.words} words, ${d.links} links)`, 8000); else toast('⚠️ ' + (d.error || d.skipped || 'failed'), 6000);
+  } catch (e) { toast('⚠️ ' + e.message, 5000); }
+  finally { if (btn) { btn.disabled = false; btn.textContent = '▶ Publish next now'; } loadCMSPlan(); loadCMSPosts(); }
+}
+
 async function loadCMSPosts() {
   const list = document.getElementById('cms-posts-list');
   if(!list) return;
+  loadCMSPlan();
   list.innerHTML = '<div style="padding:40px;text-align:center;color:var(--tx4);font-size:13px">Loading posts…</div>';
   try {
     // Posts live in D1 behind the Worker; the 17 repo posts come back as
