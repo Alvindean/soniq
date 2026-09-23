@@ -8504,13 +8504,30 @@ TYPE 1 — STRUCTURE (own line, opens every section — required):
 TYPE 2 — DELIVERY (own line immediately BEFORE the specific lyric line it affects):
 [Whispered] · [Spoken] · [Falsetto] · [Screamed] · [Harmony] · [Ad-libs]
 
-TYPE 3 — PRODUCTION DNA (placed inline inside the section body, ≥1 required per Chorus):
-[808 Bass] · [Build] · [Drop] · [Trap Hi-Hat] · [Steel Guitar] · [Choir] · [Beat Switch] · [Breakdown]
+TYPE 3 — PRODUCTION DNA (placed inline inside the section body, ≥1 required per Chorus).
+These are the lyric sheet's half of the style prompt — pick the ones this song actually uses:
+  Instrument entries — [808 Bass] · [Trap Hi-Hat] · [Steel Guitar] · [Choir] · [Organ] · [Strings] · [Horns] · [Rhodes] · [Acoustic Guitar]
+  Energy moves — [Build] · [Drop] · [Breakdown] · [Beat Switch] · [Half-Time] · [Double-Time] · [Modulation Up +1]
+  Subtraction (the most under-used lever) — [Stripped] · [Drums Out] · [A Cappella] · [Solo Voice] · [Sparse]
+  Sample / loop — [Sample Chop] · [Vocal Chop] · [New Sample] · [Filtered Loop] · [Loop Drops Out]
+  Crowd & percussion — [Stomps] · [Claps] · [Crowd Chant] · [Group Shout] · [Finger Snaps]
+  Ear candy / FX — [SFX] · [Riser] · [Impact Hit] · [Tape Stop] · [Reverse] · [Ambience]
+A tag not on this list is fine if it names a real sound plainly — [Foghorn], [Ship Bell], [Rain] all read correctly.
 
 PARENTHESES () = ad-libs and background vocal layers ONLY — never use () for structural or delivery purposes.
   Same line as a lyric = rhythmic pocket filler. Standalone line = spotlight ad-lib moment.
 
 Every word must earn its place. No bracket tag = that section does not exist.]
+
+STYLE/LYRIC CONTRACT — the two halves of this output must describe the SAME record.
+The SONG PROMPT below and the lyric sheet above are read by the same engine at the same time, and the generator runs with Variety pinned to 0 — meaning the style string is taken literally rather than reinterpreted. A promise made in one half and missing from the other is a direct contradiction, and it is the single most common reason a take comes back not sounding like the brief.
+
+So, in both directions:
+• Every SECTION MOVE named in the SONG PROMPT must appear as a bracket tag at the exact spot it happens in the lyrics. "Beat switch before the final hook" means a literal [Beat Switch] on its own line immediately before the final [Chorus]. "Stripped bridge with lone voice" means [Stripped] or [Solo Voice] inside [Bridge].
+• Every EAR CANDY element must be tagged where it lands — at minimum on its first appearance. A foghorn in the style prompt means [Foghorn] in the intro.
+• The HOOK ARRANGEMENT must be visible in the chorus body. If the hook is a crew chant with stomps and claps, the chorus carries [Crowd Chant], [Stomps], [Claps] — not just the word "chant" in the style string.
+• Conversely: no bracket tag in the lyrics may describe a sound the SONG PROMPT never mentions. If the lyrics say [Organ], the style prompt names an organ.
+• Use the SAME WORDS in both halves. "Chopped soul loop" in the style prompt pairs with [Sample Chop], not [Loop Edit]. Synonyms read as two different instructions.
 
 SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: Every field below AND the Full prompt must contain ZERO artist names, band names, or "[Name] style" references. Suno's policy rejects prompts that name specific artists as potential impersonation. If the PRODUCTION LOCK above contains any artist name, STRIP IT OUT and replace with an equivalent descriptive phrase (era, region, production technique, vocal quality, genre lineage). Examples:
@@ -12380,7 +12397,68 @@ function buildPrismSongPrompt(brief, extra) {
   return built;
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+// ── STYLE/LYRIC CONTRACT CHECK ─────────────────────────────────────────
+// Deterministic and local, so it costs nothing to run on every generation.
+// The style prompt and the lyric sheet are two descriptions of one record,
+// and Suno v6 runs with Variety pinned to 0 — it takes the style string
+// literally instead of reinterpreting it. When the style prompt promises a
+// beat switch the lyrics never mark, the engine gets two different briefs and
+// the take comes back not sounding like either. This flags that before the
+// user spends a generation finding out.
+const CONTRACT_MOVES = [
+  { key: 'beat switch',   phrases: [/\bbeat switch\b/i, /\bbeat change\b/i],                 tags: [/\bbeat switch\b/i] },
+  { key: 'stripped',      phrases: [/\bstripped\b/i, /\blone voice\b/i, /\bsolo voice\b/i],  tags: [/\bstripped\b/i, /\bsolo voice\b/i, /\ba cappella\b/i, /\bdrums out\b/i, /\bsparse\b/i] },
+  { key: 'key change',    phrases: [/\bkey change\b/i, /\bmodulat/i],                        tags: [/\bmodulation\b/i, /\bkey change\b/i] },
+  { key: 'breakdown',     phrases: [/\bbreakdown\b/i],                                       tags: [/\bbreakdown\b/i] },
+  { key: 'drop',          phrases: [/\bthe drop\b/i, /\bbass drops?\b/i],                    tags: [/\bdrop\b/i] },
+  { key: 'half-time',     phrases: [/\bhalf[- ]time\b/i],                                    tags: [/\bhalf[- ]time\b/i] },
+  { key: 'crowd chant',   phrases: [/\bcrew chant\b/i, /\bcrowd chant\b/i, /\bgang vocal/i, /\bgroup shout\b/i, /\bsingalong\b/i], tags: [/\bcrowd chant\b/i, /\bgroup shout\b/i, /\bcrowd sings\b/i, /\bgang vocal/i] },
+  { key: 'stomps/claps',  phrases: [/\bstomps?\b/i, /\bclaps?\b/i, /\bhand ?claps?\b/i],      tags: [/\bstomps?\b/i, /\bclaps?\b/i] },
+  { key: 'choir',         phrases: [/\bchoir\b/i],                                           tags: [/\bchoir\b/i] },
+  { key: 'sample chop',   phrases: [/\bchopped\b/i, /\bsample chop\b/i, /\bvocal chops?\b/i], tags: [/\bsample chop\b/i, /\bvocal chop\b/i, /\bnew sample\b/i, /\bfiltered loop\b/i] },
+  { key: 'tape stop',     phrases: [/\btape stop\b/i],                                       tags: [/\btape stop\b/i] },
+  { key: 'riser',         phrases: [/\briser\b/i],                                           tags: [/\briser\b/i, /\bbuild\b/i] },
+];
+
+function _contractSections(text) {
+  const t = String(text || '');
+  const lyrStart = t.search(/^LYRICS:/mi);
+  const promptStart = t.search(/^SONG PROMPT:/mi);
+  if (lyrStart < 0 || promptStart < 0 || promptStart < lyrStart) return null;
+  const briefStart = t.search(/^PRODUCTION BRIEF:/mi);
+  return {
+    lyrics: t.slice(lyrStart, promptStart),
+    style: t.slice(promptStart, briefStart > promptStart ? briefStart : undefined),
+  };
+}
+
+function checkStyleLyricContract(text) {
+  const parts = _contractSections(text);
+  if (!parts) return { ok: true, findings: [], checked: false };
+
+  // Only the TAGS from the lyric sheet — a word in a lyric line is not a cue.
+  const tagBlob = (parts.lyrics.match(/\[[^\]\n]{1,40}\]/g) || []).join(' ');
+  const style = parts.style;
+  const findings = [];
+
+  for (const move of CONTRACT_MOVES) {
+    const promised = move.phrases.some(re => re.test(style));
+    if (!promised) continue;
+    const marked = move.tags.some(re => re.test(tagBlob));
+    if (!marked) {
+      findings.push({
+        type: 'unmarked_move',
+        severity: 'advisory',
+        detail: 'The style prompt calls for a ' + move.key + ', but no matching bracket tag marks where it happens in the lyrics.',
+        evidence: [move.key],
+      });
+    }
+  }
+
+  return { ok: findings.length === 0, findings, checked: true };
+}
+
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
