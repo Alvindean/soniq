@@ -8257,6 +8257,55 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
     ? `\n\nLYRIC FINGERPRINT (cross-song uniqueness — non-negotiable): These lines have appeared in this user's recent songs. Do NOT reuse them verbatim, do NOT paraphrase them with synonyms, do NOT rebuild the same image with different words. Treat them as exhausted territory — go somewhere new:\n${avoidPhrases.map((p, i) => `${i+1}. "${p}"`).join('\n')}\nThe entire reason a writer has a catalog is that each song stakes out fresh ground. If a topic genuinely demands one of these images, find a new angle on it (different POV, different time of day, different sensory detail) — never recycle the line itself.`
     : '';
 
+// ── SUNO STYLE-PROMPT LAYER SPEC ───────────────────────────────────────
+// Suno weights the FRONT of the style string most heavily, so the ORDER below
+// is load-bearing, not cosmetic.
+//
+// The failure mode this replaces: a style prompt written as a spec sheet —
+// "boom bap, drums, bass, piano, 88 BPM, male vocal, warm" — names the parts
+// but describes none of them, and says nothing about what the song DOES.
+// The model has to invent the arrangement. A style prompt that CHARACTERISES
+// each element ("punchy crisp drums with hard kick and snappy snare" rather
+// than "drums") and names section-level events ("stripped bridge with lone
+// voice over the sample", "beat switch before the final hook") hands the model
+// a blueprint instead.
+//
+// SONIQ already derives all of this — it was going into the ARRANGEMENT
+// BLUEPRINT, which only the human reads. These layers route it into the string
+// Suno actually receives. 800 chars is the ask against a 1,000-char box: the
+// headroom exists to carry arrangement, not more adjectives.
+function buildSunoStyleSpec(platform) {
+  const cap = platform === 'udio' ? 300 : 800;
+  // Udio's box is far smaller, so it gets a ceiling, not a floor-and-ceiling.
+  const target = platform === 'udio' ? 'under 300' : '500-800';
+  if (platform === 'udio') {
+    // Udio prefers genre/emotion descriptors over instrument detail and has a
+    // much tighter box — keep the original lean field set for it.
+    return { cap, target, fields: `Genre: [core genre + sub-genre, no artist names]
+Instruments: [4-5 key instruments, comma-separated]
+BPM: [range, e.g. 95-100]
+Vocal: [vocal descriptor — no artist names]
+Texture: [production texture in 5-8 words — no artist names]
+Counter-melody: [counter-melody device]`, assembly: `Full prompt: [assemble the fields above into ONE ready-to-paste string, comma-separated, leading with genre and mood descriptors — Udio weights those over instrument detail. Keep it under 300 characters. ABSOLUTELY NO artist names, band names, or "[Name] style" references.]` };
+  }
+  return { cap, target, fields: `Genre: [core genre + sub-genre + era feel, no artist names — e.g. "modern soulful boom bap"]
+BPM: [a SINGLE number when the groove is specific, e.g. "88 BPM"; a tight range only when it genuinely floats]
+Sonic Signature: [the ONE defining sound this track is built on, described in full — the sample and how it is treated, the riff, the synth, the loop. e.g. "warm chopped soul vocal sample loop, pitched vintage vocal chops". This is the most important line here — it is what makes the track sound like ITSELF rather than like its genre.]
+Rhythm Section: [drums AND bass, each CHARACTERISED — never bare nouns. e.g. "punchy crisp drums with hard kick and snappy snare, deep round bass" NOT "drums, bass"]
+Instruments: [2-3 further instruments, each with its character — e.g. "dusty upright piano", "muted horn stabs". Same rule: adjective + instrument, never a bare list.]
+Texture: [production texture in 3-6 words, ideally with a tension in it — e.g. "polished but gritty", "warm but claustrophobic"]
+Vocal: [who + delivery + flow character in one phrase — e.g. "male rapper with a mature reflective storytelling flow" — no artist names]
+Hook Arrangement: [what makes the CHORUS sonically different from the verses — the single most under-used lever in AI music. e.g. "hook is a crew chant with stomps and claps over the soul loop". If the hook is only "the chorus", say what changes: who sings it, what enters, what drops out.]
+Section Moves: [1-2 specific structural events, each tied to WHERE it happens — e.g. "stripped bridge with lone voice over the sample, dramatic beat switch before the final hook into a new chopped sample". Pull these from the ARRANGEMENT BLUEPRINT below so the two agree.]
+Ear Candy: [2-3 signature sounds or motifs that recur and make the track memorable — e.g. "foghorn and ship bell hits, harbor ambience intro". Draw them from the song's own world, not a generic FX shelf.]
+Counter-melody: [counter-melody device]
+Emotional Close: [3-4 adjectives naming the FEELING to land on — e.g. "warm, wise, heartfelt, triumphant". These go last in the full prompt; Suno reads them as the emotional target.]`, assembly: `Full prompt: [assemble the fields above into ONE ready-to-paste string, comma-separated, in EXACTLY this order: genre → BPM → sonic signature → rhythm section → instruments → texture → vocal → hook arrangement → section moves → ear candy → emotional close. Suno weights the FRONT of the string hardest, so the defining sound goes early and the mood adjectives go last. Aim for ${target} characters — that length is the POINT, it is what carries the arrangement. Do not compress it back into a bare noun list. ABSOLUTELY NO artist names, band names, or "[Name] style" references.
+
+GOLD STANDARD — this is the level to hit (note that every instrument is characterised, the hook has its own arrangement, and two section-level events are named):
+"Modern soulful boom bap, 88 BPM, warm chopped soul vocal sample loop, pitched vintage vocal chops, punchy crisp drums with hard kick and snappy snare, deep round bass, polished but gritty, male rapper with a mature reflective storytelling flow, hook is a sea shanty crew chant with stomps and claps over the soul loop, foghorn and ship bell hits, harbor ambience intro, stripped bridge with lone voice over the sample, dramatic beat switch before final hook into a new chopped sample, warm, wise, heartfelt, triumphant"
+Match that DEPTH with THIS song's own world — never reuse its nautical imagery unless this song is actually about the sea.]` };
+}
+
   // ── Platform-specific instructions ─────────────────────────────────────
   const platformNotes = {
     suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 800 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
@@ -8264,6 +8313,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
     stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
   };
   const platformNote = platformNotes[platform] || platformNotes.suno;
+  const _sunoSpec = buildSunoStyleSpec(platform);
 
   // ── Specificity self-check instruction ─────────────────────────────────
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
@@ -8471,13 +8521,8 @@ SONG PROMPT:
   BAD: "E-40 Mac Dre Keak da Sneak vocabulary"
   GOOD: "Bay Area hyphy slang, Oakland scraper-bass vocabulary, hella-energy ad-libs"
 ⚠️ "LIVE" TRAP — NEVER use the bare word "live" to mean real/played instruments. Suno reads "live" as a LIVE AUDIENCE and adds crowd noise + echoey arena/outdoor reverb. For human-played instruments say "real", "organic", "acoustic", "human-played", "session", or "played not programmed" (e.g. "real drums", "organic drum kit", "session band"). ONLY use "live audience", "crowd", "crowd chant", "stadium crowd", or "concert crowd" when you ACTUALLY want audience/crowd sound behind the track. Same rule applies to bracket tags in the lyrics: [Real Drums] not [Live Drums]; reserve [Crowd Chant]/[Crowd Sings] for intentional crowd moments.
-Genre: [core genre + sub-genre, no artist names]
-Instruments: [4-5 key instruments, comma-separated]
-BPM: [range, e.g. 95-100]
-Vocal: [vocal descriptor — no artist names]
-Texture: [production texture in 5-8 words — no artist names]
-Counter-melody: [counter-melody device]
-Full prompt: [assemble all of the above into one ready-to-paste string under ${platform === 'udio' ? 300 : 440} characters — ABSOLUTELY NO artist names, band names, or "[Name] style" references]
+${_sunoSpec.fields}
+${_sunoSpec.assembly}
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -9024,7 +9069,7 @@ SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. Suno rejects prompts that name artists. If a PRODUCTION LOCK above contains any artist name, STRIP IT and replace with era/region/technique/vocal-quality descriptors. Also: never write bare "live" for real instruments (Suno hears a LIVE AUDIENCE + arena reverb) — use "real/organic/acoustic/session" (e.g. real drums); reserve "crowd/live audience/crowd chant" for intentional crowd sound.
   BAD: "Drake style, Taylor Swift vocal", "E-40 energy", "Kirk Franklin choir"
   GOOD: "auto-tuned intimate pop vocal", "Bay Area hyphy slang", "celebratory hip-hop gospel choir"
-[First strip any artist name from the PRODUCTION LOCK. Under 440 chars (Suno; drop to 300 for Udio). Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
+[First strip any artist name from the PRODUCTION LOCK. (Udio: compress to 300 chars and drop the section-level layers — it prefers genre descriptors over detail.) Required layers, in this order: genre + sub-genre, BPM, SONIC SIGNATURE (the one defining sound — sample/riff/loop and how it is treated), rhythm section with drums AND bass each CHARACTERISED (never bare nouns), 2-3 further instruments with their character, production texture, vocal + flow character, HOOK ARRANGEMENT (what makes the chorus sonically different from the verses), 1-2 SECTION MOVES tied to where they happen (stripped bridge, beat switch before the final hook), 2-3 recurring ear-candy motifs, counter-melody device, and 3-4 closing mood adjectives. Characterise every element — "punchy crisp drums with hard kick and snappy snare", never "drums". Aim for 500-800 characters; that length carries the arrangement and is the point. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -10510,7 +10555,7 @@ SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, rapper names, or "[Name] style" references anywhere in the SONG PROMPT. Suno rejects prompts naming artists. If the PRODUCTION LOCK above contains any artist names (e.g. "E-40", "Jay-Z", "Kendrick Lamar"), STRIP THEM and replace with region/era/technique descriptors. Also: never write bare "live" for real instruments (Suno hears a LIVE AUDIENCE + arena reverb) — use "real/organic/acoustic/session" (e.g. real drums); reserve "crowd/live audience/crowd chant" for intentional crowd sound.
   BAD: "E-40 Mac Dre vocabulary, Keak da Sneak energy"
   GOOD: "Bay Area hyphy slang, Oakland scraper-bass vocabulary, hella-energy ad-libs"
-[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}Under 440 chars. ${style.label} style descriptors, specific production elements, BPM range, vocal texture, key sonic signatures. Reuse the same production vocabulary as the inline TYPE 3 tags.]
+[${rapSubSunoTag ? `MUST lead with the PRODUCTION LOCK string above, BUT with any artist names stripped out and replaced by descriptive equivalents. ` : ''}${style.label} style descriptors throughout. Required layers, in this order: genre + sub-genre, BPM, SONIC SIGNATURE (the one defining sound — sample/riff/loop and how it is treated), rhythm section with drums AND bass each CHARACTERISED (never bare nouns), 2-3 further instruments with their character, production texture, vocal + flow character, HOOK ARRANGEMENT (what makes the chorus sonically different from the verses), 1-2 SECTION MOVES tied to where they happen (stripped bridge, beat switch before the final hook), 2-3 recurring ear-candy motifs, counter-melody device, and 3-4 closing mood adjectives. Characterise every element — "punchy crisp drums with hard kick and snappy snare", never "drums". Aim for 500-800 characters; that length carries the arrangement and is the point. Reuse the same production vocabulary as the inline TYPE 3 tags.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -11192,7 +11237,7 @@ PARENTHESES () = ad-libs only — never structural.]
 
 SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. The reference songs above are FOR YOUR INSPIRATION only — the SONG PROMPT must use era/region/technique/vocal-quality descriptors, never the source artists' names. Also: never write bare "live" for real instruments (Suno hears a LIVE AUDIENCE + arena reverb) — use "real/organic/acoustic/session" (e.g. real drums); reserve "crowd/live audience/crowd chant" for intentional crowd sound.
-[Under 440 chars. Hybrid genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture. Same vocabulary as the TYPE 3 bracket tags in the lyrics.]
+[Hybrid genre + sub-genre feel — name what each parent genre contributes. Required layers, in this order: genre + sub-genre, BPM, SONIC SIGNATURE (the one defining sound — sample/riff/loop and how it is treated), rhythm section with drums AND bass each CHARACTERISED (never bare nouns), 2-3 further instruments with their character, production texture, vocal + flow character, HOOK ARRANGEMENT (what makes the chorus sonically different from the verses), 1-2 SECTION MOVES tied to where they happen (stripped bridge, beat switch before the final hook), 2-3 recurring ear-candy motifs, counter-melody device, and 3-4 closing mood adjectives. Characterise every element — "punchy crisp drums with hard kick and snappy snare", never "drums". Aim for 500-800 characters; that length carries the arrangement and is the point. Same vocabulary as the TYPE 3 bracket tags in the lyrics.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
