@@ -9269,7 +9269,7 @@ HOOK ISOLATION:
 [Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
 
 LYRICS:
-${_cleanSeed ? '\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\n' : ''}[Write the complete song lyrics using this exact bracket system — three types, each with a distinct job:
+${_cleanSeed ? '\n(Instruction, never print this line: the seed line must appear verbatim, word-for-word, as the opening or closing line of your chorus: ' + _cleanSeed + ')\n' : ''}[Write the complete song lyrics using this exact bracket system — three types, each with a distinct job:
 
 TYPE 1 — STRUCTURE (own line, opens every section — required):
 [Intro] · [Verse 1] · [Pre-Chorus] · [Chorus] · [Bridge] · [Hook] · [Breakdown] · [Outro]
@@ -13439,6 +13439,7 @@ function buildCastNote(cast, genre) {
 ${roster}${notes ? `\nUSER VOICE NOTES (override the defaults above where they conflict): ${notes}` : ''}
 SECTION PLAN: ${p.plan}
 HOW TO WRITE IT SO SUNO SWITCHES VOICES:
+0. Give every line to the performer whose point of view it is. A line addressed to "girl" or "baby" belongs to the one singing TO her, never to her. When a chorus is a conversation, tag each line's speaker on the line itself: [Rapper] ... / [Singer] ....
 1. EVERY section header names its performer, e.g. [Verse 1 | ${p.members[0].id}] ${tag(p.members[0])}. A switch inside a section goes on its own line: [${p.members[1].id}]. Shared lines use [Both] or [All].
 2. Switch only at section or half-section boundaries. Never switch mid-line.
 3. Each performer writes in their OWN voice: their own details, slang, cadence and ad-lib signature. Swapping two performers' lines should feel wrong.${sameGender ? `
@@ -13518,6 +13519,7 @@ NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 4. Every lyric section repeats a word or short fragment INSIDE a lyric line ("gone, gone", "I know, I know"), and the CHORUS must contain one. Repeats inside ad-lib parentheses do not count.
 5. The final hook displaces a phrase: start its title line on a pickup word or split it across a line break so it lands on a new beat.
 6. Chorus lines are clearly shorter than verse lines.
+10. Never put translations or explanations in parentheses: Suno SINGS everything in parentheses as a background vocal. Bilingual lines stand on their own, untranslated.
 7. The title is the chorus's first or last line.
 8. Verse and chorus use different rhyme schemes; perfect rhyme is saved for the hook and the punchline.
 9. A verse-1 image returns in the bridge or final verse (callback), and verse 1 leaves one thing unresolved that the ending closes.`;
