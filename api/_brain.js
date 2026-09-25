@@ -11691,6 +11691,9 @@ function _variantCommon(variant) {
 STYLE PROMPT (Suno v6): the SUNO STYLE field is NOT a short genre list. Write it as these layered fields in this order, then assemble one 500-800 character string with no artist names:
 ${fields}
 
+${V6_VARIANT_DIRECTIVES[variant] ? `SUNO V6 SHORTCUT: make the VERY FIRST line of your output exactly:
+SUNO V6 SHORTCUT (apply to your existing track with v6 edit instead of generating a new one): ${V6_VARIANT_DIRECTIVES[variant]}
+` : ''}
 FORMAT: plain text only. No markdown: no **bold**, no # headers, no --- rules. Section and delivery tags are plain [Tag] lines, because this text is pasted straight into Suno.
 
 CRAFT: lines you keep stay exactly as written. Every line you ADD or REWRITE follows both Hit Craft cores and this genre's lens below. If you rewrite a chorus, keep the title in its first or last line and change one word in the final chorus.`;
@@ -11787,6 +11790,7 @@ After the 9 dimensions, give:
 - WEAKEST MOMENT: The single weakest line or section, with a specific rewrite
 - ONE PRIORITY FIX: If the writer could only fix one thing before recording this song, what is it?
 - GENRE VERDICT: Does this song belong in ${genre || 'its genre'}? What one production note would make it land harder?
+- SUNO V6 SECTION EDITS: 1-3 fixes the writer can apply to the EXISTING track with Suno v6's section edit instead of regenerating (a changed word or line, a delivery change, an instrument or energy change, a voice that drifted in a duet). Write each as one ready-to-paste line in exactly this form: "In the [Section], [change]. Leave every other section exactly as it is."
 
 FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
 
@@ -12571,15 +12575,18 @@ function buildV6EditDirective(opts) {
 // variant; these are the matching production instructions for v6, so a variant
 // can be applied to an existing track instead of generated from scratch.
 const V6_VARIANT_DIRECTIVES = {
-  dj_remix:       'Rework this as a club/DJ edit — extend the intro to 16 bars of beat, add a filtered build into a drop on the hook, keep the lead vocal, and end on a mixable outro.',
-  acoustic:       'Strip this back to acoustic — solo acoustic guitar and voice, no drums and no electronic production, keeping the melody and lyrics intact.',
-  radio_edit:     'Cut this to a radio edit around 3:00 — hook inside the first 15 seconds, trim the second verse, keep the final chorus, and clean any explicit language.',
-  lofi:           'Rework this as lo-fi — relaxed halftime feel, vinyl crackle and tape saturation, softened drums, and a more distant filtered vocal.',
-  slowed_reverb:  'Slow this down roughly 20% and drench it in reverb — cathedral-sized space, magnified emotion, vocal still intelligible.',
-  live_version:   'Make this a live version — room ambience and audience presence, slightly looser timing, live drum kit, and an ad-libbed vocal moment before the last chorus.',
-  trap_remix:     'Remix this as trap — 808 sub bass, rolling hi-hats with triplet fills, halftime feel, keeping the original vocal melody on top.',
-  gospel_version: 'Rework this as gospel — Hammond organ, full choir on the chorus, hand claps, and a key change into the final chorus with runs on the lead vocal.',
-  cinematic:      'Rework this as cinematic trailer music — orchestral strings and low brass, big percussion hits, a build from sparse to full, with the vocal as the emotional center.'
+  dj_remix:       'Rework this as a club remix in the club lane that fits it best (afro house, UK garage, jersey club, tech house or amapiano). Drums-only 16-bar intro, a vocal-chop post-hook built from the title, a breakdown with the hook line sung alone, a drop, and a 16-bar mixable outro. Keep the lead vocal.',
+  acoustic:       'Strip this to one mic: fingerpicked acoustic guitar or felt piano plus the voice, breaths left in, 5-10% slower, no drums or electronics. Keep the melody and lyrics.',
+  radio_edit:     'Cut this to a 2:30-3:00 streaming edit: intro under 5 seconds or cold-open on the hook, title heard before 0:30, halve verse 2, bridge 4 lines max, keep the final chorus, clean any explicit words.',
+  lofi:           'Rework this as late-night lo-fi: 70-85 BPM, swung unquantized drums, tape wobble and soft vinyl, jazz 7th chords, the vocal pulled back and doubled low, the chorus sung quieter.',
+  slowed_reverb:  'Slow this down about 20% with the pitch following, add a long hall reverb, keep the low end warm and the vocal intelligible.',
+  sped_up:        'Speed this up 25% with the pitch up 3-4 semitones, brighter drums and an airy vocal. Cold-open on the hook and keep it under 2:15.',
+  live_version:   'Make this a live recording: room and crowd presence, looser timing, live kit, the band dropping out for one line, crowd singing the last hook, an ad-libbed moment before the final chorus.',
+  trap_remix:     'Flip this into a rap record in the lane that fits (trap, drill or boom bap): 808s and matching drums, the title chopped into the hook, the original vocal melody kept on top.',
+  gospel_version: 'Rework this as contemporary gospel/worship: live band, Hammond organ, choir answering the lead on the hook, hand claps, a climbing vamp and a key change into the final chorus.',
+  cinematic:      'Rework this as cinematic sync music: strings, piano and low pulses, three stages from intimate to full, a trailer hit before the final chorus, the vocal as the emotional centre.',
+  duet:           'Turn this into a duet: add a second vocalist of the opposite gender who sings verse 2 and alternates lines on the chorus, both voices together on the title line.',
+  short_cut:      'Cut a 30-45 second short-form version: open on the hook with no intro, the strongest lines of verse 1, the full hook, and an ending that loops back into the start.'
 };
 
 function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes, length }) {
