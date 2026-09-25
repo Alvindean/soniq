@@ -110,7 +110,10 @@ for await (const chunk of res.body) {
 const secs = ((Date.now() - t0) / 1000).toFixed(1);
 
 // ── save ───────────────────────────────────────────────────────────────
-const titleMatch = text.match(/^\s*(?:TITLE|Title)\s*[:\-—]\s*(.+)$/m) || text.match(/^#\s*(.+)$/m);
+// TITLE: X, **TITLE:** X, or "# TITLE:" with the title on the next line.
+const titleMatch = text.match(/^[ \t]*#*[ \t]*\**[ \t]*(?:TITLE|Title)[ \t]*\**[ \t]*[:\-—][ \t]*\**[ \t]*(\S[^\n]*)$/m)
+  || text.match(/^[ \t]*#*[ \t]*(?:TITLE|Title):[ \t]*\n[ \t]*(\S[^\n]*)/m)
+  || text.match(/^#\s*(.+)$/m);
 const title = (titleMatch ? titleMatch[1] : flags.topic).trim().replace(/["*]/g, '');
 const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'song';
 const outDir = path.resolve(ROOT, flags.out || 'songs');
