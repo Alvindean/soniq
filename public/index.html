@@ -7058,6 +7058,11 @@ try { window.pingPv('pageview'); } catch(e){}
         <span class="variant-name">Short-Form Cut</span>
         <span class="variant-desc">30–45 sec, opens on the hook, loops clean</span>
       </button>
+      <button class="variant-btn" onclick="selectVariant('sample_flip')" data-variant="sample_flip">
+        <span class="variant-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2"/><path d="M12 3v3"/><path d="M19 12h2"/></svg></span>
+        <span class="variant-name">Sample Flip</span>
+        <span class="variant-desc">Sample your own hook into a new beat + v6 sample requests</span>
+      </button>
       <button class="variant-btn variant-btn-full" onclick="selectVariant('cinematic')" data-variant="cinematic" style="grid-column:1/-1">
         <span class="variant-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"/><path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/><path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></svg></span>
         <span class="variant-name">Cinematic / Sync</span>
@@ -18450,7 +18455,11 @@ async function blendGenerate() {
     const hookMatch   = raw.match(/(?:^|\n)HOOK ISOLATION:\s*([\s\S]*?)(?=\nLYRICS:|\nSONG PROMPT:|\nPRODUCTION BRIEF:|$)/i);
     const lyricsMatch = raw.match(/(?:^|\n)LYRICS:\s*([\s\S]*?)(?=\nSONG PROMPT:|\nPRODUCTION BRIEF:|$)/i);
     const promptMatch = raw.match(/(?:^|\n)SONG PROMPT:\s*([\s\S]*?)(?=\nPRODUCTION BRIEF:|$)/i);
-    const briefMatch  = raw.match(/(?:^|\n)PRODUCTION BRIEF:\s*([\s\S]*?)$/i);
+    const briefMatch  = raw.match(/(?:^|\n)PRODUCTION BRIEF:\s*([\s\S]*?)(?=\nSUNO V6 MASHUP:|$)/i);
+    // v6 mashup request (only works on the writer's own Suno songs).
+    const mashupMatch = raw.match(/(?:^|\n)SUNO V6 MASHUP:\s*([\s\S]*?)$/i);
+    const mashupText  = mashupMatch ? mashupMatch[1].trim() : '';
+    S._blendMashup = mashupText;
     const title       = titleMatch ? titleMatch[1].trim() : 'Untitled Blend';
     const verdict     = verdictMatch ? verdictMatch[1].trim() : '';
     const blendNotes  = blendNotesMatch ? blendNotesMatch[1].trim() : '';
@@ -18478,6 +18487,7 @@ async function blendGenerate() {
             (lyricsText ? '<button class="btn btn-sm" onclick="safeCopy(S._blendLyrics,\'Lyrics\')">📋 Lyrics</button>' : '') +
             (promptText ? '<button class="btn btn-sm" onclick="safeCopy(S._blendPrompt,\'Prompt\')">📋 Prompt</button>' : '') +
             (briefText  ? '<button class="btn btn-sm" onclick="safeCopy(S._blendBrief,\'Brief\')">📋 Brief</button>'   : '') +
+            (mashupText ? '<button class="btn btn-sm" onclick="safeCopy(S._blendMashup,\'v6 mashup\')">📋 v6 Mashup</button>' : '') +
             '<button class="btn btn-sm" onclick="safeCopy(S._blendRaw,\'Full output\')">📋 All</button>' +
             (lyricsText ? '<button class="btn btn-sm tts-btn" id="blend-tts-btn" onclick="blendToggleTTS(this)" aria-label="Read lyrics aloud" title="Read lyrics aloud">🔊 Read</button>' : '') +
           '</div>' +
@@ -18495,6 +18505,10 @@ async function blendGenerate() {
           '<button class="btn btn-sm" onclick="safeCopy(S._blendHook,\'Hook\')" aria-label="Copy hook" title="Copy hook to clipboard" style="position:absolute;top:6px;right:6px;font-size:12px;padding:2px 8px;min-height:28px">📋 Hook</button>' +
           '<div style="font-size:12px;color:var(--amber);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Hook Isolation</div>' +
           '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap;padding-right:64px">' + escHtml(hookText) + '</div>' +
+        '</div>' : '') +
+        (mashupText ? '<div style="background:var(--s1);border:1px solid var(--b2);border-radius:8px;padding:10px 12px;margin-bottom:10px">' +
+          '<div style="font-size:12px;color:var(--cyan);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Suno v6 mashup · paste into v6 if both songs are in your Suno library</div>' +
+          '<div style="font-size:13px;line-height:1.6;white-space:pre-wrap">' + escHtml(mashupText) + '</div>' +
         '</div>' : '') +
         '<div style="font-size:13px;line-height:1.8;white-space:pre-wrap">' + escHtml(raw).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') + '</div>' +
       '</div>';
@@ -19219,7 +19233,8 @@ const VARIANT_LABELS = {
   gospel_version: 'Gospel / Worship',
   cinematic: 'Cinematic / Sync',
   duet: 'Duet / Answer Song',
-  short_cut: 'Short-Form Cut'
+  short_cut: 'Short-Form Cut',
+  sample_flip: 'Sample Flip'
 };
 
 function openVariants() {

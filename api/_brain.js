@@ -11627,6 +11627,28 @@ YOUR TASK — Duet / Answer Song:
    SUNO STYLE: [the layered style prompt described below, naming both voices]
    [Full lyrics with [Voice 1] [Voice 2] [Both] tags on their own lines]`,
 
+  sample_flip: (song) => `You are a producer-writer flipping a sample from the writer's OWN song "${song.title}" into a brand-new record. Suno v6 can sample, isolate and loop parts of songs in the writer's own library, so this is legal and theirs to use.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+YOUR TASK — Sample Flip:
+1. FIND 3 SAMPLEABLE MOMENTS in the original, ranked best first. Candidates: a 2-6 syllable vocal phrase (the title, a hook fragment, a quotable line), an ad-lib, a spoken bridge line, or the instrumental riff or loop the style implies. For each: what it is, where it lives (section and line, e.g. "first line of Chorus 1"), and why it loops well (a hard consonant or long vowel ending, a rhythmic shape, emotional weight).
+2. FOR EACH MOMENT write one ready-to-paste v6 sampling request, in plain words: which part to sample, how to treat it (chop, pitch up or down, reverse, stutter, filter, slow), how long the loop is, and the new beat to build around it with genre and BPM. Tell the writer to note the timestamp of that line in their track and add it (e.g. "at 0:45").
+3. WRITE THE NEW SONG around moment #1. The sample is the hook's engine (micro-repetition and displacement come free). The new lyrics ANSWER or REFRAME the sampled line: a new speaker, a new scene or a later time, so the sample means something different now (boxes). Choose a genre lane that contrasts the original (e.g. a drill line flipped into jersey club or soul, a ballad line flipped into drill). Mark the sample in the lyrics as [Sample: "the phrase"] on its own line wherever it plays.
+4. OUTPUT FORMAT:
+   FLIP TITLE: [new title]
+   SAMPLE PICKS:
+   1. [moment] — [where] — [why]
+      V6 SAMPLE REQUEST: [ready-to-paste request]
+   2. ...
+   3. ...
+   NEW LANE: [genre + BPM + why it contrasts]
+   SUNO STYLE: [the layered style prompt described below, naming the sample treatment first]
+   [Full new lyrics built around sample #1]`,
+
   short_cut: (song) => `You are cutting "${song.title}" into a short-form version for TikTok, Reels and Shorts.
 
 ORIGINAL LYRICS:
@@ -11648,7 +11670,7 @@ YOUR TASK — Short-Form Cut (30-45 seconds):
 // Variants that write new lyric lines get the full end-of-prompt Hit Craft
 // checklist; the keep-the-lines variants only get the craft rule for any line
 // they add or change.
-const VARIANT_REWRITES = new Set(['trap_remix', 'gospel_version', 'duet', 'cinematic']);
+const VARIANT_REWRITES = new Set(['trap_remix', 'gospel_version', 'duet', 'cinematic', 'sample_flip']);
 
 // Hoisted out of buildSongPrompt so Variants share the Suno v6 style spec.
 function buildSunoStyleSpec(platform) {
@@ -12171,7 +12193,10 @@ DIRECTOR NOTES:
 [3 director-level production decisions specific to this blend — what makes the hybrid land vs. what makes it feel Frankenstein]
 
 PLATFORM TIPS:
-[3 actionable tips for AI music platforms (Suno, Udio, Stable Audio)]`;
+[3 actionable tips for AI music platforms (Suno, Udio, Stable Audio)]
+
+SUNO V6 MASHUP:
+[For writers who have BOTH songs in their own Suno library: one ready-to-paste v6 mashup request that names which elements come from which song and how they fit, e.g. which song's vocal and hook, which song's drums and bass, whose tempo and key win, and where the switch happens. Plain words, 2-4 sentences, no artist names. Note that v6 mashups only work on the writer's own songs.]`;
 
   return { system, prompt };
 }
@@ -12586,6 +12611,7 @@ const V6_VARIANT_DIRECTIVES = {
   gospel_version: 'Rework this as contemporary gospel/worship: live band, Hammond organ, choir answering the lead on the hook, hand claps, a climbing vamp and a key change into the final chorus.',
   cinematic:      'Rework this as cinematic sync music: strings, piano and low pulses, three stages from intimate to full, a trailer hit before the final chorus, the vocal as the emotional centre.',
   duet:           'Turn this into a duet: add a second vocalist of the opposite gender who sings verse 2 and alternates lines on the chorus, both voices together on the title line.',
+  sample_flip:    'Sample the strongest vocal phrase from this song (note its timestamp), chop it into a 1-2 bar loop, pitch and filter it to fit a contrasting new beat, and build a new track around it with the sample as the hook.',
   short_cut:      'Cut a 30-45 second short-form version: open on the hook with no intro, the strongest lines of verse 1, the full hook, and an ending that loops back into the start.'
 };
 
