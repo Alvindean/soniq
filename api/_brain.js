@@ -13158,7 +13158,34 @@ function checkStyleLyricContract(text) {
   return { ok: findings.length === 0, findings, checked: true };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+// HIT CRAFT FINAL CHECK — appended to the END of every lyric-generating prompt.
+// The Core + genre lens live mid-prompt inside ~100k chars of context; live
+// tests (2026-09-25) showed density contrast and repetition types getting
+// diluted. Recency placement + measurable targets fix that.
+const HIT_CRAFT_FINAL_CHECK = `
+
+━━ HIT CRAFT FINAL CHECK — verify silently before you output, revise any miss ━━
+□ DENSITY CONTRAST: count syllables. Chorus lines average at most ~65% of the verse's syllables per line (or, under a twinned Prince-Method grid, fewer distinct words held on long vowels). A chorus as wordy as the verse FAILS.
+□ REPETITION TYPES: at least THREE different kinds are on the page — exact hook, incremental (one word changed on a later hook), refrain tag ending each verse, call-and-response, or a bookend first/last line.
+□ MICRO-REPETITION: every lyric section has a word or 2-3 word fragment repeated inside a line.
+□ RHYTHMIC DISPLACEMENT: the final hook moves a key phrase to a different entry point (pickup, beat 2, after a stop) — show it in the line layout.
+□ THE WOMAN IN THE ROOM: the hook contains one line a specific listener would sing back or caption — translated to this genre's lens, even if the genre rarely does it.
+□ SHADOW RHYTHM: a verse-1 line shares the hook's syllable count and stress pattern with different words.
+□ BACK PHRASING + SYNCOPATION RATIO: verses carry more off-beat pickups than the chorus; at least one line enters late into the chorus.
+□ SCENE SEQUENCING: verse 2 is a different place/time than verse 1.
+□ DOPAMINE: every section has one withheld-then-paid-off word or a surprise turn.
+□ JUICY LINES: every section, verse 1 included, has one line quotable on its own.
+Do not print this checklist.`;
+
+function _withHitCraftClose(fn) {
+  return function (...args) {
+    const r = fn.apply(this, args);
+    if (r && typeof r === 'object' && typeof r.prompt === 'string') r.prompt += HIT_CRAFT_FINAL_CHECK;
+    return r;
+  };
+}
+
+module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt), buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
@@ -13191,13 +13218,13 @@ module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEd
   // Wave 4l additions
   GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote,
   // Wave 5 addition — two-song blend
-  buildSongBlendPrompt,
+  buildSongBlendPrompt: _withHitCraftClose(buildSongBlendPrompt),
   // Lever #7 — vocal character descriptors (re-exported for tests / debug)
   selectVocalDescriptors, buildVocalDescriptorNote,
   // Lever #8 — surprise / creativity engine
   selectSurpriseMoves, buildSurpriseNote,
   // PRISM — concept-first engine (inverse of Lucky). docs/PRISM-ENGINE-SPEC.md
-  buildPrismConcept, buildPrismSongPrompt, rollGenreDial, rollSubjectDial, rollFlipDial,
+  buildPrismConcept, buildPrismSongPrompt: _withHitCraftClose(buildPrismSongPrompt), rollGenreDial, rollSubjectDial, rollFlipDial,
   rollMetaphorDial, buildMetaphorBank, rollPhraseDial, PHRASE_BANK, PHRASE_FLIP_STRATEGIES,
   _scorePrism, pickWeighted, SUBJECT_SEED, SINGLE_GENRE_WEIGHTS };
 

@@ -435,6 +435,20 @@ async function generateBuffered(anthropicKey, messages, system, max_tokens) {
 }
 
 // Stream pre-buffered text as SSE chunks
+// Free, deterministic advisories on a finished lyric. A checker bug can never
+// break a generation that already streamed.
+function streamAdvisories(text) {
+  if (!text) return {};
+  try {
+    const _b = require('./_brain.js');
+    return {
+      continuity: _b.checkContinuity(text),
+      contract: typeof _b.checkStyleLyricContract === 'function' ? _b.checkStyleLyricContract(text) : null,
+      hitcraft: typeof _b.checkHitCraft === 'function' ? _b.checkHitCraft(text) : null,
+    };
+  } catch (_) { return {}; }
+}
+
 function streamBuffered(text, score, res) {
   const chunkSize = 40;
   for (let i = 0; i < text.length; i += chunkSize) {
@@ -506,13 +520,14 @@ async function streamOpenRouter(apiKey, messages, system, max_tokens, res) {
     const t = await r.text();
     throw new Error('OpenRouter ' + r.status + ': ' + t.slice(0, 200));
   }
-  await pipeSSE(r, res, ev => ev.choices?.[0]?.delta?.content || null);
+  return pipeSSE(r, res, ev => ev.choices?.[0]?.delta?.content || null);
 }
 
 async function pipeSSE(r, res, extractText) {
   const reader = r.body.getReader();
   const decoder = new TextDecoder();
   let buf = '';
+  let full = '';
   let cancelled = false;
 
   // Cancel upstream reader if client disconnects
@@ -538,7 +553,7 @@ async function pipeSSE(r, res, extractText) {
             throw new Error('Stream error: ' + msg.slice(0, 200));
           }
           const text = extractText(ev);
-          if (text) res.write(`data: ${JSON.stringify({text})}\n\n`);
+          if (text) { full += text; res.write(`data: ${JSON.stringify({text})}\n\n`); }
         } catch (parseErr) {
           if (parseErr.message.startsWith('Stream error:')) throw parseErr;
           // Malformed JSON chunk — skip silently
@@ -549,6 +564,7 @@ async function pipeSSE(r, res, extractText) {
     // Re-throw everything except client-disconnect cancellations
     if (!cancelled) throw err;
   }
+  return full;
 }
 
 module.exports = async function handler(req, res) {
@@ -1165,9 +1181,9 @@ module.exports = async function handler(req, res) {
   // Anthropic is the fallback — only tried if OpenRouter fails pre-stream.
   if (openrouterKey) {
     try {
-      await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
+      const _streamed = await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
       recordUsage();
-      res.write(`data: ${JSON.stringify({done: true})}\n\n`);
+      res.write(`data: ${JSON.stringify({done: true, ...streamAdvisories(_streamed)})}\n\n`);
       return res.end();
     } catch (err) {
       // Connection terminated mid-stream — transient, can't cleanly fall back
