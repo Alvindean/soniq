@@ -445,6 +445,7 @@ function streamAdvisories(text) {
       continuity: _b.checkContinuity(text),
       contract: typeof _b.checkStyleLyricContract === 'function' ? _b.checkStyleLyricContract(text) : null,
       hitcraft: typeof _b.checkHitCraft === 'function' ? _b.checkHitCraft(text) : null,
+      cast: typeof _b.checkCast === 'function' ? _b.checkCast(text) : null,
     };
   } catch (_) { return {}; }
 }

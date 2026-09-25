@@ -2289,7 +2289,8 @@ function checkHitCraft(text) {
   const v = perLine(/verse/), c = perLine(/^(?!.*\b(pre|post)[- ]?chorus)(?=.*\b(chorus|hook)\b)/);
   const densityRatio = v && c ? +(Math.max(v, c) / Math.min(v, c)).toFixed(2) : null;
 
-  const microRe = /\b([a-z']+)\b(?:[\s,.!-]+\1\b)+/i;
+  // A word or a 2-3 word fragment repeated back-to-back: "gone, gone", "right back, right back".
+  const microRe = /\b((?:[a-z']+\s+){0,2}[a-z']+)\b(?:[\s,.!-]+\1\b)+/i;
   const lyricSections = sections.filter(s => s.lines.length);
   const microSections = lyricSections.filter(s => s.lines.some(l => microRe.test(l))).length;
 
@@ -13336,6 +13337,96 @@ function checkStyleLyricContract(text) {
   return { ok: findings.length === 0, findings, checked: true };
 }
 
+// ── VOCAL CAST — multi-performer songs (duets, rap duos, rapper + singers) ──
+// Suno has no per-voice tracks: voices switch through section tags plus a
+// style prompt that describes every voice. It holds best when (1) every
+// section header names its performer, (2) switches happen at section or
+// half-section boundaries, and (3) same-gender voices differ in register,
+// texture, flow speed and ad-lib signature (otherwise they blend). Male/female
+// contrast is the most reliable. Suno's Voices / Replace Section can lock a
+// saved voice onto one section afterwards if a switch drifts.
+const CAST_PRESETS = {
+  rap_duo: {
+    label: 'Two rappers',
+    members: [
+      { id: 'Rapper A', role: 'rap', gender: 'Male', voice: 'deep gravelly baritone, slow laid-back pocket, low growled ad-libs' },
+      { id: 'Rapper B', role: 'rap', gender: 'Male', voice: 'higher nasal tenor, fast triplet flow, sharp yelped ad-libs' }
+    ],
+    plan: 'Verse 1 = Rapper A. Verse 2 = Rapper B. Hook: Rapper A lines 1-2, Rapper B lines 3-4, [Both] on the title line. Bridge or Verse 3 = a 4-bar trade (A, B, A, B), each finishing the other\'s thought. Final hook = [Both].'
+  },
+  rap_singer: {
+    label: 'Rapper + singer',
+    members: [
+      { id: 'Rapper', role: 'rap', gender: 'Male', voice: 'confident male rapper, mid-low register, conversational pocket' },
+      { id: 'Singer', role: 'sing', gender: 'Female', voice: 'soulful female R&B singer, airy highs, warm runs' }
+    ],
+    plan: 'Singer owns the hook, the intro hum and the bridge. Rapper owns every verse. Final hook = Singer lead with Rapper ad-libs answering. The Singer is the woman in the room: her hook answers what the verses admit.'
+  },
+  rap_two_singers: {
+    label: 'Rapper + two singers',
+    members: [
+      { id: 'Rapper', role: 'rap', gender: 'Male', voice: 'male rapper, gritty mid register, steady pocket' },
+      { id: 'Singer 1', role: 'sing', gender: 'Female', voice: 'female lead singer, bright powerful belt' },
+      { id: 'Singer 2', role: 'sing', gender: 'Male', voice: 'male R&B singer, smooth falsetto harmonies' }
+    ],
+    plan: 'Rapper owns the verses. Singer 1 leads the hook; Singer 2 answers her lines and harmonizes the title. Singer 2 owns the bridge (or pre-chorus). Final hook = [All], Singer 1 on top.'
+  },
+  two_rappers_singer: {
+    label: 'Two rappers + singer',
+    members: [
+      { id: 'Rapper A', role: 'rap', gender: 'Male', voice: 'deep gravelly baritone rapper, slow menacing pocket' },
+      { id: 'Rapper B', role: 'rap', gender: 'Female', voice: 'sharp female rapper, fast precise double-time' },
+      { id: 'Singer', role: 'sing', gender: 'Male', voice: 'male melodic singer, smooth auto-tuned tenor' }
+    ],
+    plan: 'Verse 1 = Rapper A. Verse 2 = Rapper B. Singer owns the hook and the bridge. If there is a Verse 3, Rapper A and Rapper B trade every 4 bars. Final hook = Singer with both rappers\' ad-libs.'
+  },
+  sung_duet: {
+    label: 'Sung duet',
+    members: [
+      { id: 'Voice 1', role: 'sing', gender: 'Male', voice: 'male lead, warm mid baritone' },
+      { id: 'Voice 2', role: 'sing', gender: 'Female', voice: 'female lead, clear bright soprano' }
+    ],
+    plan: 'Verse 1 = Voice 1. Verse 2 = Voice 2, answering from her side. Chorus alternates lines, then [Both] in harmony on the title. Bridge = overlapping lines that argue, resolving to [Both].'
+  }
+};
+
+// cast = { preset: 'rap_duo' | ..., notes: 'optional free text voice notes' }
+function buildCastNote(cast, genre) {
+  if (!cast) return '';
+  const key = typeof cast === 'string' ? cast : cast.preset;
+  const p = CAST_PRESETS[key];
+  if (!p) return '';
+  const notes = typeof cast === 'object' && cast.notes ? sanitizeInput(String(cast.notes), 300) : '';
+  const tag = (m) => `[${m.gender} Vocal] [${m.role === 'rap' ? 'Rap' : 'Sung'}]`;
+  const roster = p.members.map(m => `• ${m.id}: ${m.gender.toLowerCase()} ${m.role === 'rap' ? 'rapper' : 'singer'}, ${m.voice}. Header tags: [Section | ${m.id}] ${tag(m)}`).join('\n');
+  const sameGender = p.members.filter(m => m.role === 'rap').length > 1 && new Set(p.members.filter(m => m.role === 'rap').map(m => m.gender)).size === 1;
+  return `
+
+🎙️ VOCAL CAST — ${p.label.toUpperCase()} (${p.members.length} performers). This is NOT a solo song.
+${roster}${notes ? `\nUSER VOICE NOTES (override the defaults above where they conflict): ${notes}` : ''}
+SECTION PLAN: ${p.plan}
+HOW TO WRITE IT SO SUNO SWITCHES VOICES:
+1. EVERY section header names its performer, e.g. [Verse 1 | ${p.members[0].id}] ${tag(p.members[0])}. A switch inside a section goes on its own line: [${p.members[1].id}]. Shared lines use [Both] or [All].
+2. Switch only at section or half-section boundaries. Never switch mid-line.
+3. Each performer writes in their OWN voice: their own details, slang, cadence and ad-lib signature. Swapping two performers' lines should feel wrong.${sameGender ? `
+4. SAME-GENDER RAPPERS BLEND unless you separate them: contrast register (low vs high), texture (gravel vs clean), speed (laid-back vs triplet/double-time) and ad-libs. Make the contrast audible in the lines themselves (different syllable density and rhythm).` : ''}
+STYLE PROMPT: the Vocal field must name EVERY performer with these contrasting descriptors and the trade pattern (e.g. "${p.members.map(m => `${m.gender.toLowerCase()} ${m.role === 'rap' ? 'rapper' : 'singer'} (${m.voice.split(',')[0]})`).join(' trading with ')}"). Keep it inside the character limit.
+HIT CRAFT: the cast is a repetition type (call-and-response between performers) and a boxes device (the same hook means something different in each mouth). The woman in the room can be one of the performers.`;
+}
+
+// Advisory: are the performers labelled section by section?
+function checkCast(text) {
+  const heads = String(text || '').split(/\r?\n/).map(l => l.trim().replace(/^\*\*(\[[^\]]+\])\*\*/, '$1'))
+    .filter(l => /^\[[^\]]*\b(verse|chorus|hook|pre|bridge|outro|intro|refrain)\b[^\]]*\]/i.test(l));
+  const performerRe = /\b(rapper(?:\s+[a-z])?|singer(?:\s+\d)?|voice\s+\d|both|all)\b/i;
+  const performers = new Set();
+  let labelled = 0;
+  for (const h of heads) { const m = h.match(performerRe); if (m) { labelled++; performers.add(m[1].toLowerCase()); } }
+  String(text || '').split(/\r?\n/).forEach(l => { const m = l.trim().match(/^\[(rapper(?:\s+[a-z])?|singer(?:\s+\d)?|voice\s+\d)\]$/i); if (m) performers.add(m[1].toLowerCase()); });
+  performers.delete('both'); performers.delete('all');
+  return { performers: [...performers], sections: heads.length, labelled, ok: performers.size < 2 || labelled >= Math.ceil(heads.length * 0.8) };
+}
+
 // HIT CRAFT FINAL CHECK — appended to the END of every lyric-generating prompt.
 // The Core + genre lens live mid-prompt inside ~100k chars of context; live
 // tests (2026-09-25) showed density contrast and repetition types getting
@@ -13398,12 +13489,20 @@ NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 8. Verse and chorus use different rhyme schemes; perfect rhyme is saved for the hook and the punchline.
 9. A verse-1 image returns in the bridge or final verse (callback), and verse 1 leaves one thing unresolved that the ending closes.`;
 
-function _withHitCraftClose(fn, genreOf) {
+function _withHitCraftClose(fn, genreOf, opts) {
   return function (...args) {
     const r = fn.apply(this, args);
     if (r && typeof r === 'object' && typeof r.prompt === 'string') {
       let g = '';
       try { g = genreOf ? genreOf(args, r) : ''; } catch (_) {}
+      const p = (args[0] && typeof args[0] === 'object' && !args[0].genre?.primary ? args[0] : args[1]) || {};
+      const castNote = p.cast ? buildCastNote(p.cast, g) : '';
+      if (castNote) {
+        r.prompt += castNote;
+        if (typeof r.system === 'string') r.system += '\n\nVOCAL CAST: this song has multiple performers. Every section header names its performer; switches happen only at section boundaries; the style prompt names every voice.';
+      } else if (opts && opts.guest && p.featuredGuest && p.featuredGuest.on && !/FEATURED GUEST/.test(r.prompt)) {
+        r.prompt += buildFeaturedGuestNote(p.featuredGuest);
+      }
       r.prompt += buildHitCraftFinalCheck(g);
       if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES;
     }
@@ -13411,7 +13510,7 @@ function _withHitCraftClose(fn, genreOf) {
   };
 }
 
-module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,

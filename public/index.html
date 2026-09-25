@@ -4113,6 +4113,24 @@ try { window.pingPv('pageview'); } catch(e){}
         <div class="se-hint" id="se-hint">Auto picks 2 moves based on genre, mood, and what your lyrics literally mention. Mention "phone" → phone-call interjection. Mention "rain" → rain ambience. Click moves above to force-include or exclude specific ones.</div>
       </div>
 
+      <!-- VOCAL CAST — multi-performer songs (duets, rap duos, rapper + singers) -->
+      <div class="params" style="grid-template-columns:1fr 1fr">
+        <div class="param">
+          <div class="param-label">Vocal Cast</div>
+          <select id="g-cast" title="Write the song for more than one performer. Each section is tagged with who performs it so Suno switches voices.">
+            <option value="">Solo (one performer)</option>
+            <option value="rap_duo">Two rappers</option>
+            <option value="rap_singer">Rapper + singer</option>
+            <option value="rap_two_singers">Rapper + two singers</option>
+            <option value="two_rappers_singer">Two rappers + singer</option>
+            <option value="sung_duet">Sung duet (male + female)</option>
+          </select>
+        </div>
+        <div class="param">
+          <div class="param-label">Cast voice notes <span style="font-weight:400;color:var(--tx3)">(optional)</span></div>
+          <input id="g-cast-notes" type="text" maxlength="300" placeholder="e.g. Rapper A deep & slow, Rapper B high & fast">
+        </div>
+      </div>
       <!-- PARAMS ROW (Vocal + Structure only) -->
       <div class="params" style="grid-template-columns:1fr 1fr">
         <div class="param">
@@ -11886,8 +11904,8 @@ async function callServerStream(action, params, onChunk, signal) {
           if (luckyMeta) result.meta = luckyMeta;
           // Free server-side craft checks ride on the done event — keep them so
           // renderSunoChips can show the Craft Check panel under the song.
-          if (d.hitcraft || d.continuity || d.contract || d.truncated) {
-            result.checks = { hitcraft: d.hitcraft || null, continuity: d.continuity || null, contract: d.contract || null, truncated: !!d.truncated };
+          if (d.hitcraft || d.continuity || d.contract || d.truncated || d.cast) {
+            result.checks = { hitcraft: d.hitcraft || null, continuity: d.continuity || null, contract: d.contract || null, cast: d.cast || null, truncated: !!d.truncated };
             window.__soniqLastChecks = result.checks;
           }
           return result;
@@ -14662,6 +14680,9 @@ async function generateSong(){
     emotionalArc: S.emotionalArc || 'none',
     syllableCap: S.syllableCap || 0,
     platform: S.platform || 'suno',
+    cast: document.getElementById('g-cast')?.value
+      ? { preset: document.getElementById('g-cast').value, notes: (document.getElementById('g-cast-notes')?.value || '').trim() }
+      : undefined,
     dualPerspective: S.dualPerspective || false,
     seedLine: S.seedLine || '',
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
@@ -15517,7 +15538,7 @@ function renderCraftCheck(prefix, song) {
   if (!song) { if (box) box.remove(); return; }
   if (window.__soniqLastChecks && !song.craftChecks) { song.craftChecks = window.__soniqLastChecks; window.__soniqLastChecks = null; }
   const c = song.craftChecks;
-  if (!c || (!c.hitcraft && !c.continuity && !c.contract && !c.truncated)) { if (box) box.remove(); return; }
+  if (!c || (!c.hitcraft && !c.continuity && !c.contract && !c.truncated && !c.cast)) { if (box) box.remove(); return; }
   if (!box) {
     box = document.createElement('div');
     box.id = prefix + '-craft-check';
@@ -15539,6 +15560,7 @@ function renderCraftCheck(prefix, song) {
     if (h.callback != null) rows.push(row(h.callback, 'Callback', h.callback ? 'a verse-1 image returns later' : 'no verse-1 image returns later'));
     if (h.asymmetry) rows.push(row(!(h.issues || []).some(i => /asymmetry/.test(i)), 'Line-length contrast', `${h.asymmetry} sections have a short punch line`));
   }
+  if (c.cast && (c.cast.performers || []).length >= 2) rows.push(row(c.cast.ok, 'Vocal cast', `${c.cast.performers.length} performers, ${c.cast.labelled}/${c.cast.sections} sections name who performs them`));
   if (c.continuity && c.continuity.checked) rows.push(row(c.continuity.ok, 'Continuity', c.continuity.ok ? 'no dropped threads' : (c.continuity.findings || []).map(f => f.label || f.id || 'issue').join(', ')));
   if (c.contract && c.contract.checked) rows.push(row(c.contract.ok, 'Style ↔ lyrics match', c.contract.ok ? 'every promised move is tagged' : (c.contract.findings || []).map(f => (f.evidence || [])[0] || f.move || 'move').join(', ') + ' promised but not tagged'));
   const passed = rows.filter(r => r.includes('✓')).length;
