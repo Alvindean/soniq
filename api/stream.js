@@ -1024,7 +1024,7 @@ module.exports = async function handler(req, res) {
       }
       messages = [{role: 'user', content: built.prompt}];
       system = built.system;
-      max_tokens = 4096;
+      max_tokens = 6144; // 4096 truncated the closing theory notes on full songs (~14k chars)
       // Attach production data + lucky meta + suno settings to response header (read by client parsers)
       const metaGenre = (body.params?.genre) || (built.meta?.g1) || 'pop';
       // Pass substyle so SUBSTYLE_FX_OVERRIDES can divergence-correct genre FX

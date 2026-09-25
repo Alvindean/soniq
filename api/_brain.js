@@ -2203,7 +2203,16 @@ function checkHitCraft(text) {
   for (const raw of lines) {
     const l = raw.trim();
     const h = l.match(/^\[([^\]]+)\]/);
-    if (h) { cur = { name: h[1].toLowerCase(), lines: [] }; sections.push(cur); const rest = l.slice(h[0].length).trim(); if (rest) cur.lines.push(rest); continue; }
+    // Only real section headers open a section; production tags on their own
+    // line ([808 Bass], [Whispered], [Build]) stay inside the current one.
+    if (h && /\b(verse|chorus|hook|pre|post|bridge|intro|outro|refrain|breakdown|interlude|drop|tag|vamp|coda)\b/i.test(h[1])) {
+      cur = { name: h[1].toLowerCase(), lines: [] }; sections.push(cur);
+      const rest = l.slice(h[0].length).trim(); if (rest) cur.lines.push(rest);
+      continue;
+    }
+    if (h) { const rest = l.slice(h[0].length).trim(); if (rest && cur) cur.lines.push(rest); continue; }
+    // An ALL-CAPS analysis header (THEORY ANALYSIS:, DOPAMINE MAP:) ends the lyric.
+    if (/^[A-Z][A-Z0-9 &\/'-]{3,}:/.test(l)) { cur = null; continue; }
     if (!l || !cur) continue;
     cur.lines.push(l.replace(/\([^)]*\)/g, '').trim() || l);
   }
@@ -13165,8 +13174,8 @@ function checkStyleLyricContract(text) {
 const HIT_CRAFT_FINAL_CHECK = `
 
 ━━ HIT CRAFT FINAL CHECK — verify silently before you output, revise any miss ━━
-□ DENSITY CONTRAST: count syllables. Chorus lines average at most ~65% of the verse's syllables per line (or, under a twinned Prince-Method grid, fewer distinct words held on long vowels). A chorus as wordy as the verse FAILS.
-□ REPETITION TYPES: at least THREE different kinds are on the page — exact hook, incremental (one word changed on a later hook), refrain tag ending each verse, call-and-response, or a bookend first/last line.
+□ DENSITY CONTRAST: count syllables. Chorus lines average at most ~65% of the verse's syllables per line (or, under a twinned Prince-Method grid, fewer distinct words held on long vowels). A chorus as wordy as the verse FAILS.{{DENSITY_TARGET}}
+□ REPETITION TYPES: at least THREE different kinds are on the page — exact hook, incremental (one word changed on a later hook), refrain tag ending each verse, call-and-response, or a bookend first/last line. DEFAULT MOVES unless the song has a better one: (a) the FINAL hook changes exactly ONE word of its key line (incremental); (b) the song's last lyric line echoes its first lyric line with the meaning turned (bookend). Ad-lib parentheses alone do not count as a type.
 □ MICRO-REPETITION: every lyric section has a word or 2-3 word fragment repeated inside a line.
 □ RHYTHMIC DISPLACEMENT: the final hook moves a key phrase to a different entry point (pickup, beat 2, after a stop) — show it in the line layout.
 □ THE WOMAN IN THE ROOM: the hook contains one line a specific listener would sing back or caption — translated to this genre's lens, even if the genre rarely does it.
@@ -13177,15 +13186,38 @@ const HIT_CRAFT_FINAL_CHECK = `
 □ JUICY LINES: every section, verse 1 included, has one line quotable on its own.
 Do not print this checklist.`;
 
-function _withHitCraftClose(fn) {
+// Genre-aware version: turns the density rule into hard numbers from
+// GENRE_SYLLABLE_BUDGETS (a vague "~65%" was ignored in live tests — every
+// line came out the same length).
+function buildHitCraftFinalCheck(genre) {
+  const g = _hcGenre(genre);
+  const bud = g && GENRE_SYLLABLE_BUDGETS[g];
+  let target = '';
+  if (bud && bud.verse && bud.chorus) {
+    const vHi = parseInt(String(bud.verse).split(/[–-]/)[1], 10);
+    const vLo = parseInt(String(bud.verse), 10);
+    const cLo = parseInt(String(bud.chorus), 10);
+    const cHi = parseInt(String(bud.chorus).split(/[–-]/)[1], 10) || cLo;
+    const vAim = Math.round((vLo + vHi) / 2);
+    const cMid = Math.round((cLo + cHi) / 2);
+    target = ` HIT CRAFT TARGET: verse lines ${vAim}-${vHi} syllables; chorus lines ${cLo}-${cMid}; the title/hook line ${bud.hook || cLo}.`;
+  }
+  return HIT_CRAFT_FINAL_CHECK.replace('{{DENSITY_TARGET}}', target);
+}
+
+function _withHitCraftClose(fn, genreOf) {
   return function (...args) {
     const r = fn.apply(this, args);
-    if (r && typeof r === 'object' && typeof r.prompt === 'string') r.prompt += HIT_CRAFT_FINAL_CHECK;
+    if (r && typeof r === 'object' && typeof r.prompt === 'string') {
+      let g = '';
+      try { g = genreOf ? genreOf(args, r) : ''; } catch (_) {}
+      r.prompt += buildHitCraftFinalCheck(g);
+    }
     return r;
   };
 }
 
-module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt), buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
@@ -13218,13 +13250,13 @@ module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt), buildLu
   // Wave 4l additions
   GENRE_METAPHOR_PALETTE, CROSS_STYLE_METAPHOR_BORROWS, buildMetaphorPaletteNote,
   // Wave 5 addition — two-song blend
-  buildSongBlendPrompt: _withHitCraftClose(buildSongBlendPrompt),
+  buildSongBlendPrompt: _withHitCraftClose(buildSongBlendPrompt, a => a[0] && a[0].songA && a[0].songA.genre),
   // Lever #7 — vocal character descriptors (re-exported for tests / debug)
   selectVocalDescriptors, buildVocalDescriptorNote,
   // Lever #8 — surprise / creativity engine
   selectSurpriseMoves, buildSurpriseNote,
   // PRISM — concept-first engine (inverse of Lucky). docs/PRISM-ENGINE-SPEC.md
-  buildPrismConcept, buildPrismSongPrompt: _withHitCraftClose(buildPrismSongPrompt), rollGenreDial, rollSubjectDial, rollFlipDial,
+  buildPrismConcept, buildPrismSongPrompt: _withHitCraftClose(buildPrismSongPrompt, a => a[0] && a[0].genre && a[0].genre.primary), rollGenreDial, rollSubjectDial, rollFlipDial,
   rollMetaphorDial, buildMetaphorBank, rollPhraseDial, PHRASE_BANK, PHRASE_FLIP_STRATEGIES,
   _scorePrism, pickWeighted, SUBJECT_SEED, SINGLE_GENRE_WEIGHTS };
 
