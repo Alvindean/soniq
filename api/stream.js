@@ -552,6 +552,9 @@ async function pipeSSE(r, res, extractText) {
             const msg = ev.error?.message || JSON.stringify(ev.error);
             throw new Error('Stream error: ' + msg.slice(0, 200));
           }
+          // A length stop means the reply was cut off — flag it so the done event
+          // (and the Craft Check panel) can say so instead of failing silently.
+          if (ev.choices?.[0]?.finish_reason === 'length' || ev.delta?.stop_reason === 'max_tokens') { res._soniqTruncated = true; console.error('[stream] reply hit max_tokens — truncated'); }
           const text = extractText(ev);
           if (text) { full += text; res.write(`data: ${JSON.stringify({text})}\n\n`); }
         } catch (parseErr) {
@@ -681,7 +684,7 @@ module.exports = async function handler(req, res) {
       const variantPrompt = buildVariantPrompt(body.variant, song);
       messages = [{ role: 'user', content: variantPrompt }];
       system = 'You are Soniq, an expert music producer and songwriter. Follow the instructions exactly and output only the requested content.';
-      max_tokens = 2048;
+      max_tokens = 4096; // 2048 cut off: variants rewrite full songs + v6 style prompt
     } catch(e) {
       res.status(400).end('Unknown variant: ' + body.variant);
       return;
@@ -707,7 +710,7 @@ module.exports = async function handler(req, res) {
       const built = brain.buildFeedbackPrompt(p.lyrics, p.genre, p.topic);
       messages   = [{ role: 'user', content: built.prompt }];
       system     = built.system;
-      max_tokens = 2048;
+      max_tokens = 4096; // 2048 cut off: coach grades 9 dimensions + 22 Hit Craft techniques
     } catch (err) {
       console.error('Feedback prompt build failed:', err.message);
       return res.status(500).json({ error: 'Feedback prompt error: ' + err.message });
@@ -724,7 +727,7 @@ module.exports = async function handler(req, res) {
       const built = brain.buildEditPrompt(p);
       messages   = [{ role: 'user', content: built.prompt }];
       system     = built.system;
-      max_tokens = 2048;
+      max_tokens = 4096; // 2048 cut off: coach grades 9 dimensions + 22 Hit Craft techniques
     } catch (err) {
       console.error('Edit prompt build failed:', err.message);
       return res.status(500).json({ error: 'Edit prompt error: ' + err.message });
@@ -1183,7 +1186,7 @@ module.exports = async function handler(req, res) {
     try {
       const _streamed = await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
       recordUsage();
-      res.write(`data: ${JSON.stringify({done: true, ...streamAdvisories(_streamed)})}\n\n`);
+      res.write(`data: ${JSON.stringify({done: true, ...streamAdvisories(_streamed), ...(res._soniqTruncated ? {truncated: true} : {})})}\n\n`);
       return res.end();
     } catch (err) {
       // Connection terminated mid-stream — transient, can't cleanly fall back

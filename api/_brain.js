@@ -1577,6 +1577,66 @@ GENRE LENS: the genre-specific block below says HOW each technique sounds in thi
 MELODIC-UNITY TRUCE: if a Prince Method / melodic-unity note is active, keep its twinned verse/chorus grid and create density contrast INSIDE it — fewer distinct words held on the same strong beats, long vowels, melisma — or put the density shift in its sanctioned departure (pre-chorus / bridge). Never break a twinned tune to hit a syllable number.
 Apply all eleven silently. Never print these labels, ratios, or notes in the lyrics.`;
 
+// HIT CRAFT CORE II — the structural/sound set added 2026-09-25 after a gap
+// audit of the brain (prosody, callbacks and rhyme-scheme contrast had no rule
+// at all; the rest were one-mode mentions). Mandatory alongside Core I.
+const HIT_CRAFT_CORE_II = `
+
+HIT CRAFT CORE II — STRUCTURE & SOUND (MANDATORY, every song; also exempt from the 3-5 selection):
+12. PROSODY — stressed syllables land on strong beats; never force a weak syllable onto the downbeat ("be-CAUSE", never "BE-cause"). The line's shape matches its meaning: rising lines for hope or questions, falling lines for defeat or resolution, short choppy lines for panic, long flowing lines for calm.
+13. RHYME-TYPE LADDER — perfect rhyme means resolution, so save it for the hook landing and the punchline. Verses use family, additive/subtractive, assonance and consonance rhymes for tension. Climb toward the hook: slant → closer → perfect on the payoff.
+14. STABLE vs UNSTABLE SECTIONS — verses and pre-chorus are UNSTABLE (odd line counts or uneven lengths, slant or open rhymes, ending on a question or an unfinished thought); the chorus is STABLE (even line count, matched lengths, closed perfect rhymes). The chorus must feel like arriving home.
+15. LINE-LENGTH ASYMMETRY — mix long and short lines inside a section. A short line after two or three long ones is a punch. Every section has at least one line clearly shorter than its neighbours.
+16. CALLBACKS — an image, object or phrase from verse 1 returns in the bridge or final verse with new weight (the payphone in verse 1 is where he calls from in verse 3).
+17. RHYME-SCHEME CONTRAST — each section type uses a different end-rhyme pattern (e.g. AABB verse, ABAB pre-chorus, AAAA chorus; in rap, chained multis in verses and one locked perfect rhyme in the hook).
+18. TITLE PLACEMENT — the title sits in the chorus's FIRST or LAST line (ideally both), on its most stressed beat. Verse 1 never states the full title.
+19. OPEN LOOPS — verse 1 raises a question, withholds a fact, or starts an action it doesn't finish. The bridge or the final line closes it.
+20. BOXES — the same chorus words mean something new each time because each verse changes their context (chorus 1 hope, chorus 2 doubt, final chorus the truth). Works with the final-chorus one-word change.
+21. PRONOUN AMBIGUITY — at least one "you" in the song can be heard two ways (lover, parent, God, a younger self). Don't explain who "you" is everywhere; let one line hold both readings.
+22. TENSE & TIME TRAVEL — move time on purpose (verse 1 past, chorus present, bridge future or "if"). Mark each shift with a time word: then, now, someday.
+Apply these silently. Never print these labels in the lyrics.`;
+
+const HIT_CRAFT_II_LABELS = {
+  prosody: 'PROSODY', ladder: 'RHYME-TYPE LADDER', stable: 'STABLE vs UNSTABLE SECTIONS',
+  asym: 'LINE-LENGTH ASYMMETRY', callback: 'CALLBACKS', schemes: 'RHYME-SCHEME CONTRAST',
+  title: 'TITLE PLACEMENT', loops: 'OPEN LOOPS', boxes: 'BOXES',
+  pronoun: 'PRONOUN AMBIGUITY', tense: 'TENSE & TIME TRAVEL'
+};
+
+// How Core II plays per genre — one dense line each (the Core I lens has the
+// per-technique rows; these are the genre-specific twists that matter most).
+const HIT_CRAFT_II_GENRE_LENS = {
+  hiphop: "Prosody = stresses ride the snare on 2 and 4. Rhyme ladder = slant multis through the verse, one perfect rhyme on the bar-16 punch. Scheme contrast = chained multis in verses vs a locked AAAA hook. Callback = a verse-1 bar returns flipped in verse 3. Title in hook line 1.",
+  pop: "Title in the chorus's first AND last line. Verses unstable (3 or 5 lines), chorus stable (4 lines, perfect rhymes). Boxes are the pop engine: the chorus means something new each time. Leave one 'you' open so any listener can claim it.",
+  rnb: "Prosody through melisma: the stress lands on the long note. Slant rhymes in verses, perfect on the hook. 'You' can be the lover or the one who left. Tense: memory verse → present chorus.",
+  country: "Boxes and the title twist are core Nashville craft: the chorus means something new each time. Call back the verse-1 object in verse 3. Title in the chorus's last line. Past → present → future across verses.",
+  edm: "Title = the drop chop, placed first. Stable 4-line topline chorus. Open loop in the breakdown lyric: a question the drop answers. Prosody on the kick.",
+  rock: "Title in the chorus's first line, shouted on the one. Slant rhymes in verses, perfect in the chorus. Asymmetry: a 2-word line after long verse lines.",
+  altrock: "The rhyme ladder leans slant throughout; save the only perfect rhyme for the last line. Pronoun ambiguity is native. Open loops may stay half-open on purpose.",
+  metal: "Prosody: harsh syllables on the chug accents. Title as the clean chorus's first line. Call back a verse-1 image in the breakdown.",
+  punk: "Title = the slogan, first line of the chorus. AABB verses vs AAAA chorus. Asymmetry for the shout line.",
+  folk: "Callbacks and boxes are traditional: the refrain changes meaning each verse. Time travels across verses (seasons, years). Perfect rhymes only in the refrain.",
+  ss: "Pronoun ambiguity and time travel carry the song. The verse-1 open loop is answered in the bridge. Line lengths are uneven, like speech.",
+  jazz: "AABA: title in the first or last line of each A. The bridge is the unstable section. Witty perfect rhymes are the payoff.",
+  blues: "AAB is built-in stable/unstable: the AA lines hang, the B line resolves. Title in the B line. Call back the verse-1 image in the last 12 bars.",
+  neosoul: "Prosody through behind-the-beat stress. Slant and assonance everywhere, one perfect rhyme in the mantra. 'You' as the lover or a higher self.",
+  gospel: "Pronoun ambiguity is sacred: 'you' as lover AND God. Boxes through the vamp: the same line means more on each repeat. Tense: past struggle → present praise.",
+  reggae: "Title as the chant's first line. Stable mantra chorus. Callbacks to the verse-1 place.",
+  dancehall: "Title = the chant's first line. Heavy rhyme chains in the toasting vs one chant rhyme. Asymmetry through short shouted tags.",
+  afrobeats: "Title in the hook's first and last line. Pidgin rhyme play in verses. 'You' as the dancer and the lover at once.",
+  amapiano: "Title = the chant. Stable repeating chant vs loose verses. Open loop resolved when the log drum returns.",
+  latin: "The coro holds the title. Verses unstable, coro stable. Boxes through the montuno repeats.",
+  reggaeton: "Title in the hook's first line. Locked AAAA hook rhymes on the dembow vs slant verses. Call back a verse-1 line in the bridge.",
+  bossa: "Gentle prosody: Portuguese stress falls on the long notes. Title in the last line. Tense: the memory of her walking by.",
+  kpop: "Title = the killing-part hook's first line. Rhyme-scheme contrast between the rap and vocal parts. The English title line anchors the chorus.",
+  cpop: "Title in the chorus's last line. Seasonal time travel. Perfect rhymes on chorus line endings.",
+  bollywood: "Title in the mukhda's first line. Antara verses unstable, mukhda stable. Callbacks between antaras.",
+  tvmusical: "The reprise is boxes: the same lyric means something new later in the story. Title first or last line. Tense marks plot time.",
+  children: "Title in the first and last line. Perfect rhymes everywhere (stable). Callback: the same animal returns at the end.",
+  parody: "Keep the original title's placement for the swap. Use the rhyme ladder for joke timing: the perfect rhyme is the punchline.",
+  comedy: "Punchline = a perfect rhyme after slant setups. Callback jokes to verse 1 are mandatory. The open loop is the setup the last line pays off."
+};
+
 // HIT CRAFT GENRE LENS — how each of the eleven Hit Craft Core techniques is
 // PLAYED in each genre. The core says WHAT is mandatory; the lens says HOW it
 // sounds in this idiom. Deliberately includes non-obvious fits (the woman in
@@ -2183,6 +2243,7 @@ function buildHitCraftLensNote(genre, substyle, crossGenre) {
   const label = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[genre]) || genre;
   let out = `\n\nHIT CRAFT CORE — HOW IT PLAYS IN ${String(label).toUpperCase()} (these override the core's default ratios):\n`
     + Object.keys(HIT_CRAFT_LABELS).map(k => `• ${HIT_CRAFT_LABELS[k]}: ${lens[k]}`).join('\n');
+  if (HIT_CRAFT_II_GENRE_LENS[genre]) out += `\n• CORE II IN ${String(label).toUpperCase()}: ${HIT_CRAFT_II_GENRE_LENS[genre]}`;
   const sub = substyle && _HC_SUBSTYLE_INDEX[_hcKey(substyle)];
   if (sub) out += `\n• ${sub.name.toUpperCase()} TUNING (leads the set for this substyle): ${sub.tip}`;
   const other = crossGenre && crossGenre !== genre && HIT_CRAFT_GENRE_LENS[crossGenre];
@@ -2256,12 +2317,41 @@ function checkHitCraft(text) {
     const inter = [...a].filter(w => b.has(w)).length;
     sceneOverlap = +(inter / Math.max(1, Math.min(a.size, b.size))).toFixed(2);
   }
+  // ── Core II checks ──
+  const sylOf = (l) => syl(l);
+  const choruses = lyricSections.filter(s => /^(?!.*\b(pre|post)[- ]?chorus)(?=.*\b(chorus|hook)\b)/.test(s.name));
+  const tm = String(text || '').match(/^\s*\**\s*TITLE\s*\**\s*[:\-—]\s*(.+)$/mi);
+  const titleNorm = tm ? norm(tm[1].replace(/[*"“”]/g, '')) : '';
+  let titlePlaced = null;
+  if (titleNorm && choruses.length) {
+    const tw = titleNorm.split(' ').filter(w => w.length > 2);
+    const hasTitle = (l) => { const n = norm(l); return tw.length ? tw.filter(w => n.includes(w)).length / tw.length >= 0.6 : false; };
+    titlePlaced = choruses.some(ch => ch.lines.length && (hasTitle(ch.lines[0]) || hasTitle(ch.lines[ch.lines.length - 1])));
+  }
+  const rime = (l) => { const w = (norm(l).split(' ').pop() || ''); const m = w.match(/[aeiouy]+[^aeiouy]*$/); return m ? m[0] : w.slice(-2); };
+  const scheme = (sec) => { const map = {}; let n = 0; return sec.lines.slice(0, 4).map(l => { const r = rime(l); if (!(r in map)) map[r] = String.fromCharCode(65 + n++); return map[r]; }).join(''); };
+  const verseScheme = verses[0] && verses[0].lines.length >= 4 ? scheme(verses[0]) : null;
+  const chorusScheme = choruses[0] && choruses[0].lines.length >= 4 ? scheme(choruses[0]) : null;
+  const asymSections = lyricSections.filter(sec => sec.lines.length >= 3).filter(sec => { const c = sec.lines.map(sylOf); return Math.min(...c) <= 0.6 * Math.max(...c); }).length;
+  const asymBase = lyricSections.filter(sec => sec.lines.length >= 3).length;
+  let callback = null;
+  if (verses.length) {
+    const inChorus = new Set(choruses.flatMap(ch => ch.lines.join(' ').toLowerCase().match(/[a-z']{5,}/g) || []));
+    const v1 = [...words(verses[0])].filter(w => w.length >= 5 && !inChorus.has(w));
+    const late = lyricSections.filter(sec => /bridge|outro/.test(sec.name) || (verses.indexOf(sec) >= 1 && sec === verses[verses.length - 1]));
+    const lateWords = new Set(late.flatMap(sec => sec.lines.join(' ').toLowerCase().match(/[a-z']{5,}/g) || []));
+    callback = v1.some(w => lateWords.has(w));
+  }
   const issues = [];
+  if (titlePlaced === false) issues.push('title is not the first or last line of the chorus');
+  if (verseScheme && chorusScheme && verseScheme === chorusScheme) issues.push(`verse and chorus share the same rhyme scheme (${verseScheme})`);
+  if (asymBase && asymSections < Math.ceil(asymBase / 2)) issues.push('most sections have no clearly short line (line-length asymmetry)');
+  if (callback === false) issues.push('no verse-1 image returns in the bridge or final verse (callback)');
   if (densityRatio !== null && densityRatio < 1.25) issues.push(`density contrast weak (verse ${v.toFixed(1)} vs chorus ${c.toFixed(1)} syllables/line)`);
   if (lyricSections.length && microSections === 0) issues.push('no micro-repetition found');
   if (types.length < 3) issues.push(`only ${types.length} repetition type(s): ${types.join(', ') || 'none'}`);
   if (sceneOverlap !== null && sceneOverlap > 0.4) issues.push('verse 2 re-uses verse 1\'s scene vocabulary');
-  return { ok: issues.length === 0, densityRatio, microSections, repetitionTypes: types, sceneOverlap, issues };
+  return { ok: issues.length === 0, densityRatio, microSections, repetitionTypes: types, sceneOverlap, titlePlaced, verseScheme, chorusScheme, asymmetry: asymBase ? `${asymSections}/${asymBase}` : null, callback, issues };
 }
 
 
@@ -2289,7 +2379,7 @@ function buildLyricCraftNote(genre, mood, topic, substyle, crossGenre) {
     : '';
   // The Director's Pass + anti-cliche rules always apply, regardless of genre
   // or mood — this is the universal underpinning of the craft logic.
-  return DIRECTORS_PASS + HIT_CRAFT_CORE + buildHitCraftLensNote(genre, substyle, crossGenre) + craftBlock + buildAntiClicheNote();
+  return DIRECTORS_PASS + HIT_CRAFT_CORE + HIT_CRAFT_CORE_II + buildHitCraftLensNote(genre, substyle, crossGenre) + craftBlock + buildAntiClicheNote();
 }
 
 // ============ ANTI-CLICHE RHYME SYSTEM ============
@@ -8984,37 +9074,6 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
 // BLUEPRINT, which only the human reads. These layers route it into the string
 // Suno actually receives. 800 chars is the ask against a 1,000-char box: the
 // headroom exists to carry arrangement, not more adjectives.
-function buildSunoStyleSpec(platform) {
-  const cap = platform === 'udio' ? 300 : 800;
-  // Udio's box is far smaller, so it gets a ceiling, not a floor-and-ceiling.
-  const target = platform === 'udio' ? 'under 300' : '500-800';
-  if (platform === 'udio') {
-    // Udio prefers genre/emotion descriptors over instrument detail and has a
-    // much tighter box — keep the original lean field set for it.
-    return { cap, target, fields: `Genre: [core genre + sub-genre, no artist names]
-Instruments: [4-5 key instruments, comma-separated]
-BPM: [range, e.g. 95-100]
-Vocal: [vocal descriptor — no artist names]
-Texture: [production texture in 5-8 words — no artist names]
-Counter-melody: [counter-melody device]`, assembly: `Full prompt: [assemble the fields above into ONE ready-to-paste string, comma-separated, leading with genre and mood descriptors — Udio weights those over instrument detail. Keep it under 300 characters. ABSOLUTELY NO artist names, band names, or "[Name] style" references.]` };
-  }
-  return { cap, target, fields: `Genre: [core genre + sub-genre + era feel, no artist names — e.g. "modern soulful boom bap"]
-BPM: [a SINGLE number when the groove is specific, e.g. "88 BPM"; a tight range only when it genuinely floats]
-Sonic Signature: [the ONE defining sound this track is built on, described in full — the sample and how it is treated, the riff, the synth, the loop. e.g. "warm chopped soul vocal sample loop, pitched vintage vocal chops". This is the most important line here — it is what makes the track sound like ITSELF rather than like its genre.]
-Rhythm Section: [drums AND bass, each CHARACTERISED — never bare nouns. e.g. "punchy crisp drums with hard kick and snappy snare, deep round bass" NOT "drums, bass"]
-Instruments: [2-3 further instruments, each with its character — e.g. "dusty upright piano", "muted horn stabs". Same rule: adjective + instrument, never a bare list.]
-Texture: [production texture in 3-6 words, ideally with a tension in it — e.g. "polished but gritty", "warm but claustrophobic"]
-Vocal: [who + delivery + flow character in one phrase — e.g. "male rapper with a mature reflective storytelling flow" — no artist names]
-Hook Arrangement: [what makes the CHORUS sonically different from the verses — the single most under-used lever in AI music. e.g. "hook is a crew chant with stomps and claps over the soul loop". If the hook is only "the chorus", say what changes: who sings it, what enters, what drops out.]
-Section Moves: [1-2 specific structural events, each tied to WHERE it happens — e.g. "stripped bridge with lone voice over the sample, dramatic beat switch before the final hook into a new chopped sample". Pull these from the ARRANGEMENT BLUEPRINT below so the two agree.]
-Ear Candy: [2-3 signature sounds or motifs that recur and make the track memorable — e.g. "foghorn and ship bell hits, harbor ambience intro". Draw them from the song's own world, not a generic FX shelf.]
-Counter-melody: [counter-melody device]
-Emotional Close: [3-4 adjectives naming the FEELING to land on — e.g. "warm, wise, heartfelt, triumphant". These go last in the full prompt; Suno reads them as the emotional target.]`, assembly: `Full prompt: [assemble the fields above into ONE ready-to-paste string, comma-separated, in EXACTLY this order: genre → BPM → sonic signature → rhythm section → instruments → texture → vocal → hook arrangement → section moves → ear candy → emotional close. Suno weights the FRONT of the string hardest, so the defining sound goes early and the mood adjectives go last. Aim for ${target} characters — that length is the POINT, it is what carries the arrangement. Do not compress it back into a bare noun list. ABSOLUTELY NO artist names, band names, or "[Name] style" references.
-
-GOLD STANDARD — this is the level to hit (note that every instrument is characterised, the hook has its own arrangement, and two section-level events are named):
-"Modern soulful boom bap, 88 BPM, warm chopped soul vocal sample loop, pitched vintage vocal chops, punchy crisp drums with hard kick and snappy snare, deep round bass, polished but gritty, male rapper with a mature reflective storytelling flow, hook is a sea shanty crew chant with stomps and claps over the soul loop, foghorn and ship bell hits, harbor ambience intro, stripped bridge with lone voice over the sample, dramatic beat switch before final hook into a new chopped sample, warm, wise, heartfelt, triumphant"
-Match that DEPTH with THIS song's own world — never reuse its nautical imagery unless this song is actually about the sea.]` };
-}
 
   // ── Platform-specific instructions ─────────────────────────────────────
   const platformNotes = {
@@ -9227,7 +9286,7 @@ A tag not on this list is fine if it names a real sound plainly — [Foghorn], [
 PARENTHESES () = ad-libs and background vocal layers ONLY — never use () for structural or delivery purposes.
   Same line as a lyric = rhythmic pocket filler. Standalone line = spotlight ad-lib moment.
 
-HIT CRAFT SHAPE — write it this way on the page: the LAST [Chorus] changes ONE word in its key line versus the earlier choruses; the hook holds one line sung straight to a specific "you"; the final lyric line echoes Verse 1's first line with the meaning turned.
+HIT CRAFT SHAPE — write it this way on the page: the LAST [Chorus] changes ONE word in its key line versus the earlier choruses; the hook holds one line sung straight to a specific "you" (write that line first, inside the chorus); the title is the chorus's first or last line; a verse-1 image returns in the bridge; the final lyric line echoes Verse 1's first line with the meaning turned.
 
 Every word must earn its place. No bracket tag = that section does not exist.]
 
@@ -9793,7 +9852,7 @@ TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [
 TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]
 TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [Build] · [Drop] · [Swell] · [Choir] · [808 Bass] · [Steel Guitar]
 PARENTHESES () = ad-libs only — never structural. Every word must earn its place.
-HIT CRAFT SHAPE: the LAST [Chorus] changes ONE word in its key line; the hook holds one line sung straight to a specific "you"; the final lyric line echoes Verse 1's first line, turned.]
+HIT CRAFT SHAPE: the LAST [Chorus] changes ONE word in its key line; the chorus holds one line sung straight to a specific "you" (write it first); the title is the chorus's first or last line; a verse-1 image returns in the bridge; the final lyric line echoes Verse 1's first line, turned.]
 
 SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. Suno rejects prompts that name artists. If a PRODUCTION LOCK above contains any artist name, STRIP IT and replace with era/region/technique/vocal-quality descriptors. Also: never write bare "live" for real instruments (Suno hears a LIVE AUDIENCE + arena reverb) — use "real/organic/acoustic/session" (e.g. real drums); reserve "crowd/live audience/crowd chant" for intentional crowd sound.
@@ -11376,141 +11435,155 @@ const SYNC_BIBLE = {
 // ═══════════════════════════════════════════════════════
 const VARIANT_PROMPTS = {
 
-  dj_remix: (song) => `You are a world-class DJ and electronic music producer reworking "${song.title}" for club play.
+  dj_remix: (song) => `You are a club producer reworking "${song.title}" for today's DJ sets.
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
 ORIGINAL GENRE: ${song.genre || 'pop'}
 
-YOUR TASK — Create a DJ Remix version:
-1. STRUCTURE REWRITE: Add a 16-bar intro build (filter sweep, percussion only, no full arrangement). Identify the drop point (where the full track hits — usually where the chorus was). Add a 8-bar breakdown (strip to kick + bass + vocal chop). Extend the outro to 16+ bars for DJ mixing out.
-2. LYRIC ADAPTATION: Lyrics stay mostly the same but the chorus hook gets repeated more (4-6x). Add [Build] [Drop] [Breakdown] [Outro - extended] section tags.
-3. SUNO STYLE: Rewrite the production style as: "club remix, electronic production, 4-on-the-floor kick, side-chain compression, filter sweep intro, [original genre] influences, DJ edit, 128 BPM"
+YOUR TASK — Club Remix:
+1. PICK ONE CLUB LANE that fits the original's mood and name it with its tempo: afro house (120-124 BPM, rolling percussion), UK garage / 2-step (130-134, shuffled skip), jersey club (140, bed-squeak kick triplets), tech house (124-128, rolling bassline), amapiano (112-115, log drum), drum & bass (172-174, half-time vocal), or melodic house (122, emotional pads). Choose the lane the ORIGINAL would sound best in, not the generic default.
+2. STRUCTURE: 16-bar DJ intro (drums only), verse 1 kept, the hook turned into a VOCAL-CHOP POST-HOOK built from the title (micro-repetition: "take me, take-take me"), an 8-bar breakdown where the hook's "you" line is sung alone over pads, then the drop, verse 2 cut to half, final drop, 16-bar DJ outro.
+3. LYRICS: keep the verses and hook words. Only the chop, the breakdown and any cut lines change.
 4. OUTPUT FORMAT:
-   REMIX TITLE: [title] (Club Remix)
-   SUNO STYLE: [production description]
-   STRUCTURE NOTE: [brief description of the structural changes]
-   [Full rewritten lyrics with DJ structure tags]`,
+   REMIX TITLE: [title] ([Lane] Remix)
+   LANE: [lane + BPM + why it fits this song]
+   SUNO STYLE: [the layered style prompt described below]
+   STRUCTURE NOTE: [what changed]
+   [Full lyrics with [Intro] [Build] [Drop] [Vocal Chop] [Breakdown] [Outro] tags]`,
 
-  acoustic: (song) => `You are a master arranger stripping "${song.title}" down to its raw acoustic form.
+  acoustic: (song) => `You are an arranger making a one-mic stripped version of "${song.title}".
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
 ORIGINAL GENRE: ${song.genre || 'pop'}
 
-YOUR TASK — Create an Acoustic Version:
-1. ARRANGEMENT: Remove all electronic production, drums, bass synths. Rewrite for fingerpicked acoustic guitar and voice (add piano or cello as a second instrument only if it serves the song). The production becomes intimate — close-mic, room sound, human feel.
-2. STRUCTURE: Simplify if needed. Can remove a repeat chorus. Can add a new quiet bridge moment that the original production buried. Dynamics are created by adding/removing the second instrument, not volume.
-3. LYRICS: Keep original lyrics exactly. You may add a single new quiet bridge if the stripped arrangement creates space for one.
-4. SUNO STYLE: "acoustic, fingerpicked guitar, close-mic vocals, intimate, no drums, warm room reverb, [original genre] acoustic version"
+YOUR TASK — Stripped Version:
+1. CHOOSE THE INSTRUMENT the song wants: fingerpicked acoustic guitar OR felt piano, plus at most one colour (cello, room harmony, soft pad). Say which and why.
+2. FEEL: 5-10% slower, close-mic vocal with breaths left in, key can drop a step for intimacy. Dynamics come from the second instrument entering and leaving, not volume.
+3. STRUCTURE: you may drop a repeated chorus. You may add ONE new quiet bridge (4 lines) that calls back a verse-1 image, if the stripped space invites it.
+4. LYRICS: keep the original lines. The final chorus is sung half-spoken, so its one changed word lands.
 5. OUTPUT FORMAT:
-   ACOUSTIC TITLE: [title] (Acoustic)
-   SUNO STYLE: [production description]
-   ARRANGEMENT NOTE: [what was stripped, what was kept]
-   [Full lyrics with acoustic section tags]`,
+   STRIPPED TITLE: [title] (Stripped)
+   SUNO STYLE: [the layered style prompt described below]
+   ARRANGEMENT NOTE: [what was stripped, what was kept, the new bridge if any]
+   [Full lyrics with stripped section tags]`,
 
-  radio_edit: (song) => `You are a professional radio editor cutting "${song.title}" to radio format.
+  radio_edit: (song) => `You are a streaming-era radio editor cutting "${song.title}".
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
-YOUR TASK — Create a Radio Edit (target: 3:00-3:30):
-1. CUT STRATEGY: Remove the intro if it's more than 4 bars before the first vocal. Cut one full verse if there are 3 verses. Remove or shorten the bridge. Bring the hook forward — it should hit within the first 45 seconds.
-2. STRUCTURE TARGET: Verse 1 → Pre-Chorus → Chorus → Verse 2 → Chorus → Bridge (shortened) → Final Chorus → Quick Outro (4 bars max).
-3. EDITS: Mark your cuts clearly with [CUT] annotations. The song must feel complete — no abrupt endings.
-4. HOOK: The strongest hook line must appear in the first 30 seconds. If it doesn't in the original, restructure so it does.
+YOUR TASK — Radio + Streaming Edit (target 2:30-3:00):
+1. FIRST 30 SECONDS: intro 5 seconds or less, or cold-open straight on the hook. The title must be heard before 0:30. Skip rates spike after long intros.
+2. CUTS: halve or cut verse 2, keep the bridge to 4 lines or less, no instrumental break longer than 4 bars. Mark cuts with [CUT].
+3. CLEAN EDIT: replace any explicit word with a clean word that keeps the rhyme, the syllable count and the stress (prosody). Never leave a gap or a bleep.
+4. The song must still feel complete: keep the final chorus with its one changed word and the last-line bookend.
 5. OUTPUT FORMAT:
    RADIO TITLE: [title] (Radio Edit)
-   RUNTIME NOTE: Estimated [X:XX] — cuts [describe what was removed]
-   [Full edited lyrics with structure tags and [CUT] annotations where applicable]`,
+   RUNTIME NOTE: Estimated [X:XX]; title first heard at [0:XX]; cuts: [what was removed]
+   CLEAN SWAPS: [original → clean, one per line, or "none"]
+   [Full edited lyrics with structure tags and [CUT] annotations]`,
 
-  lofi: (song) => `You are a lo-fi producer creating a bedroom version of "${song.title}".
+  lofi: (song) => `You are a lo-fi producer making a late-night version of "${song.title}".
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
 ORIGINAL GENRE: ${song.genre || 'pop'}
 
-YOUR TASK — Create a Lo-fi Version:
-1. PRODUCTION REWRITE: The sound becomes: vinyl crackle, slightly off-tempo drums (human feel, not quantized), warm tape saturation, detuned slightly flat, reverb-heavy vocals pulled back in the mix, jazz-influenced chord voicings underneath.
-2. TEMPO: Slow down 10-15 BPM from the original feel. Lo-fi breathes slower.
-3. LYRICS: Keep original lyrics. Add intimate, introspective feel — remove any big anthem moments. If there's a big chorus shout, rewrite it as a quieter confession.
-4. STRUCTURE: Can cut repeats. Lo-fi songs often feel unfinished on purpose — 2:00-2:30 is ideal.
-5. SUNO STYLE: "lo-fi hip hop, vinyl crackle, warm tape, jazzy chords, slow tempo, bedroom pop, nostalgic, [original genre] lo-fi"
-6. OUTPUT FORMAT:
+YOUR TASK — Lo-fi Version:
+1. SOUND: 70-85 BPM, swung unquantized drums, tape wobble, soft vinyl, jazz 7th and 9th chords, vocal pulled back and doubled low.
+2. SHAPE: 2:00-2:30. Keep verse 1, the hook and the bridge. It may end unresolved on purpose.
+3. LYRICS: keep the lines, but rewrite the chorus's loudest line as a quieter confession with the same syllable count, so the hook becomes something said to one person at 2am.
+4. OUTPUT FORMAT:
    LO-FI TITLE: [title] (Lo-fi)
-   SUNO STYLE: [production description]
-   VIBE NOTE: [emotional shift from original]
-   [Full lyrics adapted for lo-fi feel]`,
+   SUNO STYLE: [the layered style prompt described below]
+   VIBE NOTE: [the emotional shift from the original]
+   [Full lyrics adapted for lo-fi]`,
 
-  slowed_reverb: (song) => `You are creating a slowed + reverb version of "${song.title}" for emotional/TikTok aesthetic.
+  slowed_reverb: (song) => `You are making a slowed + reverb edit of "${song.title}" for short-form and late-night playlists.
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
-YOUR TASK — Create a Slowed + Reverb Version:
-1. CONCEPT: Slowed + reverb is about emotional magnification. The slower tempo makes every word hit harder. The reverb creates spaciousness — like the song is happening in a cathedral or an empty stadium at 3am.
-2. PRODUCTION NOTE: BPM reduced 15-20%. Heavy cathedral or hall reverb on everything. Vocals pitch-shifted slightly down with the tempo. No compression — let the dynamics breathe.
-3. LYRICS: Keep exactly. But add [Echo] tags where specific lines should have audible echo repeats of the last word or phrase. Identify the 2-3 most emotionally heavy lines — these are where the reverb effect will be most powerful.
-4. SUNO STYLE: "slowed, reverb, dreamy, emotional, [original genre], slow tempo, spacious, melancholic, atmospheric"
-5. OUTPUT FORMAT:
+YOUR TASK — Slowed + Reverb:
+1. PRODUCTION: tempo down 15-20% with pitch following it, a long hall reverb, low-end kept warm, no hard limiting.
+2. LYRICS: keep every line. Add [Echo] tags where the last word of a line should repeat into the reverb (2-4 places, on the heaviest lines).
+3. CLIP MOMENT: mark the single 15-second stretch people will use under a video with [Clip Start] and [Clip End]. It must contain the hook's "you" line.
+4. OUTPUT FORMAT:
    SLOWED TITLE: [title] (Slowed + Reverb)
-   SUNO STYLE: [production description]
-   KEY LINES: [list the 2-3 lines that hit hardest slowed down]
-   [Full lyrics with [Echo] annotations on key phrases]`,
+   SUNO STYLE: [the layered style prompt described below]
+   KEY LINES: [the 2-3 lines that hit hardest slowed down]
+   [Full lyrics with [Echo] and [Clip Start]/[Clip End] annotations]`,
 
-  live_version: (song) => `You are a live performance director staging "${song.title}" as a live concert version.
+  sped_up: (song) => `You are making a sped-up edit of "${song.title}" for TikTok, Reels and Shorts.
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
-YOUR TASK — Create a Live Version:
-1. INTRO: Add a spoken or sung performance intro — the artist addressing the crowd before the song starts. Keep it short (2-4 lines). Example: "This next song is about..." or a hummed intro that builds.
-2. EXTENDED OUTRO: Add a live outro — the crowd singalong moment, the artist calling back to the crowd, the final repeat of the hook with crowd energy. This is where the song becomes communal.
-3. DYNAMIC MOMENTS: Mark where the band would drop out for an acoustic moment ([Band drops], [Crowd sings]), where the energy peaks ([Full band in]), where a solo would go ([Guitar solo] or [Piano break]).
-4. LYRICS: Keep original but add these performance annotations. You may add 1-2 ad-lib lines that feel improvised/authentic.
-5. SUNO STYLE: "live recording, concert atmosphere, crowd noise, warm live sound, [original genre] live performance"
-6. OUTPUT FORMAT:
-   LIVE TITLE: [title] (Live)
-   VENUE NOTE: [describe the ideal venue for this song — intimate club, festival, arena]
-   [Full lyrics with live performance annotations]`,
+YOUR TASK — Sped Up:
+1. PRODUCTION: tempo up 20-30%, pitch up 3-4 semitones, drums brighter, vocal airy.
+2. SHAPE: 1:45-2:15. Cold-open on the hook (no intro), then verse 1, hook, a half verse, final hook.
+3. LYRICS: keep the lines. Cut only whole sections.
+4. CLIP MOMENT: mark the 15-second loop with [Clip Start] and [Clip End]. Its last word should flow back into its first so the clip loops cleanly.
+5. OUTPUT FORMAT:
+   SPED UP TITLE: [title] (Sped Up)
+   SUNO STYLE: [the layered style prompt described below]
+   [Full lyrics with structure tags and clip markers]`,
 
-  trap_remix: (song) => `You are a trap producer flipping "${song.title}" into a trap banger.
+  live_version: (song) => `You are a live director staging "${song.title}" for a concert recording.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+YOUR TASK — Live Version:
+1. INTRO: 2-4 spoken or hummed lines to the crowd that set up the song's open loop without answering it.
+2. CROWD MOMENTS: [Band drops] for one verse-1 callback line sung nearly alone, a call-and-response on the hook ([Call] artist / [Response] crowd), and a final chorus where the CROWD sings the one changed word.
+3. PERFORMANCE MARKS: [Full band in], [Guitar solo] or [Keys break], [Crowd sings], [Key change] if the song earns it.
+4. LYRICS: keep the original. You may add 1-2 ad-lib lines that feel improvised.
+5. OUTPUT FORMAT:
+   LIVE TITLE: [title] (Live)
+   VENUE NOTE: [the right room: club, theatre, festival, arena, and why]
+   SUNO STYLE: [the layered style prompt described below]
+   [Full lyrics with live annotations]`,
+
+  trap_remix: (song) => `You are a rap producer and writer flipping "${song.title}" into a rap record.
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
 ORIGINAL GENRE: ${song.genre || 'pop'}
 
-YOUR TASK — Create a Trap Remix:
-1. STRUCTURE: Add a trap intro (8 bars, beat only with ad-libs). The chorus becomes the trap hook — melodic but with 808 underpinning. Add a rap verse (8-16 bars) that reinterprets the song's theme in rap form. The rap verse sits between chorus repetitions.
-2. NEW RAP VERSE: Write 8-16 bars of original trap rap that speaks to the song's theme. Bar = 1 line. Internal rhymes. Ad-libs in parentheses. Bar 8 or 16 = the punchline.
-3. PRODUCTION: 808 bass, rolling hi-hats, trap snare on 2+4, melodic hook sampled/chopped from the original chorus.
-4. SUNO STYLE: "trap remix, 808 bass, rolling hi-hats, trap drums, melodic hook, [original genre] trap flip, auto-tune, 140 BPM"
+YOUR TASK — Rap Flip:
+1. PICK THE LANE from the original's mood and name it: trap (140-150 half-time), drill (140-145, sliding 808s), boom bap (88-94, chopped sample), or melodic rap (120-130, sung-rap hook).
+2. HOOK: flip the original chorus into a rap hook: the title chopped and repeated (micro-repetition), the "you" line kept intact.
+3. NEW 16-BAR VERSE from the OTHER SIDE: the person the original song is about answers back. This is the woman in the room getting her say. Apply all Hit Craft techniques: dense bars vs a sparse hook, a perfect rhyme saved for bar 16, a callback to a verse-1 image, a new scene.
+4. STRUCTURE: 8-bar intro, hook, original verse 1 (rapped or half-sung), hook, [Rap Verse] (the new 16), hook with one word changed, outro.
 5. OUTPUT FORMAT:
-   TRAP TITLE: [title] (Trap Remix)
-   SUNO STYLE: [production description]
-   [Full lyrics with trap structure — include the new rap verse clearly marked [Rap Verse]]`,
+   FLIP TITLE: [title] ([Lane] Flip)
+   LANE: [lane + BPM]
+   SUNO STYLE: [the layered style prompt described below]
+   [Full lyrics; the new verse clearly marked [Rap Verse]]`,
 
-  gospel_version: (song) => `You are a gospel arranger transforming "${song.title}" into a gospel/choir version.
+  gospel_version: (song) => `You are a contemporary gospel and worship arranger reworking "${song.title}".
 
 ORIGINAL LYRICS:
 ${song.lyrics}
 
-YOUR TASK — Create a Gospel/Choir Version:
-1. LYRIC TRANSFORMATION: Rewrite the lyrics to elevate the theme spiritually. If the song is about love, it becomes divine love or community love. If it's about struggle, it becomes faith through struggle. Keep the emotional core — shift the frame to the spiritual/communal.
-2. STRUCTURE ADDITIONS: Add a call-and-response section (lead vocal line / choir response). Add a vamp at the end that builds and builds (the choir takes over, the lead ad-libs over the top). Add a [Testimony] section if a bridge exists.
-3. CHOIR ARRANGEMENT: Mark [Lead], [Choir], [Call], [Response], [Vamp] sections. The choir should first echo then harmonize then overtake the lead.
-4. SUNO STYLE: "gospel, choir, organ, clapping, soul, call and response, spiritual, uplifting, live church feel"
-5. OUTPUT FORMAT:
+YOUR TASK — Gospel / Worship Version:
+1. REFRAME WITH PRONOUN AMBIGUITY: keep the emotional core, and let "you" hold two readings: the person in the song AND God. Change as few words as possible to open that second reading.
+2. SOUND: live band, Hammond organ, pads, choir, handclaps; a modern worship build (quiet verse → full choir chorus).
+3. STRUCTURE: call-and-response between lead and choir on the hook; a [Testimony] section (spoken or sung) in place of the bridge; a [Vamp] that repeats one hook line, climbs a key, and means more each time (boxes).
+4. OUTPUT FORMAT:
    GOSPEL TITLE: [title] (Gospel Version)
-   SUNO STYLE: [production description]
-   THEME NOTE: [how the lyric theme was spiritually reframed]
-   [Full rewritten lyrics with choir annotations]`,
+   SUNO STYLE: [the layered style prompt described below]
+   THEME NOTE: [how the second reading of "you" was opened]
+   [Full lyrics with [Lead] [Choir] [Call] [Response] [Testimony] [Vamp] annotations]`,
 
-  cinematic: (song) => `You are a composer and sync licensing specialist creating a cinematic/orchestral version of "${song.title}" for film/TV placement.
+  cinematic: (song) => `You are a composer and sync licensing specialist creating a cinematic, sync-ready version of "${song.title}" for film, TV and trailers.
 
 ORIGINAL LYRICS:
 ${song.lyrics}
@@ -11520,20 +11593,102 @@ ORIGINAL GENRE: ${song.genre || 'pop'}
 SYNC LICENSING RULES YOU MUST FOLLOW:
 ${SYNC_BIBLE.lyric_rules.map((r,i) => `${i+1}. ${r}`).join('\n')}
 
-YOUR TASK — Create a Cinematic/Sync-Ready Version:
-1. LYRIC AUDIT: First, identify any lyrics that violate sync rules (proper nouns, brand names, dates, explicit content). Rewrite those lines with universal equivalents.
-2. ARRANGEMENT: Rewrite for orchestral/cinematic production. Remove modern production elements. Add strings, piano, light percussion or no drums. The arrangement should support a visual scene, not compete with it.
-3. EMOTIONAL CUE: Identify the primary emotional cue of this song (tension / release / yearning / triumph / melancholy / wonder / intimacy). The arrangement should intensify that single emotion.
-4. PLACEMENT SUGGESTIONS: Based on the lyrics and emotion, suggest 2-3 ideal placement types (trailer / TV drama / ad / documentary / indie film) and why this song fits.
-5. SUNO STYLE: "cinematic, orchestral, strings, piano, emotional, [primary emotion], sync-ready, no drums, film score, [original genre] acoustic"
-6. OUTPUT FORMAT:
+YOUR TASK — Cinematic / Sync Version:
+1. LYRIC AUDIT: find lines that break sync rules (proper nouns, brands, dates, explicit words) and rewrite them with universal equivalents that keep the rhyme, syllable count and stress.
+2. ARRANGEMENT: strings, piano, low pulses, sparse percussion. Build in three editable stages so an editor can cut to picture: [Stage 1 — Intimate], [Stage 2 — Build], [Stage 3 — Full]. Offer a [Trailer Hit] moment (a braam or impact) before the final chorus.
+3. EMOTIONAL CUE: name ONE primary cue (tension, release, yearning, triumph, melancholy, wonder, intimacy) and serve only that.
+4. PLACEMENTS: suggest 2-3 placement types (trailer, TV drama, ad, documentary, sports montage) and why.
+5. OUTPUT FORMAT:
    CINEMATIC TITLE: [title] (Cinematic)
-   SUNO STYLE: [production description]
-   SYNC AUDIT: [list any lyric changes made for sync + why]
-   PLACEMENT FIT: [2-3 ideal placements with brief reason each]
-   PRIMARY EMOTION: [the single emotional cue]
-   [Full sync-safe rewritten lyrics with orchestral section tags]`
+   SUNO STYLE: [the layered style prompt described below]
+   SYNC AUDIT: [each change and why]
+   PLACEMENT FIT: [2-3 placements with a reason each]
+   PRIMARY EMOTION: [the cue]
+   [Full sync-safe lyrics with stage tags]`,
+
+  duet: (song) => `You are a songwriter turning "${song.title}" into a duet: an answer song where the "you" finally sings back.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+ORIGINAL GENRE: ${song.genre || 'pop'}
+
+YOUR TASK — Duet / Answer Song:
+1. VOICE 2 is the person the original is sung to. Give them their own point of view and a different truth. This is the woman in the room answering.
+2. STRUCTURE: [Voice 1] sings original verse 1 unchanged. [Voice 2] writes and sings a NEW verse 2 answering it from their side, set in a new scene. The chorus becomes a split: alternating lines, then both on the title line. A new bridge where their lines overlap and argue. Final chorus with one word changed so the meaning lands differently for each of them (boxes).
+3. Apply all Hit Craft techniques to every new line, including a callback from Voice 2 to a verse-1 image.
+4. OUTPUT FORMAT:
+   DUET TITLE: [title] (feat. the other side)
+   VOICES: [Voice 1 descriptor] / [Voice 2 descriptor]
+   SUNO STYLE: [the layered style prompt described below, naming both voices]
+   [Full lyrics with [Voice 1] [Voice 2] [Both] tags on their own lines]`,
+
+  short_cut: (song) => `You are cutting "${song.title}" into a short-form version for TikTok, Reels and Shorts.
+
+ORIGINAL LYRICS:
+${song.lyrics}
+
+YOUR TASK — Short-Form Cut (30-45 seconds):
+1. OPEN on the hook or the song's single most quotable line. No intro.
+2. BODY: the best 4-8 lines of verse 1 (the lines that set the scene fastest), then the full hook.
+3. LOOP: the last line must flow back into the first line so the cut loops without a seam. Mark [Loop Point].
+4. Keep every kept line word-for-word. Choose; don't rewrite.
+5. OUTPUT FORMAT:
+   SHORT TITLE: [title] (Short Cut)
+   LENGTH: [estimated seconds]
+   CAPTION LINE: [the one lyric line to put on screen as text]
+   SUNO STYLE: [the layered style prompt described below]
+   [The cut lyrics with structure tags and [Loop Point]]`
 };
+
+// Variants that write new lyric lines get the full end-of-prompt Hit Craft
+// checklist; the keep-the-lines variants only get the craft rule for any line
+// they add or change.
+const VARIANT_REWRITES = new Set(['trap_remix', 'gospel_version', 'duet', 'cinematic']);
+
+// Hoisted out of buildSongPrompt so Variants share the Suno v6 style spec.
+function buildSunoStyleSpec(platform) {
+  const cap = platform === 'udio' ? 300 : 800;
+  // Udio's box is far smaller, so it gets a ceiling, not a floor-and-ceiling.
+  const target = platform === 'udio' ? 'under 300' : '500-800';
+  if (platform === 'udio') {
+    // Udio prefers genre/emotion descriptors over instrument detail and has a
+    // much tighter box — keep the original lean field set for it.
+    return { cap, target, fields: `Genre: [core genre + sub-genre, no artist names]
+Instruments: [4-5 key instruments, comma-separated]
+BPM: [range, e.g. 95-100]
+Vocal: [vocal descriptor — no artist names]
+Texture: [production texture in 5-8 words — no artist names]
+Counter-melody: [counter-melody device]`, assembly: `Full prompt: [assemble the fields above into ONE ready-to-paste string, comma-separated, leading with genre and mood descriptors — Udio weights those over instrument detail. Keep it under 300 characters. ABSOLUTELY NO artist names, band names, or "[Name] style" references.]` };
+  }
+  return { cap, target, fields: `Genre: [core genre + sub-genre + era feel, no artist names — e.g. "modern soulful boom bap"]
+BPM: [a SINGLE number when the groove is specific, e.g. "88 BPM"; a tight range only when it genuinely floats]
+Sonic Signature: [the ONE defining sound this track is built on, described in full — the sample and how it is treated, the riff, the synth, the loop. e.g. "warm chopped soul vocal sample loop, pitched vintage vocal chops". This is the most important line here — it is what makes the track sound like ITSELF rather than like its genre.]
+Rhythm Section: [drums AND bass, each CHARACTERISED — never bare nouns. e.g. "punchy crisp drums with hard kick and snappy snare, deep round bass" NOT "drums, bass"]
+Instruments: [2-3 further instruments, each with its character — e.g. "dusty upright piano", "muted horn stabs". Same rule: adjective + instrument, never a bare list.]
+Texture: [production texture in 3-6 words, ideally with a tension in it — e.g. "polished but gritty", "warm but claustrophobic"]
+Vocal: [who + delivery + flow character in one phrase — e.g. "male rapper with a mature reflective storytelling flow" — no artist names]
+Hook Arrangement: [what makes the CHORUS sonically different from the verses — the single most under-used lever in AI music. e.g. "hook is a crew chant with stomps and claps over the soul loop". If the hook is only "the chorus", say what changes: who sings it, what enters, what drops out.]
+Section Moves: [1-2 specific structural events, each tied to WHERE it happens — e.g. "stripped bridge with lone voice over the sample, dramatic beat switch before the final hook into a new chopped sample". Pull these from the ARRANGEMENT BLUEPRINT below so the two agree.]
+Ear Candy: [2-3 signature sounds or motifs that recur and make the track memorable — e.g. "foghorn and ship bell hits, harbor ambience intro". Draw them from the song's own world, not a generic FX shelf.]
+Counter-melody: [counter-melody device]
+Emotional Close: [3-4 adjectives naming the FEELING to land on — e.g. "warm, wise, heartfelt, triumphant". These go last in the full prompt; Suno reads them as the emotional target.]`, assembly: `Full prompt: [assemble the fields above into ONE ready-to-paste string, comma-separated, in EXACTLY this order: genre → BPM → sonic signature → rhythm section → instruments → texture → vocal → hook arrangement → section moves → ear candy → emotional close. Suno weights the FRONT of the string hardest, so the defining sound goes early and the mood adjectives go last. Aim for ${target} characters — that length is the POINT, it is what carries the arrangement. Do not compress it back into a bare noun list. ABSOLUTELY NO artist names, band names, or "[Name] style" references.
+
+GOLD STANDARD — this is the level to hit (note that every instrument is characterised, the hook has its own arrangement, and two section-level events are named):
+"Modern soulful boom bap, 88 BPM, warm chopped soul vocal sample loop, pitched vintage vocal chops, punchy crisp drums with hard kick and snappy snare, deep round bass, polished but gritty, male rapper with a mature reflective storytelling flow, hook is a sea shanty crew chant with stomps and claps over the soul loop, foghorn and ship bell hits, harbor ambience intro, stripped bridge with lone voice over the sample, dramatic beat switch before final hook into a new chopped sample, warm, wise, heartfelt, triumphant"
+Match that DEPTH with THIS song's own world — never reuse its nautical imagery unless this song is actually about the sea.]` };
+}
+
+function _variantCommon(variant) {
+  let fields = '';
+  try { fields = buildSunoStyleSpec('suno').fields; } catch (_) {}
+  return `
+
+STYLE PROMPT (Suno v6): the SUNO STYLE field is NOT a short genre list. Write it as these layered fields in this order, then assemble one 500-800 character string with no artist names:
+${fields}
+
+CRAFT: lines you keep stay exactly as written. Every line you ADD or REWRITE follows both Hit Craft cores and this genre's lens below. If you rewrite a chorus, keep the title in its first or last line and change one word in the final chorus.`;
+}
 
 // Main variant prompt assembler
 function buildVariantPrompt(variant, song) {
@@ -11559,7 +11714,7 @@ function buildVariantPrompt(variant, song) {
   const academicNote = buildAcademicFrameworkNote(safeSong.genre, song.era);
   const edgeNote = buildEdgeNote(song.edgeMode, song.lyricTier, safeSong.genre);
   const regionNote = buildRegionNote(safeSong.genre, song.region);
-  return builder(safeSong) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote() + buildMetaphorBalanceNote() + buildMetaphorPaletteNote(safeSong.genre);
+  return builder(safeSong) + _variantCommon(variant) + craftNote + speedGearsNote + lyricTierNote + velocityNote + academicNote + edgeNote + regionNote + buildCraftFirewallNote() + buildMetaphorBalanceNote() + buildMetaphorPaletteNote(safeSong.genre) + (VARIANT_REWRITES.has(variant) ? buildHitCraftFinalCheck(safeSong.genre) : '');
 }
 
 // ═══════════════════════════════════════════════════════
@@ -11615,8 +11770,8 @@ YOUR TASK — Analyze these lyrics across 9 dimensions. For each dimension give:
 DIMENSIONS TO COVER:
 ${Object.entries(FEEDBACK_DIMENSIONS).map(([k,v]) => `**${v.label}**: ${v.desc}`).join('\n')}
 
-HIT CRAFT SCORECARD (after the dimensions): grade EACH of the eleven Hit Craft techniques as ✅ present / ⚠️ weak / ❌ missing, quote the line that shows it (or where it should go), and give a one-line fix written the way this genre plays it:
-${Object.values(HIT_CRAFT_LABELS).join(' · ')}
+HIT CRAFT SCORECARD (after the dimensions): grade EACH of the twenty-two Hit Craft techniques (Core I and Core II) as ✅ present / ⚠️ weak / ❌ missing, quote the line that shows it (or where it should go), and give a one-line fix written the way this genre plays it:
+${Object.values(HIT_CRAFT_LABELS).concat(Object.values(HIT_CRAFT_II_LABELS)).join(' · ')}
 ${buildHitCraftLensNote(genre, '', '')}
 Automatic text check (advisory, count-based — confirm by reading): ${(() => { try { const h = checkHitCraft(lyrics); return h.issues.length ? h.issues.join('; ') : 'density, micro-repetition, repetition types and scene movement all pass'; } catch (_) { return 'n/a'; } })()}
 
@@ -13193,6 +13348,14 @@ const HIT_CRAFT_FINAL_CHECK = `
 □ SCENE SEQUENCING: verse 2 is a different place/time than verse 1.
 □ DOPAMINE: every section has one withheld-then-paid-off word or a surprise turn.
 □ JUICY LINES: every section, verse 1 included, has one line quotable on its own.
+□ PROSODY: every stressed syllable sits on a strong beat; no forced stresses.
+□ TITLE PLACEMENT: the title is the chorus's first or last line.
+□ RHYME-SCHEME CONTRAST + LADDER: verse and chorus use different end-rhyme patterns; perfect rhymes are saved for the hook and the punchline.
+□ STABLE vs UNSTABLE: verses end open or uneven; the chorus is even and closed.
+□ LINE-LENGTH ASYMMETRY: every section has one clearly short line.
+□ CALLBACK: a verse-1 image returns in the bridge or final verse.
+□ OPEN LOOP + BOXES: verse 1 leaves something unresolved; each chorus means more than the last.
+□ PRONOUN + TENSE: one "you" holds two readings; time moves across sections.
 Do not print this checklist.`;
 
 // Genre-aware version: turns the density rule into hard numbers from
@@ -13222,10 +13385,13 @@ const HIT_CRAFT_SYSTEM_MOVES = `
 NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 1. The FINAL chorus changes exactly ONE word in its key line versus the earlier choruses (incremental repetition). Identical final choruses are wrong.
 2. The song's LAST lyric line echoes verse 1's FIRST line with the meaning turned (bookend).
-3. The hook contains one line spoken straight to a specific "you" — the woman in the room — even in drill, metal or punk (translate it to the genre; never skip it).
+3. Write the hook's "you" line FIRST, before anything else: one line sung straight to a specific "you" — the woman in the room — even in drill, metal or punk. It goes in the CHORUS text itself, not only in a verse. Build the rest of the chorus around it.
 4. Every lyric section repeats a word or short fragment INSIDE a line ("gone, gone", "I know, I know") — not only in ad-lib parentheses.
 5. The final hook displaces a phrase: start its title line on a pickup word or split it across a line break so it lands on a new beat.
-6. Chorus lines are clearly shorter than verse lines.`;
+6. Chorus lines are clearly shorter than verse lines.
+7. The title is the chorus's first or last line.
+8. Verse and chorus use different rhyme schemes; perfect rhyme is saved for the hook and the punchline.
+9. A verse-1 image returns in the bridge or final verse (callback), and verse 1 leaves one thing unresolved that the ending closes.`;
 
 function _withHitCraftClose(fn, genreOf) {
   return function (...args) {
@@ -13240,7 +13406,7 @@ function _withHitCraftClose(fn, genreOf) {
   };
 }
 
-module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
