@@ -77,6 +77,7 @@ const params = {
   punchlineCraft: [], genreCraft: [],
   avoidPatterns: [], avoidHookPatterns: [],
   voice: { name: '', influences: '', forbidden: '' },
+  ...(flags.cast ? { cast: { preset: flags.cast, notes: flags['cast-notes'] || '' } } : {}),
   blend: { genre2: flags.genre2 || '', style2: '', ratio: 70 },
   ...sets,
 };
