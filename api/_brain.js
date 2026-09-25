@@ -2262,7 +2262,8 @@ function checkHitCraft(text) {
   const sections = [];
   let cur = null;
   for (const raw of lines) {
-    const l = raw.trim();
+    // Models sometimes bold their tags (**[Chorus]**) — read through it.
+    const l = raw.trim().replace(/^\*\*(\[[^\]]+\])\*\*/, '$1');
     const h = l.match(/^\[([^\]]+)\]/);
     // Only real section headers open a section; production tags on their own
     // line ([808 Bass], [Whispered], [Build]) stay inside the current one.
@@ -11688,6 +11689,8 @@ function _variantCommon(variant) {
 
 STYLE PROMPT (Suno v6): the SUNO STYLE field is NOT a short genre list. Write it as these layered fields in this order, then assemble one 500-800 character string with no artist names:
 ${fields}
+
+FORMAT: plain text only. No markdown: no **bold**, no # headers, no --- rules. Section and delivery tags are plain [Tag] lines, because this text is pasted straight into Suno.
 
 CRAFT: lines you keep stay exactly as written. Every line you ADD or REWRITE follows both Hit Craft cores and this genre's lens below. If you rewrite a chorus, keep the title in its first or last line and change one word in the final chorus.`;
 }

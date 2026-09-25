@@ -710,7 +710,7 @@ module.exports = async function handler(req, res) {
       const built = brain.buildFeedbackPrompt(p.lyrics, p.genre, p.topic);
       messages   = [{ role: 'user', content: built.prompt }];
       system     = built.system;
-      max_tokens = 4096; // 2048 cut off: coach grades 9 dimensions + 22 Hit Craft techniques
+      max_tokens = 8192; // 4096 still cut off: coach grades 9 dimensions + 22 Hit Craft techniques
     } catch (err) {
       console.error('Feedback prompt build failed:', err.message);
       return res.status(500).json({ error: 'Feedback prompt error: ' + err.message });
@@ -727,7 +727,7 @@ module.exports = async function handler(req, res) {
       const built = brain.buildEditPrompt(p);
       messages   = [{ role: 'user', content: built.prompt }];
       system     = built.system;
-      max_tokens = 4096; // 2048 cut off: coach grades 9 dimensions + 22 Hit Craft techniques
+      max_tokens = 8192; // 4096 still cut off: coach grades 9 dimensions + 22 Hit Craft techniques
     } catch (err) {
       console.error('Edit prompt build failed:', err.message);
       return res.status(500).json({ error: 'Edit prompt error: ' + err.message });
