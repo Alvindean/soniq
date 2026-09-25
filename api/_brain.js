@@ -9223,6 +9223,8 @@ A tag not on this list is fine if it names a real sound plainly — [Foghorn], [
 PARENTHESES () = ad-libs and background vocal layers ONLY — never use () for structural or delivery purposes.
   Same line as a lyric = rhythmic pocket filler. Standalone line = spotlight ad-lib moment.
 
+HIT CRAFT SHAPE — write it this way on the page: the LAST [Chorus] changes ONE word in its key line versus the earlier choruses; the hook holds one line sung straight to a specific "you"; the final lyric line echoes Verse 1's first line with the meaning turned.
+
 Every word must earn its place. No bracket tag = that section does not exist.]
 
 STYLE/LYRIC CONTRACT — the two halves of this output must describe the SAME record.
@@ -9786,7 +9788,8 @@ LYRICS:
 TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [Bridge] · [Outro]
 TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]
 TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [Build] · [Drop] · [Swell] · [Choir] · [808 Bass] · [Steel Guitar]
-PARENTHESES () = ad-libs only — never structural. Every word must earn its place.]
+PARENTHESES () = ad-libs only — never structural. Every word must earn its place.
+HIT CRAFT SHAPE: the LAST [Chorus] changes ONE word in its key line; the hook holds one line sung straight to a specific "you"; the final lyric line echoes Verse 1's first line, turned.]
 
 SONG PROMPT:
 ⚠️ SUNO COMPLIANCE — MANDATORY: ZERO artist names, band names, or "[Name] style" references. Suno rejects prompts that name artists. If a PRODUCTION LOCK above contains any artist name, STRIP IT and replace with era/region/technique/vocal-quality descriptors. Also: never write bare "live" for real instruments (Suno hears a LIVE AUDIENCE + arena reverb) — use "real/organic/acoustic/session" (e.g. real drums); reserve "crowd/live audience/crowd chant" for intentional crowd sound.
