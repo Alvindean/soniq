@@ -445,13 +445,14 @@ function streamBuffered(text, score, res) {
   // Advisory only: it reports evidence and never gates or rewrites, because it
   // cannot tell a deliberate verse-2 Time Jump from a genuine slip. Wrapped so a
   // checker bug can never break a generation that already succeeded.
-  let continuity = null, contract = null;
+  let continuity = null, contract = null, hitcraft = null;
   try {
     const _b = require('./_brain.js');
     continuity = _b.checkContinuity(text);
     contract = _b.checkStyleLyricContract(text);
+    if (typeof _b.checkHitCraft === 'function') hitcraft = _b.checkHitCraft(text);
   } catch (_) { /* non-fatal — ship the song without the advisories */ }
-  res.write(`data: ${JSON.stringify({done: true, score, continuity, contract})}
+  res.write(`data: ${JSON.stringify({done: true, score, continuity, contract, hitcraft})}
 
 `);
   res.end();

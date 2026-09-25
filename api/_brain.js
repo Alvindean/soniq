@@ -1005,7 +1005,7 @@ const RAP_STYLE_ADLIBS = {
 // ─────────────────────────────────────────────────────────────────────────────
 // LYRIC CRAFT TOOLKIT — universal techniques, genre + mode filtered per song.
 // Each technique has a short-form instruction used in the live prompt.
-// buildLyricCraftNote(genre, mood, topic) selects the relevant set based on
+// buildLyricCraftNote(genre, mood, topic, substyle, crossGenre) selects the relevant set based on
 // BOTH genre match AND mood-signal match (for cross-cutting frameworks like
 // the comedy / parody craft below, which apply to any genre when mood signals
 // funny / playful / absurd / etc.).
@@ -1573,9 +1573,684 @@ HIT CRAFT CORE — MANDATORY, every song (these are NOT part of the 3-5 selectio
 9. SCENE SEQUENCING — each section is ONE camera shot: a specific place, time, and image. Scenes move forward in time or space (bedroom → car → her porch), never re-describe the same shot. Verse 2 must be a NEW scene, not verse 1 reworded.
 10. REPETITION PHRASE TYPES — use at least THREE different kinds of repetition: exact repeat (the hook), incremental repeat (same line with one word changed each time), a refrain tag ending each verse, call-and-response, or a bookend (the first line returns as the last, with its meaning changed).
 11. JUICY LINES — every section carries at least one line so specific, sensory, and sonically rich (internal consonance/assonance, one unexpected word) that it gets quoted alone. Verse 1 included. A section with no juicy line gets rewritten.
+GENRE LENS: the genre-specific block below says HOW each technique sounds in this idiom and its numbers override the defaults above. Where a technique is unusual for the genre (e.g. the woman in the room inside drill), TRANSLATE it — never skip it.
+MELODIC-UNITY TRUCE: if a Prince Method / melodic-unity note is active, keep its twinned verse/chorus grid and create density contrast INSIDE it — fewer distinct words held on the same strong beats, long vowels, melisma — or put the density shift in its sanctioned departure (pre-chorus / bridge). Never break a twinned tune to hit a syllable number.
 Apply all eleven silently. Never print these labels, ratios, or notes in the lyrics.`;
 
-function buildLyricCraftNote(genre, mood, topic) {
+// HIT CRAFT GENRE LENS — how each of the eleven Hit Craft Core techniques is
+// PLAYED in each genre. The core says WHAT is mandatory; the lens says HOW it
+// sounds in this idiom. Deliberately includes non-obvious fits (the woman in
+// the room inside drill, micro-repetition inside a jazz ballad) — the owner
+// wants those translated, not skipped. Genre lens numbers override the core's
+// default ratios. Keys: sync, density, shadow, dopamine, displace, woman, back,
+// micro, scene, reps, juicy.
+const HIT_CRAFT_GENRE_LENS = {
+  hiphop: {
+    sync: "Verses 55-70% off-beat: land rhymes on the 'and', start bars on pickups, let multis straddle the bar line. Hook drops to ~25% so the crowd can shout it on the one.",
+    density: "Switch gears inside the verse: double-time run → half-time bars → one bar of near-silence. Hook is the sparsest thing in the song (4-6 words per line).",
+    shadow: "Set a bar's cadence template (e.g. 3-3-2 syllable clusters) and ride it for 2-4 bars with new words; plant the hook cadence as a shadow in bar 1-2 of verse 1.",
+    dopamine: "Set up the multi, then delay the payoff rhyme one bar with a filler bar that looks like a miss — then land it harder. Punchline on bar 4/8/16 is the release.",
+    displace: "Repeat the hook's tag phrase but start it on beat 2 or the 'and' of 4 on the final hook; rap the same line twice in a verse starting on different beats.",
+    woman: "Mid-flex, drop ONE unguarded bar aimed at her ('you seen me broke, you ain't flinch') — the vulnerable bar in a cold verse is what she quotes. Hook stays a line she'd caption.",
+    back: "Enter bars late, after the kick, and let the last word drag into the next bar (Snoop/Future pocket). Back-phrase the last line into the hook.",
+    micro: "Stutter-repeats and ad-lib echoes: 'gone gone', 'I know, I know', a word repeated with a (yeah) answer. Triplet repeats ('run it, run it, run it') in trap.",
+    scene: "Each verse is one location with a timestamp: 'the Cutlass at 3am' → 'the courthouse steps' → 'mama's kitchen now'. Never re-describe the block.",
+    reps: "Exact hook + incremental hook (one word swapped on the last hook) + call-and-response ad-libs + a bar that bookends verse 1 in the outro.",
+    juicy: "A quotable bar per 8: a brand/place/number made into a double meaning, heavy internal assonance, one word nobody else would pick."
+  },
+  pop: {
+    sync: "Verses ~40% off-beat (conversational pickups); pre-chorus rises in syncopation; chorus ~20% — every stress on the grid so a stadium can sing it.",
+    density: "Wordy, observational verse → 3-6 word chorus lines with open vowels. Post-chorus is even sparser (one word or a vocal chop).",
+    shadow: "Verse 1 line 2 carries the chorus's exact rhythm with different words — the hook feels like deja vu on first listen.",
+    dopamine: "Pre-chorus withholds the title (implies it, circles it), chorus line 1 pays it off; one unexpected word in the final chorus.",
+    displace: "Final chorus: move the title from line 1 to a pickup entrance or sing it starting on beat 2 — same words, new shock.",
+    woman: "The hook is the text she sends at 1am or the caption under a mirror selfie. Direct 'you', present tense, one confession.",
+    back: "Last verse line enters late and spills over the bar so the chorus downbeat lands like a release.",
+    micro: "'Oh-oh', 'baby baby', 'I, I, I' — a stuttered syllable in the chorus or post-chorus that doubles as the ear candy.",
+    scene: "Verse 1 = the room, Verse 2 = the drive home/the next morning, Bridge = the flash-forward. One shot each.",
+    reps: "Exact chorus + incremental chorus (one word flipped last time) + post-chorus chant + a bookended opening line.",
+    juicy: "One line per section with a specific brand/object/time and a surprising verb — the TikTok caption line."
+  },
+  rnb: {
+    sync: "Heavy off-beat phrasing in verses (~55%), lazy pickups, words floating over the grid; chorus anchors more (~30%) but keeps one late-landing word.",
+    density: "Verses conversational and full; chorus stretches few words across long melismatic notes — density contrast via runs, not word count.",
+    shadow: "The chorus's rhythm hides in the verse's first two lines; ad-lib runs echo the hook rhythm on 'ooh' before the hook arrives.",
+    dopamine: "Hold the resolving note/word (a run that hangs before the last word), and delay the chorus with an extra pre-chorus bar.",
+    displace: "The hook phrase returns in the outro ad-libs starting in different spots of the bar, riffed around.",
+    woman: "This is the home genre of it: every hook is spoken directly to her, intimate, second person, a little dangerous. Keep the brag out of the hook.",
+    back: "Behind-the-beat everything — drag the phrase, start late, glide into the downbeat of the next bar.",
+    micro: "'Baby, baby', 'yeah yeah yeah', a stuttered name, a repeated 'tell me, tell me' as the pre-chorus lift.",
+    scene: "Candlelit room → the car outside her place → the voicemail the next day. Sensory: fabric, perfume, streetlight.",
+    reps: "Exact hook + ad-lib answers (call-and-response) + incremental hook + a bookend whisper line.",
+    juicy: "One sensory, slightly explicit-by-implication line per section — a specific object that stands in for touch."
+  },
+  country: {
+    sync: "Verses ~30% off-beat (storytelling on the grid with a few pickups); chorus ~20%. Syncopate the TWIST word so it pops.",
+    density: "Detail-heavy story verse → big open chorus built around the title phrase with long vowels.",
+    shadow: "The title's rhythm appears in verse 1 inside a normal sentence before it becomes the hook.",
+    dopamine: "The title flip: chorus means one thing first time, a sadder/funnier thing by the last chorus. Hold the reveal until the bridge.",
+    displace: "Last chorus title starts on a pickup or after a stop-time rest.",
+    woman: "The hook is the line she sings loudest at the bonfire — nostalgia, loyalty, or the one that got away, addressed to 'you'.",
+    back: "A drawled late entry into the chorus; the last word of a verse line hangs over the bar.",
+    micro: "'Gone, gone, gone', 'drive, drive', a repeated town name — small and plainspoken.",
+    scene: "Classic three-scene arc: the tailgate at 17 → the church or the wedding → the porch at 60. Names, roads, brands.",
+    reps: "Exact chorus + meaning-shifting title (incremental) + a verse tag line + a bookend (first image returns changed).",
+    juicy: "A plainspoken line with a twist nobody saw coming — the Nashville 'turn of phrase'."
+  },
+  edm: {
+    sync: "Topline ~30% off-beat against a straight kick; the drop's vocal chop is heavily syncopated (60%+) — that's the hook.",
+    density: "Verse/breakdown lyric is sparse already; the build compresses a phrase by repeating it faster; the drop is 1-3 words or a chop.",
+    shadow: "The drop's chop rhythm is sung as a normal line in the breakdown first.",
+    dopamine: "The build IS dopamine: withhold, filter, snare roll, a lyric that asks a question, then the drop answers with the chop.",
+    displace: "Chop the hook word and re-trigger it on different 16ths through the drop.",
+    woman: "The line she screams with her eyes closed at the festival — euphoric, direct, 'you' as the whole crowd.",
+    back: "Topline enters late in the breakdown bars, floating; tighten onto the grid in the build.",
+    micro: "The chop itself: 'I-I-I', 'la-la-love' — micro-repetition is the drop.",
+    scene: "Breakdown = the quiet moment (sunrise, the car park), build = the rush, drop = inside the crowd.",
+    reps: "Exact topline hook + chopped hook + build repeats that shorten (incremental) + a bookended intro vocal.",
+    juicy: "One vivid, universal line in the breakdown — short enough to fit on a festival banner."
+  },
+  rock: {
+    sync: "Verses ~35% off-beat against the riff; chorus ~20%, lock with the drums for the fist-pump.",
+    density: "Muttered or talky verse → shouted, wide-vowel chorus with half the syllables.",
+    shadow: "The chorus rhythm mirrors the main riff's rhythm — plant it as a verse line first.",
+    dopamine: "Quiet-loud: withhold distortion and the title, then detonate both on chorus bar 1. Stop-time before the last chorus.",
+    displace: "Last chorus: title shouted a beat early over the stop, then returns on the one.",
+    woman: "The hook she screams in the car with the windows down — defiance or longing aimed at one 'you'.",
+    back: "Late-entering verse lines riding over the riff; pushed (ahead) chorus for urgency.",
+    micro: "'Hey! hey!', 'no, no, no', a repeated gang-shout word.",
+    scene: "The basement show → the highway → the empty apartment. Grit, sweat, specific streets.",
+    reps: "Exact chorus + gang-vocal response + incremental chorus + a bookended riff/lyric line.",
+    juicy: "One sneering or wounded line per section with a hard-consonant ending."
+  },
+  altrock: {
+    sync: "Verses ~40% off-beat, angular and conversational; chorus ~25% but let one word slip late for unease.",
+    density: "Deadpan dense verse → wide-open chorus; or the reverse (whispered chorus after a loud verse) for inversion.",
+    shadow: "An oblique verse line secretly carries the chorus rhythm — a half-memory.",
+    dopamine: "Ambiguity then a single crystal-clear line that finally lands the meaning.",
+    displace: "Repeat a line starting on a different beat so it feels like a skipping record.",
+    woman: "The line she underlines in her notes app — oblique but aimed at one 'you'; intimacy through strangeness.",
+    back: "Drag behind the beat, detached delivery, late entries.",
+    micro: "Obsessive micro-loops: 'over and over and over', a repeated word that turns into texture.",
+    scene: "Surreal but specific scenes: the fluorescent 7-Eleven, the swimming pool at night.",
+    reps: "Incremental repetition dominates + exact chorus + bookend + a mantra outro.",
+    juicy: "An image that shouldn't connect and does — the line fans tattoo."
+  },
+  metal: {
+    sync: "Verse vocals ride palm-muted chugs off-beat (~50%) in the breakdown; the clean chorus sits on the grid (~20%).",
+    density: "Harsh verses dense and rhythmic → clean chorus melodic and sparse. Breakdown = 1-3 words max.",
+    shadow: "The breakdown's chug rhythm is the chorus rhythm half-time — plant it as a shouted verse line.",
+    dopamine: "The breakdown call ('get up') held back until the last possible moment; a clean chorus after harsh verses is the reward.",
+    displace: "Breakdown shout re-triggered on different beats of the chug pattern.",
+    woman: "Metal's version: the one person in the pit who needs this — the clean chorus speaks to her grief or rage directly. Not a love song; a lifeline.",
+    back: "Harsh vocals enter after the downbeat hit; clean vocals drag slightly over the riff.",
+    micro: "Gang shouts and repeated single words ('Burn! Burn!').",
+    scene: "Mythic or literal scenes: the hospital bed, the burning field, the cell — one per section.",
+    reps: "Exact clean chorus + breakdown chant + incremental chorus + bookend.",
+    juicy: "One visceral line with a brutal specific verb per section."
+  },
+  punk: {
+    sync: "Mostly on the grid (~25%); speed is the energy. Syncopate only the insult/slogan word.",
+    density: "Fast, packed verse → 2-4 word gang chorus.",
+    shadow: "The slogan chorus rhythm sneaks into verse 1 as a throwaway line.",
+    dopamine: "The 1-2-3-4 count and a stop before the slogan; the last chorus doubles in speed or cuts to a cappella.",
+    displace: "The slogan chanted off the beat at the end, crowd-style.",
+    woman: "The girl in the front row with the marker-written hands — the chorus is her anthem of not fitting in.",
+    back: "Mostly ahead of the beat (urgency); back-phrase one line per song for a sneer.",
+    micro: "'Oi! oi!', 'no, no, no', 'hey ho'.",
+    scene: "The suburb, the detention room, the gig — real, grubby places.",
+    reps: "Exact slogan + gang response + bookend + one incremental twist.",
+    juicy: "A snotty, funny, specific line that could be a patch on a jacket."
+  },
+  folk: {
+    sync: "Mostly on the grid (~20%); speech-rhythm pickups create gentle syncopation on key words.",
+    density: "Wordy narrative verses → a short refrain or chorus line.",
+    shadow: "Every verse follows the first verse's exact rhythm with new words — the ballad form IS shadow rhythm; make the refrain rhythm appear inside verse 1.",
+    dopamine: "Incremental storytelling: each verse withholds a fact the refrain eventually reveals.",
+    displace: "The refrain line re-enters one beat late on the final verse.",
+    woman: "The one listening by the fire — sing to her as 'you' inside the story, so she's in the song.",
+    back: "Relaxed late phrasing like speech; let lines spill.",
+    micro: "'Down, down, down', 'oh, the river, the river'.",
+    scene: "Classic ballad scene sequence: the mill → the wedding → the grave. Seasons move.",
+    reps: "Refrain tag after each verse + incremental repetition + bookend + a sing-along chorus.",
+    juicy: "An old-fashioned, weather-and-wood image with one modern surprise word."
+  },
+  ss: {
+    sync: "Conversational rhythm (~35% off-beat): phrase like talking, pickups on the important words.",
+    density: "Diary-dense verses → a simple, repeatable chorus or refrain line.",
+    shadow: "The refrain rhythm hides in verse 1 as a normal sentence.",
+    dopamine: "Withhold the confession until the bridge; the last chorus means something new.",
+    displace: "Last refrain delayed a beat — a breath before the truth.",
+    woman: "Sing to one person who is actually in the room; the hook is what you'd say if she looked up.",
+    back: "Late entry, speech-like drags, lines that run over the bar like thought.",
+    micro: "'I know, I know', 'stay, stay'.",
+    scene: "Hyper-specific rooms: the Honda's cup holder, the kitchen at 4am.",
+    reps: "Refrain tag + bookend + incremental chorus + one exact repeated line.",
+    juicy: "A house-number-level specific detail that hurts."
+  },
+  jazz: {
+    sync: "Swing phrasing: 50%+ off-beat, anticipations on the 'and' of 4, lines that cross bar lines.",
+    density: "Scatted/dense bridge vs. sparse, held melody on the head.",
+    shadow: "Repeat the head's rhythm with new words in the second A section (AABA form is shadow rhythm).",
+    dopamine: "Delay the resolving word over the turnaround; the witty last line of the A section.",
+    displace: "Restate the title phrase starting on a different beat each A section.",
+    woman: "The torch-song angle: the whole lyric is spoken to one person across a smoky room.",
+    back: "Classic behind-the-beat vocal jazz phrasing (Billie Holiday).",
+    micro: "Scat fragments, 'you, you, you', repeated title words.",
+    scene: "The bar, the rain on 52nd Street, the last train. Noir detail.",
+    reps: "AABA exact heads + incremental title + scat call-and-response + a tag ending.",
+    juicy: "A witty, urbane line with an internal rhyme (Cole Porter energy)."
+  },
+  blues: {
+    sync: "Moderate (~40%); lazy shuffle pickups, rhymes landing late.",
+    density: "AAB: the A line is stated, repeated; the B line is denser and lands the twist.",
+    shadow: "The A line's rhythm repeats exactly (AAB form is built-in shadow rhythm).",
+    dopamine: "AAB is the dopamine machine: two As build expectation, the B line pays off with a twist.",
+    displace: "Sing the repeated A line starting later the second time.",
+    woman: "Blues is already sung to her — the woman who left or the one who stayed; make her specific.",
+    back: "Way behind the beat; let the guitar answer in the gap.",
+    micro: "'Lord, lord', 'mmm-mmm'.",
+    scene: "The railroad, the juke joint, the empty bed — one scene per 12-bar.",
+    reps: "AAB exact repeat + guitar call-and-response + tag + incremental last verse.",
+    juicy: "A plain, funny, bitter line with a double entendre."
+  },
+  neosoul: {
+    sync: "High off-beat (~60%), Dilla-swung phrasing; chorus ~40% — it still breathes.",
+    density: "Loose, conversational verses → mantra-like chorus with few words.",
+    shadow: "The mantra's rhythm floats through the verse as a hum or ad-lib.",
+    dopamine: "Hold a chord/word unresolved; the chorus resolves it softly.",
+    displace: "The mantra line shifts around the bar in the outro vamp.",
+    woman: "Speak to her mind, not her body — affirmation, sensuality, spiritual intimacy.",
+    back: "Everything behind the beat; late entries are the vibe.",
+    micro: "'Mmm', 'on and on', 'baby, baby'.",
+    scene: "Incense, vinyl, the bookstore, Sunday morning — warm specifics.",
+    reps: "Mantra chorus (exact) + outro vamp (incremental ad-libs) + call-and-response.",
+    juicy: "A poetic, slightly philosophical line with texture words."
+  },
+  gospel: {
+    sync: "Choir sections on the grid (~20%); the lead's ad-lib vamp heavily syncopated (60%+).",
+    density: "Testimony-dense verse → simple congregational chorus (4-6 words).",
+    shadow: "The chorus rhythm appears inside the testimony verse first.",
+    dopamine: "The vamp modulates up and repeats until release — delay the final 'Hallelujah'.",
+    displace: "Vamp phrases re-enter on different beats as the lead improvises.",
+    woman: "The one woman in the pew who's struggling — the chorus is the word she needs today.",
+    back: "Lead back-phrases over the choir; choir stays on the beat.",
+    micro: "'Yes, yes, yes', 'Lord, Lord', 'I won't, I won't'.",
+    scene: "The hospital hallway → the kitchen table bills → the altar.",
+    reps: "Exact chorus + call-and-response (lead/choir) + vamp repeats that climb + a bookend.",
+    juicy: "A testimony line with a specific life detail that turns into praise."
+  },
+  reggae: {
+    sync: "Vocal floats off the one-drop (~45%); chorus is a comforting mantra on the offbeat skank.",
+    density: "Conscious, fuller verse → a simple chanted chorus.",
+    shadow: "The chorus rhythm is voiced first as a verse line over the skank.",
+    dopamine: "The dub break withholds the vocal, then the chorus returns with echo.",
+    displace: "Chorus phrase re-entered on different offbeats in the outro vamp.",
+    woman: "Lovers Rock energy even in a conscious song — one verse addressed to her, tender.",
+    back: "Laid-back, late, relaxed phrasing.",
+    micro: "'Jah, Jah', 'one, one', 'yeah yeah'.",
+    scene: "The yard, the bus to town, the hills at dusk.",
+    reps: "Chanted chorus + vamp + call-and-response + bookend.",
+    juicy: "A proverb-like line with a patois twist."
+  },
+  dancehall: {
+    sync: "Very high (65%+): the vocal pattern bounces against the riddim's offbeats.",
+    density: "Toasting verses packed with syllables → a short, chantable hook.",
+    shadow: "The hook's riddim flow shows up in verse bar 1.",
+    dopamine: "Stop the riddim, deliver the punch line a cappella, drop back in.",
+    displace: "Hook chant shifted around the riddim in the outro.",
+    woman: "Dancehall's native address — the gal dem in the room. Make the hook a compliment she'd repeat.",
+    back: "Mostly ahead/on, with one lazy back-phrased line per verse for swagger.",
+    micro: "'Wine, wine, wine', 'bad, bad', a repeated patois word.",
+    scene: "The street dance, the sound system, the corner shop.",
+    reps: "Chant hook + crowd call-and-response + incremental hook.",
+    juicy: "A slick patois punchline."
+  },
+  afrobeats: {
+    sync: "High (~55%) — vocal dances around the percussion; hook is syncopated but simple.",
+    density: "Loose conversational verses → a hook with very few words, repeated.",
+    shadow: "The hook's rhythm hums through verse 1 as an ad-lib.",
+    dopamine: "Hold the hook one extra bar of groove; call-and-response pays it off.",
+    displace: "Hook fragment moved around the bar with the percussion.",
+    woman: "Native to the genre — the hook praises her directly, joyful and specific.",
+    back: "Relaxed, late phrasing over the shekere.",
+    micro: "'Ehn, ehn', 'o, o', 'jo, jo'.",
+    scene: "The Lagos party, the beach, the rooftop at night.",
+    reps: "Exact hook + call-and-response + ad-lib vamp.",
+    juicy: "A pidgin/Yoruba line with a flirty twist."
+  },
+  amapiano: {
+    sync: "Vocal lines sit loose and syncopated (~50%) over the log drum.",
+    density: "Very sparse — chants and short phrases; the log drum is the density.",
+    shadow: "The chant rhythm follows the log-drum pattern.",
+    dopamine: "Long builds of groove before the vocal chant enters.",
+    displace: "Chant phrase shifted against the log drum.",
+    woman: "The chant is sung to her on the dance floor.",
+    back: "Very late, lazy entries that let the log drum speak first.",
+    micro: "Repeated one-word chants.",
+    scene: "The township party, the car at night.",
+    reps: "Chant exact + vamp + call-and-response.",
+    juicy: "One Zulu/English slang line that becomes the dance-floor caption."
+  },
+  latin: {
+    sync: "High (50%+), riding clave or montuno; chorus coro still syncopated but tight.",
+    density: "Sung verses → coro answered by pregón in salsa; romantic long notes in bachata.",
+    shadow: "The coro's rhythm is sung inside verse 1.",
+    dopamine: "Montuno section builds with call-and-response, then the mambo break.",
+    displace: "Coro phrase against clave from the 2-side then the 3-side.",
+    woman: "Direct romantic address in Spanish — the line she'd sing back.",
+    back: "Relaxed phrasing in bachata/bolero, tight in salsa.",
+    micro: "'Ay, ay, ay', 'dale, dale'.",
+    scene: "The plaza, the dance hall, the balcony.",
+    reps: "Coro-pregón call-and-response + exact coro + incremental.",
+    juicy: "A passionate line with a vivid image."
+  },
+  reggaeton: {
+    sync: "Dembow-locked flow, highly syncopated (60%+); hook syncopation stays high — it's the groove.",
+    density: "Dense verses → chantable hook.",
+    shadow: "The hook's flow appears in verse 1 bar 1.",
+    dopamine: "Beat drop-out, then the perreo hook.",
+    displace: "Hook shifted across dembow hits.",
+    woman: "Direct address to her on the dance floor — the hook she sings back.",
+    back: "Lazy back phrasing on the romantic hook.",
+    micro: "'Dale, dale', 'mami, mami'.",
+    scene: "The club, the car, the after-party.",
+    reps: "Exact hook + ad-libs + incremental.",
+    juicy: "A flirty, bold line."
+  },
+  bossa: {
+    sync: "Gentle syncopation (~45%) against the bossa guitar.",
+    density: "Sparse and whispered throughout; contrast is between long held notes and quick murmurs.",
+    shadow: "Each verse follows the first verse's rhythm (like 'Girl from Ipanema').",
+    dopamine: "Harmony shifts delay resolution; the last word softly lands.",
+    displace: "Repeat a phrase starting on a different beat of the bossa pattern.",
+    woman: "Native — the whole song is sung to her walking by.",
+    back: "Soft, relaxed, behind the beat.",
+    micro: "'Tão, tão', 'sim, sim'.",
+    scene: "The beach, the balcony, the café.",
+    reps: "Exact refrain + incremental + bookend.",
+    juicy: "A delicate, sensual image."
+  },
+  kpop: {
+    sync: "Rap parts 60%+ off-beat; chorus ~25% on the grid for the dance break.",
+    density: "Genre-switching sections: dense rap → sparse chorus → one-word dance break.",
+    shadow: "The chorus rhythm planted in the pre-chorus.",
+    dopamine: "The pre-chorus build then the killing part; the dance break withholds the vocal.",
+    displace: "Hook word displaced in the dance break.",
+    woman: "The line fans chant back at the concert — a direct 'you'.",
+    back: "Mixed: rap back-phrased, chorus tight.",
+    micro: "Hook words repeated ('ddu-du ddu-du').",
+    scene: "Concept-driven scenes that change each section.",
+    reps: "Exact hook + chant + English-Korean incremental.",
+    juicy: "The killing-part line."
+  },
+  cpop: {
+    sync: "Moderate (~35%), ballad-leaning; chorus on the grid.",
+    density: "Poetic verses → soaring chorus.",
+    shadow: "The chorus rhythm echoed in the verse.",
+    dopamine: "Hold the key change until the last chorus.",
+    displace: "The title phrase shifted in the last chorus.",
+    woman: "Direct romantic address, poetic.",
+    back: "Let the verse drift a hair late like a sigh, then land the chorus squarely on the one.",
+    micro: "A doubled tender word in the chorus ('ni, ni' / 'stay, stay') that doubles as the ear candy.",
+    scene: "Seasonal imagery — rain, cherry blossoms, city lights.",
+    reps: "Exact chorus + bookend.",
+    juicy: "A poetic image with a modern twist."
+  },
+  bollywood: {
+    sync: "Moderate (~40%) — dhol grooves syncopated; chorus on the grid.",
+    density: "Poetic verses → hook chant.",
+    shadow: "Hook rhythm hidden in verse.",
+    dopamine: "The dhol build and the hook drop.",
+    displace: "Hook phrase moved across the tabla pattern.",
+    woman: "Direct romantic address — the hero sings to her.",
+    back: "Romantic lines float late over the tabla; the filmi hook lands on the one.",
+    micro: "Repeated words like 'dil, dil'.",
+    scene: "Film-scene sequencing — the wedding, the rain, the train.",
+    reps: "Exact hook + call-and-response.",
+    juicy: "A poetic line with a twist."
+  },
+  tvmusical: {
+    sync: "On the grid (~20%) — character-driven, clear diction; patter songs syncopated.",
+    density: "Patter verse (dense) vs. soaring chorus (sparse).",
+    shadow: "Reprise: the chorus rhythm returns with new lyrics in a later scene.",
+    dopamine: "The 11 o'clock number moment: hold the belt note.",
+    displace: "Reprise phrase starting later.",
+    woman: "The character sings to her — in-scene direct address.",
+    back: "Mostly on the beat; back-phrase in the ballad.",
+    micro: "Repeated words in the patter ('Wait, wait, wait').",
+    scene: "Each section advances the plot — a scene per verse.",
+    reps: "Reprise + exact chorus + call-and-response ensemble.",
+    juicy: "A witty, character-specific line."
+  },
+  children: {
+    sync: "Low (~15%) — clear and clappable; one syncopated word for fun.",
+    density: "Short, simple lines throughout; chorus sparser.",
+    shadow: "Every verse uses the same rhythm (easy to learn).",
+    dopamine: "The counting/reveal game: 'what comes next?' then the answer.",
+    displace: "A fun delay before the last word (let the kids shout it).",
+    woman: "Reinterpreted: the parent in the room — write a line that makes the grown-up smile too.",
+    back: "On the beat for clarity.",
+    micro: "'Clap, clap, clap', 'jump, jump'.",
+    scene: "Each verse a new place or animal.",
+    reps: "Exact chorus + incremental (add one thing per verse) + call-and-response.",
+    juicy: "A silly, vivid image kids repeat."
+  },
+  parody: {
+    sync: "Match the original's syncopation exactly; the joke is the contrast.",
+    density: "Mirror the original's density; pack the joke words in.",
+    shadow: "The original's rhythm IS the shadow rhythm — fit new words to it exactly.",
+    dopamine: "Set up the expected lyric from the original, then swap in the joke.",
+    displace: "Delay the punchline word for comic timing.",
+    woman: "Reinterpreted: the person who gets the joke — write the in-joke she'd share.",
+    back: "Comic late entries.",
+    micro: "Repeat the funny word.",
+    scene: "Absurdly mundane scenes.",
+    reps: "Exact chorus parody + incremental absurdity.",
+    juicy: "The line people quote to their friends."
+  },
+  comedy: {
+    sync: "Low (~20%) — clarity for the punchline; syncopate only the reveal word.",
+    density: "Setup dense → punchline short.",
+    shadow: "Every verse uses the same setup rhythm so the audience expects the punchline shape.",
+    dopamine: "Rule of three: two setups then the twist.",
+    displace: "A pause before the punchline.",
+    woman: "Reinterpreted: the friend who texts 'omg this is you' — relatable roast.",
+    back: "Delayed punchline delivery.",
+    micro: "Repeating the absurd word.",
+    scene: "Mundane escalating scenes.",
+    reps: "Callbacks + incremental absurdity + bookend.",
+    juicy: "The quotable punchline."
+  }
+};
+
+// Substyle tuning — one line per substyle naming which Hit Craft techniques
+// LEAD in that style and how. Parent-genre lens still applies underneath.
+// Keys are matched loosely (case/punctuation-insensitive) so Rap Lab's
+// rapStyle ('trap', 'boombap') hits 'Trap' / 'Boom Bap'.
+const HIT_CRAFT_SUBSTYLE_TUNING = {
+  // hiphop
+  'Trap': "Triplet micro-repetition ('run it, run it, run it') + hook syncopation locked to hi-hat rolls; density contrast = triplet verse vs 4-word hook.",
+  'Boom Bap': "Shadow rhythms over a 90 BPM loop (4-bar cadence templates), juicy multi-syllable bars every 4, back phrasing against the dusty snare.",
+  'Lyrical/Conscious': "Scene sequencing leads (each verse a different life/POV); juicy lines are the philosophy; one bar to the woman in the room humanizes the lecture.",
+  'Drill': "Syncopation 65%+ riding sliding 808s; back phrasing behind the beat; the woman in the room = the one cold line about who waited for him, dropped mid-menace.",
+  'Ambient Drill': "Drill syncopation with half the density — sparse bars floating late over pads; micro-repetition as a hypnotic tag.",
+  'Melodic Rap': "Sung-rap hybrid: density contrast via melody, hook written to her; micro-repetition in the auto-tuned hook ('I, I, I').",
+  'Old School': "On-the-grid syncopation (~30%), call-and-response crowd reps, party-scene sequencing.",
+  'G-Funk': "Maximum back phrasing (lazy West Coast drag), cruising scene sequence, the sung Nate Dogg-style hook is where the woman in the room lives.",
+  'Bay Area': "Hyphy displacement — slang tags re-triggered on odd beats; micro-repetition of slang ('hella, hella').",
+  'Down South': "Drawled back phrasing, chant reps, hook syncopation low for the club chant.",
+  'Crunk': "Gang-shout micro-repetition + chant hook on the grid (~15%); density contrast = shouted chant vs rapped verse.",
+  'Chopped & Screwed': "Displacement by tempo: the hook returns slowed and re-phrased; back phrasing at maximum drag.",
+  'East Coast': "Dense internal-rhyme bars with shadow cadences; juicy lines are the currency; scenes are specific blocks.",
+  'Midwest': "Fast chopper density vs slow hook = extreme density contrast; displacement of syllable bursts.",
+  'Cloud Rap': "Sparse, floaty back phrasing; micro-repetition as texture; dopamine through haze-then-clarity.",
+  'Phonk': "Cowbell-locked syncopation; chant micro-repetition; dark scene sequencing (parking lots, drift cars).",
+  'Pop-Rap Crossover': "Sung pop hook to her + rapped verses; standard pop density contrast; shadow of the hook in verse 1.",
+  'Pop-Rap Rock': "Rapped verses over live drums, shouted chorus on the grid; gang reps.",
+  // metal
+  'Classic Metal': "Galloping syncopation in verses, anthem chorus on the grid; mythic scene sequencing.",
+  'Nu-Metal': "Rapped/whispered verse → screamed chorus (extreme density + dynamic contrast); the woman in the room is the wound the chorus admits.",
+  'Metalcore': "Clean chorus written to her grief after harsh verses; breakdown call is the displacement moment.",
+  'Thrash': "Fast, dense, on-the-grid shouts; gang micro-repetition; war-scene sequencing.",
+  'Death Metal': "Rhythmic growls locked to blast/chug patterns; shadow rhythms via riff-following vocal cadences; juicy = brutal imagery.",
+  'Black Metal': "Long held shrieks (sparse density) vs tremolo; scene sequencing through bleak landscapes.",
+  'Doom Metal': "Extreme back phrasing and very sparse density; dopamine via a slow crushing delay.",
+  'Power Metal': "Soaring anthem chorus on the grid, fantasy scene sequencing, gang choir reps.",
+  'Symphonic Metal': "Operatic held lines, choir call-and-response reps.",
+  'Progressive Metal': "Displacement is native — shift phrases across odd meters; shadow rhythms across sections.",
+  'Djent': "Vocal syncopation locked to polymetric chugs; displacement against the groove.",
+  'Melodic Death Metal': "Harsh verse / melodic chorus contrast; the chorus speaks to her directly.",
+  'Screamo': "Screamed confession density vs whispered bridge; the woman in the room is who the confession is about.",
+  'Avant-Garde Metal': "Surreal scene sequencing; displacement and odd micro-repetitions as texture.",
+  'Lo-Fi Metal': "Buried vocals — keep lines short and repeated; micro-repetition carries the hook.",
+  // altrock
+  'Shoegaze': "Buried, sparse vocals; micro-repetition and mantra reps; the woman in the room through hushed intimacy.",
+  'Post-Punk': "Deadpan on-the-grid delivery with angular displacement; bleak urban scene sequencing.",
+  'Grunge': "Mumbled verse → screamed chorus density contrast; back phrasing drawl.",
+  'Indie Rock': "Conversational verses, specific scenes, a chorus she screams at the show.",
+  'Lo-Fi': "Diary-dense, micro-repetition, bedroom scenes.",
+  'Art Rock': "Displacement and odd shadow rhythms; surreal juicy lines.",
+  'Emo': "Confessional scenes; the woman in the room is the ex; gang-shout reps.",
+  'Math Rock': "Displacement across odd meters is the core.",
+  'Post-Grunge': "Big chorus on the grid; heartfelt woman-in-the-room hook.",
+  'Adult Alt-Rock': "Mature scenes; subtle back phrasing.",
+  'Reggae-Rock': "Offbeat syncopation; laid-back back phrasing; beach scenes.",
+  // punk
+  'Classic Punk': "On-the-grid gang shouts; snotty juicy lines.",
+  'Pop-Punk': "Fast verses, big chorus to the girl at the show; bookend reps.",
+  'Hardcore': "Short shouted lines; breakdown displacement.",
+  'Ska-Punk': "Upstroke syncopation; horn call-and-response reps.",
+  'Anti-Folk': "Conversational, dense, funny; micro-repetition.",
+  // blues
+  'Chicago Blues': "AAB shadow rhythm; electric call-and-response.",
+  'Delta Blues': "Back phrasing and slide answers; rural scene sequencing.",
+  'Texas Blues': "Shuffle syncopation; guitar-vocal call-and-response.",
+  'Jump Blues': "Swing syncopation; party micro-repetition.",
+  'Soul Blues': "Gospel-tinged vocal runs to her; AAB.",
+  // reggae
+  'Roots Reggae': "One-drop back phrasing; conscious scenes; chant reps.",
+  'Dancehall': "Riddim syncopation 65%+; toasting density vs chant hook.",
+  'Ska': "Upbeat syncopation; call-and-response horns.",
+  'Rocksteady': "Slower back phrasing; romantic woman-in-room focus.",
+  'Dub': "Sparse vocals, echoed micro-repetition; displacement via delay.",
+  'Lovers Rock': "The woman in the room is the whole song; sweet back phrasing.",
+  // jazz
+  'Bebop': "Scat density; heavy syncopation; displacement across fast changes.",
+  'Cool Jazz': "Behind-the-beat cool; sparse density.",
+  'Hard Bop': "Bluesy syncopation; call-and-response.",
+  'Modal Jazz': "Long sustained phrasing; sparse density.",
+  'Free Jazz': "Displacement everywhere; fragments and micro-repetition.",
+  'Jazz Fusion': "Syncopated grooves; displacement across meter shifts.",
+  'Smooth Jazz': "Relaxed back phrasing; romantic focus.",
+  'Vocal Jazz': "Torch-song woman in the room; AABA shadow rhythm.",
+  'Big Band / Swing': "Swing syncopation; call-and-response brass.",
+  'Gypsy Jazz': "Fast syncopation; playful micro-repetition.",
+  'Soul Jazz / Acid Jazz': "Groove syncopation; hooky micro-repetition.",
+  'Nu-Jazz': "Electronic displacement; sparse vocals.",
+  // rnb
+  'Motown Soul': "On-the-grid hooks, call-and-response backing vocals, shadow rhythms.",
+  'Stax / Memphis Soul': "Gritty back phrasing; horn answers.",
+  'Philadelphia Soul': "Lush strings; romantic hooks.",
+  'Quiet Storm': "Slow back phrasing; intimate address.",
+  'New Jack Swing': "Swing syncopation; dance hooks.",
+  'Contemporary R&B': "Melismatic density contrast; intimate hooks.",
+  'Alt R&B / PBR&B': "Moody sparse vocals; displacement.",
+  'Trap-Soul': "Trap syncopation with soulful hooks.",
+  'Classic Funk': "The One — syncopation around beat 1; chant reps.",
+  'P-Funk': "Chant call-and-response; party scenes.",
+  'Minneapolis Funk': "Syncopated synth hooks; Prince-style micro-repetition.",
+  'Funk Rock': "Riff-driven syncopation; shouted hooks.",
+  'Boogie / Post-Disco': "Dance-floor hooks; displacement.",
+  'Modern Funk': "Groove syncopation; talkbox micro-repetition.",
+  'Afro-Funk': "Polyrhythmic syncopation; chant reps.",
+  // pop
+  'Synth-Pop': "Robotic on-the-grid hooks; micro-repetition.",
+  'Teen-Pop': "Relatable scenes; hook for her.",
+  'Dance-Pop': "Four-on-the-floor hooks; post-chorus chop.",
+  'Indie-Pop': "Quirky scenes; conversational phrasing.",
+  'Bedroom Pop': "Hushed intimacy; diary scenes.",
+  'Hyper-Pop': "Pitch-shifted micro-repetition; chaotic displacement.",
+  'Pop Ballad': "Slow build; big final chorus; incremental repetition.",
+  'Pop Rock': "Guitar hooks; shouted chorus.",
+  'Disco-Pop Revival': "Disco syncopation; dance hooks.",
+  // edm
+  'House': "Vocal chop displacement; four-on-the-floor.",
+  'Deep House': "Hypnotic micro-repetition.",
+  'Tech House': "Chopped vocal hooks; groove.",
+  'Techno': "Minimal repeated phrases.",
+  'Trance': "Euphoric long topline; build dopamine.",
+  'Drum & Bass': "Fast breakbeat syncopation; MC chants.",
+  'Dubstep': "Build-and-drop dopamine.",
+  'Future Bass': "Chopped vocal hooks; emotional topline.",
+  'EDM Festival / Big Room': "Chant drops; crowd call-and-response.",
+  'Garage / 2-Step': "Syncopated shuffle vocals; romantic hooks.",
+  'Hardstyle': "Euphoric anthem hooks.",
+  'Ambient / IDM': "Sparse, textural vocals.",
+  'Liminal Ambient': "Sparse, whispered micro-repetition.",
+  // folk
+  'Traditional Folk': "Ballad shadow rhythm; refrain reps.",
+  'Folk Revival': "Protest refrains; singalong.",
+  'Contemporary Folk': "Personal scenes; confessional.",
+  'Indie Folk': "Intimate specifics; harmonies.",
+  'Folk Rock': "Driving rhythm; singalong chorus.",
+  'Celtic / Irish Folk': "Jig syncopation; pub scenes.",
+  'Bluegrass Folk': "Fast syncopation; harmony reps.",
+  'Murder Ballad / Dark Folk': "Incremental repetition; grim scenes.",
+  'Folk Punk': "Fast, shouted, gang reps.",
+  'Goblincore Folk': "Whimsical scenes; nature imagery.",
+  // country
+  'Outlaw Country': "Drawled back phrasing; rebellious scenes.",
+  'Bakersfield': "Twangy on-the-grid hooks.",
+  'Nashville Pop': "Title-flip dopamine; polished chorus to her.",
+  'Americana': "Story scenes; roots phrasing.",
+  'Bluegrass': "Fast syncopation; harmony reps.",
+  'Bro-Country': "Party scenes; hook for her.",
+  'Alt-Country': "Melancholic scenes; back phrasing.",
+  'Texas / Red Dirt': "Road scenes; raw phrasing.",
+  'Classic Honky-Tonk': "Barroom scenes; heartbreak hooks.",
+  'Country Gospel': "Testimony scenes; singalong reps.",
+  'Country Rap': "Rapped verses, sung hook; displacement.",
+  'Country Blues': "AAB shadow rhythm.",
+  'Synthwave Country': "Retro synths; nostalgic scenes.",
+  'Lo-Fi Country': "Sparse, intimate.",
+  'Cowpunk': "Fast, shouted.",
+  'Trap-Soul Country': "Trap syncopation; soulful hooks.",
+  'Phonk Country': "Cowbell syncopation; dark scenes.",
+  // kpop
+  'Girl Group': "Killing-part hooks; chant reps.",
+  'Boy Group': "Rap-vocal contrast; dance breaks.",
+  'K-Pop Ballad': "Emotional build; final chorus key change.",
+  'Dance Pop': "Hook repetition; dance break displacement.",
+  'Dark Concept': "Intense syncopation; dramatic scenes.",
+  'Bubblegum': "Cute micro-repetition.",
+  'Hip-Hop K-Pop': "Rap syncopation.",
+  'R&B K-Pop': "Smooth back phrasing.",
+  // latin
+  'Salsa': "Clave syncopation; coro-pregón call-and-response; montuno dopamine.",
+  'Bachata': "Romantic back phrasing; guitar answers.",
+  'Cumbia': "Offbeat syncopation; chant reps.",
+  'Bossa Nova': "Gentle syncopation; whispered intimacy.",
+  'Latin Pop': "Pop hooks with Latin rhythm.",
+  'Latin Jazz': "Clave-based syncopation.",
+  'Mariachi': "Grito micro-repetition; emotional belts.",
+  'Vapor Cumbia': "Slowed, hazy phrasing.",
+  'Cumbia Phonk': "Cowbell syncopation.",
+  'Slowed Sertanejo': "Slowed romantic phrasing.",
+  // reggaeton
+  'Perreo Clásico': "Dembow-locked chant hooks.",
+  'Trap Latino': "Trap syncopation; dark scenes.",
+  'Reggaeton Romántico': "Romantic hooks to her.",
+  'Urbano Latino': "Melodic rap hooks.",
+  'Dembow Puro': "Fast dembow chant.",
+  'Reggaeton Pop': "Pop hooks on dembow.",
+  // neosoul
+  'Classic Neo-Soul': "Dilla-swung back phrasing; mantra chorus.",
+  'Hip-Hop Neo-Soul': "Rap-sung blend; groove syncopation.",
+  'Neo-Soul Ballad': "Intimate slow phrasing.",
+  'Afro-Soul': "Afro rhythms; chant reps.",
+  'Jazz-Soul': "Jazz harmony; swing phrasing.",
+  'Lo-Fi Soul': "Sparse, warm.",
+  'Psychedelic Soul': "Trippy displacement.",
+  'Gospel Soul': "Vamps; call-and-response."
+};
+
+function _hcKey(s) { return String(s || '').toLowerCase().replace(/[^a-z0-9]/g, ''); }
+const _HC_SUBSTYLE_INDEX = Object.fromEntries(Object.entries(HIT_CRAFT_SUBSTYLE_TUNING).map(([k, v]) => [_hcKey(k), { name: k, tip: v }]));
+const HIT_CRAFT_LABELS = {
+  sync: 'SYNCOPATION RATIO', density: 'DENSITY CONTRAST', shadow: 'SHADOW RHYTHMS',
+  dopamine: 'DOPAMINE TRIGGERING', displace: 'RHYTHMIC DISPLACEMENT', woman: 'THE WOMAN IN THE ROOM',
+  back: 'BACK PHRASING', micro: 'MICRO-REPETITION', scene: 'SCENE SEQUENCING',
+  reps: 'REPETITION PHRASE TYPES', juicy: 'JUICY LINES'
+};
+
+// How the Hit Craft Core is PLAYED in this genre (+ substyle tuning, + an
+// optional crossover borrow for blends). Returns '' for unknown genres — the
+// universal core still applies.
+// Accepts GENRE_BIBLE keys, fusion display names ('Hip-Hop', 'Country') and
+// the ad-lib aliases ('brazilian', 'mandopop') used by Lucky / Blend.
+const _HC_ALIASES = { brazilian: 'bossa', mandopop: 'cpop' };
+function _hcGenre(g) {
+  if (!g) return '';
+  if (HIT_CRAFT_GENRE_LENS[g]) return g;
+  const k = (typeof _FUSION_KEY_MAP !== 'undefined' && _FUSION_KEY_MAP[g]) || String(g).toLowerCase();
+  return HIT_CRAFT_GENRE_LENS[k] ? k : (_HC_ALIASES[k] || '');
+}
+function buildHitCraftLensNote(genre, substyle, crossGenre) {
+  genre = _hcGenre(genre); crossGenre = _hcGenre(crossGenre);
+  const lens = HIT_CRAFT_GENRE_LENS[genre];
+  if (!lens) return '';
+  const label = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[genre]) || genre;
+  let out = `\n\nHIT CRAFT CORE — HOW IT PLAYS IN ${String(label).toUpperCase()} (these override the core's default ratios):\n`
+    + Object.keys(HIT_CRAFT_LABELS).map(k => `• ${HIT_CRAFT_LABELS[k]}: ${lens[k]}`).join('\n');
+  const sub = substyle && _HC_SUBSTYLE_INDEX[_hcKey(substyle)];
+  if (sub) out += `\n• ${sub.name.toUpperCase()} TUNING (leads the set for this substyle): ${sub.tip}`;
+  const other = crossGenre && crossGenre !== genre && HIT_CRAFT_GENRE_LENS[crossGenre];
+  if (other) {
+    const oLabel = (typeof GENRE_LABELS !== 'undefined' && GENRE_LABELS[crossGenre]) || crossGenre;
+    out += `\n• CROSSOVER BORROW from ${oLabel}: steal its syncopation (${other.sync}) and its take on the woman in the room (${other.woman})`;
+  }
+  return out;
+}
+
+// Deterministic, advisory check of the text-visible Hit Craft techniques
+// (density contrast, micro-repetition, repetition types, scene sequencing).
+// Free — no model call. Same advisory shape as checkContinuity.
+function checkHitCraft(text) {
+  const lines = String(text || '').split(/\r?\n/);
+  const sections = [];
+  let cur = null;
+  for (const raw of lines) {
+    const l = raw.trim();
+    const h = l.match(/^\[([^\]]+)\]/);
+    if (h) { cur = { name: h[1].toLowerCase(), lines: [] }; sections.push(cur); const rest = l.slice(h[0].length).trim(); if (rest) cur.lines.push(rest); continue; }
+    if (!l || !cur) continue;
+    cur.lines.push(l.replace(/\([^)]*\)/g, '').trim() || l);
+  }
+  const syl = (s) => (s.toLowerCase().replace(/[^a-z\s']/g, ' ').match(/[aeiouy]+/g) || []).length;
+  const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
+  const perLine = (re) => avg(sections.filter(s => re.test(s.name)).flatMap(s => s.lines.map(syl)));
+  const v = perLine(/verse/), c = perLine(/chorus|hook/);
+  const densityRatio = v && c ? +(Math.max(v, c) / Math.min(v, c)).toFixed(2) : null;
+
+  const microRe = /\b([a-z']+)\b(?:[\s,.!-]+\1\b)+/i;
+  const lyricSections = sections.filter(s => s.lines.length);
+  const microSections = lyricSections.filter(s => s.lines.some(l => microRe.test(l))).length;
+
+  const norm = (l) => l.toLowerCase().replace(/[^a-z\s]/g, '').replace(/\s+/g, ' ').trim();
+  const all = lyricSections.flatMap(s => s.lines.map(norm)).filter(Boolean);
+  const counts = {}; all.forEach(l => { counts[l] = (counts[l] || 0) + 1; });
+  const types = [];
+  if (Object.values(counts).some(n => n >= 2)) types.push('exact');
+  const uniq = Object.keys(counts);
+  const oneWordOff = uniq.some((a, i) => uniq.slice(i + 1).some(b => {
+    const x = a.split(' '), y = b.split(' ');
+    return x.length === y.length && x.length >= 3 && x.filter((w, j) => w !== y[j]).length === 1;
+  }));
+  if (oneWordOff) types.push('incremental');
+  if (all.length > 4 && all[0] && all[0] === all[all.length - 1]) types.push('bookend');
+  const verses = lyricSections.filter(s => /verse/.test(s.name));
+  const tails = verses.map(s => norm(s.lines[s.lines.length - 1] || ''));
+  if (tails.length >= 2 && new Set(tails).size < tails.length) types.push('refrain-tag');
+  if (/\([^)]+\)\s*$/m.test(String(text || ''))) types.push('call-response');
+
+  const words = (s) => new Set(s.lines.join(' ').toLowerCase().match(/[a-z']{4,}/g) || []);
+  let sceneOverlap = null;
+  if (verses.length >= 2) {
+    const a = words(verses[0]), b = words(verses[1]);
+    const inter = [...a].filter(w => b.has(w)).length;
+    sceneOverlap = +(inter / Math.max(1, Math.min(a.size, b.size))).toFixed(2);
+  }
+  const issues = [];
+  if (densityRatio !== null && densityRatio < 1.25) issues.push(`density contrast weak (verse ${v.toFixed(1)} vs chorus ${c.toFixed(1)} syllables/line)`);
+  if (lyricSections.length && microSections === 0) issues.push('no micro-repetition found');
+  if (types.length < 3) issues.push(`only ${types.length} repetition type(s): ${types.join(', ') || 'none'}`);
+  if (sceneOverlap !== null && sceneOverlap > 0.4) issues.push('verse 2 re-uses verse 1\'s scene vocabulary');
+  return { ok: issues.length === 0, densityRatio, microSections, repetitionTypes: types, sceneOverlap, issues };
+}
+
+
+function buildLyricCraftNote(genre, mood, topic, substyle, crossGenre) {
   // Normalize mood: lowercase, turn hyphens/underscores into spaces, collapse
   // internal whitespace, pad with single spaces for word-boundary matching
   // (so `' funny '` never matches inside `'funnymoney'`, `' ironic '` never
@@ -1599,7 +2274,7 @@ function buildLyricCraftNote(genre, mood, topic) {
     : '';
   // The Director's Pass + anti-cliche rules always apply, regardless of genre
   // or mood — this is the universal underpinning of the craft logic.
-  return DIRECTORS_PASS + HIT_CRAFT_CORE + craftBlock + buildAntiClicheNote();
+  return DIRECTORS_PASS + HIT_CRAFT_CORE + buildHitCraftLensNote(genre, substyle, crossGenre) + craftBlock + buildAntiClicheNote();
 }
 
 // ============ ANTI-CLICHE RHYME SYSTEM ============
@@ -8338,7 +9013,7 @@ Match that DEPTH with THIS song's own world — never reuse its nautical imagery
   // ── Specificity self-check instruction ─────────────────────────────────
   const specificityNote = `\n\nSPECIFICITY MANDATE: After writing the lyrics, review every abstract or vague word. Replace "feel," "love," "pain," "heart," "tears" with concrete sensory images. "My heart aches" → "I'm pressing your old sweater to my face." "I feel lost" → "I've been driving the same block for an hour." Abstract words are placeholders — replace every one.`;
 
-  const lyricCraftNote = buildLyricCraftNote(genre, mood, topic);
+  const lyricCraftNote = buildLyricCraftNote(genre, mood, topic, substyle, blend && blend.genre2 ? String(blend.genre2).toLowerCase() : '');
   // Speed-gears auto-triggers when the user picks the gear-shift structure
   // or the mood signals escalation; hip-hop always gets the framework.
   const speedGearsExplicit = structure === 'gear_shift_escalation';
@@ -8932,7 +9607,7 @@ function buildLuckyPrompt(params) {
   // Lucky gets the full lyric craft toolkit — money lines, hook kernels, opening/
   // closing gravity, storytelling craft, comedy craft (mood-gated). Same builder
   // used by Writer and Rap Lab so Lucky songs match their craft ceiling.
-  const lyricCraftNote = buildLyricCraftNote(g1, mood, topic);
+  const lyricCraftNote = buildLyricCraftNote(g1, mood, topic, params.substyle || '', g2 || '');
   const speedGearsNote = buildSpeedGearsNote(g1, mood, topic, structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(g1, params.lyricTier);
   const velocityNote = buildEmotionalVelocityNote(g1, params.emotionalVelocity);
@@ -10566,7 +11241,7 @@ SONGWRITING RULES:
 - Every Hook/Chorus MUST contain ≥1 inline TYPE 3 production tag (e.g. [808 Bass], [Beat Switch], [Drop]) inside the lyric body. No production tag in a hook = rewrite it.
 - NO EM DASHES: Never use em dashes (—) in lyrics. Use commas or ellipsis instead.${buildLengthBudgetNote(length)}${buildAdlibNote('hiphop', mood, style && style.label)}${buildProductionNote('hiphop', mood, params && params.aggression, params && params.lyricTier)}
 
-${buildLyricCraftNote('hiphop', mood, topic)}
+${buildLyricCraftNote('hiphop', mood, topic, rapStyle)}
 ${buildSpeedGearsNote('hiphop', mood, topic, Array.isArray(rapDimensions.flow) ? rapDimensions.flow.includes('speed-rap') : rapDimensions.flow === 'speed-rap')}
 ${buildLyricTierNote('hiphop', params.lyricTier)}
 ${buildAcademicFrameworkNote('hiphop', params.era)}
@@ -10857,7 +11532,7 @@ function buildVariantPrompt(variant, song) {
   // sync rewrite, etc.) so they need the same craft toolkit as Writer/Lucky/
   // Rap Lab — money lines, hook kernels, opening/closing gravity,
   // storytelling craft, comedy craft if the original was comedic.
-  const craftNote = buildLyricCraftNote(safeSong.genre, '', safeSong.topic);
+  const craftNote = buildLyricCraftNote(safeSong.genre, '', safeSong.topic, sanitizeInput(song.substyle || '', 60), safeSong.genre2);
   // Variants inherit speed-gears for rap genres (baseline applies) but can't
   // tell if the original used gear-shifting — safe default: no explicit flag.
   const speedGearsNote = buildSpeedGearsNote(safeSong.genre, '', safeSong.topic, false);
@@ -10921,6 +11596,11 @@ YOUR TASK — Analyze these lyrics across 9 dimensions. For each dimension give:
 
 DIMENSIONS TO COVER:
 ${Object.entries(FEEDBACK_DIMENSIONS).map(([k,v]) => `**${v.label}**: ${v.desc}`).join('\n')}
+
+HIT CRAFT SCORECARD (after the dimensions): grade EACH of the eleven Hit Craft techniques as ✅ present / ⚠️ weak / ❌ missing, quote the line that shows it (or where it should go), and give a one-line fix written the way this genre plays it:
+${Object.values(HIT_CRAFT_LABELS).join(' · ')}
+${buildHitCraftLensNote(genre, '', '')}
+Automatic text check (advisory, count-based — confirm by reading): ${(() => { try { const h = checkHitCraft(lyrics); return h.issues.length ? h.issues.join('; ') : 'density, micro-repetition, repetition types and scene movement all pass'; } catch (_) { return 'n/a'; } })()}
 
 OVERALL VERDICT:
 After the 9 dimensions, give:
@@ -10998,7 +11678,7 @@ YOUR JOB: Apply ONLY the requested edit. Honor the genre DNA above. Preserve the
   // instruction is a craft-level rewrite (make hook punchier, deeper verse,
   // new bridge), the editor benefits from the same money-line / storytelling
   // / comedy-mode rules as the original generate.
-  const craftNote = buildLyricCraftNote(genre, p.mood, p.topic);
+  const craftNote = buildLyricCraftNote(genre, p.mood, p.topic, p.substyle || '', p.genre2 || '');
   const speedGearsNote = buildSpeedGearsNote(genre, p.mood, p.topic, p.structure === 'gear_shift_escalation');
   const lyricTierNote = buildLyricTierNote(genre, p.lyricTier);
   const velocityNote = buildEmotionalVelocityNote(genre, p.emotionalVelocity);
@@ -11180,7 +11860,7 @@ function buildSongBlendPrompt(params) {
   // users want a polished, stream-able hybrid, not an archival demo.
   const lyricTier = p.lyricTier || 'radio';
   const moodHint  = targetMood || (p.mood || '');
-  const craftNote        = buildLyricCraftNote(_dom, moodHint, twist);
+  const craftNote        = buildLyricCraftNote(_dom, moodHint, twist, _dom === _normalizeGenreKey(aGenre) ? aSubstyle : bSubstyle, _normalizeGenreKey(_other));
   const speedGearsNote   = buildSpeedGearsNote(_dom, moodHint, twist, false);
   const lyricTierNote    = buildLyricTierNote(_dom, lyricTier);
   const academicNote     = buildAcademicFrameworkNote(_dom, p.era);
@@ -12478,7 +13158,7 @@ function checkStyleLyricContract(text) {
   return { ok: findings.length === 0, findings, checked: true };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, buildHitCraftLensNote, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,

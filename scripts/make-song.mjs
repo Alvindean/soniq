@@ -127,6 +127,7 @@ const front = [
   done?.score != null ? `score: ${JSON.stringify(done.score)}` : null,
   done?.continuity ? `continuity: ${JSON.stringify(done.continuity)}` : null,
   done?.contract ? `contract: ${JSON.stringify(done.contract)}` : null,
+  done?.hitcraft ? `hitcraft: ${JSON.stringify(done.hitcraft)}` : null,
   meta ? `meta: ${JSON.stringify(meta)}` : null,
   '---', '',
 ].filter(Boolean).join('\n');
@@ -136,3 +137,4 @@ console.log(`\n\n── saved ${path.relative(ROOT, file)}  (${text.length} char
 if (done?.score != null) console.log('   score:', JSON.stringify(done.score));
 if (done?.continuity) console.log('   continuity:', JSON.stringify(done.continuity));
 if (done?.contract?.findings?.length) console.log('   contract:', done.contract.findings.map(f => f.evidence[0]).join(', '), '— promised in the style prompt, not tagged in the lyrics');
+if (done?.hitcraft) console.log('   hit craft:', done.hitcraft.ok ? 'all text checks pass' : done.hitcraft.issues.join('; '), `(density x${done.hitcraft.densityRatio}, repetition: ${done.hitcraft.repetitionTypes.join('/')})`);
