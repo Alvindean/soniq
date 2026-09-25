@@ -13439,7 +13439,10 @@ function buildCastNote(cast, genre) {
 ${roster}${notes ? `\nUSER VOICE NOTES (override the defaults above where they conflict): ${notes}` : ''}
 SECTION PLAN: ${p.plan}
 HOW TO WRITE IT SO SUNO SWITCHES VOICES:
-0. Give every line to the performer whose point of view it is. A line addressed to "girl" or "baby" belongs to the one singing TO her, never to her. When a chorus is a conversation, tag each line's speaker on the line itself: [Rapper] ... / [Singer] ....
+0. Give every line to the performer whose point of view it is. A line addressed to "girl" or "baby" belongs to the one singing TO her, never to her. Give each performer their OWN version of a shared idea (he sings "I love you, girl"; she answers with her own phrase, never his words turned around).
+0a. SWITCH TAGS SUNO FOLLOWS: at every voice change put a gender tag ALONE on its own line right before the lines: [Male Vocal], [Female Vocal], or [Male and Female Vocals] for shared lines. Never put the speaker tag inline in front of a lyric (Suno may sing it or ignore it). Switch no faster than every 2 lines; line-by-line ping-pong makes the voices drift.
+0b. SHARED LINES must be true in BOTH mouths (a bilingual tag both can mean works best), and there must be at least one shared line per chorus so both voices are actually heard together.
+0c. THE HANDOFF: the last line before the hook is a setup from one performer (a dare, a question, a demand) that the OTHER performer's first hook line answers. That collision is the punch into the hook.
 1. EVERY section header names its performer, e.g. [Verse 1 | ${p.members[0].id}] ${tag(p.members[0])}. A switch inside a section goes on its own line: [${p.members[1].id}]. Shared lines use [Both] or [All].
 2. Switch only at section or half-section boundaries. Never switch mid-line.
 3. Each performer writes in their OWN voice: their own details, slang, cadence and ad-lib signature. Swapping two performers' lines should feel wrong.${sameGender ? `
@@ -13519,6 +13522,7 @@ NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 4. Every lyric section repeats a word or short fragment INSIDE a lyric line ("gone, gone", "I know, I know"), and the CHORUS must contain one. Repeats inside ad-lib parentheses do not count.
 5. The final hook displaces a phrase: start its title line on a pickup word or split it across a line break so it lands on a new beat.
 6. Chorus lines are clearly shorter than verse lines.
+11. EARN THE BIG DECLARATION: an "I love you", "I'd die for you" or "you're the one" must make sense in the story. Show WHY and HOW LONG (a year of watching, a history, a moment that changed it) before it lands, or have the singer admit it's too fast. Strangers don't love each other on line one.
 10. Never put translations or explanations in parentheses: Suno SINGS everything in parentheses as a background vocal. Bilingual lines stand on their own, untranslated.
 7. The title is the chorus's first or last line.
 8. Verse and chorus use different rhyme schemes; perfect rhyme is saved for the hook and the punchline.
