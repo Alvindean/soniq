@@ -2212,9 +2212,12 @@ function checkHitCraft(text) {
     }
     if (h) { const rest = l.slice(h[0].length).trim(); if (rest && cur) cur.lines.push(rest); continue; }
     // An ALL-CAPS analysis header (THEORY ANALYSIS:, DOPAMINE MAP:) ends the lyric.
-    if (/^[A-Z][A-Z0-9 &\/'-]{3,}:/.test(l)) { cur = null; continue; }
+    if (/^[A-Z][A-Z0-9 &\/'-]{3,}:/.test(l) || /^(#|---)/.test(l)) { cur = null; continue; }
     if (!l || !cur) continue;
-    cur.lines.push(l.replace(/\([^)]*\)/g, '').trim() || l);
+    // Ad-lib-only lines "(gone, gone)" are not lyric — they never count as a
+    // micro-repetition, a repetition type, or the song's last line.
+    const lyric = l.replace(/\([^)]*\)/g, '').trim();
+    if (lyric) cur.lines.push(lyric);
   }
   // Rough syllable estimate: vowel groups per word, minus a silent final 'e'.
   const syl = (s) => (s.toLowerCase().replace(/[^a-z\s']/g, ' ').split(/\s+/).filter(Boolean)
@@ -2234,12 +2237,13 @@ function checkHitCraft(text) {
   const types = [];
   if (Object.values(counts).some(n => n >= 2)) types.push('exact');
   const uniq = Object.keys(counts);
-  const oneWordOff = uniq.some((a, i) => uniq.slice(i + 1).some(b => {
-    const x = a.split(' '), y = b.split(' ');
-    return x.length === y.length && x.length >= 3 && x.filter((w, j) => w !== y[j]).length === 1;
-  }));
-  if (oneWordOff) types.push('incremental');
-  if (all.length > 4 && all[0] && all[0] === all[all.length - 1]) types.push('bookend');
+  // Incremental / bookend = the same line OPENING (first 3 words) with a
+  // changed tail — "I'm gone, gone before they miss me" → "I'm gone, gone,
+  // and I'm finally breathin'". Exact-match-only missed real incremental hooks.
+  const head3 = (l) => l.split(' ').slice(0, 3).join(' ');
+  const echoes = (a, b) => a !== b && a.split(' ').length >= 4 && b.split(' ').length >= 4 && head3(a) === head3(b);
+  if (uniq.some((a, i) => uniq.slice(i + 1).some(b => echoes(a, b)))) types.push('incremental');
+  if (all.length > 4 && all[0] && (all[0] === all[all.length - 1] || echoes(all[0], all[all.length - 1]))) types.push('bookend');
   const verses = lyricSections.filter(s => /verse/.test(s.name));
   const tails = verses.map(s => norm(s.lines[s.lines.length - 1] || ''));
   if (tails.length >= 2 && new Set(tails).size < tails.length) types.push('refrain-tag');
