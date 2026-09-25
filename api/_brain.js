@@ -13481,7 +13481,7 @@ const HIT_CRAFT_SYSTEM_MOVES = `
 NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 1. The FINAL chorus changes exactly ONE word in its key line versus the earlier choruses (incremental repetition). Identical final choruses are wrong.
 2. The song's LAST lyric line echoes verse 1's FIRST line with the meaning turned (bookend).
-3. Write the hook's "you" line FIRST, before anything else: one line sung straight to a specific "you" — the woman in the room — even in drill, metal or punk. It goes in the CHORUS text itself, not only in a verse. It must ADDRESS a person being spoken to ("you ain't pick up when the judge said ten", "you still wear my hoodie to sleep"); a generic "you/your" ("when your blood ain't around") does NOT count. Build the rest of the chorus around it.
+3. Write the hook's "you" line FIRST, before anything else: one line sung straight to a specific "you" — the woman in the room — even in drill, metal or punk. It goes in the CHORUS text itself, not only in a verse. It must ADDRESS a person being spoken to: an accusation, confession, promise or question aimed at them, built from THIS song's own details (never reuse a line from these instructions). A generic "you/your" (as in "when your blood ain't around") does NOT count. Build the rest of the chorus around it.
 4. Every lyric section repeats a word or short fragment INSIDE a lyric line ("gone, gone", "I know, I know"), and the CHORUS must contain one. Repeats inside ad-lib parentheses do not count.
 5. The final hook displaces a phrase: start its title line on a pickup word or split it across a line break so it lands on a new beat.
 6. Chorus lines are clearly shorter than verse lines.
