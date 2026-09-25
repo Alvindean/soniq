@@ -2216,10 +2216,12 @@ function checkHitCraft(text) {
     if (!l || !cur) continue;
     cur.lines.push(l.replace(/\([^)]*\)/g, '').trim() || l);
   }
-  const syl = (s) => (s.toLowerCase().replace(/[^a-z\s']/g, ' ').match(/[aeiouy]+/g) || []).length;
+  // Rough syllable estimate: vowel groups per word, minus a silent final 'e'.
+  const syl = (s) => (s.toLowerCase().replace(/[^a-z\s']/g, ' ').split(/\s+/).filter(Boolean)
+    .reduce((n, w) => { let k = (w.match(/[aeiouy]+/g) || []).length; if (k > 1 && /[^aeiouyl]e$/.test(w)) k--; return n + Math.max(1, k); }, 0));
   const avg = (arr) => arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
   const perLine = (re) => avg(sections.filter(s => re.test(s.name)).flatMap(s => s.lines.map(syl)));
-  const v = perLine(/verse/), c = perLine(/chorus|hook/);
+  const v = perLine(/verse/), c = perLine(/^(?!.*\b(pre|post)[- ]?chorus)(?=.*\b(chorus|hook)\b)/);
   const densityRatio = v && c ? +(Math.max(v, c) / Math.min(v, c)).toFixed(2) : null;
 
   const microRe = /\b([a-z']+)\b(?:[\s,.!-]+\1\b)+/i;
@@ -13205,6 +13207,19 @@ function buildHitCraftFinalCheck(genre) {
   return HIT_CRAFT_FINAL_CHECK.replace('{{DENSITY_TARGET}}', target);
 }
 
+// Concrete, checkable moves in the SYSTEM message. The user-turn checklist
+// alone was ignored on long prompts (identical final chorus, no bookend, no
+// "you" line in a drill hook) — system placement carries more weight.
+const HIT_CRAFT_SYSTEM_MOVES = `
+
+NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
+1. The FINAL chorus changes exactly ONE word in its key line versus the earlier choruses (incremental repetition). Identical final choruses are wrong.
+2. The song's LAST lyric line echoes verse 1's FIRST line with the meaning turned (bookend).
+3. The hook contains one line spoken straight to a specific "you" — the woman in the room — even in drill, metal or punk (translate it to the genre; never skip it).
+4. Every lyric section repeats a word or short fragment INSIDE a line ("gone, gone", "I know, I know") — not only in ad-lib parentheses.
+5. The final hook displaces a phrase: start its title line on a pickup word or split it across a line break so it lands on a new beat.
+6. Chorus lines are clearly shorter than verse lines.`;
+
 function _withHitCraftClose(fn, genreOf) {
   return function (...args) {
     const r = fn.apply(this, args);
@@ -13212,6 +13227,7 @@ function _withHitCraftClose(fn, genreOf) {
       let g = '';
       try { g = genreOf ? genreOf(args, r) : ''; } catch (_) {}
       r.prompt += buildHitCraftFinalCheck(g);
+      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES;
     }
     return r;
   };
