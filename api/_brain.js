@@ -1555,6 +1555,26 @@ Great writing is thought, not decoration. Plan silently before the first line:
 5. THE TEST — every standout line: "quoted alone, does it still hit, and does it make them FEEL rather than merely understand?" If it only informs, rewrite until it lands. Apply this test to VERSE 1 exactly as hard as the final verse.
 Do this reasoning silently. Output ONLY the finished song — never print the plan, the level labels, section reasoning, or any of this scaffold as lyric text. The thinking must be VISIBLE IN THE RESULT, invisible on the page.`;
 
+// HIT CRAFT CORE — the owner's contest-winning rhythm/psychology set. Unlike the
+// optional toolkit (where the Director's Pass selects 3-5 devices), these eleven
+// are ALWAYS applied, every song, every genre. Expressed through syllable
+// counts, line placement, and word choice so they survive a lyrics-only brief.
+const HIT_CRAFT_CORE = `
+
+HIT CRAFT CORE — MANDATORY, every song (these are NOT part of the 3-5 selection; all eleven apply):
+1. SYNCOPATION RATIO — decide how many stressed syllables land OFF the beat per section. Verses run higher (~40-60% off-beat: pickups, words landing on the "and"); the chorus drops to ~20-30% so the hook anchors ON the beat and is easy to sing. Never 0% (stiff) or all-off (no anchor). The CHANGE in ratio between sections is the point.
+2. DENSITY CONTRAST — syllables-per-line must shift hard between sections. Dense verse → sparse chorus (cut the syllable count by roughly half, open long vowels), or the reverse for a whisper-verse/explosive-chorus song. Two adjacent sections at the same density is a failure.
+3. SHADOW RHYTHMS — once a line sets a rhythmic template (syllable count + stress pattern), later lines repeat that EXACT rhythm with NEW words, so the ear hears the pattern underneath. Plant the chorus's rhythm as a shadow in verse 1 so the hook feels familiar before it arrives.
+4. DOPAMINE TRIGGERING — build anticipation, then delay it, then pay it off. Set up an expected rhyme or phrase and hold it a beat (or a line) longer than expected before landing it. Give every section at least one prediction error: a turn, a withheld word, a surprise rhyme.
+5. RHYTHMIC DISPLACEMENT — repeat a key phrase but start it on a DIFFERENT beat (first time on the one, next time on the pickup or beat 2). Same words, shifted position, so the repeat sounds new. Use it on the hook's last repeat at minimum.
+6. THE WOMAN IN THE ROOM — write as if one specific listener is in the room and the song is aimed at her. The hook must work as something she would sing back, caption a post with, or send to someone. Put intimacy, a direct "you," and emotional truth in the hook; keep the chest-beating in the verses.
+7. BACK PHRASING — start some lines AFTER the downbeat (leave beat 1 empty, enter late) and let them spill into the next bar, especially going into the chorus. The late entry creates lean-in tension that the on-beat chorus releases.
+8. MICRO-REPETITION — repeat a single word or 2-3 word fragment INSIDE a line ("gone, gone, gone", "I know, I know"). Small stutters create stickiness without repeating whole lines. At least one per section, never the same fragment twice across sections unless it's the hook.
+9. SCENE SEQUENCING — each section is ONE camera shot: a specific place, time, and image. Scenes move forward in time or space (bedroom → car → her porch), never re-describe the same shot. Verse 2 must be a NEW scene, not verse 1 reworded.
+10. REPETITION PHRASE TYPES — use at least THREE different kinds of repetition: exact repeat (the hook), incremental repeat (same line with one word changed each time), a refrain tag ending each verse, call-and-response, or a bookend (the first line returns as the last, with its meaning changed).
+11. JUICY LINES — every section carries at least one line so specific, sensory, and sonically rich (internal consonance/assonance, one unexpected word) that it gets quoted alone. Verse 1 included. A section with no juicy line gets rewritten.
+Apply all eleven silently. Never print these labels, ratios, or notes in the lyrics.`;
+
 function buildLyricCraftNote(genre, mood, topic) {
   // Normalize mood: lowercase, turn hyphens/underscores into spaces, collapse
   // internal whitespace, pad with single spaces for word-boundary matching
@@ -1579,7 +1599,7 @@ function buildLyricCraftNote(genre, mood, topic) {
     : '';
   // The Director's Pass + anti-cliche rules always apply, regardless of genre
   // or mood — this is the universal underpinning of the craft logic.
-  return DIRECTORS_PASS + craftBlock + buildAntiClicheNote();
+  return DIRECTORS_PASS + HIT_CRAFT_CORE + craftBlock + buildAntiClicheNote();
 }
 
 // ============ ANTI-CLICHE RHYME SYSTEM ============
