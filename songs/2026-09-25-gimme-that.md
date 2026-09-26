@@ -2,7 +2,7 @@
 title: "Gimme That"
 lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
-v8: style rebuilt (flute first, half-time trap bounce under rap verses, full dembow chorus, heavier dance break/drop, voices described). v7: "you smell like trouble" (she senses it on him and likes it); rain removed. v6: ownable hook lines, verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
+v9: "smell like trouble" only once (verse 2); chorus = "You don't know my name" -> final "Now you know my name". v8: style rebuilt (flute first, half-time trap bounce under rap verses, full dembow chorus, heavier dance break/drop, voices described). v7: "you smell like trouble" (she senses it on him and likes it); rain removed. v6: ownable hook lines, verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
 ---
 
 STYLE:
@@ -43,7 +43,7 @@ So tell me what you want, 'cause I'm right here with you
 [Full Dembow] [Claps] [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-You smell like trouble (trouble)
+You don't know my name (my name)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Keep pulling my chain (pull it)
@@ -82,7 +82,7 @@ So tell me what you want, 'cause I'm right here with you
 [Full Dembow] [Claps] [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-You smell like trouble (trouble)
+You don't know my name (my name)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Keep pulling my chain (pull it)
@@ -123,7 +123,7 @@ Gimme that!
 [Snappy Snare] [Claps] [Harmony] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-I'm leaving with trouble (with trouble)
+Now you know my name (my name)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Keep pulling my chain (pull it)
