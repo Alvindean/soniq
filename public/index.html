@@ -26533,6 +26533,38 @@ window.adminLogin = adminLogin;
   }
 })();
 
+// ── Hand-off from the free tools (/rap-lyrics-generator, /ai-lyrics-generator,
+// /suno-prompt-generator): "Turn it into a full song" links here with the
+// visitor's topic, genre, style and mood so they land ready to press Write
+// instead of on a blank studio. Params are cleaned from the URL right away.
+(function toolHandoff() {
+  const q = new URLSearchParams(window.location.search);
+  const topic = (q.get('topic') || '').slice(0, 300).trim();
+  if (!q.get('from') || !topic) return;
+  const RAP = { trap: 'trap', drill: 'drill', boombap: 'boom_bap', melodic: 'melodic_rap', conscious: 'lyrical_conscious', gfunk: 'g_funk', cloud: 'cloud_rap', phonk: 'phonk' };
+  const MOOD = { confident: 'Triumphant', hungry: 'Defiant', cold: 'Dark', romantic: 'Romantic', heartbroken: 'Devastated', motivational: 'Hopeful',
+    reflective: 'Nostalgic', playful: 'Playful', angry: 'Angry', celebratory: 'Euphoric' };
+  const genre = (q.get('genre') || '').toLowerCase(), style = (q.get('style') || '').toLowerCase(), mood = MOOD[(q.get('mood') || '').toLowerCase()];
+  const from = q.get('from');
+  window.history.replaceState({}, '', window.location.pathname);
+  setTimeout(function () {
+    try {
+      const t = document.getElementById('g-topic');
+      if (t) { t.value = topic; t.dispatchEvent(new Event('input', { bubbles: true })); }
+      if (genre && typeof GENRES_DEF !== 'undefined' && GENRES_DEF.some(function (x) { return x.id === genre; }) && typeof onGenreChange === 'function') onGenreChange(genre);
+      if (genre === 'hiphop' && RAP[style] && typeof onRapStyleSelect === 'function') onRapStyleSelect(RAP[style]);
+      if (mood && typeof S !== 'undefined') {
+        S.selectedMoods = [mood];
+        document.querySelectorAll('.mood-pill').forEach(function (p) { p.classList.toggle('on', p.dataset.mid === mood); });
+      }
+      if (t) t.scrollIntoView({ block: 'center' });
+      const label = from === 'rapgen' ? 'free rap lyrics generator' : from === 'sunogen' ? 'free Suno prompt generator' : 'free lyrics generator';
+      if (typeof toast === 'function') toast('Your idea from the ' + label + ' is loaded. Press Write to get the full song.');
+      try { fetch('https://soniq-api.thealvindean.workers.dev/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'app_cta', path: '/app/handoff-' + from }), keepalive: true }); } catch (e) {}
+    } catch (e) { /* hand-off is best-effort; the app still works */ }
+  }, 600);
+})();
+
 // Global admin clear function
 window.clearAdminSession = function() {
   localStorage.removeItem('soniq_admin_token');

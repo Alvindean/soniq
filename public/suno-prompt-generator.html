@@ -362,6 +362,7 @@ footer{color:var(--tx3);font-size:14px;padding-block:30px;border-top:1px solid v
         clearInterval(t); go.disabled = false;
         if (j.lyrics || j.style) {
           out.textContent = render(j); out.classList.add('show'); actions.classList.add('show');
+          var hp = new URLSearchParams({ from: 'sunogen', topic: topic, genre: document.getElementById('genre').value, mood: document.getElementById('mood').value }); document.querySelectorAll('#actions a[href^="/app"], .cta-band a[href^="/app"]').forEach(function (a) { a.setAttribute('href', '/app?' + hp.toString()); });
           msg.textContent = j.remaining > 0 ? j.remaining + ' free left today.' : 'Last free one for today. Full songs are in SONIQ.';
         } else { msg.textContent = j.message || 'Something went wrong. Try again.'; }
       })

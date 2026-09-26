@@ -313,6 +313,7 @@ Every single doubter in the crowd now, hands high screaming lyrics, how you like
         clearInterval(t); go.disabled = false;
         if (j.lyrics) {
           out.textContent = j.lyrics; out.classList.add('show'); actions.classList.add('show');
+          var hp = new URLSearchParams({ from: 'rapgen', topic: topic, genre: 'hiphop', style: document.getElementById('style').value, mood: document.getElementById('mood').value }); document.querySelectorAll('#actions a[href^="/app"], .cta-band a[href^="/app"]').forEach(function (a) { a.setAttribute('href', '/app?' + hp.toString()); });
           msg.textContent = j.remaining > 0 ? j.remaining + ' free verse' + (j.remaining === 1 ? '' : 's') + ' left today.' : 'Last free verse for today. Full songs are in Rap Lab.';
           try { fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'gen_done' }), keepalive: true }); } catch (e) {}
         } else { msg.textContent = j.message || 'Something went wrong. Try again.'; }
