@@ -1651,7 +1651,7 @@ const HIT_CRAFT_GENRE_LENS = {
     shadow: "Set a bar's cadence template (e.g. 3-3-2 syllable clusters) and ride it for 2-4 bars with new words; plant the hook cadence as a shadow in bar 1-2 of verse 1.",
     dopamine: "Set up the multi, then delay the payoff rhyme one bar with a filler bar that looks like a miss — then land it harder. Punchline on bar 4/8/16 is the release.",
     displace: "Repeat the hook's tag phrase but start it on beat 2 or the 'and' of 4 on the final hook; rap the same line twice in a verse starting on different beats.",
-    woman: "Mid-flex, drop ONE unguarded bar aimed at her ('you seen me broke, you ain't flinch') — the vulnerable bar in a cold verse is what she quotes. Hook stays a line she'd caption.",
+    woman: "Mid-flex, drop ONE unguarded bar aimed at her (an admission of what she saw or survived with him, built from this song's details, never a stock line) — the vulnerable bar in a cold verse is what she quotes. Hook stays a line she'd caption.",
     back: "Enter bars late, after the kick, and let the last word drag into the next bar (Snoop/Future pocket). Back-phrase the last line into the hook.",
     micro: "Stutter-repeats and ad-lib echoes: 'gone gone', 'I know, I know', a word repeated with a (yeah) answer. Triplet repeats ('run it, run it, run it') in trap.",
     scene: "Each verse is one location with a timestamp: 'the Cutlass at 3am' → 'the courthouse steps' → 'mama's kitchen now'. Never re-describe the block.",
