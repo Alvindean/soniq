@@ -1,21 +1,22 @@
 ---
 title: "Gimme That"
-lane: moombahton-pop / hip-hop / Latin, 108 BPM, male + female duet
+lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
 ---
 
 STYLE:
-moombahton pop and hip-hop crossover, 108 BPM, dembow groove with funky open hi-hats and timbales, bright plucked mandolin riff as the signature hook, deep 808 and syncopated Latin bass, flirty club duet with a male rapper and a female singer-rapper trading lines, both voices together on the gimme that chant, drums that build and break, instrumental dance break on the mandolin riff and percussion, EDM breakdown with snare roll and riser into a moombahton drop on a chopped gimme that vocal, catchy singable pop chorus, sultry, playful, seductive, danceable, euphoric
+moombahton pop and hip-hop crossover, 108 BPM, dembow groove with a tight snappy crack snare on 2 and 4, funky open hi-hats and timbales, bright breathy bansuri flute riff with quick bends as the signature hook, deep 808 and syncopated Latin bass, flirty club duet with a male rapper and a female singer-rapper trading lines, both voices together on the gimme that chant, drums that build and break, instrumental dance break on the flute riff, snare and percussion, EDM breakdown with a snappy snare roll and riser into a moombahton drop on a chopped gimme that vocal, catchy singable pop chorus, sultry, playful, seductive, danceable, euphoric
 
 LYRICS:
 
 [Intro]
-[Mandolin Riff] [Timbales]
+[Bansuri Flute Riff] [Timbales] [Snappy Snare]
 [Female Vocal]
 Gimme, gimme (ay)
 Gimme, gimme
 
 [Verse 1 | Him]
+[Snappy Snare] [Open Hi-Hats]
 [Male Vocal] [Rap]
 Left my crew by the bar, they ain't notice I'm gone
 You left yours by the booth when they played your song (yeah)
@@ -46,7 +47,7 @@ Gimme, gimme, gimme that
 Gimme, gimme, gimme that (ay)
 
 [Dance Break]
-[Instrumental] [Mandolin Riff] [Timbales] [Open Hi-Hats]
+[Instrumental] [Bansuri Flute Riff] [Snappy Snare] [Timbales] [Open Hi-Hats]
 (gimme, gimme)
 (ay, ay)
 
@@ -81,7 +82,7 @@ Gimme, gimme, gimme that
 Gimme, gimme, gimme that (ay)
 
 [Bridge]
-[Drums Out] [Mandolin Riff]
+[Drums Out] [Bansuri Flute Riff]
 [Male Vocal]
 Lights up, doors open, cab at the curb
 Say the word, girl, just say the word
@@ -90,7 +91,7 @@ One more song, then I'm yours tonight
 Take me somewhere with a slower light
 
 [Build]
-[Snare Roll] [Riser]
+[Snappy Snare Roll] [Riser]
 [Male and Female Vocals]
 Gimme, gimme, gimme, gimme
 Gimme, gimme, gimme, gimme
@@ -101,10 +102,10 @@ Gimme that
 Gim-me that, gim-me that
 [Male Vocal]
 Gim-me that, gim-me that
-[Instrumental] [Mandolin Riff] [Timbales]
+[Instrumental] [Bansuri Flute Riff] [Snappy Snare] [Timbales]
 
 [Final Chorus]
-[Claps] [Harmony]
+[Snappy Snare] [Claps] [Harmony]
 [Female Vocal]
 Gimme that, gimme that
 The way you're leaving with me
