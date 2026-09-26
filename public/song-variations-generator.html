@@ -267,5 +267,6 @@ footer{color:var(--tx3);font-size:14px;padding-block:30px;border-top:1px solid v
   </footer>
 </div>
 <script>try{fetch('https://soniq-api.thealvindean.workers.dev/api/pv',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'pageview',path:'/song-variations-generator'}),keepalive:true});}catch(e){}</script>
+<script>/* app-click funnel beacon: counts clicks from this page into /app */document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href')||'';if(!/^(\/app|https:\/\/www\.mysoniq\.com\/app)/.test(h))return;try{var d=JSON.stringify({event:'app_cta',path:location.pathname.replace(/\.html$/,'').toLowerCase()});if(navigator.sendBeacon)navigator.sendBeacon('https://soniq-api.thealvindean.workers.dev/api/pv',new Blob([d],{type:'text/plain'}));else fetch('https://soniq-api.thealvindean.workers.dev/api/pv',{method:'POST',headers:{'Content-Type':'application/json'},body:d,keepalive:true});}catch(x){}},true);</script>
 </body>
 </html>

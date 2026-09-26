@@ -12,6 +12,8 @@
   var ref = pagePath;
   // First-party pageview beacon (no cookies, no PII) — blog pages never sent one before.
   // Older static posts carry their own inline beacon; only send when they don't (no double counts).
+  // app-click funnel: count clicks from this post into /app (per page)
+  document.addEventListener('click', function (e) { var a = e.target.closest && e.target.closest('a[href]'); if (!a) return; var h = a.getAttribute('href') || ''; if (!/^(\/app|https:\/\/www\.mysoniq\.com\/app)/.test(h)) return; try { var d = JSON.stringify({ event: 'app_cta', path: pagePath }); if (navigator.sendBeacon) navigator.sendBeacon(API + '/api/pv', new Blob([d], { type: 'text/plain' })); else fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: d, keepalive: true }); } catch (x) {} }, true);
   var hasInline = [].some.call(document.scripts, function (s) { return !s.src && /pageview beacon/.test(s.textContent); });
   if (!hasInline) { try { fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'pageview', path: pagePath }), keepalive: true }); } catch (e) {} }
 
