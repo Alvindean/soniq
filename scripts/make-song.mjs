@@ -35,7 +35,7 @@ const BASE = process.env.SONIQ_API || 'https://soniq-api.thealvindean.workers.de
 // ── env ────────────────────────────────────────────────────────────────
 for (const line of fs.readFileSync(path.join(ROOT, '.env.test'), 'utf8').split(/\r?\n/)) {
   const m = line.match(/^([A-Za-z_][A-Za-z0-9_]*)="?(.*?)"?$/);
-  if (m && !process.env[m[1]]) process.env[m[1]] = m[2];
+  if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, ''); // .env.test values are quoted
 }
 const { ADMIN_PASSWORD, ADMIN_TOKEN_SECRET } = process.env;
 if (!ADMIN_PASSWORD || !ADMIN_TOKEN_SECRET) { console.error('missing ADMIN_PASSWORD / ADMIN_TOKEN_SECRET in .env.test'); process.exit(1); }
