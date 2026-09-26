@@ -127,6 +127,46 @@
       "dest": "/ai-lyrics-generator.html"
     },
     {
+      "src": "/suno-lyrics-generator/?",
+      "dest": "/suno-lyrics-generator.html"
+    },
+    {
+      "src": "/random-song-generator/?",
+      "dest": "/random-song-generator.html"
+    },
+    {
+      "src": "/song-idea-generator/?",
+      "dest": "/song-idea-generator.html"
+    },
+    {
+      "src": "/song-mashup-generator/?",
+      "dest": "/song-mashup-generator.html"
+    },
+    {
+      "src": "/songwriting-techniques/?",
+      "dest": "/songwriting-techniques.html"
+    },
+    {
+      "src": "/ai-rap-song-maker/?",
+      "dest": "/ai-rap-song-maker.html"
+    },
+    {
+      "src": "/ai-song-feedback/?",
+      "dest": "/ai-song-feedback.html"
+    },
+    {
+      "src": "/song-variations-generator/?",
+      "dest": "/song-variations-generator.html"
+    },
+    {
+      "src": "/suno-sample-flip/?",
+      "dest": "/suno-sample-flip.html"
+    },
+    {
+      "src": "/ai-duet-song-generator/?",
+      "dest": "/ai-duet-song-generator.html"
+    },
+    {
       "src": "/app",
       "dest": "/index.html"
     },

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Song Mashup Generator: Blend Two Songs into One | SONIQ</title>
+<meta name="description" content="Blend two of your songs into one new record, or write a new song influenced by both. SONIQ merges the lyrics and the production DNA, and writes a Suno v6">
+<link rel="canonical" href="https://www.mysoniq.com/song-mashup-generator">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Song Mashup Generator: Blend Two Songs into One">
+<meta property="og:description" content="Blend two of your songs into one new record, or write a new song influenced by both. SONIQ merges the lyrics and the production DNA, and writes a Suno v6 mashup request you can apply to both tracks in your library.">
+<meta property="og:url" content="https://www.mysoniq.com/song-mashup-generator">
+<meta property="og:image" content="https://www.mysoniq.com/blog/img/ai-songwriting-tools.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "SONIQ Song Mashup Generator",
+      "url": "https://www.mysoniq.com/song-mashup-generator",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any (web browser)",
+      "description": "Blend two of your songs into one new record, or write a new song influenced by both. SONIQ merges the lyrics and the production DNA, and writes a Suno v6 mashup request you can apply to both tracks in your library.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "First 3 songs free"
+      },
+      "featureList": [
+        "Merged lyrics with a hook isolation",
+        "Blend notes on what came from where",
+        "A style prompt for the hybrid",
+        "A Suno v6 mashup request"
+      ],
+      "publisher": {
+        "@id": "https://www.mysoniq.com/#org"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.mysoniq.com/#org",
+      "name": "SONIQ",
+      "url": "https://www.mysoniq.com/",
+      "logo": "https://www.mysoniq.com/og-image.png"
+    },
+    {
+      "@type": "HowTo",
+      "name": "How to use Song Mashup Generator",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Pick two songs",
+          "text": "Choose Song A and Song B from your SONIQ songs."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Pick a mode",
+          "text": "Mashup combines them directly; Influence writes a new song shaped by both."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Make it",
+          "text": "Use the new lyrics and style prompt, or paste the v6 mashup request if both songs are in your Suno library."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I mash up other artists' songs?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "SONIQ works with your own songs, and Suno v6 mashups only work on songs in your own Suno library."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the v6 mashup request?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A plain-language instruction for Suno v6, like \"vocals and hook from song A over the drums of song B\", that you paste into v6."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "SONIQ",
+          "item": "https://www.mysoniq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Song Mashup Generator",
+          "item": "https://www.mysoniq.com/song-mashup-generator"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{--bg:#0a0a0f;--s1:#12121a;--s2:#1a1a26;--b1:rgba(255,255,255,.08);--tx1:#f4f4f8;--tx2:#b9b9c8;--tx3:#83839a;--violet:#8b5cf6;--amber:#f5a524;--cyan:#22d3ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx1);font:17px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:16px}
+a{color:var(--cyan)}
+.wrap{max-width:880px;margin:0 auto}
+header.top{display:flex;justify-content:space-between;align-items:center;padding-block:18px}
+header.top a.brand{color:var(--tx1);font-weight:800;letter-spacing:.08em;text-decoration:none}
+header.top nav{display:flex;gap:18px;font-size:15px}
+header.top nav a{color:var(--tx2);text-decoration:none}
+.hero{padding-block:28px 12px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
+h1{font-size:clamp(34px,6vw,54px);line-height:1.08;margin:.3em 0 .3em;text-wrap:balance;font-weight:800}
+.lede{color:var(--tx2);font-size:19px;max-width:62ch;margin:0}
+.tool{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:20px;margin-block:26px;display:grid;gap:14px}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+label{font-size:13px;font-weight:600;color:var(--tx2);display:grid;gap:6px}
+input,select{background:var(--s2);color:var(--tx1);border:1px solid var(--b1);border-radius:10px;padding:12px;font:inherit;font-size:16px;width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--tx2)}
+.check input{width:auto}
+button.go{background:linear-gradient(90deg,var(--violet),#a855f7);color:#fff;border:0;border-radius:12px;padding:14px 20px;font:700 17px Inter,system-ui,sans-serif;cursor:pointer}
+button.go[disabled]{opacity:.6;cursor:progress}
+.out{display:none;background:#0d0d14;border:1px solid var(--b1);border-radius:12px;padding:16px;white-space:pre-wrap;font:15px/1.7 "JetBrains Mono",ui-monospace,Consolas,monospace;color:var(--tx1)}
+.out.show{display:block}
+.actions{display:none;gap:10px;flex-wrap:wrap}
+.actions.show{display:flex}
+.btn2{background:var(--s2);color:var(--tx1);border:1px solid var(--b1);border-radius:10px;padding:10px 14px;font:600 15px Inter,system-ui,sans-serif;cursor:pointer;text-decoration:none}
+.btn2.cta{background:var(--amber);color:#111;border-color:var(--amber)}
+.msg{color:var(--amber);font-size:15px;min-height:1em}
+.note{font-size:13px;color:var(--tx3)}
+section{padding-block:18px}
+h2{font-size:28px;line-height:1.2;margin:1.2em 0 .5em;text-wrap:balance}
+h3{font-size:19px;margin:1.1em 0 .3em}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:0;list-style:none}
+.styles li{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:12px 14px}
+.styles b{display:block}
+.styles span{color:var(--tx2);font-size:15px}
+pre.example{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px;white-space:pre-wrap;font:15px/1.7 ui-monospace,Consolas,monospace;overflow-x:auto}
+details{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:12px 16px;margin-block:10px}
+summary{font-weight:700;cursor:pointer}
+.cta-band{background:linear-gradient(135deg,#1c1230,#14142a);border:1px solid var(--b1);border-radius:16px;padding:22px;margin-block:28px}
+footer{color:var(--tx3);font-size:14px;padding-block:30px;border-top:1px solid var(--b1);margin-top:30px}
+@media (max-width:640px){.row{grid-template-columns:1fr}header.top nav{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.aff{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:18px 20px;margin-block:26px}
+.aff h2{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin:0 0 12px}
+.aff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.aff a{display:flex;gap:10px;align-items:center;background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--tx1)}
+.aff img{width:36px;height:36px;border-radius:8px;flex:none}
+.aff b{display:block;font-size:15px}
+.aff span{display:block;font-size:13px;color:var(--tx2);line-height:1.35}
+.aff small{display:block;margin-top:10px;color:var(--tx3);font-size:12px}
+.feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:0;list-style:none}
+.feat li{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:12px 14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/">SONIQ</a>
+    <nav><a href="/rap-lyrics-generator">Rap generator</a><a href="/ai-lyrics-generator">Lyrics generator</a><a href="/suno-prompt-generator">Suno prompts</a><a href="/app">Open SONIQ</a></nav>
+  </header>
+  <div class="hero">
+    <div class="eyebrow">SONIQ feature · First 3 songs free</div>
+    <h1>Song Mashup Generator</h1>
+    <p class="lede">Blend two of your songs into one new record, or write a new song influenced by both. SONIQ merges the lyrics and the production DNA, and writes a Suno v6 mashup request you can apply to both tracks in your library.</p>
+    <p><a class="btn2 cta" href="/app?ref=song-mashup-generator">Try it free →</a></p>
+  </div>
+  <section>
+    <h2>How it works</h2>
+    <ol><li><b>Pick two songs.</b> Choose Song A and Song B from your SONIQ songs.</li><li><b>Pick a mode.</b> Mashup combines them directly; Influence writes a new song shaped by both.</li><li><b>Make it.</b> Use the new lyrics and style prompt, or paste the v6 mashup request if both songs are in your Suno library.</li></ol>
+  </section>
+  <section>
+    <h2>What you get</h2>
+    <ul class="feat"><li>Merged lyrics with a hook isolation</li><li>Blend notes on what came from where</li><li>A style prompt for the hybrid</li><li>A Suno v6 mashup request</li></ul>
+  </section>
+  <section>
+    <h2>Mashup or influence?</h2><p><b>Mashup</b> keeps recognisable parts of both songs. <b>Influence</b> writes something new that carries the DNA of both: song A's hook energy with song B's groove. Both keep the Hit Craft rules, so the result is a song, not a collage.</p>
+  </section>
+  <div class="cta-band">
+    <h2 style="margin-top:0">Try Song Mashup Generator free</h2>
+    <p>Your first 3 songs are free. Every song comes with a Suno v6 style prompt and a Craft Check.</p>
+    <a class="btn2 cta" href="/app?ref=song-mashup-generator">Open SONIQ →</a>
+  </div>
+  <section>
+    <h2>FAQ</h2>
+    <details><summary>Can I mash up other artists' songs?</summary><p>SONIQ works with your own songs, and Suno v6 mashups only work on songs in your own Suno library.</p></details>
+    <details><summary>What is the v6 mashup request?</summary><p>A plain-language instruction for Suno v6, like "vocals and hook from song A over the drums of song B", that you paste into v6.</p></details>
+  </section>
+  <section>
+    <h2>Free tools</h2>
+    <p><a href="/rap-lyrics-generator">Rap lyrics generator</a> · <a href="/ai-lyrics-generator">AI lyrics generator</a> · <a href="/suno-prompt-generator">Suno prompt generator</a> · <a href="/songwriting-techniques">Songwriting techniques</a> · <a href="/blog">Guides</a></p>
+  </section>
+  <aside class="aff" aria-label="Tools we use">
+    <h2>Tools we actually use</h2>
+    <div class="aff-grid">
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=distrokid&amp;ref=%2Fsong-mashup-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-distrokid.png" alt="DistroKid logo" width="36" height="36" loading="lazy"><div><b>DistroKid →</b><span>Put your songs on Spotify, Apple Music and more.</span></div></a>
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=tunecorepartner&amp;ref=%2Fsong-mashup-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-tunecore.png" alt="TuneCore logo" width="36" height="36" loading="lazy"><div><b>TuneCore →</b><span>Distribution with publishing admin built in.</span></div></a>
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=soundraw&amp;ref=%2Fsong-mashup-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-soundraw.png" alt="Soundraw logo" width="36" height="36" loading="lazy"><div><b>Soundraw →</b><span>AI beats you can customise and own.</span></div></a>
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=splice&amp;ref=%2Fsong-mashup-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-splice.png" alt="Splice logo" width="36" height="36" loading="lazy"><div><b>Splice →</b><span>Samples, loops and presets for your productions.</span></div></a>
+    </div>
+    <small>Some links are partner links: SONIQ may earn a commission at no cost to you.</small>
+  </aside>
+  <footer>
+    <p>SONIQ is an AI songwriting studio by Nu Wav Media LLC. <a href="/">Home</a> · <a href="/blog">Blog</a> · <a href="/rap-lyrics-generator">Rap lyrics generator</a> · <a href="/ai-lyrics-generator">AI lyrics generator</a> · <a href="/suno-prompt-generator">Suno prompt generator</a> · <a href="/legal/privacy.html">Privacy</a> · <a href="/legal/terms.html">Terms</a></p>
+  </footer>
+</div>
+<script>try{fetch('https://soniq-api.thealvindean.workers.dev/api/pv',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({event:'pageview',path:'/song-mashup-generator'}),keepalive:true});}catch(e){}</script>
+</body>
+</html>

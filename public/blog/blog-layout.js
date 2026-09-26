@@ -11,7 +11,9 @@
   var pagePath = location.pathname.replace(/\.html$/, '').toLowerCase().replace(/\/+$/, '') || '/';
   var ref = pagePath;
   // First-party pageview beacon (no cookies, no PII) — blog pages never sent one before.
-  try { fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'pageview', path: pagePath }), keepalive: true }); } catch (e) {}
+  // Older static posts carry their own inline beacon; only send when they don't (no double counts).
+  var hasInline = [].some.call(document.scripts, function (s) { return !s.src && /pageview beacon/.test(s.textContent); });
+  if (!hasInline) { try { fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'pageview', path: pagePath }), keepalive: true }); } catch (e) {} }
 
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function rnd(seed) { var x = seed || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }

@@ -198,6 +198,16 @@ summary{font-weight:700;cursor:pointer}
 footer{color:var(--tx3);font-size:14px;padding-block:30px;border-top:1px solid var(--b1);margin-top:30px}
 @media (max-width:640px){.row{grid-template-columns:1fr}header.top nav{display:none}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.aff{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:18px 20px;margin-block:26px}
+.aff h2{font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--tx3);margin:0 0 12px}
+.aff-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.aff a{display:flex;gap:10px;align-items:center;background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:10px 12px;text-decoration:none;color:var(--tx1)}
+.aff img{width:36px;height:36px;border-radius:8px;flex:none}
+.aff b{display:block;font-size:15px}
+.aff span{display:block;font-size:13px;color:var(--tx2);line-height:1.35}
+.aff small{display:block;margin-top:10px;color:var(--tx3);font-size:12px}
+.feat{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:0;list-style:none}
+.feat li{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:12px 14px}
 </style>
 </head>
 <body>
@@ -297,6 +307,16 @@ Watching it become somebody else's truck</pre>
     <details><summary>How do I turn this into a song in Suno?</summary><p>Use the <a href="/suno-prompt-generator">free Suno prompt generator</a> for the style prompt, or let SONIQ write the full song with a matching prompt.</p></details>
   </section>
 
+  <aside class="aff" aria-label="Tools we use">
+    <h2>Tools we actually use</h2>
+    <div class="aff-grid">
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=distrokid&amp;ref=%2Fai-lyrics-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-distrokid.png" alt="DistroKid logo" width="36" height="36" loading="lazy"><div><b>DistroKid →</b><span>Put your songs on Spotify, Apple Music and more.</span></div></a>
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=tunecorepartner&amp;ref=%2Fai-lyrics-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-tunecore.png" alt="TuneCore logo" width="36" height="36" loading="lazy"><div><b>TuneCore →</b><span>Distribution with publishing admin built in.</span></div></a>
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=soundraw&amp;ref=%2Fai-lyrics-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-soundraw.png" alt="Soundraw logo" width="36" height="36" loading="lazy"><div><b>Soundraw →</b><span>AI beats you can customise and own.</span></div></a>
+      <a href="https://soniq-api.thealvindean.workers.dev/api/aff?p=splice&amp;ref=%2Fai-lyrics-generator" target="_blank" rel="nofollow sponsored noopener"><img src="/blog/logo-splice.png" alt="Splice logo" width="36" height="36" loading="lazy"><div><b>Splice →</b><span>Samples, loops and presets for your productions.</span></div></a>
+    </div>
+    <small>Some links are partner links: SONIQ may earn a commission at no cost to you.</small>
+  </aside>
   <footer>
     <p>SONIQ is an AI songwriting studio by Nu Wav Media LLC. <a href="/">Home</a> · <a href="/blog">Blog</a> · <a href="/rap-lyrics-generator">Rap lyrics generator</a> · <a href="/ai-lyrics-generator">AI lyrics generator</a> · <a href="/suno-prompt-generator">Suno prompt generator</a> · <a href="/legal/privacy.html">Privacy</a> · <a href="/legal/terms.html">Terms</a></p>
   </footer>
