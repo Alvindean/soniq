@@ -103,6 +103,10 @@
       "dest": "/blog/index.html"
     },
     {
+      "src": "/blog/img/(.*)",
+      "dest": "/blog/img/$1"
+    },
+    {
       "src": "/blog/([^/]+\\.(css|js|png|jpg|jpeg|svg|webp|ico|xml|txt))",
       "dest": "/blog/$1"
     },
