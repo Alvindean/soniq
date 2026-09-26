@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free Suno Prompt Generator for v6 (Style Prompt + Settings) | SONIQ</title>
+<meta name="description" content="Free Suno prompt generator. Describe your song and get a ready-to-paste Suno v6 style prompt under the 800-character limit, an exclude list, recommended settings and matching lyric tags. No sign-up.">
+<link rel="canonical" href="https://www.mysoniq.com/suno-prompt-generator">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Free Suno v6 Prompt Generator">
+<meta property="og:description" content="Free Suno prompt generator. Describe your song and get a ready-to-paste Suno v6 style prompt under the 800-character limit, an exclude list, recommended settings and matching lyric tags. No sign-up.">
+<meta property="og:url" content="https://www.mysoniq.com/suno-prompt-generator">
+<meta property="og:image" content="https://www.mysoniq.com/blog/img/ai-songwriting-tools.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "@id": "https://www.mysoniq.com/suno-prompt-generator#app",
+      "name": "SONIQ Suno Prompt Generator",
+      "url": "https://www.mysoniq.com/suno-prompt-generator",
+      "applicationCategory": "MultimediaApplication",
+      "operatingSystem": "Any (web browser)",
+      "description": "Free generator for Suno v6 style prompts: layered, front-loaded, under 800 characters, with exclude styles, recommended settings and matching lyric tags.",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "description": "5 free generations per day, no sign-up"
+      },
+      "featureList": [
+        "Suno v6 style prompt under 800 characters",
+        "Exclude styles list",
+        "Recommended Weirdness, Style Influence, Variety and model",
+        "Matching lyric tags",
+        "One-click copy"
+      ],
+      "publisher": {
+        "@id": "https://www.mysoniq.com/#org"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://www.mysoniq.com/#org",
+      "name": "SONIQ",
+      "url": "https://www.mysoniq.com/",
+      "logo": "https://www.mysoniq.com/og-image.png",
+      "parentOrganization": {
+        "@type": "Organization",
+        "name": "Nu Wav Media LLC"
+      }
+    },
+    {
+      "@type": "HowTo",
+      "name": "How to write a Suno v6 prompt with SONIQ",
+      "totalTime": "PT1M",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Pick a genre and mood",
+          "text": "Choose the genre and the mood of the song."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Describe the song",
+          "text": "Write one line about the song and any sound you want, like a flute hook or a duet."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Paste into Suno",
+          "text": "Copy the style prompt into Suno's Style box, add the exclude styles, and set Variety to 0 so v6 keeps your prompt."
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is the Suno prompt generator free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. 5 prompts a day, no sign-up."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work with Suno v6?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Prompts are written for v6: layered, front-loaded, under 800 characters, with Variety set to 0 so v6 does not rewrite them."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why no artist names?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Suno rejects prompts that name real artists or bands. The generator describes the sound instead, which also gives you more control."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the exclude styles?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sounds you do not want Suno to drift into for your genre, like trap hi-hats on a country song. Paste them into Suno's exclude field."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can it describe duets or several voices?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Describe the voices in your idea, like \"male rapper and female singer\", and the prompt will name both. SONIQ's Vocal Cast also tags each section with its performer."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where do I write the lyrics?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Use the free AI lyrics generator or the rap lyrics generator, or let SONIQ write the full song."
+          }
+        }
+      ]
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "SONIQ",
+          "item": "https://www.mysoniq.com/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Free Suno Prompt Generator",
+          "item": "https://www.mysoniq.com/suno-prompt-generator"
+        }
+      ]
+    }
+  ]
+}
+</script>
+<style>
+:root{--bg:#0a0a0f;--s1:#12121a;--s2:#1a1a26;--b1:rgba(255,255,255,.08);--tx1:#f4f4f8;--tx2:#b9b9c8;--tx3:#83839a;--violet:#8b5cf6;--amber:#f5a524;--cyan:#22d3ee}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx1);font:17px/1.65 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;padding-inline:16px}
+a{color:var(--cyan)}
+.wrap{max-width:880px;margin:0 auto}
+header.top{display:flex;justify-content:space-between;align-items:center;padding-block:18px}
+header.top a.brand{color:var(--tx1);font-weight:800;letter-spacing:.08em;text-decoration:none}
+header.top nav{display:flex;gap:18px;font-size:15px}
+header.top nav a{color:var(--tx2);text-decoration:none}
+.hero{padding-block:28px 12px}
+.eyebrow{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--amber)}
+h1{font-size:clamp(34px,6vw,54px);line-height:1.08;margin:.3em 0 .3em;text-wrap:balance;font-weight:800}
+.lede{color:var(--tx2);font-size:19px;max-width:62ch;margin:0}
+.tool{background:var(--s1);border:1px solid var(--b1);border-radius:16px;padding:20px;margin-block:26px;display:grid;gap:14px}
+.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+label{font-size:13px;font-weight:600;color:var(--tx2);display:grid;gap:6px}
+input,select{background:var(--s2);color:var(--tx1);border:1px solid var(--b1);border-radius:10px;padding:12px;font:inherit;font-size:16px;width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--violet);outline-offset:2px}
+.check{display:flex;align-items:center;gap:8px;font-size:14px;color:var(--tx2)}
+.check input{width:auto}
+button.go{background:linear-gradient(90deg,var(--violet),#a855f7);color:#fff;border:0;border-radius:12px;padding:14px 20px;font:700 17px Inter,system-ui,sans-serif;cursor:pointer}
+button.go[disabled]{opacity:.6;cursor:progress}
+.out{display:none;background:#0d0d14;border:1px solid var(--b1);border-radius:12px;padding:16px;white-space:pre-wrap;font:15px/1.7 "JetBrains Mono",ui-monospace,Consolas,monospace;color:var(--tx1)}
+.out.show{display:block}
+.actions{display:none;gap:10px;flex-wrap:wrap}
+.actions.show{display:flex}
+.btn2{background:var(--s2);color:var(--tx1);border:1px solid var(--b1);border-radius:10px;padding:10px 14px;font:600 15px Inter,system-ui,sans-serif;cursor:pointer;text-decoration:none}
+.btn2.cta{background:var(--amber);color:#111;border-color:var(--amber)}
+.msg{color:var(--amber);font-size:15px;min-height:1em}
+.note{font-size:13px;color:var(--tx3)}
+section{padding-block:18px}
+h2{font-size:28px;line-height:1.2;margin:1.2em 0 .5em;text-wrap:balance}
+h3{font-size:19px;margin:1.1em 0 .3em}
+.styles{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;padding:0;list-style:none}
+.styles li{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:12px 14px}
+.styles b{display:block}
+.styles span{color:var(--tx2);font-size:15px}
+pre.example{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:16px;white-space:pre-wrap;font:15px/1.7 ui-monospace,Consolas,monospace;overflow-x:auto}
+details{background:var(--s1);border:1px solid var(--b1);border-radius:12px;padding:12px 16px;margin-block:10px}
+summary{font-weight:700;cursor:pointer}
+.cta-band{background:linear-gradient(135deg,#1c1230,#14142a);border:1px solid var(--b1);border-radius:16px;padding:22px;margin-block:28px}
+footer{color:var(--tx3);font-size:14px;padding-block:30px;border-top:1px solid var(--b1);margin-top:30px}
+@media (max-width:640px){.row{grid-template-columns:1fr}header.top nav{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="/">SONIQ</a>
+    <nav><a href="/rap-lyrics-generator">Rap generator</a><a href="/ai-lyrics-generator">Lyrics generator</a><a href="/suno-prompt-generator">Suno prompts</a><a href="/app">Open SONIQ</a></nav>
+  </header>
+
+  <div class="hero">
+    <div class="eyebrow">Free · No sign-up · 5 a day</div>
+    <h1>Free Suno Prompt Generator</h1>
+    <p class="lede">Describe your song and get a ready-to-paste Suno v6 style prompt: front-loaded with the sound that matters, under Suno's 800-character limit, plus an exclude list and the settings to use.</p>
+  </div>
+
+  <form class="tool" id="gen" autocomplete="off">
+    <label for="topic">Describe the song (sound, story, voices)
+      <input id="topic" name="topic" maxlength="160" required placeholder="e.g. summer love on a Lagos rooftop, flirty male and female duet">
+    </label>
+    <div class="row">
+      <label for="genre">Genre
+        <select id="genre" name="genre"><option value="pop">Pop</option><option value="rnb">R&B / Soul</option><option value="country">Country</option><option value="rock">Rock</option><option value="altrock">Indie / Alt-Rock</option><option value="edm">EDM / Electronic</option><option value="afrobeats">Afrobeats</option><option value="reggaeton">Reggaeton</option><option value="latin">Latin</option><option value="gospel">Gospel</option><option value="kpop">K-Pop</option><option value="folk">Folk</option><option value="neosoul">Neo-Soul</option><option value="hiphop">Hip-Hop</option><option value="metal">Metal</option><option value="punk">Punk</option></select>
+      </label>
+      <label for="mood">Mood
+        <select id="mood" name="mood"><option>romantic</option><option>heartbroken</option><option>confident</option><option>reflective</option><option>hungry</option><option>playful</option><option>celebratory</option><option>motivational</option><option>angry</option><option>cold</option></select>
+      </label>
+      <div></div>
+    </div>
+    <button class="go" id="go" type="submit">Write my Suno prompt</button>
+    <div class="msg" id="msg" role="status" aria-live="polite"></div>
+    <div class="out" id="out"></div>
+    <div class="actions" id="actions">
+      <button class="btn2" type="button" id="copy">Copy prompt</button>
+      <button class="btn2" type="button" id="again">Another take</button>
+      <a class="btn2 cta" href="/app">Write the lyrics too →</a>
+    </div>
+    <p class="note">No artist names: Suno rejects prompts that name real artists, so the generator describes the sound instead.</p>
+  </form>
+
+  <section>
+    <h2>What makes a Suno v6 prompt work</h2>
+    <h3>1. Order matters</h3>
+    <p>Suno weighs the start of the style prompt most. Put the genre and the one sound the song is built on first, and the mood words last.</p>
+    <h3>2. Stay under the limit</h3>
+    <p>Prompts past about 800 characters get cut from the end, which is exactly where the vocal description and the emotional close usually sit. The generator keeps every prompt under that line.</p>
+    <h3>3. Describe, don't name</h3>
+    <p>Suno rejects prompts that name real artists. Describe the sound instead: "breathy bansuri flute hook", "sliding 808 that bends root to fifth".</p>
+    <h3>4. Set Variety to 0</h3>
+    <p>In v6, Variety above 0 rewrites your prompt. Keep it at 0 so the prompt you wrote is the prompt Suno uses. Read <a href="/blog/suno-v6-explained">Suno v6 explained</a> for the rest of the new controls.</p>
+    <h3>5. Match your lyric tags</h3>
+    <p>If the prompt promises a drop or a stripped bridge, tag it in the lyrics too, like [Drop] or [Stripped]. The generator gives you tags that match.</p>
+  </section>
+  <section>
+    <h2>Example: Afrobeats, "summer love on a Lagos rooftop"</h2>
+<pre class="example">Afrobeats with amapiano log drum pulse, 105 BPM, signature shimmering kalimba melody cascading through the mix, four-on-the-floor kick with syncopated shekere and talking drum accents, silky bass guitar slides, electric keys with delay trails, warm horn stabs, lush atmospheric pads, male and female vocalists trading flirty phrases with breathy intimate delivery and playful adlibs, call-and-response hooks with harmonized chorus, verse strips to kalimba and light percussion before building into full arrangement, subtle vinyl crackle and distant Lagos street ambience, sunset-golden warmth with tender sensuality and carefree joy</pre>
+    <p class="note">684 characters. Settings: v6 · Weirdness 35% · Style influence 90% · Variety 0 · Max Mode on.</p>
+  </section>
+
+  <div class="cta-band">
+    <h2 style="margin-top:0">Want the lyrics written to match?</h2>
+    <p>SONIQ writes the whole song and the style prompt together, so what the prompt promises is tagged in the lyrics: duets, drops, key changes, stripped bridges. Your first 3 songs are free.</p>
+    <a class="btn2 cta" href="/app">Open SONIQ free →</a>
+  </div>
+
+  <section>
+    <h2>Suno prompt generator FAQ</h2>
+    <details><summary>Is the Suno prompt generator free?</summary><p>Yes. 5 prompts a day, no sign-up.</p></details>
+    <details><summary>Does it work with Suno v6?</summary><p>Yes. Prompts are written for v6: layered, front-loaded, under 800 characters, with Variety set to 0 so v6 does not rewrite them.</p></details>
+    <details><summary>Why no artist names?</summary><p>Suno rejects prompts that name real artists or bands. The generator describes the sound instead, which also gives you more control.</p></details>
+    <details><summary>What are the exclude styles?</summary><p>Sounds you do not want Suno to drift into for your genre, like trap hi-hats on a country song. Paste them into Suno's exclude field.</p></details>
+    <details><summary>Can it describe duets or several voices?</summary><p>Yes. Describe the voices in your idea, like "male rapper and female singer", and the prompt will name both. SONIQ's Vocal Cast also tags each section with its performer.</p></details>
+    <details><summary>Where do I write the lyrics?</summary><p>Use the <a href="/ai-lyrics-generator">free AI lyrics generator</a> or the <a href="/rap-lyrics-generator">rap lyrics generator</a>, or let SONIQ write the full song.</p></details>
+  </section>
+
+  <footer>
+    <p>SONIQ is an AI songwriting studio by Nu Wav Media LLC. <a href="/">Home</a> · <a href="/blog">Blog</a> · <a href="/rap-lyrics-generator">Rap lyrics generator</a> · <a href="/ai-lyrics-generator">AI lyrics generator</a> · <a href="/suno-prompt-generator">Suno prompt generator</a> · <a href="/legal/privacy.html">Privacy</a> · <a href="/legal/terms.html">Terms</a></p>
+  </footer>
+</div>
+<script>
+(function () {
+  var API = 'https://soniq-api.thealvindean.workers.dev', MODE = 'suno';
+  try { fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'pageview', path: '/suno-prompt-generator' }), keepalive: true }); } catch (e) {}
+  var form = document.getElementById('gen'), go = document.getElementById('go'), out = document.getElementById('out'), msg = document.getElementById('msg'), actions = document.getElementById('actions');
+  var lines = ["Picking the signature sound…","Characterising the drums and bass…","Describing the voices…","Fitting it under 800 characters…"];
+  function render(j) {
+    if (MODE === 'suno') {
+      var s = j.settings || {};
+      return 'STYLE PROMPT (' + j.chars + ' characters, paste into Suno "Style"):\n' + j.style +
+        (j.exclude && j.exclude.length ? '\n\nEXCLUDE STYLES:\n' + j.exclude.join(', ') : '') +
+        '\n\nSETTINGS:\nModel: ' + (s.model || 'v6') + ' · Weirdness: ' + s.weirdness + '% · Style influence: ' + s.styleInfluence + '% · Variety: 0 (keeps your prompt) · Max Mode: ' + (s.maxMode ? 'on for songs over 2 min' : 'optional') +
+        (j.tags ? '\n\nLYRIC TAGS THAT MATCH:\n' + j.tags : '');
+    }
+    return j.lyrics;
+  }
+  function run(e) {
+    if (e) e.preventDefault();
+    var topic = document.getElementById('topic').value.trim();
+    if (topic.length < 3) { msg.textContent = 'Tell it what the song is about.'; return; }
+    go.disabled = true; out.classList.remove('show'); actions.classList.remove('show');
+    var i = 0; msg.textContent = lines[0];
+    var t = setInterval(function () { i = (i + 1) % lines.length; msg.textContent = lines[i]; }, 2500);
+    var cl = document.getElementById('clean');
+    fetch(API + '/api/lyricgen', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mode: MODE, topic: topic, genre: document.getElementById('genre').value, mood: document.getElementById('mood').value, clean: cl ? cl.checked : true }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        clearInterval(t); go.disabled = false;
+        if (j.lyrics || j.style) {
+          out.textContent = render(j); out.classList.add('show'); actions.classList.add('show');
+          msg.textContent = j.remaining > 0 ? j.remaining + ' free left today.' : 'Last free one for today. Full songs are in SONIQ.';
+        } else { msg.textContent = j.message || 'Something went wrong. Try again.'; }
+      })
+      .catch(function () { clearInterval(t); go.disabled = false; msg.textContent = 'Network hiccup. Try again.'; });
+  }
+  form.addEventListener('submit', run);
+  document.getElementById('again').addEventListener('click', run);
+  document.getElementById('copy').addEventListener('click', function () {
+    var txt = out.textContent;
+    (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { msg.textContent = 'Copied.'; })
+      .catch(function () { var r = document.createRange(); r.selectNodeContents(out); var s = getSelection(); s.removeAllRanges(); s.addRange(r); msg.textContent = 'Selected. Press Ctrl+C to copy.'; });
+  });
+})();
+</script>
+</body>
+</html>

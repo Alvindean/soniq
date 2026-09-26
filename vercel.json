@@ -119,6 +119,14 @@
       "dest": "/rap-lyrics-generator.html"
     },
     {
+      "src": "/suno-prompt-generator/?",
+      "dest": "/suno-prompt-generator.html"
+    },
+    {
+      "src": "/ai-lyrics-generator/?",
+      "dest": "/ai-lyrics-generator.html"
+    },
+    {
       "src": "/app",
       "dest": "/index.html"
     },
