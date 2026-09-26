@@ -2,11 +2,11 @@
 title: "Gimme That"
 lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
-v7: "you smell like trouble" (she senses it on him and likes it); rain removed. v6: ownable hook lines, verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
+v8: style rebuilt (flute first, half-time trap bounce under rap verses, full dembow chorus, heavier dance break/drop, voices described). v7: "you smell like trouble" (she senses it on him and likes it); rain removed. v6: ownable hook lines, verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
 ---
 
 STYLE:
-moombahton pop and hip-hop crossover, 108 BPM, dembow groove, tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, sliding 808 and syncopated Latin bass with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, dry rap verses with melodic auto-tune on his hook and pre-hook lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, risers and reverse cymbals into sections, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, a full stop then a whole-step key change up into the final chorus, polished club mix, sultry, playful, danceable, euphoric
+moombahton pop meets hard-hitting hip-hop, 108 BPM, bright breathy bansuri flute hook with quick bends, dembow groove with a tight snappy crack snare, ghost-note fills, open hi-hats, timbales, congas and shakers, deep sliding 808 and syncopated Latin bass with sidechain pump, rap verses drop into a harder half-time trap bounce with punchy kicks and 808 stabs, confident crisp male rapper with a percussive flow and melodic auto-tune on his hook lines, smoky playful female singer-rapper, trading duet with stacked ad-libs, echo throws and gang chants, chorus opens to full dembow with claps, percussion and flute dance break, snare roll into a heavy moombahton drop with vocal chops, full stop then a whole-step key change into the final chorus, sultry, playful, peak-time danceable
 
 LYRICS:
 
@@ -19,7 +19,7 @@ Gimme, gimme (ay)
 (Hey!)
 
 [Verse 1 | Him]
-[Snappy Snare] [Open Hi-Hats]
+[Half-Time Trap Bounce] [Punchy Kick] [808 Stabs]
 [Male Vocal] [Rap]
 Left my crew by the bar, they ain't notice I'm gone (yeah)
 You left yours by the booth when they played your song (your song)
@@ -40,7 +40,7 @@ You been teasing all night, I see what you do (I see you)
 So tell me what you want, 'cause I'm right here with you
 
 [Chorus]
-[Background Vocals] [Gang Vocals]
+[Full Dembow] [Claps] [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
 You smell like trouble (trouble)
@@ -52,13 +52,13 @@ Gimme, gimme, gimme that (hey!)
 Gimme, gimme, gimme that (ay)
 
 [Dance Break]
-[Instrumental] [Bansuri Flute Riff] [Snappy Snare] [Timbales] [Open Hi-Hats]
+[Instrumental] [Full Dembow] [Bansuri Flute Riff] [Congas] [Timbales] [Claps]
 (Gimme, gimme)
 (Hey! Hey!)
 (Ay, ay, ay)
 
 [Verse 2 | Her]
-[Snappy Snare]
+[Half-Time Trap Bounce] [Punchy Kick] [808 Stabs]
 [Female Vocal] [Rap]
 My girls in the corner like "who is he?" (who is he?)
 I ain't even turn around, let 'em watch and see (mm)
@@ -79,7 +79,7 @@ You been teasing all night, I see what you do (I see you)
 So tell me what you want, 'cause I'm right here with you
 
 [Chorus]
-[Background Vocals] [Gang Vocals]
+[Full Dembow] [Claps] [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
 You smell like trouble (trouble)
@@ -106,7 +106,7 @@ Gimme, gimme, gimme, gimme
 Gimme, gimme, gimme, gimme
 Gimme that (hey!)
 
-[Drop | EDM Breakdown] [Vocal Chop]
+[Drop | Heavy Moombahton Drop] [Vocal Chop]
 [Female Vocal]
 Gim-me that, gim-me that (that, that, that)
 [Male Vocal] [Auto-Tune]
