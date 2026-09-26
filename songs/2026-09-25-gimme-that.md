@@ -2,7 +2,7 @@
 title: "Gimme That"
 lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
-v6 (rated 78 -> fixes): ownable hook lines (rain/chain), verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
+v7: "you smell like trouble" (she senses it on him and likes it); rain removed. v6: ownable hook lines, verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
 ---
 
 STYLE:
@@ -43,7 +43,7 @@ So tell me what you want, 'cause I'm right here with you
 [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-You smell like the rain (like the rain)
+You smell like trouble (trouble)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Keep pulling my chain (pull it)
@@ -62,7 +62,7 @@ Gimme, gimme, gimme that (ay)
 [Female Vocal] [Rap]
 My girls in the corner like "who is he?" (who is he?)
 I ain't even turn around, let 'em watch and see (mm)
-You smell like the rain and a little cologne (ooh)
+You smell like trouble and a little cologne (ooh)
 Keep your hands where I put 'em, you ain't running this alone (nah)
 I lean to your ear, then I pull right back (right back)
 You chasing every inch, and I know you like that (ay)
@@ -82,7 +82,7 @@ So tell me what you want, 'cause I'm right here with you
 [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-You smell like the rain (like the rain)
+You smell like trouble (trouble)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Keep pulling my chain (pull it)
@@ -93,11 +93,11 @@ Gimme, gimme, gimme that (ay)
 [Bridge]
 [Drums Out] [Bansuri Flute Riff]
 [Male Vocal] [Auto-Tune]
-Lights up, doors open, rain on the curb (on the curb)
+Lights up, doors open, cab at the curb (at the curb)
 Say the word, girl, just say the word (say the word)
 [Female Vocal]
 One more song, then I'm yours tonight (tonight)
-Heels in your hand and the rain on the ride (ooh)
+Heels in your hand, let the city go by (ooh)
 
 [Build]
 [Snappy Snare Roll] [Riser]
@@ -123,7 +123,7 @@ Gimme that!
 [Snappy Snare] [Claps] [Harmony] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-You leaving in the rain (in the rain)
+I'm leaving with trouble (with trouble)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Keep pulling my chain (pull it)
