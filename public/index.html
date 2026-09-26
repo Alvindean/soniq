@@ -26551,7 +26551,11 @@ window.adminLogin = adminLogin;
     try {
       const t = document.getElementById('g-topic');
       if (t) { t.value = topic; t.dispatchEvent(new Event('input', { bubbles: true })); }
-      if (genre && typeof GENRES_DEF !== 'undefined' && GENRES_DEF.some(function (x) { return x.id === genre; }) && typeof onGenreChange === 'function') onGenreChange(genre);
+      // Respect plan locks: a locked genre goes through the same upgrade prompt as clicking it.
+      if (genre && typeof GENRES_DEF !== 'undefined' && GENRES_DEF.some(function (x) { return x.id === genre; })) {
+        if (typeof isGenreFree === 'function' && !isGenreFree(genre)) { if (typeof lockedGenreClick === 'function') lockedGenreClick(genre); }
+        else if (typeof onGenreChange === 'function') onGenreChange(genre);
+      }
       if (genre === 'hiphop' && RAP[style] && typeof onRapStyleSelect === 'function') onRapStyleSelect(RAP[style]);
       if (mood && typeof S !== 'undefined') {
         S.selectedMoods = [mood];
