@@ -6,7 +6,12 @@
 (function () {
   var API = 'https://soniq-api.thealvindean.workers.dev';
   var slug = (location.pathname.replace(/^\/blog\/?/, '').replace(/\.html$/, '') || 'index');
-  var ref = 'blog-' + slug;
+  // ref = the page path, so affiliate clicks line up with this page's pageviews
+  // (soniq:pv:pages:*) and the admin stats can compute click-through rate.
+  var pagePath = location.pathname.replace(/\.html$/, '').toLowerCase().replace(/\/+$/, '') || '/';
+  var ref = pagePath;
+  // First-party pageview beacon (no cookies, no PII) — blog pages never sent one before.
+  try { fetch(API + '/api/pv', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ event: 'pageview', path: pagePath }), keepalive: true }); } catch (e) {}
 
   function hash(s) { var h = 2166136261; for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
   function rnd(seed) { var x = seed || 1; return function () { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
@@ -57,7 +62,12 @@
   // hero: two-column with art
   var heroInner = document.createElement('div'); heroInner.className = 'post-hero-inner';
   while (hero.firstChild) heroInner.appendChild(hero.firstChild);
-  var art = document.createElement('div'); art.className = 'post-hero-art'; art.innerHTML = coverArt(slug, category, true);
+  var art = document.createElement('div'); art.className = 'post-hero-art';
+  // A real hero photo (featured_image, rendered by the Worker at the top of the
+  // body) replaces the generated waveform art so posts don't show two covers.
+  var photo = body && body.querySelector('img.post-hero-img');
+  if (photo) { photo.style.margin = '0'; photo.style.height = '100%'; photo.style.objectFit = 'cover'; art.appendChild(photo); }
+  else art.innerHTML = coverArt(slug, category, true);
   hero.appendChild(heroInner); hero.appendChild(art);
 
   // layout wrapper
