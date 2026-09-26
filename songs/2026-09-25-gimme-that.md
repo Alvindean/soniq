@@ -2,11 +2,11 @@
 title: "Gimme That"
 lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
-v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
+v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
 ---
 
 STYLE:
-moombahton pop and hip-hop crossover, 108 BPM, dembow groove with a tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, deep sliding 808 locked to a syncopated Latin bassline with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, white-noise risers and reverse cymbals into each section, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, wide polished club mix, sultry, playful, danceable, euphoric
+moombahton pop and hip-hop crossover, 108 BPM, dembow groove with a tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, deep sliding 808 locked to a syncopated Latin bassline with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, dry rap verses with melodic auto-tune on his hook and pre-hook lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, white-noise risers and reverse cymbals into each section, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, wide polished club mix, sultry, playful, danceable, euphoric
 
 LYRICS:
 
@@ -35,7 +35,7 @@ Your hand on my chain like the night just begun (let's go)
 [Female Vocal]
 Don't talk, don't talk, just move with me (mm)
 Hands on my waist, keep it on the beat (on the beat)
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 You been teasing all night, I see what you do (I see you)
 So tell me what you want, 'cause I'm right here with you
 
@@ -44,7 +44,7 @@ So tell me what you want, 'cause I'm right here with you
 [Female Vocal]
 Gimme that, gimme that (gimme that)
 The way you move on me (move on me)
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Don't stop, don't leave (don't leave)
 [Male and Female Vocals]
@@ -74,7 +74,7 @@ Last song, lights up, so where we going then? (going then?)
 [Female Vocal]
 Don't talk, don't talk, just move with me (mm)
 Hands on my waist, keep it on the beat (on the beat)
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 You been teasing all night, I see what you do (I see you)
 So tell me what you want, 'cause I'm right here with you
 
@@ -83,7 +83,7 @@ So tell me what you want, 'cause I'm right here with you
 [Female Vocal]
 Gimme that, gimme that (gimme that)
 The way you move on me (move on me)
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Don't stop, don't leave (don't leave)
 [Male and Female Vocals]
@@ -92,7 +92,7 @@ Gimme, gimme, gimme that (ay)
 
 [Bridge]
 [Drums Out] [Bansuri Flute Riff]
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 Lights up, doors open, cab at the curb (at the curb)
 Say the word, girl, just say the word (say the word)
 [Female Vocal]
@@ -109,7 +109,7 @@ Gimme that (hey!)
 [Drop | EDM Breakdown] [Vocal Chop]
 [Female Vocal]
 Gim-me that, gim-me that (that, that, that)
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 Gim-me that, gim-me that (let's go)
 [Instrumental] [Bansuri Flute Riff] [Snappy Snare] [Timbales]
 (Hey! Hey!)
@@ -119,7 +119,7 @@ Gim-me that, gim-me that (let's go)
 [Female Vocal]
 Gimme that, gimme that (gimme that)
 The way you're leaving with me (with me)
-[Male Vocal]
+[Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
 Don't stop, don't leave (don't leave)
 [Male and Female Vocals]
