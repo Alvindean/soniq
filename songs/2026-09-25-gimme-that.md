@@ -2,11 +2,11 @@
 title: "Gimme That"
 lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
-v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
+v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
 ---
 
 STYLE:
-moombahton pop and hip-hop crossover, 108 BPM, dembow groove with a tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, deep sliding 808 locked to a syncopated Latin bassline with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, dry rap verses with melodic auto-tune on his hook and pre-hook lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, white-noise risers and reverse cymbals into each section, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, wide polished club mix, sultry, playful, danceable, euphoric
+moombahton pop and hip-hop crossover, 108 BPM, dembow groove with a tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, deep sliding 808 locked to a syncopated Latin bassline with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, dry rap verses with melodic auto-tune on his hook and pre-hook lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, risers and reverse cymbals into sections, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, a full stop then a whole-step key change up into the final chorus, polished club mix, sultry, playful, danceable, euphoric
 
 LYRICS:
 
@@ -114,7 +114,12 @@ Gim-me that, gim-me that (let's go)
 [Instrumental] [Bansuri Flute Riff] [Snappy Snare] [Timbales]
 (Hey! Hey!)
 
+[Stop]
+[A Cappella] [Male and Female Vocals]
+Gimme that!
+
 [Final Chorus]
+[Key Change Up a Whole Step]
 [Snappy Snare] [Claps] [Harmony] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
