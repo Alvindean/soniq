@@ -6,7 +6,7 @@ v5: stop + whole-step key change into the final chorus. v4: auto-tune on his mel
 ---
 
 STYLE:
-moombahton pop and hip-hop crossover, 108 BPM, dembow groove with a tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, deep sliding 808 locked to a syncopated Latin bassline with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, dry rap verses with melodic auto-tune on his hook and pre-hook lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, risers and reverse cymbals into sections, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, a full stop then a whole-step key change up into the final chorus, polished club mix, sultry, playful, danceable, euphoric
+moombahton pop and hip-hop crossover, 108 BPM, dembow groove, tight snappy crack snare on 2 and 4 and ghost-note fills, funky open hi-hats and timbale rolls, breathy bansuri flute lead with quick bends as the signature hook, sliding 808 and syncopated Latin bass with sidechain pump, flirty male rapper and female singer-rapper duet trading lines, dry rap verses with melodic auto-tune on his hook and pre-hook lines, stacked background ad-libs and echo throws on line ends, gang vocal chant on the gimme that hook, risers and reverse cymbals into sections, flute and percussion dance break, snappy snare roll into a moombahton drop on a chopped gimme that vocal, a full stop then a whole-step key change up into the final chorus, polished club mix, sultry, playful, danceable, euphoric
 
 LYRICS:
 
