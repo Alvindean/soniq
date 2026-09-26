@@ -93,7 +93,8 @@
     { p: 'distrokid', name: 'DistroKid', domain: 'distrokid.com', line: 'Unlimited releases to every store. 7% off through SONIQ.' },
     { p: 'tunecorepartner', name: 'TuneCore', domain: 'tunecore.com', line: 'Distribution + publishing admin. Code SONIQ20.' },
     { p: 'soundraw', name: 'Soundraw', domain: 'soundraw.io', line: 'Royalty-free AI beats to write over.' },
-    { p: 'splice', name: 'Splice', domain: 'splice.com', line: 'Samples, loops and presets for your productions.' }
+    { p: 'splice', name: 'Splice', domain: 'splice.com', line: 'Samples, loops and presets for your productions.' },
+    { p: 'descript', name: 'Descript', domain: 'descript.com', line: 'Edit music videos, lyric videos and podcasts by editing text.' }
   ];
   side.insertAdjacentHTML('beforeend', '<div class="side-card side-tools"><div class="side-kicker">TOOLS WE ACTUALLY USE</div>' +
     tools.map(function (t) {
