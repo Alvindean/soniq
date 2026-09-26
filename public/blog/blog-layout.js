@@ -104,6 +104,12 @@
     }).join('') +
     '<div class="side-disclosure">Partner links — SONIQ may earn a commission at no cost to you. It never changes what we recommend.</div></div>');
 
+  // 2b) Descript banner (verified partner link, tracked via /api/aff)
+  side.insertAdjacentHTML('beforeend', '<div class="side-card side-banner" style="padding:10px">' +
+    '<a href="' + API + '/api/aff?p=descript&ref=' + esc(ref) + '" target="_blank" rel="nofollow sponsored noopener" aria-label="Try Descript for free: AI-powered video editing">' +
+    '<img src="/blog/img/descript-banner.jpg" alt="Descript: AI-powered video editing. Try Descript for free." width="640" height="533" loading="lazy" style="width:100%;height:auto;border-radius:10px;display:block"></a>' +
+    '<div class="side-disclosure" style="margin-top:6px">Sponsored</div></div>');
+
   // 3) TOC (numbered, active tracking)
   var h2s = Array.prototype.slice.call(body.querySelectorAll('h2'));
   if (h2s.length >= 2) {
