@@ -2,7 +2,7 @@
 title: "Gimme That"
 lane: moombahton-pop (bansuri flute + snappy snare) / hip-hop / Latin, 108 BPM, male + female duet
 story (one night, three scenes): they leave their friend groups on the floor → the tease gets closer → last song, lights up, curb outside
-v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
+v6 (rated 78 -> fixes): ownable hook lines (rain/chain), verse-1 cliches swapped, concrete bridge. v5: stop + whole-step key change into the final chorus. v4: auto-tune on his melodic lines only (verses stay dry). v3: ad-libs on line ends (his: yeah/uh/woo/let's go; hers: ay/mm/ooh/hey), echo throws that repeat the last words, background vocals + gang chant on the hook, richer production spec
 ---
 
 STYLE:
@@ -23,12 +23,12 @@ Gimme, gimme (ay)
 [Male Vocal] [Rap]
 Left my crew by the bar, they ain't notice I'm gone (yeah)
 You left yours by the booth when they played your song (your song)
-Red dress in the strobe and you moving it slow (uh)
+Gold hoops in the strobe and you moving it slow (uh)
 Every time the bass drop, you ain't letting it go (let it go)
 Caught my eye through the smoke, then you looked away (woo)
 Then you looked right back like you had something to say (say it)
 Now we three feet close, now we two, now one (uh)
-Your hand on my chain like the night just begun (let's go)
+Your hand on my chain and you tug it for fun (let's go)
 
 [Pre-Chorus]
 [Reverse Cymbal]
@@ -43,10 +43,10 @@ So tell me what you want, 'cause I'm right here with you
 [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-The way you move on me (move on me)
+You smell like the rain (like the rain)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
-Don't stop, don't leave (don't leave)
+Keep pulling my chain (pull it)
 [Male and Female Vocals]
 Gimme, gimme, gimme that (hey!)
 Gimme, gimme, gimme that (ay)
@@ -82,10 +82,10 @@ So tell me what you want, 'cause I'm right here with you
 [Background Vocals] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-The way you move on me (move on me)
+You smell like the rain (like the rain)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
-Don't stop, don't leave (don't leave)
+Keep pulling my chain (pull it)
 [Male and Female Vocals]
 Gimme, gimme, gimme that (hey!)
 Gimme, gimme, gimme that (ay)
@@ -93,11 +93,11 @@ Gimme, gimme, gimme that (ay)
 [Bridge]
 [Drums Out] [Bansuri Flute Riff]
 [Male Vocal] [Auto-Tune]
-Lights up, doors open, cab at the curb (at the curb)
+Lights up, doors open, rain on the curb (on the curb)
 Say the word, girl, just say the word (say the word)
 [Female Vocal]
 One more song, then I'm yours tonight (tonight)
-Take me somewhere with a slower light (ooh)
+Heels in your hand and the rain on the ride (ooh)
 
 [Build]
 [Snappy Snare Roll] [Riser]
@@ -123,10 +123,10 @@ Gimme that!
 [Snappy Snare] [Claps] [Harmony] [Gang Vocals]
 [Female Vocal]
 Gimme that, gimme that (gimme that)
-The way you're leaving with me (with me)
+You leaving in the rain (in the rain)
 [Male Vocal] [Auto-Tune]
 Gimme that, gimme that (gimme that)
-Don't stop, don't leave (don't leave)
+Keep pulling my chain (pull it)
 [Male and Female Vocals]
 Gimme, gimme, gimme that (hey!)
 And gimme, gimme, gimme that (ay, ay)
