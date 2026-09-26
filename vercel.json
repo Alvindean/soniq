@@ -63,6 +63,10 @@
       "dest": "/llms.txt"
     },
     {
+      "src": "/c57863775139e740f0b60c8d33b189f3.txt",
+      "dest": "/c57863775139e740f0b60c8d33b189f3.txt"
+    },
+    {
       "src": "/favicon.svg",
       "dest": "/favicon.svg"
     },
