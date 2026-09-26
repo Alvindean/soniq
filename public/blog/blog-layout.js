@@ -96,6 +96,11 @@
     { p: 'splice', name: 'Splice', domain: 'splice.com', line: 'Samples, loops and presets for your productions.' },
     { p: 'descript', name: 'Descript', domain: 'descript.com', line: 'Edit music videos, lyric videos and podcasts by editing text.' }
   ];
+  // Pianoforall only where piano helps the reader: songwriting, genre and theory
+  // guides — not rap/trap/drill posts, where a piano course is off-topic.
+  if (!/rap|hip-hop|hip hop|trap|drill|diss|bars|verse/i.test(title)) {
+    tools.splice(2, 0, { p: 'pianoforall', name: 'Pianoforall', domain: 'pianoforall.com', line: 'Learn piano chords fast and write songs on keys.' });
+  }
   side.insertAdjacentHTML('beforeend', '<div class="side-card side-tools"><div class="side-kicker">TOOLS WE ACTUALLY USE</div>' +
     tools.map(function (t) {
       return '<a class="tool-card" href="' + API + '/api/aff?p=' + t.p + '&ref=' + esc(ref) + '" target="_blank" rel="nofollow sponsored noopener">' +
