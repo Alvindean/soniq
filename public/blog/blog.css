@@ -499,3 +499,8 @@ body {
   .blog-v2 .post-body p, .blog-v2 .post-body li { font-size: 1.05rem; }
   .blog-v2 .post-hero h1 { font-size: 1.9rem; }
 }
+
+/* Sidebar scrolls with the page (was a viewport-tall scroll box that hid the lower cards); the last card, the partner banner, stays in view. */
+.post-side { position: relative; top: auto; max-height: none; overflow: visible; align-self: stretch; }
+.post-side .side-banner { position: sticky; top: 76px; }
+@media (max-width: 1000px) { .post-side .side-banner { position: static; } }
