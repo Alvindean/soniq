@@ -171,6 +171,10 @@
       "dest": "/ai-duet-song-generator.html"
     },
     {
+      "src": "/press/(.*)",
+      "dest": "/press/$1"
+    },
+    {
       "src": "/app",
       "dest": "/index.html"
     },
