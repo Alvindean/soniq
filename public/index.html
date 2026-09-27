@@ -20005,20 +20005,20 @@ async function openUpgradeModal() {
       if (tierIcon) tierIcon.textContent = '🔥';
       if (tierName) tierName.textContent = 'Early Founder — $5/mo forever';
       if (tierBadge) tierBadge.textContent = 'Founding';
-      if (tierSpot) tierSpot.textContent = t1SpotsLeft + ' of 500 spots left';
+      if (tierSpot) tierSpot.textContent = window.__soniqAdmin ? t1SpotsLeft + ' of 500 spots left (admin only)' : 'Limited founding spots';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 - t1SpotsLeft;
       if (urgencySuffix) urgencySuffix.textContent = 'of 500 claimed';
-      if (urgency) urgency.style.display = '';
+      if (urgency) urgency.style.display = window.__soniqAdmin ? '' : 'none';
       currentCheckoutPlan = 'founding_t1';
     } else if (data.current_tier === 2 && t2SpotsLeft > 0) {
       if (banner) banner.style.display = 'flex';
       if (tierIcon) tierIcon.textContent = '⚡';
       if (tierName) tierName.textContent = 'Founding Member — Locked Rate';
       if (tierBadge) tierBadge.textContent = 'Founding';
-      if (tierSpot) tierSpot.textContent = t2SpotsLeft + ' of 1500 spots left';
+      if (tierSpot) tierSpot.textContent = window.__soniqAdmin ? t2SpotsLeft + ' of 1500 spots left (admin only)' : 'Limited founding spots';
       if (urgencyClaimed) urgencyClaimed.textContent = 500 + (1500 - t2SpotsLeft);
       if (urgencySuffix) urgencySuffix.textContent = 'of 2000 founding spots claimed';
-      if (urgency) urgency.style.display = '';
+      if (urgency) urgency.style.display = window.__soniqAdmin ? '' : 'none';
       currentCheckoutPlan = 'founding_t2';
     }
   } catch (e) { /* silently fail — modal still shows */ }
@@ -20176,10 +20176,12 @@ async function loadFoundingStatus() {
       if (offerEl && spotsEl) {
         if (data.current_tier === 1) {
           offerEl.innerHTML = '🔥 <strong>Early Founder</strong> — Early Founder rate — $5/mo · <span id="founding-spots">' + (data.tier1?.spots_left ?? '...') + '</span> spots left';
+          if (!window.__soniqAdmin) offerEl.innerHTML = '🔥 <strong>Early Founder</strong> — $5/mo forever · limited spots';
           offerEl.style.display = '';
           offerEl.style.color = '#fb923c';
         } else if (data.current_tier === 2) {
           offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — Locked founding rate · <span id="founding-spots">' + (data.tier2?.spots_left ?? '...') + '</span> spots left';
+          if (!window.__soniqAdmin) offerEl.innerHTML = '⚡ <strong>Founding Member</strong> — locked founding rate · limited spots';
           offerEl.style.display = '';
           offerEl.style.color = '#a78bfa';
         } else {
