@@ -96,7 +96,8 @@
     { p: 'tunecorepartner', name: 'TuneCore', domain: 'tunecore.com', line: 'Distribution + publishing admin. Code SONIQ20.' },
     { p: 'soundraw', name: 'Soundraw', domain: 'soundraw.io', line: 'Royalty-free AI beats to write over.' },
     { p: 'splice', name: 'Splice', domain: 'splice.com', line: 'Samples, loops and presets for your productions.' },
-    { p: 'descript', name: 'Descript', domain: 'descript.com', line: 'Edit music videos, lyric videos and podcasts by editing text.' }
+    { p: 'descript', name: 'Descript', domain: 'descript.com', line: 'Edit music videos, lyric videos and podcasts by editing text.' },
+    { p: 'hostgator', name: 'HostGator', domain: 'hostgator.com', line: 'Your own artist website and domain: music, merch, EPK and email list.' }
   ];
   // Pianoforall only where piano helps the reader: songwriting, genre and theory
   // guides — not rap/trap/drill posts, where a piano course is off-topic.
