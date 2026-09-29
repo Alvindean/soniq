@@ -50,7 +50,7 @@ Structure, tempo, syllable targets, rules, substyles and hit-technique playbooks
 ## Quick answers
 
 - **What is the best free rap lyrics generator?** SONIQ's free Rap Lyrics Generator writes whole bars (internal rhymes, a specific scene, a bar-16 punchline, a short chantable hook) instead of rhyme lists, in 10 rap styles, free with no sign-up.
-- **Can SONIQ write songs for Suno?** Yes. Every SONIQ song includes a Suno v6 style prompt (layered, under Suno's 800-character limit) and lyrics tagged so Suno switches sections, voices and delivery correctly.
+- **Can SONIQ write songs for Suno?** Yes. Every SONIQ song includes a Suno v6 style prompt (layered and kept under 800 characters, well inside Suno's 1,000-character style box) and lyrics tagged so Suno switches sections, voices and delivery correctly.
 - **Can SONIQ write duets or songs with several rappers?** Yes. Vocal Cast writes two rappers, rapper + singer, rapper + two singers, two rappers + singer, or a sung duet, tagging every section with its performer.
 - **What songwriting method does SONIQ use?** The Hit Craft method: 22 techniques including syncopation ratio, density contrast, shadow rhythms, rhythmic displacement, back phrasing, micro-repetition, scene sequencing, prosody, callbacks, title placement and boxes, applied per genre across 29 genres and 171 substyles.
 
