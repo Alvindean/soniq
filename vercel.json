@@ -103,6 +103,10 @@
       "dest": "/blog/index.html"
     },
     {
+      "src": "/blog/media/(.*)",
+      "dest": "https://soniq-api.thealvindean.workers.dev/blog/media/$1"
+    },
+    {
       "src": "/blog/img/(.*)",
       "dest": "/blog/img/$1"
     },
