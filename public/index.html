@@ -11740,7 +11740,7 @@ async function callLocalOllama(prompt, systemPrompt, maxTokens, signal, onChunk)
           ...(systemPrompt ? [{role: 'system', content: systemPrompt}] : []),
           {role: 'user', content: prompt}
         ],
-        options: {num_predict: maxTokens}
+        options: {num_predict: maxTokens, num_ctx: 8192, num_gpu: 28}
       }),
       signal
     });
