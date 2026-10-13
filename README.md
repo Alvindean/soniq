@@ -63,6 +63,14 @@ After saving → Deployments → latest → Redeploy. Done.
 
 `SONIQ_AI_PROVIDER` is optional: `auto` (default) tries Anthropic first when `ANTHROPIC_API_KEY` is configured, then OpenRouter; `anthropic` or `openrouter` forces one provider without fallback. The API Key dialog accepts personal `sk-ant-...` and `sk-or-...` keys, and hosted generation forwards a saved key to its matching provider.
 
+On the hosted app, choose **Use Local Qwen 3.6 (Ollama)** from **AI Provider** to run prompt-based writing on the computer running the browser. This uses the local Ollama model `qwen3.6:latest`; Ollama must be running on port `11434`. Because browser security requires an explicit CORS allowlist, on Windows set the user environment variable below, then fully quit and restart Ollama:
+
+```powershell
+[Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', 'https://www.mysoniq.com,https://mysoniq.com', 'User')
+```
+
+Local-mode prompts are sent from the browser directly to Ollama, not to SONIQ's AI provider API. Use **AI Provider → Use SONIQ Cloud** to switch back. This browser-local option applies to prompt-based generation; server-side account, publishing, and other API features continue to use their existing endpoints.
+
 ---
 
 ## Local Development
