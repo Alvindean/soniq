@@ -67,7 +67,11 @@ On the hosted app, choose **Use Local Qwen 3.6 (Ollama)** from **AI Provider** t
 
 ```powershell
 [Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', 'https://www.mysoniq.com,https://mysoniq.com', 'User')
+[Environment]::SetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', '0', 'User')
+[Environment]::SetEnvironmentVariable('OLLAMA_KV_CACHE_TYPE', 'f16', 'User')
 ```
+
+The attention/cache settings avoid a CUDA runner crash observed with this Qwen 3.6 setup; the `f16` cache uses more GPU memory than a quantized cache. These are Ollama-wide settings.
 
 Local-mode prompts are sent from the browser directly to Ollama, not to SONIQ's AI provider API. Use **AI Provider → Use SONIQ Cloud** to switch back. This browser-local option applies to prompt-based generation; server-side account, publishing, and other API features continue to use their existing endpoints.
 
