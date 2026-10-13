@@ -12,6 +12,7 @@ const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const { createClient } = require('@supabase/supabase-js');
 const { validatePhrase: _laValidatePhrase } = require('./_loop_anchor');
+const { getProviderOrder, getUserProvider, OPENROUTER_MODEL } = require('./_provider');
 
 function getSupabaseClient(token) {
   const url = process.env.SUPABASE_URL;
@@ -497,7 +498,7 @@ async function orFetch(apiKey, orMsgs, max_tokens) {
       'HTTP-Referer': 'https://www.mysoniq.com',
       'X-Title': 'SONIQ'
     },
-    body: JSON.stringify({model: 'anthropic/claude-sonnet-4-5', max_tokens, stream: true, messages: orMsgs})
+    body: JSON.stringify({model: OPENROUTER_MODEL, max_tokens, stream: true, messages: orMsgs})
   });
 }
 
@@ -1079,22 +1080,29 @@ module.exports = async function handler(req, res) {
   }
 
   // Treat 'server-side' sentinel (set by client on Vercel) as no user key
-  const userKey = (body?.userKey && body.userKey !== 'server-side') ? body.userKey : null;
+  const rawUserKey = (body?.userKey && body.userKey !== 'server-side') ? String(body.userKey).trim() : null;
+  const userCredential = rawUserKey ? getUserProvider(rawUserKey) : null;
+  if (rawUserKey && !userCredential) {
+    return res.status(400).json({ error: 'API key must start with sk-ant- or sk-or-.' });
+  }
 
   // If using server key and this is a legacy raw-message request (no action/variant),
   // lock the system prompt. For brain-built prompts (action/variant), keep their specialized system.
-  if (!userKey && !body.action && !body.variant) {
+  if (!userCredential && !body.action && !body.variant) {
     system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
   }
 
-  const anthropicKey = userKey || process.env.ANTHROPIC_API_KEY;
-  const openrouterKey = userKey ? null : process.env.OPENROUTER_API_KEY;
+  const anthropicKey = userCredential
+    ? (userCredential.provider === 'anthropic' ? userCredential.key : null)
+    : process.env.ANTHROPIC_API_KEY;
+  const openrouterKey = userCredential
+    ? (userCredential.provider === 'openrouter' ? userCredential.key : null)
+    : process.env.OPENROUTER_API_KEY;
 
-  if (!anthropicKey && !openrouterKey) {
-    return res.status(500).json({
-      error: 'No API key configured. Add ANTHROPIC_API_KEY or OPENROUTER_API_KEY in Vercel → Settings → Environment Variables, then Redeploy.'
-    });
-  }
+  const providerPlan = userCredential
+    ? { order: [userCredential.provider] }
+    : getProviderOrder(anthropicKey, openrouterKey);
+  if (providerPlan.error) return res.status(providerPlan.status).json({ error: providerPlan.error });
 
   if (!messages?.length) return res.status(400).end();
 
@@ -1134,7 +1142,7 @@ module.exports = async function handler(req, res) {
   // Paid plans with score guarantee: buffer, score, retry if needed.
   // Skipped for regen-line — scoring a one-line output as a full song would
   // always fail the threshold and burn retry calls.
-  if (anthropicKey && minScore > 0 && body.action !== 'regen-line') {
+  if (providerPlan.order.includes('anthropic') && anthropicKey && minScore > 0 && body.action !== 'regen-line') {
     let bestText = '', bestScore = 0, attempts = 0;
     const totalAttempts = maxRetries + 1;
     try {
@@ -1156,7 +1164,7 @@ module.exports = async function handler(req, res) {
 
   // Free plan: 1 structural retry if hook is clearly missing (uses no AI — pure
   // regex check). Skipped for regen-line — a single line has no hook to score.
-  if (anthropicKey && plan === 'free' && body.action !== 'regen-line') {
+  if (providerPlan.order.includes('anthropic') && anthropicKey && plan === 'free' && body.action !== 'regen-line') {
     try {
       const firstAttempt = await generateBuffered(anthropicKey, messages, system, max_tokens);
       const hookQuality  = serverHookScore(firstAttempt);
@@ -1181,13 +1189,18 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // OpenRouter is the primary streaming provider (funded, working account).
-  // Anthropic is the fallback — only tried if OpenRouter fails pre-stream.
-  if (openrouterKey) {
+  for (let i = 0; i < providerPlan.order.length; i++) {
+    const provider = providerPlan.order[i];
     try {
-      const _streamed = await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
-      recordUsage();
-      res.write(`data: ${JSON.stringify({done: true, ...streamAdvisories(_streamed), ...(res._soniqTruncated ? {truncated: true} : {})})}\n\n`);
+      if (provider === 'openrouter') {
+        const _streamed = await streamOpenRouter(openrouterKey, messages, system, max_tokens, res);
+        recordUsage();
+        res.write(`data: ${JSON.stringify({done: true, ...streamAdvisories(_streamed), ...(res._soniqTruncated ? {truncated: true} : {})})}\n\n`);
+      } else {
+        await streamAnthropic(anthropicKey, messages, system, max_tokens, res);
+        recordUsage();
+        res.write(`data: ${JSON.stringify({done: true})}\n\n`);
+      }
       return res.end();
     } catch (err) {
       // Connection terminated mid-stream — transient, can't cleanly fall back
@@ -1197,25 +1210,13 @@ module.exports = async function handler(req, res) {
         res.write(`data: ${JSON.stringify({error: 'Connection dropped mid-stream — please try again.'})}\n\n`);
         return res.end();
       }
-      // CREDITS_LOW is raised pre-stream — safe to fall back to Anthropic.
-      if (err.message === 'CREDITS_LOW' && !anthropicKey) {
+      // CREDITS_LOW is raised before output begins, so it is safe to retry.
+      if (provider === 'openrouter' && err.message === 'CREDITS_LOW' && i === providerPlan.order.length - 1) {
         res.write(`data: ${JSON.stringify({error: 'OpenRouter credit balance too low — add credits at openrouter.ai/settings/credits.'})}\n\n`);
         return res.end();
       }
-      console.error('OpenRouter stream failed, trying fallback:', err.message);
-      errors.push('OpenRouter: ' + (err.message === 'CREDITS_LOW' ? 'credit balance too low' : err.message));
-    }
-  }
-
-  if (anthropicKey) {
-    try {
-      await streamAnthropic(anthropicKey, messages, system, max_tokens, res);
-      recordUsage();
-      res.write(`data: ${JSON.stringify({done: true})}\n\n`);
-      return res.end();
-    } catch (err) {
-      console.error('Anthropic stream failed:', err.message);
-      errors.push('Anthropic: ' + err.message);
+      console.error(`${provider} stream failed${i < providerPlan.order.length - 1 ? ', trying fallback' : ''}:`, err.message);
+      errors.push(`${provider === 'anthropic' ? 'Anthropic' : 'OpenRouter'}: ${err.message === 'CREDITS_LOW' ? 'credit balance too low' : err.message}`);
     }
   }
 

@@ -3423,7 +3423,7 @@ try { window.pingPv('pageview'); } catch(e){}
   <div class="kb-desc">
     Works with <a href="https://openrouter.ai/keys" target="_blank">OpenRouter</a> (free credits, <code style="font-size:12px">sk-or-...</code>)
     or <a href="https://console.anthropic.com" target="_blank">Anthropic</a> direct (<code style="font-size:12px">sk-ant-...</code>).<br>
-    Stored in your browser only — never sent anywhere except the AI provider.
+    Stored in this browser. On the hosted website it is sent to SONIQ's API and forwarded to the selected provider.
   </div>
   <div class="kb-row">
     <input id="kb-input" class="kb-input" type="password" placeholder="sk-or-v1-... or sk-ant-api03-..."
@@ -5843,8 +5843,12 @@ try { window.pingPv('pageview'); } catch(e){}
     };
 
     async function flowAuthedPost(url, body, signal){
+      var payload = Object.assign({}, body);
+      if (typeof _soniqKey !== 'undefined' && _soniqKey && _soniqKey !== 'server-side' && !payload.userKey) {
+        payload.userKey = _soniqKey;
+      }
       var doFetch = function(){
-        return fetch(url, { method: 'POST', headers: flowAuthHeaders(), body: JSON.stringify(body), signal: signal });
+        return fetch(url, { method: 'POST', headers: flowAuthHeaders(), body: JSON.stringify(payload), signal: signal });
       };
       var r = await doFetch();
       if (r.status === 401) {
@@ -11809,7 +11813,8 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal, maxTokens
         body: JSON.stringify({
           messages: [{role: 'user', content: prompt}],
           system: systemPrompt || undefined,
-          max_tokens: maxTokens
+          max_tokens: maxTokens,
+          userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined
         }),
         signal
       });
@@ -11939,7 +11944,8 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
       body: JSON.stringify({
         messages: [{role:'user', content:prompt}],
         system: systemPrompt || undefined,
-        max_tokens: maxTok
+        max_tokens: maxTok,
+        userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined
       })
     });
     const ct = res.headers.get('content-type') || '';
@@ -11980,7 +11986,7 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+apiKey},
-      body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens:maxTok, messages:msgs})
+      body: JSON.stringify({model:'anthropic/claude-sonnet-4.5', max_tokens:maxTok, messages:msgs})
     });
     if (res.status===401) {
       localStorage.removeItem('soniq_api_key'); _soniqKey=null;
@@ -19285,6 +19291,7 @@ async function generateVariant() {
       topic: song.topic,
       max_tokens: 2048
     };
+    if (_soniqKey && _soniqKey !== 'server-side') body.userKey = _soniqKey;
 
     const variantHeaders = { 'Content-Type': 'application/json' };
     if (S.session?.access_token) variantHeaders['Authorization'] = 'Bearer ' + S.session.access_token;
@@ -25351,7 +25358,8 @@ async function loadPromptIntelligence(prefix) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'suggest',
-        params: { genre, topic, mood, hookScore, title: song.title || '', verdict: song.verdict || '', lyrics: (song.lyrics || '').slice(0, 400) }
+        params: { genre, topic, mood, hookScore, title: song.title || '', verdict: song.verdict || '', lyrics: (song.lyrics || '').slice(0, 400) },
+        userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined
       })
     });
     if (!resp.ok) throw new Error('suggest failed');

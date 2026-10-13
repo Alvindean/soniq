@@ -24,6 +24,7 @@
 
 const { FREQUENCIES } = require('./_frequency_catalog');
 const { CHANTS }      = require('./_frequency_chants');
+const { OPENROUTER_MODEL } = require('./_provider');
 
 // ── spend caps for the optional LLM chant-craft path ─────────────────────────
 // The endpoint is public/unauthenticated, so without a cap, enabling
@@ -190,7 +191,7 @@ async function callOpenRouterChant(apiKey, prompt) {
       'X-Title': 'SONIQ'
     },
     body: JSON.stringify({
-      model: 'anthropic/claude-sonnet-4-5',
+      model: OPENROUTER_MODEL,
       max_tokens: 400,
       messages: [{ role: 'user', content: prompt }]
     })

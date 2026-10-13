@@ -7,7 +7,8 @@
     "node": ">=18.x"
   },
   "scripts": {
-    "deploy": "vercel --prod"
+    "deploy": "vercel --prod",
+    "test": "node --test test/provider-selection.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.101.0",

@@ -61,6 +61,8 @@ Vercel → your project → Settings → Environment Variables — add all 5:
 
 After saving → Deployments → latest → Redeploy. Done.
 
+`SONIQ_AI_PROVIDER` is optional: `auto` (default) tries Anthropic first when `ANTHROPIC_API_KEY` is configured, then OpenRouter; `anthropic` or `openrouter` forces one provider without fallback. The API Key dialog accepts personal `sk-ant-...` and `sk-or-...` keys, and hosted generation forwards a saved key to its matching provider.
+
 ---
 
 ## Local Development

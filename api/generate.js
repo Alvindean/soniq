@@ -9,6 +9,7 @@ const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 
 const { createClient } = require('@supabase/supabase-js');
 const { validatePhrase: _laValidatePhrase, selectAnchorTransform: _laSelectAnchorTransform } = require('./_loop_anchor');
+const { getProviderOrder, getUserProvider, OPENROUTER_MODEL } = require('./_provider');
 
 function getSupabaseClient(token) {
   const url = process.env.SUPABASE_URL;
@@ -100,7 +101,7 @@ async function orRequest(apiKey, orMsgs, max_tokens) {
       'HTTP-Referer': 'https://soniq.vercel.app',
       'X-Title': 'SONIQ'
     },
-    body: JSON.stringify({model:'anthropic/claude-sonnet-4-5', max_tokens, messages:orMsgs})
+    body: JSON.stringify({model:OPENROUTER_MODEL, max_tokens, messages:orMsgs})
   });
 }
 
@@ -182,14 +183,30 @@ const _generateHandler = async function handler(req, res) {
   // generate — flow-song increments usage on success, flow-score is the
   // cheap async scorer and only blocks at the burst cap.
   const flowMode = req.body && req.body.mode;
+  const flowRawUserKey = (req.body?.userKey && req.body.userKey !== 'server-side')
+    ? String(req.body.userKey).trim()
+    : null;
+  if (flowMode && flowRawUserKey && !getUserProvider(flowRawUserKey)) {
+    return res.status(400).json({ error: 'API key must start with sk-ant- or sk-or-.' });
+  }
 
   // Shared Flow AI caller — must live at handler scope so both the
   // flow-song branch AND the flow-score branch can reach it.
   // (Was previously nested inside the song if-block, which made the
   // function declaration's block-scoped hoist invisible from flow-score.)
   async function flowCallAI(messages, system, max_tokens, budgetMs) {
-    const ak = process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE;
-    const ok = process.env.OPENROUTER_API_KEY;
+    const rawUserKey = (req.body?.userKey && req.body.userKey !== 'server-side')
+      ? String(req.body.userKey).trim()
+      : null;
+    const userCredential = rawUserKey ? getUserProvider(rawUserKey) : null;
+    if (rawUserKey && !userCredential) throw new Error('API key must start with sk-ant- or sk-or-.');
+
+    const ak = userCredential
+      ? (userCredential.provider === 'anthropic' ? userCredential.key : null)
+      : (process.env.ANTHROPIC_API_KEY || process.env.Claude || process.env.CLAUDE);
+    const ok = userCredential
+      ? (userCredential.provider === 'openrouter' ? userCredential.key : null)
+      : process.env.OPENROUTER_API_KEY;
     if (!ak && !ok) throw new Error('No AI provider configured');
     const limit = typeof budgetMs === 'number' ? budgetMs : 55000;
     const tStart = Date.now();
@@ -201,20 +218,25 @@ const _generateHandler = async function handler(req, res) {
       guard.catch(() => {});
       return Promise.race([promise, guard]).finally(() => clearTimeout(to));
     };
-    // OpenRouter is the primary provider — the funded, working account. It
-    // gets the full budget: a real generation runs ~37-40s and a split would
-    // abort slow-but-valid completions. Anthropic is the fallback — it only
-    // fires if OpenRouter errors fast, leaving real time on the clock.
-    try {
-      if (ok) return await withTimeout(callOpenRouter(ok, messages, system, max_tokens), limit);
-      return await withTimeout(callAnthropic(ak, messages, system, max_tokens), limit);
-    } catch (e) {
-      const remaining = limit - (Date.now() - tStart) - 500;
-      if (ak && ok && remaining > 5000) {
-        return await withTimeout(callAnthropic(ak, messages, system, max_tokens), remaining);
+    const providerPlan = userCredential
+      ? { order: [userCredential.provider] }
+      : getProviderOrder(ak, ok);
+    if (providerPlan.error) throw new Error(providerPlan.error);
+    for (let i = 0; i < providerPlan.order.length; i++) {
+      const provider = providerPlan.order[i];
+      try {
+        const call = provider === 'anthropic'
+          ? callAnthropic(ak, messages, system, max_tokens)
+          : callOpenRouter(ok, messages, system, max_tokens);
+        const remaining = i === 0 ? limit : limit - (Date.now() - tStart) - 500;
+        if (remaining <= 5000) throw new Error('AI timeout (' + limit + 'ms)');
+        return await withTimeout(call, remaining);
+      } catch (e) {
+        if (i === providerPlan.order.length - 1) throw e;
+        if (limit - (Date.now() - tStart) - 500 <= 5000) throw e;
       }
-      throw e;
     }
+    throw new Error('No AI provider available');
   }
   if (flowMode === 'flow-song') {
     const flowConcept = (req.body.concept || '').trim();
@@ -1012,37 +1034,25 @@ const _generateHandler = async function handler(req, res) {
   try { body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body; }
   catch { return res.status(400).json({error:'Invalid JSON'}); }
 
-  // Treat 'server-side' sentinel as no user key. Also validate that a
-  // submitted key is actually an Anthropic key format — refuse to forward
-  // arbitrary strings to anthropic.com on the user's behalf.
+  // Treat 'server-side' sentinel as no user key. Validate and route personal
+  // keys only to their matching provider.
   const _rawKey = (body?.userKey && body.userKey !== 'server-side') ? String(body.userKey).trim() : null;
-  const userKey = (_rawKey && /^sk-ant-[A-Za-z0-9_\-]{20,}$/.test(_rawKey)) ? _rawKey : null;
-  if (_rawKey && !userKey) {
-    return res.status(400).json({ error: 'invalid_api_key_format' });
+  const userCredential = _rawKey ? getUserProvider(_rawKey) : null;
+  if (_rawKey && !userCredential) {
+    return res.status(400).json({ error: 'API key must start with sk-ant- or sk-or-.' });
   }
 
-  if (userKey) {
-    // User-supplied key: use their key directly
-    const { messages, system } = body;
-    const max_tokens = Math.min(Math.max(parseInt(body.max_tokens) || 2048, 256), 8192);
-    if (!messages?.length) return res.status(400).json({error:'messages required'});
-    try {
-      const text = await callAnthropic(userKey, messages, system, max_tokens);
-      return res.status(200).json({content:[{type:'text', text}]});
-    } catch(err) {
-      console.error('User-key Anthropic error:', err.message);
-      return res.status(502).json({error: 'API key rejected — check it is valid at console.anthropic.com'});
-    }
-  }
+  const anthropicKey = userCredential
+    ? (userCredential.provider === 'anthropic' ? userCredential.key : null)
+    : process.env.ANTHROPIC_API_KEY;
+  const openrouterKey = userCredential
+    ? (userCredential.provider === 'openrouter' ? userCredential.key : null)
+    : process.env.OPENROUTER_API_KEY;
 
-  const anthropicKey = process.env.ANTHROPIC_API_KEY;
-  const openrouterKey = process.env.OPENROUTER_API_KEY;
-
-  if (!anthropicKey && !openrouterKey) {
-    return res.status(500).json({
-      error: 'No API key configured. Add ANTHROPIC_API_KEY or OPENROUTER_API_KEY in Vercel → Settings → Environment Variables, then Redeploy.'
-    });
-  }
+  const providerPlan = userCredential
+    ? { order: [userCredential.provider] }
+    : getProviderOrder(anthropicKey, openrouterKey);
+  if (providerPlan.error) return res.status(providerPlan.status).json({ error: providerPlan.error });
 
   let { messages, system } = body || {};
   const max_tokens = Math.min(Math.max(parseInt(body?.max_tokens) || 2048, 256), 8192);
@@ -1070,7 +1080,7 @@ const _generateHandler = async function handler(req, res) {
 
   // If using server key and this is a legacy raw-message request (no variant),
   // lock the system prompt. For brain-built variant prompts, keep their specialized system.
-  if (!userKey && !body?.variant) {
+  if (!userCredential && !body?.variant) {
     system = 'You are Soniq, an expert AI music producer and songwriter. Follow all instructions carefully and output only the requested song content.';
   }
 
@@ -1089,29 +1099,20 @@ const _generateHandler = async function handler(req, res) {
     }
   };
 
-  // Try OpenRouter first (the funded primary), then Anthropic as fallback
-  if (openrouterKey) {
+  for (const provider of providerPlan.order) {
     try {
-      const text = await callOpenRouter(openrouterKey, messages, system, max_tokens);
+      const text = provider === 'anthropic'
+        ? await callAnthropic(anthropicKey, messages, system, max_tokens)
+        : await callOpenRouter(openrouterKey, messages, system, max_tokens);
       recordUsage();
       return res.status(200).json({content:[{type:'text', text}]});
     } catch(err) {
-      if (err.message === 'CREDITS_LOW' && !anthropicKey) {
+      const message = err.message === 'CREDITS_LOW' ? 'credit balance too low' : err.message;
+      if (provider === 'openrouter' && err.message === 'CREDITS_LOW' && providerPlan.order.length === 1) {
         return res.status(402).json({error: 'Your OpenRouter credit balance is too low. Add credits at openrouter.ai/settings/credits to continue.'});
       }
-      console.error('OpenRouter failed, trying fallback:', err.message);
-      errors.push('OpenRouter: ' + (err.message === 'CREDITS_LOW' ? 'credit balance too low' : err.message));
-    }
-  }
-
-  if (anthropicKey) {
-    try {
-      const text = await callAnthropic(anthropicKey, messages, system, max_tokens);
-      recordUsage();
-      return res.status(200).json({content:[{type:'text', text}]});
-    } catch(err) {
-      console.error('Anthropic failed:', err.message);
-      errors.push('Anthropic: ' + err.message);
+      console.error(`${provider} failed${providerPlan.order.length > 1 ? ', trying fallback' : ''}:`, err.message);
+      errors.push(`${provider === 'anthropic' ? 'Anthropic' : 'OpenRouter'}: ${message}`);
     }
   }
 
