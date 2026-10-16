@@ -11672,6 +11672,31 @@ function isLocalOllamaEnabled() {
   return localStorage.getItem('soniq_ai_mode') === 'ollama';
 }
 
+// Local Qwen as a backup for cloud mode. Opt-in: armed once this browser has
+// successfully activated Local Qwen, so other visitors never probe localhost.
+let _ollamaBackupCheck = null;
+async function isLocalOllamaBackupReady() {
+  if (isLocalOllamaEnabled() || localStorage.getItem('soniq_ollama_backup') !== '1') return false;
+  if (_ollamaBackupCheck && Date.now() - _ollamaBackupCheck.at < 60000) return _ollamaBackupCheck.ok;
+  let ok = false;
+  try {
+    const res = await fetch(`${SONIQ_OLLAMA_URL}/api/tags`, {signal: AbortSignal.timeout(2000)});
+    const data = res.ok ? await res.json() : {};
+    ok = Array.isArray(data.models) && data.models.some(m => m.name === SONIQ_OLLAMA_MODEL);
+  } catch (e) { ok = false; }
+  _ollamaBackupCheck = {ok, at: Date.now()};
+  return ok;
+}
+
+// Auth, plan limits and user cancels are not outages — never fall back on those.
+async function shouldUseOllamaBackup(err) {
+  if (!err || err.name === 'AbortError' || err.code === 'auth_required' || err.code === 'limit_reached') return false;
+  if (!(await isLocalOllamaBackupReady())) return false;
+  console.warn('Cloud AI failed, using Local Qwen backup:', err.message);
+  toast('☁️ Cloud AI is down — using Local Qwen on this computer.');
+  return true;
+}
+
 function updateAIProviderButton() {
   const button = document.querySelector('button[onclick="showKeyScreen()"]');
   if (!button) return;
@@ -11691,6 +11716,7 @@ async function activateLocalOllama() {
       throw new Error(`Ollama is running, but ${SONIQ_OLLAMA_MODEL} is not installed.`);
     }
     localStorage.setItem('soniq_ai_mode', 'ollama');
+    localStorage.setItem('soniq_ollama_backup', '1');
     const isHosted = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
     _soniqKey = isHosted ? 'server-side' : null;
     const banner = document.getElementById('key-banner');
@@ -11740,7 +11766,7 @@ async function callLocalOllama(prompt, systemPrompt, maxTokens, signal, onChunk)
           ...(systemPrompt ? [{role: 'system', content: systemPrompt}] : []),
           {role: 'user', content: prompt}
         ],
-        options: {num_predict: maxTokens, num_ctx: 8192, num_gpu: 28}
+        options: {num_predict: maxTokens, num_ctx: 8192}
       }),
       signal
     });
@@ -11978,11 +12004,17 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal, maxTokens
       }
       return fullText;
     } catch (streamErr) {
+      if (streamErr.name === 'AbortError') throw streamErr;
       // Streaming failed — silently fall back to regular endpoint
       console.warn('Stream failed, falling back to /api/generate:', streamErr.message);
-      const text = await callClaude(prompt, systemPrompt, maxTokens);
-      onChunk(text, text);
-      return text;
+      try {
+        const text = await callCloudGenerate(prompt, systemPrompt, maxTokens);
+        onChunk(text, text);
+        return text;
+      } catch (genErr) {
+        if (await shouldUseOllamaBackup(genErr)) return callLocalOllama(prompt, systemPrompt, maxTokens, signal, onChunk);
+        throw genErr;
+      }
     }
   }
 
@@ -12066,6 +12098,17 @@ async function callClaude(prompt, systemPrompt='', maxTok=2048) {
   if (isLocalOllamaEnabled()) {
     return callLocalOllama(prompt, systemPrompt, maxTok);
   }
+  try {
+    return await callCloudGenerate(prompt, systemPrompt, maxTok);
+  } catch (err) {
+    if (err._ollamaTried) throw err;
+    err._ollamaTried = true;
+    if (await shouldUseOllamaBackup(err)) return callLocalOllama(prompt, systemPrompt, maxTok);
+    throw err;
+  }
+}
+
+async function callCloudGenerate(prompt, systemPrompt='', maxTok=2048) {
   const isVercel = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
 
   // On Vercel — use secure server-side proxy
@@ -15114,11 +15157,16 @@ VIDEO PROMPT:
     let raw, genProdData;
     if (isVercel && !isLocalOllamaEnabled()) {
       // Server-side prompt building — IP stays hidden
-      const result = await callServerStream('generate', songParams, streamCb, genSignal);
-      raw = result.text;
-      genProdData = result.meta?.prodData;
-      // Stash computed Suno settings so save/like can feed the learning loop
-      if (result.meta?.sunoSettings) S._pendingSunoSettings = result.meta.sunoSettings;
+      try {
+        const result = await callServerStream('generate', songParams, streamCb, genSignal);
+        raw = result.text;
+        genProdData = result.meta?.prodData;
+        // Stash computed Suno settings so save/like can feed the learning loop
+        if (result.meta?.sunoSettings) S._pendingSunoSettings = result.meta.sunoSettings;
+      } catch (cloudErr) {
+        if (!(await shouldUseOllamaBackup(cloudErr))) throw cloudErr;
+        raw = await callLocalOllama(prompt, system, 8192, genSignal, streamCb);
+      }
     } else {
       // Local Ollama/dev fallback — client builds prompt
       raw = await callClaudeStream(prompt, system, streamCb, genSignal, isLocalOllamaEnabled() ? 8192 : 2048);

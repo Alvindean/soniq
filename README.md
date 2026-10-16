@@ -67,11 +67,14 @@ On the hosted app, choose **Use Local Qwen 3.6 (Ollama)** from **AI Provider** t
 
 ```powershell
 [Environment]::SetEnvironmentVariable('OLLAMA_ORIGINS', 'https://www.mysoniq.com,https://mysoniq.com', 'User')
-[Environment]::SetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', '0', 'User')
-[Environment]::SetEnvironmentVariable('OLLAMA_KV_CACHE_TYPE', 'f16', 'User')
+[Environment]::SetEnvironmentVariable('OLLAMA_FLASH_ATTENTION', '1', 'User')
+[Environment]::SetEnvironmentVariable('OLLAMA_KV_CACHE_TYPE', 'q8_0', 'User')
+[Environment]::SetEnvironmentVariable('OLLAMA_NUM_PARALLEL', '1', 'User')
 ```
 
-The attention/cache settings avoid a CUDA runner crash observed with this Qwen 3.6 setup; the `f16` cache uses more GPU memory than a quantized cache. These are Ollama-wide settings.
+Tested on an RTX 5080 (16 GB) with Ollama 0.40.4: flash attention plus a `q8_0` cache runs Qwen 3.6 at about 65-80 tokens/s with no CUDA crash (older builds crashed with flash attention on; if that returns, fall back to `0` / `f16`). Also keep the Ollama app's context-length slider at 16k or lower — 128k reserves so much memory that models spill onto the CPU. These are Ollama-wide settings.
+
+**Backup mode:** once a browser has activated Local Qwen, switching back to **Use SONIQ Cloud** keeps Local Qwen armed as a backup. If the cloud AI fails (not sign-in, plan limits or a cancel), main Generate and prompt-based writing retry on this computer's Ollama and show a toast. Browsers that never activated Local Qwen never contact localhost.
 
 Local-mode prompts are sent from the browser directly to Ollama, not to SONIQ's AI provider API. Use **AI Provider → Use SONIQ Cloud** to switch back. This browser-local option applies to prompt-based generation; server-side account, publishing, and other API features continue to use their existing endpoints.
 
