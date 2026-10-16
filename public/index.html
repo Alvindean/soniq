@@ -11752,7 +11752,23 @@ function useCloudAI() {
   }
 }
 
+// Ollama's runner sometimes crashes while warming up Qwen 3.6 on a cold load
+// (CUDA "shared object initialization failed"); the next load almost always works.
+const SONIQ_OLLAMA_LOAD_RETRIES = 2;
+
 async function callLocalOllama(prompt, systemPrompt, maxTokens, signal, onChunk) {
+  for (let attempt = 0; ; attempt++) {
+    try {
+      return await callLocalOllamaOnce(prompt, systemPrompt, maxTokens, signal, onChunk);
+    } catch (err) {
+      if (!err.ollamaLoadCrash || attempt >= SONIQ_OLLAMA_LOAD_RETRIES) throw err;
+      console.warn(`Local Qwen crashed while loading, retrying (${attempt + 1}/${SONIQ_OLLAMA_LOAD_RETRIES})`);
+      toast('🔁 Local Qwen hiccuped while starting — retrying…');
+    }
+  }
+}
+
+async function callLocalOllamaOnce(prompt, systemPrompt, maxTokens, signal, onChunk) {
   let response;
   try {
     response = await fetch(`${SONIQ_OLLAMA_URL}/api/chat`, {
@@ -11776,7 +11792,9 @@ async function callLocalOllama(prompt, systemPrompt, maxTokens, signal, onChunk)
   }
   if (!response.ok) {
     const detail = (await response.text()).slice(0, 240);
-    throw new Error(`Local Ollama error ${response.status}: ${detail}`);
+    const err = new Error(`Local Ollama error ${response.status}: ${detail}`);
+    err.ollamaLoadCrash = response.status === 500 && /llama-server process has terminated|exit status 0xc0000409/.test(detail);
+    throw err;
   }
 
   if (!onChunk) {
