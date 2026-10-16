@@ -11697,6 +11697,17 @@ async function shouldUseOllamaBackup(err) {
   return true;
 }
 
+// Server-built prompt first; on a cloud outage with Local Qwen armed, rerun
+// the tool's own client-built prompt on local Ollama instead.
+async function withLocalBackup(serverCall, localCall) {
+  try {
+    return await serverCall();
+  } catch (err) {
+    if (!(await shouldUseOllamaBackup(err))) throw err;
+    return localCall();
+  }
+}
+
 function updateAIProviderButton() {
   const button = document.querySelector('button[onclick="showKeyScreen()"]');
   if (!button) return;
@@ -13619,7 +13630,8 @@ VIDEO PROMPT:
   const isVercelLucky = window.location.protocol === 'https:' && !window.location.hostname.includes('localhost');
   // Pass ALL picked params to server so filtered genres + reveal values are honoured exactly
   const luckyPromise = isVercelLucky && !isLocalOllamaEnabled()
-    ? callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [], viralMode: S.viralMode === true, sampleHookMode: S.sampleHookMode === true, producerTemplate: typeof S.producerTemplate === 'string' ? S.producerTemplate : '', loopAnchor: (function(){ const p = (typeof laGetPhrase === 'function') ? laGetPhrase('lucky') : ''; return p ? { phrase: p } : undefined; })()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings }))
+    ? withLocalBackup(() => callServerStream('lucky', {g1, g2, topic, mood, vocal, structure, edgeMode: window.__qfEdge === true, emotionalVelocity: isAdvancedCraftAllowed() ? (Math.random() < 0.5 ? 'auto' : ['slow_burn','standard_arc','cycling','whiplash','plateau_drift'][Math.floor(Math.random()*5)]) : 'auto', platinum: _platinumOn && isPlatinumEligible(), punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [], viralMode: S.viralMode === true, sampleHookMode: S.sampleHookMode === true, producerTemplate: typeof S.producerTemplate === 'string' ? S.producerTemplate : '', loopAnchor: (function(){ const p = (typeof laGetPhrase === 'function') ? laGetPhrase('lucky') : ''; return p ? { phrase: p } : undefined; })()}, luckyStreamCb, luckySignal).then(r => ({ text: r.text, prodData: r.meta?.prodData, sunoSettings: r.meta?.sunoSettings })),
+        () => callLocalOllama(prompt, system, 8192, luckySignal, luckyStreamCb).then(text => ({ text, prodData: null, sunoSettings: null })))
     : callClaudeStream(prompt, system, luckyStreamCb, luckySignal, isLocalOllamaEnabled() ? 8192 : 2048).then(text => ({ text, prodData: null, sunoSettings: null }));
   luckyPromise.then(({text: raw, prodData: luckyProdData, sunoSettings: luckySuno})=>{
     finishSongProgress('lres');
@@ -25019,13 +25031,15 @@ async function instantEdit() {
       theoryAnalysis: song.theoryAnalysis || '',
       verdict:        song.verdict      || '',
     };
-    if (isVercel) {
-      await callServerStream('edit', editParams, (chunk, text) => { full = text; });
+    const localPrompt = `You are editing a ${song.genre||'pop'} song. Apply this specific change: "${instruction}"\n\nCURRENT LYRICS:\n${song.lyrics}\n\nReturn the complete revised lyrics with [Section] tags only.`;
+    const localSystem = 'You are a professional lyric editor. Apply only the requested change precisely.';
+    const onText = (chunk, text) => { full = text; };
+    if (isVercel && !isLocalOllamaEnabled()) {
+      await withLocalBackup(
+        () => callServerStream('edit', editParams, onText),
+        () => callLocalOllama(localPrompt, localSystem, 4096, null, onText));
     } else {
-      await callClaudeStream(
-        `You are editing a ${song.genre||'pop'} song. Apply this specific change: "${instruction}"\n\nCURRENT LYRICS:\n${song.lyrics}\n\nReturn the complete revised lyrics with [Section] tags only.`,
-        'You are a professional lyric editor. Apply only the requested change precisely.',
-        (chunk, text) => { full = text; });
+      await callClaudeStream(localPrompt, localSystem, onText, null, 4096);
     }
     const newLyrics = full.trim();
     S.currentSong.lyrics = newLyrics;
@@ -25916,14 +25930,15 @@ async function revise(prefix, instruction) {
       theoryAnalysis: song.theoryAnalysis || '',
       verdict:        song.verdict       || '',
     };
-    if (isVercel) {
-      await callServerStream('edit', editParams, (chunk, text) => { full = text; updateSongProgress(prefix, full); });
+    const localPrompt = `Revise this ${song.genre||'pop'} song: ${instruction}.\n\nTitle: ${song.title||''}\nGenre: ${song.genre||'pop'}\n\nCurrent Lyrics:\n${song.lyrics}\n\nReturn ONLY the complete revised lyrics with [Section] tags.`;
+    const localSystem = 'You are a professional lyric editor. Apply only the specific instruction. Return ONLY the complete lyrics with [Section] tags, no commentary.';
+    const onText = (chunk, text) => { full = text; updateSongProgress(prefix, full); };
+    if (isVercel && !isLocalOllamaEnabled()) {
+      await withLocalBackup(
+        () => callServerStream('edit', editParams, onText),
+        () => callLocalOllama(localPrompt, localSystem, 4096, null, onText));
     } else {
-      await callClaudeStream(
-        `Revise this ${song.genre||'pop'} song: ${instruction}.\n\nTitle: ${song.title||''}\nGenre: ${song.genre||'pop'}\n\nCurrent Lyrics:\n${song.lyrics}\n\nReturn ONLY the complete revised lyrics with [Section] tags.`,
-        'You are a professional lyric editor. Apply only the specific instruction. Return ONLY the complete lyrics with [Section] tags, no commentary.',
-        (chunk, text) => { full = text; updateSongProgress(prefix, full); }
-      );
+      await callClaudeStream(localPrompt, localSystem, onText, null, 4096);
     }
     finishSongProgress(prefix);
     const newLyrics = full.trim();
