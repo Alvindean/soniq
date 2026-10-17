@@ -1043,7 +1043,7 @@ const LYRIC_CRAFT_UNIVERSAL = {
 
   phoneticMorph: {
     label: 'PHONETIC MORPH',
-    short: `DELIBERATELY distort a word's pronunciation just enough that ONE small bend lands MULTIPLE craft layers at once — rhyme + simile + entendre + surface meaning, all from a single morphed syllable. Distinct from homophonePun (which exploits EXISTING sound-twins like peace/piece). Phonetic morph MANUFACTURES the homophone by bending pronunciation on the fly. Hip-hop: "skeeting on his beat like it was nuthin' to it" — "nothing → nuthin' → nuttin'" makes (1) -it rhyme land, (2) simile feel idiomatic, (3) sexual entendre activate, (4) surface meaning remain. "fastly" (non-word) bent to rhyme with "classy". "drawls" = drawers (Southern morph carrying rhyme + sexual + winter-image). Pop wordplay songs (Taylor Swift "Bad Blood" / Olivia Rodrigo) bend pronunciation for hook lock-in. Comedy/novelty songs (Weird Al, Lonely Island) phonetic-morph for joke timing. Country novelty ("She thinks my tractor's sexy"). Apex practitioners: Eminem (mom's spaghetti / vomit phonetic shadow), Jay-Z (I'm not a businessman, I'm a business, man — comma-placement morph), Lil Wayne, MF DOOM. The craft is choosing WHICH word to bend so the morph carries the maximum number of simultaneous payloads.`,
+    short: `DELIBERATELY distort a word's pronunciation just enough that ONE small bend lands MULTIPLE craft layers at once — rhyme + simile + entendre + surface meaning, all from a single morphed syllable. Distinct from the HOMOPHONE STACK (which exploits EXISTING sound-twins like cents/sense or a loan/alone). Phonetic morph MANUFACTURES the homophone by bending pronunciation on the fly. Hip-hop: "skeeting on his beat like it was nuthin' to it" — "nothing → nuthin' → nuttin'" makes (1) -it rhyme land, (2) simile feel idiomatic, (3) sexual entendre activate, (4) surface meaning remain. "fastly" (non-word) bent to rhyme with "classy". "drawls" = drawers (Southern morph carrying rhyme + sexual + winter-image). Pop wordplay songs (Taylor Swift "Bad Blood" / Olivia Rodrigo) bend pronunciation for hook lock-in. Comedy/novelty songs (Weird Al, Lonely Island) phonetic-morph for joke timing. Country novelty ("She thinks my tractor's sexy"). Apex practitioners: Eminem (mom's spaghetti / vomit phonetic shadow), Jay-Z (I'm not a businessman, I'm a business, man — comma-placement morph), Lil Wayne, MF DOOM. The craft is choosing WHICH word to bend so the morph carries the maximum number of simultaneous payloads.`,
     genres: ['hiphop', 'pop', 'country']
   },
 
@@ -1448,7 +1448,7 @@ RULES: (1) Both narratives must be internally consistent. (2) Specific details a
 
   wordplayTaxonomy: {
     label: 'WORDPLAY FORMS',
-    short: `Four types: (1) HOMOPHONE — same sound, different word ("reign/rain/rein"); (2) HOMONYM — same word, two meanings ("bat"); (3) PORTMANTEAU — two words fused into one; (4) ACRONYM FLIP — word also reads as meaningful acronym. Rule: must reward the listener without requiring explanation. If it needs a footnote, it failed.`,
+    short: `Four types: (1) HOMOPHONE — same sound, different word ("reign/rain/rein"); (2) HOMONYM — same word, two meanings ("bat"); (3) PORTMANTEAU — two words fused into one; (4) ACRONYM FLIP — word also reads as meaningful acronym; (5) SPELLED-LETTER TRIPLE — letters spelled out (I-C-U) read as a phrase, an acronym AND a word (I see you / ICU / icy, you); (6) RE-PARSE — one word splits into two in delivery (polarize / polar ice, alone / a loan); (7) PROPER-NOUN SOUND-ALIKE — a real place or name heard as an everyday word (Seoul / soul, Hungary / hungry). Strongest when several of these chain inside ONE theme across consecutive bars (see HOMOPHONE STACK). Rule: must reward the listener without requiring explanation. If it needs a footnote, it failed.`,
     genres: ['hiphop','pop','comedy','parody','country','blues','rnb','altrock']
   },
 
@@ -10007,6 +10007,17 @@ Pair with: chess-strategy / mythic-biblical / cinematic-storyteller register. St
     when: { tier: ['street','conscious','archival'] },
     examples: 'GZA "Cold World" / "Duel of the Iron Mic" — the chess-as-misdirection bar architecture. RZA "Triumph" verse — every Wu-Tang member contributes a different inversion. Jay-Z "Takeover" — the inversion is the entire song. Killer Mike "Reagan" — political-strategy inversion. André 3000 (every Outkast verse builds an inversion). The whole "Liquid Swords" album is a clinic in this technique. Sun Tzu / Musashi\'s Book of Five Rings as canonical references.',
   },
+  triple_entendre: {
+    label: 'Triple Entendre / Homophone Stack',
+    short: 'One sound, three meanings: spelled-letter triples, re-parsed words and sound-alike names chained inside one theme.',
+    directive: `TRIPLE ENTENDRE / HOMOPHONE STACK (apply as 1-2 runs of 3-6 bars across the song, never every bar):
+Build bars where ONE sound carries THREE true readings, then chain them inside one theme so each bar raises the one before it.
+Moves: (1) spelled-letter triple, letters written with hyphens so they are spelled aloud ("I-C-U" = I see you / ICU / icy, you); (2) re-parse, one word heard as two ("polarize" = polar ice, "alone" = a loan, "decade" = decayed); (3) proper-noun sound-alike, a real place or name heard as an everyday word (Seoul / soul, Hungary / hungry), strongest when a real fact about the place adds the third layer.
+Concrete chain shape (cold theme): bar 1 spells I-C-U (watching you / the ward / icy), bar 2 says the bars "polarize" (divide people / polar ice), bar 3 names a cold real place in a way that also sounds like a weather word.
+Critical rules: (1) every reading must be TRUE in the song, not decoration; (2) the surface line must work for a listener who misses the pun; (3) never explain it or put the hidden reading in parentheses; (4) skip worn-out pairs (peace/piece, reign/rain) unless flipped a new way.`,
+    when: { tier: ['street','conscious','archival'] },
+    examples: 'Eminem (spelled-letter triples and theme-locked cold chains), Lupe Fiasco (layered entendre stacks), Lil Wayne (sound-alike punchlines), MF DOOM (re-parsed compound words), Big L (homophone punchline closers).'
+  },
   long_con_callback: {
     label: 'Long-Con Callback',
     short: 'Plant a seemingly trivial detail in verse 1 that pays off catastrophically in verse 2 or the bridge.',
@@ -13528,6 +13539,30 @@ NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 8. Verse and chorus use different rhyme schemes; perfect rhyme is saved for the hook and the punchline.
 9. A verse-1 image returns in the bridge or final verse (callback), and verse 1 leaves one thing unresolved that the ending closes.`;
 
+const HOMOPHONE_STACK = `
+
+HOMOPHONE STACK (Eminem-lineage multi-reading wordplay; use in EVERY rap verse, one stack per verse):
+One sound, several words. The listener hears the bar once, then catches a second and third meaning half a beat later. Build each stack from these moves:
+1. SPELLED-LETTER TRIPLE: spell a word out letter by letter so the letters read THREE ways at once. Write the letters with hyphens so the vocalist spells them aloud. Shape: "they lost my pulse in the I-C-U" = I see you (I'm watching) + ICU (the hospital ward) + icy, you (cold). Every reading must be TRUE inside the song, not decoration.
+2. RE-PARSE: a word that splits into two different words when spoken. "polarize" = polar ice. "alone" = a loan. "a nice cold" = an ice-cold. "decade" = decayed. "insight" = in sight. "forgiven" = for given. The split reading must stay inside the bar's theme.
+3. PROPER-NOUN SOUND-ALIKE: a real place, river, brand or name that sounds like an everyday word in delivery. Seoul / soul. Rome / roam. Hungary / hungry. Wales / whales. Sioux / sue. Best when a real fact about the place adds a layer (a city famous for cold, a river that almost never freezes, a country known for hunger or plenty).
+4. THEME LOCK (the chain): pick ONE domain (cold, money, water, fire, time, war) and make every homophone in the run land inside it across 3-6 consecutive bars, so the wordplay BUILDS instead of scattering. Money chain shape: "sense / cents" -> "change" (coins / growing up) -> "alone / a loan" -> "Cash" (money / the man in black). Cold chain shape: "I-C-U" (icy) -> "polarize" (polar ice) -> a frozen-river or cold-city proper noun.
+5. DELIVERY CARRIES IT: spell the SURFACE reading in the lyric; let pronunciation carry the hidden one. Never explain it, never put the second reading in parentheses or quotes (the vocalist sings them).
+RULES: one stack (a 3-6 bar run) per verse, landing in the back half of the verse or as the verse closer; the surface line must work alone for a listener who misses the pun; every reading must be real English or a real name; skip worn-out pairs (peace/piece, reign/rain, ice cream/I scream, whole/hole) unless you flip them a NEW way; a stack that needs a footnote failed.`;
+
+const HOMOPHONE_STACK_LITE = `
+
+HOMOPHONE MOMENT (optional craft, 1-2 per song maximum): one line where a single sound carries two true meanings. Use a re-parse ("alone" = a loan, "decade" = decayed, "insight" = in sight), a proper-noun sound-alike (Seoul / soul, Rome / roam), or a spelled-letter flip (I-C-U = I see you / ICU / icy). Best placed in the title line, the hook's last line, or the final chorus twist where it reframes the song. Keep both readings inside the song's theme, spell the surface reading, never explain it or put the second reading in parentheses. If it reads forced, leave it out.`;
+
+const _HOMOPHONE_FULL_GENRES = new Set(['hiphop']);
+const _HOMOPHONE_LITE_GENRES = new Set(['pop','rnb','neosoul','country','comedy','parody','rock','altrock','punk','metal','reggae','dancehall','afrobeats','folk','ss','blues','gospel','jazz','tvmusical','kpop']);
+function _homophoneNote(g) {
+  const k = String((g && typeof g === 'object' ? g.primary : g) || '').toLowerCase();
+  if (_HOMOPHONE_FULL_GENRES.has(k)) return HOMOPHONE_STACK;
+  if (_HOMOPHONE_LITE_GENRES.has(k)) return HOMOPHONE_STACK_LITE;
+  return '';
+}
+
 function _withHitCraftClose(fn, genreOf, opts) {
   return function (...args) {
     const r = fn.apply(this, args);
@@ -13543,7 +13578,7 @@ function _withHitCraftClose(fn, genreOf, opts) {
         r.prompt += buildFeaturedGuestNote(p.featuredGuest);
       }
       r.prompt += buildHitCraftFinalCheck(g);
-      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES;
+      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _homophoneNote(g);
     }
     return r;
   };
