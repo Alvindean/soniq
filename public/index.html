@@ -840,6 +840,11 @@ body.craft-advanced .craft-basic-only{display:none !important}
 .prism-chip-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--tx4)}
 .prism-chip-value{font-size:13px;font-weight:700;color:var(--tx1);line-height:1.25;overflow:hidden;text-overflow:ellipsis}
 .prism-chip-sub{font-size:12px;color:var(--tx3);line-height:1.3}
+.prism-rerolls{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+.prism-rerolls-label{font-size:12px;color:var(--tx3);width:100%}
+.prism-reroll,.prism-clear-locks{background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx2);font-size:12px;padding:7px 11px;cursor:pointer}
+.prism-reroll:hover,.prism-clear-locks:hover{color:var(--tx1);border-color:var(--b3)}
+.prism-clear-locks{align-self:flex-end}
 .prism-chip.is-phrase,.prism-chip-phrase{border-color:var(--amberline);background:var(--amberbg)}
 .prism-chip.is-phrase .prism-chip-label,.prism-chip-phrase .prism-chip-label{color:var(--amber)}
 .prism-phrase-strat{font-weight:400;color:var(--tx3);font-size:12px}
@@ -5444,6 +5449,29 @@ try { window.pingPv('pageview'); } catch(e){}
           <label class="prism-label" for="prism-g2">Fuse with <span class="prism-opt">optional</span></label>
           <input type="text" id="prism-g2" class="prism-input" maxlength="40" autocomplete="off" placeholder="e.g. drill" />
         </div>
+      </div>
+      <div class="prism-row">
+        <div class="prism-field prism-field-grow">
+          <label class="prism-label" for="prism-subject">Lock what it's about <span class="prism-opt">optional</span></label>
+          <input type="text" id="prism-subject" class="prism-input" maxlength="120" autocomplete="off" placeholder="e.g. my father's hands" />
+        </div>
+        <div class="prism-field prism-field-grow">
+          <label class="prism-label" for="prism-metaphor">Lock central image <span class="prism-opt">optional</span></label>
+          <input type="text" id="prism-metaphor" class="prism-input" maxlength="80" autocomplete="off" placeholder="e.g. a porch light left on" />
+        </div>
+      </div>
+      <div class="prism-row">
+        <div class="prism-field">
+          <label class="prism-label" for="prism-axis">Lock point of view</label>
+          <select id="prism-axis" class="prism-select">
+            <option value="">Auto</option>
+            <option value="WHO">Narrator vs. witness</option>
+            <option value="WHEN">Now vs. before</option>
+            <option value="EYES">Through the object / place</option>
+            <option value="VOICE">Narrator vs. subject</option>
+          </select>
+        </div>
+        <button type="button" class="prism-clear-locks" onclick="clearPrismLocks()" title="Empty every lock so Prism rolls everything">Clear locks</button>
       </div>
     </div>
 
@@ -13891,7 +13919,10 @@ function feelPrism(){
     electronic:'edm', house:'edm', techno:'edm', dnb:'edm', dubstep:'edm', synthpop:'pop',
     indie:'altrock', alternative:'altrock', 'singer-songwriter':'ss', singersongwriter:'ss',
     americana:'folk', bluegrass:'folk', hardrock:'rock', punkrock:'punk', emo:'punk',
-    heavymetal:'metal', afrobeat:'afrobeats', salsa:'latin', bachata:'latin'
+    heavymetal:'metal', afrobeat:'afrobeats', salsa:'latin', bachata:'latin',
+    // Brain genres with no ALL_GENRE_LABELS entry (Prism can roll them, so a
+    // re-roll must be able to lock them without an "unknown genre" warning).
+    bossa:'bossa', 'bossa nova':'bossa', bossanova:'bossa', cpop:'cpop', 'c-pop':'cpop', mandopop:'cpop'
   };
   const normalizePrismGenre = (input) => {
     if (!input) return null;
@@ -13920,7 +13951,12 @@ function feelPrism(){
     try { toast('🔮 Locking unknown genre' + (_unmatched.length > 1 ? 's' : '') + ': ' + _unmatched.join(', ') + ' — try a known genre if the lock is ignored'); } catch (_) {}
   }
 
-  const params = { g1: g1In, g2: g2In, phrase, phraseStrategy, phraseMode, spice, platinum: _platinumOn && isPlatinumEligible() };
+  // Dial locks (any dial can be pinned; re-roll buttons on the reveal fill these).
+  const subjectLock = (document.getElementById('prism-subject')?.value || '').trim() || undefined;
+  const metaphorLock = (document.getElementById('prism-metaphor')?.value || '').trim() || undefined;
+  const axisLock = document.getElementById('prism-axis')?.value || undefined;
+  const params = { g1: g1In, g2: g2In, phrase, phraseStrategy, phraseMode, spice, platinum: _platinumOn && isPlatinumEligible(),
+    subject: subjectLock, metaphor: metaphorLock, flipAxis: axisLock };
   Object.keys(params).forEach(k => { if (params[k] === undefined) delete params[k]; });
 
   const orb=document.getElementById('prism-orb');
@@ -13990,6 +14026,30 @@ function feelPrism(){
 }
 
 // Paint the PRISM concept brief (4 dials) + the streamed song into #prism-reveal.
+// Empty every Prism lock field.
+function clearPrismLocks() {
+  ['prism-subject', 'prism-metaphor', 'prism-g1', 'prism-g2', 'prism-phrase'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const ax = document.getElementById('prism-axis'); if (ax) ax.value = '';
+  const st = document.getElementById('prism-strategy'); if (st) st.value = '';
+  toast('Locks cleared — next roll is fully random');
+}
+// Re-roll ONE dial: lock every other dial to the last concept, leave this one open.
+function rerollPrismDial(dial) {
+  const p = S._prismLastBrief;
+  if (!p) return;
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  const g = p.genre || {};
+  set('prism-subject', dial === 'subject' ? '' : (p.subject && p.subject.surface));
+  set('prism-metaphor', dial === 'metaphor' ? '' : (p.metaphor && p.metaphor.token));
+  set('prism-axis', dial === 'axis' ? '' : (p.flip && p.flip.axis));
+  set('prism-g1', dial === 'genre' ? '' : g.primary);
+  set('prism-g2', dial === 'genre' ? '' : (g.mode === 'fusion' ? g.secondary : ''));
+  // A phrase flip rides with the subject: keep it unless the subject is re-rolled.
+  if (p.phrase && dial !== 'subject') set('prism-phrase', p.phrase.phrase); else set('prism-phrase', '');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  feelPrism();
+}
+
 function renderPrismReveal(meta, songText){
   const reveal = document.getElementById('prism-reveal');
   if (!reveal) return;
@@ -14194,9 +14254,17 @@ function renderPrismReveal(meta, songText){
       phraseChip +
       conceptLine +
       '<div class="prism-dials">' + dials + '</div>' +
+      '<div class="prism-rerolls">' +
+        '<span class="prism-rerolls-label">Re-roll one dial, keep the rest (writes a new song):</span>' +
+        '<button type="button" class="prism-reroll" onclick="rerollPrismDial(\'subject\')">🔄 What it\'s about</button>' +
+        '<button type="button" class="prism-reroll" onclick="rerollPrismDial(\'metaphor\')">🔄 Image</button>' +
+        '<button type="button" class="prism-reroll" onclick="rerollPrismDial(\'axis\')">🔄 Point of view</button>' +
+        '<button type="button" class="prism-reroll" onclick="rerollPrismDial(\'genre\')">🔄 Sound</button>' +
+      '</div>' +
     '</div>' +
     lyricsHtml +
     actsHtml;
+  S._prismLastBrief = p;
   paintPrismCard();
   // Concept-first: scroll the brief (chips) into view so it reads as the hero
   // of the reveal instead of being buried under the streamed song.

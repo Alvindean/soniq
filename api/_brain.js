@@ -12956,12 +12956,13 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
 // onto the existing buildSongPrompt() to produce the actual song.
 // Spec: docs/PRISM-ENGINE-SPEC.md
 //
-// MVP scope (steps 1-2 + hybrid subject + light flip):
-//   ✓ Dial 4 GENRE (quality-weighted over the FUSION_DATA whitelist)
-//   ✓ Dial 1 SUBJECT (hybrid: optional live pool + SUBJECT_SEED + LUCKY_TOPICS)
-//   ~ Dial 3 PERSPECTIVE (light flip; full weighted roller = step 5)
-//   ☐ Dial 2 METAPHOR (step 3 — left null; buildSongPrompt already splices the
-//     metaphor balance + palette notes at ~line 6384, so nothing breaks)
+// Built (spec §1-§11):
+//   ✓ Dial 4 GENRE (quality-weighted over the FUSION_DATA whitelist, free-plan gate)
+//   ✓ Dial 1 SUBJECT (live sparks pool built server-side + SUBJECT_SEED + LUCKY_TOPICS)
+//   ✓ Dial 3 PERSPECTIVE (weighted by subject agency + genre legality; lockable axis)
+//   ✓ Dial 2 METAPHOR (genre palette; fusions borrow from the partner genre /
+//     CROSS_STYLE_METAPHOR_BORROWS; ~25% cross-genre surprise otherwise)
+//   ✓ Dial 5 PHRASE FLIP, N-candidate coherence scoring, Idea Engine pitches
 // ═══════════════════════════════════════════════════════════════════════════
 
 // Weighted pick primitive. weightFn(key) -> positive number. Uniform fallback
@@ -12976,8 +12977,9 @@ function pickWeighted(keys, weightFn) {
   return keys[keys.length - 1];
 }
 
-// Curated evergreen subject seed (~50, Lucky register). Hybrid Dial-1 merges
-// these with the live `soniq:topics:top` pool (wired in step 4 via params.subjectPool).
+// Curated evergreen subject seed (extended to ~180 by SUBJECT_SEED_EXT below).
+// Dial 1 merges these with the live pool the server passes as params.subjectPool
+// (today's live sparks for Prism; sparks + community topics for Ideas).
 const SUBJECT_SEED = [
   'the version of yourself you abandoned','a city that never loved you back','the last good day before everything changed',
   'falling for someone at exactly the wrong time','what your hometown took from you','the friend who didn\'t make it out',
@@ -13103,8 +13105,8 @@ function _prismSubjectAgency(s) {
   return agent > 0 ? 'agent' : 'abstraction';                     // tie-break
 }
 
-// Dial 1 — SUBJECT (hybrid). livePool: array of strings or {surface,score}
-// (the `soniq:topics:top` ZSET, wired in step 4). Live dominates when present;
+// Dial 1 — SUBJECT (hybrid). livePool: array of strings or {surface,score,source}
+// (built server-side: live sparks and/or community topics). Live dominates when present;
 // SUBJECT_SEED + LUCKY_TOPICS backfill to keep the pool ≥ 20.
 function rollSubjectDial(opts) {
   opts = opts || {};
@@ -13134,7 +13136,7 @@ function rollSubjectDial(opts) {
   return { id: _prismSubjId(surface), surface, score: tok.score, source: liveTokens.length ? 'hybrid' : 'seed', agency: _prismSubjectAgency(surface) };
 }
 
-// Dial 3 — PERSPECTIVE-FLIP (v0 light roller; full weighted/legality version = step 5).
+// Dial 3 — PERSPECTIVE-FLIP (weighted + legality-aware; a caller can lock the axis).
 const PRISM_FLIP_AXES = {
   WHO:   { dual: true, structure: 'storytelling' },
   WHEN:  { dual: true, structure: 'storytelling' },
@@ -13150,7 +13152,7 @@ function _prismFlipResolve(axis, subject) {
     default:      return 'the opposite vantage on "' + subject + '"';
   }
 }
-function rollFlipDial(genreKey, subject) {
+function rollFlipDial(genreKey, subject, forcedAxis) {
   // WEIGHTED + legality-aware. Axes are BIASED (never pre-filtered) so the coherence
   // SCORE still culls — every axis keeps a nonzero floor. Two signals set the weights:
   //  (1) SUBJECT AGENCY — WHO/VOICE need a second human agent, so an agent subject
@@ -13167,8 +13169,8 @@ function rollFlipDial(genreKey, subject) {
   const LEGAL_MULT = legalForRotation
     ? { WHO: 1, WHEN: 1, EYES: 1, VOICE: 1 }
     : { WHO: 0.3, WHEN: 0.8, EYES: 1, VOICE: 0.3 };
-  const axis = pickWeighted(Object.keys(PRISM_FLIP_AXES),
-    a => (AGENCY_WEIGHTS[a] || 1) * (LEGAL_MULT[a] || 1)) || 'WHEN';
+  const axis = (forcedAxis && PRISM_FLIP_AXES[forcedAxis]) ? forcedAxis
+    : (pickWeighted(Object.keys(PRISM_FLIP_AXES), a => (AGENCY_WEIGHTS[a] || 1) * (LEGAL_MULT[a] || 1)) || 'WHEN');
   const ax = PRISM_FLIP_AXES[axis];
   return {
     axis,
@@ -13230,6 +13232,25 @@ function rollMetaphorDial(opts) {
   }
   const bank = buildMetaphorBank();
   const gk = _normalizeGenreKey(opts.genreKey || '');
+  // FUSION BORROW: when the genre dial rolled a fusion, ~40% of rolls take the
+  // image from the PARTNER genre — first the curated bridge images
+  // (CROSS_STYLE_METAPHOR_BORROWS, e.g. country<-hiphop "the come-up"), else the
+  // partner's own palette — so a Country × Hip-Hop song can carry a hip-hop image.
+  const sk = opts.secondaryKey ? _normalizeGenreKey(opts.secondaryKey) : '';
+  if (sk && sk !== gk && Math.random() < 0.4) {
+    const bridge = CROSS_STYLE_METAPHOR_BORROWS[gk + '<-' + sk] || CROSS_STYLE_METAPHOR_BORROWS[sk + '<-' + gk];
+    const partner = bank.byGenre[sk] && bank.byGenre[sk].length ? bank.byGenre[sk] : null;
+    if (bridge && bridge.images && bridge.images.length && (!partner || Math.random() < 0.6)) {
+      return { token: pickRandom(bridge.images), family: 'cross-style borrow', sentiment: 'the energy of ' + (GENRE_LABELS[sk] || sk),
+        genres: [sk], directive: 'TOUCHPOINT not THROUGHLINE — name the borrow', borrow: sk, fusionBorrow: true,
+        nod: pickRandom(bridge.nod_patterns || []) || '' };
+    }
+    if (partner) {
+      const t = pickRandom(partner);
+      return { token: t.token, family: t.family, sentiment: t.sentiment, genres: [sk],
+        directive: 'TOUCHPOINT not THROUGHLINE', borrow: sk, fusionBorrow: true, nod: '' };
+    }
+  }
   const home = bank.byGenre[gk] && bank.byGenre[gk].length ? bank.byGenre[gk] : null;
   const borrow = Math.random() < 0.25 || !home;
   const pool = borrow ? bank.flat : home;
@@ -13485,6 +13506,8 @@ function _scorePrism(q) {
     const j = _prismHash01((m.token || '') + '|' + (m.family || '') + '|' + prim);
     if (m.genres && m.genres.includes(prim)) {
       s += 22 + Math.round(j * 8);          // 22-30 home fit
+    } else if (m.fusionBorrow && q.genre.secondary && _normalizeGenreKey(q.genre.secondary) === m.borrow) {
+      s += 20 + Math.round(j * 8);          // 20-28 borrow from the fusion partner (spec: +20)
     } else if (m.borrow) {
       s += 8 + Math.round(j * 10);          // 8-18 intentional cross-genre friction
     } else {
@@ -13527,8 +13550,9 @@ function _scorePrism(q) {
 
 // Roll all dials N times, score, return the best CONCEPT BRIEF (no prompt/system —
 // that's what makes it the inverse of Lucky).
-// params: { g1?, g2?, subject?, subjectPool?, metaphor?, phrase?, phraseStrategy?,
-//           phraseMode? ('auto'|true), spice?, candidates? }.
+// params: { g1?, g2?, subject?, subjectPool?, metaphor?, flipAxis? (WHO|WHEN|EYES|VOICE),
+//           phrase?, phraseStrategy?, phraseMode? ('auto'|true), spice?, candidates?, allowedGenres? }.
+const _capFirst = s => String(s || '').replace(/^\s*([a-z])/, (m, c) => m.replace(c, c.toUpperCase()));
 function buildPrismConcept(params) {
   params = params || {};
   const N = Math.max(1, Math.min(parseInt(params.candidates, 10) || 5, 12));
@@ -13548,14 +13572,14 @@ function buildPrismConcept(params) {
   // unsatisfiable — a low score then reflects the USER'S deliberate choices, not a
   // weak roll. We flag it (coherenceFloorMet/pinned) so the UI shows "Custom concept"
   // instead of silently shipping a misleading low "Coherence NN" badge.
-  const pinned = !!(params.subject && params.metaphor);
+  const pinned = !!(params.subject && params.metaphor) || !!(params.subject && params.flipAxis);
   let best = null, attempts = 0;
   while (attempts < MAX_ATTEMPTS) {
     attempts++;
     const genre = rollGenreDial({ g1: params.g1, g2: params.g2, spice: params.spice, allowedGenres: params.allowedGenres });
     const subject = rollSubjectDial({ subject: params.subject, livePool: params.subjectPool });
-    const flip = rollFlipDial(genre.primary, subject);
-    const metaphor = rollMetaphorDial({ genreKey: genre.primary, metaphor: params.metaphor });
+    const flip = rollFlipDial(genre.primary, subject, params.flipAxis);
+    const metaphor = rollMetaphorDial({ genreKey: genre.primary, secondaryKey: genre.secondary, metaphor: params.metaphor });
     const phrase = phraseOn ? rollPhraseDial({ phrase: params.phrase, strategy: params.phraseStrategy }) : null;
     const score = _scorePrism({ genre, subject, flip, metaphor });
     if (!best || score > best.score || (score === best.score && subject.score > best.subject.score)) {
@@ -13573,7 +13597,13 @@ function buildPrismConcept(params) {
   // read displayGenreLabel.
   const displayGenreLabel = genreLabel;
   const m = best.metaphor;
-  const touch = ' the image of "' + m.token + '" (' + (m.sentiment || 'the feeling underneath') + ')';
+  // touch = what PEOPLE read (conceptLine); touchModel adds the borrow's nod
+  // instruction, which belongs only in the model-facing promptDirective.
+  const _borrowLabel = m.fusionBorrow ? (GENRE_LABELS[m.borrow] || m.borrow) : '';
+  const touch = m.fusionBorrow
+    ? ' the image of "' + m.token + '" (borrowed from ' + _borrowLabel + ')'
+    : ' the image of "' + m.token + '" (' + (m.sentiment || 'the feeling underneath') + ')';
+  const touchModel = touch + (m.fusionBorrow ? (m.nod ? ' — nod to the borrow, e.g. ' + m.nod : ' — name the borrow, don\'t sneak it') : '');
   // ── TWO fields (punch-list #2) ──────────────────────────────────────────────
   // conceptLine    = HUMAN description (genre + subject + human strategy desc +
   //                  touchstone image). NO "Write a song where…" instruction voice.
@@ -13588,7 +13618,7 @@ function buildPrismConcept(params) {
       ' Grounded in ' + best.subject.surface + ', touched once by' + touch + '.';
     promptDirective = displayGenreLabel + '. "' + best.phrase.phrase + '" — ' + best.phrase.strategyLabel + '. ' +
       best.phrase.flipDirective + ' Ground it in ' + best.subject.surface +
-      ', touched once by' + touch + '.';
+      ', touched once by' + touchModel + '.';
   } else {
     // Non-phrase path: conceptLine is already a human description (no instruction
     // voice). promptDirective mirrors it — the dials carry their own directives
@@ -13596,13 +13626,17 @@ function buildPrismConcept(params) {
     // serves both the human read and the model topic here.
     conceptLine = displayGenreLabel + '. A song about ' + best.subject.surface +
       ', told from the angle of ' + best.flip.flippedPOV +
-      ', with' + touch + ' as a touchstone. ' + best.flip.reconciliation + '.';
-    promptDirective = conceptLine;
+      ', with' + touch + ' as a touchstone. ' + _capFirst(best.flip.reconciliation) + '.';
+    promptDirective = m.fusionBorrow
+      ? displayGenreLabel + '. A song about ' + best.subject.surface +
+        ', told from the angle of ' + best.flip.flippedPOV +
+        ', with' + touchModel + ' as a touchstone. ' + _capFirst(best.flip.reconciliation) + '.'
+      : conceptLine;
   }
   return {
     version: 'prism-1',
     subject: best.subject,
-    metaphor: { token: m.token, family: m.family, sentiment: m.sentiment, genres: m.genres, directive: m.directive, borrow: m.borrow },
+    metaphor: { token: m.token, family: m.family, sentiment: m.sentiment, genres: m.genres, directive: m.directive, borrow: m.borrow, fusionBorrow: !!m.fusionBorrow },
     phrase: best.phrase,
     flip: best.flip,
     genre: { mode: g.mode, primary: g.primary, secondary: g.secondary, fusionName: g.fusionName, label: g.label, quality: g.quality, blend: g.blend, treatment: g.tip || '' },
