@@ -11340,7 +11340,7 @@ ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier, 'hiphop')}
 ${buildRegionNote('hiphop', params.region)}
 ${buildEmotionalVelocityNote('hiphop', params.emotionalVelocity)}
-${buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier)}
+${buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier)}${params.platinum ? buildTopTierNote('hiphop') : ''}
 
 Respond with EXACTLY this format:
 
@@ -12209,7 +12209,7 @@ PLATFORM TIPS:
 SUNO V6 MASHUP:
 [For writers who have BOTH songs in their own Suno library: one ready-to-paste v6 mashup request that names which elements come from which song and how they fit, e.g. which song's vocal and hook, which song's drums and bass, whose tempo and key win, and where the switch happens. Plain words, 2-4 sentences, no artist names. Note that v6 mashups only work on the writer's own songs.]`;
 
-  return { system: system + buildWordplayNote([aGenre, bGenre]), prompt };
+  return { system: system + buildCraftNotes([aGenre, bGenre], p.platinum === true), prompt };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -13295,7 +13295,8 @@ function buildPrismSongPrompt(brief, extra) {
     structure: fp.structure || 'standard',
     lyricTier: extra.lyricTier || 'street',
     length: extra.length || 'medium',
-    plan: extra.plan, isAdmin: extra.isAdmin
+    plan: extra.plan, isAdmin: extra.isAdmin,
+    platinum: extra.platinum === true
   });
   // Surface the brief + the lucky-style meta keys the client reveal UI expects.
   built.meta = Object.assign({}, built.meta, {
@@ -13317,7 +13318,7 @@ function buildPrismSongPrompt(brief, extra) {
     // agrees with the chip (#4).
     fusionName: displayGenreLabel, substyle: (built.meta && built.meta.substyle) || ''
   });
-  if (built && typeof built.system === 'string') built.system += buildWordplayNote([g.primary, g.secondary]);
+  if (built && typeof built.system === 'string') built.system += buildCraftNotes([g.primary, g.secondary], extra.platinum === true);
   return built;
 }
 
@@ -13604,12 +13605,115 @@ function buildWordplayNote(genres) {
   const list = (Array.isArray(genres) ? genres : [genres]).filter(Boolean).map(x => (x && typeof x === 'object') ? x.primary : x);
   if (list.some(x => _HOMOPHONE_FULL_GENRES.has(_homophoneGenreKey(x)) || _RAP_WORDS_RE.test(String(x)))) return HOMOPHONE_STACK;
   if (list.some(x => _HOMOPHONE_LITE_GENRES.has(_homophoneGenreKey(x)))) return HOMOPHONE_STACK_LITE;
+  // Free text: map it to a genre first so EDM / techno lenses stay wordplay-free.
+  const keys = list.map(x => _genreKeyFromText(x)).filter(Boolean);
+  if (keys.length) return keys.some(k => _HOMOPHONE_LITE_GENRES.has(k)) ? HOMOPHONE_STACK_LITE : '';
   return list.length ? HOMOPHONE_STACK_LITE : '';
 }
 // Variants that rewrite lyrics get the note; audio-only variants don't.
 function buildVariantWordplayNote(variantKey, genre) {
   if (!VARIANT_REWRITES.has(variantKey)) return '';
-  return buildWordplayNote(variantKey === 'trap_remix' ? ['hiphop', genre] : [genre]);
+  return buildCraftNotes(variantKey === 'trap_remix' ? ['hiphop', genre] : [genre]);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MOMENTUM MAP — build, breakdown, air, relaunch. Every genre, every song.
+// Lives in the system prompt (never trimmed). Per-genre lens says HOW this
+// genre builds / breaks / breathes; Platinum adds a stricter upgrade.
+// ═══════════════════════════════════════════════════════════════════════════
+const MOMENTUM_CORE = `
+
+MOMENTUM MAP (every song, every genre): energy is a line you draw, not a constant level.
+1. ENERGY LEVELS: give every section an energy number from 1 to 10 in your head. No two neighbouring sections sit at the same level. The final chorus is the peak. After the first chorus there is at least one valley at 4 or below.
+2. THE BUILD: rise into every chorus with at least two of these: shorter lines, faster or denser syllables, a phrase that repeats and climbs, a rising melody, an added layer tag such as [Build], [Riser] or [Drums Enter].
+3. THE BREAKDOWN: once per song (after chorus 2, or as the bridge) pull the floor out: strip to one or two elements with a tag such as [Breakdown], [Half-Time], [Stripped] or [Drums + Vocal Only]. The words get fewer, the space gets bigger, and the most honest line of the song lives here.
+4. THE AIR: at least two pockets of space. Options: a breath bar or one-word line right before the final chorus, the beat dropping out under the hook's key word ([Beat Drops Out]), a line left unfinished that the music finishes. Space right before a peak is what makes the peak hit.
+5. THE RELAUNCH: after the breakdown, come back BIGGER than before, never the same chorus at the same size: a key lift, gang vocals, double-time, ad-lib counter-lines, or a new last line.
+6. WORDS MATCH ENERGY: high-energy sections use short punchy lines and more repetition; low-energy sections use longer, quieter, more detailed lines. Write the words to the energy, not against it.
+Show the shape with inline TYPE 3 tags so the platform hears it, and keep the STRUCTURE MAP and DOPAMINE MAP consistent with it. If a Slow Burn velocity or an intimate ballad is requested, keep the valleys subtle (dynamics and density, not new sections) but still shape the line.`;
+
+const MOMENTUM_GENRE_LENS = {
+  hiphop:    'Build with a flow switch into double-time and rising ad-lib density. Break with a beat switch, half-time, or the beat cutting out for an a cappella bar. Air: drop the beat one beat before the money word so the punchline lands in silence.',
+  pop:       'Build through the pre-chorus lift, then a half-bar pull-back right before the chorus. Use a post-chorus to keep the high. Break the bridge down to piano or a single synth and voice. Final chorus: key lift or gang vocals.',
+  rnb:       'Slow-burn build through harmony stacks and runs. Break down to bass, keys and voice. Air lives in held notes, whispered lines and the gap after a run. Final chorus carries ad-lib runs over the hook.',
+  neosoul:   'Momentum comes from groove and harmony, not volume. Build by adding Rhodes, horns or backing vocals. Break down to bass and drums with spoken or hummed lines. Air: laid-back phrasing behind the beat.',
+  edm:       'Build with a riser and snare roll, then a full bar of silence or a filtered vocal before the drop. Breakdown is pads and vocal only. Second drop must change: a new lead, a beat switch or a heavier bass.',
+  country:   'Build by stacking the band: acoustic verse 1, steel and drums by chorus 1, full band by chorus 2. Break the bridge to acoustic and voice. Air: the band drops out for the line before the title punch.',
+  rock:      'Quiet-loud dynamics. Build with tom fills and guitar layers. Break with a stop-time hit section or a clean-guitar bridge. Air: the full stop before the last chorus explodes.',
+  altrock:   'Quiet-loud dynamics with tension held longer in the quiet part. Build with feedback, layered guitars and drums entering late. Break to one clean guitar and voice. Air: a held note or feedback hang before the loud return.',
+  punk:      'Momentum is speed and shout. Build with a drum lead-in and gang shout. Break with a half-time stomp or a single-chord stop. Air: a one-beat dead stop before the last chorus.',
+  metal:     'A metal breakdown goes HEAVIER, not quieter: half-time chug with palm-muted riffs. Build with double-kick and tremolo riffs. Air: a clean or ambient interlude, or a full stop before the final riff.',
+  gospel:    'Build through the vamp: repeat a line and lift the key each round. Break down to organ, claps and choir hum. Air: the hush before the shout. End on a tag or a vamp that keeps rising.',
+  jazz:      'Momentum comes from dynamics and interplay. Build by trading phrases and pushing the rhythm section. Break down to bass or piano alone. Air: rests and phrasing behind the beat.',
+  blues:     'Build through call and response and turnaround intensity. Break with stop-time: band hits on beat 1 and the voice sings alone in the gaps. Air lives in those stop-time holes.',
+  folk:      'Build by adding one instrument per verse. Break down to a single voice or voice and one guitar. Air: long pauses and room sound between lines.',
+  ss:        'Build by adding one instrument per verse. Break down to voice and one instrument, with the most honest line. Air: a long pause before the last chorus.',
+  reggae:    'Build with the riddim locking in and horns entering. Break with a dub section: drum and bass only, echo on the last word. Air: the space between the skanks on 2 and 4.',
+  dancehall: 'Build with riddim layers and chant hype. Break to the bare riddim and voice. Air: a stop on the hype line, then the riddim slams back in.',
+  reggaeton: 'Build with percussion layering over the dembow. Break by dropping the dembow and keeping only the vocal and pads. Air: a short stop before the perreo section relaunches.',
+  latin:     'Build through percussion layers (congas, timbales, brass). Break to a montuno or percussion-only section. Air: horn stabs with rests between.',
+  afrobeats: 'Build with layered percussion and call-and-response. Break by stripping to the drum groove and voice. Air: let the groove breathe with the vocal resting for a bar.',
+  amapiano:  'Long patient build; the log drum entrance IS the drop. Break down to shakers, keys and pads. Air: hold back the log drum for a full phrase before bringing it back.',
+  kpop:      'Contrast is the momentum: rap verse, pre-chorus build, chorus drop, then a dance break. Bridge breaks down to a vocal showcase. Final chorus adds the high-note ad-lib.',
+  cpop:      'Build through the pre-chorus lift into a big melodic chorus. Break the bridge down to piano and voice. Final chorus: key lift or added harmonies.',
+  bossa:     'Momentum comes from harmonic movement, not volume. Build with fuller voicings; break to guitar and voice. Air is natural: soft phrasing and rests.',
+  bollywood: 'Build with orchestral swells and percussion (dhol, tabla). Break with an instrumental interlude or a solo vocal alaap. Final chorus: full ensemble.',
+  tvmusical: 'Build to the button note at the end. Break to underscore with half-spoken lines. Air: the dramatic pause before the final belt.',
+  children:  'Build with call-and-response and repetition kids can shout. Break to clapping or a quiet "whisper verse". Air: a pause before the big singalong line.',
+  comedy:    'Comic momentum is timing: build the setup, then leave a beat of air before the punchline. Break with a spoken aside. Relaunch bigger after the biggest joke.',
+  parody:    'Mirror the original song\'s build and drop so the joke rides its momentum. Air: a beat of silence before the punchline lands.',
+};
+
+const MOMENTUM_PLATINUM = `
+
+PLATINUM MOMENTUM UPGRADE (Platinum mode is ON; this raises the Momentum Map):
+1. TWO VALLEYS of DIFFERENT kinds (for example a strip-down AND a beat switch or stop-time), never the same trick twice.
+2. MICRO-MOMENTUM: every verse builds inside itself: sparse first half, denser and faster second half.
+3. ONE FAKE-OUT: set up a chorus and withhold it once (an extra bar, a false stop, or a repeated pre-chorus line) before it lands.
+4. AIR ON THE MONEY LINE: the single most important lyric of the song lands into silence or over one element.
+5. FINAL-CHORUS STACK: at least three changes at once (key lift, gang vocal, ad-lib counter-line, double-time, or a new last line).
+6. DELIBERATE OUTRO: release the energy on purpose (fade to one element, a callback line, or a hard stop on a word), never just repeat and end.
+7. SILENT CHECK before output: write each section's energy number to yourself; if the line stays flat for three sections in a row, rewrite.`;
+
+function _momentumNote(g, platinum) {
+  const k = _homophoneGenreKey(g);
+  const lens = MOMENTUM_GENRE_LENS[k];
+  const lensLine = lens ? `\nMOMENTUM IN ${(GENRE_LABELS[k] || k).toUpperCase()}: ${lens}` : '';
+  return MOMENTUM_CORE + lensLine + (platinum ? MOMENTUM_PLATINUM : '');
+}
+
+// Free-text lens (Alternate Take: "Atlanta Trap (Regional swap)") -> genre key.
+const _MOMENTUM_TEXT_KEYS = [
+  [/\b(hip[- ]?hop|rap|trap|drill|grime|boom[- ]?bap|phonk)\b/i, 'hiphop'],
+  [/\bamapiano\b/i, 'amapiano'], [/\breggaeton\b/i, 'reggaeton'], [/\bdancehall\b/i, 'dancehall'],
+  [/\breggae\b/i, 'reggae'], [/\bafro/i, 'afrobeats'], [/\bk-?pop\b/i, 'kpop'], [/\bc-?pop|mandopop\b/i, 'cpop'],
+  [/\bbossa\b/i, 'bossa'], [/\bbollywood\b/i, 'bollywood'], [/\bgospel\b/i, 'gospel'], [/\bneo-?soul\b/i, 'neosoul'],
+  [/\br&b|rnb|soul\b/i, 'rnb'], [/\bcountry|nashville|bluegrass|americana\b/i, 'country'], [/\bmetal\b/i, 'metal'],
+  [/\bpunk\b/i, 'punk'], [/\balt-?rock|indie|grunge|emo\b/i, 'altrock'], [/\brock\b/i, 'rock'], [/\bblues\b/i, 'blues'],
+  [/\bjazz\b/i, 'jazz'], [/\bfolk\b/i, 'folk'], [/\bsinger-?songwriter\b/i, 'ss'], [/\bedm|house|techno|dubstep|electronic|trance|drum and bass|dnb\b/i, 'edm'],
+  [/\blatin|salsa|cumbia|bachata\b/i, 'latin'], [/\bmusical|broadway\b/i, 'tvmusical'], [/\bpop\b/i, 'pop'],
+];
+function _genreKeyFromText(t) {
+  const k = _homophoneGenreKey(t);
+  if (MOMENTUM_GENRE_LENS[k]) return k;
+  for (const [re, key] of _MOMENTUM_TEXT_KEYS) if (re.test(String(t || ''))) return key;
+  return '';
+}
+
+// All system-level craft notes for one genre: wordplay + momentum (+ Platinum).
+function _craftSystemNotes(g, platinum) {
+  return _homophoneNote(g) + (platinum ? _homophonePlatinumNote(g) : '') + _momentumNote(g, platinum);
+}
+// Same, for features that build their own system prompt (Prism, Blend,
+// Variants, Alternate Take). Wordplay takes the rap-most genre; momentum
+// follows the first (primary / target) genre.
+function buildCraftNotes(genres, platinum) {
+  const list = (Array.isArray(genres) ? genres : [genres]).filter(Boolean).map(x => (x && typeof x === 'object') ? x.primary : x);
+  const wordplay = buildWordplayNote(list);
+  const rapish = list.find(x => _HOMOPHONE_FULL_GENRES.has(_homophoneGenreKey(x)) || _RAP_WORDS_RE.test(String(x)));
+  const platWord = platinum ? (wordplay === HOMOPHONE_STACK ? HOMOPHONE_STACK_PLATINUM : (wordplay ? HOMOPHONE_STACK_LITE_PLATINUM : '')) : '';
+  const primary = _genreKeyFromText(rapish && list[0] === rapish ? 'hiphop' : list[0]);
+  return wordplay + platWord + _momentumNote(primary, platinum);
 }
 
 function _withHitCraftClose(fn, genreOf, opts) {
@@ -13627,13 +13731,13 @@ function _withHitCraftClose(fn, genreOf, opts) {
         r.prompt += buildFeaturedGuestNote(p.featuredGuest);
       }
       r.prompt += buildHitCraftFinalCheck(g);
-      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _homophoneNote(g) + (p.platinum ? _homophonePlatinumNote(g) : '');
+      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _craftSystemNotes(g, !!p.platinum);
     }
     return r;
   };
 }
 
-module.exports = { buildWordplayNote, buildVariantWordplayNote, buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildWordplayNote, buildVariantWordplayNote, buildCraftNotes, MOMENTUM_GENRE_LENS, buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,

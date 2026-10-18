@@ -5368,6 +5368,11 @@ try { window.pingPv('pageview'); } catch(e){}
           <span class="prism-toggle-track"><span class="prism-toggle-thumb"></span></span>
           <span class="prism-toggle-label">🌶 Spice <span class="prism-opt">unexpected fusions</span></span>
         </label>
+        <label class="prism-toggle" for="prism-platinum" id="prism-platinum-wrap" style="display:none" title="Top 5% hit references + Platinum wordplay and momentum upgrades">
+          <input type="checkbox" id="prism-platinum" onchange="syncPrismPlatinum(this)" />
+          <span class="prism-toggle-track"><span class="prism-toggle-thumb"></span></span>
+          <span class="prism-toggle-label">✦ Platinum <span class="prism-opt">top 5% craft</span></span>
+        </label>
       </div>
       <div class="prism-row">
         <div class="prism-field prism-field-grow">
@@ -13743,7 +13748,7 @@ function feelPrism(){
     try { toast('🔮 Locking unknown genre' + (_unmatched.length > 1 ? 's' : '') + ': ' + _unmatched.join(', ') + ' — try a known genre if the lock is ignored'); } catch (_) {}
   }
 
-  const params = { g1: g1In, g2: g2In, phrase, phraseStrategy, phraseMode, spice };
+  const params = { g1: g1In, g2: g2In, phrase, phraseStrategy, phraseMode, spice, platinum: _platinumOn && isPlatinumEligible() };
   Object.keys(params).forEach(k => { if (params[k] === undefined) delete params[k]; });
 
   const orb=document.getElementById('prism-orb');
@@ -19986,9 +19991,17 @@ function isPlatinumEligible() {
 function initPlatinumToggle() {
   const wrap = document.getElementById('platinum-toggle-wrap');
   if (wrap) wrap.style.display = isPlatinumEligible() ? 'flex' : 'none';
+  const prismWrap = document.getElementById('prism-platinum-wrap');
+  if (prismWrap) prismWrap.style.display = isPlatinumEligible() ? '' : 'none';
   // Also refresh the craft-tier body class — same trigger points as platinum
   // toggle (auth, plan change). Drives basic vs advanced UI surfaces.
   if (typeof applyCraftTierClass === 'function') applyCraftTierClass();
+}
+
+// Prism's Platinum switch shares state with the main Platinum toggle.
+function syncPrismPlatinum(el) {
+  if (!isPlatinumEligible()) { el.checked = false; return; }
+  if (el.checked !== _platinumOn) togglePlatinum();
 }
 
 function togglePlatinum() {
@@ -19998,6 +20011,8 @@ function togglePlatinum() {
   const btn = document.getElementById('gen-btn');
   if (sw) sw.classList.toggle('on', _platinumOn);
   if (btn) btn.classList.toggle('platinum-on', _platinumOn);
+  const prismBox = document.getElementById('prism-platinum');
+  if (prismBox) prismBox.checked = _platinumOn;
   toast(_platinumOn ? '✦ Platinum Mode ON — top 5% references active' : 'Platinum Mode off');
 }
 
