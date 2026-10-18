@@ -4716,7 +4716,7 @@ const BLEND_STYLE_BIBLE = {
 //   1. Genre-only blend (no writing style): describe genre fusion
 //   2. Style-only blend: inject BLEND_STYLE_BIBLE entry
 //   3. Both: layered overlay with explicit primary/secondary ratios
-function buildBlendNote(primaryGenre, blend) {
+function buildBlendNote(primaryGenre, blend, graft) {
   if (!blend || (!blend.genre2 && !blend.style2)) return '';
   const ratio = Math.max(10, Math.min(90, parseInt(blend.ratio || 70, 10)));
   const secondaryPct = 100 - ratio;
@@ -4729,6 +4729,13 @@ function buildBlendNote(primaryGenre, blend) {
     // nudge. _resolveFusionKey is order/case tolerant.
     let fd = null;
     try { const fk = _resolveFusionKey(primaryGenre, blend.genre2); fd = fk ? FUSION_DATA[fk] : null; } catch (_) {}
+    // A Section Graft decides who raps or sings that section, so drop any
+    // playbook sentence that forbids it (e.g. Pop-Rap "Never rap the chorus").
+    if (fd && fd.tip && graft && graft.graftGenre) {
+      const sec = ['verse', 'chorus', 'bridge'].includes(graft.graftSection) ? graft.graftSection : 'chorus';
+      const tip = fd.tip.split(/(?<=\.)\s+/).filter(t => !new RegExp('\\b(never|don\'t|do not)\\b[^.]*\\b' + sec, 'i').test(t)).join(' ');
+      fd = Object.assign({}, fd, { tip: tip ? tip + ` (The ${sec} follows the SECTION GRAFT.)` : `The ${sec} follows the SECTION GRAFT.` });
+    }
     // One structural moment the secondary genre is allowed to OWN, so the fusion
     // shapes the song's construction — not just its lyric texture.
     const g2 = String(blend.genre2).toLowerCase();
@@ -8747,7 +8754,7 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
 
   // Blend — secondary genre + writing style influence (rewritten to inject the
   // BLEND_STYLE_BIBLE for writing styles + concrete sonic guidance).
-  const blendNote = buildBlendNote(genre, blend);
+  const blendNote = buildBlendNote(genre, blend, { graftGenre, graftSection });
 
   // Era map
   const eraMap = {
@@ -13700,20 +13707,62 @@ function _genreKeyFromText(t) {
   return '';
 }
 
-// All system-level craft notes for one genre: wordplay + momentum (+ Platinum).
-function _craftSystemNotes(g, platinum) {
-  return _homophoneNote(g) + (platinum ? _homophonePlatinumNote(g) : '') + _momentumNote(g, platinum);
-}
-// Same, for features that build their own system prompt (Prism, Blend,
-// Variants, Alternate Take). Wordplay takes the rap-most genre; momentum
-// follows the first (primary / target) genre.
+// Craft notes for features that build their own system prompt (Prism, Blend,
+// Variants, Alternate Take): first genre = primary, second = blend partner.
 function buildCraftNotes(genres, platinum) {
   const list = (Array.isArray(genres) ? genres : [genres]).filter(Boolean).map(x => (x && typeof x === 'object') ? x.primary : x);
-  const wordplay = buildWordplayNote(list);
-  const rapish = list.find(x => _HOMOPHONE_FULL_GENRES.has(_homophoneGenreKey(x)) || _RAP_WORDS_RE.test(String(x)));
-  const platWord = platinum ? (wordplay === HOMOPHONE_STACK ? HOMOPHONE_STACK_PLATINUM : (wordplay ? HOMOPHONE_STACK_LITE_PLATINUM : '')) : '';
-  const primary = _genreKeyFromText(rapish && list[0] === rapish ? 'hiphop' : list[0]);
-  return wordplay + platWord + _momentumNote(primary, platinum);
+  return _craftNotesFor({ primary: list[0] || '', secondary: list[1] || '', platinum: !!platinum });
+}
+
+// ── Fusion-aware craft notes ────────────────────────────────────────────────
+// Blends (genre2 + ratio), Section Grafts (a rap chorus on an R&B song) and
+// two-genre rolls (Lucky g2, Prism secondary) get BOTH genres' momentum lenses,
+// wordplay scoped to the rapped sections, and switch-point rules.
+const FUSION_MOMENTUM_RULES = `
+- The dominant genre sets the overall energy arc; the other genre colours sections, it never resets the arc.
+- Every genre switch is a momentum event: put switches where the energy changes, never in the middle of a plateau. Sung verse into a rap hook = a density punch (more syllables, harder drums). Rap verse into a sung hook = a melodic lift (longer vowels, open space).
+- Build into each switch with the RECEIVING genre's build style, so the listener feels the new world arriving.
+- One main breakdown, owned by whichever genre breaks down best in this blend; name it in the tag (for example [Breakdown | Rock Half-Time] or [Breakdown | R&B Bass + Keys]).
+- Glue: carry one element across every switch (the same drum pattern, a repeated phrase, or the title word) so the blend sounds like ONE song, not two songs taking turns.`;
+
+const FUSION_PLATINUM_RULES = `
+
+PLATINUM FUSION UPGRADE: land one genre switch exactly on the fake-out or an air pocket; write at least one MEETING LINE where both genres overlap (a rapped line answered by a sung echo, or a sung line riding a rap cadence); the final chorus brings both genres in at once.`;
+
+function _craftNotesFor(ctx) {
+  const platinum = !!ctx.platinum;
+  const kP = _genreKeyFromText(ctx.primary) || _homophoneGenreKey(ctx.primary);
+  const kS = ctx.secondary ? (_genreKeyFromText(ctx.secondary) || _homophoneGenreKey(ctx.secondary)) : '';
+  const kG = ctx.graftGenre ? (_genreKeyFromText(ctx.graftGenre) || _homophoneGenreKey(ctx.graftGenre)) : '';
+  const sec = ['verse', 'chorus', 'bridge'].includes(ctx.graftSection) ? ctx.graftSection : 'chorus';
+  const others = [kS, kG].filter(k => k && k !== kP);
+  if (!others.length) {
+    return _homophoneNote(kP) + (platinum ? _homophonePlatinumNote(kP) : '') + _momentumNote(kP, platinum);
+  }
+  const all = [kP, ...others];
+  const label = k => GENRE_LABELS[k] || k;
+
+  // Wordplay: full stack if rap is anywhere in the blend, scoped to rapped sections.
+  let wordplay = '';
+  if (all.includes('hiphop')) {
+    const scope = (kG === 'hiphop' && kP !== 'hiphop')
+      ? `\nWORDPLAY SCOPE (section graft): the rapped ${sec} carries the Homophone Stack as a hook-sized stack (2-4 bars, the triple lands on the title line). The sung sections use at most a homophone moment so the melody stays clean.`
+      : `\nWORDPLAY SCOPE (genre blend): the rapped sections carry the Homophone Stack; the sung sections use at most a homophone moment so the melody stays clean.`;
+    wordplay = HOMOPHONE_STACK + scope + (platinum ? HOMOPHONE_STACK_PLATINUM + '\nIn this blend the Platinum stack count applies to the RAPPED sections only.' : '');
+  } else if (all.some(k => _HOMOPHONE_LITE_GENRES.has(k))) {
+    wordplay = HOMOPHONE_STACK_LITE + (platinum ? HOMOPHONE_STACK_LITE_PLATINUM : '');
+  }
+
+  // Momentum: core + every genre's lens + fusion switch rules.
+  const lenses = [...new Set(all)].filter(k => MOMENTUM_GENRE_LENS[k])
+    .map(k => `\nMOMENTUM IN ${label(k).toUpperCase()}: ${MOMENTUM_GENRE_LENS[k]}`).join('');
+  const ratio = Number(ctx.ratio) > 0 && Number(ctx.ratio) < 100 ? ` (about ${Math.round(Number(ctx.ratio))}% ${label(kP)})` : '';
+  const mix = [label(kP), ...(kS && kS !== kP ? [label(kS)] : [])].join(' + ');
+  const graftLine = kG && kG !== kP
+    ? `\n- SECTION GRAFT: the ${sec} is ${label(kG)}. This overrides any fusion tip about who sings or raps that section; treat the switch into and out of the ${sec} as the song's main momentum events.`
+    : '';
+  const fusion = `\n\nFUSION MOMENTUM (this song blends ${mix}${ratio}${kG && kG !== kP ? `, with a ${label(kG)} ${sec}` : ''}):` + FUSION_MOMENTUM_RULES + graftLine;
+  return wordplay + MOMENTUM_CORE + lenses + fusion + (platinum ? MOMENTUM_PLATINUM + FUSION_PLATINUM_RULES : '');
 }
 
 function _withHitCraftClose(fn, genreOf, opts) {
@@ -13731,7 +13780,13 @@ function _withHitCraftClose(fn, genreOf, opts) {
         r.prompt += buildFeaturedGuestNote(p.featuredGuest);
       }
       r.prompt += buildHitCraftFinalCheck(g);
-      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _craftSystemNotes(g, !!p.platinum);
+      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _craftNotesFor({
+        primary: g,
+        secondary: (p.blend && p.blend.genre2) || (r.meta && r.meta.g2) || '',
+        ratio: p.blend && p.blend.ratio,
+        graftGenre: p.graftGenre, graftSection: p.graftSection,
+        platinum: !!p.platinum
+      });
     }
     return r;
   };
