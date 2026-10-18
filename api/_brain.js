@@ -8612,6 +8612,175 @@ function pickWeightedArchetype(fullPool, preferredNames) {
   return pickRandom(fullPool);
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// SWING DNA / SYLLABLE DENSITY / SOUTHPAW — restored (originally 9ce21fc,
+// lost in a later brain rewrite while the UI kept sending the params).
+// Opt-in: only an explicit pick adds a note.
+// ═══════════════════════════════════════════════════════════════════════════
+const SWING_LEVELS = {
+  straight: {
+    label:   'Straight',
+    ratio:   '50/50',
+    feel:    'Dead straight — every note lands exactly on the grid. Machine precision.',
+    suno_tag:'quantized, tight grid, straight rhythm, on the beat',
+    production: 'All instruments quantized to grid. Kick on beat 1, snare on beat 3. Hi-hats perfectly even. Tight, locked, clinical.',
+    lyric_rules: 'Dense syllables — pack every beat. Lines are even and precise. Internal rhymes hit every 2-3 syllables. Consonants are sharp. 8-14 syllables per bar.',
+    syllable_range: '8–14 per bar',
+  },
+  shuffle: {
+    label:   'Shuffle',
+    ratio:   '58/42',
+    feel:    'Slight shuffle — a loose, breathing human feel. The groove leans without fully swinging.',
+    suno_tag:'shuffle groove, slightly swung, loose feel, human timing',
+    production: 'Hi-hats swung at 58/42. Snare lands slightly behind beat 2 and 4. Bass note elongated on the downbeat. Gives warmth without full jazz swing.',
+    lyric_rules: 'Medium density — some lines breathe, some pack tight. Allow vowels to stretch on emotional words. 6–9 syllables per bar. Mix lines that push against the beat with ones that lean back.',
+    syllable_range: '6–9 per bar',
+  },
+  swing: {
+    label:   'Heavy Swing',
+    ratio:   '67/33',
+    feel:    'Full triplet swing — notes arrive in groups of three. The groove breathes and drags.',
+    suno_tag:'heavy swing, triplet feel, behind the beat',
+    production: 'Full triplet subdivision. Hi-hats and snare swing at 67/33. Drums land slightly late. Bass slides into pitch. The groove breathes — never fill every 16th note. Space IS the music.',
+    lyric_rules: 'Sparse and spacious — triplet phrasing with natural rests between clusters. Write in 3-syllable groups. Choose words with open vowels (love, soul, gold, home). 3–6 syllables per bar.',
+    syllable_range: '3–6 per bar',
+  },
+};
+
+const SYLLABLE_DENSITY_RULES = {
+  dense:  'SYLLABLE DENSITY — Dense: Pack syllables tightly. 10–16 syllables per bar. Internal rhymes every 2-3 syllables. Lines should feel rapid and full — every slot filled.',
+  normal: 'SYLLABLE DENSITY — Normal: Standard phrasing for the genre. 6–10 syllables per bar. Balance density with space. Natural, conversational rhythm.',
+  sparse: 'SYLLABLE DENSITY — Sparse: Minimal words, maximum space. 3–6 syllables per bar. Choose each word as if it costs something — what you don\'t say matters as much as what you do.',
+};
+
+const SOUTHPAW_NOTE = `
+
+SOUTHPAW RHYME SCHEME — Deferred/Scattered (The Freeway Principle):
+RULE: Do NOT resolve rhymes where expected. Plant a rhyme in line 2 — pay it off in line 5 or 6. The listener's ear holds an unresolved tension until the payoff arrives late.
+TECHNIQUE 1 — Deferred rhyme: Set up A in bar 1, B in bar 2, then A returns in bar 5 and B in bar 7. Cross-stitch rhymes across 4-6 bars instead of adjacent lines.
+TECHNIQUE 2 — Cross-bar phrasing: Lines can START slightly before or AFTER the bar line — they "sit against" the grid rather than landing on the beat. The phrase carries across the barline.
+TECHNIQUE 3 — Scattered internal rhymes: Not every bar needs to rhyme with the adjacent bar. Let a word in bar 3 echo a word from bar 1 that nobody expected.
+TECHNIQUE 4 — Unresolved tension: Leave ONE rhyme per verse deliberately unpaid. The ear waits for it. Sometimes the silence IS the payoff.
+APPLICATION IN ALL GENRES:
+- In rap: flow phrases across the barline, plant rhymes 3-4 bars early
+- In country/folk: conversational lines that rhyme irregularly, like speech
+- In gospel: unexpected rhyme arrival creates revelation effect — the "turn" lands late
+- In pop: hook can delay its rhyme by one full bar, creating a "lean-in" moment
+- In jazz/neosoul: lyric phrasing mirrors the bebop concept of delayed resolution
+The goal: make the listener ACTIVE. They're tracking the rhyme thread. When it arrives late, the reward is bigger.`;
+
+function _rhythmFeelNote(genre, swing, syllableDensity, southpaw) {
+  let out = '';
+  const sw = SWING_LEVELS[swing];
+  const dens = syllableDensity && syllableDensity !== 'auto' ? SYLLABLE_DENSITY_RULES[syllableDensity] : '';
+  if (sw) {
+    out += `\n\nRHYTHM DNA — Swing: ${sw.label} (${sw.ratio} subdivision):\nFeel: ${sw.feel}\nProduction: ${sw.production}\nLyric writing: ${dens || sw.lyric_rules}\nVerse lines: target ${sw.syllable_range}.\nInclude this in the SONG PROMPT: "${sw.suno_tag}"`;
+  } else if (dens) {
+    out += `\n\n${dens}`;
+  }
+  if (southpaw === true) out += SOUTHPAW_NOTE;
+  return out;
+}
+
+function _eraNotes(era, eraUndertone) {
+  // ── Era vocabulary injection ────────────────────────────────────────────
+  const _eraVoc = ERA_VOCABULARY[era];
+  const eraVocNote = _eraVoc
+    ? `\n\nERA ANCHORS (${_eraVoc.label}): Weave 2-3 of these into the lyrics to lock the song in its era: ${_eraVoc.anchors.slice(0,8).join(', ')}. Forbidden anachronisms: ${_eraVoc.forbidden.slice(0,5).join(', ')}.`
+    : '';
+
+  // ── Era UNDERTONE — secondary era tint for V2 / bridge ──────────────────
+  const _undEra = (eraUndertone && eraUndertone !== era) ? ERA_VOCABULARY[eraUndertone] : null;
+  const eraUndertoneNote = _undEra
+    ? `\n\nERA UNDERTONE (${_undEra.label}): Verse 2 and the bridge should tint with vocabulary from this era — pull 1-2 anchors from: ${_undEra.anchors.slice(0,6).join(', ')}. This is a TEXTURE layer; do not let it overpower the primary era. The contrast between the two eras IS the craft move.`
+    : '';
+  return { eraVocNote, eraUndertoneNote };
+}
+
+function _invertCounterNote(genre, genreLabel, invertCounter) {
+  // ── INVERT COUNTER-MELODY — flip where the genre's counter-melody lives
+  let invertCounterNote = '';
+  if (invertCounter && GENRE_BIBLE[genre] && GENRE_BIBLE[genre].counter) {
+    const _c = GENRE_BIBLE[genre].counter;
+    invertCounterNote = `\n\n🔄 COUNTER-MELODY INVERSION:
+In ${genreLabel}, the counter-melody normally lives here: ${_c.map || 'standard section placement'}.
+INVERT IT. Put the counter-melody where it does NOT normally belong (e.g. move a chorus-level counter into the verses, or move a verse-level counter into the chorus, or pull the bridge counter out and let the bridge run naked). Leave the sections that normally carry the counter deliberately sparse — the missing voice should feel felt.
+This is a structural rule-break, not a cosmetic one. Describe the inversion explicitly in the COUNTERMELODY and SONG PROMPT sections.`;
+  }
+  return invertCounterNote;
+}
+
+function _emotionalArcNote(emotionalArc) {
+  // ── Emotional arc injection ─────────────────────────────────────────────
+  const _arcData = EMOTIONAL_ARCS[emotionalArc];
+  const emotionalArcNote = _arcData
+    ? `\n\nEMOTIONAL ARC — "${_arcData.name}":\n${_arcData.arc}`
+    : '';
+  return emotionalArcNote;
+}
+
+function _seedLineNote(_cleanSeed) {
+  const seedLineNote = _cleanSeed
+    ? `\n\nSEED LINE (build the entire song around this line): "${_cleanSeed}" — This is the anchor. Every chorus, every verse must orbit this line. It MUST appear verbatim, word-for-word, unedited, as the opening or closing line of the chorus. This is non-negotiable. Do not paraphrase, do not alter a single word.`
+    : '';
+  return seedLineNote;
+}
+
+function _syllableCapNote(syllableCap) {
+  const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
+  return _capNote;
+}
+
+function _dualPerspNote(dualPerspective) {
+  // ── Dual perspective (antagonist POV in Verse 2) ────────────────────────
+  const dualPerspNote = dualPerspective
+    ? `\n\nDUAL PERSPECTIVE RULE: Verse 2 MUST be written from the antagonist's or opposite perspective. If Verse 1 is the protagonist's longing, Verse 2 is the other person's detachment. If Verse 1 is anger, Verse 2 is the accused person's justification. This creates dramatic tension and forces the listener to hold two truths simultaneously.`
+    : '';
+  return dualPerspNote;
+}
+
+function _avoidHookNote(avoidHookPatterns) {
+  const avoidHookNote = avoidHookPatterns && avoidHookPatterns.length > 0
+    ? `\n\nHOOK PATTERN AVOIDANCE: These hook/chorus opening lines were used in this user's recent songs — do NOT open any [Hook] or [Chorus] section with similar phrasing, structure, or imagery: ${avoidHookPatterns.map(p => `"${p}"`).join(', ')}. The hook is the song's signature — find a fresh first line every time.`
+    : '';
+  return avoidHookNote;
+}
+
+function _platformNote(platform) {
+  const platformNotes = {
+    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 800 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
+    udio:   'PLATFORM: Udio — Section tags work differently: Udio responds well to emotional descriptors in brackets, e.g. [Verse - melancholic], [Chorus - anthemic]. Keep SONG PROMPT under 300 characters. Udio prefers genre descriptors over instrument lists.',
+    stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
+  };
+  const platformNote = platformNotes[platform] || platformNotes.suno;
+  return platformNote;
+}
+
+function _coachRewriteNote(coachInstruction, originalLyrics) {
+  const _coachI = (coachInstruction && typeof coachInstruction === 'string') ? coachInstruction.trim().slice(0, 4000) : '';
+  const _origL  = (originalLyrics && typeof originalLyrics === 'string') ? originalLyrics.trim().slice(0, 6000) : '';
+  const coachRewriteNote = (_coachI && _origL) ? `
+
+🎓 COACH-DRIVEN REWRITE — this is NOT a fresh-page generation. You are rewriting an existing song to address specific weaknesses identified by an AI feedback coach. Preserve the topic + emotional intent; transform craft.
+
+ORIGINAL LYRICS (the version that was analyzed):
+${_origL}
+
+COACH FEEDBACK (every weakness identified MUST be addressed in your rewrite):
+${_coachI}
+
+REWRITE RULES:
+- Address EVERY weakness the coach identified — do not cherry-pick.
+- Preserve the topic, emotional arc, and any imagery anchors that worked.
+- The rewrite should feel like the SAME song made better, not a different song. A listener who knew the original should recognize the bones and feel the upgrade.
+- If the coach identified a weak hook, rewrite the hook. If the coach said V2 = V1 in synonyms, rewrite V2 along a new axis. If the coach said the opening was weak, replace it.
+- The full Soniq craft system below ALSO applies — lyric tier, region, edge, academic frameworks, craft mechanics. Apply them on top of the coach fixes.
+- Do NOT include the coach feedback or the original lyrics in your output. Only emit the rewritten song in the standard format.
+
+` : '';
+  return coachRewriteNote;
+}
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
@@ -8634,6 +8803,7 @@ function buildSongPrompt(params) {
     coachInstruction = '', originalLyrics = '', aggression = '',
     genreCraft = [],
     punchlineCraft = [],
+    swing = 'genre_default', syllableDensity = 'auto', southpaw = false,
     leanBrief = false              // flow-song: emit only the 3 surfaced brief sections (Arrangement/Vocal/Sonic Refs), skip the heavy tail so the response fits Flow's tight token+time budget
   } = params;
 
@@ -8875,17 +9045,7 @@ The interlude RESETS attention before the final chorus delivery. If unnatural fo
     : Object.keys(RHYME_SCHEMES)[Math.floor(Math.random() * Object.keys(RHYME_SCHEMES).length)];
   const rhymeNote  = `\n\nRHYME SCHEME: ${_rhemeKey}\n${RHYME_SCHEMES[_rhemeKey] || ''}`;
 
-  // ── Era vocabulary injection ────────────────────────────────────────────
-  const _eraVoc = ERA_VOCABULARY[era];
-  const eraVocNote = _eraVoc
-    ? `\n\nERA ANCHORS (${_eraVoc.label}): Weave 2-3 of these into the lyrics to lock the song in its era: ${_eraVoc.anchors.slice(0,8).join(', ')}. Forbidden anachronisms: ${_eraVoc.forbidden.slice(0,5).join(', ')}.`
-    : '';
-
-  // ── Era UNDERTONE — secondary era tint for V2 / bridge ──────────────────
-  const _undEra = (eraUndertone && eraUndertone !== era) ? ERA_VOCABULARY[eraUndertone] : null;
-  const eraUndertoneNote = _undEra
-    ? `\n\nERA UNDERTONE (${_undEra.label}): Verse 2 and the bridge should tint with vocabulary from this era — pull 1-2 anchors from: ${_undEra.anchors.slice(0,6).join(', ')}. This is a TEXTURE layer; do not let it overpower the primary era. The contrast between the two eras IS the craft move.`
-    : '';
+  const { eraVocNote, eraUndertoneNote } = _eraNotes(era, eraUndertone);
 
   // ── BREAK ONE RULE — pick a random outlier from this genre and grant
   //    explicit permission to commit to the same rule-break ────────────────
@@ -8914,15 +9074,7 @@ ${_keys}
 The rest of the song stays in ${genreLabel}. The graft is structural — the listener should feel a shift when the ${_sec} arrives. Do NOT just borrow a word or a tag; bend the melodic shape, cadence, and instrumentation cues of the ${_sec} toward the grafted genre.`;
   }
 
-  // ── INVERT COUNTER-MELODY — flip where the genre's counter-melody lives
-  let invertCounterNote = '';
-  if (invertCounter && GENRE_BIBLE[genre] && GENRE_BIBLE[genre].counter) {
-    const _c = GENRE_BIBLE[genre].counter;
-    invertCounterNote = `\n\n🔄 COUNTER-MELODY INVERSION:
-In ${genreLabel}, the counter-melody normally lives here: ${_c.map || 'standard section placement'}.
-INVERT IT. Put the counter-melody where it does NOT normally belong (e.g. move a chorus-level counter into the verses, or move a verse-level counter into the chorus, or pull the bridge counter out and let the bridge run naked). Leave the sections that normally carry the counter deliberately sparse — the missing voice should feel felt.
-This is a structural rule-break, not a cosmetic one. Describe the inversion explicitly in the COUNTERMELODY and SONG PROMPT sections.`;
-  }
+  const invertCounterNote = _invertCounterNote(genre, genreLabel, invertCounter);
 
   // ── Key psychology injection ────────────────────────────────────────────
   const _keyPsych = MUSIC_THEORY_BIBLE.keyPsychology;
@@ -8939,21 +9091,15 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
     freestyleMode, mode: (params.modulation || 'auto'),
   });
 
-  // ── Emotional arc injection ─────────────────────────────────────────────
-  const _arcData = EMOTIONAL_ARCS[emotionalArc];
-  const emotionalArcNote = _arcData
-    ? `\n\nEMOTIONAL ARC — "${_arcData.name}":\n${_arcData.arc}`
-    : '';
+  const emotionalArcNote = _emotionalArcNote(emotionalArc);
 
   // ── Seed line injection ─────────────────────────────────────────────────
   const _cleanSeed = seedLine ? sanitizeInput(seedLine, 120) : '';
-  const seedLineNote = _cleanSeed
-    ? `\n\nSEED LINE (build the entire song around this line): "${_cleanSeed}" — This is the anchor. Every chorus, every verse must orbit this line. It MUST appear verbatim, word-for-word, unedited, as the opening or closing line of the chorus. This is non-negotiable. Do not paraphrase, do not alter a single word.`
-    : '';
+  const seedLineNote = _seedLineNote(_cleanSeed);
 
   // ── Syllable budget ─────────────────────────────────────────────────────
   const _sylBudget  = GENRE_SYLLABLE_BUDGETS[genre] || { verse:'8–13', chorus:'6–10', hook:'4–7', bridge:'6–10', prechorus:'6–9' };
-  const _capNote    = syllableCap > 0 ? ` HARD CAP: no line may exceed ${syllableCap} syllables — enforce strictly.` : '';
+  const _capNote    = _syllableCapNote(syllableCap);
   const syllableNote = `\n\nSYLLABLE BUDGET:\n- Hook (title/refrain line): ${_sylBudget.hook || '4–7'} syllables — keep it singable and memorable\n- Verse lines: ${_sylBudget.verse} syllables\n- Chorus lines: ${_sylBudget.chorus} syllables\n- Pre-chorus lines: ${_sylBudget.prechorus} syllables\n- Bridge lines: ${_sylBudget.bridge} syllables${_capNote}`;
 
   // ── Prince Method (melodic unity) ───────────────────────────────────────
@@ -9048,10 +9194,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
     mode: (params.popDrop || popDrop || 'auto'),
   });
 
-  // ── Dual perspective (antagonist POV in Verse 2) ────────────────────────
-  const dualPerspNote = dualPerspective
-    ? `\n\nDUAL PERSPECTIVE RULE: Verse 2 MUST be written from the antagonist's or opposite perspective. If Verse 1 is the protagonist's longing, Verse 2 is the other person's detachment. If Verse 1 is anger, Verse 2 is the accused person's justification. This creates dramatic tension and forces the listener to hold two truths simultaneously.`
-    : '';
+  const dualPerspNote = _dualPerspNote(dualPerspective);
 
   // ── Pattern avoidance ───────────────────────────────────────────────────
   const avoidNote = avoidPatterns && avoidPatterns.length > 0
@@ -9059,9 +9202,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
     : '';
   // ── Hook-opener avoidance — mirrors verse-1 opener tracking but for hooks.
   // Stops the model from defaulting to the same chorus opening across the user's catalog.
-  const avoidHookNote = avoidHookPatterns && avoidHookPatterns.length > 0
-    ? `\n\nHOOK PATTERN AVOIDANCE: These hook/chorus opening lines were used in this user's recent songs — do NOT open any [Hook] or [Chorus] section with similar phrasing, structure, or imagery: ${avoidHookPatterns.map(p => `"${p}"`).join(', ')}. The hook is the song's signature — find a fresh first line every time.`
-    : '';
+  const avoidHookNote = _avoidHookNote(avoidHookPatterns);
   // ── Lyric phrase fingerprint — server-side history of distinctive lines from
   // this user's last ~30 generated lines. Stops cross-song verbatim/paraphrase repetition.
   const avoidPhrasesNote = avoidPhrases && avoidPhrases.length > 0
@@ -9087,12 +9228,7 @@ This is a structural rule-break, not a cosmetic one. Describe the inversion expl
 // headroom exists to carry arrangement, not more adjectives.
 
   // ── Platform-specific instructions ─────────────────────────────────────
-  const platformNotes = {
-    suno:   'PLATFORM: Suno — Use bracket tags precisely: [Verse 1], [Chorus], [Bridge], [Pre-Chorus], [Outro]. Keep SONG PROMPT under 800 characters for best results. Use [Instrumental] for gaps. Suno reads bracket tags as structural cues.',
-    udio:   'PLATFORM: Udio — Section tags work differently: Udio responds well to emotional descriptors in brackets, e.g. [Verse - melancholic], [Chorus - anthemic]. Keep SONG PROMPT under 300 characters. Udio prefers genre descriptors over instrument lists.',
-    stable: 'PLATFORM: Stable Audio — Optimise the SONG PROMPT as a single dense style description (no brackets needed in lyrics for Stable Audio). Focus the style prompt on texture, mood, and instrumentation — it processes audio descriptions, not musical structure tags.',
-  };
-  const platformNote = platformNotes[platform] || platformNotes.suno;
+  const platformNote = _platformNote(platform);
   const _sunoSpec = buildSunoStyleSpec(platform);
 
   // ── Specificity self-check instruction ─────────────────────────────────
@@ -9216,27 +9352,7 @@ VIDEO PROMPT:
   // model treats this as a fix-and-improve job, not a fresh-page generation.
   // The original lyrics + coach feedback are passed in; the model is told to
   // address every weakness identified, while preserving topic + intent.
-  const _coachI = (coachInstruction && typeof coachInstruction === 'string') ? coachInstruction.trim().slice(0, 4000) : '';
-  const _origL  = (originalLyrics && typeof originalLyrics === 'string') ? originalLyrics.trim().slice(0, 6000) : '';
-  const coachRewriteNote = (_coachI && _origL) ? `
-
-🎓 COACH-DRIVEN REWRITE — this is NOT a fresh-page generation. You are rewriting an existing song to address specific weaknesses identified by an AI feedback coach. Preserve the topic + emotional intent; transform craft.
-
-ORIGINAL LYRICS (the version that was analyzed):
-${_origL}
-
-COACH FEEDBACK (every weakness identified MUST be addressed in your rewrite):
-${_coachI}
-
-REWRITE RULES:
-- Address EVERY weakness the coach identified — do not cherry-pick.
-- Preserve the topic, emotional arc, and any imagery anchors that worked.
-- The rewrite should feel like the SAME song made better, not a different song. A listener who knew the original should recognize the bones and feel the upgrade.
-- If the coach identified a weak hook, rewrite the hook. If the coach said V2 = V1 in synonyms, rewrite V2 along a new axis. If the coach said the opening was weak, replace it.
-- The full Soniq craft system below ALSO applies — lyric tier, region, edge, academic frameworks, craft mechanics. Apply them on top of the coach fixes.
-- Do NOT include the coach feedback or the original lyrics in your output. Only emit the rewritten song in the standard format.
-
-` : '';
+  const coachRewriteNote = _coachRewriteNote(coachInstruction, originalLyrics);
 
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 ${coachRewriteNote}${buildCraftFirewallNote()}${buildMetaphorBalanceNote()}${buildMetaphorPaletteNote(genre)}
@@ -9260,7 +9376,7 @@ SONGWRITING RULES:
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
 - GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
-- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${princeMethodNote}${oneNoteMelodyNote}${intervalMapNote}${melodicClicheNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${buildFeaturedGuestNote(featuredGuest)}${invertCounterNote}${keyPsychNote}${modulationNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${chorusIntroNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${popDropNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${melodicBassNote}${productionNote}${antiDropNote}${vocalDescriptorNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}
+- NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${buildLengthBudgetNote(length)}${syllableNote}${princeMethodNote}${oneNoteMelodyNote}${intervalMapNote}${melodicClicheNote}${rhymeNote}${eraVocNote}${eraUndertoneNote}${breakRuleNote}${graftNote}${buildFeaturedGuestNote(featuredGuest)}${invertCounterNote}${_rhythmFeelNote(genre, swing, syllableDensity, southpaw)}${keyPsychNote}${modulationNote}${dualPerspNote}${avoidNote}${avoidHookNote}${avoidPhrasesNote}${specificityNote}${lyricCraftNote}${speedGearsNote}${lyricTierNote}${academicNote}${edgeNote}${regionNote}${velocityNote}${aggressionNote}${introNote}${chorusIntroNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${popDropNote}${interludeNote}${outroNote}${platinumNote}${adlibNote}${melodicBassNote}${productionNote}${antiDropNote}${vocalDescriptorNote}${freestyleSongLock}${(freestyleMode && offTheTopMode) ? OFF_THE_TOP_DIRECTIVE : ''}${buildProducerTemplateNote(producerTemplate)}${(viralMode && VIRAL_GENRE_WHITELIST.has(genre)) ? VIRAL_PRODUCER_DIRECTIVE : ''}${sampleHookMode ? SAMPLE_HOOK_DIRECTIVE : ''}${(() => { const n = buildGenreCraftNote(genre, genreCraft, mood, params.lyricTier); return n ? '\n\n' + n : ''; })()}${(() => { const n = buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier, { explicit: true }); return n ? '\n\n' + n : ''; })()}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
 - ${platformNote}
 
@@ -9720,7 +9836,7 @@ function buildLuckyPrompt(params) {
   const luckyPunchlineCraft = _userPunchlineCraft.length > 0
     ? _userPunchlineCraft
     : (_luckyShouldAutoCraft ? [pickRandom(luckyAutoCraftPool), pickRandom(luckyAutoCraftPool)].filter((v,i,a)=>a.indexOf(v)===i) : []);
-  const punchlineCraftNote = buildPunchlineCraftNote(luckyPunchlineCraft, mood, params && params.lyricTier);
+  const punchlineCraftNote = buildPunchlineCraftNote(luckyPunchlineCraft, mood, params && params.lyricTier, { explicit: _userPunchlineCraft.length > 0 });
 
   // ── Substyle auto-pick for Lucky ───────────────────────────────────────
   // When the primary or secondary genre has SUBSTYLE coverage, pick one
@@ -10043,14 +10159,16 @@ Pair with: cinematic-storyteller / chess-strategy register, omniscient or first-
 // Note: hasOwnProperty check is required — bare `PUNCHLINE_CRAFT_TOOLS[k]` would
 // resolve prototype keys like 'toString' to truthy function refs and crash later
 // when accessing .label/.directive on them.
-function buildPunchlineCraftNote(toolKeys, mood, lyricTier) {
+function buildPunchlineCraftNote(toolKeys, mood, lyricTier, opts) {
   if (!Array.isArray(toolKeys) || toolKeys.length === 0) return '';
   const tierKey = String(lyricTier || 'street').toLowerCase();
+  const explicit = !!(opts && opts.explicit);
   const selected = toolKeys
     .filter(k => Object.prototype.hasOwnProperty.call(PUNCHLINE_CRAFT_TOOLS, k))
     .map(k => PUNCHLINE_CRAFT_TOOLS[k])
-    // Tier gate — radio tier disallows tools that need craft headroom
-    .filter(t => !t.when || !t.when.tier || t.when.tier.includes(tierKey))
+    // Tier gate — only for auto-picked tools. A tool the user clicked always
+    // applies; silently dropping it made two pills do nothing on Street tier.
+    .filter(t => explicit || !t.when || !t.when.tier || t.when.tier.includes(tierKey))
     .slice(0, 3); // hard cap — 3+ tools dilute each other
   if (!selected.length) return '';
 
@@ -10634,6 +10752,16 @@ NEVER: write generic West Coast rap and call it hyphy. If the slang isn\'t prese
     agent: 'You are a neo-boom-bap reconstructionist. You take the 90s template and run modern lyrical complexity and contemporary production through it. The sample chops are fresh, the wordplay is current, but the foundation philosophy — lyricism as the highest value — is unchanged.',
     defaults: { flow: 'on-beat', rhymeArch: 'internal', density: 'dense', vocabRegister: 'conscious-literary', persona: 'first-person-raw' }
   },
+  'jazz-improv-rap': {
+    label: 'Jazz Improv Rap', category: 'established', era: '1990s–present (live-improv lineage)',
+    agent: 'You are a jazz improvisation rapper. Jazz logic lives INSIDE the bars, not just in the beat. Pick ONE improv architecture per verse and hold it: BEBOP (triplet runs, chromatic syllable clusters, phrases that start behind the beat and resolve late), CALL-AND-RESPONSE (bars that answer each other across the verse, a question bar answered two bars later, a motif stated then varied), or MODAL (one thematic center, endless variation on it, no cadence until the verse closer). State the motif early, vary it like a soloist trades fours, and land the resolution on the verse-closing bar. Each verse may use a different architecture; never blend two inside one verse.',
+    defaults: { flow: 'behind-beat', rhymeArch: 'multi-syllabic', density: 'medium', vocabRegister: 'conscious-literary', persona: 'first-person-raw' }
+  },
+  'toronto-sound': {
+    label: 'Toronto Sound', category: 'established', era: '2010–present',
+    agent: 'You are a Toronto-sound diarist. Half-rapped, half-sung, half-spoken: the delivery slides between rap and melody inside a single bar. Write like a late-night voice memo: specific names, places, times and text-message details, confessional and petty in the same breath. Sparse, moody, low-end heavy, filtered and underwater; leave room for the beat to breathe. Mark the sung lines and the rapped lines so the vocalist knows where the melody enters.',
+    defaults: { flow: 'behind-beat', rhymeArch: 'slant', density: 'sparse', vocabRegister: 'confessional', persona: 'first-person-raw' }
+  },
   'jazz-rap': {
     label: 'Jazz-Rap Revival', category: 'revisionist', era: 'Reimagined Classic',
     agent: 'You are a jazz-rap synthesist. The bebop vocabulary lives inside hip-hop cadences. You write bars that swing. Your vocabulary comes from both the jazz tradition and the streets. Unexpected chord samples, polyrhythmic flow patterns that feel improvised but are precisely calculated.',
@@ -11138,6 +11266,32 @@ Tag that section in the lyric output EXACTLY as: ${tag}
 This is the Eminem×Dido / Jay-Z×Alicia Keys / Nate Dogg-hook move — the listener must feel a different person took over for the ${secLabel}. Write it as the guest's OWN moment (their cadence, register, phrasing), not the lead imitating a style. Reflect the guest in the Suno style prompt too, e.g. "${sunoHint}".`;
 }
 
+// Write-screen settings that stay visible while Rap Lab is active. Reuses the
+// same note builders as buildSongPrompt. Era only applies when explicitly
+// picked (each rap style carries its own era), and the Rap Lab density
+// dimension owns syllable counts.
+function _rapLabSharedSettingsNote(params, style) {
+  const p = params || {};
+  const parts = [];
+  if (p.era && p.era !== 'current') parts.push(_eraNotes(p.era, p.eraUndertone).eraVocNote);
+  if (p.eraUndertone) parts.push(_eraNotes(p.era || 'current', p.eraUndertone).eraUndertoneNote);
+  const modeDef = p.mode && p.mode !== 'auto' ? MUSIC_THEORY_BIBLE.modes[p.mode] : null;
+  const tl = p.theoryLevel && p.theoryLevel !== 'standard' ? MUSIC_THEORY_BIBLE.theoryLevels[p.theoryLevel] : null;
+  if (modeDef || tl) {
+    parts.push(`\n\nHARMONY FOR THE BEAT:${modeDef ? `\n- Mode: ${modeDef.name} — ${modeDef.feel}` : ''}${tl ? `\n- Harmony level: ${tl.label} — ${tl.desc}` : ''}\nReflect it in the CHORD PROGRESSION / THEORY ANALYSIS and the sample or melody choice.`);
+  }
+  parts.push(_seedLineNote(p.seedLine ? sanitizeInput(p.seedLine, 120) : ''));
+  if (Number(p.syllableCap) > 0) parts.push(`\n\nSYLLABLE CAP:${_syllableCapNote(Number(p.syllableCap))}`);
+  parts.push(_dualPerspNote(p.dualPerspective));
+  parts.push(_emotionalArcNote(p.emotionalArc));
+  parts.push(_invertCounterNote('hiphop', (style && style.label) || 'Rap / Hip-Hop', p.invertCounter));
+  parts.push(_avoidHookNote(p.avoidHookPatterns));
+  if (p.platform && p.platform !== 'suno') parts.push('\n\n' + _platformNote(p.platform));
+  const rhythm = _rhythmFeelNote('hiphop', p.swing, '', p.southpaw);
+  if (rhythm) parts.push(rhythm + '\n(The Rap Lab DENSITY dimension above owns syllable counts; use the rhythm note for feel and pocket.)');
+  return parts.filter(Boolean).join('');
+}
+
 function buildRapLabPrompt(params) {
   const {
     genre = 'hiphop',
@@ -11294,7 +11448,7 @@ RAP LAB ACTIVE: You are operating in precision rap construction mode. Every dime
   const rapSettingNote = _rapStaging.settingNote;
   const rapContinuityNote = buildContinuityNote();
 
-  const prompt = `Write a complete, production-ready Rap / Hip-Hop song in the ${style.label} style at the highest possible level of craft.
+  const prompt = `${_coachRewriteNote(params.coachInstruction, params.originalLyrics)}Write a complete, production-ready Rap / Hip-Hop song in the ${style.label} style at the highest possible level of craft.
 
 Style: ${style.label} (${style.era})
 Topic: ${topic}
@@ -11328,7 +11482,7 @@ ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${assembleCraf
 BRACKET REQUIREMENTS:
 ${freestyleMode
   ? 'Use ONLY: [Intro] (optional), [Verse 1], [Verse 2], [Verse 3], [Verse 4] (optional), [Outro] (optional). Inline ad-libs in (parentheses) on the same line as bars are allowed. NO hook/chorus/bridge/pre-chorus brackets of any kind.'
-  : bracketInstructionServer('hiphop', 'suno', style.label)}${rapOpeningNote}${rapSettingNote}${rapContinuityNote}
+  : bracketInstructionServer('hiphop', params.bracketMode || 'suno', style.label)}${rapOpeningNote}${rapSettingNote}${rapContinuityNote}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
@@ -11347,7 +11501,7 @@ ${buildAcademicFrameworkNote('hiphop', params.era)}
 ${buildEdgeNote(params.edgeMode, params.lyricTier, 'hiphop')}
 ${buildRegionNote('hiphop', params.region)}
 ${buildEmotionalVelocityNote('hiphop', params.emotionalVelocity)}
-${buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier)}${params.platinum ? buildTopTierNote('hiphop') : ''}
+${buildPunchlineCraftNote(punchlineCraft, mood, params.lyricTier, { explicit: true })}${params.platinum ? buildTopTierNote('hiphop') : ''}${_rapLabSharedSettingsNote(params, style)}
 
 Respond with EXACTLY this format:
 
