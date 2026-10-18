@@ -11287,8 +11287,15 @@ function _rapLabSharedSettingsNote(params, style) {
   parts.push(_invertCounterNote('hiphop', (style && style.label) || 'Rap / Hip-Hop', p.invertCounter));
   parts.push(_avoidHookNote(p.avoidHookPatterns));
   if (p.platform && p.platform !== 'suno') parts.push('\n\n' + _platformNote(p.platform));
-  const rhythm = _rhythmFeelNote('hiphop', p.swing, '', p.southpaw);
-  if (rhythm) parts.push(rhythm + '\n(The Rap Lab DENSITY dimension above owns syllable counts; use the rhythm note for feel and pocket.)');
+  // An explicit Write-screen Syllable pick sets the per-bar syllable COUNT;
+  // the Rap Lab DENSITY dimension still shapes how tightly rhymes are packed.
+  const explicitSyl = p.syllableDensity && p.syllableDensity !== 'auto' && SYLLABLE_DENSITY_RULES[p.syllableDensity];
+  const rhythm = _rhythmFeelNote('hiphop', p.swing, explicitSyl ? p.syllableDensity : '', p.southpaw);
+  if (rhythm) {
+    parts.push(rhythm + (explicitSyl
+      ? '\n(This syllable count was chosen explicitly and sets the per-bar syllable range. The Rap Lab DENSITY dimension above still shapes how tightly the rhymes and internal echoes are packed inside that range.)'
+      : '\n(The Rap Lab DENSITY dimension above owns syllable counts; use the rhythm note for feel and pocket.)'));
+  }
   return parts.filter(Boolean).join('');
 }
 
