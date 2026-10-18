@@ -12740,7 +12740,7 @@ const RAP_DIM_DEFAULTS = {
   phonk:            { flow:'syncopated',    rhymeArch:'end-only',        density:'sparse',       vocabRegister:'minimal-phonetic',    persona:'first-person-raw' },
   anthem_rap:       { flow:'on-beat',       rhymeArch:'multi-syllabic',  density:'medium',       vocabRegister:'street-coded',        persona:'collective-we' },
   hustle_grind:     { flow:'conversational',rhymeArch:'multi-syllabic',  density:'medium',       vocabRegister:'street-coded',        persona:'first-person-raw' },
-  post_algorithm:   { flow:'mosaic',        rhymeArch:'mosaic',          density:'dense',        vocabRegister:'abstract-surreal',    persona:'omniscient' },
+  post_algorithm:   { flow:'syncopated',    rhymeArch:'mosaic',          density:'dense',        vocabRegister:'abstract-surreal',    persona:'omniscient' },
   neo_phonetic:     { flow:'triplet',       rhymeArch:'mosaic',          density:'ultra-dense',  vocabRegister:'minimal-phonetic',    persona:'character' },
   climate_rap:      { flow:'conversational',rhymeArch:'internal',        density:'dense',        vocabRegister:'conscious-literary',  persona:'collective-we' },
   ai_native:        { flow:'syncopated',    rhymeArch:'slant',           density:'medium',       vocabRegister:'abstract-surreal',    persona:'second-person' },
@@ -12752,7 +12752,7 @@ const RAP_DIM_DEFAULTS = {
   jazz_rap:         { flow:'on-beat',       rhymeArch:'internal',        density:'dense',        vocabRegister:'conscious-literary',  persona:'first-person-raw' },
   jazz_improv_rap:  { flow:'behind-beat',   rhymeArch:'multi-syllabic',  density:'medium',       vocabRegister:'conscious-literary',  persona:'first-person-raw' },
   jazz_rap_revival: { flow:'behind-beat',   rhymeArch:'multi-syllabic',  density:'dense',        vocabRegister:'conscious-literary',  persona:'omniscient' },
-  toronto_sound:    { flow:'behind-beat',   rhymeArch:'end-rhyme',       density:'sparse',       vocabRegister:'conversational-diary', persona:'first-person-raw' },
+  toronto_sound:    { flow:'behind-beat',   rhymeArch:'slant',           density:'sparse',       vocabRegister:'confessional',        persona:'first-person-raw' },
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -19886,6 +19886,13 @@ async function applyCoachAndRegenerate() {
       avoidHookPatterns: S.recentHookOpenings ? [...S.recentHookOpenings] : [],
       edgeMode: window.__qfEdge === true,
       platinum: _platinumOn && isPlatinumEligible(),
+      // Keep Rap Lab: a Rap Lab song is rewritten by the Rap Lab builder with
+      // the same style, dimensions and punchline tools (was dropped before).
+      rapStyle: (genre === 'hiphop' && S.rapLabActive) ? S.rapStyle : undefined,
+      rapDimensions: (genre === 'hiphop' && S.rapLabActive) ? S.rapDimensions : undefined,
+      rapLabActive: (genre === 'hiphop' && S.rapLabActive) || false,
+      punchlineCraft: Array.isArray(S.punchlineCraft) ? S.punchlineCraft : [],
+      barSwitch: (typeof S.barSwitch === 'number' && [2,4,8].includes(S.barSwitch)) ? S.barSwitch : 0,
       // The two new fields that turn this into a coach-driven rewrite:
       coachInstruction: _coachFeedback,
       originalLyrics: song.lyrics
