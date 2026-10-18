@@ -12209,7 +12209,7 @@ PLATFORM TIPS:
 SUNO V6 MASHUP:
 [For writers who have BOTH songs in their own Suno library: one ready-to-paste v6 mashup request that names which elements come from which song and how they fit, e.g. which song's vocal and hook, which song's drums and bass, whose tempo and key win, and where the switch happens. Plain words, 2-4 sentences, no artist names. Note that v6 mashups only work on the writer's own songs.]`;
 
-  return { system, prompt };
+  return { system: system + buildWordplayNote([aGenre, bGenre]), prompt };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -13317,6 +13317,7 @@ function buildPrismSongPrompt(brief, extra) {
     // agrees with the chip (#4).
     fusionName: displayGenreLabel, substyle: (built.meta && built.meta.substyle) || ''
   });
+  if (built && typeof built.system === 'string') built.system += buildWordplayNote([g.primary, g.secondary]);
   return built;
 }
 
@@ -13555,12 +13556,38 @@ const HOMOPHONE_STACK_LITE = `
 HOMOPHONE MOMENT (optional craft, 1-2 per song maximum): one line where a single sound carries two true meanings. Use a re-parse ("alone" = a loan, "decade" = decayed, "insight" = in sight), a proper-noun sound-alike (Seoul / soul, Rome / roam), or a spelled-letter flip (I-C-U = I see you / ICU / icy). Best placed in the title line, the hook's last line, or the final chorus twist where it reframes the song. Keep both readings inside the song's theme, spell the surface reading, never explain it or put the second reading in parentheses. If it reads forced, leave it out.`;
 
 const _HOMOPHONE_FULL_GENRES = new Set(['hiphop']);
-const _HOMOPHONE_LITE_GENRES = new Set(['pop','rnb','neosoul','country','comedy','parody','rock','altrock','punk','metal','reggae','dancehall','afrobeats','folk','ss','blues','gospel','jazz','tvmusical','kpop']);
+const _HOMOPHONE_LITE_GENRES = new Set(['pop','rnb','neosoul','country','comedy','parody','rock','altrock','punk','metal','reggae','dancehall','afrobeats','folk','ss','blues','gospel','jazz','tvmusical','kpop','latin','reggaeton']);
+// Lucky uses its own short names ("Hip-Hop", "R&B"), not GENRE_LABELS.
+const _HOMOPHONE_ALIASES = { 'hip-hop': 'hiphop', 'hip hop': 'hiphop', 'rap': 'hiphop', 'r&b': 'rnb' };
+function _homophoneGenreKey(g) {
+  const raw = String((g && typeof g === 'object' ? g.primary : g) || '').trim();
+  const k = raw.toLowerCase();
+  if (_HOMOPHONE_FULL_GENRES.has(k) || _HOMOPHONE_LITE_GENRES.has(k)) return k;
+  if (_HOMOPHONE_ALIASES[k]) return _HOMOPHONE_ALIASES[k];
+  // Some callers pass display labels (GENRE_LABELS values), not keys.
+  for (const [key, label] of Object.entries(GENRE_LABELS)) if (label.toLowerCase() === k) return key;
+  return k;
+}
 function _homophoneNote(g) {
-  const k = String((g && typeof g === 'object' ? g.primary : g) || '').toLowerCase();
+  const k = _homophoneGenreKey(g);
   if (_HOMOPHONE_FULL_GENRES.has(k)) return HOMOPHONE_STACK;
   if (_HOMOPHONE_LITE_GENRES.has(k)) return HOMOPHONE_STACK_LITE;
   return '';
+}
+// Wordplay note for features that build their own system prompt (Blend,
+// Variants, Alternate Take). Full stack if ANY genre is rap, else lite.
+// Free text (e.g. "Atlanta trap x gospel") is matched by keyword.
+const _RAP_WORDS_RE = /\b(hip[- ]?hop|rap|trap|drill|grime|boom[- ]?bap|phonk|freestyle|bars)\b/i;
+function buildWordplayNote(genres) {
+  const list = (Array.isArray(genres) ? genres : [genres]).filter(Boolean).map(x => (x && typeof x === 'object') ? x.primary : x);
+  if (list.some(x => _HOMOPHONE_FULL_GENRES.has(_homophoneGenreKey(x)) || _RAP_WORDS_RE.test(String(x)))) return HOMOPHONE_STACK;
+  if (list.some(x => _HOMOPHONE_LITE_GENRES.has(_homophoneGenreKey(x)))) return HOMOPHONE_STACK_LITE;
+  return list.length ? HOMOPHONE_STACK_LITE : '';
+}
+// Variants that rewrite lyrics get the note; audio-only variants don't.
+function buildVariantWordplayNote(variantKey, genre) {
+  if (!VARIANT_REWRITES.has(variantKey)) return '';
+  return buildWordplayNote(variantKey === 'trap_remix' ? ['hiphop', genre] : [genre]);
 }
 
 function _withHitCraftClose(fn, genreOf, opts) {
@@ -13584,7 +13611,7 @@ function _withHitCraftClose(fn, genreOf, opts) {
   };
 }
 
-module.exports = { buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+module.exports = { buildWordplayNote, buildVariantWordplayNote, buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
