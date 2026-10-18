@@ -393,6 +393,7 @@ function _capWords(s) {
  */
 function selectVocalDescriptors({
   genre = 'pop', substyle = '', mood = '', lyrics = '', overrides = {}, autoMode = false,
+  sungHook = false, allowAutotune = false,
 } = {}) {
   // Resolve genre profile (substyle wins for hip-hop subgenres if recognised).
   const subKey = String(substyle || '').toLowerCase().replace(/\s+/g,'_');
@@ -487,7 +488,7 @@ function selectVocalDescriptors({
 
   // Negative tags (anti-defaults) — always include genre profile negatives plus
   // any overrides[negativeAdd].
-  const negative_list = [...(profile.negative || [])];
+  const negative_list = filterVocalNegatives(profile.negative || [], { sungHook, allowAutotune });
   if (overrides && Array.isArray(overrides.negativeAdd)) {
     for (const n of overrides.negativeAdd) {
       const clean = String(n).trim().toLowerCase().slice(0, 40);
@@ -497,7 +498,7 @@ function selectVocalDescriptors({
   const negative = negative_list.length ? '[' + negative_list.join(', ') + ']' : '';
 
   return {
-    stack, suno_prefix, negative, negative_list,
+    stack, suno_prefix, negative, negative_list, sungHook: !!sungHook,
     source: autoMode ? 'auto' : (overrides && Object.keys(overrides).length ? 'manual' : 'auto'),
     profileKey: resolvedKey,
   };
@@ -508,6 +509,14 @@ function selectVocalDescriptors({
  * what to put on the Vocal: line and at the head of the Full prompt, and locks
  * the negative tags into the Suno style string.
  */
+// Rap profiles exclude singing so Suno stops drifting into emo-rap. When the
+// song ASKS for a sung hook, those exclusions would block it — drop them.
+const _SUNG_BLOCKERS = /melodic singing|clean singing|sustained vowels|sing-song|melisma/i;
+function filterVocalNegatives(list, { sungHook = false, allowAutotune = false } = {}) {
+  return (list || []).filter(n =>
+    !(sungHook && _SUNG_BLOCKERS.test(n)) && !(allowAutotune && /auto-?tune/i.test(n)));
+}
+
 function buildVocalDescriptorNote(stackResult) {
   if (!stackResult || !stackResult.suno_prefix) return '';
   const prefix = stackResult.suno_prefix;
@@ -543,12 +552,15 @@ function buildVocalDescriptorNote(stackResult) {
       + (isAggressive ? ' · [Yell] · [Scream] · [Growl]' : '');
   }
 
+  const sungHookLine = stackResult.sungHook
+    ? '\nSUNG HOOK: this stack is the voice of the RAPPED sections. The hook / chorus is SUNG (smooth melody, held vowels allowed there). Mention the sung hook in the Full prompt (e.g. "smooth sung hook") so the platform switches voice on the chorus.'
+    : '';
   return `
 
 🎙️ VOCAL DESCRIPTOR LOCK (Lever #7 — controls WHO is singing, not just what):
 The "Vocal:" field in the SONG PROMPT and the FIRST tokens of the "Full prompt" MUST start with this descriptor stack, character-for-character:
 
-${prefix}${negProse ? '\nAVOID these vocal qualities — keep them OUT of the vocal line and the Full prompt entirely. Do NOT write them as [no …] / "avoid:" tags anywhere in the prompt (Suno reads bracketed negatives as POSITIVE tokens and would ADD them). To hard-exclude, the user places them in Suno\'s separate Exclude Styles field: ' + negProse : ''}
+${prefix}${sungHookLine}${negProse ? '\nAVOID these vocal qualities — keep them OUT of the vocal line and the Full prompt entirely. Do NOT write them as [no …] / "avoid:" tags anywhere in the prompt (Suno reads bracketed negatives as POSITIVE tokens and would ADD them). To hard-exclude, the user places them in Suno\'s separate Exclude Styles field: ' + negProse : ''}
 
 Rules:
 - Do NOT translate, summarise, or rephrase the bracketed descriptor terms — they are precision tags Suno's vocal model reads directly.
@@ -574,6 +586,7 @@ Moment-tag rules:
 }
 
 module.exports = {
+  filterVocalNegatives,
   selectVocalDescriptors,
   buildVocalDescriptorNote,
   // Exported families let the UI render the picker without duplicating the taxonomy.

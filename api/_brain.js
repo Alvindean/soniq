@@ -1567,7 +1567,7 @@ HIT CRAFT CORE — MANDATORY, every song (these are NOT part of the 3-5 selectio
 3. SHADOW RHYTHMS — once a line sets a rhythmic template (syllable count + stress pattern), later lines repeat that EXACT rhythm with NEW words, so the ear hears the pattern underneath. Plant the chorus's rhythm as a shadow in verse 1 so the hook feels familiar before it arrives.
 4. DOPAMINE TRIGGERING — build anticipation, then delay it, then pay it off. Set up an expected rhyme or phrase and hold it a beat (or a line) longer than expected before landing it. Give every section at least one prediction error: a turn, a withheld word, a surprise rhyme.
 5. RHYTHMIC DISPLACEMENT — repeat a key phrase but start it on a DIFFERENT beat (first time on the one, next time on the pickup or beat 2). Same words, shifted position, so the repeat sounds new. Use it on the hook's last repeat at minimum.
-6. THE WOMAN IN THE ROOM — write as if one specific listener is in the room and the song is aimed at her. The hook must work as something she would sing back, caption a post with, or send to someone. Put intimacy, a direct "you," and emotional truth in the hook; keep the chest-beating in the verses.
+6. THE WOMAN IN THE ROOM (the person in the room) — write as if one specific listener is in the room and the song is aimed at them: whoever THIS song's story points at (a lover, an ex, a rival, a doubter, a parent, a child, a crowd, a younger self). It is a romantic partner ONLY when the song is about love. The hook must work as something they would sing back, caption a post with, or send to someone. Put intimacy, a direct "you," and emotional truth in the hook; keep the chest-beating in the verses.
 7. BACK PHRASING — start some lines AFTER the downbeat (leave beat 1 empty, enter late) and let them spill into the next bar, especially going into the chorus. The late entry creates lean-in tension that the on-beat chorus releases.
 8. MICRO-REPETITION — repeat a single word or 2-3 word fragment INSIDE a line ("gone, gone, gone", "I know, I know"). Small stutters create stickiness without repeating whole lines. At least one per section, never the same fragment twice across sections unless it's the hook.
 9. SCENE SEQUENCING — each section is ONE camera shot: a specific place, time, and image. Scenes move forward in time or space (bedroom → car → her porch), never re-describe the same shot. Verse 2 must be a NEW scene, not verse 1 reworded.
@@ -1651,7 +1651,7 @@ const HIT_CRAFT_GENRE_LENS = {
     shadow: "Set a bar's cadence template (e.g. 3-3-2 syllable clusters) and ride it for 2-4 bars with new words; plant the hook cadence as a shadow in bar 1-2 of verse 1.",
     dopamine: "Set up the multi, then delay the payoff rhyme one bar with a filler bar that looks like a miss — then land it harder. Punchline on bar 4/8/16 is the release.",
     displace: "Repeat the hook's tag phrase but start it on beat 2 or the 'and' of 4 on the final hook; rap the same line twice in a verse starting on different beats.",
-    woman: "Mid-flex, drop ONE unguarded bar aimed at her (an admission of what she saw or survived with him, built from this song's details, never a stock line) — the vulnerable bar in a cold verse is what she quotes. Hook stays a line she'd caption.",
+    woman: "Mid-flex, drop ONE unguarded bar aimed at the person this song is about (a partner, a parent, a child, a rival, whoever the story points at): an admission of what they saw or survived with him, built from this song's details, never a stock line. The vulnerable bar in a cold verse is what they quote. Hook stays a line they'd caption.",
     back: "Enter bars late, after the kick, and let the last word drag into the next bar (Snoop/Future pocket). Back-phrase the last line into the hook.",
     micro: "Stutter-repeats and ad-lib echoes: 'gone gone', 'I know, I know', a word repeated with a (yeah) answer. Triplet repeats ('run it, run it, run it') in trap.",
     scene: "Each verse is one location with a timestamp: 'the Cutlass at 3am' → 'the courthouse steps' → 'mama's kitchen now'. Never re-describe the block.",
@@ -4729,12 +4729,18 @@ function buildBlendNote(primaryGenre, blend, graft) {
     // nudge. _resolveFusionKey is order/case tolerant.
     let fd = null;
     try { const fk = _resolveFusionKey(primaryGenre, blend.genre2); fd = fk ? FUSION_DATA[fk] : null; } catch (_) {}
-    // A Section Graft decides who raps or sings that section, so drop any
-    // playbook sentence that forbids it (e.g. Pop-Rap "Never rap the chorus").
-    if (fd && fd.tip && graft && graft.graftGenre) {
-      const sec = ['verse', 'chorus', 'bridge'].includes(graft.graftSection) ? graft.graftSection : 'chorus';
-      const tip = fd.tip.split(/(?<=\.)\s+/).filter(t => !new RegExp('\\b(never|don\'t|do not)\\b[^.]*\\b' + sec, 'i').test(t)).join(' ');
-      fd = Object.assign({}, fd, { tip: tip ? tip + ` (The ${sec} follows the SECTION GRAFT.)` : `The ${sec} follows the SECTION GRAFT.` });
+    // A Section Graft or an explicit hook style decides who raps or sings that
+    // section, so drop any playbook sentence that forbids it (e.g. Pop-Rap
+    // "Never rap the chorus" vs a rap-chorus graft or the "Rapped Hook" style).
+    const _rappedHook = graft && graft.hookStyle === 'Rapped Hook';
+    if (fd && fd.tip && graft && (graft.graftGenre || _rappedHook)) {
+      const sec = graft.graftGenre ? (['verse', 'chorus', 'bridge'].includes(graft.graftSection) ? graft.graftSection : 'chorus') : 'chorus';
+      const owner = graft.graftGenre ? 'SECTION GRAFT' : 'chosen HOOK STYLE';
+      const forbids = graft.graftGenre
+        ? new RegExp('\\b(never|don\'t|do not)\\b[^.]*\\b' + sec, 'i')
+        : /\b(never|don't|do not)\b[^.]*\brap\b[^.]*\b(chorus|hook)/i;
+      const tip = fd.tip.split(/(?<=\.)\s+/).filter(t => !forbids.test(t)).join(' ');
+      if (tip !== fd.tip) fd = Object.assign({}, fd, { tip: tip ? tip + ` (The ${sec} follows the ${owner}.)` : `The ${sec} follows the ${owner}.` });
     }
     // One structural moment the secondary genre is allowed to OWN, so the fusion
     // shapes the song's construction — not just its lyric texture.
@@ -6046,7 +6052,7 @@ function buildStagingPair(opts) {
 function buildContinuityNote() {
   return `\n\nCONTINUITY CONTRACT — the song must survive a second listen:
 - ONE narrator throughout. Person (I / you / he / she / they) and tense stay fixed unless a device named elsewhere in this brief explicitly changes them.
-- The hour, place and season fixed by STAGING hold in EVERY section. Do not drift from an afternoon into a night, or from summer into snow, between verses.
+- The hour, place and season fixed by STAGING hold in EVERY section. Do not drift from an afternoon into a night, or from summer into snow, between verses. Exception: a section may open with a clearly SIGNPOSTED jump ("a year later", "cut to", "back then") — that is a deliberate new scene, not drift; hold the new setting from there.
 - Physical logic holds: the narrator cannot be in two places at once. If they are driving, they are not also seated at a table. If they leave, they are gone until the song says otherwise.
 - Props persist. An object introduced in one section stays where the song put it — a ring left on the dashboard is still on the dashboard in the last chorus unless a line moves it.
 - Facts do not contradict. If someone left in verse 1 they cannot still be present in verse 2; if the narrator never called, they cannot later refer to the call.
@@ -6188,11 +6194,17 @@ const DOUBLETIME_GENRES = new Set(['hiphop','tvmusical','folk','country','pop'])
 // Returns a concatenated directive string (may be '') for the given genre key.
 // Pocket fires every eligible song; enjambment ~55%; double-time ~28% — so the
 // devices vary take-to-take instead of firing as a rigid checklist every time.
-function buildFlowCraftNotes(genreKey) {
+// Rap Lab passes its FLOW dimension so the pocket can't contradict it
+// (behind-beat flow + an "On the Beat" pocket told the model both).
+const _FLOW_TO_POCKET = { 'behind-beat': 'Behind the Beat', 'on-beat': 'On the Beat', 'syncopated': 'Off-Grid / Syncopated', 'triplet': 'Off-Grid / Syncopated', 'speed-rap': 'Pushed / Ahead', 'double-time': 'Pushed / Ahead', 'conversational': 'Behind the Beat' };
+function buildFlowCraftNotes(genreKey, opts) {
   const g = String(genreKey || '').toLowerCase();
   const out = [];
+  const _flow = opts && opts.flow ? (Array.isArray(opts.flow) ? opts.flow : [opts.flow]) : [];
+  const _pocketName = _flow.map(f => _FLOW_TO_POCKET[f]).find(Boolean);
+  const _sparse = opts && opts.density && [].concat(opts.density).some(d => d === 'sparse');
   if (POCKET_GENRES.has(g)) {
-    const p = pickRandom(FLOW_POCKET_LENSES);
+    const p = (_pocketName && FLOW_POCKET_LENSES.find(l => l.name === _pocketName)) || pickRandom(FLOW_POCKET_LENSES);
     out.push({ id: 'flow-pocket', priority: 90, group: 'pocket', spine: null,
       text: `\n\nFLOW POCKET — "${p.name}" (WHERE the voice sits against the beat — placement, not speed or rhyme density):\n${p.rule}\nThis is RHYTHMIC PLACEMENT: a simple line hits hard when the pocket is right. Hold this feel as the section default; you may break it once for a specific moment, then return to it.` });
   }
@@ -6203,7 +6215,7 @@ function buildFlowCraftNotes(genreKey) {
     out.push({ id: 'enjambment', priority: 70, group: null, spine: null,
       text: `\n\nPHRASING — ENJAMBMENT (run SOME lines past the ${unit}):\nDo NOT end-stop every line. Let a few sentences spill across the ${unit} so the grammar and the rhyme grid deliberately fall out of sync — the thought finishes mid-next-line while the rhyme still lands where it should. This creates momentum and a conversational, un-sing-song feel: ${models}. Balance it — a lyric that is ALL enjambment loses its landing points; alternate end-stopped lines with run-on ones so the run-ons have contrast to work against.` });
   }
-  if (DOUBLETIME_GENRES.has(g) && Math.random() < 0.28) {
+  if (DOUBLETIME_GENRES.has(g) && Math.random() < 0.28 && !_sparse) {
     const models = (g === 'hiphop') ? 'Logic, Eminem "Rap God", Twista, Tech N9ne'
       : (g === 'tvmusical') ? 'Gilbert & Sullivan patter, Hamilton "Guns and Ships"'
       : (g === 'folk') ? 'Dylan "Subterranean Homesick Blues"'
@@ -8781,6 +8793,24 @@ REWRITE RULES:
   return coachRewriteNote;
 }
 
+// A request wants a SUNG hook when the hook style, vocal text, a grafted
+// chorus, a sung blend partner or a sung featured guest says so.
+const _SUNG_HOOK_STYLES = new Set(['Smooth Sung', 'Melodic Auto-Tune', 'Vocal Run / Melisma Hook', 'Gospel Vamp', 'Half-Sung', 'Octave Jump', 'Final-Chorus Key Change', 'Wordless Singalong', 'Whisper-to-Shout']);
+const _SUNG_GENRES = new Set(['pop', 'rnb', 'neosoul', 'gospel', 'country', 'kpop', 'cpop', 'latin', 'reggaeton', 'afrobeats', 'folk', 'ss', 'jazz', 'rock', 'altrock', 'reggae', 'tvmusical', 'bossa', 'bollywood']);
+function _wantsSungHook(p) {
+  p = p || {};
+  if (_SUNG_HOOK_STYLES.has(p.hookStyle)) return true;
+  if (/\b(sung|sing|singer|singing|melodic|croon|harmon)/i.test(String(p.vocal || ''))) return true;
+  if (p.graftGenre && (p.graftSection || 'chorus') === 'chorus' && _SUNG_GENRES.has(p.graftGenre)) return true;
+  if (p.blend && _SUNG_GENRES.has(p.blend.genre2)) return true;
+  if (p.featuredGuest && p.featuredGuest.on && /sung|sing/i.test(String(p.featuredGuest.delivery || ''))) return true;
+  return false;
+}
+function _wantsAutotune(p) {
+  p = p || {};
+  return p.hookStyle === 'Melodic Auto-Tune' || /auto-?tune/i.test(String(p.vocal || ''));
+}
+
 function buildSongPrompt(params) {
   const {
     genre = 'pop', topic: rawTopic = '', mood: rawMood = 'Emotional', vocal: rawVocal = 'any',
@@ -8924,7 +8954,7 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
 
   // Blend — secondary genre + writing style influence (rewritten to inject the
   // BLEND_STYLE_BIBLE for writing styles + concrete sonic guidance).
-  const blendNote = buildBlendNote(genre, blend, { graftGenre, graftSection });
+  const blendNote = buildBlendNote(genre, blend, { graftGenre, graftSection, hookStyle });
 
   // Era map
   const eraMap = {
@@ -9255,6 +9285,7 @@ The rest of the song stays in ${genreLabel}. The graft is structural — the lis
   // params.vocalDescriptors shape: { texture, character, performance, accent, era, postural, processing, autoMode, negativeAdd }
   const _vocalDescStack = selectVocalDescriptors({
     genre, substyle, mood,
+    sungHook: _wantsSungHook(params), allowAutotune: _wantsAutotune(params),
     lyrics: (topic || '') + ' ' + (params.seedLine || ''),
     overrides: (params.vocalDescriptors && typeof params.vocalDescriptors === 'object') ? params.vocalDescriptors : {},
     autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
@@ -9782,6 +9813,7 @@ function buildLuckyPrompt(params) {
   // overrides flow through params.vocalDescriptors when supplied)
   const _luckyVocalDescStack = selectVocalDescriptors({
     genre: g1, substyle: params.substyle || '', mood,
+    sungHook: _wantsSungHook(params), allowAutotune: _wantsAutotune(params),
     lyrics: (topic || ''),
     overrides: (params.vocalDescriptors && typeof params.vocalDescriptors === 'object') ? params.vocalDescriptors : {},
     autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
@@ -11484,7 +11516,7 @@ ${(dims.flow.length>1 || dims.rhymeArch.length>1 || dims.density.length>1 || dim
   - Can I point at a specific bar in Verse 2 where the flow/rhyme/density visibly changed from Verse 1? If no → rewrite V2.
   - Does the Bridge feel tonally/structurally different from the Hook? If no → rewrite the Bridge.
   - If someone transcribed V1 and V2 without section labels, could they tell which is which from the craft alone? If no → the blend failed; rewrite.` : ''}
-${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${assembleCraft([buildFlowCraftNotes('hiphop'), buildSignatureCraftNotes('hiphop', ''), buildEraCraftNotes('hiphop'), buildStyleCraftNotes('hiphop'), buildRetroCraftNotes('hiphop')], { budget: 4 })}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}${rapAdlibLock}${assembleCraft([buildFlowCraftNotes('hiphop', { flow: rapDimensions.flow, density: rapDimensions.density }), buildSignatureCraftNotes('hiphop', ''), buildEraCraftNotes('hiphop'), buildStyleCraftNotes('hiphop'), buildRetroCraftNotes('hiphop')], { budget: 4 })}${freestyleLock}${offTheTopLock}${producerTemplateNote}${viralLock}${sampleHookLock}${barSwitchLock}${breakRuleLock}${buildFeaturedGuestNote(featuredGuest)}
 
 BRACKET REQUIREMENTS:
 ${freestyleMode
@@ -11551,6 +11583,7 @@ DIRECTOR NOTES:
   genre: 'hiphop',
   substyle: backendId,
   mood,
+  sungHook: _wantsSungHook(params), allowAutotune: _wantsAutotune(params),
   lyrics: topic || '',
   overrides: (params.vocalDescriptors && typeof params.vocalDescriptors === 'object') ? params.vocalDescriptors : {},
   autoMode: !params.vocalDescriptors || params.vocalDescriptors.autoMode === true,
@@ -12794,7 +12827,18 @@ const V6_VARIANT_DIRECTIVES = {
   short_cut:      'Cut a 30-45 second short-form version: open on the hook with no intro, the strongest lines of verse 1, the full hook, and an ending that loops back into the start.'
 };
 
-function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes, length }) {
+// Exclude-style phrases that would cancel a genre the user blended or grafted in.
+const _BLEND_EXCLUDE_CLASH = {
+  rock: /rock|guitar|metal|scream|punk/i, altrock: /rock|guitar|scream|grunge/i, metal: /metal|guitar|scream|growl|rock/i, punk: /punk|rock|guitar|scream/i,
+  country: /country|steel|twang|banjo/i, folk: /folk|acoustic|banjo/i, ss: /acoustic|folk/i, blues: /blues|guitar/i,
+  edm: /edm|electronic|drop|synth/i, gospel: /gospel|choir/i, tvmusical: /musical theater|broadway/i, jazz: /jazz|swing/i,
+  hiphop: /trap|808|rap|hip-?hop|drill/i, rnb: /r&b|melisma|auto-?tune/i, latin: /latin|reggaeton|dembow/i, reggaeton: /reggaeton|dembow|latin/i,
+  reggae: /reggae|dub/i, afrobeats: /afro/i, kpop: /k-?pop/i, pop: /pop/i,
+};
+function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLearning, aggression, lyricTier, userExcludes, length, hookStyle, vocal, blend, graftGenre, graftSection, featuredGuest }) {
+  const _req = { hookStyle, vocal, blend, graftGenre, graftSection, featuredGuest };
+  const _clashKeys = [blend && blend.genre2, graftGenre].filter(k => k && k !== genre);
+  const _clashes = (e) => _clashKeys.some(k => _BLEND_EXCLUDE_CLASH[k] && _BLEND_EXCLUDE_CLASH[k].test(e));
   const base = SUNO_GEN_SETTINGS_BASE[genre] || SUNO_GEN_SETTINGS_BASE.pop;
   let weirdness = base.weirdness;
   let styleInfluence = base.styleInfluence;
@@ -12805,10 +12849,10 @@ function buildSunoSettings({ genre, substyle, mood, structure, rapStyle, userLea
   const _normEx = (e) => String(e).replace(/^no\s+/i, '').trim().toLowerCase().slice(0, 40);
   const excludes = new Set();
   (Array.isArray(userExcludes) ? userExcludes : []).forEach(e => { const c = _normEx(e); if (c) excludes.add(c); });
-  (base.exclude || []).forEach(e => excludes.add(e));
+  (base.exclude || []).forEach(e => { if (!_clashes(e)) excludes.add(e); });
   try {
-    const _vd = selectVocalDescriptors({ genre, mood, autoMode: true });
-    ((_vd && _vd.negative_list) || []).forEach(e => { const c = _normEx(e); if (c) excludes.add(c); });
+    const _vd = selectVocalDescriptors({ genre, mood, autoMode: true, sungHook: _wantsSungHook(_req), allowAutotune: _wantsAutotune(_req) });
+    ((_vd && _vd.negative_list) || []).forEach(e => { const c = _normEx(e); if (c && !_clashes(c)) excludes.add(c); });
   } catch (_) { /* vocal resolver optional — genre defaults still carry the exclude */ }
 
   // Word-boundary mood match (same pattern as anti-cliche / speed-gears)
@@ -13656,10 +13700,10 @@ const HIT_CRAFT_FINAL_CHECK = `
 □ REPETITION TYPES: at least THREE different kinds are on the page — exact hook, incremental (one word changed on a later hook), refrain tag ending each verse, call-and-response, or a bookend first/last line. DEFAULT MOVES unless the song has a better one: (a) the FINAL hook changes exactly ONE word of its key line (incremental); (b) the song's last lyric line echoes its first lyric line with the meaning turned (bookend). Ad-lib parentheses alone do not count as a type.
 □ MICRO-REPETITION: every lyric section has a word or 2-3 word fragment repeated inside a line.
 □ RHYTHMIC DISPLACEMENT: the final hook moves a key phrase to a different entry point (pickup, beat 2, after a stop) — show it in the line layout.
-□ THE WOMAN IN THE ROOM: the hook contains one line a specific listener would sing back or caption — translated to this genre's lens, even if the genre rarely does it.
+□ THE PERSON IN THE ROOM: the hook contains one line a specific listener (whoever this song is aimed at, not automatically a woman or a lover) would sing back or caption — translated to this genre's lens, even if the genre rarely does it.
 □ SHADOW RHYTHM: a verse-1 line shares the hook's syllable count and stress pattern with different words.
 □ BACK PHRASING + SYNCOPATION RATIO: verses carry more off-beat pickups than the chorus; at least one line enters late into the chorus.
-□ SCENE SEQUENCING: verse 2 is a different place/time than verse 1.
+□ SCENE SEQUENCING: verse 2 is a NEW shot: a later moment or a new angle in the same setting, OR a clearly signposted time/place jump ("a year later", "cut to").
 □ DOPAMINE: every section has one withheld-then-paid-off word or a surprise turn.
 □ JUICY LINES: every section, verse 1 included, has one line quotable on its own.
 □ PROSODY: every stressed syllable sits on a strong beat; no forced stresses.
@@ -13699,7 +13743,7 @@ const HIT_CRAFT_SYSTEM_MOVES = `
 NON-NEGOTIABLE HIT CRAFT MOVES (every lyric you write):
 1. The FINAL chorus changes exactly ONE word in its key line versus the earlier choruses (incremental repetition). Identical final choruses are wrong.
 2. The song's LAST lyric line echoes verse 1's FIRST line with the meaning turned (bookend).
-3. Write the hook's "you" line FIRST, before anything else: one line sung straight to a specific "you" — the woman in the room — even in drill, metal or punk. It goes in the CHORUS text itself, not only in a verse. It must ADDRESS a person being spoken to: an accusation, confession, promise or question aimed at them, built from THIS song's own details (never reuse a line from these instructions). A generic "you/your" (as in "when your blood ain't around") does NOT count. Build the rest of the chorus around it.
+3. Write the hook's "you" line FIRST, before anything else: one line sung straight to a specific "you" — the person in the room this song is aimed at (a lover only if it is a love song; otherwise the rival, doubter, child, crowd or whoever the story points at) — even in drill, metal or punk. It goes in the CHORUS text itself, not only in a verse. It must ADDRESS a person being spoken to: an accusation, confession, promise or question aimed at them, built from THIS song's own details (never reuse a line from these instructions). A generic "you/your" (as in "when your blood ain't around") does NOT count. Build the rest of the chorus around it.
 4. Every lyric section repeats a word or short fragment INSIDE a lyric line ("gone, gone", "I know, I know"), and the CHORUS must contain one. Repeats inside ad-lib parentheses do not count.
 5. The final hook displaces a phrase: start its title line on a pickup word or split it across a line break so it lands on a new beat.
 6. Chorus lines are clearly shorter than verse lines.
@@ -13926,6 +13970,10 @@ function _craftNotesFor(ctx) {
   return wordplay + MOMENTUM_CORE + lenses + fusion + (platinum ? MOMENTUM_PLATINUM + FUSION_PLATINUM_RULES : '');
 }
 
+const FREESTYLE_CRAFT_OVERRIDE = `
+
+FREESTYLE OVERRIDE: this is a freestyle with NO hook, chorus, pre-chorus or bridge. Wherever a rule above mentions the hook or chorus (a homophone moment in the hook, building into a chorus, the final chorus as the peak, the fake-out before a chorus), apply it to the CLOSING 4 BARS of each verse instead. The last verse's closing bars are the song's peak, and the first and last bars of the whole freestyle still bookend each other.`;
+
 function _withHitCraftClose(fn, genreOf, opts) {
   return function (...args) {
     const r = fn.apply(this, args);
@@ -13940,14 +13988,17 @@ function _withHitCraftClose(fn, genreOf, opts) {
       } else if (opts && opts.guest && p.featuredGuest && p.featuredGuest.on && !/FEATURED GUEST/.test(r.prompt)) {
         r.prompt += buildFeaturedGuestNote(p.featuredGuest);
       }
-      r.prompt += buildHitCraftFinalCheck(g);
-      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _craftNotesFor({
+      // Freestyle has no hook/chorus/bridge, so the chorus-centred hit-craft
+      // moves and checklist would contradict it; send an override instead.
+      const freestyle = p.freestyleMode === true;
+      if (!freestyle) r.prompt += buildHitCraftFinalCheck(g);
+      if (typeof r.system === 'string') r.system += (freestyle ? '' : HIT_CRAFT_SYSTEM_MOVES) + _craftNotesFor({
         primary: g,
         secondary: (p.blend && p.blend.genre2) || (r.meta && r.meta.g2) || '',
         ratio: p.blend && p.blend.ratio,
         graftGenre: p.graftGenre, graftSection: p.graftSection,
         platinum: !!p.platinum
-      });
+      }) + (freestyle ? FREESTYLE_CRAFT_OVERRIDE : '');
     }
     return r;
   };
