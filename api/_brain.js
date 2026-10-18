@@ -9786,7 +9786,12 @@ function buildLuckyPrompt(params) {
   const [g1, g2] = key.split('+');
   const fd = FUSION_DATA[key];
   // Honour client-picked values so reveal UI matches generated song exactly
-  const topic     = (params && params.topic)     ? sanitizeInput(params.topic, 100)     : pickRandom(LUCKY_TOPICS);
+  // Lucky draws from live sparks (passed by the server) about half the time,
+  // otherwise from the full evergreen pool (LUCKY_TOPICS + SUBJECT_SEED).
+  const _luckyLive = Array.isArray(params && params.topicPool) ? params.topicPool.filter(t => typeof t === 'string' && t.trim().length >= 6) : [];
+  const topic     = (params && params.topic)     ? sanitizeInput(params.topic, 100)
+    : (_luckyLive.length && Math.random() < 0.5) ? sanitizeInput(pickRandom(_luckyLive), 100)
+    : pickRandom(LUCKY_TOPICS.concat(SUBJECT_SEED));
   const mood      = (params && params.mood)      ? sanitizeInput(params.mood, 100)      : pickRandom(LUCKY_MOODS);
   const structure = (params && params.structure) ? sanitizeInput(params.structure, 50)  : pickRandom(LUCKY_STRUCTURES);
   const vocal     = (params && params.vocal)     ? sanitizeInput(params.vocal, 100)     : pickRandom(LUCKY_VOCALS);
@@ -13284,6 +13289,145 @@ const PHRASE_BANK = [
   { phrase: 'hold your horses', meaning: 'slow down before you ruin it', register: 'southern' },
   { phrase: 'that dog won\'t hunt', meaning: 'that excuse won\'t work', register: 'southern' }
 ];
+
+// ── Idea Engine: expanded evergreen pools (2026-10-17) ─────────────────────
+// The original SUBJECT_SEED / PHRASE_BANK leaned melancholic and small. These
+// add range across the whole emotional map (swagger, joy, humor, defiance,
+// tenderness, nostalgia, wonder) so rolls stop repeating. Live sparks (the
+// Spark Factory) and users' own topics layer on top of these at request time.
+const SUBJECT_SEED_EXT = [
+  // swagger / triumph
+  'the first time the bouncer knew your name','paying off your mother\'s car in cash','the comeback nobody bet on','walking into the reunion with nothing to prove',
+  'buying the corner store you used to get chased out of','the day your side hustle became the main thing','winning ugly and loving it','the hometown billboard with your face on it',
+  'teaching the young ones by never saying a word','outworking everybody who doubted you','the trophy you keep in the kitchen so you see it every morning','getting your flowers while you can still smell them',
+  'the rematch you waited a year for','being the plug for your whole block','your first suit that actually fits','the crowd chanting a name they used to mispronounce',
+  // joy / celebration
+  'the summer the whole street had one sprinkler','dancing in the kitchen while dinner burns','your best friend\'s wedding where you lost your voice','the road trip with a broken radio and no regrets',
+  'the night the power went out and nobody wanted it back','your grandmother teaching the whole family her one dance move','the first warm day after a long winter','a birthday nobody forgot',
+  'the group chat that saved your year','finally getting the window seat','the cookout that lasted until the streetlights came on','winning the arcade high score at thirty-five',
+  // love / tenderness
+  'learning someone\'s coffee order by heart','the hoodie you never gave back','slow dancing in a parking lot to car speakers','falling for your best friend at the worst possible wedding',
+  'the voice note you play when you can\'t sleep','writing their name in the fog on the bus window','loving someone through their worst year','a second chance at the same diner booth',
+  'the long-distance call that ends with both of you asleep','meeting their family and passing the test','the promise you made on a fire escape','choosing each other on a Tuesday for no reason',
+  // heartbreak / longing
+  'seeing your ex\'s dog at the park without them','the playlist you can\'t delete','driving past their street on purpose','splitting up the vinyl collection',
+  'the toothbrush still in the cup','getting over someone in a city that reminds you of them','the wedding you weren\'t invited to','loving someone who is already halfway out the door',
+  // defiance / rebellion
+  'quitting the job in the middle of the meeting','the tattoo your father swore you\'d regret','leaving town with one bag and no plan','the night you finally said no',
+  'refusing to shrink for a room that wanted you small','the rumor you turned into a résumé','burning the bridge and roasting marshmallows','the rules you broke that made you',
+  // nostalgia / coming of age
+  'the corner store that closed', 'your first car and every sound it made','the mixtape that got you through tenth grade','the last day of school before everyone scattered',
+  'the treehouse your dad never finished','the arcade that became a bank','the friend you only see at funerals and weddings now','learning to drive in an empty church parking lot',
+  'the bedroom you outgrew in one summer','hearing your old song on the radio in a grocery store','your first apartment with a mattress on the floor','the summer job that taught you everything',
+  // family / roots
+  'your father\'s hands on the steering wheel','the recipe nobody wrote down','being the first in the family to go to college','raising your little brother when nobody else would',
+  'the house your grandparents built with their own hands','your mother singing in another language while she cleans','the family reunion where everybody tells it differently','becoming the parent you needed',
+  'the name you carry and the person you made it mean','calling home and pretending everything is fine','the inheritance that was only a story','teaching your kid the song your mother taught you',
+  // humor / everyday absurdity
+  'the group project where you did everything','your cat\'s secret life while you are at work','arguing with the GPS like it is your ex','the gym membership you pay for and never use',
+  'your landlord\'s idea of "fixed"','trying to be cool at the self-checkout','the wedding DJ who would not take requests','your phone at one percent at the worst moment',
+  // work / hustle
+  'the night shift that nobody thanks','the last bus home after a double','building something from a garage with no heat','the job interview where you were too honest',
+  'the restaurant kitchen at 9pm on a Saturday','clocking out and finally being yourself','the boss you outgrew','the dream you work on after the day job',
+  // wonder / spiritual / big picture
+  'looking at the stars from a city with no stars','the moment you forgave yourself','a prayer you said without believing and it worked anyway','the ocean the first time you saw it',
+  'the stranger who changed your life in one sentence','the quiet after you finally stop running','growing older and liking it','the version of you that made it, waving from the future',
+  'the river that runs past every house you ever lived in','a sunrise you stayed up for on purpose','finding God in a gas station at 2am','the moment you realize your parents were just kids too',
+  // place / city
+  'a small town where everybody knows your business','the subway car where strangers all sang along','a city that finally said your name right','the last record store in town',
+  'the barbershop where the real news gets told','the beach town in the off-season','moving back home and seeing it new','the rooftop where you planned your whole life',
+  // friendship / loyalty
+  'the friend who drove four hours at midnight','loyalty that survived the money','the crew that came up together and stayed together','the one who stayed when the party ended',
+  'the day your best friend became your business partner','forgiving the friend who told your secret','growing apart from the person who knew you first','the toast you gave and meant every word',
+  // reinvention / healing
+  'the first morning you didn\'t think about it','learning to be loud again','starting over at forty with a blank page','the scar you stopped hiding',
+  'getting sober and getting your laugh back','the therapist who asked the right question','throwing out the old photos and keeping one','becoming someone your younger self would follow',
+];
+for (const s of SUBJECT_SEED_EXT) if (!SUBJECT_SEED.includes(s)) SUBJECT_SEED.push(s);
+
+// Public-domain sayings, idioms and proverbs (no lyrics, no slogans, no brand lines).
+const PHRASE_BANK_EXT = [
+  { phrase: 'the early bird gets the worm', meaning: 'those who start first win', register: 'folksy' },
+  { phrase: 'don\'t count your chickens before they hatch', meaning: 'don\'t celebrate too soon', register: 'folksy' },
+  { phrase: 'a rolling stone gathers no moss', meaning: 'keep moving and nothing sticks to you', register: 'proverb' },
+  { phrase: 'still waters run deep', meaning: 'quiet people feel the most', register: 'proverb' },
+  { phrase: 'the apple doesn\'t fall far from the tree', meaning: 'children become their parents', register: 'folksy' },
+  { phrase: 'you can\'t teach an old dog new tricks', meaning: 'people don\'t change', register: 'folksy' },
+  { phrase: 'blood is thicker than water', meaning: 'family comes first', register: 'proverb' },
+  { phrase: 'what goes around comes around', meaning: 'karma returns', register: 'street' },
+  { phrase: 'the bigger they are, the harder they fall', meaning: 'the mighty fall hardest', register: 'street' },
+  { phrase: 'don\'t burn your bridges', meaning: 'never cut off a way back', register: 'proverb' },
+  { phrase: 'a picture is worth a thousand words', meaning: 'images say more than talk', register: 'proverb' },
+  { phrase: 'actions speak louder than words', meaning: 'what you do is who you are', register: 'proverb' },
+  { phrase: 'you made your bed, now lie in it', meaning: 'live with your choices', register: 'southern' },
+  { phrase: 'don\'t put all your eggs in one basket', meaning: 'don\'t risk everything on one thing', register: 'folksy' },
+  { phrase: 'when it rains, it pours', meaning: 'trouble comes all at once', register: 'folksy' },
+  { phrase: 'the squeaky wheel gets the grease', meaning: 'the loud get attention', register: 'folksy' },
+  { phrase: 'you reap what you sow', meaning: 'consequences follow choices', register: 'biblical' },
+  { phrase: 'pride comes before a fall', meaning: 'arrogance precedes ruin', register: 'biblical' },
+  { phrase: 'the truth will set you free', meaning: 'honesty releases you', register: 'biblical' },
+  { phrase: 'this too shall pass', meaning: 'nothing lasts, not even pain', register: 'biblical' },
+  { phrase: 'an eye for an eye', meaning: 'payback in kind', register: 'biblical' },
+  { phrase: 'it takes a village', meaning: 'nobody grows up alone', register: 'proverb' },
+  { phrase: 'home is where the heart is', meaning: 'home is a feeling, not a place', register: 'folksy' },
+  { phrase: 'absence makes the heart grow fonder', meaning: 'distance deepens love', register: 'romantic' },
+  { phrase: 'out of sight, out of mind', meaning: 'distance makes us forget', register: 'proverb' },
+  { phrase: 'love is blind', meaning: 'love ignores flaws', register: 'romantic' },
+  { phrase: 'all\'s fair in love and war', meaning: 'no rules when the heart is involved', register: 'romantic' },
+  { phrase: 'two wrongs don\'t make a right', meaning: 'revenge doesn\'t fix it', register: 'proverb' },
+  { phrase: 'the best things in life are free', meaning: 'what matters can\'t be bought', register: 'hopeful' },
+  { phrase: 'money can\'t buy happiness', meaning: 'wealth isn\'t joy', register: 'proverb' },
+  { phrase: 'time is money', meaning: 'every hour has a price', register: 'hustle' },
+  { phrase: 'no pain, no gain', meaning: 'growth hurts', register: 'hustle' },
+  { phrase: 'rome wasn\'t built in a day', meaning: 'great things take time', register: 'hustle' },
+  { phrase: 'fake it till you make it', meaning: 'act the part until it\'s real', register: 'hustle' },
+  { phrase: 'go big or go home', meaning: 'all in or nothing', register: 'hustle' },
+  { phrase: 'slow and steady wins the race', meaning: 'patience beats speed', register: 'folksy' },
+  { phrase: 'better late than never', meaning: 'late is still worth it', register: 'folksy' },
+  { phrase: 'curiosity killed the cat', meaning: 'nosiness gets you hurt', register: 'folksy' },
+  { phrase: 'let sleeping dogs lie', meaning: 'leave old trouble alone', register: 'folksy' },
+  { phrase: 'the devil is in the details', meaning: 'small things cause big trouble', register: 'proverb' },
+  { phrase: 'where there\'s smoke, there\'s fire', meaning: 'rumors usually have a source', register: 'proverb' },
+  { phrase: 'speak of the devil', meaning: 'they show up right when you mention them', register: 'folksy' },
+  { phrase: 'between a rock and a hard place', meaning: 'no good options', register: 'folksy' },
+  { phrase: 'bite the hand that feeds you', meaning: 'betray who helped you', register: 'street' },
+  { phrase: 'keep your friends close and your enemies closer', meaning: 'watch your rivals', register: 'street' },
+  { phrase: 'it is what it is', meaning: 'accept what you can\'t change', register: 'street' },
+  { phrase: 'game recognize game', meaning: 'the skilled see each other', register: 'street' },
+  { phrase: 'scared money don\'t make money', meaning: 'fear stops winning', register: 'street' },
+  { phrase: 'mind your business', meaning: 'stay in your lane', register: 'street' },
+  { phrase: 'the night is young', meaning: 'there\'s still time for everything', register: 'party' },
+  { phrase: 'you only live once', meaning: 'take the chance now', register: 'party' },
+  { phrase: 'live and let live', meaning: 'let others be', register: 'hopeful' },
+  { phrase: 'when life gives you lemons, make lemonade', meaning: 'turn bad luck into good', register: 'hopeful' },
+  { phrase: 'it\'s always darkest before the dawn', meaning: 'the worst comes right before relief', register: 'hopeful' },
+  { phrase: 'every dog has its day', meaning: 'everyone gets their moment', register: 'folksy' },
+  { phrase: 'you can\'t go home again', meaning: 'the past doesn\'t wait for you', register: 'literary' },
+  { phrase: 'the road to hell is paved with good intentions', meaning: 'meaning well isn\'t enough', register: 'proverb' },
+  { phrase: 'old habits die hard', meaning: 'we fall back into who we were', register: 'proverb' },
+  { phrase: 'lightning never strikes twice', meaning: 'the rare thing won\'t repeat', register: 'folksy' },
+  { phrase: 'don\'t judge a book by its cover', meaning: 'appearances deceive', register: 'proverb' },
+  { phrase: 'you can lead a horse to water', meaning: 'you can\'t force anyone to change', register: 'southern' },
+  { phrase: 'the proof is in the pudding', meaning: 'results are the real test', register: 'folksy' },
+  { phrase: 'it ain\'t over till it\'s over', meaning: 'never quit early', register: 'southern' },
+  { phrase: 'hold your horses', meaning: 'slow down', register: 'southern' },
+  { phrase: 'bless your heart', meaning: 'sweet on top, sharp underneath', register: 'southern' },
+  { phrase: 'Lord willing', meaning: 'if it\'s meant to be', register: 'southern' },
+  { phrase: 'you can\'t have your cake and eat it too', meaning: 'you can\'t have both', register: 'folksy' },
+  { phrase: 'a leopard can\'t change its spots', meaning: 'nature doesn\'t change', register: 'proverb' },
+  { phrase: 'misery loves company', meaning: 'the hurting want others hurting too', register: 'proverb' },
+  { phrase: 'great minds think alike', meaning: 'the clever land on the same idea', register: 'folksy' },
+  { phrase: 'the more things change, the more they stay the same', meaning: 'change is surface deep', register: 'literary' },
+  { phrase: 'a friend in need is a friend indeed', meaning: 'real friends show up in hard times', register: 'proverb' },
+  { phrase: 'you never know what you\'ve got till it\'s gone', meaning: 'loss reveals value', register: 'romantic' },
+  { phrase: 'better to have loved and lost', meaning: 'love is worth the heartbreak', register: 'literary' },
+  { phrase: 'the writing is on the wall', meaning: 'the ending is already clear', register: 'biblical' },
+  { phrase: 'cross that bridge when you come to it', meaning: 'deal with it later', register: 'folksy' },
+  { phrase: 'when in Rome', meaning: 'do as the locals do', register: 'proverb' },
+  { phrase: 'once in a blue moon', meaning: 'almost never', register: 'folksy' },
+];
+for (const p of PHRASE_BANK_EXT) if (!PHRASE_BANK.some(x => x.phrase.toLowerCase() === p.phrase.toLowerCase())) PHRASE_BANK.push(p);
+
 // label = the listener-facing strategy name shown on the PHRASE chip.
 // dir   = the MODEL-facing instruction folded into promptDirective (directive voice).
 // desc  = a SHORT human-facing sentence describing the SONG to the user — no
@@ -14004,7 +14148,114 @@ function _withHitCraftClose(fn, genreOf, opts) {
   };
 }
 
-module.exports = { buildWordplayNote, buildVariantWordplayNote, buildCraftNotes, MOMENTUM_GENRE_LENS, buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
+// ═══════════════════════════════════════════════════════════════════════════
+// IDEA ENGINE — 5 song pitches from Prism's dials (2026-10-17)
+// buildIdeaBriefs rolls N distinct Prism concepts (different genres, subjects);
+// buildPitchWriterPrompt asks a model to turn each into a pitch (title, hook
+// line, one-line story, angle, why); parsePitches validates it; pitchToWrite
+// maps a pitch onto Write Song params. Server: handlers/ideas.js.
+// ═══════════════════════════════════════════════════════════════════════════
+function buildIdeaBriefs(opts) {
+  opts = opts || {};
+  const count = Math.max(1, Math.min(parseInt(opts.count, 10) || 5, 6));
+  const locks = opts.locks || {};
+  const spark = opts.spark ? sanitizeInput(String(opts.spark), 120) : '';
+  const pool = Array.isArray(opts.subjectPool) ? opts.subjectPool : [];
+  // liveOnly ("Live today"): every pitch is built on a different live spark.
+  const liveList = opts.liveOnly
+    ? pool.filter(p => p && p.source === 'live' && p.surface).sort(() => Math.random() - 0.5)
+    : [];
+  const briefs = [];
+  const usedGenres = new Set(), usedSubjects = new Set();
+  let guard = 0;
+  while (briefs.length < count && guard++ < count * 8) {
+    const liveSubject = liveList.length ? liveList[briefs.length % liveList.length].surface : undefined;
+    const b = buildPrismConcept({
+      g1: locks.g1, g2: locks.g2,
+      subject: locks.subject || liveSubject || (spark && briefs.length < Math.ceil(count / 2) ? spark : undefined),
+      metaphor: locks.metaphor,
+      subjectPool: pool,
+      phraseMode: locks.phrase ? true : 'auto',
+      phrase: locks.phrase,
+      spice: !!opts.spice,
+      allowedGenres: opts.allowedGenres,
+      candidates: 5,
+    });
+    const gk = b.genre.primary + '|' + (b.genre.secondary || '');
+    const sk = b.subject.surface.toLowerCase();
+    // Distinct genres AND subjects across the set, unless the caller locked them.
+    if (count > 1 && !locks.g1 && usedGenres.has(gk) && guard < count * 6) continue;
+    if (count > 1 && !locks.subject && !liveSubject && !(spark && briefs.length < Math.ceil(count / 2)) && usedSubjects.has(sk) && guard < count * 6) continue;
+    usedGenres.add(gk); usedSubjects.add(sk);
+    // If a spark came from the live pool, carry its source for the "Live" badge.
+    const live = pool.find(p => p && typeof p === 'object' && String(p.surface || '').toLowerCase() === sk && p.source === 'live');
+    b.source = live ? 'live' : (spark && sk === spark.toLowerCase() ? 'spark' : (b.subject.source || 'seed'));
+    briefs.push(b);
+  }
+  return briefs;
+}
+
+const PITCH_WRITER_SYSTEM = `You are SONIQ's A&R writer. You turn song concepts into PITCHES a songwriter would fight to write.
+For each concept, write:
+- title: 1 to 4 words. Concrete, singable, ideally with a double meaning (like "Picture This": imagine it / take a photo / a movie). No generic titles ("Unbreakable", "Rise Up", "Fire", "Heart of Gold").
+- hook: the hook's key line, 4 to 10 words, the line people sing back. Original, never a known lyric or slogan.
+- story: ONE sentence (max 25 words), the specific situation: who, where, what happened. Concrete details, not themes.
+- angle: 6 to 14 words: the flip or wordplay that makes it fresh.
+- why: 6 to 14 words: why a listener will feel it.
+Rules: never name real people, brands, teams or real events; no tragedy for shock value; stay inside each concept's genre, subject and angle; every pitch must feel different from the others.
+Return ONLY JSON: {"pitches":[{"id":1,"title":"...","hook":"...","story":"...","angle":"...","why":"..."}]} with one entry per concept, same ids.`;
+
+function buildPitchWriterPrompt(briefs) {
+  const lines = briefs.map((b, i) => {
+    const phrase = b.phrase ? ` Saying to flip: "${b.phrase.phrase}" (${b.phrase.strategyLabel}).` : '';
+    return `${i + 1}. Genre: ${b.displayGenreLabel}. Subject: ${b.subject.surface}. Angle: told from ${b.flip.flippedPOV}. Touchstone image: "${b.metaphor.token}".${phrase}`;
+  });
+  return { system: PITCH_WRITER_SYSTEM, user: `Concepts:\n${lines.join('\n')}\n\nWrite ${briefs.length} pitches.` };
+}
+
+const _PITCH_BAD = /\b(unbreakable|rise up|heart of gold|stronger|fireflies|we are the champions)\b/i;
+function parsePitches(text, briefs) {
+  let arr = [];
+  const m = String(text || '').match(/\{[\s\S]*\}/);
+  if (m) { try { arr = JSON.parse(m[0]).pitches || []; } catch (_) { arr = []; } }
+  const clean = (s, n) => String(s || '').replace(/\s+/g, ' ').replace(/[<>]/g, '').trim().slice(0, n);
+  return briefs.map((b, i) => {
+    const p = arr.find(x => Number(x && x.id) === i + 1) || arr[i] || {};
+    let title = clean(p.title, 48), hook = clean(p.hook, 90);
+    if (!title || title.split(' ').length > 6 || _PITCH_BAD.test(title)) title = '';
+    // Fallback when the model skipped or broke a pitch: derive from the brief.
+    const fallbackTitle = b.phrase ? b.phrase.phrase.split(' ').slice(0, 4).join(' ') : b.metaphor.token.split(' ').slice(-3).join(' ');
+    return {
+      id: i + 1,
+      title: title || fallbackTitle.replace(/^\w/, c => c.toUpperCase()),
+      hook: hook || (b.phrase ? b.phrase.phrase : ''),
+      story: clean(p.story, 200) || b.conceptLine.slice(0, 200),
+      angle: clean(p.angle, 120) || ('Told from ' + b.flip.flippedPOV),
+      why: clean(p.why, 120),
+      genre: b.displayGenreLabel,
+      source: b.source || 'seed',
+      fallback: !p.title,
+    };
+  });
+}
+
+// Map a chosen pitch + its brief onto Write Song params (the client fills the form).
+function pitchToWrite(brief, pitch) {
+  const g = brief.genre || {};
+  return {
+    title: pitch.title,
+    topic: sanitizeInput(`${pitch.title}: ${pitch.story} Angle: ${pitch.angle}`, 300),
+    genre: g.primary || 'pop',
+    blend: g.mode === 'fusion' && g.secondary ? { genre2: g.secondary, ratio: (g.blend && g.blend.ratio) || 65 } : null,
+    seedLine: pitch.hook || '',
+    dualPerspective: !!(brief.flip && brief.flip.generatorParams && brief.flip.generatorParams.dualPerspective),
+    structure: (brief.flip && brief.flip.generatorParams && brief.flip.generatorParams.structure) || 'standard',
+    // Locks let the client re-roll ONE dial and keep the rest.
+    locks: { subject: brief.subject.surface, metaphor: brief.metaphor.token, g1: g.primary, g2: g.secondary || undefined, phrase: brief.phrase ? brief.phrase.phrase : undefined },
+  };
+}
+
+module.exports = { buildIdeaBriefs, buildPitchWriterPrompt, parsePitches, pitchToWrite, PITCH_WRITER_SYSTEM, buildWordplayNote, buildVariantWordplayNote, buildCraftNotes, MOMENTUM_GENRE_LENS, buildSongPrompt: _withHitCraftClose(buildSongPrompt, a => a[0] && a[0].genre, { guest: true }), buildLuckyPrompt: _withHitCraftClose(buildLuckyPrompt, (a, r) => r.meta && r.meta.g1), buildRapLabPrompt: _withHitCraftClose(buildRapLabPrompt, () => 'hiphop'), buildHitCraftFinalCheck, buildEditPrompt, buildPromptIntelligence, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, SUBSTYLE_FX_OVERRIDES, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote , BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction, buildStagingPair, buildContinuityNote, checkContinuity, CONTINUITY_PATTERNS, checkStyleLyricContract, CONTRACT_MOVES, checkHitCraft, checkCast, buildCastNote, CAST_PRESETS, buildHitCraftLensNote, HIT_CRAFT_CORE_II, HIT_CRAFT_II_GENRE_LENS, HIT_CRAFT_II_LABELS, HIT_CRAFT_FINAL_CHECK, HIT_CRAFT_GENRE_LENS, HIT_CRAFT_SUBSTYLE_TUNING, ENTRY_SETTING_CONFLICTS, SETTING_LENSES, ENTRY_POINT_LENSES, buildSunoSettings, SUNO_GEN_SETTINGS_BASE, SUNO_VARIETY_LOCK, SUNO_VARIETY_REASON, buildV6EditDirective, V6_VARIANT_DIRECTIVES, MOOD_SUNO_MODIFIERS, LYRIC_TIERS, TIER_ANCHORS, buildLyricTierNote, MUSIC_ACADEMIA, GENRE_ACADEMIA_MAP, buildAcademicFrameworkNote, buildEdgeNote, REGION_BIBLE, buildRegionNote, BLEND_STYLE_BIBLE, buildBlendNote, EMOTIONAL_VELOCITY, GENRE_DEFAULT_VELOCITY, buildEmotionalVelocityNote,
   // Wave 4d / 4e / 4f / 4g / 4h / 4j additions (test/admin/inspection access)
   OFF_THE_TOP_DIRECTIVE, VIRAL_PRODUCER_DIRECTIVE, SAMPLE_HOOK_DIRECTIVE,
   PRODUCER_TEMPLATES, INTRO_ARCHETYPES, INTERLUDE_ARCHETYPES,
