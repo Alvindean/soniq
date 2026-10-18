@@ -13568,6 +13568,28 @@ function _homophoneGenreKey(g) {
   for (const [key, label] of Object.entries(GENRE_LABELS)) if (label.toLowerCase() === k) return key;
   return k;
 }
+// Platinum switch raises the wordplay bar on top of the base stack / moment.
+const HOMOPHONE_STACK_PLATINUM = `
+
+PLATINUM WORDPLAY UPGRADE (Platinum mode is ON; this raises the Homophone Stack):
+1. COVERAGE: a stack in EVERY verse, plus one homophone moment in the hook or the final chorus.
+2. TRIPLE MINIMUM: every stack contains at least one bar with THREE true readings (a spelled-letter triple, or a re-parse that is also a sound-alike name). In Platinum this overrides the usual once-per-song triple entendre limit.
+3. LONGER CHAIN: the theme lock runs 4 or more consecutive bars; each homophone upgrades the one before it, and the last bar of the chain is the verse's money line.
+4. DOUBLE DUTY: at least one homophone per verse is ALSO the multisyllabic rhyme, so the sound-twin carries the rhyme scheme.
+5. CALLBACK FLIP: the last verse re-uses one homophone from verse 1 and makes it mean something new.
+6. SILENT CHECK before output: for each stack, list every reading to yourself; if any reading is not true in the song, or the surface line fails alone, rewrite that bar.`;
+
+const HOMOPHONE_STACK_LITE_PLATINUM = `
+
+PLATINUM WORDPLAY UPGRADE (Platinum mode is ON): make ONE homophone or re-parse the TITLE TURN. The title line means one thing in verse 1 and a second true thing by the final chorus (alone / a loan, decade / decayed, Seoul / soul). Add one more homophone moment in verse 2 inside the same theme. Silently check both readings are true before output; if the turn reads forced, keep only the strongest one.`;
+
+function _homophonePlatinumNote(g) {
+  const k = _homophoneGenreKey(g);
+  if (_HOMOPHONE_FULL_GENRES.has(k)) return HOMOPHONE_STACK_PLATINUM;
+  if (_HOMOPHONE_LITE_GENRES.has(k)) return HOMOPHONE_STACK_LITE_PLATINUM;
+  return '';
+}
+
 function _homophoneNote(g) {
   const k = _homophoneGenreKey(g);
   if (_HOMOPHONE_FULL_GENRES.has(k)) return HOMOPHONE_STACK;
@@ -13605,7 +13627,7 @@ function _withHitCraftClose(fn, genreOf, opts) {
         r.prompt += buildFeaturedGuestNote(p.featuredGuest);
       }
       r.prompt += buildHitCraftFinalCheck(g);
-      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _homophoneNote(g);
+      if (typeof r.system === 'string') r.system += HIT_CRAFT_SYSTEM_MOVES + _homophoneNote(g) + (p.platinum ? _homophonePlatinumNote(g) : '');
     }
     return r;
   };
