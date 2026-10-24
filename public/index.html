@@ -15557,8 +15557,10 @@ function showAnonNudge(){
 // PROMPT; these helpers fill those tabs in place without re-running the
 // whole parse (which would push a duplicate version and reset the song id).
 // Claude sometimes bolds headers ("**LYRICS:**"); parseSection wants "LYRICS:".
+const SONG_HEADERS_RE = new RegExp('^[ \\t]*(?:#{1,4}[ \\t]*)?(?:\\*\\*[ \\t]*)?(TITLE|VERDICT|HOOK ISOLATION|LYRICS|SONG PROMPT|PRODUCTION BRIEF|STRUCTURE MAP|DOPAMINE MAP|CHORD PROGRESSION|THEORY ANALYSIS|DIRECTOR NOTES|COUNTERMELODY|VISUAL PROMPT|VIDEO PROMPT|SINGER NOTES)[ \\t]*:?[ \\t]*(?:\\*\\*)?[ \\t]*:?(?=[ \\t]|$)', 'gm');
 function normalizeSongHeaders(text){
-  return String(text||'').replace(/^[ \t]*\*\*[ \t]*([A-Z][A-Z &/]{2,}?)[ \t]*:?[ \t]*\*\*:?/gm, '$1:');
+  // "**LYRICS:**", "## LYRICS", "LYRICS" alone on a line → "LYRICS:" (same rule as the Worker).
+  return String(text||'').replace(SONG_HEADERS_RE, '$1:');
 }
 const EXTRAS_PLACEHOLDER = 'Writing the production package… chords, brief and theory land in a moment.';
 function setExtrasPlaceholders(prefix){
