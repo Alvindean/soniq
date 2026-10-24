@@ -12155,7 +12155,7 @@ async function callClaudeStream(prompt, systemPrompt, onChunk, signal, maxTokens
   return text;
 }
 
-async function callServerStream(action, params, onChunk, signal) {
+async function callServerStream(action, params, onChunk, signal, extra) {
   const headers = {'Content-Type': 'application/json'};
   if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
   const _adminTok = localStorage.getItem('soniq_admin_token');
@@ -12163,7 +12163,8 @@ async function callServerStream(action, params, onChunk, signal) {
   const res = await fetch('/api/stream', {
     method: 'POST',
     headers,
-    body: JSON.stringify({ action, params, userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined }),
+    // `extra` carries the two-pass song fields (phase, lyricsRaw) when used.
+    body: JSON.stringify({ action, params, userKey: (_soniqKey && _soniqKey !== 'server-side') ? _soniqKey : undefined, ...(extra || {}) }),
     signal
   });
   if (!res.ok) {
@@ -15438,11 +15439,16 @@ VIDEO PROMPT:
       updateSongProgress('res', full);
     };
     let raw, genProdData;
+    let _twoPass = false;
     if (isVercel && !isLocalOllamaEnabled()) {
       // Server-side prompt building — IP stays hidden
       try {
-        const result = await callServerStream('generate', songParams, streamCb, genSignal);
+        // Two-pass delivery: pass 1 streams only TITLE → SONG PROMPT so the
+        // song is on screen in ~30s. Pass 2 (chords, brief, structure, theory)
+        // is requested in the background once the song is shown — see below.
+        const result = await callServerStream('generate', songParams, streamCb, genSignal, { phase: 'lyrics' });
         raw = result.text;
+        _twoPass = true;
         genProdData = result.meta?.prodData;
         // Stash computed Suno settings so save/like can feed the learning loop
         if (result.meta?.sunoSettings) S._pendingSunoSettings = result.meta.sunoSettings;
@@ -15476,6 +15482,19 @@ VIDEO PROMPT:
       }
     }
     renderSunoChips('res', S.currentSong);
+    // Two-pass: fetch the production package now that the song is readable.
+    // Not awaited — the user can copy, save or regenerate while it fills in.
+    if (_twoPass && raw && S.currentSong) {
+      const _songId = S.currentSong.id;
+      setExtrasPlaceholders('res');
+      callServerStream('generate', songParams, null, null, { phase: 'extras', lyricsRaw: raw })
+        .then(r2 => applySongExtras('res', raw, r2.text, _songId, genProdData))
+        .catch(err => {
+          console.warn('Production package failed:', err.message);
+          clearExtrasPlaceholders('res');
+          try { toast('⚠️ Chords and brief did not load — hit Regenerate for a full package.', 5000); } catch(_) {}
+        });
+    }
     // Analytics: a song landed. Fire gen_done always; anon_gen when no session.
     try { window.pingPv && window.pingPv('gen_done'); } catch(e){}
     if (_isAnonRun) {
@@ -15530,6 +15549,49 @@ function showAnonNudge(){
   };
   var x = document.getElementById('anon-nudge-x');
   if (x) x.onclick = function(){ bar.style.display='none'; };
+}
+
+// ── Two-pass song delivery ──────────────────────────────────────────────
+// Pass 1 gives TITLE → SONG PROMPT (parsed by parseSongResult as usual, with
+// the production sections empty). Pass 2 returns PRODUCTION BRIEF → VIDEO
+// PROMPT; these helpers fill those tabs in place without re-running the
+// whole parse (which would push a duplicate version and reset the song id).
+const EXTRAS_PLACEHOLDER = 'Writing the production package… chords, brief and theory land in a moment.';
+function setExtrasPlaceholders(prefix){
+  for (const id of ['structure','dopamine','notes','chords']) {
+    const el = document.getElementById(prefix + '-' + id + '-text');
+    if (el && !el.textContent.trim()) el.textContent = EXTRAS_PLACEHOLDER;
+  }
+}
+function clearExtrasPlaceholders(prefix){
+  for (const id of ['structure','dopamine','notes','chords']) {
+    const el = document.getElementById(prefix + '-' + id + '-text');
+    if (el && el.textContent === EXTRAS_PLACEHOLDER) el.textContent = '';
+  }
+}
+function applySongExtras(prefix, pass1Raw, extrasRaw, songId, prodData){
+  // Only fill in if the user is still looking at the same song.
+  if (!extrasRaw || !S.currentSong || S.currentSong.id !== songId) return;
+  const raw = pass1Raw + '\n\n' + extrasRaw.trim();
+  const songPrompt = parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
+  const briefRaw = parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
+  const structure = parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
+  const dopamine = parseSection(raw,'DOPAMINE MAP','CHORD PROGRESSION');
+  const chords = parseSection(raw,'CHORD PROGRESSION','THEORY ANALYSIS');
+  const theoryAnalysis = parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
+  const notes = parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
+  const countermelody = parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
+  const visualPrompt = parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT')||'';
+  let _vpb = parseSection(raw,'VIDEO PROMPT',null); const _si = _vpb ? _vpb.indexOf('SINGER') : -1; if (_si > 0) _vpb = _vpb.slice(0,_si).trim(); const videoPrompt = _vpb||'';
+  const fxChain = prodData?.fxChain||'', pluginToolkit = prodData?.pluginToolkit||'', mixBlueprint = prodData?.mixBlueprint||'', masteringTarget = prodData?.masteringTarget||'';
+
+  clearExtrasPlaceholders(prefix);
+  const _set = (id, v) => { const el = document.getElementById(prefix + '-' + id + '-text'); if (el) el.textContent = v||''; };
+  _set('structure', structure); _set('dopamine', dopamine); _set('notes', notes);
+  renderChords(prefix, chords, theoryAnalysis);
+  renderBrief(prefix, songPrompt, briefRaw, { fxChain, pluginToolkit, mixBlueprint, masteringTarget });
+  renderCreativePrompts(prefix, visualPrompt, videoPrompt);
+  Object.assign(S.currentSong, { style: songPrompt || S.currentSong.style, brief: briefRaw, structure, dopamine, chords, theoryAnalysis, notes, countermelody, visualPrompt, videoPrompt });
 }
 
 function parseSection(raw, key, nextKey){
