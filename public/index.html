@@ -15487,7 +15487,7 @@ VIDEO PROMPT:
     if (_twoPass && raw && S.currentSong) {
       const _songId = S.currentSong.id;
       setExtrasPlaceholders('res');
-      callServerStream('generate', songParams, null, null, { phase: 'extras', lyricsRaw: raw })
+      callServerStream('generate', songParams, null, null, { phase: 'extras', lyricsRaw: normalizeSongHeaders(raw) })
         .then(r2 => applySongExtras('res', raw, r2.text, _songId, genProdData))
         .catch(err => {
           console.warn('Production package failed:', err.message);
@@ -15556,6 +15556,10 @@ function showAnonNudge(){
 // the production sections empty). Pass 2 returns PRODUCTION BRIEF → VIDEO
 // PROMPT; these helpers fill those tabs in place without re-running the
 // whole parse (which would push a duplicate version and reset the song id).
+// Claude sometimes bolds headers ("**LYRICS:**"); parseSection wants "LYRICS:".
+function normalizeSongHeaders(text){
+  return String(text||'').replace(/^[ \t]*\*\*[ \t]*([A-Z][A-Z &/]{2,}?)[ \t]*:?[ \t]*\*\*:?/gm, '$1:');
+}
 const EXTRAS_PLACEHOLDER = 'Writing the production package… chords, brief and theory land in a moment.';
 function setExtrasPlaceholders(prefix){
   for (const id of ['structure','dopamine','notes','chords']) {
@@ -15572,7 +15576,7 @@ function clearExtrasPlaceholders(prefix){
 function applySongExtras(prefix, pass1Raw, extrasRaw, songId, prodData){
   // Only fill in if the user is still looking at the same song.
   if (!extrasRaw || !S.currentSong || S.currentSong.id !== songId) return;
-  const raw = pass1Raw + '\n\n' + extrasRaw.trim();
+  const raw = normalizeSongHeaders(pass1Raw) + '\n\n' + normalizeSongHeaders(extrasRaw).trim();
   const songPrompt = parseSection(raw,'SONG PROMPT','PRODUCTION BRIEF');
   const briefRaw = parseSection(raw,'PRODUCTION BRIEF','STRUCTURE MAP');
   const structure = parseSection(raw,'STRUCTURE MAP','DOPAMINE MAP');
@@ -15775,6 +15779,7 @@ function trimLyricsToSunoLimit(lyrics) {
 }
 
 function parseSongResult(raw,genre,topic,prodData,albumWriteBackIndex){
+  raw = normalizeSongHeaders(raw);
   const title=parseSection(raw,'TITLE','VERDICT')||'Your Song';
   // Defensive verdict parse: try multiple downstream markers so we never
   // fall through to end-of-string and pack the whole dump into verdict.
